@@ -39,7 +39,7 @@ namespace Squidex.Domain.Users
             Assert.NotEmpty(options.SigningCredentials);
             Assert.NotEmpty(options.EncryptionCredentials);
 
-            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, default))
+            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, default, default))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Users
             Assert.NotEmpty(options.SigningCredentials);
             Assert.NotEmpty(options.EncryptionCredentials);
 
-            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, default))
+            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, default, default))
                 .MustNotHaveHappened();
         }
 
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Users
                 .Then
                 .Returns((ExistingKey(), true, 0));
 
-            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, default))
+            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, default, default))
                 .Throws(new InconsistentStateException(0, 0));
 
             var options = new OpenIddictServerOptions();
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Users
             Assert.NotEmpty(options.SigningCredentials);
             Assert.NotEmpty(options.EncryptionCredentials);
 
-            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, default))
+            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, default, default))
                 .MustHaveHappened();
         }
 

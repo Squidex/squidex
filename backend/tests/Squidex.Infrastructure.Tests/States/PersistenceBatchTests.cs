@@ -108,19 +108,19 @@ namespace Squidex.Infrastructure.States
             var persistedEvents2 = Save.Events();
             var persistence2 = bulk.WithEventSourcing(None.Type, key2, persistedEvents2.Write);
 
-            await persistence1.WriteSnapshotAsync(12);
-            await persistence2.WriteSnapshotAsync(12);
+            await persistence1.WriteSnapshotAsync(12, PersistenceAction.Update);
+            await persistence2.WriteSnapshotAsync(12, PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._, PersistenceAction.Update, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long, PersistenceAction)>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             await bulk.CommitAsync();
             await bulk.DisposeAsync();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>.That.Matches(x => x.Count() == 2), A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long, PersistenceAction)>>.That.Matches(x => x.Count() == 2), A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -140,19 +140,19 @@ namespace Squidex.Infrastructure.States
             var persistedEvents1_2 = Save.Events();
             var persistence1_2 = bulk.WithEventSourcing(None.Type, key1, persistedEvents1_2.Write);
 
-            await persistence1_1.WriteSnapshotAsync(12);
-            await persistence1_2.WriteSnapshotAsync(12);
+            await persistence1_1.WriteSnapshotAsync(12, PersistenceAction.Update);
+            await persistence1_2.WriteSnapshotAsync(12, PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._, A<PersistenceAction>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long, PersistenceAction)>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             await bulk.CommitAsync();
             await bulk.DisposeAsync();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>.That.Matches(x => x.Count() == 1), A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long, PersistenceAction)>>.That.Matches(x => x.Count() == 1), A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -169,19 +169,19 @@ namespace Squidex.Infrastructure.States
             var persistedEvents1 = Save.Events();
             var persistence1 = bulk.WithEventSourcing(None.Type, key1, persistedEvents1.Write);
 
-            await persistence1.WriteSnapshotAsync(12);
-            await persistence1.WriteSnapshotAsync(13);
+            await persistence1.WriteSnapshotAsync(12, PersistenceAction.Update);
+            await persistence1.WriteSnapshotAsync(13, PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._, A<PersistenceAction>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long, PersistenceAction)>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             await bulk.CommitAsync();
             await bulk.DisposeAsync();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>.That.Matches(x => x.Count() == 1), A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long, PersistenceAction)>>.That.Matches(x => x.Count() == 1), A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
         }
 

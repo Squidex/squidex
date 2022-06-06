@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public async Task WriteAsync(DomainId key, T value, long oldVersion, long newVersion,
+        public async Task WriteAsync(DomainId key, T value, long oldVersion, long newVersion, PersistenceAction action,
             CancellationToken ct = default)
         {
             using (Telemetry.Activities.StartActivity("ContentQueryService/WriteAsync"))
@@ -67,7 +67,7 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public async Task WriteManyAsync(IEnumerable<(DomainId Key, T Value, long Version)> snapshots,
+        public async Task WriteManyAsync(IEnumerable<(DomainId Key, T Value, long Version, PersistenceAction Action)> snapshots,
             CancellationToken ct = default)
         {
             using (Telemetry.Activities.StartActivity("ContentQueryService/WriteManyAsync"))

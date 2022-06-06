@@ -51,7 +51,7 @@ namespace Squidex.Domain.Users
 
             sut.StoreElement(xml, "name");
 
-            A.CallTo(() => store.WriteAsync(DomainId.Create("name"), A<DefaultXmlRepository.State>._, A<long>._, 0, default))
+            A.CallTo(() => store.WriteAsync(DomainId.Create("name"), A<DefaultXmlRepository.State>._, A<long>._, 0, default, default))
                 .MustHaveHappened();
         }
     }

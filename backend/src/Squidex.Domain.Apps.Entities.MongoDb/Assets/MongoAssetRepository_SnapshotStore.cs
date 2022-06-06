@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        async Task ISnapshotStore<AssetDomainObject.State>.WriteAsync(DomainId key, AssetDomainObject.State value, long oldVersion, long newVersion,
+        async Task ISnapshotStore<AssetDomainObject.State>.WriteAsync(DomainId key, AssetDomainObject.State value, long oldVersion, long newVersion, PersistenceAction action,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoAssetRepository/WriteAsync"))
@@ -59,14 +59,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity, ct);
 
-                if ((oldVersion == EtagVersion.Empty || entity.IsDeleted) && countCollection != null)
+                if (countCollection != null)
                 {
-                    await countCollection.UpdateAsync(entity.IndexedAppId, entity.IsDeleted, ct);
+                    await countCollection.UpdateAsync(entity.IndexedAppId, action, ct);
                 }
             }
         }
 
-        async Task ISnapshotStore<AssetDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, AssetDomainObject.State Value, long Version)> snapshots,
+        async Task ISnapshotStore<AssetDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, AssetDomainObject.State Value, long Version, PersistenceAction Action)> snapshots,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoAssetRepository/WriteManyAsync"))
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 if (countCollection != null)
                 {
-                    await countCollection.UpdateAsync(snapshots.Select(x => (x.Value.AppId.Id, x.Value.IsDeleted)), ct);
+                    await countCollection.UpdateAsync(snapshots.Select(x => (x.Value.AppId.Id, x.Action)), ct);
                 }
             }
         }
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 if (entity != null && !entity.IsDeleted && countCollection != null)
                 {
-                    await countCollection.UpdateAsync(entity.IndexedAppId, true, ct);
+                    await countCollection.UpdateAsync(entity.IndexedAppId, PersistenceAction.Delete, ct);
                 }
             }
         }
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return entity;
         }
 
-        private static MongoAssetEntity Map((DomainId Key, AssetDomainObject.State Value, long Version) snapshot)
+        private static MongoAssetEntity Map((DomainId Key, AssetDomainObject.State Value, long Version, PersistenceAction Action) snapshot)
         {
             var entity = Map(snapshot.Value);
 

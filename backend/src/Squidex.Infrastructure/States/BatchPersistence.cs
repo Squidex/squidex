@@ -31,17 +31,20 @@ namespace Squidex.Infrastructure.States
             Version = version;
         }
 
-        public Task DeleteAsync()
+        public Task DeleteAsync(
+            CancellationToken ct = default)
         {
             throw new NotSupportedException();
         }
 
-        public Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events)
+        public Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events,
+            CancellationToken ct = default)
         {
             throw new NotSupportedException();
         }
 
-        public Task ReadAsync(long expectedVersion = -2)
+        public Task ReadAsync(long expectedVersion = -2,
+            CancellationToken ct = default)
         {
             if (applyEvent != null)
             {
@@ -69,9 +72,10 @@ namespace Squidex.Infrastructure.States
             return Task.CompletedTask;
         }
 
-        public Task WriteSnapshotAsync(T state)
+        public Task WriteSnapshotAsync(T state, PersistenceAction action,
+            CancellationToken ct = default)
         {
-            context.Add(ownerKey, state, Version);
+            context.Add(ownerKey, state, Version, action);
 
             return Task.CompletedTask;
         }

@@ -24,8 +24,6 @@ namespace Squidex.Infrastructure.States
         private long versionSnapshot = EtagVersion.Empty;
         private long versionEvents = EtagVersion.Empty;
         private long version = EtagVersion.Empty;
-        private long previousEventVersion;
-        private bool wasSnapshotRead;
 
         public long Version
         {
@@ -67,13 +65,14 @@ namespace Squidex.Infrastructure.States
             streamName = new Lazy<string>(() => streamNameResolver.GetStreamName(ownerType, ownerKey.ToString()!));
         }
 
-        public async Task DeleteAsync()
+        public async Task DeleteAsync(
+            CancellationToken ct = default)
         {
             if (UseSnapshots)
             {
                 using (Telemetry.Activities.StartActivity("Persistence/ReadState"))
                 {
-                    await snapshotStore.RemoveAsync(ownerKey);
+                    await snapshotStore.RemoveAsync(ownerKey, ct);
                 }
             }
 
@@ -81,24 +80,25 @@ namespace Squidex.Infrastructure.States
             {
                 using (Telemetry.Activities.StartActivity("Persistence/ReadEvents"))
                 {
-                    await eventStore.DeleteStreamAsync(streamName.Value);
+                    await eventStore.DeleteStreamAsync(streamName.Value, ct);
                 }
             }
         }
 
-        public async Task ReadAsync(long expectedVersion = EtagVersion.Any)
+        public async Task ReadAsync(long expectedVersion = EtagVersion.Any,
+            CancellationToken ct = default)
         {
             versionSnapshot = EtagVersion.Empty;
             versionEvents = EtagVersion.Empty;
 
             if (UseSnapshots)
             {
-                await ReadSnapshotAsync();
+                await ReadSnapshotAsync(ct);
             }
 
             if (UseEventSourcing)
             {
-                await ReadEventsAsync();
+                await ReadEventsAsync(ct);
             }
 
             UpdateVersion();
@@ -116,9 +116,10 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        private async Task ReadSnapshotAsync()
+        private async Task ReadSnapshotAsync(
+            CancellationToken ct)
         {
-            var (state, valid, version) = await snapshotStore.ReadAsync(ownerKey);
+            var (state, valid, version) = await snapshotStore.ReadAsync(ownerKey, ct);
 
             version = Math.Max(version, EtagVersion.Empty);
             versionSnapshot = version;
@@ -128,17 +129,16 @@ namespace Squidex.Infrastructure.States
                 versionEvents = version;
             }
 
-            wasSnapshotRead = valid;
-
             if (applyState != null && version > EtagVersion.Empty && valid)
             {
                 applyState(state, version);
             }
         }
 
-        private async Task ReadEventsAsync()
+        private async Task ReadEventsAsync(
+            CancellationToken ct)
         {
-            var events = await eventStore.QueryAsync(streamName.Value, versionEvents + 1);
+            var events = await eventStore.QueryAsync(streamName.Value, versionEvents + 1, ct);
 
             var isStopped = false;
 
@@ -165,16 +165,17 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public async Task WriteSnapshotAsync(T state)
+        public async Task WriteSnapshotAsync(T state, PersistenceAction action,
+            CancellationToken ct = default)
         {
             var oldVersion = versionSnapshot;
 
-            if (!wasSnapshotRead && UseEventSourcing)
+            if (oldVersion == EtagVersion.Empty && UseEventSourcing)
             {
-                oldVersion = previousEventVersion;
+                oldVersion = versionEvents - 1;
             }
 
-            var newVersion = UseEventSourcing ? versionEvents : (oldVersion + 1);
+            var newVersion = UseEventSourcing ? versionEvents : oldVersion + 1;
 
             if (newVersion == versionSnapshot)
             {
@@ -183,7 +184,7 @@ namespace Squidex.Infrastructure.States
 
             using (Telemetry.Activities.StartActivity("Persistence/WriteState"))
             {
-                await snapshotStore.WriteAsync(ownerKey, state, oldVersion, newVersion);
+                await snapshotStore.WriteAsync(ownerKey, state, oldVersion, newVersion, action, ct);
             }
 
             versionSnapshot = newVersion;
@@ -191,7 +192,8 @@ namespace Squidex.Infrastructure.States
             UpdateVersion();
         }
 
-        public async Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events)
+        public async Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events,
+            CancellationToken ct = default)
         {
             Guard.NotEmpty(events);
 
@@ -202,8 +204,6 @@ namespace Squidex.Infrastructure.States
                 oldVersion = versionEvents;
             }
 
-            previousEventVersion = oldVersion;
-
             var eventCommitId = Guid.NewGuid();
             var eventData = events.Select(x => eventDataFormatter.ToEventData(x, eventCommitId, true)).ToArray();
 
@@ -211,7 +211,7 @@ namespace Squidex.Infrastructure.States
             {
                 using (Telemetry.Activities.StartActivity("Persistence/WriteEvents"))
                 {
-                    await eventStore.AppendAsync(eventCommitId, streamName.Value, oldVersion, eventData);
+                    await eventStore.AppendAsync(eventCommitId, streamName.Value, oldVersion, eventData, ct);
                 }
             }
             catch (WrongEventVersionException ex)

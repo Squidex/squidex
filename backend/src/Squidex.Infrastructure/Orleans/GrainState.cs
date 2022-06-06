@@ -57,7 +57,7 @@ namespace Squidex.Infrastructure.Orleans
 
             persistence = factory.WithSnapshots(GetType(), key, ApplyState);
 
-            return persistence.ReadAsync();
+            return persistence.ReadAsync(ct: ct);
         }
 
         private void ApplyState(T value, long version)
@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public Task WriteAsync()
         {
-            return persistence.WriteSnapshotAsync(Value);
+            return persistence.WriteSnapshotAsync(Value, default);
         }
 
         public Task WriteEventAsync(Envelope<IEvent> envelope)

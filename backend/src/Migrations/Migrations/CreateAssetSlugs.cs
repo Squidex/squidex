@@ -31,7 +31,7 @@ namespace Migrations.Migrations
 
                 var key = DomainId.Combine(state.AppId.Id, state.Id);
 
-                await stateForAssets.WriteAsync(key, state, version, version, ct);
+                await stateForAssets.WriteAsync(key, state, version, version, default, ct);
             }
         }
     }

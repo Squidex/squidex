@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        async Task ISnapshotStore<AssetFolderDomainObject.State>.WriteAsync(DomainId key, AssetFolderDomainObject.State value, long oldVersion, long newVersion,
+        async Task ISnapshotStore<AssetFolderDomainObject.State>.WriteAsync(DomainId key, AssetFolderDomainObject.State value, long oldVersion, long newVersion, PersistenceAction action,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/WriteAsync"))
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        async Task ISnapshotStore<AssetFolderDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, AssetFolderDomainObject.State Value, long Version)> snapshots,
+        async Task ISnapshotStore<AssetFolderDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, AssetFolderDomainObject.State Value, long Version, PersistenceAction Action)> snapshots,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/WriteManyAsync"))
@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return entity;
         }
 
-        private static MongoAssetFolderEntity Map((DomainId Key, AssetFolderDomainObject.State Value, long Version) snapshot)
+        private static MongoAssetFolderEntity Map((DomainId Key, AssetFolderDomainObject.State Value, long Version, PersistenceAction Action) snapshot)
         {
             var entity = Map(snapshot.Value);
 

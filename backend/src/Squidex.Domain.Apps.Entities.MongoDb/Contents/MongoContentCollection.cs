@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
@@ -219,16 +220,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return result?["vs"].AsInt64 ?? EtagVersion.Empty;
         }
 
-        public async Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity value,
+        public async Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity value, PersistenceAction action,
             CancellationToken ct = default)
         {
             var entity = value;
 
-            await Collection.UpsertVersionedAsync(documentId, oldVersion, entity.Version, entity);
+            await Collection.UpsertVersionedAsync(documentId, oldVersion, entity.Version, entity, ct);
 
-            if ((oldVersion == EtagVersion.Empty || entity.IsDeleted) && countCollection != null)
+            if (countCollection != null)
             {
-                await countCollection.UpdateAsync(DomainId.Combine(entity.IndexedAppId, entity.IndexedSchemaId), entity.IsDeleted, ct);
+                await countCollection.UpdateAsync(DomainId.Combine(entity.IndexedAppId, entity.IndexedSchemaId), action, ct);
             }
         }
 
@@ -239,14 +240,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             if (entity != null && !entity.IsDeleted && countCollection != null)
             {
-                await countCollection.UpdateAsync(DomainId.Combine(entity.IndexedAppId, entity.IndexedSchemaId), true, ct);
+                await countCollection.UpdateAsync(DomainId.Combine(entity.IndexedAppId, entity.IndexedSchemaId), PersistenceAction.Delete, ct);
             }
         }
 
-        public async Task InsertManyAsync(IReadOnlyList<MongoContentEntity> snapshots,
+        public async Task InsertManyAsync(IReadOnlyList<(MongoContentEntity Entity, PersistenceAction Action)> snapshots,
             CancellationToken ct = default)
         {
-            var entities = snapshots;
+            var entities = snapshots.Select(x => x.Entity).ToList();
 
             if (entities.Count == 0)
             {
@@ -257,7 +258,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             if (countCollection != null)
             {
-                await countCollection.UpdateAsync(snapshots.Select(x => (DomainId.Combine(x.IndexedAppId, x.IndexedSchemaId), x.IsDeleted)), ct);
+                await countCollection.UpdateAsync(snapshots.Select(x => (DomainId.Combine(x.Entity.IndexedAppId, x.Entity.IndexedSchemaId), x.Action)), ct);
             }
         }
 

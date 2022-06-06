@@ -219,7 +219,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key.ToString(), 3, A<ICollection<EventData>>.That.Matches(x => x.Count == 1), A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<string>._, A<long>._, A<long>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<string>._, A<long>._, A<long>._, A<PersistenceAction>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -249,14 +249,14 @@ namespace Squidex.Infrastructure.States
             await persistence.ReadAsync();
 
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
-            await persistence.WriteSnapshotAsync("4");
+            await persistence.WriteSnapshotAsync("4", PersistenceAction.Update);
 
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
-            await persistence.WriteSnapshotAsync("5");
+            await persistence.WriteSnapshotAsync("5", PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, "4", 2, 3, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(key, "4", 2, 3, PersistenceAction.Update, A<CancellationToken>._))
                 .MustHaveHappened();
-            A.CallTo(() => snapshotStore.WriteAsync(key, "5", 3, 4, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(key, "5", 3, 4, PersistenceAction.Update, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -275,14 +275,14 @@ namespace Squidex.Infrastructure.States
             await persistence.ReadAsync();
 
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
-            await persistence.WriteSnapshotAsync("4");
+            await persistence.WriteSnapshotAsync("4", PersistenceAction.Update);
 
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
-            await persistence.WriteSnapshotAsync("5");
+            await persistence.WriteSnapshotAsync("5", PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, "4", 2, 3, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(key, "4", 2, 3, PersistenceAction.Update, A<CancellationToken>._))
                 .MustHaveHappened();
-            A.CallTo(() => snapshotStore.WriteAsync(key, "5", 3, 4, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(key, "5", 3, 4, PersistenceAction.Update, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -300,9 +300,9 @@ namespace Squidex.Infrastructure.States
 
             await persistence.ReadAsync();
 
-            await persistence.WriteSnapshotAsync("4");
+            await persistence.WriteSnapshotAsync("4", PersistenceAction.Delete);
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, A<string>._, A<long>._, A<long>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(key, A<string>._, A<long>._, A<long>._, A<PersistenceAction>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 

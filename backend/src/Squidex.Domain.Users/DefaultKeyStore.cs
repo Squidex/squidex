@@ -75,7 +75,7 @@ namespace Squidex.Domain.Users
 
                 try
                 {
-                    await store.WriteAsync(default, state, 0, 0);
+                    await store.WriteAsync(default, state, 0, 0, default);
 
                     return securityKey;
                 }

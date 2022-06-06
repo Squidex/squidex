@@ -8,6 +8,7 @@
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb
 {
@@ -42,30 +43,35 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
             return entity?.Count ?? 0L;
         }
 
-        public Task UpdateAsync(DomainId key, bool isDeleted = false,
+        public Task UpdateAsync(DomainId key, PersistenceAction action,
             CancellationToken ct = default)
         {
-            return UpdateAsync(key.ToString(), isDeleted, ct);
+            return UpdateAsync(key.ToString(), action, ct);
         }
 
-        public Task UpdateAsync(string key, bool isDeleted = false,
+        public Task UpdateAsync(string key, PersistenceAction action,
             CancellationToken ct = default)
         {
-            var update = Update.Inc(x => x.Count, Inc(isDeleted));
+            if (action == PersistenceAction.Undefined || action == PersistenceAction.Update)
+            {
+                return Task.CompletedTask;
+            }
+
+            var update = Update.Inc(x => x.Count, Inc(action));
 
             return Collection.UpdateOneAsync(x => x.Key == key, update, Upsert, ct);
         }
 
-        public Task UpdateAsync(IEnumerable<(DomainId Key, bool IsDeleted)> values,
+        public Task UpdateAsync(IEnumerable<(DomainId Key, PersistenceAction Action)> values,
             CancellationToken ct = default)
         {
-            return UpdateAsync(values.Select(x => (x.Key.ToString(), x.IsDeleted)), ct);
+            return UpdateAsync(values.Select(x => (x.Key.ToString(), x.Action)), ct);
         }
 
-        public Task UpdateAsync(IEnumerable<(string Key, bool IsDeleted)> values,
+        public Task UpdateAsync(IEnumerable<(string Key, PersistenceAction Action)> values,
             CancellationToken ct = default)
         {
-            var writes = values.GroupBy(x => x.Key).Select(CreateUpdate).ToList();
+            var writes = values.GroupBy(x => x.Key).Select(CreateUpdate).NotNull().ToList();
 
             if (writes.Count == 0)
             {
@@ -84,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
         public Task SetAsync(IEnumerable<(string Key, long Value)> values,
             CancellationToken ct = default)
         {
-            var writes = values.Select(CreateUpdate).ToList();
+            var writes = values.Select(CreateUpdate).NotNull().ToList();
 
             if (writes.Count == 0)
             {
@@ -104,9 +110,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
             };
         }
 
-        private static UpdateOneModel<MongoCountEntity> CreateUpdate(IGrouping<string, (string Key, bool IsDeleted)> group)
+        private static UpdateOneModel<MongoCountEntity>? CreateUpdate(IGrouping<string, (string Key, PersistenceAction Action)> group)
         {
-            var update = Update.Inc(y => y.Count, group.Sum(x => Inc(x.IsDeleted)));
+            var inc = group.Sum(x => Inc(x.Action));
+
+            if (inc == 0)
+            {
+                return null;
+            }
+
+            var update = Update.Inc(y => y.Count, inc);
 
             return new UpdateOneModel<MongoCountEntity>(Filter.Eq(x => x.Key, group.Key), update)
             {
@@ -114,9 +127,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
             };
         }
 
-        private static int Inc(bool isDeleted)
+        private static int Inc(PersistenceAction action)
         {
-            return isDeleted ? -1 : 1;
+            switch (action)
+            {
+                case PersistenceAction.Create:
+                    return 1;
+                case PersistenceAction.Delete:
+                    return -1;
+                default:
+                    return 0;
+            }
         }
     }
 }

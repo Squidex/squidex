@@ -50,7 +50,7 @@ namespace Squidex.Domain.Users
         {
             var state = new State(element);
 
-            store.WriteAsync(DomainId.Create(friendlyName), state, EtagVersion.Any, 0);
+            store.WriteAsync(DomainId.Create(friendlyName), state, EtagVersion.Any, 0, default);
         }
 
         private async Task<IReadOnlyCollection<XElement>> GetAllElementsAsync()

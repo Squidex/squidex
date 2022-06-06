@@ -64,10 +64,10 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             A.CallTo(() => persistenceFactory.WithEventSourcing(A<Type>._, Id, A<HandleEvent>._))
                 .Returns(persistence);
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, default))
                 .Invokes((IReadOnlyList<Envelope<IEvent>> events) => LastEvents = events);
 
-            A.CallTo(() => persistence.DeleteAsync())
+            A.CallTo(() => persistence.DeleteAsync(default))
                 .Invokes(() => LastEvents = Enumerable.Empty<Envelope<IEvent>>());
 #pragma warning restore MA0056 // Do not call overridable members in constructor
         }

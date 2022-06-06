@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        async Task ISnapshotStore<ContentDomainObject.State>.WriteAsync(DomainId key, ContentDomainObject.State value, long oldVersion, long newVersion,
+        async Task ISnapshotStore<ContentDomainObject.State>.WriteAsync(DomainId key, ContentDomainObject.State value, long oldVersion, long newVersion, PersistenceAction action,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteAsync"))
@@ -77,20 +77,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 }
 
                 await Task.WhenAll(
-                    UpsertDraftContentAsync(value, oldVersion, newVersion, ct),
-                    UpsertOrDeletePublishedAsync(value, oldVersion, newVersion, ct));
+                    UpsertDraftContentAsync(value, oldVersion, newVersion, action, ct),
+                    UpsertOrDeletePublishedAsync(value, oldVersion, newVersion, action, ct));
             }
         }
 
-        async Task ISnapshotStore<ContentDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, ContentDomainObject.State Value, long Version)> snapshots,
+        async Task ISnapshotStore<ContentDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, ContentDomainObject.State Value, long Version, PersistenceAction Action)> snapshots,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteManyAsync"))
             {
-                var entitiesPublished = new List<MongoContentEntity>();
-                var entitiesAll = new List<MongoContentEntity>();
+                var entitiesPublished = new List<(MongoContentEntity, PersistenceAction)>();
+                var entitiesAll = new List<(MongoContentEntity, PersistenceAction)>();
 
-                foreach (var (_, value, version) in snapshots)
+                foreach (var (_, value, version, action) in snapshots)
                 {
                     // Some data is corrupt and might throw an exception during migration if we do not skip them.
                     if (value.AppId == null || value.CurrentVersion == null)
@@ -100,10 +100,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                     if (ShouldWritePublished(value))
                     {
-                        entitiesPublished.Add(await CreatePublishedContentAsync(value, version));
+                        entitiesPublished.Add((await CreatePublishedContentAsync(value, version), action));
                     }
 
-                    entitiesAll.Add(await CreateDraftContentAsync(value, version));
+                    entitiesAll.Add((await CreateDraftContentAsync(value, version), action));
                 }
 
                 await Task.WhenAll(
@@ -112,12 +112,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        private async Task UpsertOrDeletePublishedAsync(ContentDomainObject.State value, long oldVersion, long newVersion,
+        private async Task UpsertOrDeletePublishedAsync(ContentDomainObject.State value, long oldVersion, long newVersion, PersistenceAction action,
             CancellationToken ct = default)
         {
             if (ShouldWritePublished(value))
             {
-                await UpsertPublishedContentAsync(value, oldVersion, newVersion, ct);
+                await UpsertPublishedContentAsync(value, oldVersion, newVersion, action, ct);
             }
             else
             {
@@ -133,20 +133,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return collectionPublished.RemoveAsync(documentId, ct);
         }
 
-        private async Task UpsertDraftContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion,
+        private async Task UpsertDraftContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion, PersistenceAction action,
             CancellationToken ct = default)
         {
             var entity = await CreateDraftContentAsync(value, newVersion);
 
-            await collectionAll.UpsertVersionedAsync(entity.DocumentId, oldVersion, entity, ct);
+            await collectionAll.UpsertVersionedAsync(entity.DocumentId, oldVersion, entity, action, ct);
         }
 
-        private async Task UpsertPublishedContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion,
+        private async Task UpsertPublishedContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion, PersistenceAction action,
             CancellationToken ct = default)
         {
             var entity = await CreatePublishedContentAsync(value, newVersion);
 
-            await collectionPublished.UpsertVersionedAsync(entity.DocumentId, oldVersion, entity, ct);
+            await collectionPublished.UpsertVersionedAsync(entity.DocumentId, oldVersion, entity, action, ct);
         }
 
         private async Task<MongoContentEntity> CreatePublishedContentAsync(ContentDomainObject.State value, long newVersion)

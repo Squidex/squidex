@@ -122,9 +122,9 @@ namespace Squidex.Infrastructure.States
             Assert.Equal(10, persistence.Version);
             Assert.Equal(20, persistedState.Value);
 
-            await persistence.WriteSnapshotAsync(100);
+            await persistence.WriteSnapshotAsync(100, PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, 100, 10, 11, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(key, 100, 10, 11, PersistenceAction.Update, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -133,9 +133,9 @@ namespace Squidex.Infrastructure.States
         {
             var persistence = sut.WithSnapshots(None.Type, key, null);
 
-            await persistence.WriteSnapshotAsync(100);
+            await persistence.WriteSnapshotAsync(100, PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, 100, EtagVersion.Empty, 0, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(key, 100, EtagVersion.Empty, 0, PersistenceAction.Update, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -145,7 +145,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
                 .Returns((20, true, 10));
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, 100, 10, 11, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(key, 100, 10, 11, A<PersistenceAction>._, A<CancellationToken>._))
                 .Throws(new InconsistentStateException(1, 1, new InvalidOperationException()));
 
             var persistedState = Save.Snapshot(0);
@@ -153,7 +153,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.ReadAsync();
 
-            await Assert.ThrowsAsync<InconsistentStateException>(() => persistence.WriteSnapshotAsync(100));
+            await Assert.ThrowsAsync<InconsistentStateException>(() => persistence.WriteSnapshotAsync(100, PersistenceAction.Update));
         }
 
         [Fact]

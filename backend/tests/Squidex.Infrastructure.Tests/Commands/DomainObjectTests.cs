@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.EnsureLoadedAsync();
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._, PersistenceAction.Undefined, default))
                 .MustHaveHappened();
         }
 
@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.EnsureLoadedAsync();
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._, A<PersistenceAction>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -67,11 +67,11 @@ namespace Squidex.Infrastructure.Commands
 
             var result = await sut.ExecuteAsync(new CreateAuto { Value = 4 });
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 4)))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 4), PersistenceAction.Create, default))
                 .MustHaveHappened();
-            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1)))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1), default))
                 .MustHaveHappened();
-            A.CallTo(() => persistence.ReadAsync(A<long>._))
+            A.CallTo(() => persistence.ReadAsync(A<long>._, default))
                 .MustNotHaveHappened();
 
             Assert.Equal(CommandResult.Empty(id, 0, EtagVersion.Empty), result);
@@ -139,14 +139,14 @@ namespace Squidex.Infrastructure.Commands
             SetupCreated(2);
             SetupDeleted();
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, default))
                 .Throws(new InconsistentStateException(2, -1)).Once();
 
             var result = await sut.ExecuteAsync(new CreateAuto { Value = 4 });
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1)))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1), default))
                 .MustHaveHappenedANumberOfTimesMatching(x => x == 3);
-            A.CallTo(() => persistence.ReadAsync(A<long>._))
+            A.CallTo(() => persistence.ReadAsync(A<long>._, default))
                 .MustHaveHappened();
 
             Assert.Equal(CommandResult.Empty(id, 2, 1), result);
@@ -165,7 +165,7 @@ namespace Squidex.Infrastructure.Commands
             SetupCreated(2);
             SetupDeleted();
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, default))
                 .Throws(new InconsistentStateException(2, -1)).Once();
 
             await Assert.ThrowsAsync<DomainObjectConflictException>(() => sut.ExecuteAsync(new CreateAuto { Value = 4 }));
@@ -180,14 +180,14 @@ namespace Squidex.Infrastructure.Commands
             SetupCreated(2);
             SetupDeleted();
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, default))
                 .Throws(new InconsistentStateException(2, -1)).Once();
 
             var result = await sut.ExecuteAsync(new Upsert { Value = 4 });
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1)))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1), default))
                 .MustHaveHappenedANumberOfTimesMatching(x => x == 3);
-            A.CallTo(() => persistence.ReadAsync(A<long>._))
+            A.CallTo(() => persistence.ReadAsync(A<long>._, default))
                 .MustHaveHappened();
 
             Assert.Equal(CommandResult.Empty(id, 2, 1), result);
@@ -206,7 +206,7 @@ namespace Squidex.Infrastructure.Commands
             SetupCreated(2);
             SetupDeleted();
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, default))
                 .Throws(new InconsistentStateException(2, -1)).Once();
 
             await Assert.ThrowsAsync<DomainObjectDeletedException>(() => sut.ExecuteAsync(new Upsert { Value = 4 }));
@@ -221,11 +221,11 @@ namespace Squidex.Infrastructure.Commands
 
             var result = await sut.ExecuteAsync(new UpdateAuto { Value = 8, ExpectedVersion = 0 });
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 8)))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 8), PersistenceAction.Update, default))
                 .MustHaveHappened();
-            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1)))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1), default))
                 .MustHaveHappened();
-            A.CallTo(() => persistence.ReadAsync(A<long>._))
+            A.CallTo(() => persistence.ReadAsync(A<long>._, default))
                 .MustNotHaveHappened();
 
             Assert.Equal(CommandResult.Empty(id, 1, 0), result);
@@ -243,11 +243,11 @@ namespace Squidex.Infrastructure.Commands
 
             var result = await sut.ExecuteAsync(new UpdateAuto { Value = 8, ExpectedVersion = 0 });
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 8)))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 8), PersistenceAction.Update, default))
                 .MustHaveHappened();
-            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1)))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1), default))
                 .MustHaveHappened();
-            A.CallTo(() => persistence.ReadAsync(A<long>._))
+            A.CallTo(() => persistence.ReadAsync(A<long>._, default))
                 .MustHaveHappenedOnceExactly();
 
             Assert.Equal(CommandResult.Empty(id, 1, 0), result);
@@ -265,7 +265,7 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.ExecuteAsync(new CreateAuto());
 
-            A.CallTo(() => persistence.ReadAsync(A<long>._))
+            A.CallTo(() => persistence.ReadAsync(A<long>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -277,7 +277,7 @@ namespace Squidex.Infrastructure.Commands
             await sut.ExecuteAsync(new UpdateAuto { Value = 8, ExpectedVersion = 0 });
             await sut.ExecuteAsync(new UpdateAuto { Value = 9, ExpectedVersion = 1 });
 
-            A.CallTo(() => persistence.ReadAsync(A<long>._))
+            A.CallTo(() => persistence.ReadAsync(A<long>._, default))
                 .MustHaveHappenedOnceExactly();
 
             Assert.Empty(sut.GetUncomittedEvents());
@@ -291,9 +291,9 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.RebuildStateAsync();
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 4)))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 4), PersistenceAction.Undefined, default))
                 .MustHaveHappened();
-            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -310,7 +310,7 @@ namespace Squidex.Infrastructure.Commands
         {
             SetupEmpty();
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, default))
                 .Throws(new InconsistentStateException(4, EtagVersion.Empty));
 
             await Assert.ThrowsAsync<DomainObjectConflictException>(() => sut.ExecuteAsync(new CreateAuto()));
@@ -396,7 +396,7 @@ namespace Squidex.Infrastructure.Commands
         {
             SetupEmpty();
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._, A<PersistenceAction>._, default))
                 .Throws(new InvalidOperationException());
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(new CreateAuto()));
@@ -410,7 +410,7 @@ namespace Squidex.Infrastructure.Commands
         {
             SetupCreated(4);
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._, A<PersistenceAction>._, default))
                 .Throws(new InvalidOperationException());
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(new UpdateAuto()));
@@ -434,13 +434,13 @@ namespace Squidex.Infrastructure.Commands
 
             AssertSnapshot(sut.Snapshot, 0, EtagVersion.Empty, false);
 
-            A.CallTo(() => persistence.DeleteAsync())
+            A.CallTo(() => persistence.DeleteAsync(default))
                 .MustHaveHappened();
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, default))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => deleteStream.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
+            A.CallTo(() => deleteStream.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, default))
                 .MustHaveHappened();
         }
 
@@ -518,7 +518,7 @@ namespace Squidex.Infrastructure.Commands
 
             var version = -1;
 
-            A.CallTo(() => persistence.ReadAsync(-2))
+            A.CallTo(() => persistence.ReadAsync(-2, default))
                 .Invokes(() =>
                 {
                     version++;
@@ -548,7 +548,7 @@ namespace Squidex.Infrastructure.Commands
 
             var @events = new List<Envelope<IEvent>>();
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, default))
                 .Invokes(args =>
                 {
                     @events.AddRange(args.GetArgument<IReadOnlyList<Envelope<IEvent>>>(0)!);
@@ -563,7 +563,7 @@ namespace Squidex.Infrastructure.Commands
                 })
                 .Returns(eventsPersistence);
 
-            A.CallTo(() => eventsPersistence.ReadAsync(EtagVersion.Any))
+            A.CallTo(() => eventsPersistence.ReadAsync(EtagVersion.Any, default))
                 .Invokes(_ =>
                 {
                     foreach (var @event in events)

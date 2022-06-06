@@ -9,10 +9,10 @@ namespace Squidex.Infrastructure.States
 {
     public interface ISnapshotStore<T>
     {
-        Task WriteAsync(DomainId key, T value, long oldVersion, long newVersion,
+        Task WriteAsync(DomainId key, T value, long oldVersion, long newVersion, PersistenceAction action,
             CancellationToken ct = default);
 
-        Task WriteManyAsync(IEnumerable<(DomainId Key, T Value, long Version)> snapshots,
+        Task WriteManyAsync(IEnumerable<(DomainId Key, T Value, long Version, PersistenceAction Action)> snapshots,
             CancellationToken ct = default);
 
         Task<(T Value, bool Valid, long Version)> ReadAsync(DomainId key,
