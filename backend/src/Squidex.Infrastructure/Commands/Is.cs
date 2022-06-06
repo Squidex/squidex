@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure.Commands
@@ -29,7 +28,7 @@ namespace Squidex.Infrastructure.Commands
 
         public static bool OptionalChange(string oldValue, [NotNullWhen(true)] string? newValue)
         {
-            return !string.IsNullOrWhiteSpace(newValue) && !string.Equals(oldValue, newValue);
+            return !string.IsNullOrWhiteSpace(newValue) && !string.Equals(oldValue, newValue, StringComparison.Ordinal);
         }
 
         public static bool OptionalSetChange<T>(ISet<T> oldValue, [NotNullWhen(true)] ISet<T>? newValue)

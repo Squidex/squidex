@@ -1,0 +1,22 @@
+@import 'mixins';
+@import 'vars';
+
+.select-placeholder {
+    @include absolute(0, 0, 0, 0);
+    border: 1px solid transparent;
+    color: $color-theme-secondary;
+    line-height: 1.2rem;
+    padding: .5rem .75rem;
+    pointer-events: none;
+}
+
+.form-control {
+    &:disabled,
+    &.disabled {
+        background: $color-white;
+    }
+}
+
+.transition-to {
+    @include truncate;
+}

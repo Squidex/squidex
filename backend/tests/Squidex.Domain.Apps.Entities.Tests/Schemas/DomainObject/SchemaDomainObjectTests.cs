@@ -5,10 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
@@ -17,7 +15,6 @@ using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Commands;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
@@ -38,8 +35,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
         public SchemaDomainObjectTests()
         {
-            sut = new SchemaDomainObject(PersistenceFactory, A.Dummy<ISemanticLog>());
+            var log = A.Fake<ILogger<SchemaDomainObject>>();
+
+            sut = new SchemaDomainObject(PersistenceFactory, log);
+#pragma warning disable MA0056 // Do not call overridable members in constructor
             sut.Setup(Id);
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
         [Fact]
@@ -291,7 +292,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                 PreviewUrls = new Dictionary<string, string>
                 {
                     ["Web"] = "web-url"
-                }.ToImmutableDictionary()
+                }.ToReadonlyDictionary()
             };
 
             await ExecuteCreateAsync();

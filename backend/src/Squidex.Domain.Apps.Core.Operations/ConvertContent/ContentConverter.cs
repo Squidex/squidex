@@ -15,18 +15,23 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
     {
         public static ContentData Convert(this ContentData content, Schema schema, params FieldConverter[] converters)
         {
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(schema);
 
             var result = new ContentData(content.Count);
 
-            foreach (var (fieldName, data) in content)
+            if (converters == null || converters.Length == 0)
             {
-                if (data == null || !schema.FieldsByName.TryGetValue(fieldName, out var field))
+                return result;
+            }
+
+            foreach (var (fieldName, fieldData) in content)
+            {
+                if (fieldData == null || !schema.FieldsByName.TryGetValue(fieldName, out var field))
                 {
                     continue;
                 }
 
-                ContentFieldData? newData = data;
+                ContentFieldData? newData = fieldData;
 
                 if (newData != null)
                 {
@@ -44,16 +49,18 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         private static ContentFieldData? ConvertData(IRootField field, ContentFieldData data, FieldConverter[] converters)
         {
-            if (converters != null)
+            if (converters == null || converters.Length == 0)
             {
-                for (var i = 0; i < converters.Length; i++)
-                {
-                    data = converters[i](data!, field)!;
+                return data;
+            }
 
-                    if (data == null)
-                    {
-                        break;
-                    }
+            foreach (var converter in converters)
+            {
+                data = converter(data!, field)!;
+
+                if (data == null)
+                {
+                    break;
                 }
             }
 

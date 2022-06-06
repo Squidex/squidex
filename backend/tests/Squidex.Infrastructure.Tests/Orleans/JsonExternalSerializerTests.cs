@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using FakeItEasy;
 using Orleans.Serialization;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
+
+#pragma warning disable MA0060 // The value returned by Stream.Read/Stream.ReadAsync is not used
 
 namespace Squidex.Infrastructure.Orleans
 {
@@ -85,7 +84,7 @@ namespace Squidex.Infrastructure.Orleans
             var reader = A.Fake<IBinaryTokenStreamReader>();
 
             A.CallTo(() => reader.ReadByteArray(A<byte[]>._, A<int>._, A<int>._))
-                .Invokes(new Action<byte[], int, int>((b, o, l) => buffer.Read(b, o, l)));
+                .Invokes(new Action<byte[], int, int>((array, offset, length) => buffer.Read(array, offset, length)));
             A.CallTo(() => reader.CurrentPosition)
                 .ReturnsLazily(x => (int)buffer.Position);
             A.CallTo(() => reader.Length)

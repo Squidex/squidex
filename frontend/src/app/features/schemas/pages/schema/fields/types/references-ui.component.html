@@ -1,0 +1,30 @@
+<div [formGroup]="fieldForm">
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'schemas.field.editor' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <label class="btn btn-radio" *ngFor="let editor of editors" [class.active]="fieldForm.controls['editor'].value === editor">
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" [value]="editor">
+
+                <i class="icon-control-{{editor}}"></i>
+
+                <span class="radio-label">{{editor}}</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="form-group row" *ngIf="field.properties.isContentField">
+        <div class="col-9 offset-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldResolveReference" formControlName="resolveReference">
+                <label class="form-check-label" for="{{field.fieldId}}_fieldResolveReference">
+                    {{ 'schemas.fieldTypes.references.resolve' | sqxTranslate }}
+                </label>
+            </div>
+
+            <sqx-form-hint>
+                {{ 'schemas.fieldTypes.references.resolveHint' | sqxTranslate }}
+            </sqx-form-hint>
+        </div>
+    </div>
+</div>

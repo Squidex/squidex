@@ -97,9 +97,9 @@ namespace Squidex.Domain.Apps.Core.Model.Assets
             var sut = new AssetMetadata
             {
                 ["meta"] =
-                    JsonValue.Object()
+                    new JsonObject()
                         .Add("nested1",
-                            JsonValue.Object()
+                            new JsonObject()
                                 .Add("nested2", 12))
             };
 

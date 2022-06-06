@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Squidex.Infrastructure;
@@ -45,16 +43,7 @@ namespace Squidex.Domain.Users
 
         public IReadOnlyCollection<XElement> GetAllElements()
         {
-            var result = new List<XElement>();
-
-            store.ReadAllAsync((state, _) =>
-            {
-                result.Add(state.ToXml());
-
-                return Task.CompletedTask;
-            }).Wait();
-
-            return result;
+            return GetAllElementsAsync().Result;
         }
 
         public void StoreElement(XElement element, string friendlyName)
@@ -62,6 +51,11 @@ namespace Squidex.Domain.Users
             var state = new State(element);
 
             store.WriteAsync(DomainId.Create(friendlyName), state, EtagVersion.Any, 0);
+        }
+
+        private async Task<IReadOnlyCollection<XElement>> GetAllElementsAsync()
+        {
+            return await store.ReadAllAsync().Select(x => x.State.ToXml()).ToListAsync();
         }
     }
 }

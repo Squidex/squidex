@@ -5,21 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public static class Fields
     {
-        public static ArrayField Array(long id, string name, Partitioning partitioning, params NestedField[] fields)
-        {
-            return new ArrayField(id, name, partitioning, fields);
-        }
-
         public static ArrayField Array(long id, string name, Partitioning partitioning,
-            ArrayFieldProperties? properties = null, IFieldSettings? settings = null)
+            ArrayFieldProperties? properties = null, IFieldSettings? settings = null, params NestedField[] fields)
         {
-            return new ArrayField(id, name, partitioning, properties, settings);
+            return new ArrayField(id, name, partitioning, fields, properties, settings);
         }
 
         public static RootField<AssetsFieldProperties> Assets(long id, string name, Partitioning partitioning,

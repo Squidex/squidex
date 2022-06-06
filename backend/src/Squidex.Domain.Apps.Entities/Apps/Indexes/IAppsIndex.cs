@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
@@ -14,26 +12,22 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
     public interface IAppsIndex
     {
-        Task<List<DomainId>> GetIdsAsync();
+        Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions,
+            CancellationToken ct = default);
 
-        Task<List<IAppEntity>> GetAppsAsync();
+        Task<IAppEntity?> GetAppAsync(string name, bool canCache = false,
+            CancellationToken ct = default);
 
-        Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions);
+        Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
+            CancellationToken ct = default);
 
-        Task<IAppEntity?> GetAppByNameAsync(string name, bool canCache);
+        Task<string?> ReserveAsync(DomainId id, string name,
+            CancellationToken ct = default);
 
-        Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache);
+        Task RegisterAsync(DomainId id, string name,
+            CancellationToken ct = default);
 
-        Task<string?> ReserveAsync(DomainId id, string name);
-
-        Task<bool> AddAsync(string? token);
-
-        Task RemoveReservationAsync(string? token);
-
-        Task RebuildByContributorsAsync(string contributorId, HashSet<DomainId> apps);
-
-        Task RebuildAsync(Dictionary<string, DomainId> apps);
-
-        Task RebuildByContributorsAsync(DomainId appId, HashSet<string> contributors);
+        Task RemoveReservationAsync(string? token,
+            CancellationToken ct = default);
     }
 }

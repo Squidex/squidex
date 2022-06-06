@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Core.Contents;
@@ -79,6 +78,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public string? NewStatusColor { get; set; }
 
         /// <summary>
+        /// The UI token.
+        /// </summary>
+        public string? EditToken { get; set; }
+
+        /// <summary>
         /// The scheduled status.
         /// </summary>
         public ScheduleJobDto? ScheduleJob { get; set; }
@@ -104,11 +108,16 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public FieldDto[]? ReferenceFields { get; set; }
 
         /// <summary>
+        /// Indicates whether the content is deleted.
+        /// </summary>
+        public bool IsDeleted { get; set; }
+
+        /// <summary>
         /// The version of the content.
         /// </summary>
         public long Version { get; set; }
 
-        public static ContentDto FromContent(IEnrichedContentEntity content, Resources resources)
+        public static ContentDto FromDomain(IEnrichedContentEntity content, Resources resources)
         {
             var response = SimpleMapper.Map(content, new ContentDto
             {
@@ -127,7 +136,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             if (content.ReferenceFields != null)
             {
-                response.ReferenceFields = content.ReferenceFields.Select(FieldDto.FromField).ToArray();
+                response.ReferenceFields = content.ReferenceFields.Select(FieldDto.FromDomain).ToArray();
             }
 
             if (content.ScheduleJob != null)
@@ -138,6 +147,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 };
 
                 SimpleMapper.Map(content.ScheduleJob, response.ScheduleJob);
+            }
+
+            if (response.IsDeleted)
+            {
+                return response;
             }
 
             return response.CreateLinksAsync(content, resources, content.SchemaId.Name);
@@ -173,7 +187,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 }
             }
 
-            if (content.NextStatuses != null && resources.CanUpdateContent(schema))
+            if (content.NextStatuses != null && resources.CanChangeStatus(schema))
             {
                 foreach (var next in content.NextStatuses)
                 {
@@ -181,7 +195,12 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 }
             }
 
-            if (content.IsSingleton == false && resources.CanDeleteContent(schema))
+            if (content.ScheduleJob != null && resources.CanCancelContentStatus(schema))
+            {
+                AddDeleteLink($"cancel", resources.Url<ContentsController>(x => nameof(x.DeleteContentStatus), values));
+            }
+
+            if (!content.IsSingleton && resources.CanDeleteContent(schema))
             {
                 AddDeleteLink("delete", resources.Url<ContentsController>(x => nameof(x.DeleteContent), values));
             }

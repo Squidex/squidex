@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -15,22 +14,26 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         string Name { get; }
 
-        public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
+        public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
+            CancellationToken ct)
         {
             return Task.FromResult(true);
         }
 
-        public Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context)
+        public Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context,
+            CancellationToken ct)
         {
             return Task.CompletedTask;
         }
 
-        public Task RestoreAsync(RestoreContext context)
+        public Task RestoreAsync(RestoreContext context,
+            CancellationToken ct)
         {
             return Task.CompletedTask;
         }
 
-        public Task BackupAsync(BackupContext context)
+        public Task BackupAsync(BackupContext context,
+            CancellationToken ct)
         {
             return Task.CompletedTask;
         }
@@ -40,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return Task.CompletedTask;
         }
 
-        public Task CompleteRestoreAsync(RestoreContext context)
+        public Task CompleteRestoreAsync(RestoreContext context, string appName)
         {
             return Task.CompletedTask;
         }

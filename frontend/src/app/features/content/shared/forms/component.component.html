@@ -1,0 +1,46 @@
+<div class="component">
+    <div *ngIf="formModel.schemaChanges | async; let schema; else noSchema">
+        <sqx-form-hint>
+            {{schema.displayName}}
+        </sqx-form-hint>
+
+        <div class="form-group" *ngFor="let section of formModel.sectionsChanges | async">
+            <sqx-component-section
+                [canUnset]="canUnset"
+                [form]="form"
+                [formContext]="formContext"
+                [formLevel]="formLevel + 1"
+                [formSection]="$any(section)"
+                [isComparing]="isComparing"
+                [language]="language"
+                [languages]="languages">
+            </sqx-component-section>
+        </div>
+    </div>
+    
+    <ng-template #noSchema>
+        <ng-container *ngIf="schemasList.length > 1">
+            <button type="button" class="btn btn-outline-success dropdown-toggle" [disabled]="isDisabled | async" (click)="schemasDropdown.show()" #buttonSelect>
+                {{ 'contents.addComponent' | sqxTranslate}}
+            </button>
+            
+            <ng-container *sqxModal="schemasDropdown;closeAlways:true">
+                <sqx-dropdown-menu [sqxAnchoredTo]="buttonSelect" [scrollY]="true">
+                    <a class="dropdown-item" *ngFor="let schema of schemasList" (click)="setSchema(schema)">
+                        {{schema.displayName}}
+                    </a>
+                </sqx-dropdown-menu>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="schemasList.length === 1">
+            <button type="button" class="btn btn-outline-success" [disabled]="isDisabled | async" (click)="setSchema(schemasList[0])">
+                {{ 'contents.addComponent' | sqxTranslate}}
+            </button>
+        </ng-container>
+        <ng-container *ngIf="schemasList.length === 0">
+            <sqx-form-hint>
+                {{ 'contents.componentNoSchema' | sqxTranslate }}
+            </sqx-form-hint>
+        </ng-container>
+    </ng-template>
+</div>

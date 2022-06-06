@@ -5,81 +5,109 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Assets
 {
-    public sealed class AssetMetadata : Dictionary<string, IJsonValue>
+    public sealed class AssetMetadata : Dictionary<string, JsonValue>
     {
         private static readonly char[] PathSeparators = { '.', '[', ']' };
 
+        public const string FocusX = "focusX";
+        public const string FocusY = "focusY";
+        public const string PixelWidth = "pixelWidth";
+        public const string PixelHeight = "pixelHeight";
+        public const string VideoWidth = "videoWidth";
+        public const string VideoHeight = "videoHeight";
+
         public AssetMetadata SetFocusX(float value)
         {
-            this["focusX"] = JsonValue.Create(value);
+            this[FocusX] = (double)value;
 
             return this;
         }
 
         public AssetMetadata SetFocusY(float value)
         {
-            this["focusY"] = JsonValue.Create(value);
+            this[FocusY] = (double)value;
 
             return this;
         }
 
         public AssetMetadata SetPixelWidth(int value)
         {
-            this["pixelWidth"] = JsonValue.Create(value);
+            this[PixelWidth] = (double)value;
 
             return this;
         }
 
         public AssetMetadata SetPixelHeight(int value)
         {
-            this["pixelHeight"] = JsonValue.Create(value);
+            this[PixelHeight] = (double)value;
+
+            return this;
+        }
+
+        public AssetMetadata SetVideoWidth(int value)
+        {
+            this[VideoWidth] = (double)value;
+
+            return this;
+        }
+
+        public AssetMetadata SetVideoHeight(int value)
+        {
+            this[VideoHeight] = (double)value;
 
             return this;
         }
 
         public float? GetFocusX()
         {
-            if (TryGetValue("focusX", out var n) && n is JsonNumber number)
-            {
-                return (float)number.Value;
-            }
-
-            return null;
+            return GetSingle(FocusX);
         }
 
         public float? GetFocusY()
         {
-            if (TryGetValue("focusY", out var n) && n is JsonNumber number)
-            {
-                return (float)number.Value;
-            }
-
-            return null;
+            return GetSingle(FocusY);
         }
 
         public int? GetPixelWidth()
         {
-            if (TryGetValue("pixelWidth", out var n) && n is JsonNumber number)
+            return GetIn32(PixelWidth);
+        }
+
+        public int? GetPixelHeight()
+        {
+            return GetIn32(PixelHeight);
+        }
+
+        public int? GetVideoWidth()
+        {
+            return GetIn32(VideoWidth);
+        }
+
+        public int? GetVideoHeight()
+        {
+            return GetIn32(VideoHeight);
+        }
+
+        public int? GetIn32(string name)
+        {
+            if (TryGetValue(name, out var n) && n.Type == JsonValueType.Number)
             {
-                return (int)number.Value;
+                return (int)n.AsNumber;
             }
 
             return null;
         }
 
-        public int? GetPixelHeight()
+        public float? GetSingle(string name)
         {
-            if (TryGetValue("pixelHeight", out var n) && n is JsonNumber number)
+            if (TryGetValue(name, out var n) && n.Type == JsonValueType.Number)
             {
-                return (int)number.Value;
+                return (float)n.AsNumber;
             }
 
             return null;
@@ -87,9 +115,9 @@ namespace Squidex.Domain.Apps.Core.Assets
 
         public bool TryGetNumber(string name, out double result)
         {
-            if (TryGetValue(name, out var v) && v is JsonNumber n)
+            if (TryGetValue(name, out var n) && n.Type == JsonValueType.Number)
             {
-                result = n.Value;
+                result = n.AsNumber;
 
                 return true;
             }
@@ -101,9 +129,9 @@ namespace Squidex.Domain.Apps.Core.Assets
 
         public bool TryGetString(string name, [MaybeNullWhen(false)] out string result)
         {
-            if (TryGetValue(name, out var v) && v is JsonString s)
+            if (TryGetValue(name, out var s) && s.Type == JsonValueType.String)
             {
-                result = s.Value;
+                result = s.AsString;
 
                 return true;
             }

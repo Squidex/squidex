@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using OpenIddict.Core;
@@ -25,9 +22,10 @@ namespace Squidex.Areas.IdentityServer.Config
         {
         }
 
-        protected override ValueTask<bool> ValidateClientSecretAsync(string secret, string comparand, CancellationToken cancellationToken = default)
+        protected override ValueTask<bool> ValidateClientSecretAsync(string secret, string comparand,
+            CancellationToken cancellationToken = default)
         {
-            return new ValueTask<bool>(string.Equals(secret, comparand));
+            return new ValueTask<bool>(string.Equals(secret, comparand, StringComparison.Ordinal));
         }
     }
 }

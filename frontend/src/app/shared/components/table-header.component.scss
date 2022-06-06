@@ -1,0 +1,8 @@
+@import 'mixins';
+@import 'vars';
+
+a {
+    text-align: left;
+    text-decoration: none;
+    color: $color-text;
+}

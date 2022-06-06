@@ -5,17 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Concurrent;
 using System.Globalization;
-using System.IO;
-using System.Net;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using Squidex.Areas.Api.Controllers.UI;
 using Squidex.Domain.Apps.Entities.History;
-using Squidex.Infrastructure.Json;
 using Squidex.Web;
 
 namespace Squidex.Areas.Frontend.Middlewares
@@ -23,61 +20,64 @@ namespace Squidex.Areas.Frontend.Middlewares
     public static class IndexExtensions
     {
         private static readonly ConcurrentDictionary<string, string> Texts = new ConcurrentDictionary<string, string>();
-
-        public static bool IsIndex(this HttpContext context)
+        private static readonly JsonSerializer JsonSerializer = JsonSerializer.CreateDefault(new JsonSerializerSettings
         {
-            return context.Request.Path.Value?.EndsWith("/index.html", StringComparison.OrdinalIgnoreCase) == true;
-        }
-
-        public static bool IsHtmlPath(this HttpContext context)
-        {
-            return context.Request.Path.Value?.EndsWith(".html", StringComparison.OrdinalIgnoreCase) == true;
-        }
-
-        public static bool IsNotModified(this HttpResponse response)
-        {
-            return response.StatusCode == (int)HttpStatusCode.NotModified;
-        }
-
-        public static string AdjustBase(this string html, HttpContext httpContext)
-        {
-            if (httpContext.Request.PathBase != null)
-            {
-                html = html.Replace("<base href=\"/\">", $"<base href=\"{httpContext.Request.PathBase}/\">");
-            }
-
-            return html;
-        }
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        });
 
         public static string AddOptions(this string html, HttpContext httpContext)
         {
+            const string Placeholder = "/* INJECT OPTIONS */";
+
+            if (!html.Contains(Placeholder, StringComparison.Ordinal))
+            {
+                return html;
+            }
+
+            var scripts = new List<string>
+            {
+                $"var texts = {GetText(CultureInfo.CurrentUICulture.Name)};"
+            };
+
             var uiOptions = httpContext.RequestServices.GetService<IOptions<MyUIOptions>>()?.Value;
 
             if (uiOptions != null)
             {
+                var json = JObject.FromObject(uiOptions, JsonSerializer);
+
                 var values = httpContext.RequestServices.GetService<ExposedValues>();
 
                 if (values != null)
                 {
-                    uiOptions.More["info"] = values.ToString();
+                    json["more"] ??= new JObject();
+                    json["more"]!["info"] = values.ToString();
                 }
 
-                var notifo = httpContext.RequestServices!.GetRequiredService<IOptions<NotifoOptions>>();
+                var notifo = httpContext.RequestServices!.GetService<IOptions<NotifoOptions>>();
 
-                if (notifo.Value.IsConfigured())
+                if (notifo?.Value.IsConfigured() == true)
                 {
-                    uiOptions.More["notifoApi"] = notifo.Value.ApiUrl;
+                    json["more"] ??= new JObject();
+                    json["more"]!["notifoApi"] = notifo.Value.ApiUrl;
                 }
 
-                uiOptions.More["culture"] = CultureInfo.CurrentUICulture.Name;
+                var options = httpContext.Features.Get<OptionsFeature>();
 
-                var jsonSerializer = httpContext.RequestServices.GetRequiredService<IJsonSerializer>();
-                var jsonOptions = jsonSerializer.Serialize(uiOptions, true);
+                if (options != null)
+                {
+                    foreach (var (key, value) in options.Options)
+                    {
+                        json[key] = JToken.FromObject(value);
+                    }
+                }
 
-                var texts = GetText(CultureInfo.CurrentUICulture.Name);
+                json["more"] ??= new JObject();
+                json["more"]!["culture"] = CultureInfo.CurrentUICulture.Name;
 
-                html = html.Replace("<body>", $"<body>\n<script>\nvar options = {jsonOptions};\nvar texts = {texts};</script>");
+                scripts.Add($"var options = {json.ToString(Formatting.Indented)};");
             }
+
+            html = html.Replace(Placeholder, string.Join(Environment.NewLine, scripts), StringComparison.OrdinalIgnoreCase);
 
             return html;
         }

@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -16,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal class QueryReferences : OperationBase
+    internal sealed class QueryReferences : OperationBase
     {
         private static readonly IResultList<IContentEntity> EmptyIds = ResultList.CreateFrom<IContentEntity>(0);
         private readonly QueryByIds queryByIds;

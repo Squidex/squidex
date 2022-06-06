@@ -6,16 +6,13 @@
 // ==========================================================================
 
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
@@ -24,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         private readonly PartitionResolver partitionResolver;
         private readonly ValidationContext context;
         private readonly IEnumerable<IValidatorsFactory> factories;
-        private readonly ISemanticLog log;
+        private readonly ILogger<ContentValidator> log;
         private readonly ConcurrentBag<ValidationError> errors = new ConcurrentBag<ValidationError>();
 
         public IReadOnlyCollection<ValidationError> Errors
@@ -32,12 +29,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             get => errors;
         }
 
-        public ContentValidator(PartitionResolver partitionResolver, ValidationContext context, IEnumerable<IValidatorsFactory> factories, ISemanticLog log)
+        public ContentValidator(PartitionResolver partitionResolver, ValidationContext context, IEnumerable<IValidatorsFactory> factories,
+            ILogger<ContentValidator> log)
         {
-            Guard.NotNull(context, nameof(context));
-            Guard.NotNull(factories, nameof(factories));
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(context);
+            Guard.NotNull(factories);
+            Guard.NotNull(partitionResolver);
+            Guard.NotNull(log);
 
             this.context = context;
             this.factories = factories;
@@ -53,27 +51,27 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             errors.Add(new ValidationError(message, pathString));
         }
 
-        public Task ValidateInputPartialAsync(ContentData data)
+        public ValueTask ValidateInputPartialAsync(ContentData data)
         {
-            Guard.NotNull(data, nameof(data));
+            Guard.NotNull(data);
 
             var validator = CreateSchemaValidator(true);
 
             return validator.ValidateAsync(data, context, AddError);
         }
 
-        public Task ValidateInputAsync(ContentData data)
+        public ValueTask ValidateInputAsync(ContentData data)
         {
-            Guard.NotNull(data, nameof(data));
+            Guard.NotNull(data);
 
             var validator = CreateSchemaValidator(false);
 
             return validator.ValidateAsync(data, context, AddError);
         }
 
-        public Task ValidateContentAsync(ContentData data)
+        public ValueTask ValidateContentAsync(ContentData data)
         {
-            Guard.NotNull(data, nameof(data));
+            Guard.NotNull(data);
 
             var validator = new AggregateValidator(CreateContentValidators(), log);
 
@@ -111,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return new AggregateValidator(
                 CreateFieldValidators(field)
                     .Union(Enumerable.Repeat(
-                        new ObjectValidator<IJsonValue>(partitioningValidators, isPartial, typeName), 1)), log);
+                        new ObjectValidator<JsonValue>(partitioningValidators, isPartial, typeName), 1)), log);
         }
 
         private IValidator CreateValueValidator(IField field)

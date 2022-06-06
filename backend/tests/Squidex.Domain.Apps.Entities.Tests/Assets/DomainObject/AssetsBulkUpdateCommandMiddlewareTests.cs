@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -28,7 +27,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         public AssetsBulkUpdateCommandMiddlewareTests()
         {
-            sut = new AssetsBulkUpdateCommandMiddleware(contextProvider);
+            var log = A.Fake<ILogger<AssetsBulkUpdateCommandMiddleware>>();
+
+            sut = new AssetsBulkUpdateCommandMiddleware(contextProvider, log);
         }
 
         [Fact]

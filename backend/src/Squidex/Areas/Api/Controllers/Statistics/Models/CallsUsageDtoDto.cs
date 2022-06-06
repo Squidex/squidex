@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Infrastructure.Validation;
@@ -61,7 +59,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         [LocalizedRequired]
         public Dictionary<string, CallsUsagePerDateDto[]> Details { get; set; }
 
-        public static CallsUsageDtoDto FromStats(IAppLimitsPlan plan, ApiStatsSummary summary, Dictionary<string, List<ApiStats>> details)
+        public static CallsUsageDtoDto FromDomain(IAppLimitsPlan plan, ApiStatsSummary summary, Dictionary<string, List<ApiStats>> details)
         {
             return new CallsUsageDtoDto
             {
@@ -73,7 +71,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
                 TotalCalls = summary.TotalCalls,
                 MonthBytes = summary.MonthBytes,
                 MonthCalls = summary.MonthCalls,
-                Details = details.ToDictionary(x => x.Key, x => x.Value.Select(CallsUsagePerDateDto.FromStats).ToArray())
+                Details = details.ToDictionary(x => x.Key, x => x.Value.Select(CallsUsagePerDateDto.FromDomain).ToArray())
             };
         }
     }

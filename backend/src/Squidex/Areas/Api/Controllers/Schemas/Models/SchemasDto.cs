@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Web;
 
@@ -19,11 +17,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         public SchemaDto[] Items { get; set; }
 
-        public static SchemasDto FromSchemas(IList<ISchemaEntity> schemas, Resources resources)
+        public static SchemasDto FromDomain(IList<ISchemaEntity> schemas, Resources resources)
         {
             var result = new SchemasDto
             {
-                Items = schemas.Select(x => SchemaDto.FromSchema(x, resources)).ToArray()
+                Items = schemas.Select(x => SchemaDto.FromDomain(x, resources)).ToArray()
             };
 
             return result.CreateLinks(resources);

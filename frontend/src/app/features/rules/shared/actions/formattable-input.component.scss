@@ -1,0 +1,31 @@
+@import 'mixins';
+@import 'vars';
+
+.input-group-apppend {
+    z-index: 1;
+
+    .form-select {
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
+        color: $color-text-decent;
+        margin-left: -1px;
+
+        &:focus {
+            z-index: 3;
+        }
+    }
+}
+
+.btn-group {
+    margin-bottom: -1px;
+
+    .btn {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        color: $color-text-decent;
+
+        &.active {
+            color: $color-black;
+        }
+    }
+}

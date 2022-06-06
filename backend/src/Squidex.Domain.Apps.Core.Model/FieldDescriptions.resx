@@ -1,0 +1,426 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Actor" xml:space="preserve">
+    <value>The user or client that triggered the event or command.</value>
+  </data>
+  <data name="ActorIdentifier" xml:space="preserve">
+    <value>The ID of this actor.</value>
+  </data>
+  <data name="ActorType" xml:space="preserve">
+    <value>The type of this actor.</value>
+  </data>
+  <data name="AppId" xml:space="preserve">
+    <value>The ID of the current app.</value>
+  </data>
+  <data name="AppName" xml:space="preserve">
+    <value>The name of the current app.</value>
+  </data>
+  <data name="Asset" xml:space="preserve">
+    <value>The asset.</value>
+  </data>
+  <data name="AssetFileHash" xml:space="preserve">
+    <value>The hash of the file. Can be null for old files.</value>
+  </data>
+  <data name="AssetFileName" xml:space="preserve">
+    <value>The file name of the asset.</value>
+  </data>
+  <data name="AssetFileSize" xml:space="preserve">
+    <value>The size of the file in bytes.</value>
+  </data>
+  <data name="AssetFileType" xml:space="preserve">
+    <value>The file type (file extension) of the asset.</value>
+  </data>
+  <data name="AssetFileVersion" xml:space="preserve">
+    <value>The version of the file.</value>
+  </data>
+  <data name="AssetIsImage" xml:space="preserve">
+    <value>Determines if the uploaded file is an image.</value>
+  </data>
+  <data name="AssetIsProtected" xml:space="preserve">
+    <value>True, when the asset is not public.</value>
+  </data>
+  <data name="AssetMetadata" xml:space="preserve">
+    <value>The asset metadata.</value>
+  </data>
+  <data name="AssetMetadataText" xml:space="preserve">
+    <value>The type of the image.</value>
+  </data>
+  <data name="AssetMetadataValue" xml:space="preserve">
+    <value>The asset metadata with name 'name'.</value>
+  </data>
+  <data name="AssetMimeType" xml:space="preserve">
+    <value>The mime type.</value>
+  </data>
+  <data name="AssetParentId" xml:space="preserve">
+    <value>The id of the parent folder. Empty for files without parent.</value>
+  </data>
+  <data name="AssetParentPath" xml:space="preserve">
+    <value>The full path in the folder hierarchy as array of folder infos.</value>
+  </data>
+  <data name="AssetPixelHeight" xml:space="preserve">
+    <value>The height of the image in pixels if the asset is an image.</value>
+  </data>
+  <data name="AssetPixelWidth" xml:space="preserve">
+    <value>The width of the image in pixels if the asset is an image.</value>
+  </data>
+  <data name="AssetsItems" xml:space="preserve">
+    <value>The assets.</value>
+  </data>
+  <data name="AssetSlug" xml:space="preserve">
+    <value>The file name as slug.</value>
+  </data>
+  <data name="AssetSourceUrl" xml:space="preserve">
+    <value>The source URL of the asset.</value>
+  </data>
+  <data name="AssetsTotal" xml:space="preserve">
+    <value>The total count of assets.</value>
+  </data>
+  <data name="AssetTags" xml:space="preserve">
+    <value>The asset tags.</value>
+  </data>
+  <data name="AssetThumbnailUrl" xml:space="preserve">
+    <value>The thumbnail URL to the asset.</value>
+  </data>
+  <data name="AssetType" xml:space="preserve">
+    <value>The type of the asset.</value>
+  </data>
+  <data name="AssetUrl" xml:space="preserve">
+    <value>The URL to the asset.</value>
+  </data>
+  <data name="Command" xml:space="preserve">
+    <value>The executed command.</value>
+  </data>
+  <data name="CommentMentionedUser" xml:space="preserve">
+    <value>The user when someone is mentioned with '@'.</value>
+  </data>
+  <data name="CommentText" xml:space="preserve">
+    <value>The text of the comment.</value>
+  </data>
+  <data name="CommentUrl" xml:space="preserve">
+    <value>The URL pointing to the source of the comment.</value>
+  </data>
+  <data name="ComponentField" xml:space="preserve">
+    <value>{0} field ({1} component).</value>
+  </data>
+  <data name="ComponentSchemaId" xml:space="preserve">
+    <value>The schema id to identity the component type.</value>
+  </data>
+  <data name="Content" xml:space="preserve">
+    <value>The content.</value>
+  </data>
+  <data name="ContentArrayField" xml:space="preserve">
+    <value>{0} nested field.</value>
+  </data>
+  <data name="ContentData" xml:space="preserve">
+    <value>The data of the content.</value>
+  </data>
+  <data name="ContentDataOld" xml:space="preserve">
+    <value>The previous data of the content.</value>
+  </data>
+  <data name="ContentField" xml:space="preserve">
+    <value>{0} field.</value>
+  </data>
+  <data name="ContentFlatData" xml:space="preserve">
+    <value>The flat data of the content.</value>
+  </data>
+  <data name="ContentNewStatus" xml:space="preserve">
+    <value>The new status of the content.</value>
+  </data>
+  <data name="ContentNewStatusColor" xml:space="preserve">
+    <value>The new status color of the content.</value>
+  </data>
+  <data name="ContentPartitionField" xml:space="preserve">
+    <value>{0} field ({1}).</value>
+  </data>
+  <data name="ContentRequestData" xml:space="preserve">
+    <value>The data for the content.</value>
+  </data>
+  <data name="ContentRequestDueTime" xml:space="preserve">
+    <value>The timestamp when the status should be changed.</value>
+  </data>
+  <data name="ContentRequestOptionalId" xml:space="preserve">
+    <value>The optional custom content ID.</value>
+  </data>
+  <data name="ContentRequestOptionalStatus" xml:space="preserve">
+    <value>The initial status.</value>
+  </data>
+  <data name="ContentRequestPatch" xml:space="preserve">
+    <value>Makes the update as patch.</value>
+  </data>
+  <data name="ContentRequestPublish" xml:space="preserve">
+    <value>Set to true to autopublish content on create.</value>
+  </data>
+  <data name="ContentRequestStatus" xml:space="preserve">
+    <value>The status for the content.</value>
+  </data>
+  <data name="ContentSchemaDisplayName" xml:space="preserve">
+    <value>The display name of the schema.</value>
+  </data>
+  <data name="ContentSchemaId" xml:space="preserve">
+    <value>The ID of the schema.</value>
+  </data>
+  <data name="ContentSchemaName" xml:space="preserve">
+    <value>The name of the schema.</value>
+  </data>
+  <data name="ContentsItems" xml:space="preserve">
+    <value>The contents.</value>
+  </data>
+  <data name="ContentStatus" xml:space="preserve">
+    <value>The status of the content.</value>
+  </data>
+  <data name="ContentStatusColor" xml:space="preserve">
+    <value>The status color of the content.</value>
+  </data>
+  <data name="ContentStatusOld" xml:space="preserve">
+    <value>The previous status of the content.</value>
+  </data>
+  <data name="ContentsTotal" xml:space="preserve">
+    <value>The total count of  contents.</value>
+  </data>
+  <data name="ContentUrl" xml:space="preserve">
+    <value>The URL to the content.</value>
+  </data>
+  <data name="ContentValidate" xml:space="preserve">
+    <value>Validates the content item.</value>
+  </data>
+  <data name="Context" xml:space="preserve">
+    <value>The context object holding all values.</value>
+  </data>
+  <data name="EditToken" xml:space="preserve">
+    <value>The edit token.</value>
+  </data>
+  <data name="EntityCreated" xml:space="preserve">
+    <value>The timestamp when the object was created.</value>
+  </data>
+  <data name="EntityCreatedBy" xml:space="preserve">
+    <value>The user who created the object.</value>
+  </data>
+  <data name="EntityExpectedVersion" xml:space="preserve">
+    <value>The expected version.</value>
+  </data>
+  <data name="EntityId" xml:space="preserve">
+    <value>The ID of the object (usually GUID).</value>
+  </data>
+  <data name="EntityIsDeleted" xml:space="preserve">
+    <value>True when deleted.</value>
+  </data>
+  <data name="EntityLastModified" xml:space="preserve">
+    <value>The timestamp when the object was updated the last time.</value>
+  </data>
+  <data name="EntityLastModifiedBy" xml:space="preserve">
+    <value>The user who updated the object the last time.</value>
+  </data>
+  <data name="EntityRequestDeletePermanent" xml:space="preserve">
+    <value>True when the entity should be deleted permanently.</value>
+  </data>
+  <data name="EntityVersion" xml:space="preserve">
+    <value>The version of the objec.</value>
+  </data>
+  <data name="Event" xml:space="preserve">
+    <value>The actual event.</value>
+  </data>
+  <data name="EventName" xml:space="preserve">
+    <value>The name of the event.</value>
+  </data>
+  <data name="EventTimestamp" xml:space="preserve">
+    <value>The event timestamp.</value>
+  </data>
+  <data name="EventType" xml:space="preserve">
+    <value>The type of the event, e.g. 'Created' or 'Updated'.</value>
+  </data>
+  <data name="JsonPath" xml:space="preserve">
+    <value>The path to the json value.</value>
+  </data>
+  <data name="NamedId" xml:space="preserve">
+    <value>The ID part of this ID.</value>
+  </data>
+  <data name="NamedName" xml:space="preserve">
+    <value>The name part of this ID.</value>
+  </data>
+  <data name="Operation" xml:space="preserve">
+    <value>The current operation.</value>
+  </data>
+  <data name="QueryFilter" xml:space="preserve">
+    <value>Optional OData filter.</value>
+  </data>
+  <data name="QueryIds" xml:space="preserve">
+    <value>Comma separated list of object IDs. Overrides all other query parameters.</value>
+  </data>
+  <data name="QueryOrderBy" xml:space="preserve">
+    <value>Optional OData order definition.</value>
+  </data>
+  <data name="QueryQ" xml:space="preserve">
+    <value>JSON query as well formatted json string. Overrides all other query parameters, except 'ids'.</value>
+  </data>
+  <data name="QuerySearch" xml:space="preserve">
+    <value>Optional OData full text search.</value>
+  </data>
+  <data name="QuerySkip" xml:space="preserve">
+    <value>Optional number of contents to skip.</value>
+  </data>
+  <data name="QueryTop" xml:space="preserve">
+    <value>Optional number of contents to take.</value>
+  </data>
+  <data name="QueryVersion" xml:space="preserve">
+    <value>The optional version of the content to retrieve an older instance (not cached).</value>
+  </data>
+  <data name="SchemaId" xml:space="preserve">
+    <value>The ID of the schema.</value>
+  </data>
+  <data name="StringFieldAssets" xml:space="preserve">
+    <value>The referenced assets.</value>
+  </data>
+  <data name="StringFieldReferences" xml:space="preserve">
+    <value>The referenced content items.</value>
+  </data>
+  <data name="StringFieldText" xml:space="preserve">
+    <value>The text of this field.</value>
+  </data>
+  <data name="UsageCallsCurrent" xml:space="preserve">
+    <value>The current number of calls.</value>
+  </data>
+  <data name="UsageCallsLimit" xml:space="preserve">
+    <value>The configured usage limit.</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>Information about the current user.</value>
+  </data>
+  <data name="UserClaims" xml:space="preserve">
+    <value>The additional properties of this user.</value>
+  </data>
+  <data name="UserDisplayName" xml:space="preserve">
+    <value>The display name of this user.</value>
+  </data>
+  <data name="UserEmail" xml:space="preserve">
+    <value>The email address ofthis  user.</value>
+  </data>
+  <data name="UserId" xml:space="preserve">
+    <value>The ID of this user.</value>
+  </data>
+  <data name="UserIsClient" xml:space="preserve">
+    <value>True when this user is a client, which is typically the case when the request is made from the API.</value>
+  </data>
+  <data name="UserIsUser" xml:space="preserve">
+    <value>True when this user is a user, which is typically the case when the request is made in the UI.</value>
+  </data>
+  <data name="UsersClaimsValue" xml:space="preserve">
+    <value>The list of additional properties that have the name 'name'.</value>
+  </data>
+</root>

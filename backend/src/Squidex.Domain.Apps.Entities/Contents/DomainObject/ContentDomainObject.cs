@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -20,8 +18,9 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
 using Squidex.Shared;
+
+#pragma warning disable MA0022 // Return Task.FromResult instead of returning null
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 {
@@ -29,18 +28,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
     {
         private readonly IServiceProvider serviceProvider;
 
-        public ContentDomainObject(IPersistenceFactory<State> persistence, ISemanticLog log,
+        public ContentDomainObject(IPersistenceFactory<State> persistence, ILogger<ContentDomainObject> log,
             IServiceProvider serviceProvider)
             : base(persistence, log)
         {
             this.serviceProvider = serviceProvider;
 
-            Capacity = int.MaxValue;
+            Capacity = 5;
         }
 
-        protected override bool IsDeleted()
+        protected override bool IsDeleted(State snapshot)
         {
-            return Snapshot.IsDeleted;
+            return snapshot.IsDeleted;
         }
 
         protected override bool CanAcceptCreation(ICommand command)
@@ -51,6 +50,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         protected override bool CanRecreate()
         {
             return true;
+        }
+
+        protected override bool CanRecreate(IEvent @event)
+        {
+            return @event is ContentCreated;
         }
 
         protected override bool CanAccept(ICommand command)
@@ -68,18 +72,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 case UpsertContent upsertContent:
                     return UpsertReturnAsync(upsertContent, async c =>
                     {
-                        var operation = await OperationContext.CreateAsync(serviceProvider, c, () => Snapshot);
+                        var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                        if (Version > EtagVersion.Empty && !IsDeleted())
-                        {
-                            await UpdateCore(c.AsUpdate(), operation);
-                        }
-                        else
+                        if (Version <= EtagVersion.Empty || IsDeleted(Snapshot))
                         {
                             await CreateCore(c.AsCreate(), operation);
                         }
+                        else if (c.Patch)
+                        {
+                            await PatchCore(c.AsUpdate(), operation);
+                        }
+                        else
+                        {
+                            await UpdateCore(c.AsUpdate(), operation);
+                        }
 
-                        if (Is.OptionalChange(operation.Content.EditingStatus(), c.Status))
+                        if (Is.OptionalChange(operation.Snapshot.EditingStatus(), c.Status))
                         {
                             await ChangeCore(c.AsChange(c.Status.Value), operation);
                         }
@@ -90,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 case CreateContent createContent:
                     return CreateReturnAsync(createContent, async c =>
                     {
-                        var operation = await OperationContext.CreateAsync(serviceProvider, c, () => Snapshot);
+                        var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await CreateCore(c, operation);
 
@@ -109,11 +117,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 case ValidateContent validate:
                     return UpdateReturnAsync(validate, async c =>
                     {
-                        var operation = await OperationContext.CreateAsync(serviceProvider, c, () => Snapshot);
+                        var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                        operation.MustHavePermission(Permissions.AppContentsReadOwn);
-
-                        await operation.ValidateContentAndInputAsync(Snapshot.Data, false, Snapshot.IsPublished());
+                        await ValidateCore(operation);
 
                         return true;
                     });
@@ -121,14 +127,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 case CreateContentDraft createDraft:
                     return UpdateReturnAsync(createDraft, async c =>
                     {
-                        var operation = await OperationContext.CreateAsync(serviceProvider, c, () => Snapshot);
+                        var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                        operation.MustHavePermission(Permissions.AppContentsVersionCreate);
-                        operation.MustCreateDraft();
-
-                        var status = await operation.GetInitialStatusAsync();
-
-                        CreateDraft(c, status);
+                        await CreateDraftCore(c, operation);
 
                         return Snapshot;
                     });
@@ -136,12 +137,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 case DeleteContentDraft deleteDraft:
                     return UpdateReturnAsync(deleteDraft, async c =>
                     {
-                        var operation = await OperationContext.CreateAsync(serviceProvider, c, () => Snapshot);
+                        var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                        operation.MustHavePermission(Permissions.AppContentsVersionDelete);
-                        operation.MustDeleteDraft();
-
-                        DeleteDraft(c);
+                        DeleteDraftCore(c, operation);
 
                         return Snapshot;
                     });
@@ -149,7 +147,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 case PatchContent patchContent:
                     return UpdateReturnAsync(patchContent, async c =>
                     {
-                        var operation = await OperationContext.CreateAsync(serviceProvider, c, () => Snapshot);
+                        var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await PatchCore(c, operation);
 
@@ -159,9 +157,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 case UpdateContent updateContent:
                     return UpdateReturnAsync(updateContent, async c =>
                     {
-                        var operation = await OperationContext.CreateAsync(serviceProvider, c, () => Snapshot);
+                        var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await UpdateCore(c, operation);
+
+                        return Snapshot;
+                    });
+
+                case CancelContentSchedule cancelContentSchedule:
+                    return UpdateReturnAsync(cancelContentSchedule, async c =>
+                    {
+                        var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
+
+                        CancelChangeCore(c, operation);
 
                         return Snapshot;
                     });
@@ -177,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             }
                             else
                             {
-                                var operation = await OperationContext.CreateAsync(serviceProvider, c, () => Snapshot);
+                                var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                                 await ChangeCore(c, operation);
                             }
@@ -200,7 +208,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 case DeleteContent deleteContent when deleteContent.Permanent:
                     return DeletePermanentAsync(deleteContent, async c =>
                     {
-                        var operation = await OperationContext.CreateAsync(serviceProvider, c, () => Snapshot);
+                        var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await DeleteCore(c, operation);
                     });
@@ -208,17 +216,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 case DeleteContent deleteContent:
                     return UpdateAsync(deleteContent, async c =>
                     {
-                        var operation = await OperationContext.CreateAsync(serviceProvider, c, () => Snapshot);
+                        var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await DeleteCore(c, operation);
                     });
 
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         }
 
-        private async Task CreateCore(CreateContent c, OperationContext operation)
+        private async Task CreateCore(CreateContent c, ContentOperation operation)
         {
             operation.MustNotCreateSingleton();
             operation.MustNotCreateForUnpublishedSchema();
@@ -246,9 +255,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Create(c, status);
         }
 
-        private async Task ChangeCore(ChangeContentStatus c, OperationContext operation)
+        private async Task ChangeCore(ChangeContentStatus c, ContentOperation operation)
         {
-            operation.MustHavePermission(Permissions.AppContentsChangeStatusOwn);
+            operation.MustHavePermission(Permissions.AppContentsChangeStatus);
             operation.MustNotChangeSingleton(c.Status);
 
             if (c.Status == Snapshot.EditingStatus())
@@ -291,7 +300,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 await operation.CheckReferrersAsync();
             }
 
-            if (!c.DoNotValidate && c.Status == Status.Published && operation.SchemaDef.Properties.ValidateOnPublish)
+            if (!c.DoNotValidate && await operation.ShouldValidateAsync(c.Status))
             {
                 await operation.ValidateContentAndInputAsync(Snapshot.Data, c.OptimizeValidation, true);
             }
@@ -299,7 +308,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             ChangeStatus(c);
         }
 
-        private async Task UpdateCore(UpdateContent c, OperationContext operation)
+        private async Task UpdateCore(UpdateContent c, ContentOperation operation)
         {
             operation.MustHavePermission(Permissions.AppContentsUpdate);
             operation.MustHaveData(c.Data);
@@ -334,7 +343,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Update(c, newData);
         }
 
-        private async Task PatchCore(UpdateContent c, OperationContext operation)
+        private async Task PatchCore(UpdateContent c, ContentOperation operation)
         {
             operation.MustHavePermission(Permissions.AppContentsUpdate);
             operation.MustHaveData(c.Data);
@@ -369,14 +378,49 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Update(c, newData);
         }
 
-        private async Task DeleteCore(DeleteContent c, OperationContext operation)
+        private void CancelChangeCore(CancelContentSchedule c, ContentOperation operation)
         {
-            operation.MustHavePermission(Permissions.AppContentsDeleteOwn);
+            operation.MustHavePermission(Permissions.AppContentsChangeStatusCancel);
+
+            if (Snapshot.ScheduleJob != null)
+            {
+                CancelChangeStatus(c);
+            }
+        }
+
+        private async Task ValidateCore(ContentOperation operation)
+        {
+            operation.MustHavePermission(Permissions.AppContentsRead);
+
+            await operation.ValidateContentAndInputAsync(Snapshot.Data, false, Snapshot.IsPublished());
+        }
+
+        private async Task CreateDraftCore(CreateContentDraft c, ContentOperation operation)
+        {
+            operation.MustHavePermission(Permissions.AppContentsVersionCreate);
+            operation.MustCreateDraft();
+
+            var status = await operation.GetInitialStatusAsync();
+
+            CreateDraft(c, status);
+        }
+
+        private void DeleteDraftCore(DeleteContentDraft c, ContentOperation operation)
+        {
+            operation.MustHavePermission(Permissions.AppContentsVersionDelete);
+            operation.MustDeleteDraft();
+
+            DeleteDraft(c);
+        }
+
+        private async Task DeleteCore(DeleteContent c, ContentOperation operation)
+        {
+            operation.MustHavePermission(Permissions.AppContentsDelete);
             operation.MustNotDeleteSingleton();
 
             if (!c.DoNotScript)
             {
-                await operation.ExecuteDeleteScriptAsync();
+                await operation.ExecuteDeleteScriptAsync(c.Permanent);
             }
 
             if (c.CheckReferrers)
@@ -407,7 +451,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Raise(command, new ContentStatusScheduled { DueTime = dueTime });
         }
 
-        private void CancelChangeStatus(ChangeContentStatus command)
+        private void CancelChangeStatus(ContentCommand command)
         {
             Raise(command, new ContentSchedulingCancelled());
         }

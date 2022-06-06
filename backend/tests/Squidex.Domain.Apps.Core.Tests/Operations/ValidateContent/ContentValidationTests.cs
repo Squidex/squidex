@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
@@ -42,12 +38,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             A.CallTo(() => validatorFactory.CreateValueValidators(A<ValidationContext>._, A<IField>._, A<ValidatorFactory>._))
                 .Returns(Enumerable.Repeat(validator, 1));
 
-            schema = schema.AddNumber(1, "my-field", Partitioning.Invariant,
+            schema = schema.AddNumber(1, "myField", Partitioning.Invariant,
                 new NumberFieldProperties());
 
             var data =
                 new ContentData()
-                    .AddField("my-field",
+                    .AddField("myField",
                         new ContentFieldData()
                             .AddInvariant(1000));
 
@@ -56,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Validation failed with internal error.", "my-field.iv")
+                    new ValidationError("Validation failed with internal error.", "myField.iv")
                 });
         }
 
@@ -73,12 +69,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             A.CallTo(() => validatorFactory.CreateFieldValidators(A<ValidationContext>._, A<IField>._, A<ValidatorFactory>._))
                 .Returns(Enumerable.Repeat(validator, 1));
 
-            schema = schema.AddNumber(1, "my-field", Partitioning.Invariant,
+            schema = schema.AddNumber(1, "myField", Partitioning.Invariant,
                 new NumberFieldProperties());
 
             var data =
                 new ContentData()
-                    .AddField("my-field",
+                    .AddField("myField",
                         new ContentFieldData()
                             .AddInvariant(1000));
 
@@ -87,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Validation failed with internal error.", "my-field")
+                    new ValidationError("Validation failed with internal error.", "myField")
                 });
         }
 
@@ -111,12 +107,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_validating_data_with_invalid_field()
         {
-            schema = schema.AddNumber(1, "my-field", Partitioning.Invariant,
+            schema = schema.AddNumber(1, "myField", Partitioning.Invariant,
                 new NumberFieldProperties { MaxValue = 100 });
 
             var data =
                 new ContentData()
-                    .AddField("my-field",
+                    .AddField("myField",
                         new ContentFieldData()
                             .AddInvariant(1000));
 
@@ -125,18 +121,18 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Must be less or equal to 100.", "my-field.iv")
+                    new ValidationError("Must be less or equal to 100.", "myField.iv")
                 });
         }
 
         [Fact]
         public async Task Should_add_error_if_non_localizable_data_field_contains_language()
         {
-            schema = schema.AddNumber(1, "my-field", Partitioning.Invariant);
+            schema = schema.AddNumber(1, "myField", Partitioning.Invariant);
 
             var data =
                 new ContentData()
-                    .AddField("my-field",
+                    .AddField("myField",
                         new ContentFieldData()
                             .AddLocalized("es", 1)
                             .AddLocalized("it", 1));
@@ -146,15 +142,15 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Not a known invariant value.", "my-field.es"),
-                    new ValidationError("Not a known invariant value.", "my-field.it")
+                    new ValidationError("Not a known invariant value.", "myField.es"),
+                    new ValidationError("Not a known invariant value.", "myField.it")
                 });
         }
 
         [Fact]
         public async Task Should_add_error_if_validating_data_with_invalid_localizable_field()
         {
-            schema = schema.AddNumber(1, "my-field", Partitioning.Language,
+            schema = schema.AddNumber(1, "myField", Partitioning.Language,
                 new NumberFieldProperties { IsRequired = true });
 
             var data =
@@ -165,15 +161,15 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Field is required.", "my-field.de"),
-                    new ValidationError("Field is required.", "my-field.en")
+                    new ValidationError("Field is required.", "myField.de"),
+                    new ValidationError("Field is required.", "myField.en")
                 });
         }
 
         [Fact]
         public async Task Should_add_error_if_required_data_field_is_not_in_bag()
         {
-            schema = schema.AddNumber(1, "my-field", Partitioning.Invariant,
+            schema = schema.AddNumber(1, "myField", Partitioning.Invariant,
                 new NumberFieldProperties { IsRequired = true });
 
             var data =
@@ -184,14 +180,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Field is required.", "my-field.iv")
+                    new ValidationError("Field is required.", "myField.iv")
                 });
         }
 
         [Fact]
         public async Task Should_add_error_if_required_data_string_field_is_not_in_bag()
         {
-            schema = schema.AddString(1, "my-field", Partitioning.Invariant,
+            schema = schema.AddString(1, "myField", Partitioning.Invariant,
                 new StringFieldProperties { IsRequired = true });
 
             var data =
@@ -202,18 +198,18 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Field is required.", "my-field.iv")
+                    new ValidationError("Field is required.", "myField.iv")
                 });
         }
 
         [Fact]
         public async Task Should_add_error_if_data_contains_invalid_language()
         {
-            schema = schema.AddNumber(1, "my-field", Partitioning.Language);
+            schema = schema.AddNumber(1, "myField", Partitioning.Language);
 
             var data =
                 new ContentData()
-                    .AddField("my-field",
+                    .AddField("myField",
                         new ContentFieldData()
                             .AddLocalized("de", 1)
                             .AddLocalized("ru", 1));
@@ -223,7 +219,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Not a known language.", "my-field.ru")
+                    new ValidationError("Not a known language.", "myField.ru")
                 });
         }
 
@@ -236,12 +232,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                     .Set(Language.IT, true)
                     .Remove(Language.EN);
 
-            schema = schema.AddString(1, "my-field", Partitioning.Language,
+            schema = schema.AddString(1, "myField", Partitioning.Language,
                 new StringFieldProperties { IsRequired = true });
 
             var data =
                 new ContentData()
-                    .AddField("my-field",
+                    .AddField("myField",
                         new ContentFieldData()
                             .AddLocalized("es", "value"));
 
@@ -253,11 +249,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_data_contains_unsupported_language()
         {
-            schema = schema.AddNumber(1, "my-field", Partitioning.Language);
+            schema = schema.AddNumber(1, "myField", Partitioning.Language);
 
             var data =
                 new ContentData()
-                    .AddField("my-field",
+                    .AddField("myField",
                         new ContentFieldData()
                             .AddLocalized("es", 1)
                             .AddLocalized("it", 1));
@@ -267,8 +263,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Not a known language.", "my-field.es"),
-                    new ValidationError("Not a known language.", "my-field.it")
+                    new ValidationError("Not a known language.", "myField.es"),
+                    new ValidationError("Not a known language.", "myField.it")
                 });
         }
 
@@ -292,12 +288,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_validating_partial_data_with_invalid_field()
         {
-            schema = schema.AddNumber(1, "my-field", Partitioning.Invariant,
+            schema = schema.AddNumber(1, "myField", Partitioning.Invariant,
                 new NumberFieldProperties { MaxValue = 100 });
 
             var data =
                 new ContentData()
-                    .AddField("my-field",
+                    .AddField("myField",
                         new ContentFieldData()
                             .AddInvariant(1000));
 
@@ -306,18 +302,18 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Must be less or equal to 100.", "my-field.iv")
+                    new ValidationError("Must be less or equal to 100.", "myField.iv")
                 });
         }
 
         [Fact]
         public async Task Should_add_error_if_non_localizable_partial_data_field_contains_language()
         {
-            schema = schema.AddNumber(1, "my-field", Partitioning.Invariant);
+            schema = schema.AddNumber(1, "myField", Partitioning.Invariant);
 
             var data =
                 new ContentData()
-                    .AddField("my-field",
+                    .AddField("myField",
                         new ContentFieldData()
                             .AddLocalized("es", 1)
                             .AddLocalized("it", 1));
@@ -327,15 +323,15 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Not a known invariant value.", "my-field.es"),
-                    new ValidationError("Not a known invariant value.", "my-field.it")
+                    new ValidationError("Not a known invariant value.", "myField.es"),
+                    new ValidationError("Not a known invariant value.", "myField.it")
                 });
         }
 
         [Fact]
         public async Task Should_not_add_error_if_validating_partial_data_with_invalid_localizable_field()
         {
-            schema = schema.AddNumber(1, "my-field", Partitioning.Language,
+            schema = schema.AddNumber(1, "myField", Partitioning.Language,
                 new NumberFieldProperties { IsRequired = true });
 
             var data =
@@ -349,7 +345,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_required_partial_data_field_is_not_in_bag()
         {
-            schema = schema.AddNumber(1, "my-field", Partitioning.Invariant,
+            schema = schema.AddNumber(1, "myField", Partitioning.Invariant,
                 new NumberFieldProperties { IsRequired = true });
 
             var data =
@@ -363,11 +359,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_partial_data_contains_invalid_language()
         {
-            schema = schema.AddNumber(1, "my-field", Partitioning.Language);
+            schema = schema.AddNumber(1, "myField", Partitioning.Language);
 
             var data =
                 new ContentData()
-                    .AddField("my-field",
+                    .AddField("myField",
                         new ContentFieldData()
                             .AddLocalized("de", 1)
                             .AddLocalized("ru", 1));
@@ -377,18 +373,18 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Not a known language.", "my-field.ru")
+                    new ValidationError("Not a known language.", "myField.ru")
                 });
         }
 
         [Fact]
         public async Task Should_add_error_if_partial_data_contains_unsupported_language()
         {
-            schema = schema.AddNumber(1, "my-field", Partitioning.Language);
+            schema = schema.AddNumber(1, "myField", Partitioning.Language);
 
             var data =
                 new ContentData()
-                    .AddField("my-field",
+                    .AddField("myField",
                         new ContentFieldData()
                             .AddLocalized("es", 1)
                             .AddLocalized("it", 1));
@@ -398,34 +394,34 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Not a known language.", "my-field.es"),
-                    new ValidationError("Not a known language.", "my-field.it")
+                    new ValidationError("Not a known language.", "myField.es"),
+                    new ValidationError("Not a known language.", "myField.it")
                 });
         }
 
         [Fact]
         public async Task Should_add_error_if_array_field_has_required_nested_field()
         {
-            schema = schema.AddArray(1, "my-field", Partitioning.Invariant, f => f.
-                AddNumber(2, "my-nested", new NumberFieldProperties { IsRequired = true }));
+            schema = schema.AddArray(1, "myField", Partitioning.Invariant, f => f.
+                AddNumber(2, "myNested", new NumberFieldProperties { IsRequired = true }));
 
             var data =
                 new ContentData()
-                    .AddField("my-field",
+                    .AddField("myField",
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
-                                    JsonValue.Object(),
-                                    JsonValue.Object().Add("my-nested", 1),
-                                    JsonValue.Object())));
+                                    new JsonObject(),
+                                    new JsonObject().Add("myNested", 1),
+                                    new JsonObject())));
 
             await data.ValidatePartialAsync(languagesConfig.ToResolver(), errors, schema);
 
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Field is required.", "my-field.iv[1].my-nested"),
-                    new ValidationError("Field is required.", "my-field.iv[3].my-nested")
+                    new ValidationError("Field is required.", "myField.iv[1].myNested"),
+                    new ValidationError("Field is required.", "myField.iv[3].myNested")
                 });
         }
 
@@ -445,16 +441,16 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_nested_separator_not_defined()
         {
-            schema = schema.AddArray(1, "my-field", Partitioning.Invariant, f => f.
-                AddUI(2, "my-nested"));
+            schema = schema.AddArray(1, "myField", Partitioning.Invariant, f => f.
+                AddUI(2, "myNested"));
 
             var data =
                 new ContentData()
-                    .AddField("my-field",
+                    .AddField("myField",
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
-                                    JsonValue.Object())));
+                                    new JsonObject())));
 
             await data.ValidateAsync(languagesConfig.ToResolver(), errors, schema);
 

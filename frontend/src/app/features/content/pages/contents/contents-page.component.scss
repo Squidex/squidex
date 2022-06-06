@@ -1,0 +1,90 @@
+@import 'mixins';
+@import 'vars';
+
+.content {
+    cursor: pointer;
+}
+
+.alert {
+    border-radius: 0;
+}
+
+.table-items {
+    background-color: $color-white;
+
+    th {
+        border-left: 1px solid $color-border;
+        border-right: 0;
+        position: relative;
+
+        &.cell-select {
+            @include force-width(60px);
+            border-left: 0;
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+        }
+
+        .resize-holder {
+            @include absolute(0, -10px, 0);
+            cursor: col-resize;
+            width: 20px;
+            z-index: 1;
+        }
+
+        &:last-child {
+            border-right: 0;
+        }
+    }
+
+    .cell-actions {
+        @include force-width(90px);
+    }
+}
+
+.table-container {
+    display: block;
+
+    .table {
+        margin: 0;
+    }
+
+    .table-items {
+        margin: 0;
+    }
+}
+
+.icon-plus {
+    font-size: $font-smallest;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.settings {
+    &-container {
+        position: relative;
+    }
+
+    &-button {
+        @include absolute(null, 1rem, -2.375rem);
+        background-color: $color-background;
+        border: 0;
+        border-radius: 4px;
+        z-index: 1000;
+    }
+}
+
+.btn-status {
+    background: $color-white;
+}
+
+.selection {
+    border-bottom: 1px solid $color-border;
+    border-radius: 0;
+    padding: .25 * $panel-padding $panel-padding;
+}
+
+tbody {
+    border: 0 !important;
+}

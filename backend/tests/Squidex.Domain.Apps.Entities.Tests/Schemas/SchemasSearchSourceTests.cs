@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core;
@@ -41,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var schema1 = CreateSchema("schemaA1");
 
-            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
+            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id, default))
                 .Returns(new List<ISchemaEntity> { schema1 });
 
             A.CallTo(() => urlGenerator.SchemaUI(appId, schema1.NamedId()))
@@ -63,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var schema1 = CreateSchema("schemaA1", SchemaType.Component);
 
-            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
+            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id, default))
                 .Returns(new List<ISchemaEntity> { schema1 });
 
             A.CallTo(() => urlGenerator.SchemaUI(appId, schema1.NamedId()))
@@ -87,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             var schema2 = CreateSchema("schemaA2");
             var schema3 = CreateSchema("schemaB2");
 
-            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
+            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id, default))
                 .Returns(new List<ISchemaEntity> { schema1, schema2, schema3 });
 
             A.CallTo(() => urlGenerator.SchemaUI(appId, schema1.NamedId()))
@@ -117,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var schema1 = CreateSchema("schemaA1", SchemaType.Singleton);
 
-            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
+            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id, default))
                 .Returns(new List<ISchemaEntity> { schema1 });
 
             A.CallTo(() => urlGenerator.SchemaUI(appId, schema1.NamedId()))

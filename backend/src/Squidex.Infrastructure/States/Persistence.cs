@@ -5,17 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 
 #pragma warning disable RECS0012 // 'if' statement can be re-written as 'switch' statement
 
 namespace Squidex.Infrastructure.States
 {
-    internal class Persistence<T> : IPersistence<T>
+    internal sealed class Persistence<T> : IPersistence<T>
     {
         private readonly DomainId ownerKey;
         private readonly ISnapshotStore<T> snapshotStore;
@@ -75,12 +71,18 @@ namespace Squidex.Infrastructure.States
         {
             if (UseSnapshots)
             {
-                await snapshotStore.RemoveAsync(ownerKey);
+                using (Telemetry.Activities.StartActivity("Persistence/ReadState"))
+                {
+                    await snapshotStore.RemoveAsync(ownerKey);
+                }
             }
 
             if (UseEventSourcing)
             {
-                await eventStore.DeleteStreamAsync(streamName.Value);
+                using (Telemetry.Activities.StartActivity("Persistence/ReadEvents"))
+                {
+                    await eventStore.DeleteStreamAsync(streamName.Value);
+                }
             }
         }
 
@@ -146,7 +148,7 @@ namespace Squidex.Infrastructure.States
 
                 if (@event.EventStreamNumber != newVersion)
                 {
-                    throw new InvalidOperationException("Events must follow the snapshot version in consecutive order with no gaps.");
+                    ThrowHelper.InvalidOperationException("Events must follow the snapshot version in consecutive order with no gaps.");
                 }
 
                 if (!isStopped)
@@ -179,7 +181,10 @@ namespace Squidex.Infrastructure.States
                 return;
             }
 
-            await snapshotStore.WriteAsync(ownerKey, state, oldVersion, newVersion);
+            using (Telemetry.Activities.StartActivity("Persistence/WriteState"))
+            {
+                await snapshotStore.WriteAsync(ownerKey, state, oldVersion, newVersion);
+            }
 
             versionSnapshot = newVersion;
 
@@ -188,7 +193,7 @@ namespace Squidex.Infrastructure.States
 
         public async Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events)
         {
-            Guard.NotEmpty(events, nameof(events));
+            Guard.NotEmpty(events);
 
             var oldVersion = EtagVersion.Any;
 
@@ -204,7 +209,10 @@ namespace Squidex.Infrastructure.States
 
             try
             {
-                await eventStore.AppendAsync(eventCommitId, streamName.Value, oldVersion, eventData);
+                using (Telemetry.Activities.StartActivity("Persistence/WriteEvents"))
+                {
+                    await eventStore.AppendAsync(eventCommitId, streamName.Value, oldVersion, eventData);
+                }
             }
             catch (WrongEventVersionException ex)
             {

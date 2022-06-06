@@ -5,14 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Extensions.Actions.Webhook
 {
@@ -73,11 +71,11 @@ namespace Squidex.Extensions.Actions.Webhook
 
             foreach (var line in lines)
             {
-                var indexEqual = line.IndexOf('=');
+                var indexEqual = line.IndexOf('=', StringComparison.Ordinal);
 
                 if (indexEqual > 0 && indexEqual < line.Length - 1)
                 {
-                    var headerKey = line.Substring(0, indexEqual);
+                    var headerKey = line[..indexEqual];
                     var headerValue = line[(indexEqual + 1)..];
 
                     headerValue = await FormatAsync(headerValue, @event);
@@ -89,7 +87,8 @@ namespace Squidex.Extensions.Actions.Webhook
             return headersDictionary;
         }
 
-        protected override async Task<Result> ExecuteJobAsync(WebhookJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(WebhookJob job,
+            CancellationToken ct = default)
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {

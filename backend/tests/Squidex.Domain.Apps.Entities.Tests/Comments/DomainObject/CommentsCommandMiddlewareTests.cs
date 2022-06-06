@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -31,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         public CommentsCommandMiddlewareTests()
         {
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._))
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, default))
                 .Returns(Task.FromResult<IUser?>(null));
 
             sut = new CommentsCommandMiddleware(grainFactory, userResolver);
@@ -112,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._))
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -121,14 +120,15 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         {
             var command = new CreateComment
             {
-                Text = "Hi @invalid@squidex.io", IsMention = true
+                Text = "Hi @invalid@squidex.io",
+                IsMention = true
             };
 
             var context = CrateCommandContext(command);
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._))
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -141,7 +141,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         {
             var user = UserMocks.User(id, email);
 
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(email))
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(email, default))
                 .Returns(user);
         }
 

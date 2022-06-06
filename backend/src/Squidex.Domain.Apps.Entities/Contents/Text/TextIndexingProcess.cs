@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Events.Contents;
@@ -118,6 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 var state = new TextContentState
                 {
+                    AppId = @event.AppId.Id,
                     UniqueContentId = uniqueId
                 };
 

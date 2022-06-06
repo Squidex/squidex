@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Runtime.Serialization;
 
 namespace Squidex.Infrastructure
@@ -18,7 +17,7 @@ namespace Squidex.Infrastructure
         public DomainObjectException(string message, string id, string errorCode, Exception? inner = null)
             : base(message, errorCode, inner)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNullOrEmpty(id);
 
             Id = id;
         }

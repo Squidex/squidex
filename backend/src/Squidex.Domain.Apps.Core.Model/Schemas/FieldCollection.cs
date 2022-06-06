@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -76,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public FieldCollection(T[] fields)
         {
-            Guard.NotNull(fields, nameof(fields));
+            Guard.NotNull(fields);
 
             fieldsOrdered = fields;
         }
@@ -100,11 +97,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public FieldCollection<T> Reorder(List<long> ids)
         {
-            Guard.NotNull(ids, nameof(ids));
+            Guard.NotNull(ids);
 
             if (ids.Count != fieldsOrdered.Length || ids.Any(x => !ById.ContainsKey(x)))
             {
-                throw new ArgumentException("Ids must cover all fields.", nameof(ids));
+                ThrowHelper.ArgumentException("Ids must cover all fields.", nameof(ids));
             }
 
             if (ids.SequenceEqual(fieldsOrdered.Select(x => x.Id)))
@@ -118,16 +115,16 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public FieldCollection<T> Add(T field)
         {
-            Guard.NotNull(field, nameof(field));
+            Guard.NotNull(field);
 
             if (ByName.ContainsKey(field.Name))
             {
-                throw new ArgumentException($"A field with name '{field.Name}' already exists.", nameof(field));
+                ThrowHelper.ArgumentException($"A field with name '{field.Name}' already exists.", nameof(field));
             }
 
             if (ById.ContainsKey(field.Id))
             {
-                throw new ArgumentException($"A field with id {field.Id} already exists.", nameof(field));
+                ThrowHelper.ArgumentException($"A field with ID {field.Id} already exists.", nameof(field));
             }
 
             return new FieldCollection<T>(fieldsOrdered.Union(Enumerable.Repeat(field, 1)));
@@ -136,7 +133,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public FieldCollection<T> Update(long fieldId, Func<T, T> updater)
         {
-            Guard.NotNull(updater, nameof(updater));
+            Guard.NotNull(updater);
 
             if (!ById.TryGetValue(fieldId, out var field))
             {
@@ -150,9 +147,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 return this;
             }
 
-            if (newField is not T)
+            if (newField is null)
             {
-                throw new InvalidOperationException($"Field must be of type {typeof(T)}");
+                ThrowHelper.InvalidOperationException($"Field must be of type {typeof(T)}");
+                return default!;
             }
 
             return new FieldCollection<T>(fieldsOrdered.Select(x => ReferenceEquals(x, field) ? newField : x));

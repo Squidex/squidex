@@ -1,0 +1,11 @@
+@import 'mixins';
+@import 'vars';
+
+iframe {
+    @include absolute(0, 0, 0, 0);
+    border: 0;
+}
+
+.card-body {
+    position: relative;
+}

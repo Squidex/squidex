@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -27,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var validator = A.Fake<IValidator>();
 
-            var componentData = JsonValue.Object();
+            var componentData = new JsonObject();
             var componentObject = new Component("type", componentData, new Schema("my-schema"));
 
             var isFactoryCalled = false;

@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Text;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
@@ -93,7 +92,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public string DisplayName { get; }
 
+        public string EnumName { get; }
+
         public string LocalizedType { get; }
+
+        public string LocalizedTypeDynamic { get; }
 
         public string LocalizedInputType { get; }
 
@@ -105,6 +108,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public string ReferenceType { get; }
 
+        public string EmbeddableStringType { get; }
+
         public IReadOnlyList<FieldInfo> Fields { get; }
 
         private FieldInfo(IField field, string typeName, Names names, Names parentNames, IReadOnlyList<FieldInfo> fields)
@@ -113,12 +118,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             ComponentType = names[$"{typeName}ComponentUnionDto"];
             DisplayName = field.DisplayName();
+            EmbeddableStringType = names[$"{typeName}EmbeddableString"];
+            EnumName = names[$"{fieldName}Enum"];
             Field = field;
-            Fields = fields;
             FieldName = fieldName;
             FieldNameDynamic = names[$"{fieldName}__Dynamic"];
-            LocalizedType = names[$"{typeName}Dto"];
+            Fields = fields;
             LocalizedInputType = names[$"{typeName}InputDto"];
+            LocalizedType = names[$"{typeName}Dto"];
+            LocalizedTypeDynamic = names[$"{typeName}Dto__Dynamic"];
             NestedInputType = names[$"{typeName}ChildInputDto"];
             NestedType = names[$"{typeName}ChildDto"];
             ReferenceType = names[$"{typeName}UnionDto"];
@@ -178,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private string GetName(string name, bool isEntity)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(name);
 
             if (!char.IsLetter(name[0]))
             {

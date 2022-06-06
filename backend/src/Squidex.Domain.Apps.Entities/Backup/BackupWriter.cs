@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
 using System.IO.Compression;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Backup.Helpers;
 using Squidex.Domain.Apps.Entities.Backup.Model;
 using Squidex.Infrastructure;
@@ -37,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public BackupWriter(IJsonSerializer serializer, Stream stream, bool keepOpen = false, BackupVersion version = BackupVersion.V2)
         {
-            Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(serializer);
 
             this.serializer = serializer;
 
@@ -57,40 +54,42 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public Task WriteJsonAsync(string name, object value)
+        public Task<Stream> OpenBlobAsync(string name,
+            CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(name);
 
-            var attachmentEntry = archive.CreateEntry(ArchiveHelper.GetAttachmentPath(name));
+            writtenAttachments++;
 
-            using (var stream = attachmentEntry.Open())
+            var entry = GetEntry(name);
+
+            return Task.FromResult(entry.Open());
+        }
+
+        public async Task WriteJsonAsync(string name, object value,
+            CancellationToken ct = default)
+        {
+            Guard.NotNullOrEmpty(name);
+
+            writtenAttachments++;
+
+            var entry = GetEntry(name);
+
+            await using (var stream = entry.Open())
             {
                 serializer.Serialize(value, stream);
             }
-
-            writtenAttachments++;
-
-            return Task.CompletedTask;
         }
 
-        public async Task WriteBlobAsync(string name, Func<Stream, Task> handler)
+        private ZipArchiveEntry GetEntry(string name)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
-            Guard.NotNull(handler, nameof(handler));
-
-            var attachmentEntry = archive.CreateEntry(ArchiveHelper.GetAttachmentPath(name));
-
-            using (var stream = attachmentEntry.Open())
-            {
-                await handler(stream);
-            }
-
-            writtenAttachments++;
+            return archive.CreateEntry(ArchiveHelper.GetAttachmentPath(name));
         }
 
-        public void WriteEvent(StoredEvent storedEvent)
+        public void WriteEvent(StoredEvent storedEvent,
+            CancellationToken ct = default)
         {
-            Guard.NotNull(storedEvent, nameof(storedEvent));
+            Guard.NotNull(storedEvent);
 
             var eventEntry = archive.CreateEntry(ArchiveHelper.GetEventPath(writtenEvents));
 

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Migrations;
@@ -22,7 +20,8 @@ namespace Migrations.Migrations.MongoDb
             collection = database.GetCollection<BsonDocument>("RuleEvents");
         }
 
-        public async Task UpdateAsync(CancellationToken ct)
+        public async Task UpdateAsync(
+            CancellationToken ct)
         {
             foreach (var document in collection.Find(new BsonDocument()).ToEnumerable(ct))
             {

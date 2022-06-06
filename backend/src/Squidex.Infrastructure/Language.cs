@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
@@ -16,32 +14,35 @@ namespace Squidex.Infrastructure
     [TypeConverter(typeof(LanguageTypeConverter))]
     public partial record Language
     {
-        private static readonly Regex CultureRegex = new Regex("^([a-z]{2})(\\-[a-z]{2})?$", RegexOptions.IgnoreCase);
+        private static readonly Regex CultureRegex = new Regex("^(?<Code>[a-z]{2})(\\-[a-z]{2})?$", RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
 
         public static Language GetLanguage(string iso2Code)
         {
-            Guard.NotNullOrEmpty(iso2Code, nameof(iso2Code));
+            Guard.NotNullOrEmpty(iso2Code);
 
-            try
+            if (LanguageByCode.TryGetValue(iso2Code, out var result))
             {
-                return AllLanguagesField[iso2Code];
+                return result;
             }
-            catch (KeyNotFoundException)
-            {
-                throw new NotSupportedException($"Language {iso2Code} is not supported");
-            }
+
+            return new Language(iso2Code.Trim());
         }
 
         public static IReadOnlyCollection<Language> AllLanguages
         {
-            get => AllLanguagesField.Values;
+            get => LanguageByCode.Values;
         }
 
         public string Iso2Code { get; }
 
         public string EnglishName
         {
-            get => AllLanguagesNames.GetOrDefault(Iso2Code) ?? string.Empty;
+            get => NamesEnglish.GetOrDefault(Iso2Code) ?? string.Empty;
+        }
+
+        public string NativeName
+        {
+            get => NamesNative.GetOrDefault(Iso2Code) ?? string.Empty;
         }
 
         private Language(string iso2Code)
@@ -49,18 +50,18 @@ namespace Squidex.Infrastructure
             Iso2Code = iso2Code;
         }
 
-        public static bool IsValidLanguage(string iso2Code)
+        public static bool IsDefault(string iso2Code)
         {
-            Guard.NotNull(iso2Code, nameof(iso2Code));
+            Guard.NotNull(iso2Code);
 
-            return AllLanguagesField.ContainsKey(iso2Code);
+            return LanguageByCode.ContainsKey(iso2Code);
         }
 
         public static bool TryGetLanguage(string iso2Code, [MaybeNullWhen(false)] out Language language)
         {
-            Guard.NotNull(iso2Code, nameof(iso2Code));
+            Guard.NotNull(iso2Code);
 
-            return AllLanguagesField.TryGetValue(iso2Code, out language!);
+            return LanguageByCode.TryGetValue(iso2Code, out language!);
         }
 
         public static implicit operator string(Language language)
@@ -91,7 +92,7 @@ namespace Squidex.Infrastructure
                     return null;
                 }
 
-                input = match.Groups[1].Value;
+                input = match.Groups["Code"].Value;
             }
 
             if (TryGetLanguage(input.ToLowerInvariant(), out var result))

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.EventSynchronization;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events.Schemas;
@@ -19,9 +17,9 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
     public class SchemaSynchronizerTests
     {
         private readonly Func<long> idGenerator;
-        private readonly NamedId<long> stringId = NamedId.Of(13L, "my-value");
-        private readonly NamedId<long> nestedId = NamedId.Of(141L, "my-value");
-        private readonly NamedId<long> arrayId = NamedId.Of(14L, "11-array");
+        private readonly NamedId<long> stringId = NamedId.Of(13L, "myValue");
+        private readonly NamedId<long> nestedId = NamedId.Of(141L, "myValue");
+        private readonly NamedId<long> arrayId = NamedId.Of(14L, "11Array");
         private int fields = 50;
 
         public SchemaSynchronizerTests()
@@ -89,7 +87,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var previewUrls = new Dictionary<string, string>
             {
                 ["web"] = "Url"
-            }.ToImmutableDictionary();
+            }.ToReadonlyDictionary();
 
             var sourceSchema =
                 new Schema("source");

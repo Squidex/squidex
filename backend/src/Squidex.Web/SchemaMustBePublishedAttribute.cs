@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-
 namespace Squidex.Web
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]

@@ -1,0 +1,48 @@
+<sqx-title message="i18n:common.subscription"></sqx-title>
+
+<sqx-layout layout="main" titleText="i18n:common.subscription" titleIcon="subscription" [innerWidth]="60">
+    <ng-container menu>
+        <sqx-notifo topic="apps/{{plansState.appId}}/settings/plan"></sqx-notifo>
+
+        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:plans.refreshTooltip" shortcut="CTRL + B">
+            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+        </button>
+    </ng-container>
+
+    <ng-container>
+        <sqx-list-view innerWidth="60rem" [isLoading]="plansState.isLoading | async">
+            <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
+                <div class="alert alert-danger" *ngIf="(plansState.isOwner | async) === false">
+                    {{ 'plans.notPlanOwner' | sqxTranslate }}
+                </div>
+
+                <div>
+                    <div class="text-muted text-center empty" *ngIf="plans.length === 0">
+                        {{ 'plans.noPlanConfigured' | sqxTranslate }}
+                    </div>
+
+                    <div class="row gx-2">
+                        <div class="col-3" *ngFor="let planInfo of plans; trackBy: trackByPlan">
+                            <sqx-plan [planInfo]="planInfo"></sqx-plan>
+                        </div>
+                    </div>
+
+                    <div *ngIf="plansState.hasPortal | async" class="billing-portal-link">
+                        {{ 'plans.billingPortalHint' | sqxTranslate }} <a [href]="portalUrl" sqxExternalLink>{{ 'plans.billingPortal' | sqxTranslate }}</a>
+                    </div>
+                </div>
+            </ng-container>
+        </sqx-list-view>
+    </ng-container>
+
+    <ng-container sidebarMenu>
+        <div class="panel-nav">        
+            <a class="panel-link" routerLink="history" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.history" titlePosition="left-center">
+                <i class="icon-time"></i>
+            </a>
+        </div>
+    </ng-container>
+</sqx-layout>
+
+<router-outlet></router-outlet>
+

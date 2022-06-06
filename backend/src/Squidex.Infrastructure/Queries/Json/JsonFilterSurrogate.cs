@@ -5,91 +5,53 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Infrastructure.Queries
+namespace Squidex.Infrastructure.Queries.Json
 {
-    public sealed class JsonFilterSurrogate : ISurrogate<FilterNode<IJsonValue>>
+    public sealed class JsonFilterSurrogate : ISurrogate<FilterNode<JsonValue>>
     {
-        public FilterNode<IJsonValue>[]? And { get; set; }
+        public FilterNode<JsonValue>[]? And { get; set; }
 
-        public FilterNode<IJsonValue>[]? Or { get; set; }
+        public FilterNode<JsonValue>[]? Or { get; set; }
 
-        public FilterNode<IJsonValue>? Not { get; set; }
+        public FilterNode<JsonValue>? Not { get; set; }
 
-        public string? Op { get; set; }
+        public CompareOperator? Op { get; set; }
 
         public string? Path { get; set; }
 
-        public IJsonValue? Value { get; set; }
+        public JsonValue Value { get; set; }
 
-        public void FromSource(FilterNode<IJsonValue> source)
+        public void FromSource(FilterNode<JsonValue> source)
         {
             throw new NotSupportedException();
         }
 
-        public FilterNode<IJsonValue> ToSource()
+        public FilterNode<JsonValue> ToSource()
         {
             if (Not != null)
             {
-                return new NegateFilter<IJsonValue>(Not);
+                return new NegateFilter<JsonValue>(Not);
             }
 
             if (And != null)
             {
-                return new LogicalFilter<IJsonValue>(LogicalFilterType.And, And);
+                return new LogicalFilter<JsonValue>(LogicalFilterType.And, And);
             }
 
             if (Or != null)
             {
-                return new LogicalFilter<IJsonValue>(LogicalFilterType.Or, Or);
+                return new LogicalFilter<JsonValue>(LogicalFilterType.Or, Or);
             }
 
-            if (!string.IsNullOrWhiteSpace(Path) && !string.IsNullOrWhiteSpace(Op))
+            if (!string.IsNullOrWhiteSpace(Path))
             {
-                var @operator = ReadOperator(Op);
-
-                return new CompareFilter<IJsonValue>(Path, @operator, Value ?? JsonValue.Null);
+                return new CompareFilter<JsonValue>(Path, Op ?? CompareOperator.Equals, Value);
             }
 
-            throw new JsonException("Invalid query.");
-        }
-
-        private static CompareOperator ReadOperator(string op)
-        {
-            switch (op.ToLowerInvariant())
-            {
-                case "eq":
-                    return CompareOperator.Equals;
-                case "ne":
-                    return CompareOperator.NotEquals;
-                case "lt":
-                    return CompareOperator.LessThan;
-                case "le":
-                    return CompareOperator.LessThanOrEqual;
-                case "gt":
-                    return CompareOperator.GreaterThan;
-                case "ge":
-                    return CompareOperator.GreaterThanOrEqual;
-                case "empty":
-                    return CompareOperator.Empty;
-                case "exists":
-                    return CompareOperator.Exists;
-                case "matchs":
-                    return CompareOperator.Matchs;
-                case "contains":
-                    return CompareOperator.Contains;
-                case "endswith":
-                    return CompareOperator.EndsWith;
-                case "startswith":
-                    return CompareOperator.StartsWith;
-                case "in":
-                    return CompareOperator.In;
-            }
-
-            throw new JsonException($"Unexpected compare operator, got {op}.");
+            ThrowHelper.JsonException(Errors.InvalidJsonStructure());
+            return default!;
         }
     }
 }

@@ -1,0 +1,56 @@
+<div class="table-items-row-details-tabs clearfix">
+    <ul class="nav nav-tabs2">
+        <li class="nav-item">
+            <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">
+                {{ 'schemas.field.tabCommon' | sqxTranslate }}
+            </a>
+        </li>
+        <li class="nav-item" [class.hidden]="!field.properties.isContentField">
+            <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">
+                {{ 'schemas.field.tabValidation' | sqxTranslate }}
+            </a>
+        </li>
+        <li class="nav-item" [class.hidden]="!field.properties.isContentField">
+            <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2">
+                {{ 'schemas.field.tabEditing' | sqxTranslate }}
+            </a>
+        </li>
+    </ul>
+
+    <div class="float-end" *ngIf="showButtons">
+        <button [disabled]="field.isLocked" type="reset" class="btn btn-text-secondary" (click)="cancel.emit()">
+            {{ 'common.cancel' | sqxTranslate }}
+        </button>
+
+        <button [disabled]="field.isLocked" type="submit" class="btn btn-primary ms-1" *ngIf="isEditable">
+            {{ 'common.save' | sqxTranslate }}
+        </button>
+    </div>
+</div>
+
+<div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 0">
+    <sqx-field-form-common
+        [fieldForm]="fieldForm"
+        [field]="field"
+        [schema]="schema">
+    </sqx-field-form-common>
+</div>
+
+<div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 1">
+    <sqx-field-form-validation 
+        [languages]="languages"
+        [fieldForm]="fieldForm"
+        [field]="field"
+        [schema]="schema"
+        [isLocalizable]="isLocalizable"
+        [settings]="settings" >
+    </sqx-field-form-validation>
+</div>
+
+<div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 2">
+    <sqx-field-form-ui
+        [fieldForm]="fieldForm"
+        [field]="field"
+        [schema]="schema">
+    </sqx-field-form-ui>
+</div>

@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
@@ -20,6 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 {
     public class RuleEnricherTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
@@ -28,6 +27,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
         public RuleEnricherTests()
         {
+            ct = cts.Token;
+
             requestContext = Context.Anonymous(Mocks.App(appId));
 
             sut = new RuleEnricher(ruleEventRepository, requestCache);
@@ -38,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
         {
             var source = CreateRule();
 
-            var result = await sut.EnrichAsync(source, requestContext);
+            var result = await sut.EnrichAsync(source, requestContext, ct);
 
             Assert.Equal(0, result.NumFailed);
             Assert.Equal(0, result.NumSucceeded);
@@ -48,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
             A.CallTo(() => requestCache.AddDependency(source.UniqueId, source.Version))
                 .MustHaveHappened();
 
-            A.CallTo(() => requestCache.AddDependency(null))
+            A.CallTo(() => requestCache.AddDependency<Instant?>(null))
                 .MustNotHaveHappened();
         }
 
@@ -65,10 +66,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
                 LastExecuted = SystemClock.Instance.GetCurrentInstant()
             };
 
-            A.CallTo(() => ruleEventRepository.QueryStatisticsByAppAsync(appId.Id, A<CancellationToken>._))
+            A.CallTo(() => ruleEventRepository.QueryStatisticsByAppAsync(appId.Id, ct))
                 .Returns(new List<RuleStatistics> { stats });
 
-            await sut.EnrichAsync(source, requestContext);
+            await sut.EnrichAsync(source, requestContext, ct);
 
             A.CallTo(() => requestCache.AddDependency(source.UniqueId, source.Version))
                 .MustHaveHappened();

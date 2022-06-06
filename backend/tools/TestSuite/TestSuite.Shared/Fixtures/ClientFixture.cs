@@ -13,6 +13,8 @@ namespace TestSuite.Fixtures
     {
         public IAppsClient Apps => Squidex.Apps;
 
+        public IAssetsClient Assets => Squidex.Assets;
+
         public IBackupsClient Backups => Squidex.Backups;
 
         public ILanguagesClient Languages => Squidex.Languages;
@@ -22,5 +24,7 @@ namespace TestSuite.Fixtures
         public IRulesClient Rules => Squidex.Rules;
 
         public ISchemasClient Schemas => Squidex.Schemas;
+
+        public ITemplatesClient Templates => Squidex.Templates;
     }
 }

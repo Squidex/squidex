@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Net.Http.Headers;
+
+#pragma warning disable MA0073 // Avoid comparison with bool constant
 
 namespace Squidex.Web.Pipeline
 {
@@ -41,10 +41,17 @@ namespace Squidex.Web.Pipeline
 
         private static bool IsCacheable(HttpContext httpContext, string etag)
         {
-            return HttpMethods.IsGet(httpContext.Request.Method) &&
-                httpContext.Response.StatusCode == 200 &&
-                httpContext.Request.Headers.TryGetString(HeaderNames.IfNoneMatch, out var noneMatch) &&
-                string.Equals(etag, noneMatch, StringComparison.Ordinal);
+            if (!HttpMethods.IsGet(httpContext.Request.Method) || httpContext.Response.StatusCode != 200)
+            {
+                return false;
+            }
+
+            if (!httpContext.Request.Headers.TryGetString(HeaderNames.IfNoneMatch, out var noneMatchValue))
+            {
+                return false;
+            }
+
+            return ETagUtils.IsSameEtag(noneMatchValue, etag);
         }
     }
 }

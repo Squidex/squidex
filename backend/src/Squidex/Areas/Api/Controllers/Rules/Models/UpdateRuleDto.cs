@@ -23,13 +23,13 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// <summary>
         /// The trigger properties.
         /// </summary>
-        public RuleTriggerDto Trigger { get; set; }
+        public RuleTriggerDto? Trigger { get; set; }
 
         /// <summary>
         /// The action properties.
         /// </summary>
         [JsonConverter(typeof(RuleActionConverter))]
-        public RuleAction Action { get; set; }
+        public RuleAction? Action { get; set; }
 
         /// <summary>
         /// Enable or disable the rule.
@@ -40,10 +40,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         {
             var command = SimpleMapper.Map(this, new UpdateRule { RuleId = id });
 
-            if (Trigger != null)
-            {
-                command.Trigger = Trigger.ToTrigger();
-            }
+            command.Trigger = Trigger?.ToTrigger();
 
             return command;
         }

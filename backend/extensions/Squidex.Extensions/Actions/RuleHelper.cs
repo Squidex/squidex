@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -22,9 +18,10 @@ namespace Squidex.Extensions.Actions
         {
             if (!string.IsNullOrWhiteSpace(expression))
             {
-                var vars = new ScriptVars
+                // Script vars are just wrappers over dictionaries for better performance.
+                var vars = new EventScriptVars
                 {
-                    ["event"] = @event
+                    Event = @event
                 };
 
                 return scriptEngine.Evaluate(vars, expression);
@@ -45,7 +42,8 @@ namespace Squidex.Extensions.Actions
             return @event is EnrichedAssetEvent { Type: EnrichedAssetEventType.Deleted };
         }
 
-        public static async Task<Result> OneWayRequestAsync(this HttpClient client, HttpRequestMessage request, string requestBody = null, CancellationToken ct = default)
+        public static async Task<Result> OneWayRequestAsync(this HttpClient client, HttpRequestMessage request, string requestBody = null,
+            CancellationToken ct = default)
         {
             HttpResponseMessage response = null;
             try

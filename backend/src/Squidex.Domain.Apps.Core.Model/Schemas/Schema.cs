@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
@@ -20,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string Name { get; }
 
-        public string Category { get; private set; }
+        public string? Category { get; private set; }
 
         public bool IsPublished { get; private set; }
 
@@ -32,11 +29,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public FieldNames FieldsInReferences { get; private set; } = FieldNames.Empty;
 
-        public SchemaScripts Scripts { get; private set; } = SchemaScripts.Empty;
+        public SchemaScripts Scripts { get; private set; } = new SchemaScripts();
 
         public SchemaProperties Properties { get; private set; } = new SchemaProperties();
 
-        public ImmutableDictionary<string, string> PreviewUrls { get; private set; } = ImmutableDictionary.Empty<string, string>();
+        public ReadonlyDictionary<string, string> PreviewUrls { get; private set; } = ReadonlyDictionary.Empty<string, string>();
 
         public IReadOnlyList<RootField> Fields
         {
@@ -55,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public Schema(string name, SchemaProperties? properties = null, SchemaType type = SchemaType.Default)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(name);
 
             Name = name;
 
@@ -70,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public Schema(string name, RootField[] fields, SchemaProperties? properties, bool isPublished = false, SchemaType type = SchemaType.Default)
             : this(name, properties, type)
         {
-            Guard.NotNull(fields, nameof(fields));
+            Guard.NotNull(fields);
 
             FieldCollection = new FieldCollection<RootField>(fields);
 
@@ -78,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema Update(SchemaProperties newProperties)
+        public Schema Update(SchemaProperties? newProperties)
         {
             newProperties ??= new SchemaProperties();
 
@@ -94,7 +91,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema SetScripts(SchemaScripts newScripts)
+        public Schema SetScripts(SchemaScripts? newScripts)
         {
             newScripts ??= new SchemaScripts();
 
@@ -110,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema SetFieldsInLists(FieldNames names)
+        public Schema SetFieldsInLists(FieldNames? names)
         {
             names ??= FieldNames.Empty;
 
@@ -132,7 +129,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema SetFieldsInReferences(FieldNames names)
+        public Schema SetFieldsInReferences(FieldNames? names)
         {
             names ??= FieldNames.Empty;
 
@@ -154,7 +151,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema SetFieldRules(FieldRules rules)
+        public Schema SetFieldRules(FieldRules? rules)
         {
             rules ??= FieldRules.Empty;
 
@@ -204,9 +201,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema ChangeCategory(string category)
+        public Schema ChangeCategory(string? category)
         {
-            if (string.Equals(Category, category))
+            if (string.Equals(Category, category, StringComparison.Ordinal))
             {
                 return this;
             }
@@ -218,9 +215,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema SetPreviewUrls(ImmutableDictionary<string, string> previewUrls)
+        public Schema SetPreviewUrls(ReadonlyDictionary<string, string>? previewUrls)
         {
-            previewUrls ??= ImmutableDictionary.Empty<string, string>();
+            previewUrls ??= ReadonlyDictionary.Empty<string, string>();
 
             if (PreviewUrls.Equals(previewUrls))
             {

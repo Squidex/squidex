@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Json.Objects;
@@ -49,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [LocalizedRequired]
         public JsonObject Properties { get; set; }
 
-        public static RoleDto FromRole(Role role, IAppEntity app)
+        public static RoleDto FromDomain(Role role, IAppEntity app)
         {
             var result = new RoleDto
             {

@@ -5,18 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Assets;
 using Squidex.Infrastructure;
 using Squidex.Web.Pipeline;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Web
 {
-    public delegate Task FileCallback(Stream body, BytesRange range, CancellationToken ct);
+    public delegate Task FileCallback(Stream body, BytesRange range,
+        CancellationToken ct);
 
     public sealed class FileCallbackResult : FileResult
     {
@@ -31,7 +31,7 @@ namespace Squidex.Web
         public FileCallbackResult(string contentType, FileCallback callback)
             : base(contentType)
         {
-            Guard.NotNull(callback, nameof(callback));
+            Guard.NotNull(callback);
 
             Callback = callback;
         }

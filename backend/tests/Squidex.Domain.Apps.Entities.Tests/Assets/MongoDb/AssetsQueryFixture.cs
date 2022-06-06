@@ -5,15 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Globalization;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.MongoDb;
@@ -24,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
     {
         private readonly Random random = new Random();
         private readonly int numValues = 250;
-        private readonly IMongoClient mongoClient = new MongoClient("mongodb://localhost");
+        private readonly IMongoClient mongoClient;
         private readonly IMongoDatabase mongoDatabase;
 
         public MongoAssetRepository AssetRepository { get; }
@@ -37,7 +36,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         public AssetsQueryFixture()
         {
-            mongoDatabase = mongoClient.GetDatabase("Squidex_Testing");
+            mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
+            mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
             SetupJson();
 
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
             Task.Run(async () =>
             {
-                await assetRepository.InitializeAsync();
+                await assetRepository.InitializeAsync(default);
 
                 await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 0 }");
                 await mongoDatabase.DropCollectionAsync("system.profile");
@@ -77,11 +77,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
                     {
                         for (var i = 0; i < numValues; i++)
                         {
-                            var fileName = i.ToString();
+                            var fileName = i.ToString(CultureInfo.InvariantCulture);
 
                             for (var j = 0; j < numValues; j++)
                             {
-                                var tag = j.ToString();
+                                var tag = j.ToString(CultureInfo.InvariantCulture);
 
                                 var asset = new MongoAssetEntity
                                 {
@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         public string RandomValue()
         {
-            return random.Next(0, numValues).ToString();
+            return random.Next(0, numValues).ToString(CultureInfo.InvariantCulture);
         }
     }
 }

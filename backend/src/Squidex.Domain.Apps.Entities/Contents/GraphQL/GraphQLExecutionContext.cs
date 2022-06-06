@@ -5,17 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.DataLoader;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Log;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
@@ -25,38 +19,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private static readonly List<IEnrichedAssetEntity> EmptyAssets = new List<IEnrichedAssetEntity>();
         private static readonly List<IEnrichedContentEntity> EmptyContents = new List<IEnrichedContentEntity>();
         private readonly IDataLoaderContextAccessor dataLoaders;
-        private readonly IUserResolver userResolver;
-
-        public IUrlGenerator UrlGenerator { get; }
-
-        public ICommandBus CommandBus { get; }
-
-        public ISemanticLog Log { get; }
 
         public override Context Context { get; }
 
-        public GraphQLExecutionContext(IAssetQueryService assetQuery, IContentQueryService contentQuery,
-            Context context,
+        public GraphQLExecutionContext(
             IDataLoaderContextAccessor dataLoaders,
-            ICommandBus commandBus, IUrlGenerator urlGenerator, IUserResolver userResolver,
-            ISemanticLog log)
-            : base(assetQuery, contentQuery)
+            IAssetQueryService assetQuery,
+            IAssetCache assetCache,
+            IContentQueryService contentQuery,
+            IContentCache contentCache,
+            IServiceProvider serviceProvider,
+            Context context)
+            : base(assetQuery, assetCache, contentQuery, contentCache, serviceProvider)
         {
             this.dataLoaders = dataLoaders;
-            this.userResolver = userResolver;
-
-            CommandBus = commandBus;
-
-            UrlGenerator = urlGenerator;
 
             Context = context.Clone(b => b
                 .WithoutCleanup()
                 .WithoutContentEnrichment());
-
-            Log = log;
         }
 
-        public async Task<IUser> FindUserAsync(RefToken refToken)
+        public async Task<IUser?> FindUserAsync(RefToken refToken,
+            CancellationToken ct)
         {
             if (refToken.IsClient)
             {
@@ -66,58 +50,111 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 var dataLoader = GetUserLoader();
 
-                return await dataLoader.LoadAsync(refToken.Identifier).GetResultAsync();
+                return await dataLoader.LoadAsync(refToken.Identifier).GetResultAsync(ct);
             }
         }
 
-        public async Task<IEnrichedAssetEntity?> FindAssetAsync(DomainId id)
+        public async Task<IEnrichedAssetEntity?> FindAssetAsync(DomainId id,
+            CancellationToken ct)
         {
             var dataLoader = GetAssetsLoader();
 
-            return await dataLoader.LoadAsync(id).GetResultAsync();
+            return await dataLoader.LoadAsync(id).GetResultAsync(ct);
         }
 
-        public async Task<IContentEntity?> FindContentAsync(DomainId id)
+        public async Task<IContentEntity?> FindContentAsync(DomainId schemaId, DomainId id,
+            CancellationToken ct)
         {
             var dataLoader = GetContentsLoader();
 
-            return await dataLoader.LoadAsync(id).GetResultAsync();
+            var content = await dataLoader.LoadAsync(id).GetResultAsync(ct);
+
+            if (content?.SchemaId.Id != schemaId)
+            {
+                content = null;
+            }
+
+            return content;
         }
 
-        public Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(IJsonValue value)
+        public Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(JsonValue value, TimeSpan cacheDuration,
+            CancellationToken ct)
         {
             var ids = ParseIds(value);
 
-            if (ids == null)
-            {
-                return Task.FromResult<IReadOnlyList<IEnrichedAssetEntity>>(EmptyAssets);
-            }
-
-            var dataLoader = GetAssetsLoader();
-
-            return LoadManyAsync(dataLoader, ids);
+            return GetAssetsAsync(ids, cacheDuration, ct);
         }
 
-        public Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(IJsonValue value)
+        public async Task<IReadOnlyList<IEnrichedAssetEntity>> GetAssetsAsync(List<DomainId>? ids, TimeSpan cacheDuration,
+            CancellationToken ct)
+        {
+            if (ids == null || ids.Count == 0)
+            {
+                return EmptyAssets;
+            }
+
+            async Task<IReadOnlyList<IEnrichedAssetEntity>> LoadAsync(IEnumerable<DomainId> ids)
+            {
+                var result = await GetAssetsLoader().LoadAsync(ids).GetResultAsync(ct);
+
+                return result?.NotNull().ToList() ?? EmptyAssets;
+            }
+
+            if (cacheDuration > TimeSpan.Zero)
+            {
+                var assets = await AssetCache.CacheOrQueryAsync(ids, async pendingIds =>
+                {
+                    return await LoadAsync(pendingIds);
+                }, cacheDuration);
+
+                return assets;
+            }
+
+            return await LoadAsync(ids);
+        }
+
+        public Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(JsonValue value, TimeSpan cacheDuration,
+            CancellationToken ct)
         {
             var ids = ParseIds(value);
 
-            if (ids == null)
+            return GetContentsAsync(ids, cacheDuration, ct);
+        }
+
+        public async Task<IReadOnlyList<IEnrichedContentEntity>> GetContentsAsync(List<DomainId>? ids, TimeSpan cacheDuration,
+            CancellationToken ct)
+        {
+            if (ids == null || ids.Count == 0)
             {
-                return Task.FromResult<IReadOnlyList<IEnrichedContentEntity>>(EmptyContents);
+                return EmptyContents;
             }
 
-            var dataLoader = GetContentsLoader();
+            async Task<IReadOnlyList<IEnrichedContentEntity>> LoadAsync(IEnumerable<DomainId> ids)
+            {
+                var result = await GetContentsLoader().LoadAsync(ids).GetResultAsync(ct);
 
-            return LoadManyAsync(dataLoader, ids);
+                return result?.NotNull().ToList() ?? EmptyContents;
+            }
+
+            if (cacheDuration > TimeSpan.Zero)
+            {
+                var contents = await ContentCache.CacheOrQueryAsync(ids, async pendingIds =>
+                {
+                    return await LoadAsync(pendingIds);
+                }, cacheDuration);
+
+                return contents.ToList();
+            }
+
+            return await LoadAsync(ids);
         }
 
         private IDataLoader<DomainId, IEnrichedAssetEntity> GetAssetsLoader()
         {
-            return dataLoaders.Context.GetOrAddBatchLoader<DomainId, IEnrichedAssetEntity>(nameof(GetAssetsLoader),
-                async batch =>
+            return dataLoaders.Context!.GetOrAddBatchLoader<DomainId, IEnrichedAssetEntity>(nameof(GetAssetsLoader),
+                async (batch, ct) =>
                 {
-                    var result = await GetReferencedAssetsAsync(new List<DomainId>(batch));
+                    var result = await GetReferencedAssetsAsync(new List<DomainId>(batch), ct);
 
                     return result.ToDictionary(x => x.Id);
                 });
@@ -125,10 +162,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private IDataLoader<DomainId, IEnrichedContentEntity> GetContentsLoader()
         {
-            return dataLoaders.Context.GetOrAddBatchLoader<DomainId, IEnrichedContentEntity>(nameof(GetContentsLoader),
-                async batch =>
+            return dataLoaders.Context!.GetOrAddBatchLoader<DomainId, IEnrichedContentEntity>(nameof(GetContentsLoader),
+                async (batch, ct) =>
                 {
-                    var result = await GetReferencedContentsAsync(new List<DomainId>(batch));
+                    var result = await GetReferencedContentsAsync(new List<DomainId>(batch), ct);
 
                     return result.ToDictionary(x => x.Id);
                 });
@@ -136,33 +173,30 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private IDataLoader<string, IUser> GetUserLoader()
         {
-            return dataLoaders.Context.GetOrAddBatchLoader<string, IUser>(nameof(GetUserLoader),
-                async batch =>
+            return dataLoaders.Context!.GetOrAddBatchLoader<string, IUser>(nameof(GetUserLoader),
+                async (batch, ct) =>
                 {
-                    var result = await userResolver.QueryManyAsync(batch.ToArray());
+                    var result = await Resolve<IUserResolver>().QueryManyAsync(batch.ToArray(), ct);
 
                     return result;
                 });
         }
 
-        private static async Task<IReadOnlyList<T>> LoadManyAsync<TKey, T>(IDataLoader<TKey, T> dataLoader, ICollection<TKey> keys) where T : class
-        {
-            var contents = await Task.WhenAll(keys.Select(x => dataLoader.LoadAsync(x).GetResultAsync()));
-
-            return contents.NotNull().ToList();
-        }
-
-        private static ICollection<DomainId>? ParseIds(IJsonValue value)
+        private static List<DomainId>? ParseIds(JsonValue value)
         {
             try
             {
-                var result = new List<DomainId>();
+                List<DomainId>? result = null;
 
-                if (value is JsonArray array)
+                if (value.Type == JsonValueType.Array)
                 {
-                    foreach (var id in array)
+                    foreach (var item in value.AsArray)
                     {
-                        result.Add(DomainId.Create(id.ToString()));
+                        if (item.Type == JsonValueType.String)
+                        {
+                            result ??= new List<DomainId>();
+                            result.Add(DomainId.Create(item.AsString));
+                        }
                     }
                 }
 

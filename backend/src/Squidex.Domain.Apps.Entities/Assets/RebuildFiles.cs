@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.IO;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
@@ -33,7 +30,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.eventDataFormatter = eventDataFormatter;
         }
 
-        public async Task RepairAsync(CancellationToken ct = default)
+        public async Task RepairAsync(
+            CancellationToken ct = default)
         {
             await foreach (var storedEvent in eventStore.QueryAllAsync("^asset\\-", ct: ct))
             {
@@ -54,7 +52,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        private async Task TryRepairAsync(NamedId<DomainId> appId, DomainId id, long fileVersion, CancellationToken ct)
+        private async Task TryRepairAsync(NamedId<DomainId> appId, DomainId id, long fileVersion,
+            CancellationToken ct)
         {
             try
             {

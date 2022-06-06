@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Contents.Json;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -29,11 +27,11 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                         new Dictionary<Status, WorkflowTransition>
                         {
                             [Status.Published] = WorkflowTransition.When("Expression", "Role1", "Role2")
-                        }.ToImmutableDictionary(),
+                        }.ToReadonlyDictionary(),
                         "#00ff00",
                         NoUpdate.When("Expression", "Role1", "Role2"))
-                }.ToImmutableDictionary(),
-                ImmutableList.Create(DomainId.NewGuid()), "MyName");
+                }.ToReadonlyDictionary(),
+                ReadonlyList.Create(DomainId.NewGuid()), "MyName");
 
             var serialized = workflow.SerializeAndDeserialize();
 
@@ -63,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         [Fact]
         public void Should_serialize_and_deserialize_no_update_condition()
         {
-            var step = new WorkflowStep(noUpdate: NoUpdate.When("Expression", "Role1", "Role2"));
+            var step = new WorkflowStep(NoUpdate: NoUpdate.When("Expression", "Role1", "Role2"));
 
             var serialized = step.SerializeAndDeserialize();
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
@@ -25,12 +24,12 @@ namespace Squidex.Extensions.Actions.Slack
         [AbsoluteUrl]
         [LocalizedRequired]
         [Display(Name = "Webhook Url", Description = "The slack webhook url.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public Uri WebhookUrl { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Text", Description = "The text that is sent as message to slack.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Text { get; set; }
     }

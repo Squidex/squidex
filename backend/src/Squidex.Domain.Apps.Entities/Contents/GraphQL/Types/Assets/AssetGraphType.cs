@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
@@ -18,40 +18,41 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
 {
     internal sealed class AssetGraphType : ObjectGraphType<IEnrichedAssetEntity>
     {
-        public AssetGraphType(bool canGenerateSourceUrl)
+        public AssetGraphType()
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = "Asset";
 
             AddField(new FieldType
             {
                 Name = "id",
-                ResolvedType = AllTypes.NonNullString,
+                ResolvedType = Scalars.NonNullString,
                 Resolver = EntityResolvers.Id,
-                Description = "The id of the asset."
+                Description = FieldDescriptions.EntityId
             });
 
             AddField(new FieldType
             {
                 Name = "version",
-                ResolvedType = AllTypes.NonNullInt,
+                ResolvedType = Scalars.NonNullInt,
                 Resolver = EntityResolvers.Version,
-                Description = "The version of the asset."
+                Description = FieldDescriptions.EntityVersion
             });
 
             AddField(new FieldType
             {
                 Name = "created",
-                ResolvedType = AllTypes.NonNullDateTime,
+                ResolvedType = Scalars.NonNullDateTime,
                 Resolver = EntityResolvers.Created,
-                Description = "The date and time when the asset has been created."
+                Description = FieldDescriptions.EntityCreated
             });
 
             AddField(new FieldType
             {
                 Name = "createdBy",
-                ResolvedType = AllTypes.NonNullString,
+                ResolvedType = Scalars.NonNullString,
                 Resolver = EntityResolvers.CreatedBy,
-                Description = "The user that has created the asset."
+                Description = FieldDescriptions.EntityCreatedBy
             });
 
             AddField(new FieldType
@@ -59,23 +60,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "createdByUser",
                 ResolvedType = UserGraphType.NonNull,
                 Resolver = EntityResolvers.CreatedByUser,
-                Description = "The full info of the user that has created the asset."
+                Description = FieldDescriptions.EntityCreatedBy
             });
 
             AddField(new FieldType
             {
                 Name = "lastModified",
-                ResolvedType = AllTypes.NonNullDateTime,
+                ResolvedType = Scalars.NonNullDateTime,
                 Resolver = EntityResolvers.LastModified,
-                Description = "The date and time when the asset has been modified last."
+                Description = FieldDescriptions.EntityLastModified
             });
 
             AddField(new FieldType
             {
                 Name = "lastModifiedBy",
-                ResolvedType = AllTypes.NonNullString,
+                ResolvedType = Scalars.NonNullString,
                 Resolver = EntityResolvers.LastModifiedBy,
-                Description = "The user that has updated the asset last."
+                Description = FieldDescriptions.EntityLastModifiedBy
             });
 
             AddField(new FieldType
@@ -83,176 +84,187 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "lastModifiedByUser",
                 ResolvedType = UserGraphType.NonNull,
                 Resolver = EntityResolvers.LastModifiedByUser,
-                Description = "The full info of the user that has created the asset."
+                Description = FieldDescriptions.EntityLastModifiedBy
             });
 
             AddField(new FieldType
             {
                 Name = "mimeType",
-                ResolvedType = AllTypes.NonNullString,
+                ResolvedType = Scalars.NonNullString,
                 Resolver = Resolve(x => x.MimeType),
-                Description = "The mime type."
+                Description = FieldDescriptions.AssetMimeType
             });
 
             AddField(new FieldType
             {
                 Name = "url",
-                ResolvedType = AllTypes.NonNullString,
+                ResolvedType = Scalars.NonNullString,
                 Resolver = Url,
-                Description = "The url to the asset."
+                Description = FieldDescriptions.AssetUrl
             });
 
             AddField(new FieldType
             {
                 Name = "thumbnailUrl",
-                ResolvedType = AllTypes.String,
+                ResolvedType = Scalars.String,
                 Resolver = ThumbnailUrl,
-                Description = "The thumbnail url to the asset."
+                Description = FieldDescriptions.AssetThumbnailUrl
             });
 
             AddField(new FieldType
             {
                 Name = "fileName",
-                ResolvedType = AllTypes.NonNullString,
+                ResolvedType = Scalars.NonNullString,
                 Resolver = Resolve(x => x.FileName),
-                Description = "The file name."
+                Description = FieldDescriptions.AssetFileName
             });
 
             AddField(new FieldType
             {
                 Name = "fileHash",
-                ResolvedType = AllTypes.NonNullString,
+                ResolvedType = Scalars.NonNullString,
                 Resolver = Resolve(x => x.FileHash),
-                Description = "The hash of the file. Can be null for old files."
+                Description = FieldDescriptions.AssetFileHash
             });
 
             AddField(new FieldType
             {
                 Name = "fileType",
-                ResolvedType = AllTypes.NonNullString,
+                ResolvedType = Scalars.NonNullString,
                 Resolver = Resolve(x => x.FileName.FileType()),
-                Description = "The file type."
+                Description = FieldDescriptions.AssetFileType
             });
 
             AddField(new FieldType
             {
                 Name = "fileSize",
-                ResolvedType = AllTypes.NonNullInt,
+                ResolvedType = Scalars.NonNullInt,
                 Resolver = Resolve(x => x.FileSize),
-                Description = "The size of the file in bytes."
+                Description = FieldDescriptions.AssetFileSize
             });
 
             AddField(new FieldType
             {
                 Name = "fileVersion",
-                ResolvedType = AllTypes.NonNullInt,
+                ResolvedType = Scalars.NonNullInt,
                 Resolver = Resolve(x => x.FileVersion),
-                Description = "The version of the file."
+                Description = FieldDescriptions.AssetFileVersion
             });
 
             AddField(new FieldType
             {
                 Name = "slug",
-                ResolvedType = AllTypes.NonNullString,
+                ResolvedType = Scalars.NonNullString,
                 Resolver = Resolve(x => x.Slug),
-                Description = "The file name as slug."
+                Description = FieldDescriptions.AssetSlug
             });
 
             AddField(new FieldType
             {
                 Name = "isProtected",
-                ResolvedType = AllTypes.NonNullBoolean,
+                ResolvedType = Scalars.NonNullBoolean,
                 Resolver = Resolve(x => x.IsProtected),
-                Description = "True, when the asset is not public."
+                Description = FieldDescriptions.AssetIsProtected
             });
 
             AddField(new FieldType
             {
                 Name = "isImage",
-                ResolvedType = AllTypes.NonNullBoolean,
+                ResolvedType = Scalars.NonNullBoolean,
                 Resolver = Resolve(x => x.Type == AssetType.Image),
-                Description = "Determines if the uploaded file is an image.",
+                Description = FieldDescriptions.AssetIsImage,
                 DeprecationReason = "Use 'type' field instead."
             });
 
             AddField(new FieldType
             {
                 Name = "pixelWidth",
-                ResolvedType = AllTypes.Int,
+                ResolvedType = Scalars.Int,
                 Resolver = Resolve(x => x.Metadata.GetPixelWidth()),
-                Description = "The width of the image in pixels if the asset is an image.",
+                Description = FieldDescriptions.AssetPixelWidth,
                 DeprecationReason = "Use 'metadata' field instead."
             });
 
             AddField(new FieldType
             {
                 Name = "pixelHeight",
-                ResolvedType = AllTypes.Int,
+                ResolvedType = Scalars.Int,
                 Resolver = Resolve(x => x.Metadata.GetPixelHeight()),
-                Description = "The height of the image in pixels if the asset is an image.",
+                Description = FieldDescriptions.AssetPixelHeight,
                 DeprecationReason = "Use 'metadata' field instead."
             });
 
             AddField(new FieldType
             {
                 Name = "type",
-                ResolvedType = AllTypes.NonNullAssetType,
+                ResolvedType = Scalars.NonNullAssetType,
                 Resolver = Resolve(x => x.Type),
-                Description = "The type of the image."
+                Description = FieldDescriptions.AssetType
             });
 
             AddField(new FieldType
             {
                 Name = "metadataText",
-                ResolvedType = AllTypes.NonNullString,
+                ResolvedType = Scalars.NonNullString,
                 Resolver = Resolve(x => x.MetadataText),
-                Description = "The text representation of the metadata."
+                Description = FieldDescriptions.AssetMetadataText
             });
 
             AddField(new FieldType
             {
                 Name = "tags",
-                ResolvedType = AllTypes.NonNullStrings,
+                ResolvedType = Scalars.NonNullStrings,
                 Resolver = Resolve(x => x.TagNames),
-                Description = "The asset tags."
+                Description = FieldDescriptions.AssetTags
             });
 
             AddField(new FieldType
             {
                 Name = "metadata",
                 Arguments = AssetActions.Metadata.Arguments,
-                ResolvedType = AllTypes.JsonNoop,
+                ResolvedType = Scalars.JsonNoop,
                 Resolver = AssetActions.Metadata.Resolver,
-                Description = "The asset metadata."
+                Description = FieldDescriptions.AssetMetadata
             });
 
-            if (canGenerateSourceUrl)
+            AddField(new FieldType
             {
-                AddField(new FieldType
-                {
-                    Name = "sourceUrl",
-                    ResolvedType = AllTypes.NonNullString,
-                    Resolver = SourceUrl,
-                    Description = "The source url of the asset."
-                });
-            }
+                Name = "editToken",
+                ResolvedType = Scalars.String,
+                Resolver = Resolve(x => x.EditToken),
+                Description = FieldDescriptions.EditToken
+            });
+
+            AddField(new FieldType
+            {
+                Name = "sourceUrl",
+                ResolvedType = Scalars.NonNullString,
+                Resolver = SourceUrl,
+                Description = FieldDescriptions.AssetSourceUrl
+            });
 
             Description = "An asset";
         }
 
         private static readonly IFieldResolver Url = Resolve((asset, _, context) =>
         {
-            return context.UrlGenerator.AssetContent(asset.AppId, asset.Id.ToString());
+            var urlGenerator = context.Resolve<IUrlGenerator>();
+
+            return urlGenerator.AssetContent(asset.AppId, asset.Id.ToString());
         });
 
         private static readonly IFieldResolver SourceUrl = Resolve((asset, _, context) =>
         {
-            return context.UrlGenerator.AssetSource(asset.AppId, asset.Id, asset.FileVersion);
+            var urlGenerator = context.Resolve<IUrlGenerator>();
+
+            return urlGenerator.AssetSource(asset.AppId, asset.Id, asset.FileVersion);
         });
 
         private static readonly IFieldResolver ThumbnailUrl = Resolve((asset, _, context) =>
         {
-            return context.UrlGenerator.AssetThumbnail(asset.AppId, asset.Id.ToString(), asset.Type);
+            var urlGenerator = context.Resolve<IUrlGenerator>();
+
+            return urlGenerator.AssetThumbnail(asset.AppId, asset.Id.ToString(), asset.Type);
         });
 
         private static IFieldResolver Resolve<T>(Func<IEnrichedAssetEntity, IResolveFieldContext, GraphQLExecutionContext, T> resolver)

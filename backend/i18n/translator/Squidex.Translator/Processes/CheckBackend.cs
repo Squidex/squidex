@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.IO;
 using System.Text.RegularExpressions;
 using Squidex.Translator.State;
 
@@ -36,7 +34,7 @@ namespace Squidex.Translator.Processes
 
                 void AddTranslations(string regex)
                 {
-                    var matches = Regex.Matches(content, regex, RegexOptions.Singleline);
+                    var matches = Regex.Matches(content, regex, RegexOptions.Singleline | RegexOptions.ExplicitCapture);
 
                     foreach (Match match in matches)
                     {

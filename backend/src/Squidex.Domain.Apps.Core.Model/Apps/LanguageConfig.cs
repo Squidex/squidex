@@ -5,36 +5,24 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed record LanguageConfig
+    public sealed record LanguageConfig(bool IsOptional = false, ReadonlyList<Language>? Fallbacks = null)
     {
         public static readonly LanguageConfig Default = new LanguageConfig();
 
-        public bool IsOptional { get; }
-
-        public ImmutableList<Language> Fallbacks { get; } = ImmutableList.Empty<Language>();
-
-        public LanguageConfig(bool isOptional = false, ImmutableList<Language>? fallbacks = null)
-        {
-            IsOptional = isOptional;
-
-            if (fallbacks != null)
-            {
-                Fallbacks = fallbacks;
-            }
-        }
+        public ReadonlyList<Language> Fallbacks { get; } = Fallbacks ?? ReadonlyList.Empty<Language>();
 
         internal LanguageConfig Cleanup(string self, IReadOnlyDictionary<string, LanguageConfig> allowed)
         {
             if (Fallbacks.Any(x => x.Iso2Code == self) || Fallbacks.Any(x => !allowed.ContainsKey(x)))
             {
-                var cleaned = Fallbacks.Where(x => x.Iso2Code != self && allowed.ContainsKey(x.Iso2Code)).ToImmutableList();
+                var cleaned = Fallbacks.Where(x => x.Iso2Code != self && allowed.ContainsKey(x.Iso2Code)).ToReadonlyList();
 
                 return new LanguageConfig(IsOptional, cleaned);
             }

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Squidex.Infrastructure;
@@ -38,11 +39,11 @@ namespace Squidex.Shared.Users
             get => claims;
         }
 
-        public object Identity => throw new System.NotImplementedException();
+        public object Identity => throw new NotSupportedException();
 
         public ClientUser(RefToken token)
         {
-            Guard.NotNull(token, nameof(token));
+            Guard.NotNull(token);
 
             this.token = token;
 

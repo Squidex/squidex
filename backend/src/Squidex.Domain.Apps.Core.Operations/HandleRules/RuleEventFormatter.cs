@@ -5,18 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
+using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Infrastructure.Json;
+using Squidex.Shared;
+using Squidex.Shared.Identity;
 using Squidex.Text;
 using ValueTaskSupplement;
 
@@ -25,8 +25,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     public class RuleEventFormatter
     {
         private const string GlobalFallback = "null";
-        private static readonly Regex RegexPatternOld = new Regex(@"^(?<FullPath>(?<Type>[^_]*)_(?<Path>[^\s]*))", RegexOptions.Compiled);
-        private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<FullPath>(?<Type>[\w]+)_(?<Path>[\w\.\-]+))[\s]*(\|[\s]*(?<Transform>[^\?}]+))?(\?[\s]*(?<Fallback>[^\}\s]+))?[\s]*\}", RegexOptions.Compiled);
+        private static readonly Regex RegexPatternOld = new Regex(@"^(?<FullPath>(?<Type>[^_]*)_(?<Path>[^\s]*))", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+        private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<FullPath>(?<Type>[\w]+)_(?<Path>[\w\.\-]+))[\s]*(\|[\s]*(?<Transform>[^\?}]+))?(\?[\s]*(?<Fallback>[^\}\s]+))?[\s]*\}", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
         private readonly IJsonSerializer jsonSerializer;
         private readonly IEnumerable<IRuleEventFormatter> formatters;
         private readonly ITemplateEngine templateEngine;
@@ -79,12 +79,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public virtual string ToPayload<T>(T @event)
         {
-            return jsonSerializer.Serialize(@event);
+            var payload = @event;
+
+            return jsonSerializer.Serialize(payload);
         }
 
         public virtual string ToEnvelope(EnrichedEvent @event)
         {
-            return jsonSerializer.Serialize(new { type = @event.Name, payload = @event, timestamp = @event.Timestamp });
+            var payload = new { type = @event.Name, payload = @event, timestamp = @event.Timestamp };
+
+            return jsonSerializer.Serialize(payload);
         }
 
         public async ValueTask<string?> FormatAsync(string text, EnrichedEvent @event)
@@ -106,12 +110,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             if (TryGetScript(text.Trim(), out var script))
             {
-                var vars = new ScriptVars
+                // Script vars are just wrappers over dictionaries for better performance.
+                var vars = new EventScriptVars
                 {
-                    ["event"] = @event
+                    Event = @event,
+                    AppId = @event.AppId.Id,
+                    AppName = @event.AppId.Name,
+                    User = Admin()
                 };
 
-                var result = scriptEngine.Execute(vars, script).ToString();
+                var result = (await scriptEngine.ExecuteAsync(vars, script)).ToString();
 
                 if (result == "undefined")
                 {
@@ -129,6 +137,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
 
             return CombineParts(text, parts);
+        }
+
+        private static ClaimsPrincipal Admin()
+        {
+            var claimsIdentity = new ClaimsIdentity();
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.All));
+
+            return claimsPrincipal;
         }
 
         private static string CombineParts(string text, List<TextPart> parts)
@@ -285,7 +303,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                                 if (instant.Success)
                                 {
-                                    text = instant.Value.ToUnixTimeMilliseconds().ToString();
+                                    text = instant.Value.ToUnixTimeMilliseconds().ToString(CultureInfo.InvariantCulture);
                                 }
 
                                 break;
@@ -297,7 +315,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                                 if (instant.Success)
                                 {
-                                    text = instant.Value.ToUnixTimeSeconds().ToString();
+                                    text = instant.Value.ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture);
                                 }
 
                                 break;

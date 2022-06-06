@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace Squidex.Infrastructure
 {
@@ -334,11 +331,11 @@ namespace Squidex.Infrastructure
             return dictionary.GetOrAdd(key, _ => new TValue());
         }
 
-        public static TValue GetOrCreate<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> creator) where TKey : notnull
+        public static TValue GetOrCreate<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> valueFactory) where TKey : notnull
         {
             if (!dictionary.TryGetValue(key, out var result))
             {
-                result = creator(key);
+                result = valueFactory(key);
             }
 
             return result;
@@ -356,11 +353,11 @@ namespace Squidex.Infrastructure
             return result;
         }
 
-        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> creator) where TKey : notnull
+        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> valueFactory) where TKey : notnull
         {
             if (!dictionary.TryGetValue(key, out var result))
             {
-                result = creator(key);
+                result = valueFactory(key);
 
                 dictionary.Add(key, result);
             }
@@ -368,11 +365,11 @@ namespace Squidex.Infrastructure
             return result;
         }
 
-        public static TValue GetOrAdd<TKey, TContext, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TContext context, Func<TKey, TContext, TValue> creator) where TKey : notnull
+        public static TValue GetOrAdd<TKey, TArg, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TArg, TValue> valueFactory, TArg factoryArgument) where TKey : notnull
         {
             if (!dictionary.TryGetValue(key, out var result))
             {
-                result = creator(key, context);
+                result = valueFactory(key, factoryArgument);
 
                 dictionary.Add(key, result);
             }

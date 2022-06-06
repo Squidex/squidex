@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards;
 using Squidex.Domain.Apps.Events.Comments;
@@ -17,6 +13,8 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
+
+#pragma warning disable MA0022 // Return Task.FromResult instead of returning null
 
 namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 {
@@ -44,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         {
             streamName = $"comments-{key}";
 
-            var storedEvents = await eventStore.QueryLatestAsync(streamName, 100);
+            var storedEvents = await eventStore.QueryReverseAsync(streamName, 100);
 
             foreach (var @event in storedEvents)
             {
@@ -92,14 +90,15 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                     });
 
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         }
 
         private async Task<CommandResult> Upsert<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : CommentsCommand
         {
-            Guard.NotNull(command, nameof(command));
-            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(command);
+            Guard.NotNull(handler);
 
             if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
             {

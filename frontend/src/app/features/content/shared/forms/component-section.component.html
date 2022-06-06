@@ -1,0 +1,27 @@
+<ng-container *ngIf="!(formSection.hiddenChanges | async)">
+    <div class="header" *ngIf="formSection.separator; let separator">
+        <h3>{{separator!.displayName}}</h3>
+
+        <sqx-form-hint *ngIf="separator.properties.hints && separator.properties.hints.length > 0">
+            <span [sqxMarkdown]="separator.properties.hints" [optional]="true" [inline]="true"></span>
+        </sqx-form-hint>
+    </div>
+
+    <div class="row">
+        <div class="form-group" *ngFor="let child of formSection.fields; trackBy: trackByField"
+            [class.col-12]="isComparing || !child.field.properties.isHalfWidth"
+            [class.col-6]="!isComparing && child.field.properties.isHalfWidth">
+            <sqx-field-editor *ngIf="!(child.hiddenChanges | async)"
+                [canUnset]="canUnset"
+                [form]="form"
+                [formContext]="formContext"
+                [formLevel]="formLevel"
+                [formModel]="child"
+                [index]="index"
+                [isComparing]="isComparing"
+                [language]="language"
+                [languages]="languages">
+            </sqx-field-editor>
+        </div>
+    </div>
+</ng-container>

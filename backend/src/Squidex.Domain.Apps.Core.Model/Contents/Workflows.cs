@@ -5,15 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed class Workflows : ImmutableDictionary<DomainId, Workflow>
+    public sealed class Workflows : ReadonlyDictionary<DomainId, Workflow>
     {
         public static readonly Workflows Empty = new Workflows();
 
@@ -40,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         [Pure]
         public Workflows Add(DomainId workflowId, string name)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(name);
 
             if (!this.TryAdd(workflowId, Workflow.CreateDefault(name), out var updated))
             {
@@ -53,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         [Pure]
         public Workflows Set(Workflow workflow)
         {
-            Guard.NotNull(workflow, nameof(workflow));
+            Guard.NotNull(workflow);
 
             if (!this.TrySet(default, workflow, out var updated))
             {
@@ -66,7 +64,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         [Pure]
         public Workflows Set(DomainId id, Workflow workflow)
         {
-            Guard.NotNull(workflow, nameof(workflow));
+            Guard.NotNull(workflow);
 
             if (!this.TrySet(id, workflow, out var updated))
             {
@@ -79,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         [Pure]
         public Workflows Update(DomainId id, Workflow workflow)
         {
-            Guard.NotNull(workflow, nameof(workflow));
+            Guard.NotNull(workflow);
 
             if (id == DomainId.Empty)
             {

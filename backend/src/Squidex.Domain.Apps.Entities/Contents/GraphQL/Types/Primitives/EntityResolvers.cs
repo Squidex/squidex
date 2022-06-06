@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using GraphQL.Resolvers;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
@@ -30,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 
         private static IFieldResolver ResolveUser<TSource>(Func<TSource, RefToken> resolver)
         {
-            return Resolvers.Async<TSource, IUser>((source, _, context) => context.FindUserAsync(resolver(source)));
+            return Resolvers.Async<TSource, IUser?>((source, fieldContext, context) => context.FindUserAsync(resolver(source), fieldContext.CancellationToken));
         }
     }
 }

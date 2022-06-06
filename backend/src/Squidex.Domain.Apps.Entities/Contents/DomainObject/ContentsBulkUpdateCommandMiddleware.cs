@@ -5,18 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 
@@ -29,6 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
     {
         private readonly IContentQueryService contentQuery;
         private readonly IContextProvider contextProvider;
+        private readonly ILogger<ContentsBulkUpdateCommandMiddleware> log;
 
         private sealed record BulkTaskCommand(BulkTask Task, DomainId Id, ICommand Command)
         {
@@ -45,10 +44,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
         }
 
-        public ContentsBulkUpdateCommandMiddleware(IContentQueryService contentQuery, IContextProvider contextProvider)
+        public ContentsBulkUpdateCommandMiddleware(
+            IContentQueryService contentQuery,
+            IContextProvider contextProvider,
+            ILogger<ContentsBulkUpdateCommandMiddleware> log)
         {
             this.contentQuery = contentQuery;
             this.contextProvider = contextProvider;
+
+            this.log = log;
         }
 
         public async Task HandleAsync(CommandContext context, NextDelegate next)
@@ -73,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             // Dataflow swallows operation cancelled exception.
                             throw new AggregateException(ex);
                         }
-                }, executionOptions);
+                    }, executionOptions);
 
                     var executeCommandBlock = new ActionBlock<BulkTaskCommand>(async command =>
                     {
@@ -88,10 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         }
                     }, executionOptions);
 
-                    createCommandsBlock.LinkTo(executeCommandBlock, new DataflowLinkOptions
-                    {
-                        PropagateCompletion = true
-                    });
+                    createCommandsBlock.BidirectionalLinkTo(executeCommandBlock);
 
                     contextProvider.Context.Change(b => b
                         .WithoutContentEnrichment()
@@ -113,7 +114,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             bulkUpdates,
                             results);
 
-                        await createCommandsBlock.SendAsync(task);
+                        if (!await createCommandsBlock.SendAsync(task))
+                        {
+                            break;
+                        }
                     }
 
                     createCommandsBlock.Complete();
@@ -133,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             }
         }
 
-        private static async Task ExecuteCommandAsync(BulkTaskCommand bulkCommand)
+        private async Task ExecuteCommandAsync(BulkTaskCommand bulkCommand)
         {
             var (task, id, command) = bulkCommand;
 
@@ -145,6 +149,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             }
             catch (Exception ex)
             {
+                log.LogError(ex, "Failed to execute content bulk job with index {index} of type {type}.",
+                    task.JobIndex,
+                    task.CommandJob.Type);
+
                 task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex, ex));
             }
         }
@@ -174,6 +182,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     }
                     catch (Exception ex)
                     {
+                        log.LogError(ex, "Failed to execute content bulk job with index {index} of type {type}.",
+                            task.JobIndex,
+                            task.CommandJob.Type);
+
                         task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex, ex));
                     }
                 }
@@ -249,7 +261,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     }
 
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         }
 
@@ -291,6 +304,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 if (existing.Total > task.CommandJob.ExpectedCount)
                 {
                     throw new DomainException(T.Get("contents.bulkInsertQueryNotUnique"));
+                }
+
+                if (existing.Count == 0 && task.CommandJob.Type == BulkUpdateContentType.Upsert)
+                {
+                    return new[] { DomainId.NewGuid() };
                 }
 
                 return existing.Select(x => x.Id).ToArray();

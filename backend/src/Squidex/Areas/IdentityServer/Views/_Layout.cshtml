@@ -1,25 +1,28 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <base href="/">
+    <base href="~/">
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>@ViewBag.Title - @T.Get("common.product")</title>
 
-    <environment names="Production">
-        <link rel="stylesheet" asp-append-version="true" href="@Url.RootContentUrl("~/build/app.css")" />
-    </environment>
+    <link rel="stylesheet" asp-append-version="true" href="styles.css" />
     
     @if (IsSectionDefined("header"))
     {
         @await RenderSectionAsync("header")
     }
+
+    <environment include="Development">
+        <script type="text/javascript" src="runtime.js"></script>
+        <script type="text/javascript" src="polyfills.js"></script>
+    </environment>
 </head>
 <body class="profile">
     <div class="profile-container">
-        <img class="profile-logo" alt="@T.Get("common.product")S" title="@T.Get("common.product")" src="@Url.RootContentUrl("~/images/logo.svg")" />
+        <img class="profile-logo" alt="@T.Get("common.product")" title="@T.Get("common.product")" src="images/logo.svg" />
 
         <div class="profile-card card">
             <div class="profile-card-body card-body">
@@ -33,10 +36,5 @@
             </small>
         </div>
     </div>
-
-    <environment names="Development">
-        <script type="text/javascript" src="https://localhost:3000/shims.js"></script>
-        <script type="text/javascript" src="https://localhost:3000/app.js"></script>
-    </environment>
 </body>
 </html>

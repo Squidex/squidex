@@ -1,0 +1,81 @@
+<html>
+<head>
+    <meta charset="utf-8">
+
+    <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
+    <script src="editor-sdk.js"></script>
+	
+    <style>
+        .editor {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            height: 500px;
+			width: 100%;
+        }
+
+        .btn {
+			background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+			padding: 8px 15px;
+			margin-right: 5px;
+			margin-bottom: 5px;
+        }
+    </style>
+
+</head>
+
+<body style="margin: 0px; padding: 0px;">
+	<div>
+		<button class="btn" id="expanded">
+			Toggle Expanded
+		</button>
+		<button class="btn" id="fullscreen">
+			Toggle Fullscreen
+		</button>
+	</div>
+
+	<div>
+		<textarea name="content" class="editor" id="editor"></textarea>
+	</div>
+
+	<script>
+		var element = document.getElementById('editor');
+
+        // When the field is instantiated it notifies the UI that it has been loaded.
+        // 
+        // Furthermore it sends the current size to the parent.
+		var field = new SquidexFormField();
+
+		document.getElementById('expanded').addEventListener('click', function () {
+			field.toggleExpanded();
+        });
+
+        document.getElementById('fullscreen').addEventListener('click', function () {
+            field.toggleFullscreen();
+        });
+		
+		field.onValueChanged(function (value) {
+			if (value) {
+				element.value = JSON.stringify(value);
+			} else {
+				element.value = '';
+			}
+		});
+
+		field.onDisabled(function (disabled) {
+			element.disabled = disabled;
+		});
+
+		element.addEventListener('change', function ()  {
+			var value = element.value;
+
+			if (value) {
+				field.valueChanged(JSON.parse(value));
+			} else {
+				field.valueChanged(undefined);
+			}
+		});
+    </script>
+</body>
+</html>

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Newtonsoft.Json.Serialization;
 using Squidex.Infrastructure.Reflection;
 

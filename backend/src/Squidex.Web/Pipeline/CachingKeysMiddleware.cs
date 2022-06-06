@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
@@ -34,19 +32,19 @@ namespace Squidex.Web.Pipeline
 
             AppendAuthHeaders(context);
 
-            context.Response.OnStarting(x =>
+            context.Response.OnStarting(_ =>
             {
-                var httpContext = (HttpContext)x;
+                var httpContext = (HttpContext)_;
+
+                cachingManager.Finish(httpContext);
 
                 if (httpContext.Response.Headers.TryGetString(HeaderNames.ETag, out var etag))
                 {
-                    if (!cachingOptions.StrongETag && IsWeakEtag(etag))
+                    if (!cachingOptions.StrongETag && !ETagUtils.IsWeakEtag(etag))
                     {
-                        httpContext.Response.Headers[HeaderNames.ETag] = ToWeakEtag(etag);
+                        httpContext.Response.Headers[HeaderNames.ETag] = ETagUtils.ToWeakEtag(etag);
                     }
                 }
-
-                cachingManager.Finish(httpContext);
 
                 return Task.CompletedTask;
             }, context);
@@ -66,16 +64,6 @@ namespace Squidex.Web.Pipeline
             {
                 cachingManager.AddHeader("Auth-ClientId");
             }
-        }
-
-        private static string ToWeakEtag(string? etag)
-        {
-            return $"W/{etag}";
-        }
-
-        private static bool IsWeakEtag(string etag)
-        {
-            return !etag.StartsWith("W/", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

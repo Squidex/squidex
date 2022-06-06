@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -25,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new NumberFieldProperties());
 
-            Assert.Equal("my-number", sut.Name);
+            Assert.Equal("myNumber", sut.Name);
         }
 
         [Fact]
@@ -74,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_number_is_not_allowed()
         {
-            var sut = Field(new NumberFieldProperties { AllowedValues = ImmutableList.Create(10d) });
+            var sut = Field(new NumberFieldProperties { AllowedValues = ReadonlyList.Create(10d) });
 
             await sut.ValidateAsync(CreateValue(20), errors);
 
@@ -93,14 +91,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Invalid json type, expected number." });
         }
 
-        private static IJsonValue CreateValue(double v)
+        private static JsonValue CreateValue(double v)
         {
             return JsonValue.Create(v);
         }
 
         private static RootField<NumberFieldProperties> Field(NumberFieldProperties properties)
         {
-            return Fields.Number(1, "my-number", Partitioning.Invariant, properties);
+            return Fields.Number(1, "myNumber", Partitioning.Invariant, properties);
         }
     }
 }

@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 using IdentityModel;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Server;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Users
@@ -65,7 +64,7 @@ namespace Squidex.Domain.Users
 
                 if (securityKey.Rsa != null)
                 {
-                    var parameters = securityKey.Rsa.ExportParameters(includePrivateParameters: true);
+                    var parameters = securityKey.Rsa.ExportParameters(true);
 
                     state.Parameters = parameters;
                 }
@@ -88,7 +87,8 @@ namespace Squidex.Domain.Users
 
             if (state == null)
             {
-                throw new InvalidOperationException("Cannot read key.");
+                ThrowHelper.InvalidOperationException("Cannot read key.");
+                return default!;
             }
 
             securityKey = new RsaSecurityKey(state.Parameters)

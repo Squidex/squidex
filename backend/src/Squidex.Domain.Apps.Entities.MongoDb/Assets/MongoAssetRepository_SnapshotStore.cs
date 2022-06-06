@@ -5,31 +5,41 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed partial class MongoAssetRepository : ISnapshotStore<AssetDomainObject.State>
+    public sealed partial class MongoAssetRepository : ISnapshotStore<AssetDomainObject.State>, IDeleter
     {
-        async Task<(AssetDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<AssetDomainObject.State>.ReadAsync(DomainId key)
+        Task IDeleter.DeleteAppAsync(IAppEntity app,
+            CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoAssetRepository>())
+            return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, app.Id), ct);
+        }
+
+        IAsyncEnumerable<(AssetDomainObject.State State, long Version)> ISnapshotStore<AssetDomainObject.State>.ReadAllAsync(
+            CancellationToken ct)
+        {
+            return Collection.Find(new BsonDocument(), Batching.Options).ToAsyncEnumerable(ct).Select(x => (Map(x), x.Version));
+        }
+
+        async Task<(AssetDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<AssetDomainObject.State>.ReadAsync(DomainId key,
+            CancellationToken ct)
+        {
+            using (Telemetry.Activities.StartActivity("MongoAssetRepository/ReadAsync"))
             {
                 var existing =
                     await Collection.Find(x => x.DocumentId == key)
-                        .FirstOrDefaultAsync();
+                        .FirstOrDefaultAsync(ct);
 
                 if (existing != null)
                 {
@@ -40,63 +50,65 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        async Task ISnapshotStore<AssetDomainObject.State>.WriteAsync(DomainId key, AssetDomainObject.State value, long oldVersion, long newVersion)
+        async Task ISnapshotStore<AssetDomainObject.State>.WriteAsync(DomainId key, AssetDomainObject.State value, long oldVersion, long newVersion,
+            CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoAssetRepository>())
+            using (Telemetry.Activities.StartActivity("MongoAssetRepository/WriteAsync"))
             {
                 var entity = Map(value);
 
-                await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity);
+                await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity, ct);
 
                 if (oldVersion == EtagVersion.Empty || entity.IsDeleted)
                 {
-                    await countCollection.UpdateAsync(entity.IndexedAppId, entity.IsDeleted);
+                    await countCollection.UpdateAsync(entity.IndexedAppId, entity.IsDeleted, ct);
                 }
             }
         }
 
-        async Task ISnapshotStore<AssetDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, AssetDomainObject.State Value, long Version)> snapshots)
+        async Task ISnapshotStore<AssetDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, AssetDomainObject.State Value, long Version)> snapshots,
+            CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoAssetFolderRepository>())
+            using (Telemetry.Activities.StartActivity("MongoAssetRepository/WriteManyAsync"))
             {
-                var entities = snapshots.Select(Map).ToList();
+                var updates = snapshots.Select(Map).Select(x =>
+                    new ReplaceOneModel<MongoAssetEntity>(
+                        Filter.Eq(y => y.DocumentId, x.DocumentId),
+                        x)
+                    {
+                        IsUpsert = true
+                    }).ToList();
 
-                if (entities.Count == 0)
+                if (updates.Count == 0)
                 {
                     return;
                 }
 
-                await Collection.InsertManyAsync(entities, InsertUnordered);
+                await Collection.BulkWriteAsync(updates, BulkUnordered, ct);
 
-                await countCollection.UpdateAsync(snapshots.Select(x => (x.Value.AppId.Id, x.Value.IsDeleted)));
+                await countCollection.UpdateAsync(snapshots.Select(x => (x.Value.AppId.Id, x.Value.IsDeleted)), ct);
             }
         }
 
-        async Task ISnapshotStore<AssetDomainObject.State>.ReadAllAsync(Func<AssetDomainObject.State, long, Task> callback,
+        async Task ISnapshotStore<AssetDomainObject.State>.RemoveAsync(DomainId key,
             CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoAssetRepository>())
+            using (Telemetry.Activities.StartActivity("MongoAssetRepository/RemoveAsync"))
             {
-                await Collection.Find(new BsonDocument(), Batching.Options).ForEachPipedAsync(x => callback(Map(x), x.Version), ct);
-            }
-        }
-
-        async Task ISnapshotStore<AssetDomainObject.State>.RemoveAsync(DomainId key)
-        {
-            using (Profiler.TraceMethod<MongoAssetRepository>())
-            {
-                var entity = await Collection.FindOneAndDeleteAsync(x => x.DocumentId == key);
+                var entity = await Collection.FindOneAndDeleteAsync(x => x.DocumentId == key, null, ct);
 
                 if (entity != null && !entity.IsDeleted)
                 {
-                    await countCollection.UpdateAsync(entity.IndexedAppId, true);
+                    await countCollection.UpdateAsync(entity.IndexedAppId, true, ct);
                 }
             }
         }
 
-        public override Task ClearAsync()
+        public override Task ClearAsync(
+            CancellationToken ct = default
+        )
         {
-            return Task.WhenAll(base.ClearAsync(), countCollection.ClearAsync());
+            return Task.WhenAll(base.ClearAsync(ct), countCollection.ClearAsync(ct));
         }
 
         private static MongoAssetEntity Map(AssetDomainObject.State value)

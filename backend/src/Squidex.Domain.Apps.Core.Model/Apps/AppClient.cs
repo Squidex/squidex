@@ -7,10 +7,16 @@
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
+using Squidex.Infrastructure;
+
 namespace Squidex.Domain.Apps.Core.Apps
 {
     public sealed record AppClient(string Name, string Secret)
     {
+        public string Name { get; init; } = Guard.NotNullOrEmpty(Name);
+
+        public string Secret { get; } = Guard.NotNullOrEmpty(Secret);
+
         public string Role { get; init; } = "Editor";
 
         public long ApiCallsLimit { get; init; }

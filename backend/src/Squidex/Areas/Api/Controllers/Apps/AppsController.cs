@@ -1,33 +1,22 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Assets;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 using Squidex.Shared;
 using Squidex.Web;
-
-#pragma warning disable CA2016 // Forward the 'CancellationToken' parameter to methods that take one
 
 namespace Squidex.Areas.Api.Controllers.Apps
 {
@@ -37,26 +26,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppsController : ApiController
     {
-        private static readonly ResizeOptions ResizeOptions = new ResizeOptions { Width = 50, Height = 50, Mode = ResizeMode.Crop };
-        private readonly IAppImageStore appImageStore;
-        private readonly IAppPlansProvider appPlansProvider;
         private readonly IAppProvider appProvider;
-        private readonly IAssetStore assetStore;
-        private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
 
-        public AppsController(ICommandBus commandBus,
-            IAppImageStore appImageStore,
-            IAppPlansProvider appPlansProvider,
-            IAppProvider appProvider,
-            IAssetStore assetStore,
-            IAssetThumbnailGenerator assetThumbnailGenerator)
+        public AppsController(ICommandBus commandBus, IAppProvider appProvider)
             : base(commandBus)
         {
-            this.appImageStore = appImageStore;
-            this.appPlansProvider = appPlansProvider;
             this.appProvider = appProvider;
-            this.assetStore = assetStore;
-            this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 
         /// <summary>
@@ -79,13 +54,13 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var userOrClientId = HttpContext.User.UserOrClientId()!;
             var userPermissions = Resources.Context.UserPermissions;
 
-            var apps = await appProvider.GetUserAppsAsync(userOrClientId, userPermissions);
+            var apps = await appProvider.GetUserAppsAsync(userOrClientId, userPermissions, HttpContext.RequestAborted);
 
             var response = Deferred.Response(() =>
             {
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
-                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromApp(a, userOrClientId, isFrontend, appPlansProvider, Resources)).ToArray();
+                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromDomain(a, userOrClientId, isFrontend, Resources)).ToArray();
             });
 
             Response.Headers[HeaderNames.ETag] = apps.ToEtag();
@@ -114,7 +89,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
-                return AppDto.FromApp(App, userOrClientId, isFrontend, appPlansProvider, Resources);
+                return AppDto.FromDomain(App, userOrClientId, isFrontend, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
@@ -170,51 +145,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Get the app settings.
-        /// </summary>
-        /// <param name="app">The name of the app to get the settings for.</param>
-        /// <returns>
-        /// 200 => App settingsd returned.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/{app}/settings")]
-        [ProducesResponseType(typeof(AppSettingsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous]
-        [ApiCosts(0)]
-        public IActionResult GetAppSettings(string app)
-        {
-            var response = Deferred.Response(() =>
-            {
-                return AppSettingsDto.FromApp(App, Resources);
-            });
-
-            return Ok(response);
-        }
-
-        /// <summary>
-        /// Update the app settings.
-        /// </summary>
-        /// <param name="app">The name of the app to update.</param>
-        /// <param name="request">The values to update.</param>
-        /// <returns>
-        /// 200 => App updated.
-        /// 400 => App request not valid.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpPut]
-        [Route("apps/{app}/settings")]
-        [ProducesResponseType(typeof(AppSettingsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppUpdate)]
-        [ApiCosts(0)]
-        public async Task<IActionResult> PutAppSettings(string app, [FromBody] UpdateAppSettingsDto request)
-        {
-            var response = await InvokeCommandAsync(request.ToCommand(), x => AppSettingsDto.FromApp(x, Resources));
-
-            return Ok(response);
-        }
-
-        /// <summary>
         /// Upload the app image.
         /// </summary>
         /// <param name="app">The name of the app to update.</param>
@@ -234,77 +164,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var response = await InvokeCommandAsync(CreateCommand(file));
 
             return Ok(response);
-        }
-
-        /// <summary>
-        /// Get the app image.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <returns>
-        /// 200 => App image found and content or (resized) image returned.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/{app}/image")]
-        [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
-        [AllowAnonymous]
-        [ApiCosts(0)]
-        public IActionResult GetImage(string app)
-        {
-            if (App.Image == null)
-            {
-                return NotFound();
-            }
-
-            var etag = App.Image.Etag;
-
-            Response.Headers[HeaderNames.ETag] = etag;
-
-            var callback = new FileCallback(async (body, range, ct) =>
-            {
-                var resizedAsset = $"{App.Id}_{etag}_Resized";
-
-                try
-                {
-                    await assetStore.DownloadAsync(resizedAsset, body, ct: ct);
-                }
-                catch (AssetNotFoundException)
-                {
-                    using (Profiler.Trace("Resize"))
-                    {
-                        using (var sourceStream = GetTempStream())
-                        {
-                            using (var destinationStream = GetTempStream())
-                            {
-                                using (Profiler.Trace("ResizeDownload"))
-                                {
-                                    await appImageStore.DownloadAsync(App.Id, sourceStream);
-                                    sourceStream.Position = 0;
-                                }
-
-                                using (Profiler.Trace("ResizeImage"))
-                                {
-                                    await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, ResizeOptions);
-                                    destinationStream.Position = 0;
-                                }
-
-                                using (Profiler.Trace("ResizeUpload"))
-                                {
-                                    await assetStore.UploadAsync(resizedAsset, destinationStream);
-                                    destinationStream.Position = 0;
-                                }
-
-                                await destinationStream.CopyToAsync(body, ct);
-                            }
-                        }
-                    }
-                }
-            });
-
-            return new FileCallbackResult(App.Image.MimeType, callback)
-            {
-                ErrorAs404 = true
-            };
         }
 
         /// <summary>
@@ -328,11 +187,11 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Archive the app.
+        /// Delete the app.
         /// </summary>
-        /// <param name="app">The name of the app to archive.</param>
+        /// <param name="app">The name of the app to delete.</param>
         /// <returns>
-        /// 204 => App archived.
+        /// 204 => App deleted.
         /// 404 => App not found.
         /// </returns>
         [HttpDelete]
@@ -341,7 +200,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteApp(string app)
         {
-            await CommandBus.PublishAsync(new ArchiveApp());
+            await CommandBus.PublishAsync(new DeleteApp());
 
             return NoContent();
         }
@@ -354,7 +213,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
-                return AppDto.FromApp(x, userOrClientId, isFrontend, appPlansProvider, Resources);
+                return AppDto.FromDomain(x, userOrClientId, isFrontend, Resources);
             });
         }
 
@@ -378,19 +237,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
             }
 
             return new UploadAppImage { File = file.ToAssetFile() };
-        }
-
-        private static FileStream GetTempStream()
-        {
-            var tempFileName = Path.GetTempFileName();
-
-            return new FileStream(tempFileName,
-                FileMode.Create,
-                FileAccess.ReadWrite,
-                FileShare.Delete, 1024 * 16,
-                FileOptions.Asynchronous |
-                FileOptions.DeleteOnClose |
-                FileOptions.SequentialScan);
         }
     }
 }

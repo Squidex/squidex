@@ -8,6 +8,7 @@
 using GeoJSON.Net;
 using GeoJSON.Net.Geometry;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.ObjectPool;
@@ -17,47 +18,66 @@ namespace Squidex.Domain.Apps.Core.Contents
 {
     public static class GeoJsonValue
     {
-        public static GeoJsonParseResult TryParse(IJsonValue value, IJsonSerializer serializer, out GeoJSONObject geoJSON)
+        public static GeoJsonParseResult TryParse(JsonValue value, IJsonSerializer serializer, out GeoJSONObject? geoJSON)
         {
-            Guard.NotNull(serializer, nameof(serializer));
-            Guard.NotNull(value, nameof(value));
+            Guard.NotNull(serializer);
+            Guard.NotNull(value);
 
-            geoJSON = null!;
+            geoJSON = null;
 
-            if (value is JsonObject geoObject)
+            if (value.Type == JsonValueType.Object)
             {
-                try
+                var obj = value.AsObject;
+
+                if (TryParseGeoJson(obj, serializer, out geoJSON))
                 {
-                    using (var stream = DefaultPools.MemoryStream.GetStream())
-                    {
-                        serializer.Serialize(value, stream, true);
-
-                        stream.Position = 0;
-
-                        geoJSON = serializer.Deserialize<GeoJSONObject>(stream, null, leaveOpen: true);
-
-                        return GeoJsonParseResult.Success;
-                    }
-                }
-                catch
-                {
-                    if (!geoObject.TryGetValue<JsonNumber>("latitude", out var lat) || !lat.Value.IsBetween(-90, 90))
-                    {
-                        return GeoJsonParseResult.InvalidLatitude;
-                    }
-
-                    if (!geoObject.TryGetValue<JsonNumber>("longitude", out var lon) || !lon.Value.IsBetween(-180, 180))
-                    {
-                        return GeoJsonParseResult.InvalidLongitude;
-                    }
-
-                    geoJSON = new Point(new Position(lat.Value, lon.Value));
-
                     return GeoJsonParseResult.Success;
                 }
+
+                if (!obj.TryGetValue("latitude", out var lat) || lat.Type != JsonValueType.Number || !lat.AsNumber.IsBetween(-90, 90))
+                {
+                    return GeoJsonParseResult.InvalidLatitude;
+                }
+
+                if (!obj.TryGetValue("longitude", out var lon) || lon.Type != JsonValueType.Number || !lon.AsNumber.IsBetween(-180, 180))
+                {
+                    return GeoJsonParseResult.InvalidLongitude;
+                }
+
+                geoJSON = new Point(new Position(lat.AsNumber, lon.AsNumber));
+
+                return GeoJsonParseResult.Success;
             }
 
             return GeoJsonParseResult.InvalidValue;
+        }
+
+        private static bool TryParseGeoJson(ListDictionary<string, JsonValue> obj, IJsonSerializer serializer, out GeoJSONObject? geoJSON)
+        {
+            geoJSON = null;
+
+            if (!obj.TryGetValue("type", out var type) || type.Type != JsonValueType.String)
+            {
+                return false;
+            }
+
+            try
+            {
+                using (var stream = DefaultPools.MemoryStream.GetStream())
+                {
+                    serializer.Serialize(obj, stream, true);
+
+                    stream.Position = 0;
+
+                    geoJSON = serializer.Deserialize<GeoJSONObject>(stream, null, true);
+
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

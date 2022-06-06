@@ -1,0 +1,14 @@
+@import 'mixins';
+@import 'vars';
+
+.form-check {
+    margin-bottom: -.25rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+textarea {
+    height: 15rem;
+}

@@ -12,13 +12,13 @@ namespace Squidex.Domain.Apps.Core
 {
     public interface IUrlGenerator
     {
-        bool CanGenerateAssetSourceUrl { get; }
-
         string? AssetSource(NamedId<DomainId> appId, DomainId assetId, long fileVersion);
 
         string? AssetThumbnail(NamedId<DomainId> appId, string idOrSlug, AssetType assetType);
 
-        string AssetsUI(NamedId<DomainId> appId, string? query = null);
+        string AssetsUI(NamedId<DomainId> appId, string? @ref = null);
+
+        string AssetContentCDNBase();
 
         string AssetContent(NamedId<DomainId> appId, string idOrSlug);
 
@@ -29,6 +29,10 @@ namespace Squidex.Domain.Apps.Core
         string BackupsUI(NamedId<DomainId> appId);
 
         string ClientsUI(NamedId<DomainId> appId);
+
+        string ContentCDNBase();
+
+        string ContentBase();
 
         string ContentsUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId);
 
@@ -53,6 +57,8 @@ namespace Squidex.Domain.Apps.Core
         string SchemaUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId);
 
         string WorkflowsUI(NamedId<DomainId> appId);
+
+        string Root();
 
         string UI();
     }

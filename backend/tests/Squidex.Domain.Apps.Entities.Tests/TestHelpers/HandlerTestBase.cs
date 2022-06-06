@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
@@ -61,6 +57,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected HandlerTestBase()
         {
+#pragma warning disable MA0056 // Do not call overridable members in constructor
             A.CallTo(() => persistenceFactory.WithSnapshotsAndEventSourcing(A<Type>._, Id, A<HandleSnapshot<TState>>._, A<HandleEvent>._))
                 .Returns(persistence);
 
@@ -72,6 +69,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
             A.CallTo(() => persistence.DeleteAsync())
                 .Invokes(() => LastEvents = Enumerable.Empty<Envelope<IEvent>>());
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
         protected CommandContext CreateCommandContext<TCommand>(TCommand command) where TCommand : SquidexCommand

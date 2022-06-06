@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Statistics.Models;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -104,11 +100,11 @@ namespace Squidex.Areas.Api.Controllers.Statistics
                 return BadRequest();
             }
 
-            var (summary, details) = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date);
+            var (summary, details) = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date, HttpContext.RequestAborted);
 
             var (plan, _) = appPlansProvider.GetPlanForApp(App);
 
-            var response = CallsUsageDtoDto.FromStats(plan, summary, details);
+            var response = CallsUsageDtoDto.FromDomain(plan, summary, details);
 
             return Ok(response);
         }
@@ -162,7 +158,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var usages = await assetStatsRepository.QueryAsync(AppId, fromDate.Date, toDate.Date);
 
-            var models = usages.Select(StorageUsagePerDateDto.FromStats).ToArray();
+            var models = usages.Select(StorageUsagePerDateDto.FromDomain).ToArray();
 
             return Ok(models);
         }

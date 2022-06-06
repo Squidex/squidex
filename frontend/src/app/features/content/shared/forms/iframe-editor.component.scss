@@ -1,0 +1,20 @@
+@import 'mixins';
+@import 'vars';
+
+iframe {
+    background: 0;
+    border: 0;
+    overflow: hidden;
+}
+
+.fullscreen {
+    @include fixed(0, 0, 0, 0);
+    background: $color-white;
+    border: 0;
+    border-radius: 0;
+    z-index: 1040;
+
+    iframe {
+        height: 100% !important;
+    }
+}

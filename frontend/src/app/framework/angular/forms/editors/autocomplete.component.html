@@ -1,0 +1,48 @@
+<div class="control-container">
+    <input type="text" class="form-control" (blur)="blur()" (keydown)="onKeyDown($event)" #input
+        [sqxFocusOnInit]="autoFocus"
+        [name]="inputName" 
+        [placeholder]="placeholder"
+        autocomplete="off" 
+        autocorrect="off"
+        autocapitalize="off"
+        [class.form-empty]="inputStyle === 'empty'"
+        [class.form-underlined]="inputStyle === 'underlined'"
+        [class.form-icon]="!!icon"
+        [formControl]="queryInput">
+
+    <div class="icon" *ngIf="icon">
+        <ng-container *ngIf="snapshot.isLoading; else notLoading">
+            <sqx-loader color="input"></sqx-loader>
+        </ng-container>
+
+        <ng-template #notLoading>
+            <i class="icon-{{icon}}"></i>
+        </ng-template>
+    </div>
+
+    <div class="btn btn-sm" (click)="openModal()" sqxStopClick *ngIf="allowOpen">
+        <i class="icon-caret-down"></i>
+    </div>
+
+    <ng-container *sqxModal="suggestionsModal">
+        <sqx-dropdown-menu class="control-dropdown" #container
+            [sqxAnchoredTo]="input"
+            [adjustWidth]="dropdownFullWidth"
+            [adjustHeight]="false"
+            [scrollY]="true" 
+            [style]="dropdownStyles"
+            [position]="dropdownPosition">
+            <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
+                [class.active]="i === snapshot.suggestedIndex"
+                (mousedown)="selectItem(item)"
+                (mouseover)="selectIndex(i)"
+                [sqxScrollActive]="i === snapshot.suggestedIndex"
+                [sqxScrollContainer]="$any(container.nativeElement)">
+                <ng-container *ngIf="!itemTemplate">{{item}}</ng-container>
+
+                <ng-template *ngIf="itemTemplate" [sqxTemplateWrapper]="itemTemplate" [item]="item" [index]="i"></ng-template>
+            </div>
+        </sqx-dropdown-menu>
+    </ng-container>
+</div>

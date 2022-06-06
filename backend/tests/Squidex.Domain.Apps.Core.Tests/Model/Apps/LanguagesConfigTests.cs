@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
@@ -115,7 +114,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
                     [Language.EN] = new LanguageConfig(),
                     [Language.DE] = new LanguageConfig(),
                     [Language.ES] = new LanguageConfig(true),
-                    [Language.IT] = new LanguageConfig(true, ImmutableList.Create(Language.ES))
+                    [Language.IT] = new LanguageConfig(true, ReadonlyList.Create(Language.ES))
                 });
 
             Assert.Equal(Language.DE, config.Master);
@@ -255,7 +254,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
                 new Dictionary<string, LanguageConfig>
                 {
                     [Language.EN] = new LanguageConfig(),
-                    [Language.IT] = new LanguageConfig(true, ImmutableList.Create(Language.EN))
+                    [Language.IT] = new LanguageConfig(true, ReadonlyList.Create(Language.EN))
                 });
 
             Assert.Equal(Language.EN, config_2.Master);
@@ -272,7 +271,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
                 new Dictionary<string, LanguageConfig>
                 {
                     [Language.EN] = new LanguageConfig(),
-                    [Language.IT] = new LanguageConfig(true, ImmutableList.Create(Language.EN))
+                    [Language.IT] = new LanguageConfig(true, ReadonlyList.Create(Language.EN))
                 });
 
             Assert.Equal(Language.EN, config_2.Master);

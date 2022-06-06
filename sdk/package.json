@@ -1,0 +1,42 @@
+{
+  "private": true,
+  "name": "sdk",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "preact build --prerender false --sw false --esm false --inline-css",
+    "dev": "preact watch",
+    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
+    "serve": "sirv build --port 8080 --cors --single",
+    "start": "preact watch"
+  },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+      "preact",
+      "plugin:@typescript-eslint/recommended"
+    ],
+    "ignorePatterns": [
+      "build/"
+    ]
+  },
+  "dependencies": {
+    "preact": "^10.3.1",
+    "preact-render-to-string": "^5.1.4"
+  },
+  "devDependencies": {
+    "@types/enzyme": "^3.10.5",
+    "@types/jest": "^26.0.8",
+    "@typescript-eslint/eslint-plugin": "^2.25.0",
+    "@typescript-eslint/parser": "^2.25.0",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-preact-pure": "^3.1.0",
+    "eslint": "^6.8.0",
+    "eslint-config-preact": "^1.1.1",
+    "preact-cli": "^3.0.0",
+    "sass": "^1.49.0",
+    "sass-loader": "^10.2.1",
+    "sirv-cli": "^1.0.0-next.3",
+    "typescript": "^4.5.2"
+  }
+}

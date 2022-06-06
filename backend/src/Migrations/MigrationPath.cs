@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Migrations.Migrations;
 using Migrations.Migrations.MongoDb;
@@ -75,17 +72,12 @@ namespace Migrations
 
                 // Version 12: Introduce roles.
                 // Version 24: Improve a naming in the languages config.
-                if (version < 24)
+                // Version 26: Introduce full deletion.
+                if (version < 26)
                 {
                     yield return serviceProvider.GetRequiredService<RebuildApps>();
-                }
-
-                // Version 14: Schema refactoring
-                // Version 22: Introduce domain id.
-                if (version < 22)
-                {
-                    yield return serviceProvider.GetRequiredService<ClearSchemas>();
-                    yield return serviceProvider.GetRequiredService<ClearRules>();
+                    yield return serviceProvider.GetRequiredService<RebuildSchemas>();
+                    yield return serviceProvider.GetRequiredService<RebuildRules>();
                 }
 
                 // Version 18: Rebuild assets.
@@ -140,12 +132,6 @@ namespace Migrations
             if (version < 13)
             {
                 yield return serviceProvider.GetRequiredService<ConvertRuleEventsJson>();
-            }
-
-            // Version 19: Unify indexes.
-            if (version < 19)
-            {
-                yield return serviceProvider.GetRequiredService<PopulateGrainIndexes>();
             }
 
             yield return serviceProvider.GetRequiredService<StartEventConsumers>();

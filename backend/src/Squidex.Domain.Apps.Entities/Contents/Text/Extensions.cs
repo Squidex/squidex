@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Text;
 using GeoJSON.Net;
 using Squidex.Domain.Apps.Core.Contents;
@@ -27,7 +26,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 {
                     foreach (var (key, jsonValue) in value)
                     {
-                        if (GeoJsonValue.TryParse(jsonValue, jsonSerializer, out var geoJson) == GeoJsonParseResult.Success)
+                        GeoJsonValue.TryParse(jsonValue, jsonSerializer, out var geoJson);
+
+                        if (geoJson != null)
                         {
                             result ??= new Dictionary<string, GeoJSONObject>();
                             result[$"{field}.{key}"] = geoJson;
@@ -48,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 var languages = new Dictionary<string, StringBuilder>();
                 try
                 {
-                    foreach (var value in data.Values)
+                    foreach (var (_, value) in data)
                     {
                         if (value != null)
                         {
@@ -80,25 +81,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return result;
         }
 
-        private static void AppendJsonText(Dictionary<string, StringBuilder> languages, string language, IJsonValue value)
+        private static void AppendJsonText(Dictionary<string, StringBuilder> languages, string language, JsonValue value)
         {
-            if (value.Type == JsonValueType.String)
+            switch (value.Type)
             {
-                AppendText(languages, language, value.ToString());
-            }
-            else if (value is JsonArray array)
-            {
-                foreach (var item in array)
-                {
-                    AppendJsonText(languages, language, item);
-                }
-            }
-            else if (value is JsonObject obj)
-            {
-                foreach (var item in obj.Values)
-                {
-                    AppendJsonText(languages, language, item);
-                }
+                case JsonValueType.String:
+                    AppendText(languages, language, value.AsString);
+                    break;
+                case JsonValueType.Array:
+                    foreach (var item in value.AsArray)
+                    {
+                        AppendJsonText(languages, language, item);
+                    }
+
+                    break;
+                case JsonValueType.Object:
+                    foreach (var (_, item) in value.AsObject)
+                    {
+                        AppendJsonText(languages, language, item);
+                    }
+
+                    break;
             }
         }
 

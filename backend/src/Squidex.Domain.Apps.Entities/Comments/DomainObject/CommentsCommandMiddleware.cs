@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Infrastructure.Commands;
@@ -20,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 {
     public sealed class CommentsCommandMiddleware : ICommandMiddleware
     {
-        private static readonly Regex MentionRegex = new Regex(@"@(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+\/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+\/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+        private static readonly Regex MentionRegex = new Regex(@"@(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+\/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+\/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*", RegexOptions.Compiled | RegexOptions.ExplicitCapture, TimeSpan.FromMilliseconds(100));
         private readonly IGrainFactory grainFactory;
         private readonly IUserResolver userResolver;
 

@@ -7,28 +7,14 @@
 
 using Squidex.Infrastructure;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed record AppImage
+    public sealed record AppImage(string MimeType, string? Etag = null)
     {
-        public string MimeType { get; }
+        public string MimeType { get; } = Guard.NotNullOrEmpty(MimeType);
 
-        public string Etag { get; }
-
-        public AppImage(string mimeType, string? etag = null)
-        {
-            Guard.NotNullOrEmpty(mimeType, nameof(mimeType));
-
-            MimeType = mimeType;
-
-            if (string.IsNullOrWhiteSpace(etag))
-            {
-                Etag = RandomHash.Simple();
-            }
-            else
-            {
-                Etag = etag;
-            }
-        }
+        public string Etag { get; } = Etag ?? RandomHash.Simple();
     }
 }

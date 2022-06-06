@@ -28,6 +28,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             public ScheduleJob? ScheduleJob { get; set; }
 
+            public bool IsDeleted { get; set; }
+
             [IgnoreDataMember]
             public DomainId UniqueId
             {
@@ -37,7 +39,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             [IgnoreDataMember]
             public ContentData Data
             {
-                get => NewVersion?.Data ?? CurrentVersion.Data;
+                get => NewVersion?.Data ?? CurrentData;
+            }
+
+            [IgnoreDataMember]
+            public ContentData CurrentData
+            {
+                get => CurrentVersion.Data;
             }
 
             [IgnoreDataMember]
@@ -69,7 +77,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                     case ContentDraftCreated e:
                         {
-                            NewVersion = new ContentVersion(e.Status, e.MigratedData ?? CurrentVersion.Data);
+                            var newData = e.MigratedData?.UseSameFields(CurrentData) ?? CurrentData;
+
+                            NewVersion = new ContentVersion(e.Status, newData);
 
                             ScheduleJob = null;
 
@@ -93,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             {
                                 if (e.Status == Status.Published)
                                 {
-                                    CurrentVersion = new ContentVersion(e.Status, NewVersion.Data);
+                                    CurrentVersion = new ContentVersion(e.Status, NewVersion.Data.UseSameFields(CurrentData));
 
                                     NewVersion = null;
                                 }
@@ -128,11 +138,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         {
                             if (NewVersion != null)
                             {
-                                NewVersion = NewVersion.WithData(e.Data);
+                                NewVersion = NewVersion.WithData(e.Data.UseSameFields(Data));
                             }
                             else
                             {
-                                CurrentVersion = CurrentVersion.WithData(e.Data);
+                                CurrentVersion = CurrentVersion.WithData(e.Data.UseSameFields(CurrentData));
                             }
 
                             break;

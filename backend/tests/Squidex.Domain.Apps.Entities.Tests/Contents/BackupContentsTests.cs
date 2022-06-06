@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
@@ -26,6 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public class BackupContentsTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly Rebuilder rebuilder = A.Fake<Rebuilder>();
@@ -33,6 +32,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public BackupContentsTests()
         {
+            ct = cts.Token;
+
             sut = new BackupContents(rebuilder, urlGenerator);
         }
 
@@ -63,12 +64,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await sut.BackupEventAsync(Envelope.Create(new AppCreated
             {
                 Name = appId.Name
-            }), context);
+            }), context, ct);
 
             A.CallTo(() => writer.WriteJsonAsync(A<string>._,
                 A<BackupContents.Urls>.That.Matches(x =>
                     x.Assets == assetsUrl &&
-                    x.AssetsApp == assetsUrlApp)))
+                    x.AssetsApp == assetsUrlApp), ct))
                 .MustHaveHappened();
         }
 
@@ -91,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => urlGenerator.AssetContentBase(appId.Name))
                 .Returns(newAssetsUrlApp);
 
-            A.CallTo(() => reader.ReadJsonAsync<BackupContents.Urls>(A<string>._))
+            A.CallTo(() => reader.ReadJsonAsync<BackupContents.Urls>(A<string>._, ct))
                 .Returns(new BackupContents.Urls
                 {
                     Assets = oldAssetsUrl,
@@ -112,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     .AddField("assetsInObj",
                         new ContentFieldData()
                             .AddLocalized("iv",
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("asset", $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")));
 
             var updateData =
@@ -129,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     .AddField("assetsInObj",
                         new ContentFieldData()
                             .AddLocalized("iv",
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("asset", $"Asset: {newAssetsUrlApp}/my-asset.jpg.")));
 
             var context = new RestoreContext(appId.Id, new UserMapping(me), reader, DomainId.NewGuid());
@@ -137,12 +138,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await sut.RestoreEventAsync(Envelope.Create(new AppCreated
             {
                 Name = appId.Name
-            }), context);
+            }), context, ct);
 
             await sut.RestoreEventAsync(Envelope.Create(new ContentUpdated
             {
                 Data = data
-            }), context);
+            }), context, ct);
 
             Assert.Equal(updateData, data);
         }
@@ -165,37 +166,37 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 ContentId = contentId1,
                 SchemaId = schemaId1
-            }), context);
+            }), context, ct);
 
             await sut.RestoreEventAsync(ContentEvent(new ContentCreated
             {
                 ContentId = contentId2,
                 SchemaId = schemaId1
-            }), context);
+            }), context, ct);
 
             await sut.RestoreEventAsync(ContentEvent(new ContentCreated
             {
                 ContentId = contentId3,
                 SchemaId = schemaId2
-            }), context);
+            }), context, ct);
 
             await sut.RestoreEventAsync(ContentEvent(new ContentDeleted
             {
                 ContentId = contentId2,
                 SchemaId = schemaId1
-            }), context);
+            }), context, ct);
 
             await sut.RestoreEventAsync(Envelope.Create(new SchemaDeleted
             {
                 SchemaId = schemaId2
-            }), context);
+            }), context, ct);
 
             var rebuildContents = new HashSet<DomainId>();
 
-            A.CallTo(() => rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, A<CancellationToken>._))
-                .Invokes((IEnumerable<DomainId> source, int _, CancellationToken _) => rebuildContents.AddRange(source));
+            A.CallTo(() => rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, ct))
+                .Invokes(x => rebuildContents.AddRange(x.GetArgument<IEnumerable<DomainId>>(0)!));
 
-            await sut.RestoreAsync(context);
+            await sut.RestoreAsync(context, ct);
 
             Assert.Equal(new HashSet<DomainId>
             {
@@ -208,11 +209,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             @event.AppId = appId;
 
-            var envelope = Envelope.Create(@event);
-
-            envelope.SetAggregateId(DomainId.Combine(appId.Id, @event.ContentId));
-
-            return envelope;
+            return Envelope.Create(@event).SetAggregateId(DomainId.Combine(appId.Id, @event.ContentId));
         }
     }
 }

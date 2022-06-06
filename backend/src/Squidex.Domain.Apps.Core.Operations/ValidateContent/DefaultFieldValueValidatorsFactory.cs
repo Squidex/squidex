@@ -5,12 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Text;
+
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
@@ -18,19 +19,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         private static readonly DefaultFieldValueValidatorsFactory Instance = new DefaultFieldValueValidatorsFactory();
 
-        public readonly struct Args
-        {
-            public readonly ValidatorContext Context;
-
-            public readonly ValidatorFactory Factory;
-
-            public Args(ValidatorContext context, ValidatorFactory factory)
-            {
-                Context = context;
-
-                Factory = factory;
-            }
-        }
+        public record struct Args(ValidatorContext Context, ValidatorFactory Factory);
 
         private DefaultFieldValueValidatorsFactory()
         {
@@ -54,6 +43,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
             }
 
+            if (properties.UniqueFields?.Count > 0)
+            {
+                yield return new UniqueObjectValuesValidator(properties.UniqueFields);
+            }
+
             var nestedValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>(field.Fields.Count);
 
             foreach (var nestedField in field.Fields)
@@ -61,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 nestedValidators[nestedField.Name] = (false, args.Factory(nestedField));
             }
 
-            yield return new CollectionItemValidator(new ObjectValidator<IJsonValue>(nestedValidators, false, "field"));
+            yield return new CollectionItemValidator(new ObjectValidator<JsonValue>(nestedValidators, false, "field"));
         }
 
         public IEnumerable<IValidator> Visit(IField<AssetsFieldProperties> field, Args args)
@@ -104,6 +98,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             if (isRequired || properties.MinItems != null || properties.MaxItems != null)
             {
                 yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
+            }
+
+            if (properties.UniqueFields?.Count > 0)
+            {
+                yield return new UniqueObjectValuesValidator(properties.UniqueFields);
             }
 
             yield return new CollectionItemValidator(ComponentValidator(args.Factory));
@@ -203,10 +202,10 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 switch (properties.ContentType)
                 {
                     case StringContentType.Markdown:
-                        transform = TextHelpers.Markdown2Text;
+                        transform = MarkdownExtensions.Markdown2Text;
                         break;
                     case StringContentType.Html:
-                        transform = TextHelpers.Html2Text;
+                        transform = HtmlExtensions.Html2Text;
                         break;
                 }
 
@@ -278,7 +277,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                     nestedValidators[nestedField.Name] = (false, factory(nestedField));
                 }
 
-                return new ObjectValidator<IJsonValue>(nestedValidators, false, "field");
+                return new ObjectValidator<JsonValue>(nestedValidators, false, "field");
             });
         }
     }

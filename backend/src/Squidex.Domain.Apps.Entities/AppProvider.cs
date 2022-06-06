@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Caching;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Rules;
@@ -17,7 +13,6 @@ using Squidex.Domain.Apps.Entities.Rules.Indexes;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Entities
@@ -26,27 +21,29 @@ namespace Squidex.Domain.Apps.Entities
     {
         private readonly ILocalCache localCache;
         private readonly IAppsIndex indexForApps;
-        private readonly IRulesIndex indexRules;
-        private readonly ISchemasIndex indexSchemas;
+        private readonly IRulesIndex indexForRules;
+        private readonly ISchemasIndex indexForSchemas;
 
-        public AppProvider(ILocalCache localCache, IAppsIndex indexForApps, IRulesIndex indexRules, ISchemasIndex indexSchemas)
+        public AppProvider(IAppsIndex indexForApps, IRulesIndex indexForRules, ISchemasIndex indexForSchemas,
+            ILocalCache localCache)
         {
             this.localCache = localCache;
             this.indexForApps = indexForApps;
-            this.indexRules = indexRules;
-            this.indexSchemas = indexSchemas;
+            this.indexForRules = indexForRules;
+            this.indexForSchemas = indexForSchemas;
         }
 
-        public async Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(DomainId appId, DomainId id, bool canCache = false)
+        public async Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
+            CancellationToken ct = default)
         {
-            var app = await GetAppAsync(appId, canCache);
+            var app = await GetAppAsync(appId, canCache, ct);
 
             if (app == null)
             {
                 return (null, null);
             }
 
-            var schema = await GetSchemaAsync(appId, id, canCache);
+            var schema = await GetSchemaAsync(appId, id, canCache, ct);
 
             if (schema == null)
             {
@@ -56,189 +53,148 @@ namespace Squidex.Domain.Apps.Entities
             return (app, schema);
         }
 
-        public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false)
+        public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
+            CancellationToken ct = default)
         {
             var cacheKey = AppCacheKey(appId);
 
-            if (localCache.TryGetValue(cacheKey, out var cached) && cached is IAppEntity found)
+            var app = await GetOrCreate(cacheKey, () =>
             {
-                return found;
-            }
-
-            var app = await indexForApps.GetAppAsync(appId, canCache);
+                return indexForApps.GetAppAsync(appId, canCache, ct);
+            });
 
             if (app != null)
             {
-                localCache.Add(cacheKey, app);
                 localCache.Add(AppCacheKey(app.Name), app);
             }
 
             return app;
         }
 
-        public async Task<IAppEntity?> GetAppAsync(string appName, bool canCache = false)
+        public async Task<IAppEntity?> GetAppAsync(string appName, bool canCache = false,
+            CancellationToken ct = default)
         {
             var cacheKey = AppCacheKey(appName);
 
-            if (localCache.TryGetValue(cacheKey, out var cached) && cached is IAppEntity found)
+            var app = await GetOrCreate(cacheKey, () =>
             {
-                return found;
-            }
-
-            var app = await indexForApps.GetAppByNameAsync(appName, canCache);
+                return indexForApps.GetAppAsync(appName, canCache, ct);
+            });
 
             if (app != null)
             {
-                localCache.Add(cacheKey, app);
                 localCache.Add(AppCacheKey(app.Id), app);
             }
 
             return app;
         }
 
-        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache = false)
+        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache = false,
+            CancellationToken ct = default)
         {
             var cacheKey = SchemaCacheKey(appId, name);
 
-            if (localCache.TryGetValue(cacheKey, out var cached) && cached is ISchemaEntity found)
+            var schema = await GetOrCreate(cacheKey, () =>
             {
-                return found;
-            }
-
-            var schema = await indexSchemas.GetSchemaByNameAsync(appId, name, canCache);
+                return indexForSchemas.GetSchemaAsync(appId, name, canCache, ct);
+            });
 
             if (schema != null)
             {
-                await ResolveSchemaAsync(appId, schema.SchemaDef);
-
-                localCache.Add(cacheKey, schema);
                 localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
             }
 
             return schema;
         }
 
-        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache = false)
+        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
+            CancellationToken ct = default)
         {
             var cacheKey = SchemaCacheKey(appId, id);
 
-            if (localCache.TryGetValue(cacheKey, out var cached) && cached is ISchemaEntity found)
+            var schema = await GetOrCreate(cacheKey, () =>
             {
-                return found;
-            }
-
-            var schema = await indexSchemas.GetSchemaAsync(appId, id, canCache);
+                return indexForSchemas.GetSchemaAsync(appId, id, canCache, ct);
+            });
 
             if (schema != null)
             {
-                await ResolveSchemaAsync(appId, schema.SchemaDef);
-
-                localCache.Add(cacheKey, schema);
                 localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
             }
 
             return schema;
         }
 
-        public async Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions)
+        public async Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions,
+            CancellationToken ct = default)
         {
-            var apps = await localCache.GetOrCreateAsync($"GetUserApps({userId})", () =>
+            var apps = await GetOrCreate($"GetUserApps({userId})", () =>
             {
-                return indexForApps.GetAppsForUserAsync(userId, permissions);
+                return indexForApps.GetAppsForUserAsync(userId, permissions, ct)!;
             });
 
-            return apps;
+            return apps?.ToList() ?? new List<IAppEntity>();
         }
 
-        public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId)
+        public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId,
+            CancellationToken ct = default)
         {
-            var schemas = await localCache.GetOrCreateAsync($"GetSchemasAsync({appId})", () =>
+            var schemas = await GetOrCreate($"GetSchemasAsync({appId})", () =>
             {
-                return indexSchemas.GetSchemasAsync(appId);
+                return indexForSchemas.GetSchemasAsync(appId, ct)!;
             });
 
-            foreach (var schema in schemas)
+            if (schemas != null)
             {
-                localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
-                localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
+                foreach (var schema in schemas)
+                {
+                    localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
+                    localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
+                }
             }
 
-            foreach (var schema in schemas)
-            {
-                await ResolveSchemaAsync(appId, schema.SchemaDef);
-            }
-
-            return schemas;
+            return schemas?.ToList() ?? new List<ISchemaEntity>();
         }
 
-        public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId)
+        public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId,
+            CancellationToken ct = default)
         {
-            var rules = await localCache.GetOrCreateAsync($"GetRulesAsync({appId})", () =>
+            var rules = await GetOrCreate($"GetRulesAsync({appId})", () =>
             {
-                return indexRules.GetRulesAsync(appId);
+                return indexForRules.GetRulesAsync(appId, ct)!;
             });
 
-            return rules.ToList();
+            return rules?.ToList() ?? new List<IRuleEntity>();
         }
 
-        public async Task<IRuleEntity?> GetRuleAsync(DomainId appId, DomainId id)
+        public async Task<IRuleEntity?> GetRuleAsync(DomainId appId, DomainId id,
+            CancellationToken ct = default)
         {
-            var rules = await GetRulesAsync(appId);
+            var rules = await GetRulesAsync(appId, ct);
 
             return rules.Find(x => x.Id == id);
         }
 
-        private async Task ResolveSchemaAsync(DomainId appId, Schema schema)
+        public async Task<T?> GetOrCreate<T>(object key, Func<Task<T?>> creator) where T : class
         {
-            async Task ResolveWithIdsAsync(IField field, ImmutableList<DomainId>? schemaIds)
+            if (localCache.TryGetValue(key, out var value))
             {
-                if (schemaIds != null)
+                switch (value)
                 {
-                    foreach (var schemaId in schemaIds)
-                    {
-                        if (!field.TryGetResolvedSchema(schemaId, out _))
-                        {
-                            var resolvedEntity = await GetSchemaAsync(appId, schemaId, true);
-
-                            if (resolvedEntity != null)
-                            {
-                                field.SetResolvedSchema(schemaId, resolvedEntity.SchemaDef);
-                            }
-                        }
-                    }
+                    case T typed:
+                        return typed;
+                    case Task<T?> typedTask:
+                        return await typedTask;
+                    default:
+                        return null;
                 }
             }
 
-            async Task ResolveArrayAsync(IArrayField arrayField)
-            {
-                foreach (var nestedField in arrayField.Fields)
-                {
-                    await ResolveAsync(nestedField);
-                }
-            }
+            var result = creator();
 
-            async Task ResolveAsync(IField field)
-            {
-                switch (field)
-                {
-                    case IField<ComponentFieldProperties> component:
-                        await ResolveWithIdsAsync(field, component.Properties.SchemaIds);
-                        break;
+            localCache.Add(key, result);
 
-                    case IField<ComponentsFieldProperties> components:
-                        await ResolveWithIdsAsync(field, components.Properties.SchemaIds);
-                        break;
-
-                    case IArrayField arrayField:
-                        await ResolveArrayAsync(arrayField);
-                        break;
-                }
-            }
-
-            foreach (var field in schema.Fields)
-            {
-                await ResolveAsync(field);
-            }
+            return await result;
         }
 
         private static string AppCacheKey(DomainId appId)

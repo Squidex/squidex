@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Squidex.Hosting;
 
@@ -18,12 +16,13 @@ namespace Squidex.Infrastructure
 
         public LanguagesInitializer(IOptions<LanguagesOptions> options)
         {
-            Guard.NotNull(options, nameof(options));
+            Guard.NotNull(options);
 
             this.options = options.Value;
         }
 
-        public Task InitializeAsync(CancellationToken ct = default)
+        public Task InitializeAsync(
+            CancellationToken ct)
         {
             foreach (var (key, value) in options)
             {
@@ -31,7 +30,7 @@ namespace Squidex.Infrastructure
                 {
                     if (!Language.TryGetLanguage(key, out _))
                     {
-                        Language.AddLanguage(key, value);
+                        Language.AddLanguage(key, value, value);
                     }
                 }
             }

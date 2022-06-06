@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
+    <script src="editor-sdk.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+
+    <style>
+        .editor {
+            border: 1px solid #eee;
+            border-radius: 4px;
+            min-height: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="editor">
+        <div id="editorjs"></div>
+    </div>
+
+    <script>
+        // When the field is instantiated it notifies the UI that it has been loaded.
+        // 
+        // Furthermore it sends the current size to the parent.
+        var field = new SquidexFormField();
+
+        var editor = new EditorJS({
+            holder: 'editorjs',
+
+            tools: {
+                header: {
+                    class: Header,
+                    inlineToolbar : true
+                }
+            },
+
+            minHeight: 50,
+
+            data: {},
+
+            onReady: function () {
+                field.onValueChanged(function (value) {
+                    if (value) {
+                        editor.render(value);
+                    }
+                });
+
+                field.onDisabled(function (disabled) {
+                    editor.readOnly.toggle(disabled);
+                });
+            },
+            onChange: function () {
+                editor.save().then(function (data) {
+                    // Notify the UI that the value has been changed. Will be used to trigger validation.
+                    field.valueChanged(data);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

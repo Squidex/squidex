@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
 using TestSuite.Model;
 using Xunit;
@@ -29,7 +27,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_cleanup_old_data_from_update_response()
         {
-            var schemaName = $"schema-{DateTime.UtcNow.Ticks}";
+            var schemaName = $"schema-{Guid.NewGuid()}";
 
             // STEP 1: Create a schema.
             var schema = await TestEntity.CreateSchemaAsync(_.Schemas, _.AppName, schemaName);
@@ -46,11 +44,14 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Delete a field from schema.
-            await _.Schemas.DeleteFieldAsync(_.AppName, schema.Name, schema.Fields.ElementAt(1).FieldId);
+            await _.Schemas.DeleteFieldAsync(_.AppName, schema.Name, schema.Fields.First(x => x.Name == TestEntityData.StringField).FieldId);
 
 
             // STEP 4: Make any update.
-            var content_2 = await contents.ChangeStatusAsync(content_1.Id, "Published");
+            var content_2 = await contents.ChangeStatusAsync(content_1.Id, new ChangeStatus
+            {
+                Status = "Published"
+            });
 
             // Should not return deleted field.
             Assert.Null(content_2.Data.String);
@@ -59,7 +60,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_cleanup_old_references()
         {
-            var schemaName = $"schema-{DateTime.UtcNow.Ticks}";
+            var schemaName = $"schema-{Guid.NewGuid()}";
 
             // STEP 1: Create a schema.
             await TestEntityWithReferences.CreateSchemaAsync(_.Schemas, _.AppName, schemaName);
@@ -84,7 +85,10 @@ namespace TestSuite.ApiTests
 
 
             // STEP 4: Make any update.
-            var contentB_2 = await contents.ChangeStatusAsync(contentB_1.Id, "Published");
+            var contentB_2 = await contents.ChangeStatusAsync(contentB_1.Id, new ChangeStatus
+            {
+                Status = "Published"
+            });
 
             // Should not return deleted field.
             Assert.Empty(contentB_2.Data.References);

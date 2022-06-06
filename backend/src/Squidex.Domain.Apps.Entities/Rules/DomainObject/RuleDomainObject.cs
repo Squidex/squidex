@@ -1,21 +1,22 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
+
+#pragma warning disable MA0022 // Return Task.FromResult instead of returning null
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 {
@@ -24,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         private readonly IAppProvider appProvider;
         private readonly IRuleEnqueuer ruleEnqueuer;
 
-        public RuleDomainObject(IPersistenceFactory<State> factory, ISemanticLog log,
+        public RuleDomainObject(IPersistenceFactory<State> factory, ILogger<RuleDomainObject> log,
             IAppProvider appProvider, IRuleEnqueuer ruleEnqueuer)
             : base(factory, log)
         {
@@ -32,9 +33,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             this.ruleEnqueuer = ruleEnqueuer;
         }
 
-        protected override bool IsDeleted()
+        protected override bool IsDeleted(State snapshot)
         {
-            return Snapshot.IsDeleted;
+            return snapshot.IsDeleted;
         }
 
         protected override bool CanAcceptCreation(ICommand command)
@@ -104,7 +105,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                     });
 
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         }
 

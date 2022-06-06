@@ -26,7 +26,11 @@ namespace Squidex.Domain.Apps.Events.Rules
         {
             if (Trigger is IMigrated<RuleTrigger> migrated)
             {
-                Trigger = migrated.Migrate();
+                var clone = (RuleUpdated)MemberwiseClone();
+
+                clone.Trigger = migrated.Migrate();
+
+                return clone;
             }
 
             return this;

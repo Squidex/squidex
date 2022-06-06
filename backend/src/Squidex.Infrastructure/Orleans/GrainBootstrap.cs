@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
 using Orleans;
 using Orleans.Runtime;
 using Squidex.Hosting;
@@ -22,12 +20,13 @@ namespace Squidex.Infrastructure.Orleans
 
         public GrainBootstrap(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(grainFactory);
 
             this.grainFactory = grainFactory;
         }
 
-        public async Task StartAsync(CancellationToken ct = default)
+        public async Task StartAsync(
+            CancellationToken ct)
         {
             for (var i = 1; i <= NumTries; i++)
             {

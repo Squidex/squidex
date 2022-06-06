@@ -56,7 +56,8 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public async Task InitializeAsync(CancellationToken ct = default)
+        public async Task InitializeAsync(
+            CancellationToken ct = default)
         {
             await documentClient.CreateDatabaseIfNotExistsAsync(new Database { Id = DatabaseId });
 

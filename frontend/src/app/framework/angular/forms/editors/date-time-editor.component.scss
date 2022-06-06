@@ -1,0 +1,87 @@
+@import 'mixins';
+@import 'vars';
+
+.root {
+    max-width: 400px;
+}
+
+.flex-grow {
+    flex-grow: 1;
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-time {
+    width: 45%;
+}
+
+.form-date {
+    width: 55%;
+
+    &.with-buttons {
+        padding-left: 3.3rem;
+    }
+}
+
+.form-control {
+    &:last-child {
+        padding-left: .75rem;
+        padding-right: 2rem;
+        position: relative;
+    }
+}
+
+.btn {
+    &-clear {
+        @include absolute(auto, 4px, 3px, auto);
+        z-index: 100;
+    }
+
+    &-time-mode {
+        @include absolute(1px, auto, -1px, auto);
+        z-index: 100;
+    }
+
+    &:focus {
+        box-shadow: none;
+    }
+}
+
+.compact {
+    .btn-time-mode {
+        display: none;
+    }
+
+    .form-date {
+        padding-left: .75rem;
+    }
+}
+
+.mini {
+    .btn-time-mode {
+        display: none;
+    }
+
+    .btn-quick {
+        display: none;
+    }
+
+    .form-date {
+        padding-left: .75rem;
+    }
+}
+
+:host(.ng-invalid) {
+    &.ng-dirty {
+        .form-control {
+            border-color: $color-theme-error;
+
+            &:hover,
+            &:focus {
+                border-color: $color-theme-error-dark;
+            }
+        }
+    }
+}

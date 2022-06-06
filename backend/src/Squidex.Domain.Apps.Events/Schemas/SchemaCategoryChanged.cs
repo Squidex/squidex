@@ -12,6 +12,6 @@ namespace Squidex.Domain.Apps.Events.Schemas
     [EventType(nameof(SchemaCategoryChanged))]
     public sealed class SchemaCategoryChanged : SchemaEvent
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }

@@ -17,7 +17,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
         [LocalizedRequired]
         public string Password { get; set; }
 
-        [LocalizedRequiredAttribute]
+        [LocalizedRequired]
         public string PasswordConfirm { get; set; }
     }
 }

@@ -5,11 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
@@ -25,7 +20,7 @@ namespace Squidex.Infrastructure.States
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly Dictionary<DomainId, (long, List<Envelope<IEvent>>)> @events = new Dictionary<DomainId, (long, List<Envelope<IEvent>>)>();
-        private List<(DomainId Key, T Snapshot, long Version)>? snapshots;
+        private Dictionary<DomainId, (T Snapshot, long Version)>? snapshots;
 
         internal BatchContext(
             Type owner,
@@ -43,8 +38,12 @@ namespace Squidex.Infrastructure.States
 
         internal void Add(DomainId key, T snapshot, long version)
         {
-            snapshots ??= new List<(DomainId Key, T Snapshot, long Version)>();
-            snapshots.Add((key, snapshot, version));
+            snapshots ??= new Dictionary<DomainId, (T Snapshot, long Version)>();
+
+            if (!snapshots.TryGetValue(key, out var existing) || existing.Version < version)
+            {
+                snapshots[key] = (snapshot, version);
+            }
         }
 
         public async Task LoadAsync(IEnumerable<DomainId> ids)
@@ -87,7 +86,9 @@ namespace Squidex.Infrastructure.States
                 return Task.CompletedTask;
             }
 
-            return snapshotStore.WriteManyAsync(current);
+            var list = current.Select(x => (x.Key, x.Value.Snapshot, x.Value.Version));
+
+            return snapshotStore.WriteManyAsync(list);
         }
 
         public IPersistence<T> WithEventSourcing(Type owner, DomainId key, HandleEvent? applyEvent)

@@ -5,20 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
     public sealed class ContentData : Dictionary<string, ContentFieldData?>, IEquatable<ContentData>
     {
-        public IEnumerable<KeyValuePair<string, ContentFieldData?>> ValidValues
-        {
-            get => this.Where(x => x.Value != null);
-        }
-
         public ContentData()
             : base(StringComparer.Ordinal)
         {
@@ -36,16 +28,59 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public ContentData AddField(string name, ContentFieldData? data)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(name);
 
             this[name] = data;
 
             return this;
         }
 
+        public ContentData UseSameFields(ContentData? other)
+        {
+            if (other == null || other.Count == 0)
+            {
+                return this;
+            }
+
+            foreach (var (fieldName, fieldData) in this.ToList())
+            {
+                if (fieldData == null)
+                {
+                    continue;
+                }
+
+                if (!other.TryGetValue(fieldName, out var otherField) || otherField == null)
+                {
+                    continue;
+                }
+
+                if (otherField.Equals(fieldData))
+                {
+                    this[fieldName] = otherField;
+                }
+                else
+                {
+                    foreach (var (language, value) in fieldData.ToList())
+                    {
+                        if (!otherField.TryGetValue(language, out var otherValue))
+                        {
+                            continue;
+                        }
+
+                        if (otherValue.Equals(value))
+                        {
+                            fieldData[language] = otherValue;
+                        }
+                    }
+                }
+            }
+
+            return this;
+        }
+
         private static ContentData MergeTo(ContentData target, params ContentData[] sources)
         {
-            Guard.NotEmpty(sources, nameof(sources));
+            Guard.NotEmpty(sources);
 
             if (sources.Length == 1 || sources.Skip(1).All(x => ReferenceEquals(x, sources[0])))
             {
@@ -54,19 +89,23 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             foreach (var source in sources)
             {
-                foreach (var (key, contentFieldData) in source)
+                foreach (var (fieldName, sourceFieldData) in source)
                 {
-                    if (contentFieldData != null)
+                    if (sourceFieldData == null)
                     {
-                        var fieldValue = target.GetOrAdd(key, _ => new ContentFieldData());
+                        continue;
+                    }
 
-                        if (fieldValue != null)
-                        {
-                            foreach (var (fieldName, value) in contentFieldData)
-                            {
-                                fieldValue[fieldName] = value;
-                            }
-                        }
+                    var targetFieldData = target.GetOrAdd(fieldName, _ => new ContentFieldData());
+
+                    if (targetFieldData == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var (partition, value) in sourceFieldData)
+                    {
+                        targetFieldData[partition] = value;
                     }
                 }
             }

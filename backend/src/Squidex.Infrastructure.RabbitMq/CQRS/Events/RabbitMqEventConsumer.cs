@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using RabbitMQ.Client;
 using Squidex.Hosting;
 using Squidex.Hosting.Configuration;
@@ -58,7 +55,8 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
-        public Task InitializeAsync(CancellationToken ct = default)
+        public Task InitializeAsync(
+            CancellationToken ct)
         {
             try
             {

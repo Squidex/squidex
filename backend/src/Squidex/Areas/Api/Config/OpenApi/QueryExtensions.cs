@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using NJsonSchema;
 using NSwag;
+using Squidex.Domain.Apps.Core;
 
 namespace Squidex.Areas.Api.Config.OpenApi
 {
@@ -43,7 +43,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 {
                     Schema = stringSchema,
                     Name = "$search",
-                    Description = "Optional OData full text search."
+                    Description = FieldDescriptions.QuerySkip
                 });
             }
 
@@ -51,42 +51,42 @@ namespace Squidex.Areas.Api.Config.OpenApi
             {
                 Schema = numberSchema,
                 Name = "$top",
-                Description = "Optional OData parameter to define the number of items to retrieve."
+                Description = FieldDescriptions.QueryTop
             });
 
             AddQuery(new OpenApiParameter
             {
                 Schema = numberSchema,
                 Name = "$skip",
-                Description = "Optional OData parameter to skip items."
+                Description = FieldDescriptions.QuerySkip
             });
 
             AddQuery(new OpenApiParameter
             {
                 Schema = stringSchema,
                 Name = "$orderby",
-                Description = "Optional OData order definition to sort the result set."
+                Description = FieldDescriptions.QueryOrderBy
             });
 
             AddQuery(new OpenApiParameter
             {
                 Schema = stringSchema,
                 Name = "$filter",
-                Description = "Optional OData order definition to filter the result set."
+                Description = FieldDescriptions.QueryFilter
             });
 
             AddQuery(new OpenApiParameter
             {
                 Schema = stringSchema,
                 Name = "q",
-                Description = "JSON query as well formatted json string. Overrides all other query parameters, except 'ids'."
+                Description = FieldDescriptions.QueryQ
             });
 
             AddQuery(new OpenApiParameter
             {
                 Schema = stringSchema,
                 Name = "ids",
-                Description = "Comma separated list of content items. Overrides all other query parameters."
+                Description = FieldDescriptions.QueryIds
             });
         }
     }

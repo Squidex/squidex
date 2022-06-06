@@ -5,9 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Infrastructure
 {
@@ -24,8 +25,8 @@ namespace Squidex.Infrastructure
 
         public NamedId(T id, string name)
         {
-            Guard.NotNull(id, nameof(id));
-            Guard.NotNull(name, nameof(name));
+            Guard.NotNull(id);
+            Guard.NotNull(name);
 
             Id = id;
 
@@ -47,7 +48,7 @@ namespace Squidex.Infrastructure
                 {
                     if (value.Length > GuidLength + 1 && value[GuidLength] == ',')
                     {
-                        if (parser(span.Slice(0, GuidLength), out var id))
+                        if (parser(span[..GuidLength], out var id))
                         {
                             result = new NamedId<T>(id, value[(GuidLength + 1)..]);
 
@@ -57,11 +58,11 @@ namespace Squidex.Infrastructure
                 }
                 else
                 {
-                    var index = value.IndexOf(',');
+                    var index = value.IndexOf(',', StringComparison.Ordinal);
 
                     if (index > 0 && index < value.Length - 1)
                     {
-                        if (parser(span.Slice(0, index), out var id))
+                        if (parser(span[..index], out var id))
                         {
                             result = new NamedId<T>(id, value[(index + 1)..]);
 
@@ -80,7 +81,8 @@ namespace Squidex.Infrastructure
         {
             if (!TryParse(value, parser, out var result))
             {
-                throw new ArgumentException("Named id must have at least 2 parts divided by commata.", nameof(value));
+                ThrowHelper.ArgumentException("Named id must have at least 2 parts divided by commata.", nameof(value));
+                return default!;
             }
 
             return result;

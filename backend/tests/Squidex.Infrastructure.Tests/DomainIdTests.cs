@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using FluentAssertions;
@@ -75,7 +73,7 @@ namespace Squidex.Infrastructure
 
             var result = typeConverter.ConvertFrom(guid);
 
-            Assert.Equal(guid.ToString(), result.ToString());
+            Assert.Equal(guid.ToString(), result?.ToString());
         }
 
         [Fact]

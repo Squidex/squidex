@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.IO;
 using System.IO.Pipelines;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 
 namespace Squidex.Web.Pipeline
@@ -43,7 +40,8 @@ namespace Squidex.Web.Pipeline
             this.inner = inner;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken = default)
+        public Task StartAsync(
+            CancellationToken cancellationToken = default)
         {
             return inner.StartAsync(cancellationToken);
         }
@@ -58,7 +56,8 @@ namespace Squidex.Web.Pipeline
             inner.DisableBuffering();
         }
 
-        public async Task SendFileAsync(string path, long offset, long? count, CancellationToken cancellationToken = default)
+        public async Task SendFileAsync(string path, long offset, long? count,
+            CancellationToken cancellationToken = default)
         {
             await inner.SendFileAsync(path, offset, count, cancellationToken);
 

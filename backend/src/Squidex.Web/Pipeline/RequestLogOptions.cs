@@ -10,7 +10,5 @@ namespace Squidex.Web.Pipeline
     public sealed class RequestLogOptions
     {
         public bool LogRequests { get; set; }
-
-        public bool LogProfiler { get; set; }
     }
 }

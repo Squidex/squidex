@@ -5,132 +5,150 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json;
+using Squidex.Text;
+
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
-    public delegate JsonSchema SchemaResolver(string name, Func<JsonSchema> schema);
-
     internal sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?, JsonTypeVisitor.Args>
     {
         private const int MaxDepth = 5;
         private static readonly JsonTypeVisitor Instance = new JsonTypeVisitor();
 
-        public readonly struct Args
-        {
-            public readonly SchemaResolver? SchemaResolver;
-
-            public readonly bool WithHiddenFields;
-
-            public readonly int Level;
-
-            public Args(SchemaResolver? schemaResolver, bool withHiddenFields, int level)
-            {
-                SchemaResolver = schemaResolver;
-
-                WithHiddenFields = withHiddenFields;
-
-                Level = level;
-            }
-
-            public Args Increment()
-            {
-                return new Args(SchemaResolver, WithHiddenFields, Level + 1);
-            }
-        }
+        public record struct Args(ResolvedComponents Components, Schema Schema,
+            JsonTypeFactory Factory,
+            bool WithHidden,
+            bool WithComponents,
+            int Level = 0);
 
         private JsonTypeVisitor()
         {
         }
 
-        public static JsonSchemaProperty? BuildProperty(IField field, SchemaResolver? schemaResolver = null, bool withHiddenFields = false)
+        public static JsonSchemaProperty? BuildProperty(IField field, ResolvedComponents components, Schema schema,
+            JsonTypeFactory factory,
+            bool withHidden,
+            bool withComponents)
         {
-            var args = new Args(schemaResolver, withHiddenFields, 0);
+            var args = new Args(components, schema, factory, withHidden, withComponents);
 
             return field.Accept(Instance, args);
         }
 
-        public JsonSchemaProperty? Visit(IArrayField field, Args args)
+        private JsonSchemaProperty? Accept(Args args, NestedField nestedField)
         {
             if (args.Level > MaxDepth)
             {
                 return null;
             }
 
-            var itemSchema = SchemaBuilder.Object();
+            return nestedField.Accept(this, args);
+        }
 
-            var nestedArgs = args.Increment();
+        public JsonSchemaProperty? Visit(IArrayField field, Args args)
+        {
+            // Create a reference to give it a nice name in code generation.
+            var (reference, actual) = args.Factory($"{args.Schema.TypeName()}{field.Name.ToPascalCase()}ItemDto");
 
-            foreach (var nestedField in field.Fields.ForApi(args.WithHiddenFields))
+            if (actual != null)
             {
-                var nestedProperty = nestedField.Accept(this, nestedArgs);
+                var nestedArgs = args with { Level = args.Level + 1 };
 
-                if (nestedProperty != null)
+                foreach (var nestedField in field.Fields.ForApi(args.WithHidden))
                 {
-                    nestedProperty.Description = nestedField.RawProperties.Hints;
-                    nestedProperty.SetRequired(nestedField.RawProperties.IsRequired);
+                    var nestedProperty = Accept(nestedArgs, nestedField);
 
-                    itemSchema.Properties.Add(nestedField.Name, nestedProperty);
+                    if (nestedProperty != null)
+                    {
+                        nestedProperty.Description = nestedField.RawProperties.Hints;
+                        nestedProperty.SetRequired(nestedField.RawProperties.IsRequired);
+
+                        actual.Properties.Add(nestedField.Name, nestedProperty);
+                    }
                 }
             }
 
-            return SchemaBuilder.ArrayProperty(itemSchema);
+            return JsonTypeBuilder.ArrayProperty(reference);
         }
 
         public JsonSchemaProperty? Visit(IField<AssetsFieldProperties> field, Args args)
         {
-            return SchemaBuilder.ArrayProperty(SchemaBuilder.String());
+            var property = JsonTypeBuilder.ArrayProperty(JsonTypeBuilder.String());
+
+            property.Default = field.Properties.DefaultValue;
+
+            if (field.Properties.MinItems != null)
+            {
+                property.MinItems = field.Properties.MinItems.Value;
+            }
+
+            if (field.Properties.MaxItems != null)
+            {
+                property.MaxItems = field.Properties.MaxItems.Value;
+            }
+
+            return property;
         }
 
         public JsonSchemaProperty? Visit(IField<BooleanFieldProperties> field, Args args)
         {
-            return SchemaBuilder.BooleanProperty();
+            var property = JsonTypeBuilder.BooleanProperty();
+
+            property.Default = field.Properties.DefaultValue;
+
+            return property;
         }
 
         public JsonSchemaProperty? Visit(IField<ComponentFieldProperties> field, Args args)
         {
-            if (args.Level > MaxDepth)
-            {
-                return null;
-            }
+            var property = JsonTypeBuilder.ObjectProperty();
 
-            var property = SchemaBuilder.ObjectProperty();
-
-            BuildComponent(property, field, field.Properties.SchemaIds, args);
+            BuildComponent(property, field.Properties.SchemaIds, args);
 
             return property;
         }
 
         public JsonSchemaProperty? Visit(IField<ComponentsFieldProperties> field, Args args)
         {
-            if (args.Level > MaxDepth)
+            var itemSchema = JsonTypeBuilder.Object();
+
+            BuildComponent(itemSchema, field.Properties.SchemaIds, args);
+
+            var property = JsonTypeBuilder.ArrayProperty(itemSchema);
+
+            if (field.Properties.MinItems != null)
             {
-                return null;
+                property.MinItems = field.Properties.MinItems.Value;
             }
 
-            var itemSchema = SchemaBuilder.Object();
+            if (field.Properties.MaxItems != null)
+            {
+                property.MaxItems = field.Properties.MaxItems.Value;
+            }
 
-            BuildComponent(itemSchema, field, field.Properties.SchemaIds, args);
-
-            return SchemaBuilder.ArrayProperty(itemSchema);
+            return property;
         }
 
         public JsonSchemaProperty? Visit(IField<DateTimeFieldProperties> field, Args args)
         {
-            return SchemaBuilder.DateTimeProperty();
+            var property = JsonTypeBuilder.DateTimeProperty();
+
+            property.Default = field.Properties.DefaultValue?.ToString();
+
+            return property;
         }
 
         public JsonSchemaProperty? Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            var property = SchemaBuilder.ObjectProperty();
+            var property = JsonTypeBuilder.ObjectProperty();
 
             property.Format = GeoJson.Format;
 
@@ -139,12 +157,14 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<JsonFieldProperties> field, Args args)
         {
-            return SchemaBuilder.JsonProperty();
+            return JsonTypeBuilder.JsonProperty();
         }
 
         public JsonSchemaProperty? Visit(IField<NumberFieldProperties> field, Args args)
         {
-            var property = SchemaBuilder.NumberProperty();
+            var property = JsonTypeBuilder.NumberProperty();
+
+            property.Default = field.Properties.DefaultValue;
 
             if (field.Properties.MinValue != null)
             {
@@ -161,12 +181,35 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<ReferencesFieldProperties> field, Args args)
         {
-            return SchemaBuilder.ArrayProperty(SchemaBuilder.String());
+            var property = JsonTypeBuilder.ArrayProperty(JsonTypeBuilder.String());
+
+            property.Default = field.Properties.DefaultValue;
+
+            if (field.Properties.MinItems != null)
+            {
+                property.MinItems = field.Properties.MinItems.Value;
+            }
+
+            if (field.Properties.MaxItems != null)
+            {
+                property.MaxItems = field.Properties.MaxItems.Value;
+            }
+
+            property.ExtensionData = new Dictionary<string, object>
+            {
+                ["schemaIds"] = field.Properties.SchemaIds ?? ReadonlyList.Empty<DomainId>()
+            };
+
+            property.UniqueItems = !field.Properties.AllowDuplicates;
+
+            return property;
         }
 
         public JsonSchemaProperty? Visit(IField<StringFieldProperties> field, Args args)
         {
-            var property = SchemaBuilder.StringProperty();
+            var property = JsonTypeBuilder.StringProperty();
+
+            property.Default = field.Properties.DefaultValue;
 
             property.MaxLength = field.Properties.MaxLength;
             property.MinLength = field.Properties.MinLength;
@@ -188,7 +231,21 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<TagsFieldProperties> field, Args args)
         {
-            return SchemaBuilder.ArrayProperty(SchemaBuilder.String());
+            var property = JsonTypeBuilder.ArrayProperty(JsonTypeBuilder.String());
+
+            property.Default = field.Properties.DefaultValue;
+
+            if (field.Properties.MinItems != null)
+            {
+                property.MinItems = field.Properties.MinItems.Value;
+            }
+
+            if (field.Properties.MaxItems != null)
+            {
+                property.MaxItems = field.Properties.MaxItems.Value;
+            }
+
+            return property;
         }
 
         public JsonSchemaProperty? Visit(IField<UIFieldProperties> field, Args args)
@@ -196,53 +253,54 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return null;
         }
 
-        private void BuildComponent(JsonSchema jsonSchema, IField field, ImmutableList<DomainId>? schemaIds, Args args)
+        private static void BuildComponent(JsonSchema jsonSchema, ReadonlyList<DomainId>? schemaIds, Args args)
         {
-            jsonSchema.Properties.Add(Component.Discriminator, SchemaBuilder.StringProperty(isRequired: true));
-
-            if (args.SchemaResolver != null)
+            if (args.WithComponents)
             {
-                var schemas = schemaIds?.Select(x => field.GetResolvedSchema(x)).NotNull() ?? Enumerable.Empty<Schema>();
-
                 var discriminator = new OpenApiDiscriminator
                 {
                     PropertyName = Component.Discriminator
                 };
 
-                foreach (var schema in schemas)
+                foreach (var schema in args.Components.Resolve(schemaIds).Values)
                 {
-                    var schemaName = $"{schema.TypeName()}ComponentDto";
+                    // Create a reference to give it a nice name in code generation.
+                    var (reference, actual) = args.Factory($"{schema.TypeName()}ComponentDto");
 
-                    var componentSchema = args.SchemaResolver(schemaName, () =>
+                    if (actual != null)
                     {
-                        var nestedArgs = args.Increment();
-
-                        var componentSchema = SchemaBuilder.Object();
-
-                        foreach (var sharedField in schema.Fields.ForApi(nestedArgs.WithHiddenFields))
+                        foreach (var field in schema.Fields.ForApi(args.WithHidden))
                         {
-                            var sharedProperty = sharedField.Accept(this, nestedArgs);
+                            var property =
+                                BuildProperty(
+                                    field,
+                                    args.Components,
+                                    schema,
+                                    args.Factory,
+                                    args.WithHidden,
+                                    args.WithComponents);
 
-                            if (sharedProperty != null)
+                            if (property != null)
                             {
-                                sharedProperty.Description = sharedField.RawProperties.Hints;
-                                sharedProperty.SetRequired(sharedField.RawProperties.IsRequired);
+                                property.SetRequired(field.RawProperties.IsRequired);
+                                property.SetDescription(field);
 
-                                componentSchema.Properties.Add(sharedField.Name, sharedProperty);
+                                actual.Properties.Add(field.Name, property);
                             }
                         }
+                    }
 
-                        componentSchema.Properties.Add(Component.Discriminator, SchemaBuilder.StringProperty(isRequired: true));
+                    jsonSchema.OneOf.Add(reference);
 
-                        return componentSchema;
-                    });
-
-                    jsonSchema.OneOf.Add(componentSchema);
-
-                    discriminator.Mapping[schemaName] = componentSchema;
+                    discriminator.Mapping[schema.Name] = reference;
                 }
 
                 jsonSchema.DiscriminatorObject = discriminator;
+
+                if (discriminator.Mapping.Count > 0)
+                {
+                    jsonSchema.Properties.Add(Component.Discriminator, JsonTypeBuilder.StringProperty(isRequired: true));
+                }
             }
             else
             {

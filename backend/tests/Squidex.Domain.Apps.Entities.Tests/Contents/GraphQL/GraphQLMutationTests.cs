@@ -6,10 +6,8 @@
 // ==========================================================================
 
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using FakeItEasy;
 using GraphQL;
-using GraphQL.NewtonsoftJson;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NodaTime.Text;
@@ -157,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsCreate);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, Permissions.AppContentsCreate);
 
             var expected = new
             {
@@ -265,7 +263,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpdateOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -374,7 +372,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpsert);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, Permissions.AppContentsUpsert);
 
             var expected = new
             {
@@ -483,7 +481,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpdateOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -730,19 +728,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private string CreateQuery(string query)
         {
             query = query
-                .Replace("<ID>", contentId.ToString())
-                .Replace("'", "\"")
-                .Replace("`", "\"")
-                .Replace("<FIELDS>", TestContent.AllFields);
+                .Replace("<ID>", contentId.ToString(), StringComparison.Ordinal)
+                .Replace("'", "\"", StringComparison.Ordinal)
+                .Replace("`", "\"", StringComparison.Ordinal)
+                .Replace("<FIELDS>", TestContent.AllFields, StringComparison.Ordinal);
 
-            if (query.Contains("<DATA>"))
+            if (query.Contains("<DATA>", StringComparison.Ordinal))
             {
                 var data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id);
 
                 var dataJson = JsonConvert.SerializeObject(data, Formatting.Indented);
-                var dataString = Regex.Replace(dataJson, "\"([^\"]+)\":", x => x.Groups[1].Value + ":").Replace(".0", string.Empty);
 
-                query = query.Replace("<DATA>", dataString);
+                // Use Properties without quotes.
+                dataJson = Regex.Replace(dataJson, "\"([^\"]+)\":", x => x.Groups[1].Value + ":");
+
+                // Use pure integer numbers.
+                dataJson = dataJson.Replace(".0", string.Empty, StringComparison.Ordinal);
+
+                // Use enum values whithout quotes.
+                dataJson = dataJson.Replace("\"EnumA\"", "EnumA", StringComparison.Ordinal);
+                dataJson = dataJson.Replace("\"EnumB\"", "EnumB", StringComparison.Ordinal);
+
+                query = query.Replace("<DATA>", dataJson, StringComparison.Ordinal);
             }
 
             return query;
@@ -755,7 +762,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id)
             };
 
-            return JObject.FromObject(input).ToInputs();
+            return serializer.ReadNode<Inputs>(JObject.FromObject(input))!;
         }
     }
 }

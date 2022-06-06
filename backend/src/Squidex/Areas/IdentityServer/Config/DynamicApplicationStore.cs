@@ -5,11 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using Squidex.Config;
@@ -36,7 +31,8 @@ namespace Squidex.Areas.IdentityServer.Config
             this.serviceProvider = serviceProvider;
         }
 
-        public override async ValueTask<ImmutableApplication?> FindByIdAsync(string identifier, CancellationToken cancellationToken)
+        public override async ValueTask<ImmutableApplication?> FindByIdAsync(string identifier,
+            CancellationToken cancellationToken)
         {
             var application = await base.FindByIdAsync(identifier, cancellationToken);
 
@@ -48,7 +44,8 @@ namespace Squidex.Areas.IdentityServer.Config
             return application;
         }
 
-        public override async ValueTask<ImmutableApplication?> FindByClientIdAsync(string identifier, CancellationToken cancellationToken)
+        public override async ValueTask<ImmutableApplication?> FindByClientIdAsync(string identifier,
+            CancellationToken cancellationToken)
         {
             var application = await base.FindByClientIdAsync(identifier, cancellationToken);
 
@@ -78,7 +75,7 @@ namespace Squidex.Areas.IdentityServer.Config
                 }
             }
 
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
@@ -158,8 +155,8 @@ namespace Squidex.Areas.IdentityServer.Config
                 RedirectUris =
                 {
                     new Uri(urlGenerator.BuildUrl("login;")),
-                    new Uri(urlGenerator.BuildUrl("client-callback-silent", false)),
-                    new Uri(urlGenerator.BuildUrl("client-callback-popup", false))
+                    new Uri(urlGenerator.BuildUrl("client-callback-silent.html", false)),
+                    new Uri(urlGenerator.BuildUrl("client-callback-popup.html", false))
                 },
                 PostLogoutRedirectUris =
                 {
@@ -191,8 +188,7 @@ namespace Squidex.Areas.IdentityServer.Config
                 ClientSecret = Constants.ClientInternalSecret,
                 RedirectUris =
                 {
-                    new Uri(urlGenerator.BuildUrl($"{Constants.PrefixPortal}/signin-internal", false)),
-                    new Uri(urlGenerator.BuildUrl($"{Constants.PrefixOrleans}/signin-internal", false))
+                    new Uri(urlGenerator.BuildUrl("/signin-internal", false)),
                 },
                 Permissions =
                 {

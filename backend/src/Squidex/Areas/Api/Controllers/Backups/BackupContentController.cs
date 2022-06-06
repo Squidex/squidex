@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure;
@@ -51,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [AllowAnonymous]
         public async Task<IActionResult> GetBackupContent(string app, DomainId id)
         {
-            var backup = await backupservice.GetBackupAsync(AppId, id);
+            var backup = await backupservice.GetBackupAsync(AppId, id, HttpContext.RequestAborted);
 
             if (backup == null || backup.Status != JobStatus.Completed)
             {

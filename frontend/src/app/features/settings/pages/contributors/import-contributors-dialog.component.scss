@@ -1,0 +1,14 @@
+@import 'mixins';
+@import 'vars';
+
+textarea {
+    resize: none;
+}
+
+.aligned {
+    line-height: 2.5rem;
+}
+
+.content {
+    min-height: 300px;
+}

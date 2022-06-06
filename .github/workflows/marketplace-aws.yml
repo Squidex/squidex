@@ -3,7 +3,7 @@ concurrency: marketplace-aws
 
 on:
   release:
-    types: [ released ]
+    types: [released]
 
 jobs:
   validate:

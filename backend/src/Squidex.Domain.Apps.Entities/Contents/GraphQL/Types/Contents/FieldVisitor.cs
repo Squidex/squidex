@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -16,78 +13,103 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public delegate object ValueResolver(IJsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
+    public delegate T ValueResolver<T>(JsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
 
-    internal sealed class FieldVisitor : IFieldVisitor<(IGraphType?, IFieldResolver?, QueryArguments?), FieldInfo>
+    public delegate Task<T> AsyncValueResolver<T>(JsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
+
+    internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
     {
-        public static readonly IFieldResolver JsonNoop = CreateValueResolver((value, fieldContext, contex) => value);
+        public static readonly IFieldResolver JsonNoop = CreateValueResolver((value, fieldContext, contex) => value.Value);
         public static readonly IFieldResolver JsonPath = CreateValueResolver(ContentActions.Json.Resolver);
 
         private static readonly IFieldResolver JsonBoolean = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value)
+            switch (value.Type)
             {
-                case JsonBoolean b:
-                    return b.Value;
+                case JsonValueType.Boolean:
+                    return value.AsBoolean;
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
+            }
+        });
+
+        private static readonly IFieldResolver JsonComponents = CreateValueResolver((value, fieldContext, contex) =>
+        {
+            switch (value.Type)
+            {
+                case JsonValueType.Array:
+                    return value.AsArray.Select(x => x.AsObject).ToList();
+                default:
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         });
 
         private static readonly IFieldResolver JsonDateTime = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value)
+            switch (value.Type)
             {
-                case JsonString n:
-                    return n.Value;
+                case JsonValueType.String:
+                    return value.AsString;
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         });
 
         private static readonly IFieldResolver JsonNumber = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value)
+            switch (value.Type)
             {
-                case JsonNumber n:
-                    return n.Value;
+                case JsonValueType.Number:
+                    return value.AsNumber;
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         });
 
         private static readonly IFieldResolver JsonString = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value)
+            switch (value.Type)
             {
-                case JsonString s:
-                    return s.Value;
+                case JsonValueType.String:
+                    return value.AsString;
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         });
 
         private static readonly IFieldResolver JsonStrings = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value)
+            switch (value.Type)
             {
-                case JsonArray a:
-                    return a.Select(x => x.ToString()).ToList();
+                case JsonValueType.Array:
+                    return value.AsArray.Select(x => x.ToString()).ToList();
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         });
 
-        private static readonly IFieldResolver Assets = CreateValueResolver((value, _, context) =>
+        private static readonly IFieldResolver Assets = CreateAsyncValueResolver((value, fieldContext, context) =>
         {
-            return context.GetReferencedAssetsAsync(value);
+            var cacheDuration = fieldContext.CacheDuration();
+
+            return context.GetReferencedAssetsAsync(value, cacheDuration, fieldContext.CancellationToken);
         });
 
-        private static readonly IFieldResolver References = CreateValueResolver((value, _, context) =>
+        private static readonly IFieldResolver References = CreateAsyncValueResolver((value, fieldContext, context) =>
         {
-            return context.GetReferencedContentsAsync(value);
+            var cacheDuration = fieldContext.CacheDuration();
+
+            return context.GetReferencedContentsAsync(value, cacheDuration, fieldContext.CancellationToken);
         });
 
         private readonly Builder builder;
@@ -97,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             this.builder = builder;
         }
 
-        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IArrayField field, FieldInfo args)
+        public FieldGraphSchema Visit(IArrayField field, FieldInfo args)
         {
             if (args.Fields.Count == 0)
             {
@@ -111,32 +133,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 return default;
             }
 
-            return (new ListGraphType(new NonNullGraphType(type)), JsonNoop, null);
+            return new (new ListGraphType(new NonNullGraphType(type)), JsonComponents, null);
         }
 
-        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<AssetsFieldProperties> field, FieldInfo args)
+        public FieldGraphSchema Visit(IField<AssetsFieldProperties> field, FieldInfo args)
         {
-            return (builder.SharedTypes.AssetsList, Assets, null);
+            return new (SharedTypes.AssetsList, Assets, null);
         }
 
-        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<BooleanFieldProperties> field, FieldInfo args)
+        public FieldGraphSchema Visit(IField<BooleanFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.Boolean, JsonBoolean, null);
+            return new (Scalars.Boolean, JsonBoolean, null);
         }
 
-        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<ComponentFieldProperties> field, FieldInfo args)
-        {
-            var type = ResolveComponent(args, field.Properties.SchemaIds);
-
-            if (type == null)
-            {
-                return default;
-            }
-
-            return (type, JsonNoop, null);
-        }
-
-        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<ComponentsFieldProperties> field, FieldInfo args)
+        public FieldGraphSchema Visit(IField<ComponentFieldProperties> field, FieldInfo args)
         {
             var type = ResolveComponent(args, field.Properties.SchemaIds);
 
@@ -145,40 +155,80 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 return default;
             }
 
-            return (new ListGraphType(new NonNullGraphType(type)), JsonNoop, null);
+            return new (type, JsonNoop, null);
         }
 
-        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<DateTimeFieldProperties> field, FieldInfo args)
+        public FieldGraphSchema Visit(IField<ComponentsFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.DateTime, JsonDateTime, null);
+            var type = ResolveComponent(args, field.Properties.SchemaIds);
+
+            if (type == null)
+            {
+                return default;
+            }
+
+            return new (new ListGraphType(new NonNullGraphType(type)), JsonComponents, null);
         }
 
-        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<JsonFieldProperties> field, FieldInfo args)
+        public FieldGraphSchema Visit(IField<DateTimeFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.Json, JsonPath, ContentActions.Json.Arguments);
+            return new (Scalars.DateTime, JsonDateTime, null);
         }
 
-        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<GeolocationFieldProperties> field, FieldInfo args)
+        public FieldGraphSchema Visit(IField<JsonFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.Json, JsonPath, ContentActions.Json.Arguments);
+            return new (Scalars.Json, JsonPath, ContentActions.Json.Arguments);
         }
 
-        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<NumberFieldProperties> field, FieldInfo args)
+        public FieldGraphSchema Visit(IField<GeolocationFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.Float, JsonNumber, null);
+            return new (Scalars.Json, JsonPath, ContentActions.Json.Arguments);
         }
 
-        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<StringFieldProperties> field, FieldInfo args)
+        public FieldGraphSchema Visit(IField<NumberFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.String, JsonString, null);
+            return new (Scalars.Float, JsonNumber, null);
         }
 
-        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<TagsFieldProperties> field, FieldInfo args)
+        public FieldGraphSchema Visit(IField<StringFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.Strings, JsonStrings, null);
+            var type = Scalars.String;
+
+            if (field.Properties.IsEmbeddable)
+            {
+                type = builder.GetEmbeddableString(args, field.Properties);
+            }
+            else if (field.Properties?.AllowedValues?.Count > 0 && field.Properties.CreateEnum)
+            {
+                var @enum = builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
+
+                if (@enum != null)
+                {
+                    type = @enum;
+                }
+            }
+
+            return new (type, JsonString, null);
         }
 
-        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<ReferencesFieldProperties> field, FieldInfo args)
+        public FieldGraphSchema Visit(IField<TagsFieldProperties> field, FieldInfo args)
+        {
+            var type = Scalars.Strings;
+
+            if (field.Properties?.AllowedValues?.Count > 0 && field.Properties.CreateEnum)
+            {
+                var @enum = builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
+
+                if (@enum != null)
+                {
+                    type = new ListGraphType(new NonNullGraphType(@enum));
+                }
+            }
+
+            return new (type, JsonStrings, null);
+        }
+
+        public FieldGraphSchema Visit(IField<ReferencesFieldProperties> field, FieldInfo args)
         {
             var type = ResolveReferences(args, field.Properties.SchemaIds);
 
@@ -187,15 +237,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 return default;
             }
 
-            return (new ListGraphType(new NonNullGraphType(type)), References, null);
+            return new (new ListGraphType(new NonNullGraphType(type)), References, null);
         }
 
-        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<UIFieldProperties> field, FieldInfo args)
+        public FieldGraphSchema Visit(IField<UIFieldProperties> field, FieldInfo args)
         {
             return default;
         }
 
-        private IGraphType? ResolveReferences(FieldInfo fieldInfo, ImmutableList<DomainId>? schemaIds)
+        private IGraphType? ResolveReferences(FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)
         {
             IGraphType? contentType = null;
 
@@ -210,7 +260,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 if (!union.HasType)
                 {
-                    return default;
+                    return null;
                 }
 
                 contentType = union;
@@ -219,7 +269,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return contentType;
         }
 
-        private IGraphType? ResolveComponent(FieldInfo fieldInfo, ImmutableList<DomainId>? schemaIds)
+        private IGraphType? ResolveComponent(FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)
         {
             IGraphType? componentType = null;
 
@@ -234,7 +284,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 if (!union.HasType)
                 {
-                    return default;
+                    return null;
                 }
 
                 componentType = union;
@@ -243,20 +293,40 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return componentType;
         }
 
-        private static IFieldResolver CreateValueResolver(ValueResolver valueResolver)
+        private static IFieldResolver CreateValueResolver<T>(ValueResolver<T> valueResolver)
         {
-            return Resolvers.Sync<IReadOnlyDictionary<string, IJsonValue>, object?>((source, fieldContext, context) =>
+            return Resolvers.Sync<IReadOnlyDictionary<string, JsonValue>, object?>((source, fieldContext, context) =>
             {
                 var key = fieldContext.FieldDefinition.SourceName();
 
                 if (source.TryGetValue(key, out var value))
                 {
-                    if (value is JsonNull)
+                    if (value == JsonValue.Null)
                     {
                         return null;
                     }
 
                     return valueResolver(value, fieldContext, context);
+                }
+
+                return null;
+            });
+        }
+
+        private static IFieldResolver CreateAsyncValueResolver<T>(AsyncValueResolver<T> valueResolver)
+        {
+            return Resolvers.Async<IReadOnlyDictionary<string, JsonValue>, object?>(async (source, fieldContext, context) =>
+            {
+                var key = fieldContext.FieldDefinition.SourceName();
+
+                if (source.TryGetValue(key, out var value))
+                {
+                    if (value == JsonValue.Null)
+                    {
+                        return null;
+                    }
+
+                    return await valueResolver(value, fieldContext, context);
                 }
 
                 return null;

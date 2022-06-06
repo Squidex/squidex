@@ -1,0 +1,29 @@
+<tr [routerLink]="user.id" queryParamsHandling="preserve" routerLinkActive="active">
+    <td class="cell-user">
+        <img class="user-picture" title="{{user.displayName}}" [src]="user | sqxUserDtoPicture">
+    </td>
+    <td class="cell-auto">
+        <span class="user-name table-cell">{{user.displayName}}</span>
+    </td>
+    <td class="cell-auto">
+        <span class="user-email table-cell">{{user.email}}</span>
+    </td>
+    <td class="cell-actions-lg">
+        <button type="button" class="btn btn-text-secondary" (click)="lock()" sqxStopClick *ngIf="user.canLock" title="i18n:users.lockTooltip">
+            <i class="icon icon-unlocked"></i>
+        </button>
+        <button type="button" class="btn btn-text-secondary" (click)="unlock()" sqxStopClick *ngIf="user.canUnlock" title="i18n:users.unlockTooltip">
+            <i class="icon icon-lock"></i>
+        </button>
+
+        <button type="button" class="btn btn-text-danger" [disabled]="!user.canDelete" 
+            (sqxConfirmClick)="delete()"
+            confirmTitle="i18n:users.deleteConfirmTitle"
+            confirmText="i18n:users.deleteConfirmText"
+            confirmRememberKey="deleteUser"
+            sqxStopClick>
+            <i class="icon-bin2"></i>
+        </button>
+    </td>
+</tr>
+<tr class="spacer"></tr>

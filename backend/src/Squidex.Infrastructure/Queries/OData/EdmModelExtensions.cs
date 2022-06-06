@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -49,9 +47,9 @@ namespace Squidex.Infrastructure.Queries.OData
 
             query ??= string.Empty;
 
-            var path = model.EntityContainer.EntitySets().First().Path.Path.Split('.').Last();
+            var path = model.EntityContainer.EntitySets().First().Path.Path.Split('.')[^1];
 
-            if (query.StartsWith("?", StringComparison.Ordinal))
+            if (query.StartsWith('?'))
             {
                 query = query[1..];
             }

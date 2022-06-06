@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using NodaTime;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
+
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
 namespace Squidex.Domain.Apps.Entities.MongoDb
 {
@@ -18,15 +17,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
     {
         private static readonly AdaptIdVisitor Instance = new AdaptIdVisitor();
 
-        public readonly struct Args
-        {
-            public readonly DomainId AppId;
-
-            public Args(DomainId appId)
-            {
-                AppId = appId;
-            }
-        }
+        public record struct Args(DomainId AppId);
 
         private AdaptIdVisitor()
         {

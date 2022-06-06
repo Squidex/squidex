@@ -1,0 +1,64 @@
+<div class="card item" [class.invalid]="isInvalid | async">
+    <div class="card-header drag-handle">
+        <div class="row">
+            <div class="col-auto pe-1">
+                <ng-content></ng-content>
+            </div>
+            <div class="col">
+                <div class="truncate">
+                    <span class="header-index">#{{index + 1}}</span>
+                    <span class="header-title">{{title | async }}</span>
+                </div>
+            </div>
+            <div class="col-auto pe-4">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveTop()" title="i18n:contents.arrayMoveTop">
+                    <i class="icon-caret-top"></i>
+                </button>
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveUp()" title="i18n:contents.arrayMoveUp">
+                    <i class="icon-caret-up"></i>
+                </button>
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveDown()" title="i18n:contents.arrayMoveDown">
+                    <i class="icon-caret-down"></i>
+                </button>
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveBottom()" title="i18n:contents.arrayMoveBottom">
+                    <i class="icon-caret-bottom"></i>
+                </button>
+                <button type="button" class="btn btn-text-secondary" [class.hidden]="!(isCollapsed | async)" (click)="expand()" title="i18n:contents.arrayExpandItem">
+                    <i class="icon-plus-square"></i>
+                </button>
+                <button type="button" class="btn btn-text-secondary" [class.hidden]="isCollapsed | async" (click)="collapse()" title="i18n:contents.arrayCollapseItem">
+                    <i class="icon-minus-square"></i>
+                </button>
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled" (click)="clone.emit()" title="i18n:contents.arrayCloneItem">
+                    <i class="icon-clone"></i>
+                </button>
+        
+                <button type="button" class="btn btn-text-danger" [disabled]="isDisabled" (click)="itemRemove.emit()">
+                    <i class="icon-bin2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card-body" *sqxIfOnce="!(isCollapsed | async)" [class.hidden]="isCollapsed | async">
+        <div class="form-group" *ngFor="let section of formModel.sectionsChanges | async">
+            <sqx-component-section
+                [canUnset]="canUnset"
+                [form]="form"
+                [formContext]="formContext"
+                [formLevel]="formLevel"
+                [formSection]="$any(section)"
+                [index]="index"
+                [isComparing]="isComparing"
+                [language]="language"
+                [languages]="languages">
+            </sqx-component-section>
+        </div>
+
+        <sqx-form-hint *ngIf="isInvalidComponent | async">
+            {{ 'contents.componentInvalid' | sqxTranslate }}
+        </sqx-form-hint>
+    </div>
+</div>

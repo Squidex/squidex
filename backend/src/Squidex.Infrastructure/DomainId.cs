@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel;
 
 namespace Squidex.Infrastructure
@@ -61,12 +60,12 @@ namespace Squidex.Infrastructure
 
         public bool Equals(DomainId other)
         {
-            return string.Equals(ToString(), other.ToString());
+            return string.Equals(ToString(), other.ToString(), StringComparison.Ordinal);
         }
 
         public override int GetHashCode()
         {
-            return ToString().GetHashCode();
+            return ToString().GetHashCode(StringComparison.Ordinal);
         }
 
         public override string ToString()

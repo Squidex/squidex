@@ -1,0 +1,133 @@
+@import 'mixins';
+@import 'vars';
+
+gridster-item {
+    position: absolute;
+}
+
+.dashboard {
+    @include absolute(0, 0, 0, 0);
+
+    &-summary {
+        @include absolute(2rem, null, null, 16px);
+        z-index: 0;
+    }
+
+    &-settings {
+        @include absolute(1rem, 1rem, null, null);
+        z-index: 1000;
+    }
+
+    &-title {
+        font-size: 1.4rem;
+    }
+
+    /* stylelint-disable */
+    gridster {
+        background: none;
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+
+        &::after {
+            @include absolute(100%, 0, null, 0);
+            content: '';
+            padding: 0;
+            padding-bottom: var(--gridster-margin);
+            pointer-events: none;
+        }
+    }
+
+    gridster-item {
+        background: none;
+        border: 0;
+        border-radius: 0;
+        overflow: visible;
+
+        &.gridster-item-moving,
+        &.gridster-item-resizing {
+            box-shadow: none;
+        }
+    }
+    /* stylelint-enable */
+}
+
+.btn {
+    z-index: 1000;
+}
+
+:host ::ng-deep {
+    /* stylelint-disable */
+    chart {
+        @include absolute(0, 1rem, 1rem, 1rem);
+    }
+    /* stylelint-enable */
+
+    .subtext {
+        margin-bottom: 2rem;
+    }
+
+    .card {
+        @include absolute(0, 0, 0, 0);
+
+        &-image {
+            text-align: center;
+
+            img {
+                height: 5rem;
+            }
+        }
+
+        h4 {
+            a {
+                color: $color-title;
+                text-align: left;
+                text-decoration: none;
+            }
+        }
+
+        &-header {
+            @include truncate;
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+
+        &-body {
+            position: relative;
+        }
+
+        &-title {
+            margin-top: 1rem;
+        }
+
+        &-history {
+            overflow-y: auto;
+        }
+
+        &-text {
+            color: $color-text-decent;
+            font-size: $font-small;
+            font-weight: normal;
+        }
+
+        &-href {
+            &:hover {
+                @include box-shadow-outer(0, 3px, 16px, .2);
+            }
+        }
+    }
+
+    .aggregation {
+        text-align: center;
+
+        &-label {
+            color: $color-text-decent;
+        }
+
+        &-value {
+            font-size: 3rem;
+            margin-bottom: .5rem;
+            margin-top: 1rem;
+        }
+    }
+}

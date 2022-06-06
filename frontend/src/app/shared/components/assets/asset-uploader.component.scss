@@ -1,0 +1,74 @@
+@import 'mixins';
+@import 'vars';
+
+.icon-upload-3 {
+    font-size: 1.4rem;
+    font-weight: lighter;
+    padding-right: .5rem;
+    vertical-align: middle;
+}
+
+.dropdown-menu {
+    @include absolute(2.6rem, 0, auto, auto);
+    display: block;
+    max-width: 60%;
+    min-height: 4rem;
+    min-width: 30rem;
+    padding: 1rem;
+}
+
+.uploads {
+    background: none;
+    border: 2px solid transparent;
+    min-height: 2rem;
+
+    &-empty {
+        line-height: 1.8rem;
+    }
+}
+
+.upload {
+    @include force-height(2rem);
+    line-height: 2rem;
+    margin: 0;
+    margin-bottom: .5rem;
+
+    &:last-child {
+        margin: 0;
+    }
+
+    &-name {
+        @include truncate;
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }
+}
+
+$circle-size: 1.6rem;
+
+.upload-status {
+    @include circle-icon(1.6rem);
+
+    &-running {
+        background: $color-border;
+    }
+
+    &-failed,
+    &-success {
+        color: $color-white;
+    }
+
+    &-failed {
+        background: $color-theme-error;
+    }
+
+    &-success {
+        background: $color-theme-success;
+    }
+}
+
+.drag {
+    & > .uploads {
+        border-color: $color-theme-brand;
+    }
+}

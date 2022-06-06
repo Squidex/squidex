@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -28,35 +25,35 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.appProvider = appProvider;
         }
 
-        public async Task<StatusInfo[]> GetAllAsync(ISchemaEntity schema)
+        public async ValueTask<StatusInfo[]> GetAllAsync(ISchemaEntity schema)
         {
             var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
 
             return workflow.Steps.Select(x => new StatusInfo(x.Key, GetColor(x.Value))).ToArray();
         }
 
-        public async Task<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user)
+        public async ValueTask<bool> CanPublishInitialAsync(ISchemaEntity schema, ClaimsPrincipal? user)
+        {
+            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
+
+            return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && IsTrue(transition, null, user);
+        }
+
+        public async ValueTask<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user)
         {
             var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
 
             return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, data, user);
         }
 
-        public async Task<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal? user)
+        public async ValueTask<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal? user)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
             return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, content.Data, user);
         }
 
-        public async Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, ContentData data, ClaimsPrincipal? user)
-        {
-            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
-
-            return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && IsTrue(transition, data, user);
-        }
-
-        public async Task<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
+        public async ValueTask<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
@@ -68,7 +65,19 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return true;
         }
 
-        public async Task<StatusInfo?> GetInfoAsync(IContentEntity content, Status status)
+        public async ValueTask<bool> ShouldValidateAsync(ISchemaEntity schema, Status status)
+        {
+            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
+
+            if (workflow.TryGetStep(status, out var step) && step.Validate)
+            {
+                return true;
+            }
+
+            return status == Status.Published && schema.SchemaDef.Properties.ValidateOnPublish;
+        }
+
+        public async ValueTask<StatusInfo?> GetInfoAsync(IContentEntity content, Status status)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
@@ -80,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return null;
         }
 
-        public async Task<Status> GetInitialStatusAsync(ISchemaEntity schema)
+        public async ValueTask<Status> GetInitialStatusAsync(ISchemaEntity schema)
         {
             var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
 
@@ -89,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return status;
         }
 
-        public async Task<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
+        public async ValueTask<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
         {
             var result = new List<StatusInfo>();
 
@@ -106,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return result.ToArray();
         }
 
-        private bool IsTrue(WorkflowCondition condition, ContentData data, ClaimsPrincipal? user)
+        private bool IsTrue(WorkflowCondition condition, ContentData? data, ClaimsPrincipal? user)
         {
             if (condition?.Roles != null && user != null)
             {
@@ -116,11 +125,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(condition?.Expression))
+            if (!string.IsNullOrWhiteSpace(condition?.Expression) && data != null)
             {
-                var vars = new ScriptVars
+                var vars = new DataScriptVars
                 {
-                    ["data"] = data
+                    Data = data
                 };
 
                 return scriptEngine.Evaluate(vars, condition.Expression);
@@ -129,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return true;
         }
 
-        private async Task<Workflow> GetWorkflowAsync(DomainId appId, DomainId schemaId)
+        private async ValueTask<Workflow> GetWorkflowAsync(DomainId appId, DomainId schemaId)
         {
             Workflow? result = null;
 

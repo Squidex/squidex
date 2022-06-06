@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
@@ -24,6 +22,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
         {
             var extensions = new IFluidExtension[]
             {
+                new ContentFluidExtension(),
                 new DateTimeFluidExtension(),
                 new StringFluidExtension(),
                 new StringWordsFluidExtension()

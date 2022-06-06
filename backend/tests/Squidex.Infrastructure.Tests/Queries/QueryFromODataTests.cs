@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.OData.Edm;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Queries.OData;
 using Xunit;
 
@@ -20,39 +21,35 @@ namespace Squidex.Infrastructure.Queries
 
         static QueryFromODataTests()
         {
-            var entityType = new EdmEntityType("Squidex", "Users");
+            var fields = new List<FilterField>
+            {
+                new FilterField(FilterSchema.Guid, "id"),
+                new FilterField(FilterSchema.Guid, "idNullable", IsNullable: true),
+                new FilterField(FilterSchema.DateTime, "created"),
+                new FilterField(FilterSchema.DateTime, "createdNullable", IsNullable: true),
+                new FilterField(FilterSchema.Boolean, "isComicFigure"),
+                new FilterField(FilterSchema.Boolean, "isComicFigureNullable", IsNullable: true),
+                new FilterField(FilterSchema.String, "firstName"),
+                new FilterField(FilterSchema.String, "firstNameNullable", IsNullable: true),
+                new FilterField(FilterSchema.String, "lastName"),
+                new FilterField(FilterSchema.String, "lastNameNullable", IsNullable: true),
+                new FilterField(FilterSchema.Number, "age"),
+                new FilterField(FilterSchema.Number, "ageNullable", IsNullable: true),
+                new FilterField(FilterSchema.Number, "incomeMio"),
+                new FilterField(FilterSchema.Number, "incomeMioNullable", IsNullable: true),
+                new FilterField(FilterSchema.GeoObject, "geo"),
+                new FilterField(FilterSchema.GeoObject, "geoNullable", IsNullable: true),
+                new FilterField(FilterSchema.Any, "properties"),
+            };
 
-            entityType.AddStructuralProperty("id", EdmPrimitiveTypeKind.Guid, false);
-            entityType.AddStructuralProperty("idNullable", EdmPrimitiveTypeKind.Guid, true);
-            entityType.AddStructuralProperty("created", EdmPrimitiveTypeKind.DateTimeOffset, false);
-            entityType.AddStructuralProperty("createdNullable", EdmPrimitiveTypeKind.DateTimeOffset, true);
-            entityType.AddStructuralProperty("isComicFigure", EdmPrimitiveTypeKind.Boolean, false);
-            entityType.AddStructuralProperty("isComicFigureNullable", EdmPrimitiveTypeKind.Boolean, true);
-            entityType.AddStructuralProperty("firstName", EdmPrimitiveTypeKind.String, true);
-            entityType.AddStructuralProperty("firstNameNullable", EdmPrimitiveTypeKind.String, false);
-            entityType.AddStructuralProperty("lastName", EdmPrimitiveTypeKind.String, true);
-            entityType.AddStructuralProperty("birthday", EdmPrimitiveTypeKind.Date, false);
-            entityType.AddStructuralProperty("birthdayNullable", EdmPrimitiveTypeKind.Date, true);
-            entityType.AddStructuralProperty("incomeCents", EdmPrimitiveTypeKind.Int64, false);
-            entityType.AddStructuralProperty("incomeCentsNullable", EdmPrimitiveTypeKind.Int64, true);
-            entityType.AddStructuralProperty("incomeMio", EdmPrimitiveTypeKind.Double, false);
-            entityType.AddStructuralProperty("incomeMioNullable", EdmPrimitiveTypeKind.Double, true);
-            entityType.AddStructuralProperty("geo", EdmPrimitiveTypeKind.GeographyPoint, false);
-            entityType.AddStructuralProperty("geoNullable", EdmPrimitiveTypeKind.GeographyPoint, true);
-            entityType.AddStructuralProperty("age", EdmPrimitiveTypeKind.Int32, false);
-            entityType.AddStructuralProperty("ageNullable", EdmPrimitiveTypeKind.Int32, true);
-            entityType.AddStructuralProperty("properties", new EdmComplexTypeReference(new EdmComplexType("Squidex", "Properties", null, false, true), true));
+            var filterSchema = new FilterSchema(FilterSchemaType.Object)
+            {
+                Fields = fields.ToReadonlyList()
+            };
 
-            var container = new EdmEntityContainer("Squidex", "Container");
+            var queryModel = new QueryModel { Schema = filterSchema };
 
-            container.AddEntitySet("UserSet", entityType);
-
-            var model = new EdmModel();
-
-            model.AddElement(container);
-            model.AddElement(entityType);
-
-            EdmModel = model;
+            EdmModel = queryModel.ConvertToEdm("Squidex", "Content");
         }
 
         [Fact]
@@ -61,6 +58,18 @@ namespace Squidex.Infrastructure.Queries
             var parser = EdmModel.ParseQuery("$filter=firstName eq 'Dagobert'");
 
             Assert.NotNull(parser);
+        }
+
+        [Fact]
+        public void Should_escape_field_name()
+        {
+            Assert.Equal("field_name", "field-name".EscapeEdmField());
+        }
+
+        [Fact]
+        public void Should_unescape_field_name()
+        {
+            Assert.Equal("field-name", "field_name".UnescapeEdmField());
         }
 
         [Theory]
@@ -103,28 +112,6 @@ namespace Squidex.Infrastructure.Queries
         {
             var i = _Q("$filter=created eq 1988-01-19");
             var o = _C("Filter: created == 1988-01-19T00:00:00Z");
-
-            Assert.Equal(o, i);
-        }
-
-        [Theory]
-        [InlineData("birthday")]
-        [InlineData("birthdayNullable")]
-        [InlineData("properties/date")]
-        [InlineData("properties/nested/date")]
-        public void Should_parse_filter_if_type_is_date(string field)
-        {
-            var i = _Q($"$filter={field} eq 1988-01-19");
-            var o = _C($"Filter: {field} == 1988-01-19T00:00:00Z");
-
-            Assert.Equal(o, i);
-        }
-
-        [Fact]
-        public void Should_parse_filter_if_type_is_date_list()
-        {
-            var i = _Q("$filter=birthday in ('1988-01-19')");
-            var o = _C("Filter: birthday in [1988-01-19T00:00:00Z]");
 
             Assert.Equal(o, i);
         }
@@ -226,50 +213,6 @@ namespace Squidex.Infrastructure.Queries
         {
             var i = _Q("$filter=isComicFigure in (true)");
             var o = _C("Filter: isComicFigure in [True]");
-
-            Assert.Equal(o, i);
-        }
-
-        [Theory]
-        [InlineData("age")]
-        [InlineData("ageNullable")]
-        [InlineData("properties/int")]
-        [InlineData("properties/nested/int")]
-        public void Should_parse_filter_if_type_is_int32(string field)
-        {
-            var i = _Q($"$filter={field} eq 60");
-            var o = _C($"Filter: {field} == 60");
-
-            Assert.Equal(o, i);
-        }
-
-        [Fact]
-        public void Should_parse_filter_if_type_is_int32_list()
-        {
-            var i = _Q("$filter=age in (60)");
-            var o = _C("Filter: age in [60]");
-
-            Assert.Equal(o, i);
-        }
-
-        [Theory]
-        [InlineData("incomeCents")]
-        [InlineData("incomeCentsNullable")]
-        [InlineData("properties/long")]
-        [InlineData("properties/nested/long")]
-        public void Should_parse_filter_if_type_is_int64(string field)
-        {
-            var i = _Q($"$filter={field} eq 31543143513456789");
-            var o = _C($"Filter: {field} == 31543143513456789");
-
-            Assert.Equal(o, i);
-        }
-
-        [Fact]
-        public void Should_parse_filter_if_type_is_int64_list()
-        {
-            var i = _Q("$filter=incomeCents in (31543143513456789)");
-            var o = _C("Filter: incomeCents in [31543143513456789]");
 
             Assert.Equal(o, i);
         }

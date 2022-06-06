@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
@@ -22,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
     {
         public static void CanCreate(CreateSchema command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(e =>
             {
@@ -37,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
 
         public static void CanSynchronize(SynchronizeSchema command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(e =>
             {
@@ -47,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
 
         public static void CanReorder(ReorderFields command, Schema schema)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             IArrayField? arrayField = null;
 
@@ -76,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
 
         public static void CanConfigurePreviewUrls(ConfigurePreviewUrls command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(e =>
             {
@@ -89,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
 
         public static void CanConfigureUIFields(ConfigureUIFields command, Schema schema)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(e =>
             {
@@ -100,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
 
         public static void CanConfigureFieldRules(ConfigureFieldRules command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(e =>
             {
@@ -202,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
 
             if (field.Properties == null)
             {
-               e(Not.Defined(nameof(field.Properties)), $"{prefix}.{nameof(field.Properties)}");
+                e(Not.Defined(nameof(field.Properties)), $"{prefix}.{nameof(field.Properties)}");
             }
             else
             {

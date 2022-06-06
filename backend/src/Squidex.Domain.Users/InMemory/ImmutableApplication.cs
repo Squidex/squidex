@@ -7,7 +7,6 @@
 
 using System.Collections.Immutable;
 using System.Globalization;
-using System.Linq;
 using System.Text.Json;
 using OpenIddict.Abstractions;
 

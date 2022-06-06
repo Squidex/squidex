@@ -1,0 +1,5 @@
+<sqx-layout titleText="i18n:common.help" titleIcon="help2" [width]="20" layout="simple" [white]="true" [padding]="true" [overflow]="true">
+    <div class="help">
+        <div [innerHTML]="helpMarkdown | async | sqxHelpMarkdown"></div>
+    </div>
+</sqx-layout>

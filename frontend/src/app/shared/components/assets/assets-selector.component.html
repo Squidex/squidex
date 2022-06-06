@@ -1,0 +1,65 @@
+<sqx-modal-dialog (close)="emitComplete()" size="lg" [fullHeight]="true" [hasTabs]="false">
+    <ng-container title>
+        {{ 'assets.selectMany' | sqxTranslate }}
+    </ng-container>
+
+    <ng-container tabs>
+        <div class="row gx-2 mt-3 mb-3">
+            <div class="col-auto">
+                <button type="button" class="btn btn-text-secondary" (click)="reload()">
+                    <i class="icon-reset"></i>
+                </button>
+            </div>
+            <div class="col">
+                <div class="row g-0 search">
+                    <div class="col-6">
+                        <sqx-tag-editor class="tags" [singleLine]="true" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}" 
+                            (ngModelChange)="selectTags($event)" [undefinedWhenEmpty]="false"
+                            [ngModel]="assetsState.selectedTagNames | async"
+                            [suggestions]="assetsState.tagsNames | async">
+                        </sqx-tag-editor>
+                    </div>
+                    <div class="col-6">
+                        <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" 
+                            [enableShortcut]="true"
+                            [queriesTypes]="'common.assets' | sqxTranslate"
+                            (queryChange)="search($event)"
+                            [query]="assetsState.query | async">
+                        </sqx-search-form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="btn-group" data-toggle="buttons">
+                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="snapshot.isListView" [disabled]="snapshot.isListView" (click)="changeView(true)">
+                        <i class="icon-list"></i>
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="!snapshot.isListView" [disabled]="!snapshot.isListView" (click)="changeView(false)">
+                        <i class="icon-grid"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container content>
+        <sqx-assets-list 
+            [assetsState]="assetsState"
+            [indicateLoading]="true"
+            [isDisabled]="true"
+            [isListView]="snapshot.isListView" 
+            (select)="selectAsset($event)" 
+            [selectedIds]="snapshot.selectedAssets">
+        </sqx-assets-list>
+    </ng-container>
+
+    <ng-container footer>
+        <button type="button" class="btn btn-text-secondary" (click)="emitComplete()">
+            {{ 'common.cancel' | sqxTranslate }}
+        </button>
+
+        <button type="submit" class="btn btn-success" (click)="emitSelect()" [disabled]="snapshot.selectionCount === 0">
+            {{ 'assets.linkSelected' | sqxTranslate: { count: snapshot.selectionCount } }})
+        </button>
+    </ng-container>
+</sqx-modal-dialog>

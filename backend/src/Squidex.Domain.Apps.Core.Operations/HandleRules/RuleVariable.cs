@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using System.Reflection;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.Json.Objects;
@@ -38,16 +36,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 }
                 else if (current is ContentFieldData field)
                 {
-                    if (!field.TryGetValue(segment, out var temp) || temp == null)
+                    if (!field.TryGetValue(segment, out var temp))
                     {
                         break;
                     }
 
                     current = temp;
                 }
-                else if (current is IJsonValue json)
+                else if (current is JsonValue json)
                 {
-                    if (!json.TryGet(segment, out var temp) || temp == null || temp.Type == JsonValueType.Null)
+                    if (!json.TryGetValue(segment, out var temp) || temp == JsonValue.Null)
                     {
                         break;
                     }

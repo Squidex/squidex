@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -20,6 +17,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Setup
 {
@@ -49,7 +47,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
         [Route("setup/")]
         public async Task<IActionResult> Setup()
         {
-            if (!await userService.IsEmptyAsync())
+            if (!await userService.IsEmptyAsync(HttpContext.RequestAborted))
             {
                 return RedirectToReturnUrl(null);
             }
@@ -61,7 +59,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
         [Route("setup/")]
         public async Task<IActionResult> Setup(CreateUserModel model)
         {
-            if (!await userService.IsEmptyAsync())
+            if (!await userService.IsEmptyAsync(HttpContext.RequestAborted))
             {
                 return RedirectToReturnUrl(null);
             }
@@ -77,7 +75,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
                 var user = await userService.CreateAsync(model.Email, new UserValues
                 {
                     Password = model.Password
-                });
+                }, ct: HttpContext.RequestAborted);
 
                 await SignInManager.SignInAsync((IdentityUser)user.Identity, true);
 
@@ -99,12 +97,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
         {
             var externalProviders = await SignInManager.GetExternalProvidersAsync();
 
-            var request = HttpContext.Request;
-
             var result = new SetupVM
             {
                 BaseUrlConfigured = urlGenerator.BuildUrl(string.Empty, false),
-                BaseUrlCurrent = $"{request.Scheme}://{request.Host}",
+                BaseUrlCurrent = GetCurrentUrl(),
                 ErrorMessage = errorMessage,
                 EverybodyCanCreateApps = !uiOptions.OnlyAdminsCanCreateApps,
                 IsValidHttps = HttpContext.Request.IsHttps,
@@ -120,6 +116,20 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
             }
 
             return result;
+        }
+
+        private string GetCurrentUrl()
+        {
+            var request = HttpContext.Request;
+
+            var url = $"{request.Scheme}://{request.Host}{request.PathBase}";
+
+            if (url.EndsWith(Constants.PrefixIdentityServer, StringComparison.Ordinal))
+            {
+                url = url[0..^Constants.PrefixIdentityServer.Length];
+            }
+
+            return url.TrimEnd('/');
         }
     }
 }

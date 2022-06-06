@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
@@ -21,8 +19,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public bool HasType => types.Count > 0;
 
-        public ComponentUnionGraphType(Builder builder, FieldInfo fieldInfo, ImmutableList<DomainId>? schemaIds)
+        public ComponentUnionGraphType(Builder builder, FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = fieldInfo.ReferenceType;
 
             if (schemaIds?.Any() == true)
@@ -47,9 +46,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 ResolveType = value =>
                 {
-                    if (value is JsonObject component && component.TryGetValue<JsonString>(Component.Discriminator, out var schemaId))
+                    if (value is JsonObject json && Component.IsValid(json, out var schemaId))
                     {
-                        return types.GetOrDefault(schemaId.Value);
+                        return types.GetOrDefault(schemaId);
                     }
 
                     return null;

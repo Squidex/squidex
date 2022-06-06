@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 using StatusType = Squidex.Domain.Apps.Core.Contents.Status;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
@@ -29,6 +29,12 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public StatusType? Status { get; set; }
 
         /// <summary>
+        /// Makes the update as patch.
+        /// </summary>
+        [FromQuery]
+        public bool Patch { get; set; }
+
+        /// <summary>
         /// True to automatically publish the content.
         /// </summary>
         [FromQuery]
@@ -37,14 +43,10 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
         public UpsertContent ToCommand(DomainId id)
         {
-            var command = new UpsertContent { Data = Data!, ContentId = id };
+            var command = SimpleMapper.Map(this, new UpsertContent { ContentId = id });
 
-            if (Status != null)
-            {
-                command.Status = Status;
-            }
 #pragma warning disable CS0618 // Type or member is obsolete
-            else if (Publish)
+            if (command.Status == null && Publish)
             {
                 command.Status = StatusType.Published;
             }

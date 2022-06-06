@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Assets;
 using Xunit;
@@ -36,7 +32,7 @@ namespace Squidex.Domain.Users
 
             await sut.UploadAsync(userId, stream);
 
-            A.CallTo(() => assetStore.UploadAsync(file, stream, true, CancellationToken.None))
+            A.CallTo(() => assetStore.UploadAsync(file, stream, true, default))
                 .MustHaveHappened();
         }
 
@@ -47,7 +43,7 @@ namespace Squidex.Domain.Users
 
             await sut.DownloadAsync(userId, stream);
 
-            A.CallTo(() => assetStore.DownloadAsync(file, stream, default, CancellationToken.None))
+            A.CallTo(() => assetStore.DownloadAsync(file, stream, default, default))
                 .MustHaveHappened();
         }
     }

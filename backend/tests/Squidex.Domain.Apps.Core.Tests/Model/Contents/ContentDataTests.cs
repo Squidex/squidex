@@ -159,5 +159,55 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                 Assert.NotSame(value, source[key]);
             }
         }
+
+        [Fact]
+        public void Should_copy_fields_from_other_data_if_they_are_equal()
+        {
+            var oldData =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddInvariant(1))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddInvariant(2));
+
+            var newData =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddInvariant(1))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddInvariant(3));
+
+            newData.UseSameFields(oldData);
+
+            Assert.Same(newData["field1"], oldData["field1"]);
+            Assert.NotSame(newData["field2"], oldData["field2"]);
+        }
+
+        [Fact]
+        public void Should_copy_field_values_from_other_data_if_they_are_equal()
+        {
+            var oldData =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddLocalized("en", 1)
+                            .AddLocalized("de", 2));
+            var newData =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddLocalized("en", 1)
+                            .AddLocalized("de", 3));
+
+            newData.UseSameFields(oldData);
+
+            Assert.Same(newData["field1"]!["en"].Value, oldData["field1"]!["en"].Value);
+            Assert.NotSame(newData["field1"]!["de"].Value, oldData["field1"]!["de"].Value);
+            Assert.NotSame(newData["field1"], oldData["field1"]);
+        }
     }
 }

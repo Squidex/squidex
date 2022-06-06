@@ -1,0 +1,20 @@
+<div class="row">
+    <div class="col">
+        <div class="form-inline">
+            <sqx-query-path
+                (pathChange)="changePath($event)"
+                [path]="sorting.path"
+                [model]="model">
+            </sqx-query-path>
+
+            <select class="form-select ms-2" [ngModel]="sorting.order" (ngModelChange)="changeOrder($event)">
+                <option *ngFor="let mode of modes" [ngValue]="mode">{{mode}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-auto ps-2">
+        <button type="button" class="btn btn-text-danger" (click)="remove.emit()">
+            <i class="icon-bin2"></i>
+        </button>
+    </div>
+</div>

@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Text.Encodings.Web;
 using Fluid;
 using Fluid.Values;
@@ -48,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
 
         public override string ToStringValue()
         {
-            return value.ToString();
+            return value.ToString()!;
         }
 
         protected override FluidValue GetValue(string name, TemplateContext context)
@@ -100,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
 
         public override void WriteTo(TextWriter writer, TextEncoder encoder, CultureInfo cultureInfo)
         {
-            writer.Write(value.ToString());
+            writer.Write(value);
         }
     }
 }

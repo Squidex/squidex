@@ -5,9 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -38,6 +41,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var result = await sut.GetInitialStatusAsync(null!);
 
             Assert.Equal(Status.Draft, result);
+        }
+
+        [Fact]
+        public async Task Should_allow_publish_on_create()
+        {
+            var result = await sut.CanPublishInitialAsync(null!, null);
+
+            Assert.True(result);
         }
 
         [Fact]
@@ -150,6 +161,40 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var result = await sut.GetAllAsync(null!);
 
             result.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public async Task Should_not_validate_when_not_publishing()
+        {
+            var result = await sut.ShouldValidateAsync(null!, Status.Draft);
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task Should_not_validate_when_publishing_but_not_enabled()
+        {
+            var result = await sut.ShouldValidateAsync(CreateSchema(false), Status.Published);
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task Should_validate_when_publishing_and_enabled()
+        {
+            var result = await sut.ShouldValidateAsync(CreateSchema(true), Status.Published);
+
+            Assert.True(result);
+        }
+
+        private static ISchemaEntity CreateSchema(bool validateOnPublish)
+        {
+            var schema = new Schema("my-schema", new SchemaProperties
+            {
+                ValidateOnPublish = validateOnPublish
+            });
+
+            return Mocks.Schema(NamedId.Of(DomainId.NewGuid(), "my-app"), NamedId.Of(DomainId.NewGuid(), schema.Name), schema);
         }
     }
 }

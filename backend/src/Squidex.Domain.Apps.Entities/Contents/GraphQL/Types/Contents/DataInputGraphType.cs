@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -20,6 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         public DataInputGraphType(Builder builder, SchemaInfo schemaInfo)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = schemaInfo.DataInputType;
 
             foreach (var fieldInfo in schemaInfo.Fields)
@@ -30,6 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 {
                     var fieldGraphType = new InputObjectGraphType
                     {
+                        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
                         Name = fieldInfo.LocalizedInputType
                     };
 
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Description = $"The structure of the {schemaInfo.DisplayName} data input type.";
         }
 
-        public override object ParseDictionary(IDictionary<string, object> value)
+        public override object ParseDictionary(IDictionary<string, object?> value)
         {
             var result = new ContentData();
 
@@ -72,13 +72,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 {
                     if (source.TryGetValue(field.Name, out var value))
                     {
-                        if (value is IEnumerable<object> list && field.ResolvedType.Flatten() is IComplexGraphType nestedType)
+                        if (value is IEnumerable<object> list && field.ResolvedType?.Flatten() is IComplexGraphType nestedType)
                         {
                             var array = new JsonArray(list.Count());
 
                             foreach (var item in list)
                             {
-                                if (item is JsonObject nested)
+                                if (item is JsonValue nested && nested.Type == JsonValueType.Object)
                                 {
                                     array.Add(nested);
                                 }

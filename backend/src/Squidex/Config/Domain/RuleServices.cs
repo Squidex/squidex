@@ -5,8 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.Extensions;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -52,13 +51,13 @@ namespace Squidex.Config.Domain
                 .As<IFluidExtension>();
 
             services.AddSingletonAs<AssetsJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<ReferencesFluidExtension>()
                 .As<IFluidExtension>();
 
             services.AddSingletonAs<ReferencesJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<ManualTriggerHandler>()
                 .As<IRuleTriggerHandler>();
@@ -84,11 +83,11 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<EventJsonSchemaGenerator>()
                 .AsSelf();
 
-            services.AddSingletonAs<RuleRegistry>()
+            services.AddSingletonAs<RuleTypeProvider>()
                 .As<ITypeProvider>().AsSelf();
 
             services.AddSingletonAs<EventJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<EventFluidExtensions>()
                 .As<IFluidExtension>();
@@ -104,6 +103,11 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<GrainBootstrap<IRuleDequeuerGrain>>()
                 .AsSelf();
+
+            services.AddInitializer<RuleTypeProvider>("Serializer (Rules)", registry =>
+            {
+                RuleActionConverter.Mapping = registry.Actions.ToDictionary(x => x.Key, x => x.Value.Type);
+            }, -1);
         }
     }
 }

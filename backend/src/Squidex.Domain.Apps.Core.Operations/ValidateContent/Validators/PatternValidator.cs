@@ -1,13 +1,11 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 
@@ -19,16 +17,23 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         private readonly Regex regex;
         private readonly string? errorMessage;
 
-        public PatternValidator(string pattern, string? errorMessage = null)
+        public PatternValidator(string pattern, string? errorMessage = null, bool capture = false)
         {
-            Guard.NotNullOrEmpty(pattern, nameof(pattern));
+            Guard.NotNullOrEmpty(pattern);
 
             this.errorMessage = errorMessage;
 
-            regex = new Regex($"^{pattern}$", RegexOptions.None, Timeout);
+            var options = RegexOptions.None;
+
+            if (!capture)
+            {
+                options |= RegexOptions.ExplicitCapture;
+            }
+
+            regex = new Regex($"^{pattern}$", options, Timeout);
         }
 
-        public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value is string stringValue)
             {
@@ -55,7 +60,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 }
             }
 
-            return Task.CompletedTask;
+            return default;
         }
     }
 }

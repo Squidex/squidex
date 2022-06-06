@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
@@ -69,7 +67,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         /// <remarks>
         /// Create a new client for the app with the specified name.
-        /// The client secret is auto generated on the server and returned. The client does not exire, the access token is valid for 30 days.
+        /// The client secret is auto generated on the server and returned. The client does not expire, the access token is valid for 30 days.
         /// </remarks>
         [HttpPost]
         [Route("apps/{app}/clients/")]

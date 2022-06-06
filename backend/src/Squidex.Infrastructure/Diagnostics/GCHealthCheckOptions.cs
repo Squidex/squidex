@@ -9,6 +9,6 @@ namespace Squidex.Infrastructure.Diagnostics
 {
     public sealed class GCHealthCheckOptions
     {
-        public long Threshold { get; set; } = 4 * 1024L;
+        public long ThresholdInMB { get; set; } = 8192;
     }
 }

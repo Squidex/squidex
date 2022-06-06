@@ -15,6 +15,8 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public string ApiUrl { get; set; } = "https://app.notifo.io";
 
+        public bool Debug { get; set; }
+
         public bool IsConfigured()
         {
             return

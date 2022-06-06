@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
@@ -37,18 +36,21 @@ namespace Squidex.Areas.Api.Controllers.Assets
         private readonly IAssetUsageTracker assetStatsRepository;
         private readonly IAppPlansProvider appPlansProvider;
         private readonly ITagService tagService;
+        private readonly AssetTusRunner assetTusRunner;
 
         public AssetsController(
             ICommandBus commandBus,
             IAssetQueryService assetQuery,
             IAssetUsageTracker assetStatsRepository,
             IAppPlansProvider appPlansProvider,
-            ITagService tagService)
+            ITagService tagService,
+            AssetTusRunner assetTusRunner)
             : base(commandBus)
         {
+            this.appPlansProvider = appPlansProvider;
             this.assetQuery = assetQuery;
             this.assetStatsRepository = assetStatsRepository;
-            this.appPlansProvider = appPlansProvider;
+            this.assetTusRunner = assetTusRunner;
             this.tagService = tagService;
         }
 
@@ -57,7 +59,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <returns>
-        /// 200 => Assets returned.
+        /// 200 => Assets tags returned.
         /// 404 => App not found.
         /// </returns>
         /// <remarks>
@@ -72,9 +74,31 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var tags = await tagService.GetTagsAsync(AppId, TagGroups.Assets);
 
-            Response.Headers[HeaderNames.ETag] = tags.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = tags.Version.ToString(CultureInfo.InvariantCulture);
 
             return Ok(tags);
+        }
+
+        /// <summary>
+        /// Rename an asset tag.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The tag to return.</param>
+        /// <param name="request">The required request object.</param>
+        /// <returns>
+        /// 200 => Asset tag renamed and new tags returned.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/assets/tags/{name}")]
+        [ProducesResponseType(typeof(Dictionary<string, int>), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PutTag(string app, string name, [FromBody] RenameTagDto request)
+        {
+            await tagService.RenameTagAsync(AppId, TagGroups.Assets, Uri.UnescapeDataString(name), request.TagName);
+
+            return await GetTags(app);
         }
 
         /// <summary>
@@ -102,7 +126,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = Deferred.Response(() =>
             {
-                return AssetsDto.FromAssets(assets, Resources);
+                return AssetsDto.FromDomain(assets, Resources);
             });
 
             return Ok(response);
@@ -131,7 +155,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = Deferred.Response(() =>
             {
-                return AssetsDto.FromAssets(assets, Resources);
+                return AssetsDto.FromDomain(assets, Resources);
             });
 
             return Ok(response);
@@ -162,7 +186,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = Deferred.Response(() =>
             {
-                return AssetDto.FromAsset(asset, Resources);
+                return AssetDto.FromDomain(asset, Resources);
             });
 
             return Ok(response);
@@ -198,6 +222,43 @@ namespace Squidex.Areas.Api.Controllers.Assets
         }
 
         /// <summary>
+        /// Upload a new asset using tus.io.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 201 => Asset created.
+        /// 400 => Asset request not valid.
+        /// 413 => Asset exceeds the maximum upload size.
+        /// 404 => App not found.
+        /// </returns>
+        /// <remarks>
+        /// Use the tus protocol to upload an asset.
+        /// </remarks>
+        [OpenApiIgnore]
+        [Route("apps/{app}/assets/tus/{**fileId}")]
+        [ProducesResponseType(typeof(AssetDto), 201)]
+        [AssetRequestSizeLimit]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsCreate)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PostAssetTus(string app)
+        {
+            var url = Url.Action(null, new { app, fileId = (object?)null })!;
+
+            var (result, file) = await assetTusRunner.InvokeAsync(HttpContext, url);
+
+            if (file != null)
+            {
+                var command = UpsertAssetDto.ToCommand(file);
+
+                var response = await InvokeCommandAsync(command);
+
+                return CreatedAtAction(nameof(GetAsset), new { app, id = response.Id }, response);
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Bulk update assets.
         /// </summary>
         /// <param name="app">The name of the app.</param>
@@ -219,7 +280,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<BulkUpdateResult>();
-            var response = result.Select(x => BulkResultDto.FromBulkResult(x, HttpContext)).ToArray();
+            var response = result.Select(x => BulkResultDto.FromDomain(x, HttpContext)).ToArray();
 
             return Ok(response);
         }
@@ -359,17 +420,43 @@ namespace Squidex.Areas.Api.Controllers.Assets
             return NoContent();
         }
 
+        [HttpGet]
+        [Route("apps/{app}/assets/completion")]
+        [ApiPermissionOrAnonymous]
+        [ApiCosts(1)]
+        [OpenApiIgnore]
+        public IActionResult GetScriptCompletion(string app, string schema,
+            [FromServices] ScriptingCompleter completer)
+        {
+            var completion = completer.AssetScript();
+
+            return Ok(completion);
+        }
+
+        [HttpGet]
+        [Route("apps/{app}/assets/completion/trigger")]
+        [ApiPermissionOrAnonymous]
+        [ApiCosts(1)]
+        [OpenApiIgnore]
+        public IActionResult GetScriptTriggerCompletion(string app, string schema,
+            [FromServices] ScriptingCompleter completer)
+        {
+            var completion = completer.AssetTrigger();
+
+            return Ok(completion);
+        }
+
         private async Task<AssetDto> InvokeCommandAsync(ICommand command)
         {
             var context = await CommandBus.PublishAsync(command);
 
             if (context.PlainResult is AssetDuplicate created)
             {
-                return AssetDto.FromAsset(created.Asset, Resources, true);
+                return AssetDto.FromDomain(created.Asset, Resources, true);
             }
             else
             {
-                return AssetDto.FromAsset(context.Result<IEnrichedAssetEntity>(), Resources);
+                return AssetDto.FromDomain(context.Result<IEnrichedAssetEntity>(), Resources);
             }
         }
 

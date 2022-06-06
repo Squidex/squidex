@@ -1,36 +1,37 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
+
+#pragma warning disable MA0022 // Return Task.FromResult instead of returning null
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
     public sealed partial class AssetFolderDomainObject : DomainObject<AssetFolderDomainObject.State>
     {
-        private readonly IAssetQueryService assetQuery;
+        private readonly IServiceProvider serviceProvider;
 
-        public AssetFolderDomainObject(IPersistenceFactory<State> factory, ISemanticLog log,
-            IAssetQueryService assetQuery)
+        public AssetFolderDomainObject(IPersistenceFactory<State> factory, ILogger<AssetFolderDomainObject> log,
+            IServiceProvider serviceProvider)
             : base(factory, log)
         {
-            this.assetQuery = assetQuery;
+            this.serviceProvider = serviceProvider;
         }
 
-        protected override bool IsDeleted()
+        protected override bool IsDeleted(State snapshot)
         {
             return Snapshot.IsDeleted;
         }
@@ -54,9 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 case CreateAssetFolder c:
                     return CreateReturnAsync(c, async create =>
                     {
-                        await GuardAssetFolder.CanCreate(create, assetQuery);
-
-                        Create(create);
+                        await CreateCore(create, c);
 
                         return Snapshot;
                     });
@@ -64,19 +63,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 case MoveAssetFolder move:
                     return UpdateReturnAsync(move, async c =>
                     {
-                        await GuardAssetFolder.CanMove(c, Snapshot, assetQuery);
-
-                        Move(c);
+                        await MoveCore(c);
 
                         return Snapshot;
                     });
 
                 case RenameAssetFolder rename:
-                    return UpdateReturn(rename, c =>
+                    return UpdateReturnAsync(rename, async c =>
                     {
-                        GuardAssetFolder.CanRename(c);
-
-                        Rename(c);
+                        await RenameCore(c);
 
                         return Snapshot;
                     });
@@ -88,8 +83,44 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     });
 
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
+        }
+
+        private async Task CreateCore(CreateAssetFolder create, CreateAssetFolder c)
+        {
+            var operation = await AssetFolderOperation.CreateAsync(serviceProvider, c, () => Snapshot);
+
+            operation.MustHaveName(c.FolderName);
+
+            if (!c.OptimizeValidation)
+            {
+                await operation.MustMoveToValidFolder(c.ParentId);
+            }
+
+            Create(create);
+        }
+
+        private async Task MoveCore(MoveAssetFolder c)
+        {
+            var operation = await AssetFolderOperation.CreateAsync(serviceProvider, c, () => Snapshot);
+
+            if (!c.OptimizeValidation)
+            {
+                await operation.MustMoveToValidFolder(c.ParentId);
+            }
+
+            Move(c);
+        }
+
+        private async Task RenameCore(RenameAssetFolder c)
+        {
+            var operation = await AssetFolderOperation.CreateAsync(serviceProvider, c, () => Snapshot);
+
+            operation.MustHaveName(c.FolderName);
+
+            Rename(c);
         }
 
         private void Create(CreateAssetFolder command)

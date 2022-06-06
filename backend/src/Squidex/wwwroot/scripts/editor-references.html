@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
+    <script src="editor-sdk.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="https://cloud.squidex.io/build/styles.css">
+
+    <style>
+        body {
+            height: 38px;
+        }
+    </style>
+</head>
+
+<body>
+    <select class="form-select" id="editor">
+        <option></option>
+    </select>
+
+    <script>
+        const element = document.getElementById('editor');
+
+        // When the field is instantiated it notifies the UI that it has been loaded.
+        // 
+        // Furthermore it sends the current size to the parent.
+        const field = new SquidexFormField();
+
+        field.onInit(context => {
+            // Fetch the references with a custom filter.
+            fetch(`${context.apiUrl}/content/${context.appName}/references?filter=data/isActive/iv eq true`, {
+                headers: {
+                    Authorization: `Bearer ${context.user.user.access_token}`
+                }
+            })
+            .then(x => x.json())
+            .then(x => {
+                for (var item of x.items) {
+                    // Use the title field as option text.
+                    element.add(new Option(item.data.title.iv, item.id));
+                }
+
+                // Update the value again for the new options.
+                updateValue(field.getValue());
+            })
+        });
+
+        // Handle the value change event and set the text to the editor.
+        field.onValueChanged(function (value) {
+            updateValue(value);
+        });
+
+        // Disable the editor when it should be disabled.
+        field.onDisabled(function (disabled) {
+            updateDisabled(disabled);
+        });
+
+        element.addEventListener('change', event => {
+            if (element.value) {
+                field.valueChanged([element.value]);
+            } else {
+                field.valueChanged([]);
+            }
+        });
+        
+        function updateDisabled(disabled) {
+            element.disabled = disabled;
+        }
+
+        function updateValue(value) {
+            if (Array.isArray(value) && value.length > 0) {
+                element.value = value[0];
+            } else {
+                element.value = undefined;
+            }
+        }
+    </script>
+</body>
+
+</html>

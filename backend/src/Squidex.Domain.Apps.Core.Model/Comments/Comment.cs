@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using NodaTime;
 using Squidex.Infrastructure;
 
@@ -15,5 +14,8 @@ namespace Squidex.Domain.Apps.Core.Comments
 {
     public sealed record Comment(DomainId Id, Instant Time, RefToken User, string Text, Uri? Url = null)
     {
+        public RefToken User { get; } = Guard.NotNull(User);
+
+        public string Text { get; } = Guard.NotNullOrEmpty(Text);
     }
 }

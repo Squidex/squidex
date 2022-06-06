@@ -1,0 +1,34 @@
+<div class="d-flex root" (sqxResized)="setSize($event)" [class.mini]="size === 'Mini'" [class.compact]="size === 'Compact'">
+    <div class="form-group flex-grow me-1">
+        <div *ngIf="isDateTimeMode && shouldShowDateTimeModeButton">
+            <button type="button" class="btn btn-text-secondary btn-sm btn-time-mode" (click)="setLocalMode(false)" *ngIf="snapshot.isLocal">
+                {{ 'common.dateTimeEditor.local' | sqxTranslate }}
+            </button>
+            <button type="button" class="btn btn-text-secondary btn-sm btn-time-mode" (click)="setLocalMode(true)" *ngIf="!snapshot.isLocal">
+                {{ 'common.dateTimeEditor.utc' | sqxTranslate }}
+            </button>
+        </div>
+        <div class="input-group flex-grow">
+            <input type="text" class="form-control form-date" [formControl]="dateControl" placeholder="{{ 'common.date' | sqxTranslate }}"
+                [class.with-buttons]="isDateTimeMode && shouldShowDateTimeModeButton" 
+                (blur)="callTouched()" maxlength="10" #dateInput>
+
+            <input type="text" class="form-control form-time" [formControl]="timeControl" placeholder="{{ 'common.time' | sqxTranslate }}" (blur)="callTouched()" *ngIf="isDateTimeMode">
+        </div>
+
+        <button type="button" class="btn btn-text-secondary btn-sm btn-clear" [class.hidden]="!hasValue"
+            [disabled]="snapshot.isDisabled" (click)="reset()" *ngIf="!hideClear">
+            <i class="icon-close"></i>
+        </button>
+    </div>
+    <div class="form-group" *ngIf="isDateTimeMode && shouldShowDateButtons">
+        <button type="button" class="btn btn-text-secondary btn-quick" [disabled]="snapshot.isDisabled" (click)="writeNow()" title="i18n:common.dateTimeEditor.nowTooltip">
+            {{ 'common.dateTimeEditor.now' | sqxTranslate }}
+        </button>
+    </div>
+    <div class="form-group" *ngIf="!isDateTimeMode && shouldShowDateButtons">
+        <button type="button" class="btn btn-text-secondary btn-quick" [disabled]="snapshot.isDisabled" (click)="writeToday()" title="i18n:common.dateTimeEditor.todayTooltip">
+            {{ 'common.dateTimeEditor.today' | sqxTranslate }}
+        </button>
+    </div>
+</div>

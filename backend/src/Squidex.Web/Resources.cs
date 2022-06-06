@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using Lazy;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
@@ -30,6 +28,10 @@ namespace Squidex.Web
 
         public bool CanDeleteContentVersion(string schema) => IsAllowedForSchema(Permissions.AppContentsVersionDeleteOwn, schema);
 
+        public bool CanChangeStatus(string schema) => IsAllowedForSchema(Permissions.AppContentsChangeStatus, schema);
+
+        public bool CanCancelContentStatus(string schema) => IsAllowedForSchema(Permissions.AppContentsChangeStatusCancelOwn, schema);
+
         public bool CanUpdateContent(string schema) => IsAllowedForSchema(Permissions.AppContentsUpdateOwn, schema);
 
         // Schemas
@@ -46,6 +48,10 @@ namespace Squidex.Web
 
         [Lazy]
         public bool CanUpdateSettings => IsAllowed(Permissions.AppUpdateSettings);
+
+        // Asset Scripts
+        [Lazy]
+        public bool CanUpdateAssetsScripts => IsAllowed(Permissions.AppAssetsScriptsUpdate);
 
         // Contributors
         [Lazy]
@@ -155,7 +161,7 @@ namespace Squidex.Web
 
         // Backups
         [Lazy]
-        public bool CanRestoreBackup => IsAllowed(Permissions.AdminEventsRead);
+        public bool CanRestoreBackup => IsAllowed(Permissions.AdminRestore);
 
         [Lazy]
         public bool CanCreateBackup => IsAllowed(Permissions.AppBackupsCreate);
@@ -173,13 +179,21 @@ namespace Squidex.Web
         public Resources(ApiController controller)
         {
             Controller = controller;
-
             Context = controller.HttpContext.Context();
         }
 
         public string Url<T>(Func<T?, string> action, object? values = null) where T : ApiController
         {
-            return Controller.Url(action, values);
+            var url = Controller.Url(action, values);
+
+            var basePath = Controller.HttpContext.Request.PathBase;
+
+            if (url.StartsWith(Controller.HttpContext.Request.PathBase, StringComparison.OrdinalIgnoreCase))
+            {
+                url = url[basePath.Value!.Length..];
+            }
+
+            return url;
         }
 
         public bool IsUser(string userId)
@@ -203,21 +217,21 @@ namespace Squidex.Web
         {
             if (app == Permission.Any)
             {
-                var falback = App;
+                var fallback = App;
 
-                if (!string.IsNullOrWhiteSpace(falback))
+                if (!string.IsNullOrWhiteSpace(fallback))
                 {
-                    app = falback;
+                    app = fallback;
                 }
             }
 
             if (schema == Permission.Any)
             {
-                var falback = Controller.HttpContext.Features.Get<ISchemaFeature>()?.Schema.SchemaDef.Name;
+                var fallback = Controller.HttpContext.Features.Get<ISchemaFeature>()?.Schema.SchemaDef.Name;
 
-                if (!string.IsNullOrWhiteSpace(falback))
+                if (!string.IsNullOrWhiteSpace(fallback))
                 {
-                    schema = falback;
+                    schema = fallback;
                 }
             }
 

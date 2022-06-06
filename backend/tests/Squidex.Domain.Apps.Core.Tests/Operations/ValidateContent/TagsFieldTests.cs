@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -26,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new TagsFieldProperties());
 
-            Assert.Equal("my-tags", sut.Name);
+            Assert.Equal("myTags", sut.Name);
         }
 
         [Fact]
@@ -86,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new TagsFieldProperties { IsRequired = true });
 
-            await sut.ValidateAsync(JsonValue.Array(JsonValue.Null), errors);
+            await sut.ValidateAsync((JsonValue)JsonValue.Array(JsonValue.Null), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Invalid json type, expected array of strings." });
@@ -139,7 +136,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_value_contains_an_not_allowed_values()
         {
-            var sut = Field(new TagsFieldProperties { AllowedValues = ImmutableList.Create("tag-2", "tag-3") });
+            var sut = Field(new TagsFieldProperties { AllowedValues = ReadonlyList.Create("tag-2", "tag-3") });
 
             await sut.ValidateAsync(CreateValue("tag-1", "tag-2", null), errors);
 
@@ -147,14 +144,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "[1]: Not an allowed value." });
         }
 
-        private static IJsonValue CreateValue(params string?[]? ids)
+        private static JsonValue CreateValue(params string?[]? ids)
         {
-            return ids == null ? JsonValue.Null : JsonValue.Array(ids.OfType<object>().ToArray());
+            return ids == null ? JsonValue.Null : JsonValue.Array(ids);
         }
 
         private static RootField<TagsFieldProperties> Field(TagsFieldProperties properties)
         {
-            return Fields.Tags(1, "my-tags", Partitioning.Invariant, properties);
+            return Fields.Tags(1, "myTags", Partitioning.Invariant, properties);
         }
     }
 }

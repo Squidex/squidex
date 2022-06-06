@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Globalization;
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Hosting;
 using Squidex.Hosting.Configuration;
@@ -41,7 +38,8 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 if (mongoCollection == null)
                 {
-                    throw new InvalidOperationException("Collection has not been initialized yet.");
+                    ThrowHelper.InvalidOperationException("Collection has not been initialized yet.");
+                    return default!;
                 }
 
                 return mongoCollection;
@@ -64,7 +62,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         protected MongoRepositoryBase(IMongoDatabase database, bool setup = false)
         {
-            Guard.NotNull(database, nameof(database));
+            Guard.NotNull(database);
 
             mongoDatabase = database;
 
@@ -90,11 +88,12 @@ namespace Squidex.Infrastructure.MongoDb
             return Task.CompletedTask;
         }
 
-        public virtual async Task ClearAsync()
+        public virtual async Task ClearAsync(
+            CancellationToken ct = default)
         {
             try
             {
-                await Database.DropCollectionAsync(CollectionName());
+                await Database.DropCollectionAsync(CollectionName(), ct);
             }
             catch (MongoCommandException ex)
             {
@@ -104,10 +103,11 @@ namespace Squidex.Infrastructure.MongoDb
                 }
             }
 
-            await InitializeAsync();
+            await InitializeAsync(ct);
         }
 
-        public async Task InitializeAsync(CancellationToken ct = default)
+        public async Task InitializeAsync(
+            CancellationToken ct)
         {
             try
             {

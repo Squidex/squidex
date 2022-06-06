@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string? EditorUrl { get; init; }
 
-        public ImmutableList<string>? Tags { get; init; }
+        public ReadonlyList<string>? Tags { get; init; }
 
         public abstract T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args);
 

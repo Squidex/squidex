@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -50,7 +48,7 @@ namespace Squidex.Infrastructure.Validation
 
         private static string FormatMessage(IReadOnlyList<ValidationError> errors)
         {
-            Guard.NotNull(errors, nameof(errors));
+            Guard.NotNull(errors);
 
             var sb = new StringBuilder();
 

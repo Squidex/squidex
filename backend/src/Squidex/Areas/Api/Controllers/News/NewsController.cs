@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.News.Models;
 using Squidex.Areas.Api.Controllers.News.Service;
@@ -42,7 +40,7 @@ namespace Squidex.Areas.Api.Controllers.News
         [ApiPermission]
         public async Task<IActionResult> GetNews([FromQuery] int version = 0)
         {
-            var features = await featuresService.GetFeaturesAsync(version);
+            var features = await featuresService.GetFeaturesAsync(version, HttpContext.RequestAborted);
 
             return Ok(features);
         }

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 
@@ -25,6 +23,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         public CounterGrain(IGrainState<State> state)
         {
             this.state = state;
+        }
+
+        public Task ClearAsync()
+        {
+            TryDeactivateOnIdle();
+
+            return state.ClearAsync();
         }
 
         public Task<long> IncrementAsync(string name)

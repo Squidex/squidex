@@ -5,15 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Squidex.Domain.Apps.Entities.History;
 
 namespace Squidex.Areas.Frontend.Middlewares
 {
-    public class NotifoMiddleware
+    public sealed class NotifoMiddleware
     {
         private readonly RequestDelegate next;
         private readonly string? workerUrl;
@@ -27,13 +25,13 @@ namespace Squidex.Areas.Frontend.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if (context.Request.Path.Equals("/notifo-sw.js") && workerUrl != null)
+            if (context.Request.Path.Equals("/notifo-sw.js", StringComparison.Ordinal) && workerUrl != null)
             {
                 context.Response.Headers[HeaderNames.ContentType] = "text/javascript";
 
                 var script = $"importScripts('{workerUrl}')";
 
-                await context.Response.WriteAsync(script);
+                await context.Response.WriteAsync(script, context.RequestAborted);
             }
             else
             {
@@ -48,7 +46,7 @@ namespace Squidex.Areas.Frontend.Middlewares
                 return null;
             }
 
-            if (options.ApiUrl.Contains("localhost:5002"))
+            if (options.ApiUrl.Contains("localhost:5002", StringComparison.Ordinal))
             {
                 return "https://localhost:3002/notifo-sdk-worker.js";
             }

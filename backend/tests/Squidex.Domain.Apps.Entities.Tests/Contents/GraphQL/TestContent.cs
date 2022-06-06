@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
@@ -25,6 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
               email
               displayName
             }
+            editToken
             lastModified
             lastModifiedBy
             lastModifiedByUser {
@@ -34,6 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             }
             status
             statusColor
+            newStatus
+            newStatusColor
             url
             data {
               myJson {
@@ -41,6 +43,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 ivValue: iv(path: ""value"")
               }
               myString {
+                iv
+              }
+              myStringEnum {
                 iv
               }
               myLocalizedString {
@@ -86,6 +91,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
               myTags {
                 iv
               }
+              myTagsEnum {
+                iv
+              }
               myArray {
                 iv {
                   nestedNumber
@@ -104,6 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
               email
               displayName
             }
+            editToken
             lastModified
             lastModifiedBy
             lastModifiedByUser {
@@ -113,11 +122,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             }
             status
             statusColor
+            newStatus
+            newStatusColor
             url
             flatData {
               myJson
               myJsonValue: myJson(path: ""value"")
               myString
+              myStringEnum
               myLocalizedString
               myNumber
               myBoolean
@@ -141,6 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
               }
               myTags
+              myTagsEnum
               myArray {
                 nestedNumber
                 nestedBoolean
@@ -158,7 +171,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             .AddLocalized("de-DE", "de-DE"))
                     .AddField("my-string",
                         new ContentFieldData()
-                            .AddInvariant(null))
+                            .AddInvariant(JsonValue.Null))
+                    .AddField("my-string-enum",
+                        new ContentFieldData()
+                            .AddInvariant("EnumA"))
                     .AddField("my-assets",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(assetId.ToString())))
@@ -174,6 +190,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddField("my-tags",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array("tag1", "tag2")))
+                    .AddField("my-tags-enum",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Array("EnumA", "EnumB")))
                     .AddField("my-references",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(refId.ToString())))
@@ -183,39 +202,46 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddField("my-geolocation",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("latitude", 10)
                                     .Add("longitude", 20)))
                     .AddField("my-component",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add(Component.Discriminator, TestSchemas.Ref1.Id)
                                     .Add("schemaRef1Field", "Component1")))
                     .AddField("my-components",
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
-                                    JsonValue.Object()
+                                    new JsonObject()
                                         .Add(Component.Discriminator, TestSchemas.Ref1.Id)
                                         .Add("schemaRef1Field", "Component1"),
-                                    JsonValue.Object()
+                                    new JsonObject()
                                         .Add(Component.Discriminator, TestSchemas.Ref2.Id)
                                         .Add("schemaRef2Field", "Component2"))))
                     .AddField("my-json",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("value", 1)))
                     .AddField("my-array",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("nested-number", 10)
                                     .Add("nested-boolean", true),
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("nested-number", 20)
                                     .Add("nested-boolean", false))));
+
+            if (assetId != default || refId != default)
+            {
+                data.AddField("my-embeds",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Create($"assets:{assetId}, contents:{refId}")));
+            }
 
             var content = new ContentEntity
             {
@@ -224,12 +250,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 Version = 1,
                 Created = now,
                 CreatedBy = RefToken.User("user1"),
+                EditToken = $"token_{id}",
                 LastModified = now,
                 LastModifiedBy = RefToken.Client("client1"),
                 Data = data,
                 SchemaId = TestSchemas.DefaultId,
                 Status = Status.Draft,
-                StatusColor = "red"
+                StatusColor = "red",
+                NewStatus = Status.Published,
+                NewStatusColor = "blue"
             };
 
             return content;
@@ -252,12 +281,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 Version = 1,
                 Created = now,
                 CreatedBy = RefToken.User("user1"),
+                EditToken = $"token_{id}",
                 LastModified = now,
                 LastModifiedBy = RefToken.User("user2"),
                 Data = data,
                 SchemaId = schemaId,
                 Status = Status.Draft,
-                StatusColor = "red"
+                StatusColor = "red",
+                NewStatus = Status.Published,
+                NewStatusColor = "blue"
             };
 
             return content;
@@ -277,6 +309,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     email = $"{content.CreatedBy.Identifier}@email.com",
                     displayName = $"name_{content.CreatedBy.Identifier}"
                 },
+                editToken = $"token_{content.Id}",
                 lastModified = content.LastModified,
                 lastModifiedBy = content.LastModifiedBy.ToString(),
                 lastModifiedByUser = new
@@ -287,6 +320,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 },
                 status = "DRAFT",
                 statusColor = "red",
+                newStatus = "PUBLISHED",
+                newStatusColor = "blue",
                 url = $"contents/my-schema/{content.Id}",
                 data = Data(content)
             };
@@ -306,6 +341,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     email = $"{content.CreatedBy.Identifier}@email.com",
                     displayName = $"name_{content.CreatedBy.Identifier}"
                 },
+                editToken = $"token_{content.Id}",
                 lastModified = content.LastModified,
                 lastModifiedBy = content.LastModifiedBy.ToString(),
                 lastModifiedByUser = new
@@ -316,6 +352,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 },
                 status = "DRAFT",
                 statusColor = "red",
+                newStatus = "PUBLISHED",
+                newStatusColor = "blue",
                 url = $"contents/my-schema/{content.Id}",
                 flatData = FlatData(content)
             };
@@ -335,6 +373,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 ["myString"] = new
                 {
                     iv = (string?)null,
+                },
+                ["myStringEnum"] = new
+                {
+                    iv = "EnumA",
                 },
                 ["myLocalizedString"] = new
                 {
@@ -392,6 +434,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         "tag2"
                     }
                 },
+                ["myTagsEnum"] = new
+                {
+                    iv = new[]
+                    {
+                        "EnumA",
+                        "EnumB"
+                    }
+                },
                 ["myArray"] = new
                 {
                     iv = new[]
@@ -440,6 +490,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 };
             }
 
+            if (assetId != default || refId != default)
+            {
+                result["myEmbeds"] = new
+                {
+                    iv = $"assets:{assetId}, contents:{refId}"
+                };
+            }
+
             return result;
         }
 
@@ -458,6 +516,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 ["myString"] = new
                 {
                     iv = (string?)null,
+                },
+                ["myStringEnum"] = new
+                {
+                    iv = "EnumA",
                 },
                 ["myLocalizedString"] = new
                 {
@@ -541,6 +603,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         "tag2"
                     }
                 },
+                ["myTagsEnum"] = new
+                {
+                    iv = new[]
+                    {
+                        "EnumA",
+                        "EnumB"
+                    }
+                },
                 ["myArray"] = new
                 {
                     iv = new[]
@@ -572,6 +642,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 },
                 ["myJsonValue"] = 1,
                 ["myString"] = null,
+                ["myStringEnum"] = "EnumA",
                 ["myLocalizedString"] = "de-DE",
                 ["myNumber"] = 1.0,
                 ["myBoolean"] = true,
@@ -623,6 +694,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 {
                     "tag1",
                     "tag2"
+                },
+                ["myTagsEnum"] = new[]
+                {
+                    "EnumA",
+                    "EnumB"
                 },
                 ["myArray"] = new[]
                 {

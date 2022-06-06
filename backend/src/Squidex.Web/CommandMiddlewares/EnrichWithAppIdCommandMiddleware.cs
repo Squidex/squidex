@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
@@ -41,7 +39,8 @@ namespace Squidex.Web.CommandMiddlewares
 
             if (context.App == null)
             {
-                throw new InvalidOperationException("Cannot resolve app.");
+                ThrowHelper.InvalidOperationException("Cannot resolve app.");
+                return default!;
             }
 
             return context.App.NamedId();

@@ -6,24 +6,32 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Squidex.Shared.Users
 {
     public interface IUserResolver
     {
-        Task<(IUser? User, bool Created)> CreateUserIfNotExistsAsync(string email, bool invited = false);
+        Task<(IUser? User, bool Created)> CreateUserIfNotExistsAsync(string email, bool invited = false,
+            CancellationToken ct = default);
 
-        Task<IUser?> FindByIdOrEmailAsync(string idOrEmail);
+        Task SetClaimAsync(string id, string type, string value, bool silent = false,
+            CancellationToken ct = default);
 
-        Task<IUser?> FindByIdAsync(string idOrEmail);
+        Task<IUser?> FindByIdOrEmailAsync(string idOrEmail,
+            CancellationToken ct = default);
 
-        Task SetClaimAsync(string id, string type, string value, bool silent = false);
+        Task<IUser?> FindByIdAsync(string idOrEmail,
+            CancellationToken ct = default);
 
-        Task<List<IUser>> QueryByEmailAsync(string email);
+        Task<List<IUser>> QueryByEmailAsync(string email,
+            CancellationToken ct = default);
 
-        Task<List<IUser>> QueryAllAsync();
+        Task<List<IUser>> QueryAllAsync(
+            CancellationToken ct = default);
 
-        Task<Dictionary<string, IUser>> QueryManyAsync(string[] ids);
+        Task<Dictionary<string, IUser>> QueryManyAsync(string[] ids,
+            CancellationToken ct = default);
     }
 }

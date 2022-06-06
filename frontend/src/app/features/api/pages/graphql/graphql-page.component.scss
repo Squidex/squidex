@@ -1,0 +1,47 @@
+@import 'mixins';
+@import 'vars';
+
+:host ::ng-deep {
+    @import '~graphiql/graphiql';
+
+    .graphiql-container {
+        @include absolute(0, 0, 0, 0);
+
+        & * {
+            box-sizing: content-box;
+        }
+
+        /* stylelint-disable-next-line selector-class-pattern */
+        & .editorWrap {
+            overflow: hidden;
+        }
+
+        svg {
+            fill: $color-black;
+        }
+
+        /* stylelint-disable-next-line selector-class-pattern */
+        .historyPaneWrap {
+            border-radius: 0;
+            border-left: 1px solid $color-border;
+            box-shadow: none !important;
+        }
+
+        /* stylelint-disable-next-line selector-class-pattern */
+        .docExplorerWrap {
+            border-radius: 0;
+            border-left: 1px solid $color-border;
+            box-shadow: none !important;
+        }
+    }
+
+    /* stylelint-disable-next-line selector-class-pattern */
+    .CodeMirror {
+        padding: 0;
+    }
+
+    /* stylelint-disable-next-line selector-class-pattern */
+    .CodeMirror-linenumbers {
+        min-width: 29px;
+    }
+}

@@ -5,15 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
@@ -22,38 +23,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     {
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-        private readonly NamedId<DomainId> schemaWithScriptId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-        private readonly ProvideSchema schemaProvider;
         private readonly ScriptContent sut;
 
         public ScriptContentTests()
         {
-            var schemaDef = new Schema(schemaId.Name);
-
-            var schemaDefWithScript =
-                new Schema(schemaWithScriptId.Name)
-                    .SetScripts(new SchemaScripts
-                    {
-                        Query = "my-query"
-                    });
-
-            schemaProvider = x =>
-            {
-                if (x == schemaId.Id)
-                {
-                    return Task.FromResult(Mocks.Schema(appId, schemaId, schemaDef));
-                }
-                else if (x == schemaWithScriptId.Id)
-                {
-                    return Task.FromResult(Mocks.Schema(appId, schemaWithScriptId, schemaDefWithScript));
-                }
-                else
-                {
-                    throw new DomainObjectNotFoundException(x.ToString());
-                }
-            };
-
             sut = new ScriptContent(scriptEngine);
         }
 
@@ -62,11 +35,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId));
 
-            var content = new ContentEntity { SchemaId = schemaId };
+            var (provider, schemaId) = CreateSchema(
+                queryPre: "my-pre-query");
 
-            await sut.EnrichAsync(ctx, new[] { content }, schemaProvider, default);
+            var content = new ContentEntity { Data = new ContentData(), SchemaId = schemaId };
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
+            await sut.EnrichAsync(ctx, new[] { content }, provider, default);
+
+            A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -75,11 +51,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
-            var content = new ContentEntity { SchemaId = schemaWithScriptId };
+            var (provider, schemaId) = CreateSchema(
+                query: "my-query");
 
-            await sut.EnrichAsync(ctx, new[] { content }, schemaProvider, default);
+            var content = new ContentEntity { Data = new ContentData(), SchemaId = schemaId };
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
+            await sut.EnrichAsync(ctx, new[] { content }, provider, default);
+
+            A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -90,23 +69,72 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var oldData = new ContentData();
 
-            var content = new ContentEntity { SchemaId = schemaWithScriptId, Data = oldData };
+            var (provider, schemaId) = CreateSchema(
+                query: "my-query");
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "my-query", ScriptOptions(), A<CancellationToken>._))
+            var content = new ContentEntity { Data = oldData, SchemaId = schemaId };
+
+            A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "my-query", ScriptOptions(), A<CancellationToken>._))
                 .Returns(new ContentData());
 
-            await sut.EnrichAsync(ctx, new[] { content }, schemaProvider, default);
+            await sut.EnrichAsync(ctx, new[] { content }, provider, default);
 
             Assert.NotSame(oldData, content.Data);
 
             A.CallTo(() => scriptEngine.TransformAsync(
-                    A<ScriptVars>.That.Matches(x =>
-                        ReferenceEquals(x.User, ctx.User) &&
-                        ReferenceEquals(x.Data, oldData) &&
-                        x.ContentId == content.Id),
+                    A<DataScriptVars>.That.Matches(x =>
+                        Equals(x["user"], ctx.User) &&
+                        Equals(x["data"], oldData) &&
+                        Equals(x["contentId"], content.Id)),
                     "my-query",
                     ScriptOptions(), A<CancellationToken>._))
                 .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_make_test_with_pre_query_script()
+        {
+            var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId));
+
+            var (provider, id) = CreateSchema(
+                query: @"
+                    ctx.data.test = { iv: ctx.custom };
+                    replace()",
+                queryPre: "ctx.custom = 123;");
+
+            var content = new ContentEntity { Data = new ContentData(), SchemaId = id };
+
+            var realScriptEngine =
+                new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                    Options.Create(new JintScriptOptions
+                    {
+                        TimeoutScript = TimeSpan.FromSeconds(20),
+                        TimeoutExecution = TimeSpan.FromSeconds(100)
+                    }));
+
+            var sut2 = new ScriptContent(realScriptEngine);
+
+            await sut2.EnrichAsync(ctx, new[] { content }, provider, default);
+
+            Assert.Equal(JsonValue.Create(123), content.Data["test"]!["iv"]);
+        }
+
+        private (ProvideSchema, NamedId<DomainId>) CreateSchema(string? query = null, string? queryPre = null)
+        {
+            var id = NamedId.Of(DomainId.NewGuid(), "my-schema");
+
+            return (_ =>
+            {
+                var schemaDef =
+                    new Schema(id.Name)
+                        .SetScripts(new SchemaScripts
+                        {
+                            Query = query,
+                            QueryPre = queryPre
+                        });
+
+                return Task.FromResult((Mocks.Schema(appId, id, schemaDef), ResolvedComponents.Empty));
+            }, id);
         }
 
         private static ScriptOptions ScriptOptions()

@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 using Squidex.Web;
@@ -36,20 +35,20 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The schema ids.
         /// </summary>
-        public IReadOnlyList<DomainId>? SchemaIds { get; set; }
+        public ReadonlyList<DomainId>? SchemaIds { get; set; }
 
         /// <summary>
         /// The initial step.
         /// </summary>
         public Status Initial { get; set; }
 
-        public static WorkflowDto FromWorkflow(DomainId id, Workflow workflow)
+        public static WorkflowDto FromDomain(DomainId id, Workflow workflow)
         {
             var result = SimpleMapper.Map(workflow, new WorkflowDto
             {
                 Steps = workflow.Steps.ToDictionary(
                     x => x.Key,
-                    x => WorkflowStepDto.FromWorkflowStep(x.Value)),
+                    x => WorkflowStepDto.FromDomain(x.Value)),
                 Id = id
             });
 

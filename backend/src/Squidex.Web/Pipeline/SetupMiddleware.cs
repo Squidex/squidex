@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Users;
 
@@ -23,9 +22,17 @@ namespace Squidex.Web.Pipeline
 
         public async Task InvokeAsync(HttpContext context, IUserService userService)
         {
-            if (!isUserFound && await userService.IsEmptyAsync())
+            if (context.Request.Query.ContainsKey("skip-setup"))
             {
-                context.Response.Redirect("/identity-server/setup");
+                await next(context);
+                return;
+            }
+
+            if (!isUserFound && await userService.IsEmptyAsync(context.RequestAborted))
+            {
+                var url = context.Request.PathBase.Add("/identity-server/setup");
+
+                context.Response.Redirect(url);
             }
             else
             {

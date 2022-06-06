@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Infrastructure.Json.Objects;
@@ -16,6 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         public NestedInputGraphType(Builder builder, FieldInfo fieldInfo)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = fieldInfo.NestedInputType;
 
             foreach (var nestedFieldInfo in fieldInfo.Fields)
@@ -37,9 +37,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Description = $"The structure of the {fieldInfo.DisplayName} nested schema.";
         }
 
-        public override object ParseDictionary(IDictionary<string, object> value)
+        public override object ParseDictionary(IDictionary<string, object?> value)
         {
-            var result = JsonValue.Object();
+            var result = new JsonObject();
 
             foreach (var field in Fields)
             {
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 }
             }
 
-            return result;
+            return new JsonValue(result);
         }
     }
 }

@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -28,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         private readonly DomainId ref2 = DomainId.NewGuid();
         private readonly IValidatorsFactory factory;
 
-        private class CustomFactory : IValidatorsFactory
+        private sealed class CustomFactory : IValidatorsFactory
         {
             private readonly DomainId schemaId;
 
@@ -61,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ReferencesFieldProperties());
 
-            Assert.Equal("my-refs", sut.Name);
+            Assert.Equal("myRefs", sut.Name);
         }
 
         [Fact]
@@ -164,7 +161,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Must not contain duplicate values." });
         }
 
-        private static IJsonValue CreateValue(params DomainId[]? ids)
+        private static JsonValue CreateValue(params DomainId[]? ids)
         {
             return ids == null ?
                 JsonValue.Null :
@@ -173,7 +170,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private static RootField<ReferencesFieldProperties> Field(ReferencesFieldProperties properties)
         {
-            return Fields.References(1, "my-refs", Partitioning.Invariant, properties);
+            return Fields.References(1, "myRefs", Partitioning.Invariant, properties);
         }
     }
 }

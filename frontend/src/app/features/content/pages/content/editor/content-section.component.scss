@@ -1,0 +1,32 @@
+@import 'mixins';
+@import 'vars';
+
+h3 {
+    margin: 0;
+}
+
+.header {
+    line-height: 2rem;
+    margin-bottom: .5rem;
+    margin-top: 1.5rem;
+
+    h3 {
+        line-height: 2rem;
+    }
+}
+
+:host {
+    &:first-child {
+        .header {
+            margin-top: 0;
+        }
+    }
+}
+
+.btn {
+    width: 2rem;
+
+    &:focus {
+        border-color: transparent;
+    }
+}

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -47,7 +45,8 @@ namespace Squidex.Web.CommandMiddlewares
 
             if (feature == null)
             {
-                throw new InvalidOperationException("Cannot resolve schema.");
+                ThrowHelper.InvalidOperationException("Cannot resolve schema.");
+                return default!;
             }
 
             return feature.Schema.NamedId();

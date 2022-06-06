@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using FakeItEasy;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
@@ -28,8 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 {
     public class AssetQueryTests
     {
-        private static readonly IBsonSerializerRegistry Registry = BsonSerializer.SerializerRegistry;
-        private static readonly IBsonSerializer<MongoAssetEntity> Serializer;
         private readonly DomainId appId = DomainId.NewGuid();
 
         static AssetQueryTests()
@@ -40,8 +35,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
             TypeConverterStringSerializer<Status>.Register();
 
             InstantSerializer.Register();
-
-            Serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoAssetEntity>();
         }
 
         [Fact]
@@ -214,13 +207,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         private void AssertQuery(string expected, ClrQuery query, object? arg = null)
         {
+            var filter = query.AdjustToModel(appId).BuildFilter<MongoAssetEntity>(false).Filter!;
+
             var rendered =
-                query.AdjustToModel(appId).BuildFilter<MongoAssetEntity>(false).Filter!
-                    .Render(Serializer, Registry).ToString();
+                filter.Render(
+                    BsonSerializer.SerializerRegistry.GetSerializer<MongoAssetEntity>(),
+                    BsonSerializer.SerializerRegistry)
+                .ToString();
 
-            var expectation = Cleanup(expected, arg);
-
-            Assert.Equal(expectation, rendered);
+            Assert.Equal(Cleanup(expected, arg), rendered);
         }
 
         private void AssertSorting(string expected, params SortNode[] sort)
@@ -232,19 +227,21 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
             A.CallTo(() => cursor.Sort(A<SortDefinition<MongoAssetEntity>>._))
                 .Invokes((SortDefinition<MongoAssetEntity> sortDefinition) =>
                 {
-                    rendered = sortDefinition.Render(Serializer, Registry).ToString();
+                    rendered =
+                       sortDefinition.Render(
+                           BsonSerializer.SerializerRegistry.GetSerializer<MongoAssetEntity>(),
+                           BsonSerializer.SerializerRegistry)
+                       .ToString();
                 });
 
             cursor.QuerySort(new ClrQuery { Sort = sort.ToList() }.AdjustToModel(appId));
 
-            var expectation = Cleanup(expected);
-
-            Assert.Equal(expectation, rendered);
+            Assert.Equal(Cleanup(expected), rendered);
         }
 
         private static string Cleanup(string filter, object? arg = null)
         {
-            return filter.Replace('\'', '"').Replace("[value]", arg?.ToString());
+            return filter.Replace('\'', '"').Replace("[value]", arg?.ToString(), StringComparison.Ordinal);
         }
     }
 }

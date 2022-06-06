@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -24,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new JsonFieldProperties());
 
-            Assert.Equal("my-json", sut.Name);
+            Assert.Equal("myJson", sut.Name);
         }
 
         [Fact]
@@ -48,14 +46,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Field is required." });
         }
 
-        private static IJsonValue CreateValue(IJsonValue v)
+        private static JsonValue CreateValue(JsonValue v)
         {
             return v;
         }
 
         private static RootField<JsonFieldProperties> Field(JsonFieldProperties properties)
         {
-            return Fields.Json(1, "my-json", Partitioning.Invariant, properties);
+            return Fields.Json(1, "myJson", Partitioning.Invariant, properties);
         }
     }
 }

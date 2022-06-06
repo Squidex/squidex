@@ -5,12 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -24,7 +21,6 @@ using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
-using Squidex.Log;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -36,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly ICommandBus commandBus;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
-        private readonly ISemanticLog log;
+        private readonly ILogger<RestoreGrain> log;
         private readonly IServiceProvider serviceProvider;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IUserResolver userResolver;
@@ -59,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IServiceProvider serviceProvider,
             IStreamNameResolver streamNameResolver,
             IUserResolver userResolver,
-            ISemanticLog log)
+            ILogger<RestoreGrain> log)
         {
             this.backupArchiveLocation = backupArchiveLocation;
             this.clock = clock;
@@ -92,14 +88,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public async Task RestoreAsync(Uri url, RefToken actor, string? newAppName)
+        public async Task RestoreAsync(Uri url, RefToken actor, string? newAppName = null)
         {
-            Guard.NotNull(url, nameof(url));
-            Guard.NotNull(actor, nameof(actor));
+            Guard.NotNull(url);
+            Guard.NotNull(actor);
 
             if (!string.IsNullOrWhiteSpace(newAppName))
             {
-                Guard.ValidSlug(newAppName, nameof(newAppName));
+                Guard.ValidSlug(newAppName);
             }
 
             if (CurrentJob?.Status == JobStatus.Started)
@@ -119,7 +115,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             await state.WriteAsync();
 
+#pragma warning disable MA0042 // Do not use blocking calls in an async method
             Process();
+#pragma warning restore MA0042 // Do not use blocking calls in an async method
         }
 
         private void Process()
@@ -131,12 +129,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var handlers = CreateHandlers();
 
-            var logContext = (
-                jobId: CurrentJob.Id.ToString(),
-                jobUrl: CurrentJob.Url.ToString()
-            );
+            var ct = default(CancellationToken);
 
-            using (Profiler.StartSession())
+            using (Telemetry.Activities.StartActivity("RestoreBackup"))
             {
                 try
                 {
@@ -146,26 +141,24 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     Log("  * Restore all objects like app, schemas and contents");
                     Log("  * Complete the restore operation for all objects");
 
-                    log.LogInformation(logContext, (ctx, w) => w
-                        .WriteProperty("action", "restore")
-                        .WriteProperty("status", "started")
-                        .WriteProperty("operationId", ctx.jobId)
-                        .WriteProperty("url", ctx.jobUrl));
+                    log.LogInformation("Backup with job id {backupId} with from URL '{url}' started.",
+                        CurrentJob.Id,
+                        CurrentJob.Url);
 
                     using (var reader = await DownloadAsync())
                     {
                         await reader.CheckCompatibilityAsync();
 
-                        using (Profiler.Trace("ReadEvents"))
+                        using (Telemetry.Activities.StartActivity("ReadEvents"))
                         {
                             await ReadEventsAsync(reader, handlers);
                         }
 
                         foreach (var handler in handlers)
                         {
-                            using (Profiler.TraceMethod(handler.GetType(), nameof(IBackupHandler.RestoreAsync)))
+                            using (Telemetry.Activities.StartActivity($"{handler.GetType().Name}/RestoreAsync"))
                             {
-                                await handler.RestoreAsync(runningContext);
+                                await handler.RestoreAsync(runningContext, ct);
                             }
 
                             Log($"Restored {handler.Name}");
@@ -173,9 +166,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                         foreach (var handler in handlers)
                         {
-                            using (Profiler.TraceMethod(handler.GetType(), nameof(IBackupHandler.CompleteRestoreAsync)))
+                            using (Telemetry.Activities.StartActivity($"{handler.GetType().Name}/CompleteRestoreAsync"))
                             {
-                                await handler.CompleteRestoreAsync(runningContext);
+                                await handler.CompleteRestoreAsync(runningContext, CurrentJob.NewAppName!);
                             }
 
                             Log($"Completed {handler.Name}");
@@ -188,15 +181,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     Log("Completed, Yeah!");
 
-                    log.LogInformation(logContext, (ctx, w) =>
-                    {
-                        w.WriteProperty("action", "restore");
-                        w.WriteProperty("status", "completed");
-                        w.WriteProperty("operationId", ctx.jobId);
-                        w.WriteProperty("url", ctx.jobUrl);
-
-                        Profiler.Session?.Write(w);
-                    });
+                    log.LogInformation("Backup with job id {backupId} from URL '{url}' completed.",
+                        CurrentJob.Id,
+                        CurrentJob.Url);
                 }
                 catch (Exception ex)
                 {
@@ -217,15 +204,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     CurrentJob.Status = JobStatus.Failed;
 
-                    log.LogError(ex, logContext, (ctx, w) =>
-                    {
-                        w.WriteProperty("action", "restore");
-                        w.WriteProperty("status", "failed");
-                        w.WriteProperty("operationId", ctx.jobId);
-                        w.WriteProperty("url", ctx.jobUrl);
-
-                        Profiler.Session?.Write(w);
-                    });
+                    log.LogError(ex, "Backup with job id {backupId} from URL '{url}' failed.",
+                        CurrentJob.Id,
+                        CurrentJob.Url);
                 }
                 finally
                 {
@@ -283,10 +264,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     }
                     catch (Exception ex)
                     {
-                        log.LogError(ex, appId.ToString(), (logOperationId, w) => w
-                            .WriteProperty("action", "cleanupRestore")
-                            .WriteProperty("status", "failed")
-                            .WriteProperty("operationId", logOperationId));
+                        log.LogError(ex, "Failed to clean up restore.");
                     }
                 }
             }
@@ -294,7 +272,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task<IBackupReader> DownloadAsync()
         {
-            using (Profiler.Trace("Download"))
+            using (Telemetry.Activities.StartActivity("Download"))
             {
                 Log("Downloading Backup");
 
@@ -348,27 +326,28 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 BoundedCapacity = BatchSize * 2
             });
 
-            batchBlock.LinkTo(writeBlock, new DataflowLinkOptions
-            {
-                PropagateCompletion = true
-            });
+            batchBlock.BidirectionalLinkTo(writeBlock);
 
-            await reader.ReadEventsAsync(streamNameResolver, eventDataFormatter, async job =>
+            await foreach (var job in reader.ReadEventsAsync(streamNameResolver, eventDataFormatter))
             {
                 var newStream = await HandleEventAsync(reader, handlers, job.Stream, job.Event);
 
                 if (newStream != null)
                 {
-                    await batchBlock.SendAsync((newStream, job.Event));
+                    if (!await batchBlock.SendAsync((newStream, job.Event)))
+                    {
+                        break;
+                    }
                 }
-            });
+            }
 
             batchBlock.Complete();
 
             await writeBlock.Completion;
         }
 
-        private async Task<string?> HandleEventAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers, string stream, Envelope<IEvent> @event)
+        private async Task<string?> HandleEventAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers, string stream, Envelope<IEvent> @event,
+            CancellationToken ct = default)
         {
             if (@event.Payload is AppCreated appCreated)
             {
@@ -408,7 +387,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             foreach (var handler in handlers)
             {
-                if (!await handler.RestoreEventAsync(@event, runningContext))
+                if (!await handler.RestoreEventAsync(@event, runningContext, ct))
                 {
                     return null;
                 }
@@ -421,7 +400,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var userMapping = new UserMapping(CurrentJob.Actor);
 
-            using (Profiler.Trace("CreateUsers"))
+            using (Telemetry.Activities.StartActivity("CreateUsers"))
             {
                 Log("Creating Users");
 

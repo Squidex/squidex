@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Notifo.SDK;
@@ -20,9 +17,10 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Log;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
+
+#pragma warning disable MA0073 // Avoid comparison with bool constant
 
 namespace Squidex.Domain.Apps.Entities.History
 {
@@ -32,14 +30,14 @@ namespace Squidex.Domain.Apps.Entities.History
         private readonly NotifoOptions options;
         private readonly IUrlGenerator urlGenerator;
         private readonly IUserResolver userResolver;
-        private readonly ISemanticLog log;
+        private readonly ILogger<NotifoService> log;
         private readonly IClock clock;
         private readonly INotifoClient? client;
 
         public NotifoService(IOptions<NotifoOptions> options,
             IUrlGenerator urlGenerator,
             IUserResolver userResolver,
-            ISemanticLog log,
+            ILogger<NotifoService> log,
             IClock clock)
         {
             this.options = options.Value;
@@ -59,6 +57,11 @@ namespace Squidex.Domain.Apps.Entities.History
                 if (!string.IsNullOrWhiteSpace(options.Value.ApiUrl))
                 {
                     builder = builder.SetApiUrl(options.Value.ApiUrl);
+                }
+
+                if (options.Value.Debug)
+                {
+                    builder = builder.ReadResponseAsString(true);
                 }
 
                 client = builder.Build();
@@ -90,17 +93,17 @@ namespace Squidex.Domain.Apps.Entities.History
 
             try
             {
-                var settings = new Dictionary<string, NotificationSettingDto>
+                var settings = new Dictionary<string, ChannelSettingDto>
                 {
-                    [Providers.WebPush] = new NotificationSettingDto
+                    [Providers.WebPush] = new ChannelSettingDto
                     {
-                        Send = NotificationSend.Send,
+                        Send = ChannelSend.Send,
                         DelayInSeconds = null
                     },
 
-                    [Providers.Email] = new NotificationSettingDto
+                    [Providers.Email] = new ChannelSettingDto
                     {
-                        Send = NotificationSend.Send,
+                        Send = ChannelSend.Send,
                         DelayInSeconds = 5 * 60
                     }
                 };
@@ -131,168 +134,182 @@ namespace Squidex.Domain.Apps.Entities.History
 
                 await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.NotifoKey, response.First().ApiKey, true);
             }
+            catch (NotifoException ex)
+            {
+                log.LogError(ex, "Failed to register user in notifo: {details}.", ex.ToString());
+            }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "RegisterToNotifo")
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to register user in notifo.");
             }
         }
 
         public async Task HandleEventsAsync(IEnumerable<(Envelope<AppEvent> AppEvent, HistoryEvent? HistoryEvent)> events)
         {
-            Guard.NotNull(events, nameof(events));
+            Guard.NotNull(events);
 
             if (client == null)
             {
                 return;
             }
 
-            var now = clock.GetCurrentInstant();
-
-            var publishedEvents = events
-                .Where(x => x.AppEvent.Headers.Restored() == false)
-                .Where(x => IsTooOld(x.AppEvent.Headers, now) == false)
-                .Where(x => IsComment(x.AppEvent.Payload) || x.HistoryEvent != null);
-
-            foreach (var batch in publishedEvents.Batch(50))
+            try
             {
-                var requests = new List<PublishDto>();
+                var now = clock.GetCurrentInstant();
 
-                foreach (var @event in batch)
+                var maxAge = now - MaxAge;
+
+                var batches = events
+                    .Where(x => x.AppEvent.Headers.Restored() == false)
+                    .Where(x => x.AppEvent.Headers.Timestamp() > maxAge)
+                    .SelectMany(x => CreateRequests(x.AppEvent, x.HistoryEvent))
+                    .Batch(50);
+
+                foreach (var batch in batches)
                 {
-                    var payload = @event.AppEvent.Payload;
-
-                    if (payload is CommentCreated comment && IsComment(payload))
+                    var request = new PublishManyDto
                     {
-                        foreach (var userId in comment.Mentions!)
-                        {
-                            var publishRequest = new PublishDto
-                            {
-                                Topic = $"users/{userId}"
-                            };
+                        Requests = batch.ToList()
+                    };
 
-                            publishRequest.Properties["SquidexApp"] = comment.AppId.Name;
-
-                            publishRequest.Preformatted = new NotificationFormattingDto
-                            {
-                                Subject =
-                                {
-                                    ["en"] = comment.Text
-                                }
-                            };
-
-                            if (comment.Url?.IsAbsoluteUri == true)
-                            {
-                                publishRequest.Preformatted.LinkUrl["en"] = comment.Url.ToString();
-                            }
-
-                            SetUser(comment, publishRequest);
-
-                            requests.Add(publishRequest);
-                        }
-                    }
-                    else if (@event.HistoryEvent != null)
-                    {
-                        var historyEvent = @event.HistoryEvent;
-
-                        var publishRequest = new PublishDto
-                        {
-                            Properties = new EventProperties()
-                        };
-
-                        foreach (var (key, value) in historyEvent.Parameters)
-                        {
-                            publishRequest.Properties.Add(key, value);
-                        }
-
-                        publishRequest.Properties["SquidexApp"] = payload.AppId.Name;
-
-                        if (payload is ContentEvent c && !(payload is ContentDeleted))
-                        {
-                            var url = urlGenerator.ContentUI(c.AppId, c.SchemaId, c.ContentId);
-
-                            publishRequest.Properties["SquidexUrl"] = url;
-                        }
-
-                        publishRequest.TemplateCode = @event.HistoryEvent.EventType;
-
-                        SetUser(payload, publishRequest);
-                        SetTopic(payload, publishRequest, historyEvent);
-
-                        requests.Add(publishRequest);
-                    }
+                    await client.Events.PostEventsAsync(options.AppId, request);
                 }
 
-                var request = new PublishManyDto
+                foreach (var @event in events)
                 {
-                    Requests = requests
+                    switch (@event.AppEvent.Payload)
+                    {
+                        case AppContributorAssigned contributorAssigned:
+                            await AssignContributorAsync(client, contributorAssigned);
+                            break;
+
+                        case AppContributorRemoved contributorRemoved:
+                            await RemoveContributorAsync(client, contributorRemoved);
+                            break;
+                    }
+                }
+            }
+            catch (NotifoException ex)
+            {
+                log.LogError(ex, "Failed to push user to notifo: {details}.", ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, "Failed to push user to notifo.");
+            }
+        }
+
+        private async Task AssignContributorAsync(INotifoClient actualClient, AppContributorAssigned contributorAssigned)
+        {
+            var userId = contributorAssigned.ContributorId;
+
+            var user = await userResolver.FindByIdAsync(userId);
+
+            if (user != null)
+            {
+                await UpsertUserAsync(user);
+            }
+
+            try
+            {
+                var request = new AddAllowedTopicDto
+                {
+                    Prefix = GetAppPrefix(contributorAssigned)
                 };
 
-                await client.Events.PostEventsAsync(options.AppId, request);
+                await actualClient.Users.PostAllowedTopicAsync(options.AppId, userId, request);
             }
-
-            foreach (var @event in events)
+            catch (NotifoException ex) when (ex.StatusCode != 404)
             {
-                switch (@event.AppEvent.Payload)
+                throw;
+            }
+        }
+
+        private async Task RemoveContributorAsync(INotifoClient actualClient, AppContributorRemoved contributorRemoved)
+        {
+            var userId = contributorRemoved.ContributorId;
+
+            try
+            {
+                var prefix = GetAppPrefix(contributorRemoved);
+
+                await actualClient.Users.DeleteAllowedTopicAsync(options.ApiKey, userId, prefix);
+            }
+            catch (NotifoException ex) when (ex.StatusCode != 404)
+            {
+                throw;
+            }
+        }
+
+        private IEnumerable<PublishDto> CreateRequests(Envelope<AppEvent> appEvent, HistoryEvent? historyEvent)
+        {
+            if (appEvent.Payload is CommentCreated comment && comment.Mentions?.Length > 0)
+            {
+                foreach (var userId in comment.Mentions)
                 {
-                    case AppContributorAssigned contributorAssigned:
-                        {
-                            var userId = contributorAssigned.ContributorId;
-
-                            var user = await userResolver.FindByIdAsync(userId);
-
-                            if (user != null)
-                            {
-                                await UpsertUserAsync(user);
-                            }
-
-                            try
-                            {
-                                var request = new AddAllowedTopicDto
-                                {
-                                    Prefix = GetAppPrefix(contributorAssigned)
-                                };
-
-                                await client.Users.PostAllowedTopicAsync(options.AppId, userId, request);
-                            }
-                            catch (NotifoException ex) when (ex.StatusCode == 404)
-                            {
-                                break;
-                            }
-
-                            break;
-                        }
-
-                    case AppContributorRemoved contributorRemoved:
-                        {
-                            var userId = contributorRemoved.ContributorId;
-
-                            try
-                            {
-                                var prefix = GetAppPrefix(contributorRemoved);
-
-                                await client.Users.DeleteAllowedTopicAsync(options.ApiKey, userId, prefix);
-                            }
-                            catch (NotifoException ex) when (ex.StatusCode == 404)
-                            {
-                                break;
-                            }
-
-                            break;
-                        }
+                    yield return CreateMentionRequest(comment, userId);
                 }
             }
+            else if (historyEvent != null)
+            {
+                yield return CreateHistoryRequest(historyEvent, appEvent.Payload);
+            }
         }
 
-        private static bool IsTooOld(EnvelopeHeaders headers, Instant now)
+        private PublishDto CreateHistoryRequest(HistoryEvent historyEvent, AppEvent payload)
         {
-            return now - headers.Timestamp() > MaxAge;
+            var publishRequest = new PublishDto
+            {
+                Properties = new NotificationProperties()
+            };
+
+            foreach (var (key, value) in historyEvent.Parameters)
+            {
+                publishRequest.Properties.Add(key, value);
+            }
+
+            publishRequest.Properties["SquidexApp"] = payload.AppId.Name;
+
+            if (payload is ContentEvent @event && payload is not ContentDeleted)
+            {
+                var url = urlGenerator.ContentUI(@event.AppId, @event.SchemaId, @event.ContentId);
+
+                publishRequest.Properties["SquidexUrl"] = url;
+            }
+
+            publishRequest.TemplateCode = historyEvent.EventType;
+
+            SetUser(payload, publishRequest);
+            SetTopic(payload, publishRequest, historyEvent);
+
+            return publishRequest;
         }
 
-        private static bool IsComment(AppEvent appEvent)
+        private static PublishDto CreateMentionRequest(CommentCreated comment, string userId)
         {
-            return appEvent is CommentCreated comment && comment.Mentions?.Length > 0;
+            var publishRequest = new PublishDto
+            {
+                Topic = $"users/{userId}"
+            };
+
+            publishRequest.Properties["SquidexApp"] = comment.AppId.Name;
+
+            publishRequest.Preformatted = new NotificationFormattingDto
+            {
+                Subject =
+                {
+                    ["en"] = comment.Text
+                }
+            };
+
+            if (comment.Url?.IsAbsoluteUri == true)
+            {
+                publishRequest.Preformatted.LinkUrl["en"] = comment.Url.ToString();
+            }
+
+            SetUser(comment, publishRequest);
+
+            return publishRequest;
         }
 
         private static void SetUser(AppEvent appEvent, PublishDto publishRequest)

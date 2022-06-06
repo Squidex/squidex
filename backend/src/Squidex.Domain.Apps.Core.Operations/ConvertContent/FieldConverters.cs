@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -15,6 +12,8 @@ using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
@@ -33,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             return (data, field) =>
             {
-                foreach (var value in data.Values)
+                foreach (var (_, value) in data)
                 {
                     if (value.Type == JsonValueType.Null)
                     {
@@ -73,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                     }
                     else if (data.Count > 0)
                     {
-                        result[iv] = data.Values.First();
+                        result[iv] = data.First().Value;
                     }
 
                     return result;
@@ -101,9 +100,24 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                         return result;
                     }
 
-                    foreach (var key in data.Keys.Where(x => !languages.AllKeys.Contains(x)).ToList())
+                    while (true)
                     {
-                        data.Remove(key);
+                        var isRemoved = false;
+
+                        foreach (var (key, _) in data)
+                        {
+                            if (!languages.AllKeys.Contains(key))
+                            {
+                                data.Remove(key);
+                                isRemoved = true;
+                                break;
+                            }
+                        }
+
+                        if (!isRemoved)
+                        {
+                            break;
+                        }
                     }
                 }
 
@@ -119,15 +133,17 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 {
                     foreach (var languageCode in languages.AllKeys)
                     {
-                        if (!data.TryGetNonNull(languageCode, out _))
+                        if (data.TryGetNonNull(languageCode, out _))
                         {
-                            foreach (var fallback in languages.GetPriorities(languageCode))
+                            continue;
+                        }
+
+                        foreach (var fallback in languages.GetPriorities(languageCode))
+                        {
+                            if (data.TryGetNonNull(fallback, out var value))
                             {
-                                if (data.TryGetNonNull(fallback, out var value))
-                                {
-                                    data[languageCode] = value;
-                                    break;
-                                }
+                                data[languageCode] = value;
+                                break;
                             }
                         }
                     }
@@ -163,11 +179,23 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             {
                 if (field.Partitioning.Equals(Partitioning.Language))
                 {
-                    foreach (var (key, _) in data.ToList())
+                    while (true)
                     {
-                        if (!languageSet.Contains(key))
+                        var isRemoved = false;
+
+                        foreach (var (key, _) in data)
                         {
-                            data.Remove(key);
+                            if (!languageSet.Contains(key))
+                            {
+                                data.Remove(key);
+                                isRemoved = true;
+                                break;
+                            }
+                        }
+
+                        if (!isRemoved)
+                        {
+                            break;
                         }
                     }
                 }
@@ -176,7 +204,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter ForValues(params ValueConverter[] converters)
+        public static FieldConverter ForValues(ResolvedComponents components, params ValueConverter[] converters)
         {
             return (data, field) =>
             {
@@ -184,17 +212,17 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                 foreach (var (key, value) in data)
                 {
-                    var newValue = ConvertByType(field, value, null, converters);
+                    var newValue = ConvertByType(field, value, null, converters, components);
 
                     if (newValue == null)
                     {
                         newData ??= new ContentFieldData(data);
                         newData.Remove(key);
                     }
-                    else if (!ReferenceEquals(newValue, value))
+                    else if (!ReferenceEquals(newValue.Value.Value, value.Value))
                     {
                         newData ??= new ContentFieldData(data);
-                        newData[key] = newValue;
+                        newData[key] = newValue.Value;
                     }
                 }
 
@@ -202,33 +230,39 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        private static IJsonValue? ConvertByType<T>(T field, IJsonValue? value, IArrayField? parent, ValueConverter[] converters) where T : IField
+        private static JsonValue? ConvertByType<T>(T field, JsonValue value, IArrayField? parent, ValueConverter[] converters,
+            ResolvedComponents components) where T : IField
         {
             switch (field)
             {
                 case IArrayField arrayField:
-                    return ConvertArray(arrayField, value, converters);
+                    return ConvertArray(arrayField, value, converters, components);
 
                 case IField<ComponentFieldProperties>:
-                    return ConvertComponent(field, value, converters);
+                    return ConvertComponent(value, converters, components);
 
                 case IField<ComponentsFieldProperties>:
-                    return ConvertComponents(field, value, converters);
+                    return ConvertComponents(value, converters, components);
 
                 default:
                     return ConvertValue(field, value, parent, converters);
             }
         }
 
-        private static IJsonValue? ConvertArray(IArrayField field, IJsonValue? value, ValueConverter[] converters)
+        private static JsonValue? ConvertArray(IArrayField field, JsonValue value, ValueConverter[] converters,
+            ResolvedComponents components)
         {
-            if (value is JsonArray array)
+            if (value.Type == JsonValueType.Array)
             {
+                var array = value.AsArray;
+
                 JsonArray? result = null;
 
                 for (int i = 0, j = 0; i < array.Count; i++, j++)
                 {
-                    var newValue = ConvertArrayItem(field, array[i], converters);
+                    var oldValue = array[i];
+
+                    var newValue = ConvertArrayItem(field, oldValue, converters, components);
 
                     if (newValue == null)
                     {
@@ -236,28 +270,33 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                         result.RemoveAt(j);
                         j--;
                     }
-                    else if (!ReferenceEquals(newValue, array[i]))
+                    else if (!ReferenceEquals(newValue.Value.Value, oldValue.Value))
                     {
                         result ??= new JsonArray(array);
-                        result[j] = newValue;
+                        result[j] = newValue.Value;
                     }
                 }
 
-                return result ?? array;
+                return result ?? value;
             }
 
             return null;
         }
 
-        private static IJsonValue? ConvertComponents(IField field, IJsonValue? value, ValueConverter[] converters)
+        private static JsonValue? ConvertComponents(JsonValue? value, ValueConverter[] converters,
+            ResolvedComponents components)
         {
-            if (value is JsonArray array)
+            if (value?.Type == JsonValueType.Array)
             {
+                var array = value.Value.AsArray;
+
                 JsonArray? result = null;
 
                 for (int i = 0, j = 0; i < array.Count; i++, j++)
                 {
-                    var newValue = ConvertComponent(field, array[i], converters);
+                    var oldValue = array[i];
+
+                    var newValue = ConvertComponent(oldValue, converters, components);
 
                     if (newValue == null)
                     {
@@ -265,57 +304,64 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                         result.RemoveAt(j);
                         j--;
                     }
-                    else if (!ReferenceEquals(newValue, array[i]))
+                    else if (!ReferenceEquals(newValue.Value.Value, array[i].Value))
                     {
                         result ??= new JsonArray(array);
-                        result[j] = newValue;
+                        result[j] = newValue.Value;
                     }
                 }
 
-                return result ?? array;
+                return result ?? value;
             }
 
             return null;
         }
 
-        private static IJsonValue? ConvertComponent(IField field, IJsonValue? value, ValueConverter[] converters)
+        private static JsonValue? ConvertComponent(JsonValue? value, ValueConverter[] converters,
+            ResolvedComponents components)
         {
-            if (value is JsonObject obj && obj.TryGetValue<JsonString>(Component.Discriminator, out var type))
+            if (value.HasValue && value.Value.Type == JsonValueType.Object && value.Value.AsObject.TryGetValue(Component.Discriminator, out var type) && type.Type == JsonValueType.String)
             {
-                if (field.TryGetResolvedSchema(type.Value, out var schema))
+                var id = DomainId.Create(type.AsString);
+
+                if (components.TryGetValue(id, out var schema))
                 {
-                    return ConvertNested(schema.FieldCollection, obj, null, converters);
+                    return ConvertNested(schema.FieldCollection, value.Value, null, converters, components);
                 }
                 else
                 {
-                    return obj;
+                    return value;
                 }
             }
 
             return null;
         }
 
-        private static IJsonValue? ConvertArrayItem(IArrayField field, IJsonValue? value, ValueConverter[] converters)
+        private static JsonValue? ConvertArrayItem(IArrayField field, JsonValue value, ValueConverter[] converters,
+            ResolvedComponents components)
         {
-            if (value is JsonObject obj)
+            if (value.Type == JsonValueType.Object)
             {
-                return ConvertNested(field.FieldCollection, obj, field, converters);
+                return ConvertNested(field.FieldCollection, value, field, converters, components);
             }
 
             return null;
         }
 
-        private static IJsonValue ConvertNested<T>(FieldCollection<T> fields, JsonObject source, IArrayField? parent, ValueConverter[] converters) where T : IField
+        private static JsonValue ConvertNested<T>(FieldCollection<T> fields, JsonValue source, IArrayField? parent, ValueConverter[] converters,
+            ResolvedComponents components) where T : IField
         {
             JsonObject? result = null;
 
-            foreach (var (key, value) in source)
+            var obj = source.AsObject;
+
+            foreach (var (key, value) in obj)
             {
-                var newValue = value;
+                JsonValue? newValue = value;
 
                 if (fields.ByName.TryGetValue(key, out var field))
                 {
-                    newValue = ConvertByType(field, value, parent, converters);
+                    newValue = ConvertByType(field, value, parent, converters, components);
                 }
                 else if (key != Component.Discriminator)
                 {
@@ -324,30 +370,34 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                 if (newValue == null)
                 {
-                    result ??= new JsonObject(source);
+                    result ??= new JsonObject(obj);
                     result.Remove(key);
                 }
-                else if (!ReferenceEquals(newValue, value))
+                else if (!ReferenceEquals(newValue.Value.Value, value.Value))
                 {
-                    result ??= new JsonObject(source);
-                    result[key] = newValue;
+                    result ??= new JsonObject(obj);
+                    result[key] = newValue.Value;
                 }
             }
 
             return result ?? source;
         }
 
-        private static IJsonValue? ConvertValue(IField field, IJsonValue? value, IArrayField? parent, ValueConverter[] converters)
+        private static JsonValue? ConvertValue(IField field, JsonValue value, IArrayField? parent, ValueConverter[] converters)
         {
             var newValue = value;
 
             for (var i = 0; i < converters.Length; i++)
             {
-                newValue = converters[i](newValue!, field, parent);
+                var candidate = converters[i](newValue!, field, parent);
 
-                if (newValue == null)
+                if (candidate == null)
                 {
-                    break;
+                    return null;
+                }
+                else
+                {
+                    newValue = candidate.Value;
                 }
             }
 

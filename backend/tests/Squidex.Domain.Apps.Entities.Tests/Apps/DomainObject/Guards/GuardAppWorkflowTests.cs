@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -76,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                     new Dictionary<Status, WorkflowStep>
                     {
                         [Status.Published] = new WorkflowStep()
-                    }.ToImmutableDictionary()),
+                    }.ToReadonlyDictionary()),
                 WorkflowId = workflowId
             };
 
@@ -94,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                     new Dictionary<Status, WorkflowStep>
                     {
                         [Status.Published] = new WorkflowStep()
-                    }.ToImmutableDictionary()),
+                    }.ToReadonlyDictionary()),
                 WorkflowId = workflowId
             };
 
@@ -112,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                     new Dictionary<Status, WorkflowStep>
                     {
                         [Status.Draft] = new WorkflowStep()
-                    }.ToImmutableDictionary()),
+                    }.ToReadonlyDictionary()),
                 WorkflowId = workflowId
             };
 
@@ -131,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                     {
                         [Status.Published] = null!,
                         [Status.Draft] = new WorkflowStep()
-                    }.ToImmutableDictionary()),
+                    }.ToReadonlyDictionary()),
                 WorkflowId = workflowId
             };
 
@@ -153,9 +152,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                                 new Dictionary<Status, WorkflowTransition>
                                 {
                                     [Status.Archived] = WorkflowTransition.Always
-                                }.ToImmutableDictionary()),
+                                }.ToReadonlyDictionary()),
                         [Status.Draft] = new WorkflowStep()
-                    }.ToImmutableDictionary()),
+                    }.ToReadonlyDictionary()),
                 WorkflowId = workflowId
             };
 
@@ -179,8 +178,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                                 new Dictionary<Status, WorkflowTransition>
                                 {
                                     [Status.Draft] = null!
-                                }.ToImmutableDictionary())
-                    }.ToImmutableDictionary()),
+                                }.ToReadonlyDictionary())
+                    }.ToReadonlyDictionary()),
                 WorkflowId = workflowId
             };
 

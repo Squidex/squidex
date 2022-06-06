@@ -1,0 +1,239 @@
+@import 'mixins';
+@import 'vars';
+
+//
+// Noscript element with warning, when javascript is disabled.
+//
+noscript {
+    color: $color-theme-error;
+    display: block;
+    font-size: 30px;
+    font-weight: lighter;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 550px) {
+    .profile {
+        background-color: $color-white;
+    }
+
+    .profile-card {
+        border: 0;
+    }
+
+    .profile-card-body {
+        padding: 0;
+    }
+
+    .profile-footer {
+        border: 0;
+    }
+}
+
+//
+// Profile element
+//
+.profile {
+    &-container {
+        margin: 0 auto;
+        max-width: 40rem;
+        min-width: 10rem;
+        padding: 1rem 2rem;
+    }
+
+    // Lightweight, table like headline.
+    &-headline {
+        margin: 0 auto 2rem;
+    }
+
+    // Fix logo on the top right corner of the screen.
+    &-logo {
+        display: block;
+        margin-left: auto;
+        margin-bottom: 1rem;
+        height: 2.5rem;
+    }
+
+    &-password-signup {
+        color: $color-text-decent;
+    }
+
+    &-section {
+        margin-top: 2rem;
+    }
+
+    &-section-sm {
+        margin-top: 1rem;
+    }
+
+    &-picture-col {
+        max-width: 7rem;
+    }
+
+    &-picture {
+        @include circle(6rem);
+    }
+
+    &-picture-input {
+        @include hidden;
+    }
+
+    &-picture-form {
+        margin-top: 1.6rem;
+    }
+
+    &-footer {
+        font-size: .8rem;
+        font-weight: normal;
+        margin-top: 2rem;
+    }
+
+    //
+    // Separator element to split two sections.
+    //
+    &-separator {
+        & {
+            border-bottom: 1px solid $color-border;
+            margin-bottom: 2.5rem;
+            margin-top: 1.5rem;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+            width: 10rem;
+        }
+
+        &-text {
+            background: $color-white;
+            border: 0;
+            bottom: -.75rem;
+            color: darken($color-border, 15%);
+            display: inline-block;
+            padding: 0 1rem;
+            position: relative;
+        }
+    }
+
+    h1 {
+        font-size: 1.75rem;
+        font-weight: 400;
+    }
+
+    hr {
+        margin-top: 2rem;
+        margin-left: auto;
+        margin-right: auto;
+        width: 7rem;
+    }
+
+    .card {
+        border-width: 1px;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .table {
+        tbody {
+            border-top: 1px solid $color-border;
+        }
+
+        tr {
+            border-top: 0;
+        }
+    }
+
+    label {
+        .card {
+            font-weight: normal;
+        }
+    }
+
+    // External button and icon.
+    .external {
+        &-button {
+            line-height: 1.8rem;
+        }
+
+        &-button-small {
+            padding-left: 0;
+            padding-right: 0;
+            text-align: center;
+            width: 40px;
+        }
+
+        &-icon {
+            display: inline-block;
+            font-size: 1.1rem;
+            font-weight: normal;
+            margin-bottom: 4px;
+            margin-left: .5rem;
+            margin-right: .5rem;
+            vertical-align: middle;
+        }
+    }
+
+    .personal-information {
+        margin: 1rem 0;
+    }
+
+    p {
+        & {
+            margin-bottom: .5rem;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+a {
+    &.force-white {
+        &:focus {
+            color: $color-white;
+        }
+    }
+}
+
+.login-container {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 20rem;
+}
+
+//
+// Splash text for loader.
+//
+.splash {
+    &-h1,
+    &-text,
+    &-image {
+        text-align: center;
+    }
+
+    &-image {
+        margin-bottom: 2rem;
+        max-width: 100%;
+    }
+}
+
+.card-consent {
+    border-color: transparent;
+}
+
+//
+// Loader element.
+//
+.loading {
+    & {
+        margin-bottom: 20px;
+        margin-top: 200px;
+        text-align: center;
+    }
+
+    div {
+        font-size: 30px;
+        font-weight: lighter;
+    }
+}

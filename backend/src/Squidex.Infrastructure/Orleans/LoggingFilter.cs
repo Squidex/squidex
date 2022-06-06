@@ -5,42 +5,52 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Orleans;
-using Squidex.Log;
 
 namespace Squidex.Infrastructure.Orleans
 {
     public sealed class LoggingFilter : IIncomingGrainCallFilter
     {
-        private readonly ISemanticLog log;
+        private readonly ILoggerFactory logFactory;
 
-        public LoggingFilter(ISemanticLog log)
+        public LoggingFilter(ILoggerFactory logFactory)
         {
-            this.log = log;
+            this.logFactory = logFactory;
         }
 
         public async Task Invoke(IIncomingGrainCallContext context)
         {
-            try
-            {
-                await context.Invoke();
-            }
-            catch (DomainException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "GrainInvoked")
-                    .WriteProperty("status", "Failed")
-                    .WriteProperty("grain", context.Grain.ToString())
-                    .WriteProperty("grainMethod", context.ImplementationMethod.ToString()));
+            var name = $"Grain/{context.Grain?.GetType().Name}/{context.ImplementationMethod?.Name}";
 
-                throw;
+            using (Telemetry.Activities.StartActivity(name))
+            {
+                try
+                {
+                    await context.Invoke();
+                }
+                catch (DomainException ex)
+                {
+                    if (ex.InnerException != null)
+                    {
+                        Log(context, ex.InnerException);
+                    }
+
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    Log(context, ex);
+                    throw;
+                }
             }
+        }
+
+        private void Log(IIncomingGrainCallContext context, Exception ex)
+        {
+            var log = logFactory.CreateLogger(context.Grain.GetType());
+
+            log.LogError(ex, "Failed to execute method of grain.", context.ImplementationMethod);
         }
     }
 }

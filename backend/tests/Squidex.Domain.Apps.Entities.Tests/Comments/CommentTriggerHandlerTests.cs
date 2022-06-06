@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -82,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             var @event = new CommentCreated { Mentions = userIds };
 
-            A.CallTo(() => userResolver.QueryManyAsync(userIds))
+            A.CallTo(() => userResolver.QueryManyAsync(userIds, default))
                 .Returns(users.ToDictionary(x => x.Id));
 
             var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
@@ -127,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             Assert.Empty(result);
 
-            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._))
+            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -142,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             Assert.Empty(result);
 
-            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._))
+            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -269,9 +265,15 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 Condition = condition
             };
 
-            var memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+            var realScriptEngine =
+                new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                    Options.Create(new JintScriptOptions
+                    {
+                        TimeoutScript = TimeSpan.FromSeconds(2),
+                        TimeoutExecution = TimeSpan.FromSeconds(10)
+                    }));
 
-            var handler = new CommentTriggerHandler(new JintScriptEngine(memoryCache), userResolver);
+            var handler = new CommentTriggerHandler(realScriptEngine, userResolver);
 
             action(handler, Context(trigger));
         }

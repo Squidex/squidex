@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Translations.Models;
 using Squidex.Infrastructure.Commands;
@@ -46,7 +44,7 @@ namespace Squidex.Areas.Api.Controllers.Translations
         public async Task<IActionResult> PostTranslation(string app, [FromBody] TranslateDto request)
         {
             var result = await translator.TranslateAsync(request.Text, request.TargetLanguage, request.SourceLanguage, HttpContext.RequestAborted);
-            var response = TranslationDto.FromTranslation(result);
+            var response = TranslationDto.FromDomain(result);
 
             return Ok(response);
         }

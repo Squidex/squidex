@@ -5,16 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
@@ -31,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetFolderEntity> collection,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             return collection.Indexes.CreateManyAsync(new[]
             {
@@ -46,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         public async Task<IResultList<IAssetFolderEntity>> QueryAsync(DomainId appId, DomainId parentId,
             CancellationToken ct = default)
         {
-            using (Profiler.TraceMethod<MongoAssetFolderRepository>("QueryAsyncByQuery"))
+            using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/QueryAsync"))
             {
                 var filter = BuildFilter(appId, parentId);
 
@@ -61,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         public async Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId,
             CancellationToken ct = default)
         {
-            using (Profiler.TraceMethod<MongoAssetRepository>())
+            using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/QueryChildIdsAsync"))
             {
                 var filter = BuildFilter(appId, parentId);
 
@@ -78,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         public async Task<IAssetFolderEntity?> FindAssetFolderAsync(DomainId appId, DomainId id,
             CancellationToken ct = default)
         {
-            using (Profiler.TraceMethod<MongoAssetFolderRepository>())
+            using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/FindAssetFolderAsync"))
             {
                 var documentId = DomainId.Combine(appId, id);
 

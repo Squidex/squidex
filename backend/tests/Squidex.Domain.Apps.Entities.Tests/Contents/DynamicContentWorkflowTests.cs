@@ -5,16 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
@@ -40,15 +39,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         new Dictionary<Status, WorkflowTransition>
                         {
                             [Status.Draft] = WorkflowTransition.Always
-                        }.ToImmutableDictionary(),
-                        StatusColors.Archived, NoUpdate.Always),
+                        }.ToReadonlyDictionary(),
+                        StatusColors.Archived, NoUpdate.Always, Validate: true),
                 [Status.Draft] =
                     new WorkflowStep(
                         new Dictionary<Status, WorkflowTransition>
                         {
                             [Status.Archived] = WorkflowTransition.Always,
                             [Status.Published] = WorkflowTransition.When("data.field.iv === 2", "Editor")
-                        }.ToImmutableDictionary(),
+                        }.ToReadonlyDictionary(),
                         StatusColors.Draft),
                 [Status.Published] =
                     new WorkflowStep(
@@ -56,9 +55,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             [Status.Archived] = WorkflowTransition.Always,
                             [Status.Draft] = WorkflowTransition.Always
-                        }.ToImmutableDictionary(),
+                        }.ToReadonlyDictionary(),
                         StatusColors.Published, NoUpdate.When("data.field.iv === 2", "Owner", "Editor"))
-            }.ToImmutableDictionary());
+            }.ToReadonlyDictionary());
 
         public DynamicContentWorkflowTests()
         {
@@ -73,31 +72,32 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             new Dictionary<Status, WorkflowTransition>
                             {
                                 [Status.Published] = WorkflowTransition.Always
-                            }.ToImmutableDictionary(),
+                            }.ToReadonlyDictionary(),
                             StatusColors.Draft),
                     [Status.Published] =
                         new WorkflowStep(
                             new Dictionary<Status, WorkflowTransition>
                             {
                                 [Status.Draft] = WorkflowTransition.Always
-                            }.ToImmutableDictionary(),
+                            }.ToReadonlyDictionary(),
                             StatusColors.Published)
-                }.ToImmutableDictionary(),
-                ImmutableList.Create(simpleSchemaId.Id));
+                }.ToReadonlyDictionary(),
+                ReadonlyList.Create(simpleSchemaId.Id));
 
             var workflows = Workflows.Empty.Set(workflow).Set(DomainId.NewGuid(), simpleWorkflow);
 
-            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false))
+            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, default))
                 .Returns(app);
 
             A.CallTo(() => app.Workflows)
                 .Returns(workflows);
 
-            var scriptEngine = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())))
-            {
-                TimeoutScript = TimeSpan.FromSeconds(2),
-                TimeoutExecution = TimeSpan.FromSeconds(10)
-            };
+            var scriptEngine = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                Options.Create(new JintScriptOptions
+                {
+                    TimeoutScript = TimeSpan.FromSeconds(2),
+                    TimeoutExecution = TimeSpan.FromSeconds(10)
+                }));
 
             sut = new DynamicContentWorkflow(scriptEngine, appProvider);
         }
@@ -133,29 +133,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_allow_publish_on_create()
         {
-            var content = CreateContent(Status.Draft, 2);
-
-            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.Data, Mocks.FrontendUser("Editor"));
+            var result = await sut.CanPublishInitialAsync(Mocks.Schema(appId, schemaId), Mocks.FrontendUser("Editor"));
 
             Assert.True(result);
         }
 
         [Fact]
-        public async Task Should_not_allow_publish_on_create_if_data_is_invalid()
-        {
-            var content = CreateContent(Status.Draft, 4);
-
-            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.Data, Mocks.FrontendUser("Editor"));
-
-            Assert.False(result);
-        }
-
-        [Fact]
         public async Task Should_not_allow_publish_on_create_if_role_not_allowed()
         {
-            var content = CreateContent(Status.Draft, 2);
-
-            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.Data, Mocks.FrontendUser("Developer"));
+            var result = await sut.CanPublishInitialAsync(Mocks.Schema(appId, schemaId), Mocks.FrontendUser("Developer"));
 
             Assert.False(result);
         }
@@ -401,6 +387,48 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var result = await sut.GetAllAsync(Mocks.Schema(appId, simpleSchemaId));
 
             result.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public async Task Should_not_validate_when_not_publishing()
+        {
+            var result = await sut.ShouldValidateAsync(Mocks.Schema(appId, schemaId), Status.Draft);
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task Should_not_validate_when_publishing_but_not_enabled()
+        {
+            var result = await sut.ShouldValidateAsync(CreateSchema(false), Status.Published);
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task Should_validate_when_publishing_and_enabled()
+        {
+            var result = await sut.ShouldValidateAsync(CreateSchema(true), Status.Published);
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task Should_validate_when_enabled_in_step()
+        {
+            var result = await sut.ShouldValidateAsync(Mocks.Schema(appId, schemaId), Status.Archived);
+
+            Assert.True(result);
+        }
+
+        private ISchemaEntity CreateSchema(bool validateOnPublish)
+        {
+            var schema = new Schema("my-schema", new SchemaProperties
+            {
+                ValidateOnPublish = validateOnPublish
+            });
+
+            return Mocks.Schema(appId, simpleSchemaId, schema);
         }
 
         private ContentEntity CreateContent(Status status, int value, bool simple = false)

@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NodaTime;
@@ -100,7 +97,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                     if (!isRead)
                     {
-                        await Task.Delay(1000);
+                        await Task.Delay(1000, stopToken.Token);
                     }
                 }
             }

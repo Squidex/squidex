@@ -5,14 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.ClientLibrary;
+using Xunit;
 
 namespace TestSuite.Fixtures
 {
-    public class ClientManagerFixture : IDisposable
+    public class ClientManagerFixture : IAsyncLifetime
     {
-        public ClientManagerWrapper Squidex { get; }
+        public ClientManagerWrapper Squidex { get; private set; }
 
         public string AppName => ClientManager.Options.AppName;
 
@@ -24,14 +24,21 @@ namespace TestSuite.Fixtures
 
         public SquidexClientManager ClientManager => Squidex.ClientManager;
 
-        public ClientManagerFixture()
+        public virtual async Task InitializeAsync()
         {
-            Squidex = ClientManagerWrapper.CreateAsync().Result;
+            Squidex = await Factories.CreateAsync(nameof(ClientManagerWrapper), async () =>
+            {
+                var clientManager = new ClientManagerWrapper();
+
+                await clientManager.ConnectAsync();
+
+                return clientManager;
+            });
         }
 
-        public virtual void Dispose()
+        public virtual Task DisposeAsync()
         {
-            GC.SuppressFinalize(this);
+            return Task.CompletedTask;
         }
     }
 }

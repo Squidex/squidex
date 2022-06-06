@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.EventSourcing;
@@ -24,12 +20,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             get => false;
         }
 
-        IAsyncEnumerable<EnrichedEvent> CreateSnapshotEventsAsync(RuleContext context, CancellationToken ct)
+        IAsyncEnumerable<EnrichedEvent> CreateSnapshotEventsAsync(RuleContext context,
+            CancellationToken ct)
         {
             return AsyncEnumerable.Empty<EnrichedEvent>();
         }
 
-        IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context, CancellationToken ct);
+        IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+            CancellationToken ct);
 
         string? GetName(AppEvent @event)
         {

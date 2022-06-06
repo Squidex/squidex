@@ -1,0 +1,164 @@
+<sqx-modal-dialog (close)="complete.emit()" size="lg">
+    <ng-container title>
+        {{ 'clients.connect' | sqxTranslate }}
+    </ng-container>
+
+    <ng-container content>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-4 steps">
+                <li class="breadcrumb-item done">
+                    <i class="icon-checkmark"></i> {{ 'clients.connectWizard.step0Title' | sqxTranslate }}
+                </li>
+                <ng-container *ngIf="isStart; else noStart">
+                    <li class="breadcrumb-item active">
+                        <span>
+                            <i class="icon-checkmark"></i> {{ 'clients.connectWizard.step1Title' | sqxTranslate }}
+                        </span>
+                    </li>
+                </ng-container>
+                <ng-template #noStart>
+                    <li class="breadcrumb-item done">
+                        <a class="force" (click)="go('Start')">
+                            <i class="icon-checkmark"></i> {{ 'clients.connectWizard.step1Title' | sqxTranslate }}
+                        </a>
+                    </li>
+                </ng-template>
+                <li class="breadcrumb-item" [class.active]="!isStart">
+                    <i class="icon-checkmark"></i> {{ 'clients.connectWizard.step2Title' | sqxTranslate }}
+                </li>
+            </ol>
+        </nav>
+
+        <ng-container [ngSwitch]="step">
+            <ng-container *ngSwitchCase="'Start'">
+                <h3>{{ 'clients.connectWizard.step1Title' | sqxTranslate }}</h3>
+
+                <sqx-form-hint>
+                    <span [innerHTML]="'clients.connectWizard.postManDocs' | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></span>
+                </sqx-form-hint>
+        
+                <div class="section">
+                    <div class="option" (click)="go('HTTP')">
+                        <h5>{{ 'clients.connectWizard.manually' | sqxTranslate }}</h5>
+            
+                        <sqx-form-hint>{{ 'clients.connectWizard.manuallyHint' | sqxTranslate }}</sqx-form-hint>
+            
+                        <i class="icon-angle-right"></i>
+                    </div>
+            
+                    <div class="option" (click)="go('CLI')">
+                        <h5>{{ 'clients.connectWizard.cli' | sqxTranslate }}</h5>
+            
+                        <sqx-form-hint>{{ 'clients.connectWizard.cliHint' | sqxTranslate }}</sqx-form-hint>
+                        
+                        <i class="icon-angle-right"></i>
+                    </div>
+            
+                    <div class="option" (click)="go('SDK')">
+                        <h5>{{ 'clients.connectWizard.sdk' | sqxTranslate }}</h5>
+            
+                        <sqx-form-hint>{{ 'clients.connectWizard.sdkHint' | sqxTranslate }}</sqx-form-hint>
+                        
+                        <i class="icon-angle-right"></i>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'HTTP'">
+                <div class="section step">
+                    <h5><span class="badge rounded-pill bg-dark">1</span> {{ 'clients.connectWizard.manuallyStep1' | sqxTranslate }}</h5>
+
+                    <p>                 
+                        <sqx-code>{{connectHttpText}}</sqx-code>
+                    </p>
+                </div>
+                
+                <div class="section step">
+                    <h5><span class="badge rounded-pill bg-dark">2</span> {{ 'clients.connectWizard.manuallyStep2' | sqxTranslate }}</h5>
+
+                    <p>              
+                        <sqx-code>{{connectToken?.accessToken}}</sqx-code>
+                    </p>
+                </div>
+                
+                <div class="section step">
+                    <h5><span class="badge rounded-pill bg-dark">3</span> {{ 'clients.connectWizard.manuallyStep3' | sqxTranslate }}</h5>
+
+                    <p>              
+                        <sqx-code>Authorization: Bearer [YOUR_TOKEN]</sqx-code>
+                    </p>
+                </div>
+
+                <sqx-form-hint>
+                    {{ 'clients.connectWizard.manuallyTokenHint' | sqxTranslate }}
+                </sqx-form-hint>
+            </ng-container>
+            <ng-container *ngSwitchCase="'CLI'">
+                <div class="section step">
+                    <h5><span class="badge rounded-pill bg-dark">1</span> {{ 'clients.connectWizard.cliStep1' | sqxTranslate }}</h5>
+
+                    <div [innerHTML]="'clients.connectWizard.cliStep1Download' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+
+                    <sqx-form-hint>
+                        {{ 'clients.connectWizard.cliStep1Hint' | sqxTranslate }}
+                    </sqx-form-hint>
+                </div>
+                
+                <div class="section step">
+                    <h5><span class="badge rounded-pill bg-dark">2</span> <span [innerHTML]="'clients.connectWizard.cliStep2' | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></span></h5>
+                </div>
+
+                <div class="section step">
+                    <h5><span class="badge rounded-pill bg-dark">3</span> {{ 'clients.connectWizard.cliStep3' | sqxTranslate }}</h5>
+
+                    <p>                 
+                        <sqx-code>sq config add {{appName}} {{appName}}:{{client.id}} {{client.secret}} -u {{apiUrl.value}} --use</sqx-code>
+                        
+                        <sqx-form-hint>
+                            {{ 'clients.connectWizard.cliStep3Hint' | sqxTranslate }}
+                        </sqx-form-hint>
+                    </p>
+                </div>
+
+                <div class="section step">
+                    <h5><span class="badge rounded-pill bg-dark">4</span> {{ 'clients.connectWizard.cliStep4' | sqxTranslate }}</h5>
+            
+                    <p>    
+                        <sqx-code>sq config use {{appName}}</sqx-code>
+                    </p>
+                </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'SDK'">
+                <div class="section step">
+                    <h5><span class="badge rounded-pill bg-dark">1</span> {{ 'clients.connectWizard.sdkStep1' | sqxTranslate }}</h5>
+
+                    <div [innerHTML]="'clients.connectWizard.sdkStep1Download' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+
+                    <p>              
+                        <sqx-code>dotnet add package Squidex.ClientLibrary</sqx-code>
+                    </p>
+                </div>
+
+                <div class="section step">
+                    <h5><span class="badge rounded-pill bg-dark">2</span> {{ 'clients.connectWizard.sdkStep2' | sqxTranslate }}</h5>
+
+                    <p>              
+                        <sqx-code>{{connectLibraryText}}</sqx-code>
+                    </p>
+                </div>
+
+                <div class="section step">
+                    <sqx-form-hint>
+                        {{ 'clients.connectWizard.sdkHelp' | sqxTranslate }} <a href="https://support.squidex.io" sqxExternalLink>{{ 'clients.connectWizard.sdkHelpLink' | sqxTranslate }}</a>
+                    </sqx-form-hint>
+                </div>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+
+    <ng-container footer>
+        <button class="btn btn-text-secondary" [disabled]="isStart" (click)="go('Start')">
+            {{ 'common.back' | sqxTranslate }}
+        </button>
+    </ng-container>
+</sqx-modal-dialog>

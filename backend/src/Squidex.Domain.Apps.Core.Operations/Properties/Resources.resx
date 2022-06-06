@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ScriptingAssetContentAppUrl" xml:space="preserve">
+    <value>The download URL to the asset.</value>
+  </data>
+  <data name="ScriptingAssetContentSlugUrl" xml:space="preserve">
+    <value>The download URL to the asset using the file slug instead of the ID.</value>
+  </data>
+  <data name="ScriptingAssetContentUrl" xml:space="preserve">
+    <value>The download URL to the asset without the app name (deprecated).</value>
+  </data>
+  <data name="ScriptingCharacterCount" xml:space="preserve">
+    <value>Counts the number of characters in a text. Useful in combination with html2Text or markdown2Text.</value>
+  </data>
+  <data name="ScriptingComplete" xml:space="preserve">
+    <value>Completes the script when an async method is used.</value>
+  </data>
+  <data name="ScriptingContentAction" xml:space="preserve">
+    <value>The status of the content.</value>
+  </data>
+  <data name="ScriptingContentUrl" xml:space="preserve">
+    <value>The URL to the content in the UI.</value>
+  </data>
+  <data name="ScriptingDeleteJson" xml:space="preserve">
+    <value>Makes a DELETE request to the defined URL and parses the result as JSON. Headers are optional.</value>
+  </data>
+  <data name="ScriptingDisallow" xml:space="preserve">
+    <value>Tell Squidex to not allow the current operation and to return a 400 (BadRequest).</value>
+  </data>
+  <data name="ScriptingFormatDate" xml:space="preserve">
+    <value>Formats a JavaScript date object using the specified pattern.</value>
+  </data>
+  <data name="ScriptingFormatTime" xml:space="preserve">
+    <value>Formats a JavaScript date object using the specified pattern.</value>
+  </data>
+  <data name="ScriptingGetJSON" xml:space="preserve">
+    <value>Makes a GET request to the defined URL and parses the result as JSON. Headers are optional.</value>
+  </data>
+  <data name="ScriptingGuid" xml:space="preserve">
+    <value>Generates a guid.</value>
+  </data>
+  <data name="ScriptingHtml2Text" xml:space="preserve">
+    <value>Converts a HTML string to plain text.</value>
+  </data>
+  <data name="ScriptingMarkdown2Text" xml:space="preserve">
+    <value>Converts a markdown string to plain text.</value>
+  </data>
+  <data name="ScriptingMD5" xml:space="preserve">
+    <value>Calculate the MD5 hash from a given string. Use this method for hashing passwords, when backwards compatibility is important.</value>
+  </data>
+  <data name="ScriptingPatchJson" xml:space="preserve">
+    <value>Makes a PATCH request to the defined URL and parses the result as JSON. Headers are optional.</value>
+  </data>
+  <data name="ScriptingPostJSON" xml:space="preserve">
+    <value>Makes a POST request to the defined URL and parses the result as JSON. Headers are optional.</value>
+  </data>
+  <data name="ScriptingPutJson" xml:space="preserve">
+    <value>Makes a PUT request to the defined URL and parses the result as JSON. Headers are optional.</value>
+  </data>
+  <data name="ScriptingReject" xml:space="preserve">
+    <value>Tell Squidex to reject the current operation and to return a 403 (Forbidden).</value>
+  </data>
+  <data name="ScriptingReplace" xml:space="preserve">
+    <value>Tell Squidex that you have modified the data and that the change should be applied.</value>
+  </data>
+  <data name="ScriptingSHA256" xml:space="preserve">
+    <value>Calculate the SHA256 hash from a given string. Use this method for hashing passwords.</value>
+  </data>
+  <data name="ScriptingSHA512" xml:space="preserve">
+    <value>Calculate the SHA256 hash from a given string. Use this method for hashing passwords.</value>
+  </data>
+  <data name="ScriptingSlugify" xml:space="preserve">
+    <value>Calculates the slug of a text by removing all special characters and whitespaces to create a friendly term that can be used for SEO-friendly URLs.</value>
+  </data>
+  <data name="ScriptingToCamelCase" xml:space="preserve">
+    <value>Converts a text to camelCase.</value>
+  </data>
+  <data name="ScriptingToPascalCase" xml:space="preserve">
+    <value>Converts a text to PascalCase</value>
+  </data>
+  <data name="ScriptingWordCount" xml:space="preserve">
+    <value>Counts the number of words in a text. Useful in combination with html2Text or markdown2Text.</value>
+  </data>
+</root>

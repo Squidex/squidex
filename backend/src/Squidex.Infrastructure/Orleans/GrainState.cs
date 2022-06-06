@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Runtime;
@@ -30,14 +27,15 @@ namespace Squidex.Infrastructure.Orleans
 
         public GrainState(IGrainActivationContext context)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             this.context = context;
 
             context.ObservableLifecycle.Subscribe("Persistence", GrainLifecycleStage.SetupState, SetupAsync);
         }
 
-        public Task SetupAsync(CancellationToken ct = default)
+        public Task SetupAsync(
+            CancellationToken ct = default)
         {
             if (ct.IsCancellationRequested)
             {

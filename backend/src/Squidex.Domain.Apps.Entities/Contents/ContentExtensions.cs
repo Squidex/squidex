@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
@@ -138,10 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 foreach (var iso2Code in value.Split(Separators, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    if (Language.TryGetLanguage(iso2Code.Trim(), out var language))
-                    {
-                        languages.Add(language);
-                    }
+                    languages.Add(iso2Code);
                 }
 
                 return languages;

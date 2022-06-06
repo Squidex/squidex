@@ -5,14 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
@@ -45,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task<IReadOnlyList<IAssetFolderEntity>> FindAssetFolderAsync(DomainId appId, DomainId id,
             CancellationToken ct = default)
         {
-            using (Profiler.TraceMethod<AssetQueryService>())
+            using (Telemetry.Activities.StartActivity("AssetQueryService/FindAssetFolderAsync"))
             {
                 var result = new List<IAssetFolderEntity>();
 
@@ -71,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(DomainId appId, DomainId parentId,
             CancellationToken ct = default)
         {
-            using (Profiler.TraceMethod<AssetQueryService>())
+            using (Telemetry.Activities.StartActivity("AssetQueryService/QueryAssetFoldersAsync"))
             {
                 var assetFolders = await QueryFoldersCoreAsync(appId, parentId, ct);
 
@@ -82,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, DomainId parentId,
             CancellationToken ct = default)
         {
-            using (Profiler.TraceMethod<AssetQueryService>())
+            using (Telemetry.Activities.StartActivity("AssetQueryService/QueryAssetFoldersAsync"))
             {
                 var assetFolders = await QueryFoldersCoreAsync(context, parentId, ct);
 
@@ -93,9 +88,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task<IEnrichedAssetEntity?> FindByHashAsync(Context context, string hash, string fileName, long fileSize,
             CancellationToken ct = default)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
-            using (Profiler.TraceMethod<AssetQueryService>())
+            using (Telemetry.Activities.StartActivity("AssetQueryService/FindByHashAsync"))
             {
                 var asset = await FindByHashCoreAsync(context, hash, fileName, fileSize, ct);
 
@@ -111,9 +106,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task<IEnrichedAssetEntity?> FindBySlugAsync(Context context, string slug,
             CancellationToken ct = default)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
-            using (Profiler.TraceMethod<AssetQueryService>())
+            using (Telemetry.Activities.StartActivity("AssetQueryService/FindBySlugAsync"))
             {
                 var asset = await FindBySlugCoreAsync(context, slug, ct);
 
@@ -129,9 +124,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task<IEnrichedAssetEntity?> FindGlobalAsync(Context context, DomainId id,
             CancellationToken ct = default)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
-            using (Profiler.TraceMethod<AssetQueryService>())
+            using (Telemetry.Activities.StartActivity("AssetQueryService/FindGlobalAsync"))
             {
                 var asset = await FindCoreAsync(id, ct);
 
@@ -147,9 +142,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task<IEnrichedAssetEntity?> FindAsync(Context context, DomainId id, long version = EtagVersion.Any,
             CancellationToken ct = default)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
-            using (Profiler.TraceMethod<AssetQueryService>())
+            using (Telemetry.Activities.StartActivity("AssetQueryService/FindAsync"))
             {
                 IAssetEntity? asset;
 
@@ -174,14 +169,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, DomainId? parentId, Q q,
             CancellationToken ct = default)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             if (q == null)
             {
                 return EmptyAssets;
             }
 
-            using (Profiler.TraceMethod<AssetQueryService>())
+            using (Telemetry.Activities.StartActivity("AssetQueryService/QueryAsync"))
             {
                 q = await queryParser.ParseAsync(context, q);
 
@@ -215,7 +210,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         private async Task<IReadOnlyList<IEnrichedAssetEntity>> TransformCoreAsync(Context context, IEnumerable<IAssetEntity> assets,
             CancellationToken ct)
         {
-            using (Profiler.TraceMethod<AssetQueryService>())
+            using (Telemetry.Activities.StartActivity("AssetQueryService/TransformCoreAsync"))
             {
                 return await assetEnricher.EnrichAsync(assets, context, ct);
             }
@@ -257,7 +252,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             }
         }
 
-        private async Task<IAssetFolderEntity?> FindFolderCoreAsync(DomainId appId, DomainId id, CancellationToken ct)
+        private async Task<IAssetFolderEntity?> FindFolderCoreAsync(DomainId appId, DomainId id,
+            CancellationToken ct)
         {
             using (var timeout = new CancellationTokenSource(options.TimeoutFind))
             {

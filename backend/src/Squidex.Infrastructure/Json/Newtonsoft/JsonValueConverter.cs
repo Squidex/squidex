@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -18,13 +16,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
     {
         private readonly HashSet<Type> supportedTypes = new HashSet<Type>
         {
-            typeof(IJsonValue),
-            typeof(JsonArray),
-            typeof(JsonBoolean),
-            typeof(JsonNull),
-            typeof(JsonNumber),
-            typeof(JsonObject),
-            typeof(JsonString)
+            typeof(JsonValue)
         };
 
         public virtual IEnumerable<Type> SupportedTypes
@@ -37,7 +29,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             return ReadJson(reader);
         }
 
-        private static IJsonValue ReadJson(JsonReader reader)
+        private static JsonValue ReadJson(JsonReader reader)
         {
             switch (reader.TokenType)
             {
@@ -65,6 +57,8 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                                     result[propertyName] = value;
                                     break;
                                 case JsonToken.EndObject:
+                                    result.TrimExcess();
+
                                     return result;
                             }
                         }
@@ -83,6 +77,8 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                                 case JsonToken.Comment:
                                     continue;
                                 case JsonToken.EndArray:
+                                    result.TrimExcess();
+
                                     return result;
                                 default:
                                     var value = ReadJson(reader);
@@ -96,25 +92,27 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                     }
 
                 case JsonToken.Integer when reader.Value is int i:
-                    return JsonValue.Create(i);
+                    return i;
                 case JsonToken.Integer when reader.Value is long l:
-                    return JsonValue.Create(l);
+                    return l;
                 case JsonToken.Float when reader.Value is float f:
-                    return JsonValue.Create(f);
+                    return f;
                 case JsonToken.Float when reader.Value is double d:
-                    return JsonValue.Create(d);
+                    return d;
                 case JsonToken.Boolean when reader.Value is bool b:
-                    return JsonValue.Create(b);
+                    return b;
                 case JsonToken.Date when reader.Value is DateTime d:
-                    return JsonValue.Create(d.ToIso8601());
+                    return d.ToIso8601();
                 case JsonToken.String when reader.Value is string s:
-                    return JsonValue.Create(s);
+                    return s;
                 case JsonToken.Null:
+                    return default;
                 case JsonToken.Undefined:
-                    return JsonValue.Null;
+                    return default;
             }
 
-            throw new NotSupportedException();
+            ThrowHelper.NotSupportedException();
+            return default;
         }
 
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
@@ -125,48 +123,50 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 return;
             }
 
-            WriteJson(writer, (IJsonValue)value);
+            WriteJson(writer, (JsonValue)value);
         }
 
-        private static void WriteJson(JsonWriter writer, IJsonValue value)
+        private static void WriteJson(JsonWriter writer, JsonValue value)
         {
-            switch (value)
+            switch (value.Type)
             {
-                case JsonNull:
+                case JsonValueType.Null:
                     writer.WriteNull();
                     break;
-                case JsonBoolean s:
-                    writer.WriteValue(s.Value);
+                case JsonValueType.Boolean:
+                    writer.WriteValue(value.AsBoolean);
                     break;
-                case JsonString s:
-                    writer.WriteValue(s.Value);
+                case JsonValueType.String:
+                    writer.WriteValue(value.AsString);
                     break;
-                case JsonNumber s:
-                    if (s.Value % 1 == 0)
+                case JsonValueType.Number:
+                    var number = value.AsNumber;
+
+                    if (number % 1 == 0)
                     {
-                        writer.WriteValue((long)s.Value);
+                        writer.WriteValue((long)number);
                     }
                     else
                     {
-                        writer.WriteValue(s.Value);
+                        writer.WriteValue(number);
                     }
 
                     break;
-                case JsonArray array:
+                case JsonValueType.Array:
                     writer.WriteStartArray();
 
-                    for (var i = 0; i < array.Count; i++)
+                    foreach (var item in value.AsArray)
                     {
-                        WriteJson(writer, array[i]);
+                        WriteJson(writer, item);
                     }
 
                     writer.WriteEndArray();
                     break;
 
-                case JsonObject obj:
+                case JsonValueType.Object:
                     writer.WriteStartObject();
 
-                    foreach (var (key, jsonValue) in obj)
+                    foreach (var (key, jsonValue) in value.AsObject)
                     {
                         writer.WritePropertyName(key);
 

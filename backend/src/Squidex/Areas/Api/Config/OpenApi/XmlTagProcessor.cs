@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Namotion.Reflection;
@@ -36,7 +35,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
                             {
                                 tag.Description ??= string.Empty;
 
-                                if (!tag.Description.Contains(description))
+                                if (!tag.Description.Contains(description, StringComparison.Ordinal))
                                 {
                                     tag.Description += "\n\n" + description;
                                 }

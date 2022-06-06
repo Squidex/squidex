@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
@@ -125,6 +126,10 @@ namespace Squidex.Shared
         public const string AppAssetsUpdate = "squidex.apps.{app}.assets.update";
         public const string AppAssetsDelete = "squidex.apps.{app}.assets.delete";
 
+        public const string AppAssetScripts = "squidex.apps.{app}.asset-scripts";
+        public const string AppAssetSScriptsRead = "squidex.apps.{app}.asset-scripts.read";
+        public const string AppAssetsScriptsUpdate = "squidex.apps.{app}.asset-scripts.update";
+
         // Rules
         public const string AppRules = "squidex.apps.{app}.rules";
         public const string AppRulesRead = "squidex.apps.{app}.rules.read";
@@ -150,6 +155,8 @@ namespace Squidex.Shared
         public const string AppContentsCreate = "squidex.apps.{app}.contents.{schema}.create";
         public const string AppContentsUpdate = "squidex.apps.{app}.contents.{schema}.update";
         public const string AppContentsUpdateOwn = "squidex.apps.{app}.contents.{schema}.update.own";
+        public const string AppContentsChangeStatusCancel = "squidex.apps.{app}.contents.{schema}.changestatus.cancel";
+        public const string AppContentsChangeStatusCancelOwn = "squidex.apps.{app}.contents.{schema}.changestatus.cancel.own";
         public const string AppContentsChangeStatus = "squidex.apps.{app}.contents.{schema}.changestatus";
         public const string AppContentsChangeStatusOwn = "squidex.apps.{app}.contents.{schema}.changestatus.own";
         public const string AppContentsUpsert = "squidex.apps.{app}.contents.{schema}.upsert";
@@ -162,9 +169,11 @@ namespace Squidex.Shared
 
         public static Permission ForApp(string id, string app = Permission.Any, string schema = Permission.Any)
         {
-            Guard.NotNull(id, nameof(id));
+            Guard.NotNull(id);
 
-            return new Permission(id.Replace("{app}", app ?? Permission.Any).Replace("{schema}", schema ?? Permission.Any));
+            return new Permission(id
+                .Replace("{app}", app ?? Permission.Any, StringComparison.Ordinal)
+                .Replace("{schema}", schema ?? Permission.Any, StringComparison.Ordinal));
         }
     }
 }

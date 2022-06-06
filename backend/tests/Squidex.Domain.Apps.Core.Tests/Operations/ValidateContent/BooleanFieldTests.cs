@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -24,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new BooleanFieldProperties());
 
-            Assert.Equal("my-boolean", sut.Name);
+            Assert.Equal("myBoolean", sut.Name);
         }
 
         [Fact]
@@ -69,14 +67,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Invalid json type, expected boolean." });
         }
 
-        private static IJsonValue CreateValue(bool? v)
+        private static JsonValue CreateValue(bool? v)
         {
             return JsonValue.Create(v);
         }
 
         private static RootField<BooleanFieldProperties> Field(BooleanFieldProperties properties)
         {
-            return Fields.Boolean(1, "my-boolean", Partitioning.Invariant, properties);
+            return Fields.Boolean(1, "myBoolean", Partitioning.Invariant, properties);
         }
     }
 }

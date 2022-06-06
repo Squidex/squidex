@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 
@@ -47,49 +43,61 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 })
             };
 
-        public Task<Status> GetInitialStatusAsync(ISchemaEntity schema)
+        public ValueTask<Status> GetInitialStatusAsync(ISchemaEntity schema)
         {
-            return Task.FromResult(Status.Draft);
+            return ValueTask.FromResult(Status.Draft);
         }
 
-        public Task<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user)
+        public ValueTask<bool> CanPublishInitialAsync(ISchemaEntity schema, ClaimsPrincipal? user)
+        {
+            return ValueTask.FromResult(true);
+        }
+
+        public ValueTask<bool> ShouldValidateAsync(ISchemaEntity schema, Status status)
+        {
+            var result = status == Status.Published && schema.SchemaDef.Properties.ValidateOnPublish;
+
+            return ValueTask.FromResult(result);
+        }
+
+        public ValueTask<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user)
         {
             var result = Flow.TryGetValue(status, out var step) && step.Transitions.Any(x => x.Status == next);
 
-            return Task.FromResult(result);
+            return ValueTask.FromResult(result);
         }
 
-        public Task<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal? user)
+        public ValueTask<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal? user)
         {
             var result = Flow.TryGetValue(status, out var step) && step.Transitions.Any(x => x.Status == next);
 
-            return Task.FromResult(result);
+            return ValueTask.FromResult(result);
         }
 
-        public Task<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
+        public ValueTask<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
         {
             var result = status != Status.Archived;
 
-            return Task.FromResult(result);
+            return ValueTask.FromResult(result);
         }
 
-        public Task<StatusInfo?> GetInfoAsync(IContentEntity content, Status status)
+        public ValueTask<StatusInfo?> GetInfoAsync(IContentEntity content, Status status)
         {
             var result = Flow.GetValueOrDefault(status).Info;
 
-            return Task.FromResult<StatusInfo?>(result);
+            return ValueTask.FromResult<StatusInfo?>(result);
         }
 
-        public Task<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
+        public ValueTask<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
         {
             var result = Flow.TryGetValue(status, out var step) ? step.Transitions : Array.Empty<StatusInfo>();
 
-            return Task.FromResult(result);
+            return ValueTask.FromResult(result);
         }
 
-        public Task<StatusInfo[]> GetAllAsync(ISchemaEntity schema)
+        public ValueTask<StatusInfo[]> GetAllAsync(ISchemaEntity schema)
         {
-            return Task.FromResult(All);
+            return ValueTask.FromResult(All);
         }
     }
 }

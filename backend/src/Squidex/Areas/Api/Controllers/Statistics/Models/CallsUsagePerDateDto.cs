@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using NodaTime;
 using Squidex.Infrastructure.UsageTracking;
 
@@ -33,7 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// </summary>
         public double AverageElapsedMs { get; set; }
 
-        public static CallsUsagePerDateDto FromStats(ApiStats stats)
+        public static CallsUsagePerDateDto FromDomain(ApiStats stats)
         {
             var result = new CallsUsagePerDateDto
             {

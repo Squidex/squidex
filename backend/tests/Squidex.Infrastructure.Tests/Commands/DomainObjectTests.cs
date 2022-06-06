@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
@@ -98,9 +95,46 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
+        public async Task Should_recreate_when_loading()
+        {
+            sut.RecreateEvent = true;
+
+            SetupCreated(
+                new ValueChanged { Value = 2 },
+                new ValueChanged { Value = 3 },
+                new Deleted(),
+                new ValueChanged { Value = 4 });
+
+            await sut.EnsureLoadedAsync();
+
+            Assert.Equal(3, sut.Version);
+            Assert.Equal(3, sut.Snapshot.Version);
+
+            AssertSnapshot(sut.Snapshot, 4, 3);
+        }
+
+        [Fact]
+        public async Task Should_ignore_events_after_deleting_when_loading()
+        {
+            SetupCreated(
+                new ValueChanged { Value = 2 },
+                new ValueChanged { Value = 3 },
+                new Deleted(),
+                new ValueChanged { Value = 4 });
+
+            await sut.EnsureLoadedAsync();
+
+            Assert.Equal(2, sut.Version);
+            Assert.Equal(2, sut.Snapshot.Version);
+
+            AssertSnapshot(sut.Snapshot, 3, 2, true);
+        }
+
+        [Fact]
         public async Task Should_recreate_with_create_command_if_deleted_before()
         {
             sut.Recreate = true;
+            sut.RecreateEvent = true;
 
             SetupCreated(2);
             SetupDeleted();
@@ -141,6 +175,7 @@ namespace Squidex.Infrastructure.Commands
         public async Task Should_recreate_with_upsert_command_if_deleted_before()
         {
             sut.Recreate = true;
+            sut.RecreateEvent = true;
 
             SetupCreated(2);
             SetupDeleted();
@@ -418,15 +453,18 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.ExecuteAsync(new CreateAuto { Value = 3 });
             await sut.ExecuteAsync(new UpdateAuto { Value = 4 });
+            await sut.ExecuteAsync(new UpdateAuto { Value = 5 });
 
             var version_Empty = await sut.GetSnapshotAsync(EtagVersion.Empty);
             var version_0 = await sut.GetSnapshotAsync(0);
             var version_1 = await sut.GetSnapshotAsync(1);
+            var version_2 = await sut.GetSnapshotAsync(2);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(version_Empty, 0, EtagVersion.Empty);
             AssertSnapshot(version_0, 3, 0);
             AssertSnapshot(version_1, 4, 1);
+            AssertSnapshot(version_2, 5, 2);
 
             A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
                 .MustNotHaveHappened();
@@ -442,18 +480,21 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.ExecuteAsync(new CreateAuto { Value = 3 });
             await sut.ExecuteAsync(new UpdateAuto { Value = 4 });
+            await sut.ExecuteAsync(new UpdateAuto { Value = 5 });
 
             var version_Empty = await sut.GetSnapshotAsync(EtagVersion.Empty);
             var version_0 = await sut.GetSnapshotAsync(0);
             var version_1 = await sut.GetSnapshotAsync(1);
+            var version_2 = await sut.GetSnapshotAsync(2);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(version_Empty, 0, EtagVersion.Empty);
             AssertSnapshot(version_0, 3, 0);
             AssertSnapshot(version_1, 4, 1);
+            AssertSnapshot(version_2, 5, 2);
 
             A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
-                .MustHaveHappened();
+                .MustHaveHappenedOnceExactly();
         }
 
         private static void AssertSnapshot(MyDomainState state, int value, long version, bool isDeleted = false)
@@ -508,7 +549,10 @@ namespace Squidex.Infrastructure.Commands
             var @events = new List<Envelope<IEvent>>();
 
             A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
-                .Invokes(c => @events.AddRange(c.GetArgument<IReadOnlyList<Envelope<IEvent>>>(0)!));
+                .Invokes(args =>
+                {
+                    @events.AddRange(args.GetArgument<IReadOnlyList<Envelope<IEvent>>>(0)!);
+                });
 
             var eventsPersistence = A.Fake<IPersistence<MyDomainState>>();
 

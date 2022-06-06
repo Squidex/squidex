@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Squidex.Infrastructure.EventSourcing
 {
     public sealed class RetrySubscription : IEventSubscription, IEventSubscriber
@@ -16,6 +12,7 @@ namespace Squidex.Infrastructure.EventSourcing
         private readonly RetryWindow retryWindow = new RetryWindow(TimeSpan.FromMinutes(5), 5);
         private readonly IEventSubscriber eventSubscriber;
         private readonly Func<IEventSubscriber, IEventSubscription> eventSubscriptionFactory;
+        private readonly object lockObject = new object();
         private CancellationTokenSource timerCancellation = new CancellationTokenSource();
         private IEventSubscription? currentSubscription;
 
@@ -25,8 +22,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public RetrySubscription(IEventSubscriber eventSubscriber, Func<IEventSubscriber, IEventSubscription> eventSubscriptionFactory)
         {
-            Guard.NotNull(eventSubscriber, nameof(eventSubscriber));
-            Guard.NotNull(eventSubscriptionFactory, nameof(eventSubscriptionFactory));
+            Guard.NotNull(eventSubscriber);
+            Guard.NotNull(eventSubscriptionFactory);
 
             this.eventSubscriber = eventSubscriber;
             this.eventSubscriptionFactory = eventSubscriptionFactory;
@@ -38,7 +35,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             if (currentSubscription == null)
             {
-                lock (this)
+                lock (lockObject)
                 {
                     if (currentSubscription == null)
                     {
@@ -52,7 +49,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             if (currentSubscription != null)
             {
-                lock (this)
+                lock (lockObject)
                 {
                     if (currentSubscription != null)
                     {

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
@@ -32,7 +31,7 @@ namespace Squidex.Infrastructure
 
         public RefToken(RefTokenType type, string identifier)
         {
-            Guard.NotNullOrEmpty(identifier, nameof(identifier));
+            Guard.NotNullOrEmpty(identifier);
 
             Type = type;
 
@@ -66,11 +65,11 @@ namespace Squidex.Infrastructure
 
             value = value.Trim();
 
-            var idx = value.IndexOf(':');
+            var idx = value.IndexOf(':', StringComparison.Ordinal);
 
             if (idx > 0 && idx < value.Length - 1)
             {
-                if (!Enum.TryParse<RefTokenType>(value.Substring(0, idx), true, out var type))
+                if (!Enum.TryParse<RefTokenType>(value[..idx], true, out var type))
                 {
                     type = RefTokenType.Subject;
                 }
@@ -89,7 +88,8 @@ namespace Squidex.Infrastructure
         {
             if (!TryParse(value, out var result))
             {
-                throw new ArgumentException("Ref token cannot be null or empty.", nameof(value));
+                ThrowHelper.ArgumentException("Ref token cannot be null or empty.", nameof(value));
+                return default!;
             }
 
             return result;

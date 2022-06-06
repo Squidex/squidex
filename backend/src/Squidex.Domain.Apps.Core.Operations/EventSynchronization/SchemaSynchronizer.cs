@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
@@ -20,8 +17,8 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
         public static IEnumerable<SchemaEvent> Synchronize(this Schema source, Schema? target, Func<long> idGenerator,
             SchemaSynchronizationOptions? options = null)
         {
-            Guard.NotNull(source, nameof(source));
-            Guard.NotNull(idGenerator, nameof(idGenerator));
+            Guard.NotNull(source);
+            Guard.NotNull(idGenerator);
 
             if (target == null)
             {

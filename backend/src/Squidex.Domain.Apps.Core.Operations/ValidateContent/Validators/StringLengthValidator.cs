@@ -1,12 +1,11 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
@@ -20,14 +19,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             if (minLength > maxLength)
             {
-                throw new ArgumentException("Min length must be greater than max length.", nameof(minLength));
+                ThrowHelper.ArgumentException("Min length must be greater than max length.", nameof(minLength));
             }
 
             this.minLength = minLength;
             this.maxLength = maxLength;
         }
 
-        public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value is string stringValue && !string.IsNullOrEmpty(stringValue))
             {
@@ -56,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 }
             }
 
-            return Task.CompletedTask;
+            return default;
         }
     }
 }

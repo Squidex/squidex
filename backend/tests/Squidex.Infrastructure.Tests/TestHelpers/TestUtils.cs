@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security.Claims;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -15,6 +14,7 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.TestHelpers
@@ -37,11 +37,11 @@ namespace Squidex.Infrastructure.TestHelpers
                 SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry ?? new TypeNameRegistry()),
 
                 ContractResolver = new ConverterContractResolver(
-                    new SurrogateConverter<ClaimsPrincipal, ClaimsPrinicpalSurrogate>(),
-                    new EnvelopeHeadersConverter(),
                     new JsonValueConverter(),
-                    new SurrogateConverter<FilterNode<IJsonValue>, JsonFilterSurrogate>(),
-                    new StringEnumConverter()),
+                    new StringEnumConverter(),
+                    new SurrogateConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>(),
+                    new SurrogateConverter<FilterNode<JsonValue>, JsonFilterSurrogate>(),
+                    new TypeConverterJsonConverter<CompareOperator>()),
 
                 TypeNameHandling = TypeNameHandling.Auto
             }.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);

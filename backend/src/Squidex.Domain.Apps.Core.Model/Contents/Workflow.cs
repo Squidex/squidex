@@ -5,48 +5,26 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed record Workflow
+    public sealed record Workflow(Status Initial, ReadonlyDictionary<Status, WorkflowStep>? Steps = null, ReadonlyList<DomainId>? SchemaIds = null, string? Name = null)
     {
         private const string DefaultName = "Unnamed";
 
         public static readonly Workflow Default = CreateDefault();
         public static readonly Workflow Empty = new Workflow(default, null);
 
-        public Status Initial { get; }
+        public string Name { get; } = Name.Or(DefaultName);
 
-        public ImmutableDictionary<Status, WorkflowStep> Steps { get; } = ImmutableDictionary.Empty<Status, WorkflowStep>();
+        public ReadonlyDictionary<Status, WorkflowStep> Steps { get; } = Steps ?? ReadonlyDictionary.Empty<Status, WorkflowStep>();
 
-        public ImmutableList<DomainId> SchemaIds { get; } = ImmutableList.Empty<DomainId>();
-
-        public string Name { get; }
-
-        public Workflow(
-            Status initial,
-            ImmutableDictionary<Status, WorkflowStep>? steps = null,
-            ImmutableList<DomainId>? schemaIds = null,
-            string? name = null)
-        {
-            Initial = initial;
-
-            if (steps != null)
-            {
-                Steps = steps;
-            }
-
-            if (schemaIds != null)
-            {
-                SchemaIds = schemaIds;
-            }
-
-            Name = name.Or(DefaultName);
-        }
+        public ReadonlyList<DomainId> SchemaIds { get; } = SchemaIds ?? ReadonlyList.Empty<DomainId>();
 
         public static Workflow CreateDefault(string? name = null)
         {
@@ -59,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                             new Dictionary<Status, WorkflowTransition>
                             {
                                 [Status.Draft] = WorkflowTransition.Always
-                            }.ToImmutableDictionary(),
+                            }.ToReadonlyDictionary(),
                             StatusColors.Archived, NoUpdate.Always),
                     [Status.Draft] =
                         new WorkflowStep(
@@ -67,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                             {
                                 [Status.Archived] = WorkflowTransition.Always,
                                 [Status.Published] = WorkflowTransition.Always
-                            }.ToImmutableDictionary(),
+                            }.ToReadonlyDictionary(),
                             StatusColors.Draft),
                     [Status.Published] =
                         new WorkflowStep(
@@ -75,9 +53,9 @@ namespace Squidex.Domain.Apps.Core.Contents
                             {
                                 [Status.Archived] = WorkflowTransition.Always,
                                 [Status.Draft] = WorkflowTransition.Always
-                            }.ToImmutableDictionary(),
+                            }.ToReadonlyDictionary(),
                             StatusColors.Published)
-                }.ToImmutableDictionary(), null, name);
+                }.ToReadonlyDictionary(), null, name);
         }
 
         public IEnumerable<(Status Status, WorkflowStep Step, WorkflowTransition Transition)> GetTransitions(Status status)

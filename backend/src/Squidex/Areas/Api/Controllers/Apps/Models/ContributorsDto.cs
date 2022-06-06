@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
@@ -42,7 +40,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             var result = new ContributorsDto
             {
                 Items = app.Contributors
-                    .Select(x => ContributorDto.FromIdAndRole(x.Key, x.Value))
+                    .Select(x => ContributorDto.FromDomain(x.Key, x.Value))
                     .Select(x => x.CreateUser(users))
                     .Select(x => x.CreateLinks(resources))
                     .OrderBy(x => x.ContributorName)

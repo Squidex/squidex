@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Squidex.ClientLibrary;
 using TestSuite.Model;
 using Xunit;
 
@@ -64,7 +62,7 @@ namespace TestSuite.LoadTests
 
             await Run.Parallel(numUsers, numIterationsPerUser, async () =>
             {
-                await _.Contents.CreateAsync(new TestEntityData { Number = random.Next() }, true);
+                await _.Contents.CreateAsync(new TestEntityData { Number = random.Next() }, ContentCreateOptions.AsPublish);
             });
         }
     }

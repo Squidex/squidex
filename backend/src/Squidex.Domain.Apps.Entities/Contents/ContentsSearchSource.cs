@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
@@ -46,16 +43,19 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var result = new SearchResults();
 
-            var searchFilter = await CreateSearchFilterAsync(context);
+            var schemaIds = await GetSchemaIdsAsync(context, ct);
 
-            if (searchFilter == null)
+            if (schemaIds.Count == 0)
             {
                 return result;
             }
 
-            var textQuery = new TextQuery($"{query}~", searchFilter);
+            var textQuery = new TextQuery($"{query}~", 10)
+            {
+                RequiredSchemaIds = schemaIds
+            };
 
-            var ids = await contentTextIndexer.SearchAsync(context.App, textQuery, context.Scope());
+            var ids = await contentTextIndexer.SearchAsync(context.App, textQuery, context.Scope(), ct);
 
             if (ids == null || ids.Count == 0)
             {
@@ -78,26 +78,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return result;
         }
 
-        private async Task<TextFilter?> CreateSearchFilterAsync(Context context)
+        private async Task<List<DomainId>> GetSchemaIdsAsync(Context context,
+            CancellationToken ct)
         {
-            var allowedSchemas = new List<DomainId>();
+            var schemas = await appProvider.GetSchemasAsync(context.App.Id, ct);
 
-            var schemas = await appProvider.GetSchemasAsync(context.App.Id);
-
-            foreach (var schema in schemas)
-            {
-                if (HasPermission(context, schema.SchemaDef.Name))
-                {
-                    allowedSchemas.Add(schema.Id);
-                }
-            }
-
-            if (allowedSchemas.Count == 0)
-            {
-                return null;
-            }
-
-            return TextFilter.MustHaveSchemas(allowedSchemas.ToArray());
+            return schemas.Where(x => HasPermission(context, x.SchemaDef.Name)).Select(x => x.Id).ToList();
         }
 
         private static bool HasPermission(Context context, string schemaName)
@@ -109,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var sb = new StringBuilder();
 
-            IJsonValue? GetValue(ContentData? data, RootField field)
+            JsonValue? GetValue(ContentData? data, RootField field)
             {
                 if (data != null && data.TryGetValue(field.Name, out var fieldValue) && fieldValue != null)
                 {
@@ -135,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 {
                     var value = GetValue(content.ReferenceData, field) ?? GetValue(content.Data, field);
 
-                    var formatted = StringFormatter.Format(field, value);
+                    var formatted = StringFormatter.Format(field, value ?? default);
 
                     if (!string.IsNullOrWhiteSpace(formatted))
                     {

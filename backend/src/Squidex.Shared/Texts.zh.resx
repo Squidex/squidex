@@ -133,6 +133,9 @@
   <data name="apps.languages.masterLanguageNotRemovable" xml:space="preserve">
     <value>无法删除主语言。</value>
   </data>
+  <data name="apps.maximumTotalReached" xml:space="preserve">
+    <value>You cannot create more apps. Please contact the support to remove this restriction from your account.</value>
+  </data>
   <data name="apps.nameAlreadyExists" xml:space="preserve">
     <value>同名应用已经存在。</value>
   </data>
@@ -225,6 +228,9 @@
   </data>
   <data name="common.displayName" xml:space="preserve">
     <value>显示名称</value>
+  </data>
+  <data name="common.documentation" xml:space="preserve">
+    <value>Documentation</value>
   </data>
   <data name="common.editor" xml:space="preserve">
     <value>编辑器</value>
@@ -451,6 +457,9 @@
   <data name="contents.draftToDeleteNotFound" xml:space="preserve">
     <value>没有要删除的内容。</value>
   </data>
+  <data name="contents.invalidAllQuery" xml:space="preserve">
+    <value>Either Ids or Schedule range must be defined.</value>
+  </data>
   <data name="contents.invalidArrayOfObjects" xml:space="preserve">
     <value>无效的 json 类型，预期的对象数组。</value>
   </data>
@@ -514,6 +523,9 @@
   <data name="contents.validation.assetNotFound" xml:space="preserve">
     <value>未找到 ID {id}。</value>
   </data>
+  <data name="contents.validation.assetType" xml:space="preserve">
+    <value>Not of expected type: {type}.</value>
+  </data>
   <data name="contents.validation.between" xml:space="preserve">
     <value>必须介于 {min} 和 {max} 之间。</value>
   </data>
@@ -534,9 +546,6 @@
   </data>
   <data name="contents.validation.extension" xml:space="preserve">
     <value>必须是允许的扩展名。</value>
-  </data>
-  <data name="contents.validation.image" xml:space="preserve">
-    <value>不是图片。</value>
   </data>
   <data name="contents.validation.invalid" xml:space="preserve">
     <value>无效值。</value>
@@ -625,6 +634,9 @@
   <data name="contents.validation.unique" xml:space="preserve">
     <value>存在另一个具有相同值的内容。</value>
   </data>
+  <data name="contents.validation.uniqueObjectValues" xml:space="preserve">
+    <value>Must not contain items with duplicate '{field}' fields.</value>
+  </data>
   <data name="contents.validation.unknownField" xml:space="preserve">
     <value>不是已知的 {fieldType}。</value>
   </data>
@@ -681,12 +693,6 @@
   </data>
   <data name="dotnet_identity_UserLockedOut" xml:space="preserve">
     <value>User is locked out.</value>
-  </data>
-  <data name="exception.invalidJsonQuery" xml:space="preserve">
-    <value>Json 查询无效：{message}</value>
-  </data>
-  <data name="exception.invalidJsonQueryJson" xml:space="preserve">
-    <value>Json 查询无效 json: {message}</value>
   </data>
   <data name="exceptions.domainObjectConflict" xml:space="preserve">
     <value>实体 ({id}) 已经存在。</value>
@@ -898,9 +904,6 @@
   <data name="search.schemaResult" xml:space="preserve">
     <value>{name} Schemas</value>
   </data>
-  <data name="security.passwordStolen" xml:space="preserve">
-    <value>此密码以前曾出现在数据泄露事件中，永远不应使用。如果您以前曾在任何地方使用过它，请更改它！</value>
-  </data>
   <data name="setup.createUser.button" xml:space="preserve">
     <value>创建用户</value>
   </data>
@@ -1066,6 +1069,9 @@
   <data name="users.logout.title" xml:space="preserve">
     <value>注销</value>
   </data>
+  <data name="users.noEmailAddress" xml:space="preserve">
+    <value>We cannot get the email address from authentication provider.</value>
+  </data>
   <data name="users.profile.addLoginDone" xml:space="preserve">
     <value>登录添加成功。</value>
   </data>
@@ -1167,6 +1173,9 @@
   </data>
   <data name="validation.notAnImage" xml:space="preserve">
     <value>图片不是有效图片。</value>
+  </data>
+  <data name="validation.notAnValidSvg" xml:space="preserve">
+    <value>The SVG is malicious and contains script tags.</value>
   </data>
   <data name="validation.onlyOneFile" xml:space="preserve">
     <value>只能上传一个文件。</value>

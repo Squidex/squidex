@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 
@@ -75,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                 foreach (var schema in schemaNames)
                 {
-                    var replaced = trimmed.Replace("{schema}", schema);
+                    var replaced = trimmed.Replace("{schema}", schema, StringComparison.Ordinal);
 
                     result.Add(replaced);
                 }

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 using Squidex.Web;
@@ -26,12 +24,12 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         [LocalizedRequired]
         public UserDto[] Items { get; set; }
 
-        public static UsersDto FromResults(IEnumerable<IUser> items, long total, Resources resources)
+        public static UsersDto FromDomain(IEnumerable<IUser> items, long total, Resources resources)
         {
             var result = new UsersDto
             {
                 Total = total,
-                Items = items.Select(x => UserDto.FromUser(x, resources)).ToArray()
+                Items = items.Select(x => UserDto.FromDomain(x, resources)).ToArray()
             };
 
             return result.CreateLinks(resources);

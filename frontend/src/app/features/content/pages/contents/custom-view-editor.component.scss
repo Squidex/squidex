@@ -1,0 +1,24 @@
+@import 'mixins';
+@import 'vars';
+
+.container {
+    padding: .5rem 1rem;
+}
+
+.header {
+    text-align: right;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.form-check {
+    display: inline-block;
+    padding-left: 2rem;
+    padding-right: .5rem;
+}
+
+.cdk-drag-preview {
+    z-index: 9000 !important;
+}

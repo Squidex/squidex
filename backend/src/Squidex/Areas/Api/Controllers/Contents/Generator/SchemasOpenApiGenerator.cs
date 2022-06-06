@@ -5,44 +5,45 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Http;
 using NJsonSchema;
 using NSwag;
 using NSwag.Generation;
 using NSwag.Generation.Processors.Contexts;
+using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Hosting;
 using Squidex.Infrastructure.Caching;
 using Squidex.Properties;
 using Squidex.Shared;
+using IRequestUrlGenerator = Squidex.Hosting.IUrlGenerator;
 using SchemaDefType = Squidex.Domain.Apps.Core.Schemas.SchemaType;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
     public sealed class SchemasOpenApiGenerator
     {
-        private readonly IUrlGenerator urlGenerator;
+        private readonly IAppProvider appProvider;
         private readonly OpenApiDocumentGeneratorSettings schemaSettings;
         private readonly OpenApiSchemaGenerator schemaGenerator;
+        private readonly IRequestUrlGenerator urlGenerator;
         private readonly IRequestCache requestCache;
 
         public SchemasOpenApiGenerator(
-            IUrlGenerator urlGenerator,
+            IAppProvider appProvider,
             OpenApiDocumentGeneratorSettings schemaSettings,
             OpenApiSchemaGenerator schemaGenerator,
+            IRequestUrlGenerator urlGenerator,
             IRequestCache requestCache)
         {
+            this.appProvider = appProvider;
             this.urlGenerator = urlGenerator;
             this.schemaSettings = schemaSettings;
             this.schemaGenerator = schemaGenerator;
             this.requestCache = requestCache;
         }
 
-        public OpenApiDocument Generate(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas, bool flat = false)
+        public async Task<OpenApiDocument> GenerateAsync(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas, bool flat)
         {
             var document = CreateApiDocument(httpContext, app);
 
@@ -55,20 +56,21 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 requestCache.AddDependency(schema.UniqueId, schema.Version);
             }
 
-            var builder = new Builder(
-                app,
-                document,
-                schemaResolver,
-                schemaGenerator);
+            var builder = new Builder(app, document, schemaResolver, schemaGenerator);
 
-            var validSchemas = schemas.Where(x =>
-                x.SchemaDef.IsPublished &&
-                x.SchemaDef.Type != SchemaDefType.Component &&
-                x.SchemaDef.Fields.Count > 0);
+            var validSchemas =
+                schemas.Where(x =>
+                    x.SchemaDef.IsPublished &&
+                    x.SchemaDef.Type != SchemaDefType.Component &&
+                    x.SchemaDef.Fields.Count > 0);
+
+            var partitionResolver = app.PartitionResolver();
 
             foreach (var schema in validSchemas)
             {
-                GenerateSchemaOperations(builder.Schema(schema.SchemaDef, flat));
+                var components = await appProvider.GetComponentsAsync(schema, httpContext.RequestAborted);
+
+                GenerateSchemaOperations(builder.Schema(schema.SchemaDef, partitionResolver, components, flat));
             }
 
             GenerateSharedOperations(builder.Shared());
@@ -109,7 +111,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .Describe(Resources.OpenApiSchemaQuery)
                 .HasQueryOptions(true)
                 .Responds(200, "Content items retrieved.", builder.ContentsSchema)
-                .Responds(400, "Query not valid.");
+                .Responds(400, "Content query not valid.");
 
             builder.AddOperation(OpenApiOperationMethod.Get, "/{id}")
                 .RequirePermission(Permissions.AppContentsReadOwn)
@@ -120,9 +122,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             builder.AddOperation(OpenApiOperationMethod.Get, "/{id}/{version}")
                 .RequirePermission(Permissions.AppContentsReadOwn)
-                .Operation("Get")
+                .Operation("GetVersioned")
                 .OperationSummary("Get a [schema] content item by id and version.")
-                .HasPath("version", JsonObjectType.Number, "The version of the content item.")
+                .HasPath("version", JsonObjectType.Number, FieldDescriptions.EntityVersion)
                 .HasId()
                 .Responds(200, "Content item returned.", builder.ContentSchema);
 
@@ -138,8 +140,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .RequirePermission(Permissions.AppContentsCreate)
                 .Operation("Create")
                 .OperationSummary("Create a [schema] content item.")
-                .HasQuery("publish", JsonObjectType.Boolean, "True to automatically publish the content.")
-                .HasQuery("id", JsonObjectType.String, "The optional custom content id.")
+                .HasQuery("publish", JsonObjectType.Boolean, FieldDescriptions.ContentRequestPublish)
+                .HasQuery("id", JsonObjectType.String, FieldDescriptions.ContentRequestOptionalId)
                 .HasBody("data", builder.DataSchema, Resources.OpenApiSchemaBody)
                 .Responds(201, "Content item created", builder.ContentSchema)
                 .Responds(400, "Content data not valid.");
@@ -148,7 +150,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .RequirePermission(Permissions.AppContentsUpsert)
                 .Operation("Upsert")
                 .OperationSummary("Upsert a [schema] content item.")
-                .HasQuery("publish", JsonObjectType.Boolean, "True to automatically publish the content.")
+                .HasQuery("patch", JsonObjectType.Boolean, FieldDescriptions.ContentRequestPatch)
+                .HasQuery("publish", JsonObjectType.Boolean, FieldDescriptions.ContentRequestPublish)
                 .HasId()
                 .HasBody("data", builder.DataSchema, Resources.OpenApiSchemaBody)
                 .Responds(200, "Content item created or updated.", builder.ContentSchema)
@@ -217,8 +220,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                     Title = $"Squidex Content API for '{appName}' App",
                     Description =
                         Resources.OpenApiContentDescription
-                            .Replace("[REDOC_LINK_NORMAL]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs"))
-                            .Replace("[REDOC_LINK_SIMPLE]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs/flat"))
+                            .Replace("[REDOC_LINK_NORMAL]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs"), StringComparison.Ordinal)
+                            .Replace("[REDOC_LINK_SIMPLE]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs/flat"), StringComparison.Ordinal)
                 },
                 SchemaType = SchemaType.OpenApi3
             };

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Reflection;
 
 namespace Squidex.Infrastructure.Reflection.Internal
@@ -58,10 +57,9 @@ namespace Squidex.Infrastructure.Reflection.Internal
 
         private readonly IPropertyAccessor internalAccessor;
 
-        public PropertyAccessor(Type targetType, PropertyInfo propertyInfo)
+        public PropertyAccessor(PropertyInfo propertyInfo)
         {
-            Guard.NotNull(targetType, nameof(targetType));
-            Guard.NotNull(propertyInfo, nameof(propertyInfo));
+            Guard.NotNull(propertyInfo);
 
             var type = typeof(PropertyWrapper<,>).MakeGenericType(propertyInfo.DeclaringType!, propertyInfo.PropertyType);
 
@@ -70,14 +68,14 @@ namespace Squidex.Infrastructure.Reflection.Internal
 
         public object? Get(object target)
         {
-            Guard.NotNull(target, nameof(target));
+            Guard.NotNull(target);
 
             return internalAccessor.Get(target);
         }
 
         public void Set(object target, object? value)
         {
-            Guard.NotNull(target, nameof(target));
+            Guard.NotNull(target);
 
             internalAccessor.Set(target, value);
         }

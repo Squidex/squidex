@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Assets;
 using Squidex.Areas.Api.Controllers.Backups;
@@ -15,7 +13,6 @@ using Squidex.Areas.Api.Controllers.Plans;
 using Squidex.Areas.Api.Controllers.Rules;
 using Squidex.Areas.Api.Controllers.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Reflection;
@@ -29,8 +26,6 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
     public sealed class AppDto : Resource
     {
-        private static readonly JsonObject EmptyObject = JsonValue.Object();
-
         /// <summary>
         /// The name of the app.
         /// </summary>
@@ -85,27 +80,19 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public bool CanAccessContent { get; set; }
 
         /// <summary>
-        /// Gets the current plan name.
+        /// The role name of the user.
         /// </summary>
-        public string? PlanName { get; set; }
-
-        /// <summary>
-        /// Gets the next plan name.
-        /// </summary>
-        public string? PlanUpgrade { get; set; }
+        public string? RoleName { get; set; }
 
         /// <summary>
         /// The properties from the role.
         /// </summary>
         [LocalizedRequired]
-        public JsonObject RoleProperties { get; set; } = EmptyObject;
+        public JsonValue RoleProperties { get; set; }
 
-        public static AppDto FromApp(IAppEntity app, string userId, bool isFrontend, IAppPlansProvider plans, Resources resources)
+        public static AppDto FromDomain(IAppEntity app, string userId, bool isFrontend, Resources resources)
         {
-            var result = SimpleMapper.Map(app, new AppDto
-            {
-                PlanName = plans.GetPlanForApp(app).Plan.Name
-            });
+            var result = SimpleMapper.Map(app, new AppDto());
 
             var permissions = PermissionSet.Empty;
 
@@ -115,20 +102,28 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 isContributor = true;
 
+                result.RoleName = roleName;
                 result.RoleProperties = role.Properties;
                 result.Permissions = permissions.ToIds();
 
                 permissions = role.Permissions;
             }
+            else if (app.Clients.TryGetValue(userId, out var client) && app.Roles.TryGet(app.Name, client.Role, isFrontend, out role))
+            {
+                result.RoleName = roleName;
+                result.RoleProperties = role.Properties;
+                result.Permissions = permissions.ToIds();
+
+                permissions = role.Permissions;
+            }
+            else
+            {
+                result.RoleProperties = new JsonObject();
+            }
 
             if (resources.Includes(Shared.Permissions.ForApp(Shared.Permissions.AppContents, app.Name), permissions))
             {
                 result.CanAccessContent = true;
-            }
-
-            if (resources.IsAllowed(Shared.Permissions.AppPlansChange, app.Name, additional: permissions))
-            {
-                result.PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;
             }
 
             return result.CreateLinks(app, resources, permissions, isContributor);
@@ -142,7 +137,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (app.Image != null)
             {
-                AddGetLink("image", resources.Url<AppsController>(x => nameof(x.GetImage), values));
+                AddGetLink("image", resources.Url<AppImageController>(x => nameof(x.GetImage), values));
             }
 
             if (isContributor)
@@ -230,7 +225,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 AddDeleteLink("image/delete", resources.Url<AppsController>(x => nameof(x.DeleteImage), values));
             }
 
-            AddGetLink("settings", resources.Url<AppsController>(x => nameof(x.GetAppSettings), values));
+            if (resources.IsAllowed(Shared.Permissions.AppAssetsScriptsUpdate, Name, additional: permissions))
+            {
+                AddDeleteLink("assets/scripts", resources.Url<AppAssetsController>(x => nameof(x.GetAssetScripts), values));
+            }
+
+            AddGetLink("settings", resources.Url<AppSettingsController>(x => nameof(x.GetSettings), values));
 
             return this;
         }

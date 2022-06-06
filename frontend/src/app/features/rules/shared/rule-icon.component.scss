@@ -1,0 +1,48 @@
+@import 'mixins';
+@import 'vars';
+
+:host ::ng-deep {
+    svg {
+        display: block;
+
+        fill: $color-white;
+    }
+}
+
+.svg-icon {
+    display: inline-block;
+}
+
+.icon {
+    color: $color-white;
+}
+
+.sm {
+    .icon {
+        font-size: 14px;
+    }
+
+    .svg-icon {
+        width: 14px;
+    }
+}
+
+.md {
+    .icon {
+        font-size: 20px;
+    }
+
+    .svg-icon {
+        width: 20px;
+    }
+}
+
+.lg {
+    .icon {
+        font-size: 30px;
+    }
+
+    .svg-icon {
+        width: 30px;
+    }
+}

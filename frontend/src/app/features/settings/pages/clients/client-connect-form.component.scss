@@ -1,0 +1,46 @@
+@import 'mixins';
+@import 'vars';
+
+.badge {
+    @include circle(1.3rem);
+    font-size: $font-smallest;
+    font-weight: normal;
+    margin-right: .25rem;
+    padding-left: 0;
+    padding-right: 0;
+    vertical-align: top;
+}
+
+.section {
+    margin-top: 2rem;
+}
+
+.step {
+    padding-left: 1.75rem;
+
+    h5 {
+        margin-left: -1.75rem;
+    }
+}
+
+.option {
+    background: none;
+    border: 1px solid $color-border;
+    border-radius: $border-radius;
+    cursor: pointer;
+    margin-top: .5rem;
+    padding: 1rem;
+    padding-right: 0;
+    position: relative;
+
+    &:hover {
+        border-color: darken($color-border, 10%);
+    }
+
+    i {
+        @include absolute(1.6rem, 1rem, auto, auto);
+        color: $color-border;
+        font-size: $font-smallest;
+        font-weight: normal;
+    }
+}

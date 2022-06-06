@@ -5,12 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Rules;
@@ -21,7 +17,6 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
@@ -34,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         private readonly IEventEnricher eventEnricher;
         private readonly IJsonSerializer jsonSerializer;
         private readonly IClock clock;
-        private readonly ISemanticLog log;
+        private readonly ILogger<RuleService> log;
 
         public RuleService(
             IOptions<RuleOptions> ruleOptions,
@@ -43,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             IEventEnricher eventEnricher,
             IJsonSerializer jsonSerializer,
             IClock clock,
-            ISemanticLog log,
+            ILogger<RuleService> log,
             TypeNameRegistry typeNameRegistry)
         {
             this.typeNameRegistry = typeNameRegistry;
@@ -117,7 +112,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 }
                 catch (Exception ex)
                 {
-                    job = new JobResult(null, ex);
+                    job = JobResult.Failed(ex);
                 }
 
                 yield return job;
@@ -144,21 +139,32 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
         }
 
-        private async Task AddJobsAsync(List<JobResult> jobs, Envelope<IEvent> @event, RuleContext context, CancellationToken ct)
+        private async Task AddJobsAsync(List<JobResult> jobs, Envelope<IEvent> @event, RuleContext context,
+            CancellationToken ct)
         {
             try
             {
+                var skipReason = SkipReason.None;
+
                 var rule = context.Rule;
 
                 if (!rule.IsEnabled)
                 {
-                    jobs.Add(JobResult.Disabled);
-                    return;
+                    // For the simulation we want to proceed as much as possible.
+                    if (context.IncludeSkipped)
+                    {
+                        skipReason |= SkipReason.Disabled;
+                    }
+                    else
+                    {
+                        jobs.Add(JobResult.Disabled);
+                        return;
+                    }
                 }
 
                 if (@event.Payload is not AppEvent)
                 {
-                    jobs.Add(JobResult.EventMismatch);
+                    jobs.Add(JobResult.WrongEvent);
                     return;
                 }
 
@@ -166,8 +172,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                 if (typed.Payload.FromRule)
                 {
-                    jobs.Add(JobResult.FromRule);
-                    return;
+                    // For the simulation we want to proceed as much as possible.
+                    if (context.IncludeSkipped)
+                    {
+                        skipReason |= SkipReason.FromRule;
+                    }
+                    else
+                    {
+                        jobs.Add(JobResult.FromRule);
+                        return;
+                    }
                 }
 
                 var actionType = rule.Action.GetType();
@@ -197,16 +211,32 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     @event.Headers.Timestamp() :
                     now;
 
-                if (context.IgnoreStale && eventTime.Plus(Constants.StaleTime) < now)
+                if (!context.IncludeStale && eventTime.Plus(Constants.StaleTime) < now)
                 {
-                    jobs.Add(JobResult.TooOld);
-                    return;
+                    // For the simulation we want to proceed as much as possible.
+                    if (context.IncludeSkipped)
+                    {
+                        skipReason |= SkipReason.TooOld;
+                    }
+                    else
+                    {
+                        jobs.Add(JobResult.TooOld);
+                        return;
+                    }
                 }
 
                 if (!triggerHandler.Trigger(typed, context))
                 {
-                    jobs.Add(JobResult.ConditionDoesNotMatch);
-                    return;
+                    // For the simulation we want to proceed as much as possible.
+                    if (context.IncludeSkipped)
+                    {
+                        skipReason |= SkipReason.ConditionPrecheckDoesNotMatch;
+                    }
+                    else
+                    {
+                        jobs.Add(JobResult.ConditionPrecheckDoesNotMatch);
+                        return;
+                    }
                 }
 
                 await foreach (var enrichedEvent in triggerHandler.CreateEnrichedEventsAsync(typed, context, ct))
@@ -222,15 +252,25 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                         if (!triggerHandler.Trigger(enrichedEvent, context))
                         {
-                            if (jobs.Count == 0)
+                            // For the simulation we want to proceed as much as possible.
+                            if (context.IncludeSkipped)
+                            {
+                                skipReason |= SkipReason.ConditionDoesNotMatch;
+                            }
+                            else
                             {
                                 jobs.Add(JobResult.ConditionDoesNotMatch);
+                                return;
                             }
-
-                            continue;
                         }
 
                         var job = await CreateJobAsync(actionHandler, enrichedEvent, context, now);
+
+                        // If the conditions matchs, we can skip creating a new object and save a few allocation.s
+                        if (skipReason != SkipReason.None)
+                        {
+                            job = job with { SkipReason = skipReason };
+                        }
 
                         jobs.Add(job);
                     }
@@ -238,22 +278,23 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     {
                         if (jobs.Count == 0)
                         {
-                            jobs.Add(new JobResult(null, ex, SkipReason.Failed));
+                            jobs.Add(new JobResult
+                            {
+                                EnrichedEvent = enrichedEvent,
+                                EnrichmentError = ex,
+                                SkipReason = SkipReason.Failed
+                            });
                         }
 
-                        log.LogError(ex, w => w
-                            .WriteProperty("action", "createRuleJobFromEvent")
-                            .WriteProperty("status", "Failed"));
+                        log.LogError(ex, "Failed to create rule jobs from event.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                jobs.Add(new JobResult(null, ex, SkipReason.Failed));
+                jobs.Add(JobResult.Failed(ex));
 
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "createRuleJob")
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to create rule job.");
             }
         }
 
@@ -286,19 +327,19 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 job.ActionName = actionName;
                 job.Description = description;
 
-                return new JobResult(job, null);
+                return new JobResult { Job = job, EnrichedEvent = enrichedEvent };
             }
             catch (Exception ex)
             {
                 job.Description = "Failed to create job";
 
-                return new JobResult(job, ex);
+                return JobResult.Failed(ex, enrichedEvent, job);
             }
         }
 
         public string GetName(AppEvent @event)
         {
-            foreach (var handler in ruleTriggerHandlers.Values)
+            foreach (var (_, handler) in ruleTriggerHandlers)
             {
                 if (handler.Handles(@event))
                 {
@@ -314,7 +355,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return @event.GetType().Name;
         }
 
-        public async Task<(Result Result, TimeSpan Elapsed)> InvokeAsync(string actionName, string job)
+        public async Task<(Result Result, TimeSpan Elapsed)> InvokeAsync(string actionName, string job,
+            CancellationToken ct = default)
         {
             var actionWatch = ValueStopwatch.StartNew();
 
@@ -329,7 +371,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                 using (var cts = new CancellationTokenSource(GetTimeoutInMs()))
                 {
-                    result = await actionHandler.ExecuteJobAsync(deserialized, cts.Token).WithCancellation(cts.Token);
+                    using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct))
+                    {
+                        result = await actionHandler.ExecuteJobAsync(deserialized, combined.Token).WithCancellation(combined.Token);
+                    }
                 }
             }
             catch (Exception ex)

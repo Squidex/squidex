@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using NodaTime;
@@ -57,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_get_total_size_from_summary_date()
         {
-            A.CallTo(() => usageTracker.GetAsync($"{appId.Id}_Assets", default, default, null))
+            A.CallTo(() => usageTracker.GetAsync($"{appId.Id}_Assets", default, default, null, default))
                 .Returns(new Counters { ["TotalSize"] = 2048 });
 
             var size = await sut.GetTotalSizeAsync(appId.Id);
@@ -73,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var dateFrom = new DateTime(2018, 01, 05);
             var dateTo = dateFrom.AddDays(3);
 
-            A.CallTo(() => usageTracker.QueryAsync($"{appId.Id}_Assets", dateFrom, dateTo))
+            A.CallTo(() => usageTracker.QueryAsync($"{appId.Id}_Assets", dateFrom, dateTo, default))
                 .Returns(new Dictionary<string, List<(DateTime, Counters)>>
                 {
                     [category] = new List<(DateTime, Counters)>
@@ -139,10 +136,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
             Counters? countersSummary = null;
             Counters? countersDate = null;
 
-            A.CallTo(() => usageTracker.TrackAsync(default, $"{appId.Id}_Assets", null, A<Counters>._))
+            A.CallTo(() => usageTracker.TrackAsync(default, $"{appId.Id}_Assets", null, A<Counters>._, default))
                 .Invokes(x => countersSummary = x.GetArgument<Counters>(3));
 
-            A.CallTo(() => usageTracker.TrackAsync(date, $"{appId.Id}_Assets", null, A<Counters>._))
+            A.CallTo(() => usageTracker.TrackAsync(date, $"{appId.Id}_Assets", null, A<Counters>._, default))
                 .Invokes(x => countersDate = x.GetArgument<Counters>(3));
 
             await sut.On(envelope);

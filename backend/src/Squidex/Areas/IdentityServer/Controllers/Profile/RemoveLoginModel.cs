@@ -14,7 +14,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [LocalizedRequired]
         public string LoginProvider { get; set; }
 
-        [LocalizedRequiredAttribute]
+        [LocalizedRequired]
         public string ProviderKey { get; set; }
     }
 }

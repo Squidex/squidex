@@ -1,0 +1,45 @@
+<ul class="nav flex-column">
+    <li class="nav-item">
+        <a class="nav-link" routerLink="./" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="nav-icon icon-dashboard"></i> <div class="nav-text">{{ 'common.dashboard' | sqxTranslate }}</div>
+        </a>
+    </li>
+    <li class="nav-item" *ngIf="!isSchemasHidden(app) && app.canReadSchemas">
+        <a class="nav-link" routerLink="schemas" routerLinkActive="active">
+            <i class="nav-icon icon-schemas"></i> <div class="nav-text">{{ 'common.schemas' | sqxTranslate }}</div>
+        </a>
+    </li>
+    <li class="nav-item" *ngIf="app.canAccessContent">
+        <a class="nav-link" routerLink="content" routerLinkActive="active">
+            <i class="nav-icon icon-contents"></i> <div class="nav-text">{{ 'common.content' | sqxTranslate }}</div>
+        </a>
+    </li>
+    <li class="nav-item" *ngIf="!isAssetsHidden(app) && app.canReadAssets">
+        <a class="nav-link" routerLink="assets" routerLinkActive="active">
+            <i class="nav-icon icon-assets"></i> <div class="nav-text">{{ 'common.assets' | sqxTranslate }}</div> 
+        </a>
+    </li>
+    <li class="nav-item" *ngIf="app.canReadRules">
+        <a class="nav-link" routerLink="rules" routerLinkActive="active">
+            <i class="nav-icon icon-rules"></i> <div class="nav-text">{{ 'common.rules' | sqxTranslate }}</div>
+        </a>
+    </li>
+    <li class="nav-item" *ngIf="!isApiHidden(app)">
+        <a class="nav-link" routerLink="api" routerLinkActive="active">
+            <i class="nav-icon icon-api"></i> <div class="nav-text">{{ 'common.api' | sqxTranslate }}</div>
+        </a>
+    </li>
+</ul>
+
+<ul class="nav flex-column bottom">
+    <li class="nav-item">
+        <a class="nav-link" href="https://squidex.io/help" target="_blank">
+            <i class="nav-icon icon-help2"></i>
+        </a>
+    </li>
+    <li class="nav-item" *ngIf="!isSettingsHidden(app)">
+        <a class="nav-link" routerLink="settings" routerLinkActive="active">
+            <i class="nav-icon icon-settings"></i>
+        </a>
+    </li>
+</ul>

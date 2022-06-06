@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Globalization;
 using FakeItEasy;
 using LoremNET;
 using MongoDB.Bson;
@@ -31,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
     {
         private readonly Random random = new Random();
         private readonly int numValues = 10000;
-        private readonly IMongoClient mongoClient = new MongoClient("mongodb://localhost");
+        private readonly IMongoClient mongoClient;
         private readonly IMongoDatabase mongoDatabase;
 
         public MongoContentRepository ContentRepository { get; }
@@ -53,7 +51,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         public ContentsQueryFixture()
         {
-            mongoDatabase = mongoClient.GetDatabase("Squidex_Testing");
+            mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
+            mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
             SetupJson();
 
@@ -66,14 +65,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             Task.Run(async () =>
             {
-                await Task.WhenAll(
-                    SetupAsync(ContentRepository, mongoDatabase));
+                await SetupAsync(ContentRepository, mongoDatabase);
             }).Wait();
         }
 
         private async Task SetupAsync(MongoContentRepository contentRepository, IMongoDatabase database)
         {
-            await contentRepository.InitializeAsync();
+            await contentRepository.InitializeAsync(default);
 
             await database.RunCommandAsync<BsonDocument>("{ profile : 0 }");
             await database.DropCollectionAsync("system.profile");
@@ -146,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var appProvider = A.Fake<IAppProvider>();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false, A<CancellationToken>._))
                 .ReturnsLazily(x => Task.FromResult<ISchemaEntity?>(CreateSchema(x.GetArgument<DomainId>(0)!, x.GetArgument<DomainId>(1)!)));
 
             return appProvider;
@@ -181,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         public string RandomValue()
         {
-            return random.Next(0, numValues).ToString();
+            return random.Next(0, numValues).ToString(CultureInfo.InvariantCulture);
         }
 
         private static IAppEntity CreateApp(DomainId appId)

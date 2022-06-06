@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Core.Tags;
 
@@ -26,6 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
         Task ClearAsync();
 
-        Task RebuildAsync(TagsExport tags);
+        Task RenameTagAsync(string name, string newName);
+
+        Task RebuildAsync(TagsExport export);
     }
 }

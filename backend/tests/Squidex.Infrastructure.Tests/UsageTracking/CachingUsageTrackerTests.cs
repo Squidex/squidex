@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -16,6 +14,8 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public class CachingUsageTrackerTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly MemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly string key = Guid.NewGuid().ToString();
         private readonly string category = Guid.NewGuid().ToString();
@@ -25,7 +25,18 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public CachingUsageTrackerTests()
         {
+            ct = cts.Token;
+
             sut = new CachingUsageTracker(inner, cache);
+        }
+
+        [Fact]
+        public async Task Should_forward_delete_call()
+        {
+            await sut.DeleteAsync(key, ct);
+
+            A.CallTo(() => inner.DeleteAsync(key, ct))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -33,9 +44,9 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             var counters = new Counters();
 
-            await sut.TrackAsync(date, key, "my-category", counters);
+            await sut.TrackAsync(date, key, "my-category", counters, ct);
 
-            A.CallTo(() => inner.TrackAsync(date, key, "my-category", counters))
+            A.CallTo(() => inner.TrackAsync(date, key, "my-category", counters, ct))
                 .MustHaveHappened();
         }
 
@@ -45,9 +56,9 @@ namespace Squidex.Infrastructure.UsageTracking
             var dateFrom = date;
             var dateTo = dateFrom.AddDays(10);
 
-            await sut.QueryAsync(key, dateFrom, dateTo);
+            await sut.QueryAsync(key, dateFrom, dateTo, ct);
 
-            A.CallTo(() => inner.QueryAsync(key, dateFrom, dateTo))
+            A.CallTo(() => inner.QueryAsync(key, dateFrom, dateTo, ct))
                 .MustHaveHappened();
         }
 
@@ -56,16 +67,16 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             var counters = new Counters();
 
-            A.CallTo(() => inner.GetForMonthAsync(key, date, category))
+            A.CallTo(() => inner.GetForMonthAsync(key, date, category, ct))
                 .Returns(counters);
 
-            var result1 = await sut.GetForMonthAsync(key, date, category);
-            var result2 = await sut.GetForMonthAsync(key, date, category);
+            var result1 = await sut.GetForMonthAsync(key, date, category, ct);
+            var result2 = await sut.GetForMonthAsync(key, date, category, ct);
 
             Assert.Same(counters, result1);
             Assert.Same(counters, result2);
 
-            A.CallTo(() => inner.GetForMonthAsync(key, DateTime.Today, category))
+            A.CallTo(() => inner.GetForMonthAsync(key, DateTime.Today, category, ct))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -77,16 +88,16 @@ namespace Squidex.Infrastructure.UsageTracking
             var dateFrom = date;
             var dateTo = dateFrom.AddDays(10);
 
-            A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo, category))
+            A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo, category, ct))
                 .Returns(counters);
 
-            var result1 = await sut.GetAsync(key, dateFrom, dateTo, category);
-            var result2 = await sut.GetAsync(key, dateFrom, dateTo, category);
+            var result1 = await sut.GetAsync(key, dateFrom, dateTo, category, ct);
+            var result2 = await sut.GetAsync(key, dateFrom, dateTo, category, ct);
 
             Assert.Same(counters, result1);
             Assert.Same(counters, result2);
 
-            A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo, category))
+            A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo, category, ct))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -96,12 +107,12 @@ namespace Squidex.Infrastructure.UsageTracking
             var dateFrom = date;
             var dateTo = dateFrom.AddDays(10);
 
-            var result1 = await sut.QueryAsync(key, dateFrom, dateTo);
-            var result2 = await sut.QueryAsync(key, dateFrom, dateTo);
+            var result1 = await sut.QueryAsync(key, dateFrom, dateTo, ct);
+            var result2 = await sut.QueryAsync(key, dateFrom, dateTo, ct);
 
             Assert.NotSame(result2, result1);
 
-            A.CallTo(() => inner.QueryAsync(key, dateFrom, dateTo))
+            A.CallTo(() => inner.QueryAsync(key, dateFrom, dateTo, ct))
                 .MustHaveHappenedTwiceOrMore();
         }
     }

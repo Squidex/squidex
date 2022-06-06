@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             if (roles?.Length > 0)
             {
-                return new NoUpdate { Expression = expression, Roles = roles?.ToImmutableList() };
+                return new NoUpdate { Expression = expression, Roles = roles?.ToReadonlyList() };
             }
 
             if (!string.IsNullOrWhiteSpace(expression))

@@ -1,0 +1,24 @@
+<div [formGroup]="fieldForm">
+    <div class="form-group row">
+        <div class="col-9 offset-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldDefaultValue" formControlName="defaultValue" sqxIndeterminateValue>
+                <label class="form-check-label" for="{{field.fieldId}}_fieldDefaultValue">
+                    {{ 'schemas.field.defaultValue' | sqxTranslate }}
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group row" *ngIf="isLocalizable">
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValues">{{ 'schemas.field.defaultValues' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-localized-input type="boolean" [languages]="languages" formControlName="defaultValues" id="{{field.fieldId}}_fieldDefaultValues"></sqx-localized-input>
+
+            <sqx-form-hint>
+                {{ 'schemas.field.defaultValuesHint' | sqxTranslate }}
+            </sqx-form-hint>
+        </div>
+    </div>
+</div>

@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
@@ -69,15 +65,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 if (x == schemaId.Id)
                 {
-                    return Task.FromResult(Mocks.Schema(appId, schemaId, schemaDef));
+                    return Task.FromResult((Mocks.Schema(appId, schemaId, schemaDef), ResolvedComponents.Empty));
                 }
                 else if (x == refSchemaId1.Id)
                 {
-                    return Task.FromResult(Mocks.Schema(appId, refSchemaId1, refSchemaDef));
+                    return Task.FromResult((Mocks.Schema(appId, refSchemaId1, refSchemaDef), ResolvedComponents.Empty));
                 }
                 else if (x == refSchemaId2.Id)
                 {
-                    return Task.FromResult(Mocks.Schema(appId, refSchemaId2, refSchemaDef));
+                    return Task.FromResult((Mocks.Schema(appId, refSchemaId2, refSchemaDef), ResolvedComponents.Empty));
                 }
                 else
                 {
@@ -152,13 +148,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     .AddField("ref1",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("en", "ref1_1, 13")
                                     .Add("de", "ref1_1, 13")))
                     .AddField("ref2",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("en", "ref2_1, 23")
                                     .Add("de", "ref2_1, 23"))),
                 contents[0].ReferenceData);
@@ -168,13 +164,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     .AddField("ref1",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("en", "ref1_2, 17")
                                     .Add("de", "ref1_2, 17")))
                     .AddField("ref2",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("en", "ref2_2, 29")
                                     .Add("de", "ref2_2, 29"))),
                 contents[1].ReferenceData);
@@ -205,13 +201,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     .AddField("ref1",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("en", "ref1_1, 13")
                                     .Add("de", "ref1_1, 13")))
                     .AddField("ref2",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("en", "2 Reference(s)")
                                     .Add("de", "2 Reference(s)"))),
                 contents[0].ReferenceData);
@@ -221,13 +217,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     .AddField("ref1",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("en", "ref1_2, 17")
                                     .Add("de", "ref1_2, 17")))
                     .AddField("ref2",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("en", "2 Reference(s)")
                                     .Add("de", "2 Reference(s)"))),
                 contents[1].ReferenceData);
@@ -298,7 +294,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         .AddField("ref2",
                             new ContentFieldData()
                                 .AddInvariant(JsonValue.Array(ref2.Select(x => x.ToString())))),
-                SchemaId = schemaId, AppId = appId,
+                SchemaId = schemaId,
+                AppId = appId,
                 Version = 0
             };
         }
@@ -316,7 +313,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         .AddField("number",
                             new ContentFieldData()
                                 .AddInvariant(number)),
-                SchemaId = refSchemaId, AppId = appId,
+                SchemaId = refSchemaId,
+                AppId = appId,
                 Version = version
             };
         }

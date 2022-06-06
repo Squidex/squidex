@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace Squidex.Domain.Apps.Entities.Rules
 {
     public interface IRuleQueryService
     {
-        Task<IReadOnlyList<IEnrichedRuleEntity>> QueryAsync(Context context);
+        Task<IReadOnlyList<IEnrichedRuleEntity>> QueryAsync(Context context,
+            CancellationToken ct = default);
     }
 }

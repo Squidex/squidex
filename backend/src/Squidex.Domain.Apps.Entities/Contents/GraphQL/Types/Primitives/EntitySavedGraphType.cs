@@ -19,13 +19,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 
         private EntitySavedGraphType()
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = "EntitySavedResultDto";
 
             AddField(new FieldType
             {
                 Name = "version",
                 Resolver = ResolveVersion(),
-                ResolvedType = AllTypes.NonNullLong,
+                ResolvedType = Scalars.NonNullLong,
                 Description = "The new version of the item."
             });
 

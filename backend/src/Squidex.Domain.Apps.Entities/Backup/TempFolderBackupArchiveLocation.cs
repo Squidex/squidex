@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 
@@ -29,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             Stream stream;
 
-            if (string.Equals(url.Scheme, "file"))
+            if (string.Equals(url.Scheme, "file", StringComparison.OrdinalIgnoreCase))
             {
                 stream = new FileStream(url.LocalPath, FileMode.Open, FileAccess.Read);
             }
@@ -47,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
                         response.EnsureSuccessStatusCode();
 
-                        using (var sourceStream = await response.Content.ReadAsStreamAsync())
+                        await using (var sourceStream = await response.Content.ReadAsStreamAsync())
                         {
                             await sourceStream.CopyToAsync(stream);
                         }
@@ -55,7 +51,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 }
                 catch (HttpRequestException ex)
                 {
-                    throw new BackupRestoreException($"Cannot download the archive. Got status code: {response?.StatusCode}.", ex);
+                    var statusCode = response != null ? (int)response.StatusCode : 0;
+
+                    throw new BackupRestoreException($"Cannot download the archive. Got status code {statusCode}: {ex.Message}.", ex);
                 }
                 finally
                 {

@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
@@ -51,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         public async IAsyncEnumerable<EnrichedEvent> CreateSnapshotEventsAsync(RuleContext context,
-            [EnumeratorCancellation] CancellationToken ct = default)
+            [EnumeratorCancellation] CancellationToken ct)
         {
             var trigger = (ContentChangedTriggerV2)context.Rule.Trigger;
 
@@ -77,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
-            [EnumeratorCancellation] CancellationToken ct = default)
+            [EnumeratorCancellation] CancellationToken ct)
         {
             var contentEvent = (ContentEvent)@event.Payload;
 
@@ -207,9 +203,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return false;
         }
 
-        private static bool MatchsSchema(ContentChangedTriggerSchemaV2? schema, NamedId<DomainId> eventId)
+        private static bool MatchsSchema(ContentChangedTriggerSchemaV2? schema, NamedId<DomainId> schemaId)
         {
-            return eventId.Id == schema?.SchemaId;
+            return schemaId != null && schemaId.Id == schema?.SchemaId;
         }
 
         private bool MatchsCondition(ContentChangedTriggerSchemaV2 schema, EnrichedSchemaEventBase @event)
@@ -219,9 +215,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 return true;
             }
 
-            var vars = new ScriptVars
+            // Script vars are just wrappers over dictionaries for better performance.
+            var vars = new EventScriptVars
             {
-                ["event"] = @event
+                Event = @event
             };
 
             return scriptEngine.Evaluate(vars, schema.Condition);

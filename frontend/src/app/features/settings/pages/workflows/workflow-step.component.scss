@@ -1,0 +1,95 @@
+@import 'mixins';
+@import 'vars';
+
+:host ::ng-deep {
+    .dashed {
+        @include placeholder-color($color-theme-secondary);
+        border-style: dashed;
+        border-width: 1px;
+        box-shadow: none;
+    }
+
+    .color {
+        line-height: 2.8rem;
+    }
+
+    .col-label {
+        padding: 0 .5rem;
+    }
+
+    .col-arrow {
+        @include force-width(2rem);
+    }
+
+    .col-button {
+        @include force-width(3rem);
+    }
+
+    .col-step {
+        @include force-width(10rem);
+    }
+
+    .col-roles {
+        @include force-width(18rem);
+    }
+
+    .transition {
+        margin-bottom: .5rem;
+        margin-top: .25rem;
+
+        &-to {
+            line-height: 1.2rem;
+            padding: .5rem .75rem;
+            padding-right: 0;
+        }
+    }
+}
+
+.step {
+    border: 0;
+    border-bottom: 1px solid $color-border;
+    margin-bottom: 1.5rem;
+
+    &-inner {
+        padding-left: 2.4rem;
+    }
+
+    &-header {
+        &:hover {
+            .enabled {
+                visibility: visible;
+            }
+        }
+    }
+}
+
+.form-check {
+    margin: 0;
+}
+
+.btn-initial {
+    line-height: 1.6rem;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+    visibility: hidden;
+    width: 2rem;
+
+    &:disabled {
+        opacity: 1;
+    }
+
+    &.active {
+        visibility: visible;
+    }
+}
+
+.step-prevent-updates {
+    min-height: 2.5rem;
+
+    &-to {
+        line-height: 1.2rem;
+        padding: .5rem .75rem;
+        padding-right: 0;
+    }
+}

@@ -16,6 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         public DataGraphType(Builder builder, SchemaInfo schemaInfo)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = schemaInfo.DataType;
 
             foreach (var fieldInfo in schemaInfo.Fields)
@@ -26,7 +27,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 {
                     var fieldGraphType = new ObjectGraphType
                     {
-                        Name = fieldInfo.LocalizedType
+                        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
+                        Name = fieldInfo.LocalizedTypeDynamic
                     };
 
                     foreach (var partitionKey in partitioning.AllKeys)
@@ -35,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         {
                             Name = partitionKey.EscapePartition(),
                             Arguments = ContentActions.Json.Arguments,
-                            ResolvedType = AllTypes.Json,
+                            ResolvedType = Scalars.Json,
                             Resolver = FieldVisitor.JsonPath,
                             Description = fieldInfo.Field.RawProperties.Hints
                         }).WithSourceName(partitionKey);
@@ -57,6 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 {
                     var fieldGraphType = new ObjectGraphType
                     {
+                        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
                         Name = fieldInfo.LocalizedType
                     };
 

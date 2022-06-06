@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Diagnostics;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Migrations;
@@ -39,7 +38,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Envelope<IEvent> Parse(StoredEvent storedEvent)
         {
-            Guard.NotNull(storedEvent, nameof(storedEvent));
+            Guard.NotNull(storedEvent);
 
             var eventData = storedEvent.Data;
 

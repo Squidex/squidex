@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Resolvers;
+using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
@@ -37,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return new AsyncResolver<TSource, T>(resolver);
         }
 
-        private sealed class SyncResolver<TSource, T> : IFieldResolver<T>, IFieldResolver
+        private sealed class SyncResolver<TSource, T> : IFieldResolver
         {
             private readonly Func<TSource, IResolveFieldContext, GraphQLExecutionContext, T> resolver;
 
@@ -46,13 +44,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 this.resolver = resolver;
             }
 
-            public T Resolve(IResolveFieldContext context)
+            public ValueTask<object?> ResolveAsync(IResolveFieldContext context)
             {
-                var executionContext = (GraphQLExecutionContext)context.UserContext;
+                var executionContext = (GraphQLExecutionContext)context.UserContext!;
 
                 try
                 {
-                    return resolver((TSource)context.Source, context, executionContext);
+                    var result = resolver((TSource)context.Source!, context, executionContext);
+
+                    return new ValueTask<object?>(result);
                 }
                 catch (ValidationException ex)
                 {
@@ -64,22 +64,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 }
                 catch (Exception ex)
                 {
-                    executionContext.Log.LogWarning(ex, w => w
-                        .WriteProperty("action", "resolveField")
-                        .WriteProperty("status", "failed")
-                        .WriteProperty("field", context.FieldDefinition.Name));
+                    var logFactory = executionContext.Resolve<ILoggerFactory>();
 
+                    logFactory.CreateLogger("GraphQL").LogError(ex, "Failed to resolve field {field}.", context.FieldDefinition.Name);
                     throw;
                 }
             }
-
-            object IFieldResolver.Resolve(IResolveFieldContext context)
-            {
-                return Resolve(context)!;
-            }
         }
 
-        private sealed class AsyncResolver<TSource, T> : IFieldResolver<Task<T>>, IFieldResolver
+        private sealed class AsyncResolver<TSource, T> : IFieldResolver
         {
             private readonly Func<TSource, IResolveFieldContext, GraphQLExecutionContext, Task<T>> resolver;
 
@@ -88,13 +81,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 this.resolver = resolver;
             }
 
-            public async Task<T> Resolve(IResolveFieldContext context)
+            public async ValueTask<object?> ResolveAsync(IResolveFieldContext context)
             {
-                var executionContext = (GraphQLExecutionContext)context.UserContext;
+                var executionContext = (GraphQLExecutionContext)context.UserContext!;
 
                 try
                 {
-                    return await resolver((TSource)context.Source, context, executionContext);
+                    var result = await resolver((TSource)context.Source!, context, executionContext);
+
+                    return result;
                 }
                 catch (ValidationException ex)
                 {
@@ -106,18 +101,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 }
                 catch (Exception ex)
                 {
-                    executionContext.Log.LogWarning(ex, w => w
-                        .WriteProperty("action", "resolveField")
-                        .WriteProperty("status", "failed")
-                        .WriteProperty("field", context.FieldDefinition.Name));
+                    var logFactory = executionContext.Resolve<ILoggerFactory>();
 
+                    logFactory.CreateLogger("GraphQL").LogError(ex, "Failed to resolve field {field}.", context.FieldDefinition.Name);
                     throw;
                 }
-            }
-
-            object IFieldResolver.Resolve(IResolveFieldContext context)
-            {
-                return Resolve(context)!;
             }
         }
     }

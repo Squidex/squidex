@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Squidex.Infrastructure.Validation
 {
     [Serializable]
@@ -29,7 +25,7 @@ namespace Squidex.Infrastructure.Validation
 
         public ValidationError(string message, params string[] propertyNames)
         {
-            Guard.NotNullOrEmpty(message, nameof(message));
+            Guard.NotNullOrEmpty(message);
 
             this.message = message;
 

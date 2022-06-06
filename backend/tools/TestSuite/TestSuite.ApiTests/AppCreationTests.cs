@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using Xunit;
@@ -61,6 +59,26 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_not_allow_creation_if_name_used()
+        {
+            var appName = Guid.NewGuid().ToString();
+
+            // STEP 1: Create app
+            var createRequest = new CreateAppDto { Name = appName };
+
+            await _.Apps.PostAppAsync(createRequest);
+
+
+            // STEP 2: Create again and fail
+            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
+            {
+                return _.Apps.PostAppAsync(createRequest);
+            });
+
+            Assert.Equal(400, ex.StatusCode);
+        }
+
+        [Fact]
         public async Task Should_archive_app()
         {
             var appName = Guid.NewGuid().ToString();
@@ -97,6 +115,29 @@ namespace TestSuite.ApiTests
 
             // STEP 3: Create app again
             await _.Apps.PostAppAsync(createRequest);
+        }
+
+        [Fact]
+        public async Task Should_create_app_from_templates()
+        {
+            var appName = Guid.NewGuid().ToString();
+
+            // STEP 1: Get template.
+            var templates = await _.Templates.GetTemplatesAsync();
+
+            var template = templates.Items.First(x => x.IsStarter);
+
+
+            // STEP 2: Create app.
+            var createRequest = new CreateAppDto { Name = appName, Template = template.Name };
+
+            await _.Apps.PostAppAsync(createRequest);
+
+
+            // STEP 3: Get schemas
+            var schemas = await _.Schemas.GetSchemasAsync(appName);
+
+            Assert.NotEmpty(schemas.Items);
         }
     }
 }

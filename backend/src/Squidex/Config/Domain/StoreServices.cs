@@ -5,12 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Migrations.Migrations.MongoDb;
 using MongoDB.Driver;
+using Newtonsoft.Json;
+using Squidex.Assets;
+using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Apps.DomainObject;
+using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
@@ -18,22 +20,28 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Entities.History.Repositories;
+using Squidex.Domain.Apps.Entities.MongoDb.Apps;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
-using Squidex.Domain.Apps.Entities.MongoDb.FullText;
 using Squidex.Domain.Apps.Entities.MongoDb.History;
 using Squidex.Domain.Apps.Entities.MongoDb.Rules;
 using Squidex.Domain.Apps.Entities.MongoDb.Schemas;
+using Squidex.Domain.Apps.Entities.MongoDb.Text;
+using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
+using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.InMemory;
 using Squidex.Domain.Users.MongoDb;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 
@@ -75,7 +83,7 @@ namespace Squidex.Config.Domain
                         .As<IMigration>();
 
                     services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName)))
-                        .As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State>>();
+                        .As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State>>().As<IDeleter>();
 
                     services.AddTransientAs<ConvertRuleEventsJson>()
                         .As<IMigration>();
@@ -90,7 +98,10 @@ namespace Squidex.Config.Domain
                         .As<IMigration>();
 
                     services.AddHealthChecks()
-                        .AddCheck<MongoDBHealthCheck>("MongoDB", tags: new[] { "node" });
+                        .AddCheck<MongoHealthCheck>("MongoDB", tags: new[] { "node" });
+
+                    services.AddSingletonAs<MongoAssetKeyValueStore<TusMetadata>>()
+                        .As<IAssetKeyValueStore<TusMetadata>>();
 
                     services.AddSingletonAs<MongoRequestLogRepository>()
                         .As<IRequestLogRepository>();
@@ -99,10 +110,10 @@ namespace Squidex.Config.Domain
                         .As<IUsageRepository>();
 
                     services.AddSingletonAs<MongoRuleEventRepository>()
-                        .As<IRuleEventRepository>();
+                        .As<IRuleEventRepository>().As<IDeleter>();
 
                     services.AddSingletonAs<MongoHistoryEventRepository>()
-                        .As<IHistoryEventRepository>();
+                        .As<IHistoryEventRepository>().As<IDeleter>();
 
                     services.AddSingletonAs<MongoRoleStore>()
                         .As<IRoleStore<IdentityRole>>();
@@ -111,19 +122,25 @@ namespace Squidex.Config.Domain
                         .As<IUserStore<IdentityUser>>().As<IUserFactory>();
 
                     services.AddSingletonAs<MongoAssetRepository>()
-                        .As<IAssetRepository>().As<ISnapshotStore<AssetDomainObject.State>>();
+                        .As<IAssetRepository>().As<ISnapshotStore<AssetDomainObject.State>>().As<IDeleter>();
 
                     services.AddSingletonAs<MongoAssetFolderRepository>()
-                        .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderDomainObject.State>>();
+                        .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderDomainObject.State>>().As<IDeleter>();
+
+                    services.AddSingletonAs<MongoAppRepository>()
+                        .As<IAppRepository>().As<ISnapshotStore<AppDomainObject.State>>().As<IDeleter>();
+
+                    services.AddSingletonAs<MongoRuleRepository>()
+                        .As<IRuleRepository>().As<ISnapshotStore<RuleDomainObject.State>>().As<IDeleter>();
+
+                    services.AddSingletonAs<MongoSchemaRepository>()
+                        .As<ISchemaRepository>().As<ISnapshotStore<SchemaDomainObject.State>>().As<IDeleter>();
 
                     services.AddSingletonAs<MongoSchemasHash>()
-                        .AsOptional<ISchemasHash>().As<IEventConsumer>();
-
-                    services.AddSingletonAs<MongoTextIndex>()
-                        .AsOptional<ITextIndex>();
+                        .AsOptional<ISchemasHash>().As<IEventConsumer>().As<IDeleter>();
 
                     services.AddSingletonAs<MongoTextIndexerState>()
-                        .As<ITextIndexerState>();
+                        .As<ITextIndexerState>().As<IDeleter>();
 
                     services.AddOpenIddict()
                         .AddCore(builder =>
@@ -135,12 +152,41 @@ namespace Squidex.Config.Domain
                             builder.SetDefaultScopeEntity<ImmutableScope>();
                             builder.SetDefaultApplicationEntity<ImmutableApplication>();
                         });
+
+                    var atlasOptions = config.GetSection("store:mongoDb:atlas").Get<AtlasOptions>() ?? new ();
+
+                    if (atlasOptions.IsConfigured() && atlasOptions.FullTextEnabled)
+                    {
+                        services.Configure<AtlasOptions>(config.GetSection("store:mongoDb:atlas"));
+
+                        services.AddSingletonAs<AtlasTextIndex>()
+                            .AsOptional<ITextIndex>().As<IDeleter>();
+                    }
+                    else
+                    {
+                        services.AddSingletonAs<MongoTextIndex>()
+                            .AsOptional<ITextIndex>().As<IDeleter>();
+                    }
+
+                    services.AddInitializer<JsonSerializer>("Serializer (BSON)", jsonNetSerializer =>
+                    {
+                        BsonJsonConvention.Register(jsonNetSerializer);
+                    }, -1);
                 }
             });
 
-            services.AddSingleton(typeof(IStore<>), typeof(Store<>));
+            services.AddSingleton(typeof(IStore<>),
+                typeof(Store<>));
 
-            services.AddSingleton(typeof(IPersistenceFactory<>), typeof(Store<>));
+            services.AddSingleton(typeof(IPersistenceFactory<>),
+                typeof(Store<>));
+
+            services.AddSingletonAs<IInitializable>(c =>
+            {
+                var service = c.GetRequiredService<IAssetKeyValueStore<TusMetadata>>();
+
+                return new DelegateInitializer(service.GetType().Name, service.InitializeAsync);
+            });
         }
 
         private static IMongoClient GetClient(string configuration)
@@ -148,9 +194,9 @@ namespace Squidex.Config.Domain
             return Singletons<IMongoClient>.GetOrAdd(configuration, s => new MongoClient(s));
         }
 
-        private static IMongoDatabase GetDatabase(IServiceProvider service, string name)
+        private static IMongoDatabase GetDatabase(IServiceProvider serviceProvider, string name)
         {
-            return service.GetRequiredService<IMongoClient>().GetDatabase(name);
+            return serviceProvider.GetRequiredService<IMongoClient>().GetDatabase(name);
         }
     }
 }

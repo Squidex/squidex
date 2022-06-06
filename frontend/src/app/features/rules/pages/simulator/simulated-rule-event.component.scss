@@ -1,0 +1,76 @@
+@import 'mixins';
+@import 'vars';
+
+td {
+    &.details {
+        border-top: 0;
+        border-top-left-radius: 0 !important;
+        border-top-right-radius: 0 !important;
+        padding: 0 !important;
+    }
+}
+
+.table-items-row {
+    &.expanded {
+        td {
+            border-bottom: 0;
+            border-bottom-left-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+        }
+    }
+}
+
+.event {
+    &-header,
+    &-dump {
+        padding: .75rem 1.25rem;
+    }
+
+    &-header {
+        background: $color-border-light;
+        border: 0;
+        border-bottom: 2px solid $color-border;
+        position: relative;
+
+        h4 {
+            font-size: 1rem;
+            font-weight: 500;
+            margin: 0;
+        }
+    }
+}
+
+.history {
+    border-left: 2px dashed $color-border;
+    margin: .5rem 0;
+    padding: .5rem 1.5rem;
+    padding-right: 0;
+    position: relative;
+
+    &-state {
+        position: relative;
+
+        &::before {
+            @include circle($history-dot-size);
+            @include absolute(.5rem, null, null, -1.5rem);
+            background: $color-border;
+            content: '';
+            margin: 0;
+            margin-left: $history-dot-offset-x;
+        }
+    }
+
+    &-start,
+    &-stop {
+        @include circle($history-dot-size);
+        background: $color-border;
+    }
+
+    &-start {
+        @include absolute(-$history-dot-size * .5, null, null, $history-dot-offset-x);
+    }
+
+    &-stop {
+        @include absolute(null, null, -$history-dot-size * .5, $history-dot-offset-x);
+    }
+}

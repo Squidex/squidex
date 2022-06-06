@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
@@ -32,6 +31,43 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         [FromQuery]
         public bool Duplicate { get; set; }
+
+        public static UpsertAsset ToCommand(AssetTusFile file)
+        {
+            var command = new UpsertAsset { File = file };
+
+            bool TryGetString(string key, out string result)
+            {
+                result = null!;
+
+                var value = file.Metadata.FirstOrDefault(x => string.Equals(x.Key, key, StringComparison.OrdinalIgnoreCase)).Value;
+
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    result = value;
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (TryGetString("id", out var id))
+            {
+                command.AssetId = DomainId.Create(id);
+            }
+
+            if (TryGetString("parentId", out var parentId))
+            {
+                command.ParentId = DomainId.Create(parentId);
+            }
+
+            if (TryGetString("duplicate", out var duplicate) && bool.TryParse(duplicate, out var parsed))
+            {
+                command.Duplicate = parsed;
+            }
+
+            return command;
+        }
 
         public UpsertAsset ToCommand(DomainId id, AssetFile file)
         {

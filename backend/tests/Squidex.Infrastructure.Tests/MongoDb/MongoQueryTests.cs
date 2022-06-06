@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using FakeItEasy;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
@@ -23,9 +20,6 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public class MongoQueryTests
     {
-        private readonly IBsonSerializerRegistry registry = BsonSerializer.SerializerRegistry;
-        private readonly IBsonSerializer<TestEntity> serializer = BsonSerializer.SerializerRegistry.GetSerializer<TestEntity>();
-
         public class TestEntity
         {
             public DomainId Id { get; set; }
@@ -317,23 +311,25 @@ namespace Squidex.Infrastructure.MongoDb
                 .MustHaveHappened();
         }
 
-        private void AssertQuery(string expected, FilterNode<ClrValue> filter, object? arg = null)
+        private static void AssertQuery(string expected, FilterNode<ClrValue> filter, object? arg = null)
         {
             AssertQuery(new ClrQuery { Filter = filter }, expected, arg);
         }
 
-        private void AssertQuery(ClrQuery query, string expected, object? arg = null)
+        private static void AssertQuery(ClrQuery query, string expected, object? arg = null)
         {
+            var filter = query.BuildFilter<TestEntity>().Filter!;
+
             var rendered =
-                query.BuildFilter<TestEntity>().Filter!
-                    .Render(serializer, registry).ToString();
+                filter.Render(
+                    BsonSerializer.SerializerRegistry.GetSerializer<TestEntity>(),
+                    BsonSerializer.SerializerRegistry)
+                .ToString();
 
-            var expectation = Cleanup(expected, arg);
-
-            Assert.Equal(expectation, rendered);
+            Assert.Equal(Cleanup(expected, arg), rendered);
         }
 
-        private void AssertSorting(string expected, params SortNode[] sort)
+        private static void AssertSorting(string expected, params SortNode[] sort)
         {
             var cursor = A.Fake<IFindFluent<TestEntity, TestEntity>>();
 
@@ -342,19 +338,21 @@ namespace Squidex.Infrastructure.MongoDb
             A.CallTo(() => cursor.Sort(A<SortDefinition<TestEntity>>._))
                 .Invokes((SortDefinition<TestEntity> sortDefinition) =>
                 {
-                    rendered = sortDefinition.Render(serializer, registry).ToString();
+                    rendered =
+                       sortDefinition.Render(
+                           BsonSerializer.SerializerRegistry.GetSerializer<TestEntity>(),
+                           BsonSerializer.SerializerRegistry)
+                       .ToString();
                 });
 
             cursor.QuerySort(new ClrQuery { Sort = sort.ToList() });
 
-            var expectation = Cleanup(expected);
-
-            Assert.Equal(expectation, rendered);
+            Assert.Equal(Cleanup(expected), rendered);
         }
 
         private static string Cleanup(string filter, object? arg = null)
         {
-            return filter.Replace('\'', '"').Replace("[value]", arg?.ToString());
+            return filter.Replace('\'', '"').Replace("[value]", arg?.ToString(), StringComparison.Ordinal);
         }
     }
 }

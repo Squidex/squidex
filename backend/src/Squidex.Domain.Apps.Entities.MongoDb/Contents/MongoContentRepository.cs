@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -47,7 +43,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             this.appProvider = appProvider;
         }
 
-        public async Task InitializeAsync(CancellationToken ct = default)
+        public async Task InitializeAsync(
+            CancellationToken ct)
         {
             await collectionAll.InitializeAsync(ct);
             await collectionPublished.InitializeAsync(ct);
@@ -57,6 +54,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             CancellationToken ct = default)
         {
             return collectionAll.StreamAll(appId, schemaIds, ct);
+        }
+
+        public IAsyncEnumerable<IContentEntity> QueryScheduledWithoutDataAsync(Instant now,
+            CancellationToken ct = default)
+        {
+            return collectionAll.QueryScheduledWithoutDataAsync(now, ct);
         }
 
         public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q, SearchScope scope,
@@ -128,12 +131,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             CancellationToken ct = default)
         {
             return collectionAll.ResetScheduledAsync(documentId, ct);
-        }
-
-        public Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback,
-            CancellationToken ct = default)
-        {
-            return collectionAll.QueryScheduledWithoutDataAsync(now, callback, ct);
         }
 
         public Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,

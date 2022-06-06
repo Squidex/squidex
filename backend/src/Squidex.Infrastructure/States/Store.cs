@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
@@ -61,7 +59,7 @@ namespace Squidex.Infrastructure.States
 
         private IPersistence<T> CreatePersistence(Type owner, DomainId key, PersistenceMode mode, HandleSnapshot<T>? applySnapshot, HandleEvent? applyEvent)
         {
-            Guard.NotNull(key, nameof(key));
+            Guard.NotNull(key);
 
             return new Persistence<T>(key, owner,
                 snapshotStore,

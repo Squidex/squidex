@@ -3,7 +3,7 @@ concurrency: marketplace-azure
 
 on:
   release:
-    types: [ released ]
+    types: [released]
 
 # az ad sp create-for-rbac --name squidex
 

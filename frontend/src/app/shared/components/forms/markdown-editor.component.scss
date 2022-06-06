@@ -1,0 +1,19 @@
+@import 'mixins';
+@import 'vars';
+
+$background: #fff;
+
+:host ::ng-deep {
+    /* stylelint-disable-next-line selector-class-pattern */
+    .CodeMirror {
+        box-sizing: content-box;
+        height: 300px;
+        padding-bottom: 10px;
+        padding-top: 10px;
+    }
+}
+
+.fullscreen {
+    @include fixed(0, 0, 0, 0);
+    z-index: 1040;
+}

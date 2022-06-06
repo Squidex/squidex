@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Jint;
 using Jint.Native;
 using Jint.Runtime;
 using Squidex.Domain.Apps.Core.Contents;

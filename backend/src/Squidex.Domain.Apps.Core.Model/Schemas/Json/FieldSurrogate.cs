@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-
 namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
     public sealed class FieldSurrogate : IFieldSettings

@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using Xunit;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
@@ -45,6 +43,26 @@ namespace TestSuite.ApiTests
 
             // Should provide new schema when apps are schemas.
             Assert.Contains(schemas.Items, x => x.Name == schemaName);
+        }
+
+        [Fact]
+        public async Task Should_not_allow_creation_if_name_used()
+        {
+            var schemaName = $"schema-{Guid.NewGuid()}";
+
+            // STEP 1: Create schema
+            var createRequest = new CreateSchemaDto { Name = schemaName };
+
+            var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+
+
+            // STEP 2: Create again and fail
+            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
+            {
+                return _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+            });
+
+            Assert.Equal(400, ex.StatusCode);
         }
 
         [Fact]

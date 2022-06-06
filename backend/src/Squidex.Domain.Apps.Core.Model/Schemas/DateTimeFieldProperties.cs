@@ -19,6 +19,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public Instant? MinValue { get; init; }
 
+        public string? Format { get; set; }
+
         public DateTimeCalculatedDefaultValue? CalculatedDefaultValue { get; init; }
 
         public DateTimeFieldEditor Editor { get; init; }

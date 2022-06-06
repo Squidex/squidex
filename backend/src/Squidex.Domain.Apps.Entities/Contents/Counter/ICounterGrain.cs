@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Counter
@@ -15,5 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         Task<long> IncrementAsync(string name);
 
         Task<long> ResetAsync(string name, long value);
+
+        Task ClearAsync();
     }
 }

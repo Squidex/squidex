@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Assets;
 
 namespace Squidex.Domain.Users
@@ -21,14 +18,16 @@ namespace Squidex.Domain.Users
             this.assetStore = assetStore;
         }
 
-        public Task UploadAsync(string userId, Stream stream, CancellationToken ct = default)
+        public Task UploadAsync(string userId, Stream stream,
+            CancellationToken ct = default)
         {
             var fileName = GetFileName(userId);
 
             return assetStore.UploadAsync(fileName, stream, true, ct);
         }
 
-        public Task DownloadAsync(string userId, Stream stream, CancellationToken ct = default)
+        public Task DownloadAsync(string userId, Stream stream,
+            CancellationToken ct = default)
         {
             var fileName = GetFileName(userId);
 

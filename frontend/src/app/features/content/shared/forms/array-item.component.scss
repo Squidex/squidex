@@ -1,0 +1,41 @@
+@import 'mixins';
+@import 'vars';
+
+:host ::ng-deep {
+    .ui-separator {
+        border-color: $color-border !important;
+        font-size: 1.2rem;
+        font-weight: normal;
+    }
+}
+
+.card {
+    border: 1px solid $color-border;
+    border-left-width: 4px;
+    position: static;
+
+    &-header {
+        line-height: 2.2rem;
+    }
+
+    .header-index {
+        @include force-width(3rem);
+        display: inline-block;
+    }
+}
+
+.col {
+    overflow: hidden;
+}
+
+.btn-text-secondary {
+    padding: .375rem;
+}
+
+.invalid {
+    border-left-color: $color-theme-error;
+}
+
+.remove {
+    @include absolute(.5rem, .5rem, auto, auto);
+}

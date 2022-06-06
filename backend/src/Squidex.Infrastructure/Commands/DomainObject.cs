@@ -5,12 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
 
 namespace Squidex.Infrastructure.Commands
 {
@@ -19,7 +16,7 @@ namespace Squidex.Infrastructure.Commands
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private readonly SnapshotList<T> snapshots = new SnapshotList<T>();
         private readonly IPersistenceFactory<T> factory;
-        private readonly ISemanticLog log;
+        private readonly ILogger log;
         private IPersistence<T>? persistence;
         private bool isLoaded;
         private DomainId uniqueId;
@@ -45,10 +42,11 @@ namespace Squidex.Infrastructure.Commands
             set => snapshots.Capacity = value;
         }
 
-        protected DomainObject(IPersistenceFactory<T> factory, ISemanticLog log)
+        protected DomainObject(IPersistenceFactory<T> factory,
+            ILogger log)
         {
-            Guard.NotNull(factory, nameof(factory));
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(factory);
+            Guard.NotNull(log);
 
             this.factory = factory;
 
@@ -70,19 +68,18 @@ namespace Squidex.Infrastructure.Commands
 
                 var allEvents = factory.WithEventSourcing(GetType(), UniqueId, @event =>
                 {
-                    var newVersion = snapshot.Version + 1;
+                    @event = @event.Migrate(snapshot);
 
-                    if (!snapshots.Contains(newVersion))
+                    var (newSnapshot, isChanged) = ApplyEvent(@event, true, snapshot, snapshot.Version, false);
+
+                    // Can only be null in case of errors or inconsistent streams.
+                    if (newSnapshot != null)
                     {
-                        snapshot = Apply(snapshot, @event);
-                        snapshot.Version = newVersion;
-
-                        snapshots.Add(snapshot, newVersion, false);
-
-                        return true;
+                        snapshot = newSnapshot;
                     }
 
-                    return false;
+                    // If all snapshorts from this one here are valid we can stop.
+                    return newSnapshot != null && !snapshots.ContainsThisAndNewer(newSnapshot.Version);
                 });
 
                 await allEvents.ReadAsync();
@@ -105,14 +102,9 @@ namespace Squidex.Infrastructure.Commands
                 }),
                 @event =>
                 {
-                    if (@event.Payload is IMigratedStateEvent<T> migratable)
-                    {
-                        var payload = migratable.Migrate(Snapshot);
+                    @event = @event.Migrate(Snapshot);
 
-                        @event = new Envelope<IEvent>(payload, @event.Headers);
-                    }
-
-                    return ApplyEvent(@event, true);
+                    return ApplyEvent(@event, true, Snapshot, Version, true).Success;
                 });
         }
 
@@ -129,14 +121,14 @@ namespace Squidex.Infrastructure.Commands
             }
             else
             {
-                var logContext = (id: uniqueId.ToString(), name: GetType().Name);
-
-                using (log.MeasureInformation(logContext, (ctx, w) => w
-                    .WriteProperty("action", "ActivateDomainObject")
-                    .WriteProperty("domainObjectType", ctx.name)
-                    .WriteProperty("domainObjectKey", ctx.id)))
+                var watch = ValueStopwatch.StartNew();
+                try
                 {
                     await ReadAsync();
+                }
+                finally
+                {
+                    log.LogInformation("Activated domain object of type {type} with ID {id} in {time}.", GetType(), UniqueId, watch.Stop());
                 }
             }
 
@@ -154,7 +146,7 @@ namespace Squidex.Infrastructure.Commands
 
             @event.SetAggregateId(uniqueId);
 
-            if (ApplyEvent(@event, false))
+            if (ApplyEvent(@event, false, Snapshot, Version, true).Success)
             {
                 uncomittedEvents.Add(@event);
             }
@@ -172,7 +164,7 @@ namespace Squidex.Infrastructure.Commands
 
         private async Task<CommandResult> DeleteCoreAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler) where TCommand : ICommand
         {
-            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(handler);
 
             var previousSnapshot = Snapshot;
             var previousVersion = Version;
@@ -215,9 +207,9 @@ namespace Squidex.Infrastructure.Commands
 
         private async Task<CommandResult> UpsertCoreAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler, bool isCreation = false) where TCommand : ICommand
         {
-            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(handler);
 
-            var wasDeleted = IsDeleted();
+            var wasDeleted = IsDeleted(Snapshot);
 
             var previousSnapshot = Snapshot;
             var previousVersion = Version;
@@ -243,7 +235,7 @@ namespace Squidex.Infrastructure.Commands
 
                             foreach (var @event in uncomittedEvents)
                             {
-                                ApplyEvent(@event, false);
+                                ApplyEvent(@event, false, Snapshot, Version, true);
                             }
 
                             await WriteAsync(events);
@@ -287,7 +279,7 @@ namespace Squidex.Infrastructure.Commands
             return true;
         }
 
-        protected virtual bool IsDeleted()
+        protected virtual bool IsDeleted(T snapshot)
         {
             return false;
         }
@@ -297,36 +289,49 @@ namespace Squidex.Infrastructure.Commands
             return false;
         }
 
+        protected virtual bool CanRecreate(IEvent @event)
+        {
+            return false;
+        }
+
         private void RestorePreviousSnapshot(T previousSnapshot, long previousVersion)
         {
             snapshots.ResetTo(previousSnapshot, previousVersion);
         }
 
-        private bool ApplyEvent(Envelope<IEvent> @event, bool isLoading)
+        private (T?, bool Success) ApplyEvent(Envelope<IEvent> @event, bool isLoading, T snapshot, long version, bool clean)
         {
-            var newVersion = Version + 1;
-
-            var snapshotOld = Snapshot;
-
-            if (IsDeleted())
+            if (IsDeleted(snapshot))
             {
-                snapshotOld = new T
+                if (!CanRecreate(@event.Payload))
+                {
+                    return default;
+                }
+
+                snapshot = new T
                 {
                     Version = Version
                 };
             }
 
-            var snapshotNew = Apply(snapshotOld, @event);
+            var newVersion = version + 1;
+            var newSnapshot = Apply(snapshot, @event);
 
-            if (!ReferenceEquals(snapshotOld, snapshotNew) || isLoading)
+            if (ReferenceEquals(snapshot, newSnapshot) && isLoading)
             {
-                snapshotNew.Version = newVersion;
-                snapshots.Add(snapshotNew, newVersion, true);
-
-                return true;
+                newSnapshot = snapshot.Copy();
             }
 
-            return false;
+            var isChanged = !ReferenceEquals(snapshot, newSnapshot);
+
+            if (isChanged)
+            {
+                newSnapshot.Version = newVersion;
+
+                snapshots.Add(newSnapshot, newVersion, clean);
+            }
+
+            return (newSnapshot, isChanged);
         }
 
         private async Task ReadAsync()
@@ -343,9 +348,7 @@ namespace Squidex.Infrastructure.Commands
                     }
                     catch (Exception ex)
                     {
-                        log.LogError(ex, w => w
-                            .WriteProperty("action", "RepairSnapshot")
-                            .WriteProperty("status", "Failed"));
+                        log.LogError(ex, "Failed to repair snapshot for domain object of type {type} with ID {id}.", GetType(), UniqueId);
                     }
                 }
             }

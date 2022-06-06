@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using CoreTweet;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Extensions.Actions.Twitter
 {
@@ -39,7 +38,8 @@ namespace Squidex.Extensions.Actions.Twitter
             return (Description, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(TweetJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(TweetJob job,
+            CancellationToken ct = default)
         {
             var tokens = Tokens.Create(
                 twitterOptions.ClientId,

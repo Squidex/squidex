@@ -1,0 +1,35 @@
+@import 'mixins';
+@import 'vars';
+
+.title {
+    @include hover-visible('.title-edit', inline);
+    position: relative;
+
+    &-edit {
+        @include absolute(0, 0, null, null);
+        color: darken($color-border-dark, 20%);
+        cursor: pointer;
+        padding: .6rem .25rem;
+    }
+
+    &-name {
+        display: inline;
+        font-size: 1.2rem;
+        font-weight: normal;
+        padding-right: 1.75rem;
+    }
+
+    &-view {
+        @include truncate;
+        border-bottom: 1px solid transparent;
+        border-top: 0;
+        padding: .375rem 0;
+        position: absolute;
+    }
+}
+
+h3 {
+    &.fallback {
+        color: $color-text-decent;
+    }
+}

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.IO;
 using System.Text.RegularExpressions;
 using Squidex.Translator.State;
 
@@ -58,7 +56,7 @@ namespace Squidex.Translator.Processes
             service.Save();
         }
 
-        private HashSet<string> GetTranslationsInTemplate(FileInfo file)
+        private static HashSet<string> GetTranslationsInTemplate(FileInfo file)
         {
             var content = File.ReadAllText(file.FullName);
 
@@ -66,7 +64,7 @@ namespace Squidex.Translator.Processes
 
             void AddTranslations(string regex)
             {
-                var matches = Regex.Matches(content, regex, RegexOptions.Singleline);
+                var matches = Regex.Matches(content, regex, RegexOptions.Singleline | RegexOptions.ExplicitCapture);
 
                 foreach (Match match in matches)
                 {
@@ -81,7 +79,7 @@ namespace Squidex.Translator.Processes
             return translations;
         }
 
-        private HashSet<string> GetTranslationsInTypescript(FileInfo file)
+        private static HashSet<string> GetTranslationsInTypescript(FileInfo file)
         {
             var content = File.ReadAllText(file.FullName);
 
@@ -89,7 +87,7 @@ namespace Squidex.Translator.Processes
 
             void AddTranslations(string regex)
             {
-                var matches = Regex.Matches(content, regex, RegexOptions.Singleline);
+                var matches = Regex.Matches(content, regex, RegexOptions.Singleline | RegexOptions.ExplicitCapture);
 
                 foreach (Match match in matches)
                 {

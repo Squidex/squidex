@@ -5,17 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
-using NJsonSchema;
-using Squidex.Domain.Apps.Core.GenerateEdmSchema;
-using Squidex.Domain.Apps.Core.GenerateJsonSchema;
+using Squidex.Domain.Apps.Core.GenerateFilters;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Text;
@@ -28,24 +22,23 @@ using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Queries.OData;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
-using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class ContentQueryParser
     {
         private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
-        private readonly EdmModel genericEdmModel = BuildEdmModel("Generic", "Content", new EdmModel(), null);
-        private readonly JsonSchema genericJsonSchema = ContentJsonSchemaBuilder.BuildSchema("Content", null, false, true);
         private readonly IMemoryCache cache;
         private readonly IJsonSerializer jsonSerializer;
+        private readonly IAppProvider appprovider;
         private readonly ITextIndex textIndex;
         private readonly ContentOptions options;
 
-        public ContentQueryParser(IMemoryCache cache, IJsonSerializer jsonSerializer, ITextIndex textIndex, IOptions<ContentOptions> options)
+        public ContentQueryParser(IAppProvider appprovider, ITextIndex textIndex, IOptions<ContentOptions> options,
+            IMemoryCache cache, IJsonSerializer jsonSerializer)
         {
             this.jsonSerializer = jsonSerializer;
+            this.appprovider = appprovider;
             this.textIndex = textIndex;
             this.cache = cache;
             this.options = options.Value;
@@ -53,17 +46,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public virtual async Task<Q> ParseAsync(Context context, Q q, ISchemaEntity? schema = null)
         {
-            Guard.NotNull(context, nameof(context));
-            Guard.NotNull(q, nameof(q));
+            Guard.NotNull(context);
+            Guard.NotNull(q);
 
-            using (Profiler.TraceMethod<ContentQueryParser>())
+            using (Telemetry.Activities.StartActivity("ContentQueryParser/ParseAsync"))
             {
-                var query = ParseClrQuery(context, q, schema);
+                var query = await ParseClrQueryAsync(context, q, schema);
 
                 await TransformFilterAsync(query, context, schema);
 
                 WithSorting(query);
-                WithPaging(query);
+                WithPaging(query, q);
 
                 q = q.WithQuery(query);
 
@@ -91,10 +84,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 if (schema == null)
                 {
-                    throw new InvalidOperationException();
+                    ThrowHelper.InvalidOperationException();
+                    return;
                 }
 
-                var textQuery = new TextQuery(query.FullText, TextFilter.ShouldHaveSchemas(schema.Id));
+                var textQuery = new TextQuery(query.FullText, 1000)
+                {
+                    PreferredSchemaId = schema.Id
+                };
 
                 var fullTextIds = await textIndex.SearchAsync(context.App, textQuery, context.Scope());
                 var fullTextFilter = ClrFilter.Eq("id", "__notfound__");
@@ -117,21 +114,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        private ClrQuery ParseClrQuery(Context context, Q q, ISchemaEntity? schema)
+        private async Task<ClrQuery> ParseClrQueryAsync(Context context, Q q, ISchemaEntity? schema)
         {
+            var components = ResolvedComponents.Empty;
+
+            if (schema != null)
+            {
+                components = await appprovider.GetComponentsAsync(schema);
+            }
+
             var query = q.Query;
 
-            if (!string.IsNullOrWhiteSpace(q.JsonQueryString))
+            if (!string.IsNullOrWhiteSpace(q.QueryAsJson))
             {
-                query = ParseJson(context, schema, q.JsonQueryString);
+                query = ParseJson(context, schema, q.QueryAsJson, components);
             }
             else if (q?.JsonQuery != null)
             {
-                query = ParseJson(context, schema, q.JsonQuery);
+                query = ParseJson(context, schema, q.JsonQuery, components);
             }
-            else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
+            else if (!string.IsNullOrWhiteSpace(q?.QueryAsOdata))
             {
-                query = ParseOData(context, schema, q.ODataQuery);
+                query = ParseOData(context, schema, q.QueryAsOdata, components);
             }
 
             return query;
@@ -150,11 +154,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        private void WithPaging(ClrQuery query)
+        private void WithPaging(ClrQuery query, Q q)
         {
-            if (query.Take == long.MaxValue)
+            if (query.Take <= 0 || query.Take == long.MaxValue)
             {
-                query.Take = options.DefaultPageSize;
+                if (q.Ids != null && q.Ids.Count > 0)
+                {
+                    query.Take = q.Ids.Count;
+                }
+                else
+                {
+                    query.Take = options.DefaultPageSize;
+                }
             }
             else if (query.Take > options.MaxResults)
             {
@@ -162,27 +173,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        private ClrQuery ParseJson(Context context, ISchemaEntity? schema, Query<IJsonValue> query)
+        private ClrQuery ParseJson(Context context, ISchemaEntity? schema, Query<JsonValue> query,
+            ResolvedComponents components)
         {
-            var jsonSchema = BuildJsonSchema(context, schema);
+            var queryModel = BuildQueryModel(context, schema, components);
 
-            return jsonSchema.Convert(query);
+            return queryModel.Convert(query);
         }
 
-        private ClrQuery ParseJson(Context context, ISchemaEntity? schema, string json)
+        private ClrQuery ParseJson(Context context, ISchemaEntity? schema, string json,
+            ResolvedComponents components)
         {
-            var jsonSchema = BuildJsonSchema(context, schema);
+            var queryModel = BuildQueryModel(context, schema, components);
 
-            return jsonSchema.Parse(json, jsonSerializer);
+            return queryModel.Parse(json, jsonSerializer);
         }
 
-        private ClrQuery ParseOData(Context context, ISchemaEntity? schema, string odata)
+        private ClrQuery ParseOData(Context context, ISchemaEntity? schema, string odata,
+            ResolvedComponents components)
         {
             try
             {
-                var model = BuildEdmModel(context, schema);
+                var model = BuildEdmModel(context, schema, components);
 
                 return model.ParseQuery(odata).ToQuery();
+            }
+            catch (ValidationException)
+            {
+                throw;
             }
             catch (NotSupportedException)
             {
@@ -200,125 +218,53 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        private JsonSchema BuildJsonSchema(Context context, ISchemaEntity? schema)
+        private QueryModel BuildQueryModel(Context context, ISchemaEntity? schema,
+            ResolvedComponents components)
         {
-            if (schema == null)
-            {
-                return genericJsonSchema;
-            }
-
             var cacheKey = BuildJsonCacheKey(context.App, schema, context.IsFrontendClient);
 
             var result = cache.GetOrCreate(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheTime;
 
-                return BuildJsonSchema(schema.SchemaDef, context.App, context.IsFrontendClient);
+                return ContentQueryModel.Build(schema?.SchemaDef, context.App.PartitionResolver(), components);
             });
 
             return result;
         }
 
-        private IEdmModel BuildEdmModel(Context context, ISchemaEntity? schema)
+        private IEdmModel BuildEdmModel(Context context, ISchemaEntity? schema,
+            ResolvedComponents components)
         {
-            if (schema == null)
-            {
-                return genericEdmModel;
-            }
-
             var cacheKey = BuildEmdCacheKey(context.App, schema, context.IsFrontendClient);
 
             var result = cache.GetOrCreate<IEdmModel>(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheTime;
 
-                return BuildEdmModel(schema.SchemaDef, context.App, context.IsFrontendClient);
+                return BuildQueryModel(context, schema, components).ConvertToEdm("Contents", schema?.SchemaDef.Name ?? "Generic");
             });
 
             return result;
         }
 
-        private static JsonSchema BuildJsonSchema(Schema schema, IAppEntity app, bool withHiddenFields)
+        private static string BuildEmdCacheKey(IAppEntity app, ISchemaEntity? schema, bool withHidden)
         {
-            var dataSchema = schema.BuildJsonSchema(app.PartitionResolver(), withHiddenFields);
-
-            return ContentJsonSchemaBuilder.BuildSchema(schema.DisplayName(), dataSchema, false, true);
-        }
-
-        private static EdmModel BuildEdmModel(Schema schema, IAppEntity app, bool withHiddenFields)
-        {
-            var model = new EdmModel();
-
-            var pascalAppName = app.Name.ToPascalCase();
-            var pascalSchemaName = schema.Name.ToPascalCase();
-
-            var typeFactory = new EdmTypeFactory(name =>
+            if (schema == null)
             {
-                var finalName = pascalSchemaName;
-
-                if (!string.IsNullOrWhiteSpace(name))
-                {
-                    finalName += ".";
-                    finalName += name;
-                }
-
-                var result = model.SchemaElements.OfType<EdmComplexType>().FirstOrDefault(x => x.Name == finalName);
-
-                if (result != null)
-                {
-                    return (result, false);
-                }
-
-                result = new EdmComplexType(pascalAppName, finalName);
-
-                model.AddElement(result);
-
-                return (result, true);
-            });
-
-            var schemaType = schema.BuildEdmType(withHiddenFields, app.PartitionResolver(), typeFactory);
-
-            return BuildEdmModel(app.Name.ToPascalCase(), schema.Name, model, schemaType);
-        }
-
-        private static EdmModel BuildEdmModel(string modelName, string name, EdmModel model, EdmComplexType? schemaType)
-        {
-            var entityType = new EdmEntityType(modelName, name);
-
-            entityType.AddStructuralProperty("id", EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty("isDeleted", EdmPrimitiveTypeKind.Boolean);
-            entityType.AddStructuralProperty("created", EdmPrimitiveTypeKind.DateTimeOffset);
-            entityType.AddStructuralProperty("createdBy", EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty("lastModified", EdmPrimitiveTypeKind.DateTimeOffset);
-            entityType.AddStructuralProperty("lastModifiedBy", EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty("newStatus", EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty("status", EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty("version", EdmPrimitiveTypeKind.Int32);
-
-            if (schemaType != null)
-            {
-                entityType.AddStructuralProperty("data", new EdmComplexTypeReference(schemaType, false));
-
-                model.AddElement(schemaType);
+                return $"EDM/__generic";
             }
 
-            var container = new EdmEntityContainer("Squidex", "Container");
-
-            container.AddEntitySet("ContentSet", entityType);
-
-            model.AddElement(container);
-            model.AddElement(entityType);
-
-            return model;
-        }
-
-        private static string BuildEmdCacheKey(IAppEntity app, ISchemaEntity schema, bool withHidden)
-        {
             return $"EDM/{app.Version}/{schema.Id}_{schema.Version}/{withHidden}";
         }
 
-        private static string BuildJsonCacheKey(IAppEntity app, ISchemaEntity schema, bool withHidden)
+        private static string BuildJsonCacheKey(IAppEntity app, ISchemaEntity? schema, bool withHidden)
         {
+            if (schema == null)
+            {
+                return $"JSON/__generic";
+            }
+
             return $"JSON/{app.Version}/{schema.Id}_{schema.Version}/{withHidden}";
         }
     }

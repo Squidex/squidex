@@ -1,0 +1,60 @@
+@import 'mixins';
+@import 'vars';
+
+.form-group {
+    position: relative;
+}
+
+.editor {
+    @include absolute(0, 0, 0, 0);
+
+    &-progress {
+        @include absolute(0, 0, null, 0);
+    }
+}
+
+.nav-link {
+    padding-bottom: 1.25rem;
+}
+
+.nav-tabs2 {
+    .nav-link {
+        color: inherit;
+    }
+}
+
+.metadata {
+    margin: 1rem auto;
+    max-width: 500px;
+    min-width: 0;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.path {
+    min-height: 2.5rem;
+}
+
+.slug {
+    padding-right: 6rem;
+}
+
+.slug-generate {
+    @include absolute(auto, 10px, 3px, auto);
+
+    &:focus {
+        box-shadow: none;
+    }
+}
+
+sqx-video-player {
+    @include absolute(0, 0, 0, 0);
+    height: auto !important;
+}
+
+ngx-doc-viewer {
+    @include absolute(0, 0, 0, 0);
+    height: auto !important;
+}

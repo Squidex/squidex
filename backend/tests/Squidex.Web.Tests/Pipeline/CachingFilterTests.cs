@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -39,7 +37,7 @@ namespace Squidex.Web.Pipeline
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
             var actionFilters = new List<IFilterMetadata>();
 
-            executingContext = new ActionExecutingContext(actionContext, actionFilters, new Dictionary<string, object>(), this);
+            executingContext = new ActionExecutingContext(actionContext, actionFilters, new Dictionary<string, object?>(), this);
             executedContext = new ActionExecutedContext(actionContext, actionFilters, this)
             {
                 Result = new OkResult()
@@ -48,17 +46,21 @@ namespace Squidex.Web.Pipeline
             sut = new CachingFilter(cachingManager);
         }
 
-        [Fact]
-        public async Task Should_return_304_for_same_etags()
+        [Theory]
+        [InlineData("13", "13")]
+        [InlineData("13", "W/13")]
+        [InlineData("W/13", "13")]
+        [InlineData("W/13", "W/13")]
+        public async Task Should_return_304_for_same_etags(string ifNoneMatch, string etag)
         {
             httpContext.Request.Method = HttpMethods.Get;
-            httpContext.Request.Headers[HeaderNames.IfNoneMatch] = "W/13";
+            httpContext.Request.Headers[HeaderNames.IfNoneMatch] = ifNoneMatch;
 
-            httpContext.Response.Headers[HeaderNames.ETag] = "W/13";
+            httpContext.Response.Headers[HeaderNames.ETag] = etag;
 
             await sut.OnActionExecutionAsync(executingContext, Next());
 
-            Assert.Equal(304, ((StatusCodeResult)executedContext.Result).StatusCode);
+            Assert.Equal(304, ((StatusCodeResult)executedContext.Result!).StatusCode);
         }
 
         [Fact]
@@ -71,7 +73,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(executingContext, Next());
 
-            Assert.Equal(200, ((StatusCodeResult)executedContext.Result).StatusCode);
+            Assert.Equal(200, ((StatusCodeResult)executedContext.Result!).StatusCode);
         }
 
         [Fact]
@@ -84,7 +86,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(executingContext, Next());
 
-            Assert.Equal(200, ((StatusCodeResult)executedContext.Result).StatusCode);
+            Assert.Equal(200, ((StatusCodeResult)executedContext.Result!).StatusCode);
         }
 
         private ActionExecutionDelegate Next()

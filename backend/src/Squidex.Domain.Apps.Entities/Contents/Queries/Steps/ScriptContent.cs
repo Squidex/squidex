@@ -5,11 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 {
@@ -25,33 +22,69 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
             CancellationToken ct)
         {
-            if (ShouldEnrich(context))
+            if (!ShouldEnrich(context))
             {
-                foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+                return;
+            }
+
+            foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+            {
+                var (schema, _) = await schemas(group.Key);
+
+                var script = schema.SchemaDef.Scripts.Query;
+
+                if (string.IsNullOrWhiteSpace(script))
                 {
-                    var schema = await schemas(group.Key);
-
-                    var script = schema.SchemaDef.Scripts.Query;
-
-                    if (!string.IsNullOrWhiteSpace(script))
-                    {
-                        await Task.WhenAll(group.Select(x => TransformAsync(context, script, x, ct)));
-                    }
+                    continue;
                 }
+
+                var vars = new ContentScriptVars
+                {
+                    AppId = schema.AppId.Id,
+                    AppName = schema.AppId.Name,
+                    SchemaId = schema.Id,
+                    SchemaName = schema.SchemaDef.Name,
+                    User = context.User
+                };
+
+                var preScript = schema.SchemaDef.Scripts.QueryPre;
+
+                if (!string.IsNullOrWhiteSpace(preScript))
+                {
+                    var options = new ScriptOptions
+                    {
+                        AsContext = true
+                    };
+
+                    await scriptEngine.ExecuteAsync(vars, preScript, options, ct);
+                }
+
+                await AsyncHelper.WhenAllThrottledAsync(group, async (content, _) =>
+                {
+                    await TransformAsync(vars, script, content, ct);
+                }, ct: ct);
             }
         }
 
-        private async Task TransformAsync(Context context, string script, ContentEntity content,
+        private async Task TransformAsync(ContentScriptVars sharedVars, string script, ContentEntity content,
             CancellationToken ct)
         {
-            var vars = new ScriptVars
+            var vars = new ContentScriptVars
             {
                 ContentId = content.Id,
                 Data = content.Data,
-                AppId = context.App.Id,
-                AppName = context.App.Name,
-                User = context.User
+                DataOld = default,
+                Status = content.Status,
+                StatusOld = default
             };
+
+            foreach (var (key, value) in sharedVars)
+            {
+                if (!vars.ContainsKey(key))
+                {
+                    vars[key] = value;
+                }
+            }
 
             var options = new ScriptOptions
             {

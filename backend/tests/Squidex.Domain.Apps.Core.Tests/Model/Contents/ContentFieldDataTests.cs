@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Json.Objects;
@@ -69,8 +67,8 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         {
             var source = new ContentFieldData
             {
-                ["en"] = JsonValue.Array(),
-                ["de"] = JsonValue.Array()
+                ["en"] = new JsonArray(),
+                ["de"] = new JsonArray()
             };
 
             var clone = source.Clone();
@@ -79,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             foreach (var (key, value) in clone)
             {
-                Assert.NotSame(value, source[key]);
+                Assert.NotSame(value.Value, source[key].Value);
             }
         }
     }

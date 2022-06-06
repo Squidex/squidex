@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Types;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
@@ -19,8 +17,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public bool HasType => types.Count > 0;
 
-        public ReferenceUnionGraphType(Builder builder, FieldInfo fieldInfo, ImmutableList<DomainId>? schemaIds)
+        public ReferenceUnionGraphType(Builder builder, FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = fieldInfo.ReferenceType;
 
             if (schemaIds?.Any() == true)

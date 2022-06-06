@@ -1,0 +1,57 @@
+<div class="top-header">
+    <ng-container *ngTemplateOutlet="topHeaderTemplate"></ng-container>
+</div>
+
+<ng-container *ngIf="!syncedHeader">
+    <div class="list-header" [class.loading-indicator]="isLoading" #headerElement>
+        <div class="inner" [style.minWidth]="innerWidth" [style.maxWidth]="innerWidth">
+            <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
+        </div>
+    </div>
+    
+    <div class="list-content normal" [class.loading-indicator]="isLoading" #contentElement sqxCompensateScrollbar>
+        <div class="inner normal" [style.minWidth]="innerWidth" [style.maxWidth]="innerWidth" [class.tabled]="table">
+            <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+        </div>
+    </div>
+</ng-container>
+
+<ng-container *ngIf="syncedHeader">
+    <div class="list-header synced" [class.loading-indicator]="isLoading" #headerElement>
+        <div class="sync-inner inner" [class.tabled2]="tableNoPadding" #header>
+            <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
+        </div>
+    </div>
+    
+    <div class="list-content synced" [class.loading-indicator]="isLoading" [sqxSyncScrolling]="header">
+        <div class="inner" [class.tabled]="table" [class.tabled2]="tableNoPadding">
+            <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+        </div>
+    </div>
+</ng-container>
+
+<div class="list-footer" [class.loading-indicator]="isLoading" #footerElement>
+    <div class="inner" [style.minWidth]="innerWidth" [style.maxWidth]="innerWidth">
+        <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
+    </div>
+</div>
+
+<div class="loader text-center" *ngIf="isLoading">
+    <sqx-loader></sqx-loader>
+</div>
+
+<ng-template #contentTemplate>
+    <ng-content></ng-content>
+</ng-template>
+
+<ng-template #topHeaderTemplate>
+    <ng-content select="[topHeader]"></ng-content>
+</ng-template>
+
+<ng-template #headerTemplate>
+    <ng-content select="[header]"></ng-content>
+</ng-template>
+
+<ng-template #footerTemplate>
+    <ng-content select="[footer]"></ng-content>
+</ng-template>

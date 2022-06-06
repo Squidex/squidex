@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class FieldNames : ImmutableList<string>
+    public sealed class FieldNames : ReadonlyList<string>
     {
         public static readonly FieldNames Empty = new FieldNames(new List<string>());
 

@@ -1,0 +1,111 @@
+@import 'mixins';
+@import 'vars';
+
+/* stylelint-disable */
+
+//
+// GENERAL
+//
+$enable-shadows:                true;
+$enable-rounded:                true;
+
+//
+// TYPOGRAPHY
+//
+$font-size-base:                1rem; // .875rem;
+
+$h1-font-size:                  $font-size-base * 1.4;
+$h2-font-size:                  $font-size-base * 1.3;
+$h3-font-size:                  $font-size-base * 1.2;
+$h4-font-size:                  $font-size-base * 1.1;
+$h5-font-size:                  $font-size-base;
+$h6-font-size:                  $font-size-base;
+
+$small-font-size:               85%;
+
+$text-muted:                    $color-text-decent;
+
+//
+// COLORS
+//
+// General colors, reduce ratio to enforce white buttons for all colors.
+$min-contrast-ratio:            1.5;
+
+// Primary color.
+$primary:                       $color-theme-brand;
+
+// Theme colors.
+$danger:                        $color-theme-error;
+$info:                          $color-theme-info;
+$secondary:                     $color-theme-secondary;
+$success:                       $color-theme-success;
+$warning:                       $color-theme-warning;
+
+// Background.
+$body-bg:                       $color-background;
+
+// Borders.
+$border-color:                  $color-border;
+$border-radius:                 .25rem;
+
+//
+// COMPONENTS
+//
+
+// Buttons
+$btn-border-width:              1px;
+$btn-white-space:               nowrap;
+
+// Alerts
+$alert-color-scale:             -100%;
+$alert-bg-scale:                0%;
+$alert-border-scale:                0%;
+$alert-link-font-weight:        normal;
+
+// Labels
+$label-margin-bottom:           .25rem;
+
+// Imputs
+$input-bg:                      $color-white;
+$input-border-color:            $color-input;
+$input-disabled-bg:             $color-input-disabled;
+$input-group-addon-bg:          $color-white;
+$input-placeholder-color:       $color-input-placeholder;
+
+$form-select-box-shadow:        0 0 0 0;
+
+$badge-bg-level: 2;
+
+// Dropdown
+$dropdown-border-color:         0;
+$dropdown-box-shadow:           0 3px 16px rgba(0, 0, 0, .2);
+$dropdown-divider-bg:           $color-border-dark;
+$dropdown-link-hover-bg:        $color-theme-brand-light;
+
+// Horizontal separator
+$hr-opacity:                    1;
+
+// cards
+$card-border-color:             $color-border;
+$card-border-radius:            $border-radius;
+$card-cap-bg:                   $color-white;
+
+// Paragraphs
+$paragraph-margin-bottom:       .5rem;
+
+// Modal
+$modal-content-border-radius:    1rem;
+$modal-footer-border-color:     $color-border;
+$modal-footer-border-width:     1px;
+$modal-header-padding-x:        1.75rem;
+$modal-header-padding-y:        .75rem;
+$modal-inner-padding:           1.75rem;
+
+// Navbar
+$navbar-padding-y:              .375rem;
+
+// Close button
+$btn-close-width:               .5rem;
+
+// Blockquote
+$blockquote-margin-y:           0;

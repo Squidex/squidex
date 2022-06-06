@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -25,6 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
               email
               displayName
             }
+            editToken
             lastModified
             lastModifiedBy
             lastModifiedByUser {
@@ -63,6 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 Version = 1,
                 Created = now,
                 CreatedBy = RefToken.User("user1"),
+                EditToken = $"token_{id}",
                 LastModified = now,
                 LastModifiedBy = RefToken.Client("client1"),
                 FileName = "MyFile.png",
@@ -101,6 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     email = $"{asset.CreatedBy.Identifier}@email.com",
                     displayName = $"name_{asset.CreatedBy.Identifier}"
                 },
+                editToken = $"token_{asset.Id}",
                 lastModified = asset.LastModified,
                 lastModifiedBy = asset.LastModifiedBy.ToString(),
                 lastModifiedByUser = new

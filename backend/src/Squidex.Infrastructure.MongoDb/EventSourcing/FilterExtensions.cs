@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using MongoDB.Driver;
 
 namespace Squidex.Infrastructure.EventSourcing
@@ -31,7 +30,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 return null;
             }
 
-            if (streamFilter.Contains("^"))
+            if (streamFilter.Contains('^', StringComparison.Ordinal))
             {
                 return Builders<MongoEventCommit>.Filter.Regex(x => x.EventStream, streamFilter);
             }
@@ -48,7 +47,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 return null;
             }
 
-            if (streamFilter.Contains("^"))
+            if (streamFilter.Contains('^', StringComparison.Ordinal))
             {
                 return Builders<ChangeStreamDocument<MongoEventCommit>>.Filter.Regex(x => x.FullDocument.EventStream, streamFilter);
             }

@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
@@ -55,7 +51,7 @@ namespace Squidex.Web.Pipeline
                 {
                     foreach (var (state, callback) in callbacks)
                     {
-                        callback(state).Wait();
+                        callback(state).Wait(httpContext.RequestAborted);
                     }
                 });
 
@@ -215,6 +211,21 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
+        public async Task Should_append_surrogate_and_ecape_if_necessary()
+        {
+            var id = DomainId.Create("id@domain");
+
+            cachingOptions.MaxSurrogateKeysSize = 100;
+
+            await MakeRequestAsync(() =>
+            {
+                cachingManager.AddDependency(id, 12);
+            });
+
+            Assert.Equal("id%40domain", httpContext.Response.Headers["Surrogate-Key"]);
+        }
+
+        [Fact]
         public async Task Should_append_surrogate_keys()
         {
             var id1 = DomainId.NewGuid();
@@ -283,6 +294,58 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
+        public async Task Should_add_header_to_etag()
+        {
+            var id1 = DomainId.NewGuid();
+
+            await MakeRequestAsync(() =>
+            {
+                cachingManager.AddDependency(id1, 12);
+            });
+
+            var etag1 = httpContext.Response.Headers[HeaderNames.ETag].ToString();
+
+            httpContext.Response.Headers.Remove(HeaderNames.ETag);
+            httpContext.Request.Headers["X-Custom"] = "123";
+
+            await MakeRequestAsync(() =>
+            {
+                cachingManager.AddDependency(id1, 12);
+                cachingManager.AddHeader("X-Custom");
+            });
+
+            var etag2 = httpContext.Response.Headers[HeaderNames.ETag].ToString();
+
+            Assert.NotEqual(etag1, etag2);
+        }
+
+        [Fact]
+        public async Task Should_not_add_header_to_etag_if_not_found()
+        {
+            var id1 = DomainId.NewGuid();
+
+            await MakeRequestAsync(() =>
+            {
+                cachingManager.AddDependency(id1, 12);
+            });
+
+            var etag1 = httpContext.Response.Headers[HeaderNames.ETag].ToString();
+
+            httpContext.Response.Headers.Remove(HeaderNames.ETag);
+            httpContext.Request.Headers["X-Other"] = "123";
+
+            await MakeRequestAsync(() =>
+            {
+                cachingManager.AddDependency(id1, 12);
+                cachingManager.AddHeader("X-Custom");
+            });
+
+            var etag2 = httpContext.Response.Headers[HeaderNames.ETag].ToString();
+
+            Assert.Equal(etag1, etag2);
+        }
+
+        [Fact]
         public async Task Should_generate_etag_from_ids_and_versions()
         {
             var id1 = DomainId.NewGuid();
@@ -295,7 +358,31 @@ namespace Squidex.Web.Pipeline
                 cachingManager.AddDependency(12);
             });
 
-            Assert.True(httpContext.Response.Headers[HeaderNames.ETag].ToString().Length > 20);
+            var etag = httpContext.Response.Headers[HeaderNames.ETag].ToString();
+
+            Assert.StartsWith("W/", etag, StringComparison.Ordinal);
+            Assert.True(etag.Length > 20);
+        }
+
+        [Fact]
+        public async Task Should_generate_strong_etag_from_ids_and_versions()
+        {
+            var id1 = DomainId.NewGuid();
+            var id2 = DomainId.NewGuid();
+
+            cachingOptions.StrongETag = true;
+
+            await MakeRequestAsync(() =>
+            {
+                cachingManager.AddDependency(id1, 12);
+                cachingManager.AddDependency(id2, 12);
+                cachingManager.AddDependency(12);
+            });
+
+            var etag = httpContext.Response.Headers[HeaderNames.ETag].ToString();
+
+            Assert.False(etag.StartsWith("W/", StringComparison.Ordinal));
+            Assert.True(etag.Length > 20);
         }
 
         [Fact]
@@ -322,7 +409,7 @@ namespace Squidex.Web.Pipeline
 
             action?.Invoke();
 
-            await httpContext.Response.StartAsync();
+            await httpContext.Response.StartAsync(httpContext.RequestAborted);
         }
     }
 }

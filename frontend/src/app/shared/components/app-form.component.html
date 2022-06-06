@@ -1,0 +1,45 @@
+<form [formGroup]="createForm.form" (ngSubmit)="createApp()">
+    <sqx-modal-dialog (close)="emitComplete()">
+        <ng-container title>
+            <ng-container *ngIf="template; else noTemplate">
+                {{ 'apps.createWithTemplate' | sqxTranslate: { template: template.title } }}
+            </ng-container>
+
+            <ng-template #noTemplate>
+                {{ 'apps.create' | sqxTranslate }}
+            </ng-template>
+        </ng-container>
+
+        <ng-container content>
+            <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
+        
+            <div class="form-group">
+                <label for="appName">{{ 'common.name' | sqxTranslate }} <small class="hint">({{ 'common.requiredHint' | sqxTranslate }})</small></label>
+                
+                <sqx-control-errors for="name"></sqx-control-errors>
+        
+                <input type="text" class="form-control" id="name" formControlName="name" autocomplete="off" sqxTransformInput="LowerCase" sqxFocusOnInit>
+                    
+                <sqx-form-hint>
+                    {{ 'apps.appNameHint' | sqxTranslate }}
+                </sqx-form-hint>
+            </div>
+
+            <div class="form-group">
+                <sqx-form-alert marginTop="2" marginBottom="0">
+                    {{ 'apps.appNameWarning' | sqxTranslate }}
+                </sqx-form-alert>
+            </div>
+        </ng-container>
+
+        <ng-container footer>
+            <button type="button" class="btn btn-secondary" (click)="emitComplete()">
+                {{ 'common.cancel' | sqxTranslate }}
+            </button>
+
+            <button type="submit" class="btn btn-success">
+                {{ 'common.create' | sqxTranslate }}
+            </button>
+        </ng-container>
+    </sqx-modal-dialog>
+</form>

@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Infrastructure;
@@ -35,7 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
             var result = new RulesDto
             {
-                Items = items.Select(x => RuleDto.FromRule(x, runningRuleId == null, ruleRunnerService, resources)).ToArray()
+                Items = items.Select(x => RuleDto.FromDomain(x, runningRuleId == null, ruleRunnerService, resources)).ToArray()
             };
 
             result.RunningRuleId = runningRuleId;

@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
-using Squidex.Log;
 
 namespace Squidex.Web
 {
@@ -19,7 +18,7 @@ namespace Squidex.Web
     {
         public static string ToEtag<T>(this IReadOnlyList<T> items) where T : IEntity, IEntityWithVersion
         {
-            using (Profiler.Trace("CalculateEtag"))
+            using (Telemetry.Activities.StartActivity("CalculateEtag"))
             {
                 var hash = Create(items, 0);
 
@@ -29,7 +28,7 @@ namespace Squidex.Web
 
         public static string ToEtag<T>(this IResultList<T> entities) where T : IEntity, IEntityWithVersion
         {
-            using (Profiler.Trace("CalculateEtag"))
+            using (Telemetry.Activities.StartActivity("CalculateEtag"))
             {
                 var hash = Create(entities, entities.Total);
 
@@ -50,7 +49,7 @@ namespace Squidex.Web
                 }
 
                 var cacheBuffer = hasher.GetHashAndReset();
-                var cacheString = BitConverter.ToString(cacheBuffer).Replace("-", string.Empty).ToUpperInvariant();
+                var cacheString = BitConverter.ToString(cacheBuffer).Replace("-", string.Empty, StringComparison.Ordinal).ToUpperInvariant();
 
                 return cacheString;
             }
@@ -58,7 +57,29 @@ namespace Squidex.Web
 
         public static string ToEtag<T>(this T entity) where T : IEntity, IEntityWithVersion
         {
-            return entity.Version.ToString();
+            return entity.Version.ToString(CultureInfo.InvariantCulture);
+        }
+
+        public static bool TryParseEtagVersion(this HttpContext httpContext, string header, out long version)
+        {
+            version = default;
+
+            if (httpContext.Request.Headers.TryGetString(header, out var etag))
+            {
+                var span = etag.AsSpan();
+
+                if (span.StartsWith("W/", StringComparison.OrdinalIgnoreCase))
+                {
+                    span = span[2..];
+                }
+
+                if (long.TryParse(span, NumberStyles.Any, CultureInfo.InvariantCulture, out version))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

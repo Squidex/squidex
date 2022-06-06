@@ -1,0 +1,8 @@
+@import 'mixins';
+@import 'vars';
+
+:host ::ng-deep {
+    .editor {
+        @include absolute(0, 0, 0, 0);
+    }
+}

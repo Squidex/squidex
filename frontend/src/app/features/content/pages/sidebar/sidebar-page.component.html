@@ -1,0 +1,11 @@
+<sqx-layout titleText="i18n:common.sidebar" [width]="20" [white]="true" [padding]="true" [overflow]="true">
+    <sqx-content-extension
+        [url]="url | async"
+        [content]="contentsState.selectedContent | async"
+        [contentSchema]="(schemasState.selectedSchema | async)!">
+    </sqx-content-extension>
+</sqx-layout>
+
+
+
+

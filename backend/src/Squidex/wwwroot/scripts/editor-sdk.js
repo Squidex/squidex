@@ -144,28 +144,36 @@ function SquidexPlugin() {
 }
 
 function SquidexFormField() {
-    var initHandler;
-    var initCalled = false;
-    var disabledHandler;
-    var disabled = false;
-    var fullscreen = false;
-    var fullscreenHandler = false;
-    var movedHandler;
-    var valueHandler;
-    var value;
-    var languageHandler;
-    var language;
-    var formValueHandler;
-    var formValue;
-    var index;
+    var context;
     var currentConfirm;
     var currentPickAssets;
-    var context;
+    var disabled = false;
+    var disabledHandler;
+    var formValue;
+    var formValueHandler;
+    var fullscreen = false;
+    var fullscreenHandler
+    var expanded = false;
+    var expandedHandler;
+    var index;
+    var initCalled = false;
+    var initHandler;
+    var language;
+    var languageHandler;
+    var movedHandler;
     var timer;
+    var value;
+    var valueHandler;
 
     function raiseDisabled() {
         if (disabledHandler) {
             disabledHandler(disabled);
+        }
+    }
+
+    function raiseExpanded() {
+        if (expandedHandler) {
+            expandedHandler(expanded);
         }
     }
 
@@ -246,6 +254,10 @@ function SquidexFormField() {
                 fullscreen = event.data.fullscreen;
 
                 raiseFullscreen();
+            } else if (type === 'expandedChanged') {
+                expanded = event.data.expanded;
+
+                raiseExpanded();
             } else if (type === 'init') {
                 context = event.data.context;
 
@@ -325,6 +337,13 @@ function SquidexFormField() {
         },
 
         /**
+         * Get the expanded state.
+         */
+        isExpanded: function () {
+            return expanded;
+        },
+
+        /**
          * Notifies the control container that the editor has been touched.
          */
         touched: function () {
@@ -350,6 +369,15 @@ function SquidexFormField() {
         toggleFullscreen: function () {
             if (window.parent) {
                 window.parent.postMessage({ type: 'fullscreen', mode: !fullscreen }, '*');
+            }
+        },
+
+        /**
+         * Notifies the parent to go to expanded mode.
+         */
+        toggleExpanded: function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'expanded', mode: !expanded }, '*');
             }
         },
 
@@ -454,14 +482,14 @@ function SquidexFormField() {
          *
          * @param {Function} callback: The callback to invoke. Argument 1: New position (number).
          */
-        onInit: function (callback) {
+        onMoved: function (callback) {
             if (!isFunction(callback)) {
                 return;
             }
 
-            initHandler = callback;
+            movedHandler = callback;
 
-            raiseInit();
+            raisedMoved();
         },
 
         /**
@@ -537,6 +565,21 @@ function SquidexFormField() {
             fullscreenHandler = callback;
 
             raiseFullscreen();
+        },
+
+        /**
+         * Register an function that is called whenever the expanded mode has changed.
+         *
+         * @param {Function} callback: The callback to invoke. Argument 1: Expanded state (boolean, expanded on = true, expanded off = false).
+         */
+        onExpanded: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
+            expandedHandler = callback;
+
+            raiseExpanded();
         },
 
         /**

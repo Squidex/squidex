@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure.Validation;
@@ -34,7 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 Items =
                     app.Workflows
-                        .Select(x => WorkflowDto.FromWorkflow(x.Key, x.Value))
+                        .Select(x => WorkflowDto.FromDomain(x.Key, x.Value))
                         .Select(x => x.CreateLinks(resources))
                         .ToArray()
             };

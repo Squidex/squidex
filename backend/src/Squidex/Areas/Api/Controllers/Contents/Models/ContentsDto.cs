@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -40,14 +38,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             var result = new ContentsDto
             {
                 Total = contents.Total,
-                Items = contents.Select(x => ContentDto.FromContent(x, resources)).ToArray()
+                Items = contents.Select(x => ContentDto.FromDomain(x, resources)).ToArray()
             };
 
             if (schema != null)
             {
                 await result.AssignStatusesAsync(workflow, schema);
 
-                result.CreateLinks(resources, schema.SchemaDef.Name);
+                await result.CreateLinksAsync(resources, workflow, schema);
             }
 
             return result;
@@ -57,22 +55,25 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         {
             var allStatuses = await workflow.GetAllAsync(schema);
 
-            Statuses = allStatuses.Select(StatusInfoDto.FromStatusInfo).ToArray();
+            Statuses = allStatuses.Select(StatusInfoDto.FromDomain).ToArray();
         }
 
-        private void CreateLinks(Resources resources, string schema)
+        private async Task CreateLinksAsync(Resources resources, IContentWorkflow workflow, ISchemaEntity schema)
         {
-            var values = new { app = resources.App, schema };
+            var values = new { app = resources.App, schema = schema.SchemaDef.Name };
 
             AddSelfLink(resources.Url<ContentsController>(x => nameof(x.GetContents), values));
 
-            if (resources.CanCreateContent(schema))
+            if (resources.CanCreateContent(values.schema))
             {
                 AddPostLink("create", resources.Url<ContentsController>(x => nameof(x.PostContent), values));
 
-                var publishValues = new { values.app, values.schema, publish = true };
+                if (resources.CanChangeStatus(values.schema) && await workflow.CanPublishInitialAsync(schema, resources.Context.User))
+                {
+                    var publishValues = new { values.app, values.schema, publish = true };
 
-                AddPostLink("create/publish", resources.Url<ContentsController>(x => nameof(x.PostContent), publishValues));
+                    AddPostLink("create/publish", resources.Url<ContentsController>(x => nameof(x.PostContent), publishValues));
+                }
             }
         }
     }

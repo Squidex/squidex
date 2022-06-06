@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using CommandDotNet;
 using FluentValidation;
 using FluentValidation.Attributes;
@@ -92,7 +88,7 @@ namespace Squidex.Translator
             [Command(Name = "clean-backend", Description = "Clean the backend translations.")]
             public void CleanBackend(TranslateArguments arguments)
             {
-                var (folder, service) = Setup(arguments, "backend");
+                var (_, service) = Setup(arguments, "backend");
 
                 Helper.CleanOtherLocales(service);
 
@@ -102,7 +98,7 @@ namespace Squidex.Translator
             [Command(Name = "clean-frontend", Description = "Clean the frontend translations.")]
             public void CleanFrontend(TranslateArguments arguments)
             {
-                var (folder, service) = Setup(arguments, "frontend");
+                var (_, service) = Setup(arguments, "frontend");
 
                 Helper.CleanOtherLocales(service);
 
@@ -141,7 +137,7 @@ namespace Squidex.Translator
             {
                 if (!Directory.Exists(arguments.Folder))
                 {
-                    throw new ArgumentException("Folder does not exist.");
+                    throw new ArgumentException("Folder does not exist.", nameof(arguments));
                 }
 
                 var supportedLocales = new string[] { "en", "nl", "it", "zh" };

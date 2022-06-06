@@ -5,22 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using FakeItEasy;
-using Squidex.Log;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Squidex.Infrastructure.Migrations
 {
     public class MigratorTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IMigrationStatus status = A.Fake<IMigrationStatus>();
         private readonly IMigrationPath path = A.Fake<IMigrationPath>();
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly ILogger<Migrator> log = A.Fake<ILogger<Migrator>>();
         private readonly List<(int From, int To, IMigration Migration)> migrations = new List<(int From, int To, IMigration Migration)>();
 
         public sealed class InMemoryStatus : IMigrationStatus
@@ -29,12 +26,14 @@ namespace Squidex.Infrastructure.Migrations
             private int version;
             private bool isLocked;
 
-            public Task<int> GetVersionAsync()
+            public Task<int> GetVersionAsync(
+                CancellationToken ct = default)
             {
                 return Task.FromResult(version);
             }
 
-            public Task<bool> TryLockAsync()
+            public Task<bool> TryLockAsync(
+                CancellationToken ct = default)
             {
                 var lockAcquired = false;
 
@@ -51,7 +50,8 @@ namespace Squidex.Infrastructure.Migrations
                 return Task.FromResult(lockAcquired);
             }
 
-            public Task CompleteAsync(int newVersion)
+            public Task CompleteAsync(int newVersion,
+                CancellationToken ct = default)
             {
                 lock (lockObject)
                 {
@@ -61,7 +61,8 @@ namespace Squidex.Infrastructure.Migrations
                 return Task.CompletedTask;
             }
 
-            public Task UnlockAsync()
+            public Task UnlockAsync(
+                CancellationToken ct = default)
             {
                 lock (lockObject)
                 {
@@ -74,6 +75,8 @@ namespace Squidex.Infrastructure.Migrations
 
         public MigratorTests()
         {
+            ct = cts.Token;
+
             A.CallTo(() => path.GetNext(A<int>._))
                 .ReturnsLazily((int version) =>
                 {
@@ -89,8 +92,11 @@ namespace Squidex.Infrastructure.Migrations
                     return (newVersion, migrations.Select(x => x.Migration));
                 });
 
-            A.CallTo(() => status.GetVersionAsync()).Returns(0);
-            A.CallTo(() => status.TryLockAsync()).Returns(true);
+            A.CallTo(() => status.GetVersionAsync(ct))
+                .Returns(0);
+
+            A.CallTo(() => status.TryLockAsync(ct))
+                .Returns(true);
         }
 
         [Fact]
@@ -102,27 +108,27 @@ namespace Squidex.Infrastructure.Migrations
 
             var sut = new Migrator(status, path, log);
 
-            await sut.MigrateAsync();
+            await sut.MigrateAsync(ct);
 
-            A.CallTo(() => migrator_0_1.UpdateAsync(A<CancellationToken>._))
+            A.CallTo(() => migrator_0_1.UpdateAsync(ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._))
+            A.CallTo(() => migrator_1_2.UpdateAsync(ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => migrator_2_3.UpdateAsync(A<CancellationToken>._))
+            A.CallTo(() => migrator_2_3.UpdateAsync(ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(1))
+            A.CallTo(() => status.CompleteAsync(1, ct))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(2))
+            A.CallTo(() => status.CompleteAsync(2, ct))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(3))
+            A.CallTo(() => status.CompleteAsync(3, ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => status.UnlockAsync())
+            A.CallTo(() => status.UnlockAsync(default))
                 .MustHaveHappened();
         }
 
@@ -135,27 +141,27 @@ namespace Squidex.Infrastructure.Migrations
 
             var sut = new Migrator(status, path, log);
 
-            await sut.MigrateAsync();
+            await sut.MigrateAsync(ct);
 
-            A.CallTo(() => migrator_0_1.UpdateAsync(A<CancellationToken>._))
+            A.CallTo(() => migrator_0_1.UpdateAsync(ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._))
+            A.CallTo(() => migrator_1_2.UpdateAsync(ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => migrator_2_3.UpdateAsync(A<CancellationToken>._))
+            A.CallTo(() => migrator_2_3.UpdateAsync(ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(1))
+            A.CallTo(() => status.CompleteAsync(1, ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(2))
+            A.CallTo(() => status.CompleteAsync(2, ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(3))
+            A.CallTo(() => status.CompleteAsync(3, ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => status.UnlockAsync())
+            A.CallTo(() => status.UnlockAsync(A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -168,9 +174,10 @@ namespace Squidex.Infrastructure.Migrations
 
             var sut = new Migrator(status, path, log);
 
-            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._)).Throws(new ArgumentException());
+            A.CallTo(() => migrator_1_2.UpdateAsync(ct))
+                .Throws(new InvalidOperationException());
 
-            await Assert.ThrowsAsync<MigrationFailedException>(() => sut.MigrateAsync());
+            await Assert.ThrowsAsync<MigrationFailedException>(() => sut.MigrateAsync(ct));
 
             A.CallTo(() => migrator_0_1.UpdateAsync(A<CancellationToken>._))
                 .MustHaveHappened();
@@ -181,16 +188,16 @@ namespace Squidex.Infrastructure.Migrations
             A.CallTo(() => migrator_2_3.UpdateAsync(A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(1))
+            A.CallTo(() => status.CompleteAsync(1, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(2))
+            A.CallTo(() => status.CompleteAsync(2, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(3))
+            A.CallTo(() => status.CompleteAsync(3, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => status.UnlockAsync())
+            A.CallTo(() => status.UnlockAsync(default))
                 .MustHaveHappened();
         }
 
@@ -202,17 +209,17 @@ namespace Squidex.Infrastructure.Migrations
 
             var ex = new InvalidOperationException();
 
-            A.CallTo(() => migrator_0_1.UpdateAsync(A<CancellationToken>._))
+            A.CallTo(() => migrator_0_1.UpdateAsync(ct))
                 .Throws(ex);
 
             var sut = new Migrator(status, path, log);
 
-            await Assert.ThrowsAsync<MigrationFailedException>(() => sut.MigrateAsync());
+            await Assert.ThrowsAsync<MigrationFailedException>(() => sut.MigrateAsync(ct));
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Fatal, ex, A<LogFormatter>._!))
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Critical && x.GetArgument<Exception>(3) == ex)
                 .MustHaveHappened();
 
-            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._))
+            A.CallTo(() => migrator_1_2.UpdateAsync(ct))
                 .MustNotHaveHappened();
         }
 
@@ -224,13 +231,38 @@ namespace Squidex.Infrastructure.Migrations
 
             var sut = new Migrator(new InMemoryStatus(), path, log) { LockWaitMs = 2 };
 
-            await Task.WhenAll(Enumerable.Repeat(0, 10).Select(x => Task.Run(() => sut.MigrateAsync())));
+            await Task.WhenAll(Enumerable.Repeat(0, 10).Select(x => Task.Run(() => sut.MigrateAsync(ct), ct)));
 
-            A.CallTo(() => migrator_0_1.UpdateAsync(A<CancellationToken>._))
+            A.CallTo(() => migrator_0_1.UpdateAsync(ct))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._))
+            A.CallTo(() => migrator_1_2.UpdateAsync(ct))
                 .MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task Should_not_release_lock_if_not_acquired()
+        {
+            using (var tcs = new CancellationTokenSource())
+            {
+                var sut = new Migrator(status, path, log) { LockWaitMs = 2 };
+
+                A.CallTo(() => status.TryLockAsync(tcs.Token))
+                    .Returns(false);
+
+                var task = sut.MigrateAsync(tcs.Token);
+
+#pragma warning disable MA0040 // Flow the cancellation token
+                await Task.Delay(100);
+#pragma warning restore MA0040 // Flow the cancellation token
+
+                tcs.Cancel();
+
+                await task;
+
+                A.CallTo(() => status.UnlockAsync(A<CancellationToken>._))
+                    .MustNotHaveHappened();
+            }
         }
 
         private IMigration BuildMigration(int fromVersion, int toVersion)

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -551,7 +549,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<ISchemaEntity>();
-            var response = SchemaDto.FromSchema(result, Resources);
+            var response = SchemaDto.FromDomain(result, Resources);
 
             return response;
         }

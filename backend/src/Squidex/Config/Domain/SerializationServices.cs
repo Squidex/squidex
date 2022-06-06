@@ -6,11 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using GraphQL;
-using GraphQL.Execution;
-using GraphQL.NewtonsoftJson;
-using GraphQL.Server;
-using Microsoft.Extensions.DependencyInjection;
 using Migrations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -23,31 +18,30 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Config.Domain
 {
     public static class SerializationServices
     {
-        private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
+        private static JsonSerializerSettings ConfigureJson(TypeNameHandling typeNameHandling, JsonSerializerSettings? settings = null)
         {
+            settings ??= new JsonSerializerSettings();
             settings.Converters.Add(new StringEnumConverter());
 
             settings.ContractResolver = new ConverterContractResolver(
                 new ContentFieldDataConverter(),
-                new EnvelopeHeadersConverter(),
-                new ExecutionResultJsonConverter(new ErrorInfoProvider()),
                 new JsonValueConverter(),
                 new StringEnumConverter(),
-                new SurrogateConverter<ClaimsPrincipal, ClaimsPrinicpalSurrogate>(),
-                new SurrogateConverter<FilterNode<IJsonValue>, JsonFilterSurrogate>(),
+                new SurrogateConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>(),
+                new SurrogateConverter<FilterNode<JsonValue>, JsonFilterSurrogate>(),
                 new SurrogateConverter<LanguageConfig, LanguageConfigSurrogate>(),
                 new SurrogateConverter<LanguagesConfig, LanguagesConfigSurrogate>(),
                 new SurrogateConverter<Roles, RolesSurrogate>(),
@@ -55,6 +49,7 @@ namespace Squidex.Config.Domain
                 new SurrogateConverter<Schema, SchemaSurrogate>(),
                 new SurrogateConverter<WorkflowStep, WorkflowStepSurrogate>(),
                 new SurrogateConverter<WorkflowTransition, WorkflowTransitionSurrogate>(),
+                new TypeConverterJsonConverter<CompareOperator>(),
                 new WriteonlyGeoJsonConverter());
 
             settings.NullValueHandling = NullValueHandling.Ignore;
@@ -81,14 +76,11 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AutoAssembyTypeProvider<SquidexMigrations>>()
                 .As<ITypeProvider>();
 
-            services.AddSingletonAs<FieldRegistry>()
+            services.AddSingletonAs<FieldTypeProvider>()
                 .As<ITypeProvider>();
 
             services.AddSingletonAs<NewtonsoftJsonSerializer>()
                 .As<IJsonSerializer>();
-
-            services.AddSingletonAs<SerializationInitializer>()
-                .AsSelf();
 
             services.AddSingletonAs<TypeNameRegistry>()
                 .AsSelf();
@@ -98,7 +90,7 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs(c =>
                 {
-                    var serializerSettings = ConfigureJson(new JsonSerializerSettings(), TypeNameHandling.Auto);
+                    var serializerSettings = ConfigureJson(TypeNameHandling.Auto, new JsonSerializerSettings());
 
                     var typeNameRegistry = c.GetService<TypeNameRegistry>();
 
@@ -119,21 +111,7 @@ namespace Squidex.Config.Domain
             {
                 options.AllowInputFormatterExceptionMessages = false;
 
-                ConfigureJson(options.SerializerSettings, TypeNameHandling.None);
-            });
-
-            return builder;
-        }
-
-        public static IGraphQLBuilder AddSquidexWriter(this IGraphQLBuilder builder)
-        {
-            builder.Services.AddSingleton<IDocumentWriter>(c =>
-            {
-                var settings = ConfigureJson(new JsonSerializerSettings(), TypeNameHandling.None);
-
-                var serializer = new NewtonsoftJsonSerializer(settings);
-
-                return new DefaultDocumentWriter(serializer);
+                ConfigureJson(TypeNameHandling.None, options.SerializerSettings);
             });
 
             return builder;

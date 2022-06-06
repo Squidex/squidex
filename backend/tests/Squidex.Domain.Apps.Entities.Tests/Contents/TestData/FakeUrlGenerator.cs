@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
@@ -36,12 +35,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
             return $"contents/{schemaId.Name}/{contentId}";
         }
 
-        public string AssetsUI(NamedId<DomainId> appId, string? query = null)
+        public string AssetContentBase()
         {
-            throw new NotSupportedException();
+            return "$assets/";
         }
 
-        public string AssetContentBase()
+        public string AssetContentCDNBase()
+        {
+            return $"cdn/assets/";
+        }
+
+        public string ContentBase()
+        {
+            return $"contents/";
+        }
+
+        public string ContentCDNBase()
+        {
+            return $"cdn/contents/";
+        }
+
+        public string AssetsUI(NamedId<DomainId> appId, string? @ref = null)
         {
             throw new NotSupportedException();
         }
@@ -92,6 +106,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
         }
 
         public string RolesUI(NamedId<DomainId> appId)
+        {
+            throw new NotSupportedException();
+        }
+
+        public string Root()
         {
             throw new NotSupportedException();
         }

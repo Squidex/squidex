@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
@@ -19,8 +17,9 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
 using Squidex.Shared.Users;
+
+#pragma warning disable MA0022 // Return Task.FromResult instead of returning null
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 {
@@ -31,8 +30,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private readonly IAppPlanBillingManager appPlansBillingManager;
         private readonly IUserResolver userResolver;
 
-        public AppDomainObject(IPersistenceFactory<State> persistence, ISemanticLog log,
-            InitialSettings initialPatterns,
+        public AppDomainObject(IPersistenceFactory<State> persistence, ILogger<AppDomainObject> log,
+            InitialSettings initialSettings,
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
             IUserResolver userResolver)
@@ -41,12 +40,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             this.userResolver = userResolver;
             this.appPlansProvider = appPlansProvider;
             this.appPlansBillingManager = appPlansBillingManager;
-            this.initialSettings = initialPatterns;
+            this.initialSettings = initialSettings;
         }
 
-        protected override bool IsDeleted()
+        protected override bool IsDeleted(State snapshot)
         {
-            return Snapshot.IsArchived;
+            return snapshot.IsDeleted;
         }
 
         protected override bool CanAcceptCreation(ICommand command)
@@ -109,6 +108,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         GuardApp.CanRemoveImage(c);
 
                         RemoveImage(c);
+
+                        return Snapshot;
+                    });
+
+                case ConfigureAssetScripts configureAssetScripts:
+                    return UpdateReturn(configureAssetScripts, c =>
+                    {
+                        GuardApp.CanUpdateAssetScripts(c);
+
+                        ConfigureAssetScripts(c);
 
                         return Snapshot;
                     });
@@ -281,16 +290,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         }
                     });
 
-                case ArchiveApp archive:
-                    return UpdateAsync(archive, async c =>
+                case DeleteApp delete:
+                    return UpdateAsync(delete, async c =>
                     {
                         await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null, null);
 
-                        ArchiveApp(c);
+                        DeleteApp(c);
                     });
 
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         }
 
@@ -325,7 +335,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         private void ChangePlan(ChangePlan command)
         {
-            if (string.Equals(appPlansProvider.GetFreePlan()?.Id, command.PlanId))
+            if (string.Equals(appPlansProvider.GetFreePlan()?.Id, command.PlanId, StringComparison.Ordinal))
             {
                 Raise(command, new AppPlanReset());
             }
@@ -343,6 +353,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private void UpdateSettings(UpdateAppSettings command)
         {
             Raise(command, new AppSettingsUpdated());
+        }
+
+        private void ConfigureAssetScripts(ConfigureAssetScripts command)
+        {
+            Raise(command, new AppAssetsScriptsConfigured());
         }
 
         private void UpdateClient(UpdateClient command)
@@ -425,9 +440,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             Raise(command, new AppRoleUpdated());
         }
 
-        private void ArchiveApp(ArchiveApp command)
+        private void DeleteApp(DeleteApp command)
         {
-            Raise(command, new AppArchived());
+            Raise(command, new AppDeleted());
         }
 
         private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent

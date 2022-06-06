@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
@@ -36,7 +33,12 @@ namespace Squidex.Extensions.Actions.Notification
         {
             if (@event is EnrichedUserEventBase userEvent)
             {
-                var text = await FormatAsync(action.Text, @event);
+                var user = await userResolver.FindByIdOrEmailAsync(action.User);
+
+                if (user == null)
+                {
+                    throw new InvalidOperationException($"Cannot find user by '{action.User}'");
+                }
 
                 var actor = userEvent.Actor;
 
@@ -45,16 +47,13 @@ namespace Squidex.Extensions.Actions.Notification
                     actor = RefToken.Client(action.Client);
                 }
 
-                var user = await userResolver.FindByIdOrEmailAsync(action.User);
-
-                if (user == null)
+                var ruleJob = new CreateComment
                 {
-                    throw new InvalidOperationException($"Cannot find user by '{action.User}'");
-                }
-
-                var commentsId = DomainId.Create(user.Id);
-
-                var ruleJob = new CreateComment { Actor = actor, CommentsId = commentsId, Text = text };
+                    Actor = actor,
+                    CommentId = DomainId.NewGuid(),
+                    CommentsId = DomainId.Create(user.Id),
+                    Text = await FormatAsync(action.Text, @event)
+                };
 
                 if (!string.IsNullOrWhiteSpace(action.Url))
                 {
@@ -72,7 +71,8 @@ namespace Squidex.Extensions.Actions.Notification
             return ("Ignore", new CreateComment());
         }
 
-        protected override async Task<Result> ExecuteJobAsync(CreateComment job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(CreateComment job,
+            CancellationToken ct = default)
         {
             if (job.CommentsId == default)
             {

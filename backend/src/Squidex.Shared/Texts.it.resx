@@ -133,6 +133,9 @@
   <data name="apps.languages.masterLanguageNotRemovable" xml:space="preserve">
     <value>La lingua master non può essere rimossa.</value>
   </data>
+  <data name="apps.maximumTotalReached" xml:space="preserve">
+    <value>You cannot create more apps. Please contact the support to remove this restriction from your account.</value>
+  </data>
   <data name="apps.nameAlreadyExists" xml:space="preserve">
     <value>Esiste già un'app con lo stesso nome.</value>
   </data>
@@ -225,6 +228,9 @@
   </data>
   <data name="common.displayName" xml:space="preserve">
     <value>Nome da visualizzare</value>
+  </data>
+  <data name="common.documentation" xml:space="preserve">
+    <value>Documentation</value>
   </data>
   <data name="common.editor" xml:space="preserve">
     <value>Redattore</value>
@@ -451,6 +457,9 @@
   <data name="contents.draftToDeleteNotFound" xml:space="preserve">
     <value>Non c'è niente da eliminare.</value>
   </data>
+  <data name="contents.invalidAllQuery" xml:space="preserve">
+    <value>Either Ids or Schedule range must be defined.</value>
+  </data>
   <data name="contents.invalidArrayOfObjects" xml:space="preserve">
     <value>Errore nel json, atteso un array di objects.</value>
   </data>
@@ -514,6 +523,9 @@
   <data name="contents.validation.assetNotFound" xml:space="preserve">
     <value>Id {id} non trovato.</value>
   </data>
+  <data name="contents.validation.assetType" xml:space="preserve">
+    <value>Not of expected type: {type}.</value>
+  </data>
   <data name="contents.validation.between" xml:space="preserve">
     <value>Deve essere tra {min} e {max}.</value>
   </data>
@@ -534,9 +546,6 @@
   </data>
   <data name="contents.validation.extension" xml:space="preserve">
     <value>Deve essere un'estensione consentita.</value>
-  </data>
-  <data name="contents.validation.image" xml:space="preserve">
-    <value>Non è un'immagine.</value>
   </data>
   <data name="contents.validation.invalid" xml:space="preserve">
     <value>Valore non consentito.</value>
@@ -625,6 +634,9 @@
   <data name="contents.validation.unique" xml:space="preserve">
     <value>Esiste un altro contenuto con lo stesso valore.</value>
   </data>
+  <data name="contents.validation.uniqueObjectValues" xml:space="preserve">
+    <value>Must not contain items with duplicate '{field}' fields.</value>
+  </data>
   <data name="contents.validation.unknownField" xml:space="preserve">
     <value>Non è noto {fieldType}.</value>
   </data>
@@ -681,12 +693,6 @@
   </data>
   <data name="dotnet_identity_UserLockedOut" xml:space="preserve">
     <value>L'utente è bloccato.</value>
-  </data>
-  <data name="exception.invalidJsonQuery" xml:space="preserve">
-    <value>La query Json non è valida: {message}</value>
-  </data>
-  <data name="exception.invalidJsonQueryJson" xml:space="preserve">
-    <value>La query Json non è valida: {message}</value>
   </data>
   <data name="exceptions.domainObjectConflict" xml:space="preserve">
     <value>L'entità ({id}) esiste già.</value>
@@ -898,9 +904,6 @@
   <data name="search.schemaResult" xml:space="preserve">
     <value>Schema {name}</value>
   </data>
-  <data name="security.passwordStolen" xml:space="preserve">
-    <value>Questa password risulta essere stata compromessa e non dovrebbe essere mai utilizzata. Se l'hai utilizzata in precedenza, cambiala!</value>
-  </data>
   <data name="setup.createUser.button" xml:space="preserve">
     <value>Nuovo utente</value>
   </data>
@@ -1066,6 +1069,9 @@
   <data name="users.logout.title" xml:space="preserve">
     <value>Esci</value>
   </data>
+  <data name="users.noEmailAddress" xml:space="preserve">
+    <value>We cannot get the email address from authentication provider.</value>
+  </data>
   <data name="users.profile.addLoginDone" xml:space="preserve">
     <value>La login è stata aggiunta con successo.</value>
   </data>
@@ -1167,6 +1173,9 @@
   </data>
   <data name="validation.notAnImage" xml:space="preserve">
     <value>L'immagine non è un'immagine valida.</value>
+  </data>
+  <data name="validation.notAnValidSvg" xml:space="preserve">
+    <value>The SVG is malicious and contains script tags.</value>
   </data>
   <data name="validation.onlyOneFile" xml:space="preserve">
     <value>Puoi caricare solo un file.</value>

@@ -5,15 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure;
-using Squidex.Log;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
@@ -36,7 +33,9 @@ namespace Squidex.Domain.Users
             A.CallTo(userManager).WithReturnType<Task<IdentityResult>>()
                 .Returns(IdentityResult.Success);
 
-            sut = new DefaultUserService(userManager, userFactory, Enumerable.Repeat(userEvents, 1), A.Fake<ISemanticLog>());
+            var log = A.Fake<ILogger<DefaultUserService>>();
+
+            sut = new DefaultUserService(userManager, userFactory, Enumerable.Repeat(userEvents, 1), log);
         }
 
         [Fact]
@@ -583,7 +582,7 @@ namespace Squidex.Domain.Users
 
             for (var i = 0; i < numCurrentUsers; i++)
             {
-                users.Add(CreatePendingUser(i.ToString()));
+                users.Add(CreatePendingUser(i.ToString(CultureInfo.InvariantCulture)));
             }
 
             A.CallTo(() => userManager.Users)

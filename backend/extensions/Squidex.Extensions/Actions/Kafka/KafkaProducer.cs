@@ -5,21 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Avro;
 using Avro.Generic;
 using Confluent.Kafka;
 using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Log;
 using Schema = Avro.Schema;
 
 namespace Squidex.Extensions.Actions.Kafka
@@ -31,7 +26,8 @@ namespace Squidex.Extensions.Actions.Kafka
         private readonly ISchemaRegistryClient schemaRegistry;
         private readonly IJsonSerializer jsonSerializer;
 
-        public KafkaProducer(IOptions<KafkaProducerOptions> options, ISemanticLog log, IJsonSerializer jsonSerializer)
+        public KafkaProducer(IOptions<KafkaProducerOptions> options, IJsonSerializer jsonSerializer,
+            ILogger<KafkaProducer> log)
         {
             this.jsonSerializer = jsonSerializer;
 
@@ -67,52 +63,48 @@ namespace Squidex.Extensions.Actions.Kafka
             }
         }
 
-        private static void LogMessage(ISemanticLog log, LogMessage message)
+        private static void LogMessage(ILogger<KafkaProducer> log, LogMessage message)
         {
-            var level = SemanticLogLevel.Information;
+            var level = LogLevel.Information;
 
             switch (message.Level)
             {
                 case SyslogLevel.Emergency:
-                    level = SemanticLogLevel.Error;
+                    level = LogLevel.Error;
                     break;
                 case SyslogLevel.Alert:
-                    level = SemanticLogLevel.Error;
+                    level = LogLevel.Error;
                     break;
                 case SyslogLevel.Critical:
-                    level = SemanticLogLevel.Error;
+                    level = LogLevel.Error;
                     break;
                 case SyslogLevel.Error:
-                    level = SemanticLogLevel.Error;
+                    level = LogLevel.Error;
                     break;
                 case SyslogLevel.Warning:
-                    level = SemanticLogLevel.Warning;
+                    level = LogLevel.Warning;
                     break;
                 case SyslogLevel.Notice:
-                    level = SemanticLogLevel.Information;
+                    level = LogLevel.Information;
                     break;
                 case SyslogLevel.Info:
-                    level = SemanticLogLevel.Information;
+                    level = LogLevel.Information;
                     break;
                 case SyslogLevel.Debug:
-                    level = SemanticLogLevel.Debug;
+                    level = LogLevel.Debug;
                     break;
             }
 
-            log.Log(level, null, w => w
-                 .WriteProperty("action", "KafkaAction")
-                 .WriteProperty("name", message.Name)
-                 .WriteProperty("message", message.Message));
+            log.Log(level, "Kafka log {name}: {message}.", message.Name, message.Message);
         }
 
-        private static void LogError(ISemanticLog log, Error error)
+        private static void LogError(ILogger<KafkaProducer> log, Error error)
         {
-            log.LogWarning(w => w
-                .WriteProperty("action", "KafkaError")
-                .WriteProperty("reason", error.Reason));
+            log.LogWarning("Kafka error with {code} and {reason}.", error.Code, error.Reason);
         }
 
-        public async Task SendAsync(KafkaJob job, CancellationToken ct)
+        public async Task SendAsync(KafkaJob job,
+            CancellationToken ct)
         {
             if (!string.IsNullOrWhiteSpace(job.Schema))
             {
@@ -130,7 +122,8 @@ namespace Squidex.Extensions.Actions.Kafka
             }
         }
 
-        private static async Task ProduceAsync<T>(IProducer<string, T> producer, Message<string, T> message, KafkaJob job, CancellationToken ct)
+        private static async Task ProduceAsync<T>(IProducer<string, T> producer, Message<string, T> message, KafkaJob job,
+            CancellationToken ct)
         {
             message.Key = job.MessageKey;
 
@@ -146,7 +139,7 @@ namespace Squidex.Extensions.Actions.Kafka
 
             if (!string.IsNullOrWhiteSpace(job.PartitionKey) && job.PartitionCount > 0)
             {
-                var partition = Math.Abs(job.PartitionKey.GetHashCode()) % job.PartitionCount;
+                var partition = Math.Abs(job.PartitionKey.GetHashCode(StringComparison.Ordinal)) % job.PartitionCount;
 
                 await producer.ProduceAsync(new TopicPartition(job.TopicName, partition), message, ct);
             }
@@ -180,23 +173,23 @@ namespace Squidex.Extensions.Actions.Kafka
             avroProducer?.Dispose();
         }
 
-        private static object GetValue(IJsonValue value, Schema schema)
+        private static object GetValue(JsonValue value, Schema schema)
         {
-            switch (value)
+            switch (value.Type)
             {
-                case JsonString s when IsTypeOrUnionWith(schema, Schema.Type.String):
-                    return s.Value;
-                case JsonNumber n when IsTypeOrUnionWith(schema, Schema.Type.Long):
-                    return (long)n.Value;
-                case JsonNumber n when IsTypeOrUnionWith(schema, Schema.Type.Float):
-                    return (float)n.Value;
-                case JsonNumber n when IsTypeOrUnionWith(schema, Schema.Type.Int):
-                    return (int)n.Value;
-                case JsonNumber n when IsTypeOrUnionWith(schema, Schema.Type.Double):
-                    return n.Value;
-                case JsonBoolean b when IsTypeOrUnionWith(schema, Schema.Type.Boolean):
-                    return b.Value;
-                case JsonObject o when IsTypeOrUnionWith(schema, Schema.Type.Map):
+                case JsonValueType.String when IsTypeOrUnionWith(schema, Schema.Type.String):
+                    return value.AsString;
+                case JsonValueType.Number when IsTypeOrUnionWith(schema, Schema.Type.Long):
+                    return (long)value.AsNumber;
+                case JsonValueType.Number when IsTypeOrUnionWith(schema, Schema.Type.Float):
+                    return (float)value.AsNumber;
+                case JsonValueType.Number when IsTypeOrUnionWith(schema, Schema.Type.Int):
+                    return (int)value.AsNumber;
+                case JsonValueType.Number when IsTypeOrUnionWith(schema, Schema.Type.Double):
+                    return value.AsNumber;
+                case JsonValueType.Boolean when IsTypeOrUnionWith(schema, Schema.Type.Boolean):
+                    return value.AsBoolean;
+                case JsonValueType.Object when IsTypeOrUnionWith(schema, Schema.Type.Map):
                     {
                         var mapResult = new Dictionary<string, object>();
 
@@ -204,14 +197,14 @@ namespace Squidex.Extensions.Actions.Kafka
                         {
                             var map = (MapSchema)union.Schemas.FirstOrDefault(x => x.Tag == Schema.Type.Map);
 
-                            foreach (var (key, childValue) in o)
+                            foreach (var (key, childValue) in value.AsObject)
                             {
                                 mapResult.Add(key, GetValue(childValue, map?.ValueSchema));
                             }
                         }
                         else if (schema is MapSchema map)
                         {
-                            foreach (var (key, childValue) in o)
+                            foreach (var (key, childValue) in value.AsObject)
                             {
                                 mapResult.Add(key, GetValue(childValue, map?.ValueSchema));
                             }
@@ -220,7 +213,7 @@ namespace Squidex.Extensions.Actions.Kafka
                         return mapResult;
                     }
 
-                case JsonObject o when IsTypeOrUnionWith(schema, Schema.Type.Record):
+                case JsonValueType.Object when IsTypeOrUnionWith(schema, Schema.Type.Record):
                     {
                         GenericRecord result = null;
 
@@ -230,7 +223,7 @@ namespace Squidex.Extensions.Actions.Kafka
 
                             result = new GenericRecord(record);
 
-                            foreach (var (key, childValue) in o)
+                            foreach (var (key, childValue) in value.AsObject)
                             {
                                 if (record != null && record.TryGetField(key, out var field))
                                 {
@@ -242,7 +235,7 @@ namespace Squidex.Extensions.Actions.Kafka
                         {
                             result = new GenericRecord(record);
 
-                            foreach (var (key, childValue) in o)
+                            foreach (var (key, childValue) in value.AsObject)
                             {
                                 if (record.TryGetField(key, out var field))
                                 {
@@ -254,7 +247,7 @@ namespace Squidex.Extensions.Actions.Kafka
                         return result;
                     }
 
-                case JsonArray a when IsTypeOrUnionWith(schema, Schema.Type.Array):
+                case JsonValueType.Array when IsTypeOrUnionWith(schema, Schema.Type.Array):
                     {
                         var result = new List<object>();
 
@@ -262,14 +255,14 @@ namespace Squidex.Extensions.Actions.Kafka
                         {
                             var arraySchema = (ArraySchema)union.Schemas.FirstOrDefault(x => x.Tag == Schema.Type.Array);
 
-                            foreach (var item in a)
+                            foreach (var item in value.AsArray)
                             {
                                 result.Add(GetValue(item, arraySchema?.ItemSchema));
                             }
                         }
                         else if (schema is ArraySchema array)
                         {
-                            foreach (var item in a)
+                            foreach (var item in value.AsArray)
                             {
                                 result.Add(GetValue(item, array.ItemSchema));
                             }

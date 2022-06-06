@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using NewtonsoftJsonReader = Newtonsoft.Json.JsonReader;
@@ -19,7 +18,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         public BsonJsonReader(IBsonReader bsonReader)
         {
-            Guard.NotNull(bsonReader, nameof(bsonReader));
+            Guard.NotNull(bsonReader);
 
             this.bsonReader = bsonReader;
         }
@@ -82,7 +81,8 @@ namespace Squidex.Infrastructure.MongoDb
                         SetToken(NewtonsoftJsonToken.Float, Decimal128.ToDouble(bsonReader.ReadDecimal128()));
                         break;
                     default:
-                        throw new NotSupportedException();
+                        ThrowHelper.NotSupportedException();
+                        break;
                 }
             }
             else if (bsonReader.State == BsonReaderState.EndOfDocument)

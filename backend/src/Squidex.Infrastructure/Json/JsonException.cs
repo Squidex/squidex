@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Runtime.Serialization;
 
 namespace Squidex.Infrastructure.Json
@@ -17,12 +16,12 @@ namespace Squidex.Infrastructure.Json
         {
         }
 
-        public JsonException(string message)
+        public JsonException(string? message)
             : base(message)
         {
         }
 
-        public JsonException(string message, Exception inner)
+        public JsonException(string? message, Exception? inner)
             : base(message, inner)
         {
         }

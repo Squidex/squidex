@@ -1,0 +1,34 @@
+@import 'mixins';
+@import 'vars';
+
+.code {
+    background: $color-code-background;
+    margin: .25rem 0;
+    padding-left: .5rem;
+    padding-right: 3rem;
+}
+
+.code,
+.code-copy {
+    @include text-code;
+    min-height: 27px;
+    padding-bottom: .25rem;
+    padding-top: .25rem;
+}
+
+.copy-container {
+    position: relative;
+}
+
+.code-copy {
+    @include absolute(0, 0, auto, auto);
+    background: darken($color-border-dark, 30%);
+    border: 0;
+    color: $color-white;
+    padding-left: .375rem;
+    padding-right: .375rem;
+
+    &:focus {
+        background: darken($color-border-dark, 40%);
+    }
+}

@@ -14,7 +14,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [LocalizedRequired]
         public string Name { get; set; }
 
-        [LocalizedRequiredAttribute]
+        [LocalizedRequired]
         public string Value { get; set; }
 
         public (string Name, string Value) ToTuple()

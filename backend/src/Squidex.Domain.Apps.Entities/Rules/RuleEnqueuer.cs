@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -47,23 +44,22 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public async Task EnqueueAsync(Rule rule, DomainId ruleId, Envelope<IEvent> @event)
         {
-            Guard.NotNull(rule, nameof(rule));
+            Guard.NotNull(rule);
             Guard.NotNull(@event, nameof(@event));
 
             var ruleContext = new RuleContext
             {
                 Rule = rule,
-                RuleId = ruleId,
-                IgnoreStale = false
+                RuleId = ruleId
             };
 
             var jobs = ruleService.CreateJobsAsync(@event, ruleContext);
 
-            await foreach (var (job, ex, _) in jobs)
+            await foreach (var job in jobs)
             {
-                if (job != null)
+                if (job.Job != null && job.SkipReason == SkipReason.None)
                 {
-                    await ruleEventRepository.EnqueueAsync(job, ex);
+                    await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError);
                 }
             }
         }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Infrastructure.Collections;
@@ -26,7 +25,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
 
         public override RuleTrigger ToTrigger()
         {
-            var schemas = Schemas?.Select(x => x.ToTrigger()).ToImmutableList();
+            var schemas = Schemas?.Select(x => x.ToTrigger()).ToReadonlyList();
 
             return new ContentChangedTriggerV2 { HandleAll = HandleAll, Schemas = schemas };
         }

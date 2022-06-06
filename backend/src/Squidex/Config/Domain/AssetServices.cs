@@ -5,15 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using FluentFTP;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Squidex.Assets;
-using Squidex.Assets.ImageSharp;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Assets.Queries;
@@ -22,6 +18,8 @@ using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Orleans;
+using tusdotnet.Interfaces;
 
 namespace Squidex.Config.Domain
 {
@@ -53,6 +51,18 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetQueryParser>()
                 .AsSelf();
 
+            services.AddTransientAs<AssetTagsDeleter>()
+                .As<IDeleter>();
+
+            services.AddTransientAs<AssetCache>()
+                .As<IAssetCache>();
+
+            services.AddSingletonAs<AssetTusRunner>()
+                .AsSelf();
+
+            services.AddSingletonAs<AssetTusStore>()
+                .As<ITusStore>().As<ITusExpirationStore>();
+
             services.AddSingletonAs<RebuildFiles>()
                 .AsSelf();
 
@@ -63,7 +73,7 @@ namespace Squidex.Config.Domain
                 .As<ISearchSource>();
 
             services.AddSingletonAs<DefaultAssetFileStore>()
-                .As<IAssetFileStore>();
+                .As<IAssetFileStore>().As<IDeleter>();
 
             services.AddSingletonAs<AssetEnricher>()
                 .As<IAssetEnricher>();
@@ -75,7 +85,7 @@ namespace Squidex.Config.Domain
                 .As<IAssetLoader>();
 
             services.AddSingletonAs<AssetUsageTracker>()
-                .As<IAssetUsageTracker>().As<IEventConsumer>();
+                .As<IAssetUsageTracker>().As<IEventConsumer>().As<IDeleter>();
 
             services.AddSingletonAs<FileTypeAssetMetadataSource>()
                 .As<IAssetMetadataSource>();
@@ -85,6 +95,12 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<ImageAssetMetadataSource>()
                 .As<IAssetMetadataSource>();
+
+            services.AddSingletonAs<SvgAssetMetadataSource>()
+                .As<IAssetMetadataSource>();
+
+            services.AddSingletonAs<GrainBootstrap<IAssetCleanupGrain>>()
+                .AsSelf();
         }
 
         public static void AddSquidexAssetInfrastructure(this IServiceCollection services, IConfiguration config)
@@ -105,22 +121,28 @@ namespace Squidex.Config.Domain
                 },
                 ["GoogleCloud"] = () =>
                 {
-                    var bucketName = config.GetRequiredValue("assetStore:googleCloud:bucket");
+                    var options = new GoogleCloudAssetOptions
+                    {
+                        BucketName = config.GetRequiredValue("assetStore:googleCloud:bucket")
+                    };
 
-                    services.AddSingletonAs(c => new GoogleCloudAssetStore(bucketName))
+                    services.AddSingletonAs(c => new GoogleCloudAssetStore(options))
                         .As<IAssetStore>();
                 },
                 ["AzureBlob"] = () =>
                 {
-                    var connectionString = config.GetRequiredValue("assetStore:azureBlob:connectionString");
-                    var containerName = config.GetRequiredValue("assetStore:azureBlob:containerName");
+                    var options = new AzureBlobAssetOptions
+                    {
+                        ConnectionString = config.GetRequiredValue("assetStore:azureBlob:connectionString"),
+                        ContainerName = config.GetRequiredValue("assetStore:azureBlob:containerName")
+                    };
 
-                    services.AddSingletonAs(c => new AzureBlobAssetStore(connectionString, containerName))
+                    services.AddSingletonAs(c => new AzureBlobAssetStore(options))
                         .As<IAssetStore>();
                 },
                 ["AmazonS3"] = () =>
                 {
-                    var amazonS3Options = config.GetSection("assetStore:amazonS3").Get<AmazonS3Options>();
+                    var amazonS3Options = config.GetSection("assetStore:amazonS3").Get<AmazonS3AssetOptions>() ?? new ();
 
                     services.AddSingletonAs(c => new AmazonS3AssetStore(amazonS3Options))
                         .As<IAssetStore>();
@@ -153,25 +175,27 @@ namespace Squidex.Config.Domain
                     var username = config.GetRequiredValue("assetStore:ftp:username");
                     var password = config.GetRequiredValue("assetStore:ftp:password");
 
-                    var path = config.GetOptionalValue("assetStore:ftp:path", "/");
+                    var options = new FTPAssetOptions
+                    {
+                        Path = config.GetOptionalValue("assetStore:ftp:path", "/")
+                    };
 
                     services.AddSingletonAs(c =>
                         {
                             var factory = new Func<FtpClient>(() => new FtpClient(serverHost, serverPort, username, password));
 
-                            return new FTPAssetStore(factory, path, c.GetRequiredService<ILogger<FTPAssetStore>>());
+                            return new FTPAssetStore(factory, options, c.GetRequiredService<ILogger<FTPAssetStore>>());
                         })
                         .As<IAssetStore>();
                 }
             });
 
-            services.AddSingletonAs<ImageSharpAssetThumbnailGenerator>()
-                .As<IAssetThumbnailGenerator>();
+            services.AddSingletonAs<IInitializable>(c =>
+            {
+                var service = c.GetRequiredService<IAssetStore>();
 
-            services.AddSingletonAs(c => new DelegateInitializer(
-                    c.GetRequiredService<IAssetStore>().GetType().Name,
-                    c.GetRequiredService<IAssetStore>().InitializeAsync))
-                .As<IInitializable>();
+                return new DelegateInitializer(service.GetType().Name, service.InitializeAsync);
+            });
         }
     }
 }

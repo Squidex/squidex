@@ -1,0 +1,81 @@
+@import 'mixins';
+@import 'vars';
+
+$color-user-background: rgba(0, 0, 0, 50%);
+$color-background: #000;
+
+.preview {
+    align-items: center;
+    background: $color-background;
+    border: 0;
+    border-radius: 0;
+    text-align: center;
+
+    & {
+        position: relative;
+        max-height: none;
+        min-height: 2rem;
+    }
+
+    sqx-loader {
+        @include absolute(50%, null, null, 50%);
+        margin-left: -8px;
+    }
+
+    img {
+        max-width: 100%;
+    }
+}
+
+.search {
+    display: inline-block;
+    margin-left: 0;
+    margin-right: 1rem;
+    width: 300px;
+}
+
+.empty {
+    @include absolute(40%, 0, null, 0);
+}
+
+.photos {
+    column-gap: 0;
+    column-width: 200px;
+    margin-right: -1rem;
+    margin-left: 0;
+}
+
+.photo {
+    border: 2px solid $color-border;
+    border-radius: 0;
+    break-inside: avoid-column;
+    margin-bottom: .5rem;
+    margin-right: .5rem;
+    position: relative;
+
+    &:hover {
+        border-color: $color-theme-brand;
+    }
+
+    &.selected {
+        border-color: $color-theme-brand;
+    }
+
+    &-user {
+        @include absolute(auto, 0, 0, 0);
+        background: $color-user-background;
+        border: 0;
+        padding: .5rem .75rem;
+    }
+
+    &-user-link {
+        @include truncate;
+        color: $color-white;
+        font-size: $font-small;
+        font-weight: normal;
+    }
+
+    img {
+        width: 100%;
+    }
+}

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
@@ -71,7 +72,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The allowed values for the field value.
         /// </summary>
-        public ImmutableList<string>? AllowedValues { get; set; }
+        public ReadonlyList<string>? AllowedValues { get; set; }
+
+        /// <summary>
+        /// The allowed schema ids that can be embedded.
+        /// </summary>
+        public ReadonlyList<DomainId>? SchemaIds { get; init; }
 
         /// <summary>
         /// Indicates if the field value must be unique. Ignored for nested fields and localized fields.
@@ -79,9 +85,19 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public bool IsUnique { get; set; }
 
         /// <summary>
+        /// Indicates that other content items or references are embedded.
+        /// </summary>
+        public bool IsEmbeddable { get; set; }
+
+        /// <summary>
         /// Indicates that the inline editor is enabled for this field.
         /// </summary>
         public bool InlineEditable { get; set; }
+
+        /// <summary>
+        /// Indicates whether GraphQL Enum should be created.
+        /// </summary>
+        public bool CreateEnum { get; init; }
 
         /// <summary>
         /// How the string content should be interpreted.

@@ -5,12 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Squidex.Log;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -20,34 +18,44 @@ namespace Squidex.Infrastructure.EventSourcing
         private const int MaxWriteAttempts = 20;
         private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
 
-        public Task DeleteStreamAsync(string streamName)
+        public Task DeleteStreamAsync(string streamName,
+            CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNullOrEmpty(streamName);
 
-            return Collection.DeleteManyAsync(x => x.EventStream == streamName);
+            return Collection.DeleteManyAsync(x => x.EventStream == streamName, ct);
         }
 
-        public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events)
+        public Task DeleteAsync(string streamFilter,
+            CancellationToken ct = default)
         {
-            return AppendAsync(commitId, streamName, EtagVersion.Any, events);
+            Guard.NotNullOrEmpty(streamFilter);
+
+            return Collection.DeleteManyAsync(FilterExtensions.ByStream(streamFilter), ct);
         }
 
-        public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
+        public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events,
+            CancellationToken ct = default)
         {
-            Guard.NotEmpty(commitId, nameof(commitId));
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
-            Guard.NotNull(events, nameof(events));
-            Guard.LessThan(events.Count, MaxCommitSize, "events.Count");
-            Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));
+            return AppendAsync(commitId, streamName, EtagVersion.Any, events, ct);
+        }
 
-            using (Profiler.TraceMethod<MongoEventStore>())
+        public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events,
+            CancellationToken ct = default)
+        {
+            Guard.NotEmpty(commitId);
+            Guard.NotNullOrEmpty(streamName);
+            Guard.NotNull(events);
+            Guard.GreaterEquals(expectedVersion, EtagVersion.Any);
+
+            using (Telemetry.Activities.StartActivity("ContentQueryService/AppendAsync"))
             {
                 if (events.Count == 0)
                 {
                     return;
                 }
 
-                var currentVersion = await GetEventStreamOffsetAsync(streamName);
+                var currentVersion = await GetEventStreamOffsetAsync(streamName, ct);
 
                 if (expectedVersion > EtagVersion.Any && expectedVersion != currentVersion)
                 {
@@ -60,7 +68,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 {
                     try
                     {
-                        await Collection.InsertOneAsync(commit);
+                        await Collection.InsertOneAsync(commit, cancellationToken: ct);
 
                         if (!CanUseChangeStreams)
                         {
@@ -73,7 +81,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     {
                         if (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
                         {
-                            currentVersion = await GetEventStreamOffsetAsync(streamName);
+                            currentVersion = await GetEventStreamOffsetAsync(streamName, ct);
 
                             if (expectedVersion > EtagVersion.Any)
                             {
@@ -98,11 +106,12 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public async Task AppendUnsafeAsync(IEnumerable<EventCommit> commits)
+        public async Task AppendUnsafeAsync(IEnumerable<EventCommit> commits,
+            CancellationToken ct = default)
         {
-            Guard.NotNull(commits, nameof(commits));
+            Guard.NotNull(commits);
 
-            using (Profiler.TraceMethod<MongoEventStore>())
+            using (Telemetry.Activities.StartActivity("ContentQueryService/AppendUnsafeAsync"))
             {
                 var writes = new List<WriteModel<MongoEventCommit>>();
 
@@ -115,12 +124,13 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 if (writes.Count > 0)
                 {
-                    await Collection.BulkWriteAsync(writes, BulkUnordered);
+                    await Collection.BulkWriteAsync(writes, BulkUnordered, ct);
                 }
             }
         }
 
-        private async Task<long> GetEventStreamOffsetAsync(string streamName)
+        private async Task<long> GetEventStreamOffsetAsync(string streamName,
+            CancellationToken ct = default)
         {
             var document =
                 await Collection.Find(Filter.Eq(EventStreamField, streamName))
@@ -128,7 +138,7 @@ namespace Squidex.Infrastructure.EventSourcing
                         .Include(EventStreamOffsetField)
                         .Include(EventsCountField))
                     .Sort(Sort.Descending(EventStreamOffsetField)).Limit(1)
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync(ct);
 
             if (document != null)
             {

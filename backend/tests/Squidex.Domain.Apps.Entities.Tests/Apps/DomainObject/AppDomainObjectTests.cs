@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -17,7 +16,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Log;
 using Squidex.Shared.Users;
 using Xunit;
 
@@ -48,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             user = UserMocks.User(contributorId);
 
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId))
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId, default))
                 .Returns(user);
 
             A.CallTo(() => appPlansProvider.GetFreePlan())
@@ -69,12 +67,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 }
             };
 
-            sut = new AppDomainObject(PersistenceFactory, A.Dummy<ISemanticLog>(), initialSettings, appPlansProvider, appPlansBillingManager, userResolver);
+            var log = A.Fake<ILogger<AppDomainObject>>();
+
+            sut = new AppDomainObject(PersistenceFactory, log,
+                initialSettings,
+                appPlansProvider,
+                appPlansBillingManager,
+                userResolver);
+#pragma warning disable MA0056 // Do not call overridable members in constructor
             sut.Setup(Id);
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
         [Fact]
-        public async Task Command_should_throw_exception_if_app_is_archived()
+        public async Task Command_should_throw_exception_if_app_is_deleted()
         {
             await ExecuteCreateAsync();
             await ExecuteArchiveAsync();
@@ -608,7 +614,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         [Fact]
         public async Task UpdateRole_should_create_events_and_update_role()
         {
-            var command = new UpdateRole { Name = roleName, Permissions = new[] { "clients.read" }, Properties = JsonValue.Object() };
+            var command = new UpdateRole { Name = roleName, Permissions = new[] { "clients.read" }, Properties = new JsonObject() };
 
             await ExecuteCreateAsync();
             await ExecuteAddRoleAsync();
@@ -624,9 +630,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         }
 
         [Fact]
-        public async Task ArchiveApp_should_create_events_and_update_archived_flag()
+        public async Task ArchiveApp_should_create_events_and_update_deleted_flag()
         {
-            var command = new ArchiveApp();
+            var command = new DeleteApp();
 
             await ExecuteCreateAsync();
 
@@ -634,11 +640,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             result.ShouldBeEquivalent(None.Value);
 
-            Assert.True(sut.Snapshot.IsArchived);
+            Assert.True(sut.Snapshot.IsDeleted);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppArchived())
+                    CreateEvent(new AppDeleted())
                 );
 
             A.CallTo(() => appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, AppNamedId, null, A<string?>._))
@@ -687,7 +693,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         private Task ExecuteArchiveAsync()
         {
-            return PublishAsync(new ArchiveApp());
+            return PublishAsync(new DeleteApp());
         }
 
         private Task<object> PublishIdempotentAsync(AppCommand command)

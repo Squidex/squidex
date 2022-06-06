@@ -1,0 +1,35 @@
+<ng-container *sqxModal="dueTimeDialog">
+    <sqx-modal-dialog (close)="cancelStatusChange()">
+        <ng-container title>
+            {{ 'contents.changeStatusTo' | sqxTranslate: { action: dueTimeAction } }}
+        </ng-container>
+    
+        <ng-container content>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Immediately" id="immediately" name="dueTimeMode">
+                <label class="form-check-label" for="immediately">
+                    {{ 'contents.changeStatusToImmediately' | sqxTranslate: { action: dueTimeAction } }}
+                </label>
+            </div>
+    
+            <div class="form-check">
+                <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Scheduled" id="scheduled" name="dueTimeMode">
+                <label class="form-check-label" for="scheduled">
+                    {{ 'contents.changeStatusToLater' | sqxTranslate: { action: dueTimeAction } }}
+                </label>
+            </div>
+    
+            <sqx-date-time-editor [disabled]="dueTimeMode === 'Immediately'" [enforceTime]="true" mode="DateTime" [hideClear]="true" [(ngModel)]="dueTime"></sqx-date-time-editor>
+        </ng-container>
+    
+        <ng-container footer>
+            <button type="button" class="btn btn-text-secondary" (click)="cancelStatusChange()">
+                {{ 'common.cancel' | sqxTranslate }}
+            </button>
+    
+            <button type="button" class="btn btn-primary" [disabled]="dueTimeMode === 'Scheduled' && !dueTime" (click)="confirmStatusChange()" sqxFocusOnInit>
+                {{ 'common.confirm' | sqxTranslate }}
+            </button>
+        </ng-container>
+    </sqx-modal-dialog>
+</ng-container>

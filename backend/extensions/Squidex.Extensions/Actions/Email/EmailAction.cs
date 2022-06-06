@@ -23,46 +23,46 @@ namespace Squidex.Extensions.Actions.Email
     {
         [LocalizedRequired]
         [Display(Name = "Server Host", Description = "The IP address or host to the SMTP server.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string ServerHost { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Server Port", Description = "The port to the SMTP server.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public int ServerPort { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Username", Description = "The username for the SMTP server.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string ServerUsername { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Password", Description = "The password for the SMTP server.")]
-        [DataType(DataType.Password)]
+        [Editor(RuleFieldEditor.Password)]
         public string ServerPassword { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "From Address", Description = "The email sending address.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string MessageFrom { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "To Address", Description = "The email message will be sent to.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string MessageTo { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Subject", Description = "The subject line for this email message.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string MessageSubject { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Body", Description = "The message body.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string MessageBody { get; set; }
     }

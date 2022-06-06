@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-
 namespace Squidex.Domain.Apps.Core
 {
     public sealed class InvariantPartitioning : IFieldPartitioning

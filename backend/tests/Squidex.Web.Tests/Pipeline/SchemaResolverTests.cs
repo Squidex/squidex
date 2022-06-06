@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -47,7 +45,7 @@ namespace Squidex.Web.Pipeline
                 EndpointMetadata = new List<object>()
             });
 
-            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), this);
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>(), this);
             actionExecutingContext.HttpContext = httpContext;
             actionExecutingContext.HttpContext.User = new ClaimsPrincipal(user);
             actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
@@ -62,6 +60,22 @@ namespace Squidex.Web.Pipeline
             sut = new SchemaResolver(appProvider);
         }
 
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public async Task Should_return_not_found_if_schema_name_is_null(string? schema)
+        {
+            actionContext.RouteData.Values["schema"] = schema;
+
+            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+
+            AssertNotFound();
+
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true, httpContext.RequestAborted))
+                .MustNotHaveHappened();
+        }
+
         [Fact]
         public async Task Should_return_not_found_if_schema_not_published_when_attribute_applied()
         {
@@ -70,12 +84,12 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema(false);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true, httpContext.RequestAborted))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            AssetNotFound();
+            AssertNotFound();
         }
 
         [Fact]
@@ -85,7 +99,7 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema(false);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true, httpContext.RequestAborted))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -98,12 +112,12 @@ namespace Squidex.Web.Pipeline
         {
             actionContext.RouteData.Values["schema"] = schemaId.Id.ToString();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true, httpContext.RequestAborted))
                 .Returns(Task.FromResult<ISchemaEntity?>(null));
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            AssetNotFound();
+            AssertNotFound();
         }
 
         [Fact]
@@ -113,7 +127,7 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema(true);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, true))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, true, httpContext.RequestAborted))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -130,7 +144,7 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema(true);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, httpContext.RequestAborted))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -145,7 +159,7 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema(true);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, true))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, true, httpContext.RequestAborted))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -162,7 +176,7 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema(true);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, false, httpContext.RequestAborted))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -180,7 +194,7 @@ namespace Squidex.Web.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false))
+            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false, httpContext.RequestAborted))
                 .MustNotHaveHappened();
         }
 
@@ -191,11 +205,11 @@ namespace Squidex.Web.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false))
+            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false, httpContext.RequestAborted))
                 .MustNotHaveHappened();
         }
 
-        private void AssetNotFound()
+        private void AssertNotFound()
         {
             Assert.IsType<NotFoundResult>(actionExecutingContext.Result);
             Assert.False(isNextCalled);
@@ -203,7 +217,7 @@ namespace Squidex.Web.Pipeline
 
         private void AssertSchema(ISchemaEntity schema)
         {
-            Assert.Equal(schema, actionContext.HttpContext.Features.Get<ISchemaFeature>().Schema);
+            Assert.Equal(schema, actionContext.HttpContext.Features.Get<ISchemaFeature>()!.Schema);
             Assert.True(isNextCalled);
         }
 

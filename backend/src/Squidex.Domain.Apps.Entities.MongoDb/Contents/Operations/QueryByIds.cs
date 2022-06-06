@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -39,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         public async Task<IResultList<IContentEntity>> QueryAsync(DomainId appId, List<ISchemaEntity> schemas, Q q,
             CancellationToken ct)
         {
-            Guard.NotNull(q, nameof(q));
+            Guard.NotNull(q);
 
             if (q.Ids == null || q.Ids.Count == 0)
             {
@@ -88,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             }
             else
             {
-                var first = documentIds.First();
+                var first = documentIds[0];
 
                 filters.Add(
                     Filter.Or(

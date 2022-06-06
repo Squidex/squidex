@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             if (roles?.Length > 0)
             {
-                return new WorkflowTransition { Expression = expression, Roles = roles?.ToImmutableList() };
+                return new WorkflowTransition { Expression = expression, Roles = roles?.ToReadonlyList() };
             }
 
             if (!string.IsNullOrWhiteSpace(expression))

@@ -1,0 +1,37 @@
+<ng-container *ngIf="isLocalized">
+    <button type="button" class="btn btn-outline-secondary btn-sm ms-1 dropdown-toggle" title="{{ 'common.copy' | sqxTranslate }}" (click)="dropdown.toggle()" #button tabindex="-1">
+        <i class="icon-copy"></i>
+    </button>
+
+    <ng-container *sqxModal="dropdown">
+        <sqx-dropdown-menu [sqxAnchoredTo]="button" [scrollY]="true">
+            <div class="section d-flex justify-content-end">
+                <button type="button" class="btn btn-primary" (click)="copy()" tabindex="-1">
+                    {{ 'common.copy' | sqxTranslate }}
+                </button>
+            </div>
+
+            <div class="dropdown-divider"></div>
+
+            <div class="section row">
+                <label class="col-auto col-form-label" for="languageSource">{{ 'common.from' | sqxTranslate }}</label>
+                
+                <div class="col">
+                    <select class="form-select" id="languagesSource"
+                        [ngModel]="copySource"
+                        (ngModelChange)="setCopySource($event)">
+                        <option *ngFor="let language of languages" [ngValue]="language.iso2Code">{{language.iso2Code}}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="dropdown-divider"></div>
+
+            <div class="section">
+                <label>{{ 'common.to' | sqxTranslate }}</label>
+                
+                <sqx-checkbox-group [(ngModel)]="copyTargets" [values]="languageCodes" layout="Multiline"></sqx-checkbox-group>
+            </div>
+        </sqx-dropdown-menu>
+    </ng-container>
+</ng-container>

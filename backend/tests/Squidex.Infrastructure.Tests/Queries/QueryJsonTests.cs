@@ -39,6 +39,16 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_convert_comparison_without_operator()
+        {
+            var json = new { path = "property" };
+
+            var filter = SerializeAndDeserialize(json);
+
+            Assert.Equal("property == null", filter.ToString());
+        }
+
+        [Fact]
         public void Should_convert_comparison_empty()
         {
             var json = new { path = "property", op = "empty" };
@@ -142,25 +152,9 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_throw_exception_for_missing_operator()
-        {
-            var json = new { path = "property", value = 12 };
-
-            Assert.ThrowsAny<JsonException>(() => SerializeAndDeserialize(json));
-        }
-
-        [Fact]
         public void Should_throw_exception_for_missing_value()
         {
             var json = new { path = "property", op = "invalid" };
-
-            Assert.ThrowsAny<JsonException>(() => SerializeAndDeserialize(json));
-        }
-
-        [Fact]
-        public void Should_throw_exception_for_invalid_property()
-        {
-            var json = new { path = "property", op = "invalid", value = 12, other = 4 };
 
             Assert.ThrowsAny<JsonException>(() => SerializeAndDeserialize(json));
         }
@@ -181,11 +175,11 @@ namespace Squidex.Infrastructure.Queries
             SerializeAndDeserialize(json);
         }
 
-        private static FilterNode<IJsonValue> SerializeAndDeserialize<T>(T value)
+        private static FilterNode<JsonValue> SerializeAndDeserialize<T>(T value)
         {
             var json = TestUtils.DefaultSerializer.Serialize(value, true);
 
-            return TestUtils.DefaultSerializer.Deserialize<FilterNode<IJsonValue>>(json);
+            return TestUtils.DefaultSerializer.Deserialize<FilterNode<JsonValue>>(json);
         }
     }
 }

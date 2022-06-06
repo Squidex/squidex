@@ -5,11 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Esprima;
 using Esprima.Ast;
 using Microsoft.Extensions.Caching.Memory;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Internal
 {
@@ -18,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Internal
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
         private static readonly ParserOptions DefaultParserOptions = new ParserOptions
         {
-            AdaptRegexp = true, Tolerant = true, Loc = true
+            AdaptRegexp = true, Tolerant = true
         };
 
         private readonly IMemoryCache cache;

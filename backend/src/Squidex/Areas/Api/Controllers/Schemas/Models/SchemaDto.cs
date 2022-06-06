@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -101,7 +98,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// The preview Urls.
         /// </summary>
         [LocalizedRequired]
-        public ImmutableDictionary<string, string> PreviewUrls { get; set; }
+        public ReadonlyDictionary<string, string> PreviewUrls { get; set; }
 
         /// <summary>
         /// The name of fields that are used in content lists.
@@ -126,7 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         [LocalizedRequired]
         public List<FieldDto> Fields { get; set; }
 
-        public static SchemaDto FromSchema(ISchemaEntity schema, Resources resources)
+        public static SchemaDto FromDomain(ISchemaEntity schema, Resources resources)
         {
             var result = new SchemaDto();
 
@@ -135,13 +132,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
             SimpleMapper.Map(schema.SchemaDef.Scripts, result.Scripts);
             SimpleMapper.Map(schema.SchemaDef.Properties, result.Properties);
 
-            result.FieldRules = schema.SchemaDef.FieldRules.Select(FieldRuleDto.FromFieldRule).ToList();
+            result.FieldRules = schema.SchemaDef.FieldRules.Select(FieldRuleDto.FromDomain).ToList();
 
             result.Fields = new List<FieldDto>();
 
             foreach (var field in schema.SchemaDef.Fields)
             {
-                result.Fields.Add(FieldDto.FromField(field));
+                result.Fields.Add(FieldDto.FromDomain(field));
             }
 
             result.CreateLinks(resources);

@@ -14,6 +14,6 @@ namespace Squidex.Areas.Api.Controllers.UI.Models
         /// <summary>
         /// The value for the setting.
         /// </summary>
-        public IJsonValue Value { get; set; }
+        public JsonValue Value { get; set; }
     }
 }

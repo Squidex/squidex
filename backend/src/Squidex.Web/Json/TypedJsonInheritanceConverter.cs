@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Newtonsoft.Json.Linq;
@@ -32,7 +29,7 @@ namespace Squidex.Web.Json
 
                 if (discriminator.EndsWith(baseName, StringComparison.CurrentCulture))
                 {
-                    discriminator = discriminator.Substring(0, discriminator.Length - baseName.Length);
+                    discriminator = discriminator[..^baseName.Length];
                 }
 
                 result[discriminator] = type;
@@ -84,7 +81,19 @@ namespace Squidex.Web.Json
 
         protected override Type GetDiscriminatorType(JObject jObject, Type objectType, string discriminatorValue)
         {
-            return mapping.GetOrDefault(discriminatorValue) ?? throw new InvalidOperationException($"Could not find subtype of '{objectType.Name}' with discriminator '{discriminatorValue}'.");
+            if (discriminatorValue == null)
+            {
+                ThrowHelper.JsonException("Cannot find discriminator.");
+                return default!;
+            }
+
+            if (!mapping.TryGetValue(discriminatorValue, out var type))
+            {
+                ThrowHelper.JsonException($"Could not find subtype of '{objectType.Name}' with discriminator '{discriminatorValue}'.");
+                return default!;
+            }
+
+            return type;
         }
 
         public override string GetDiscriminatorValue(Type type)

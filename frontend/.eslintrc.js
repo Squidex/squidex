@@ -13,10 +13,12 @@ module.exports = {
         "project": "tsconfig.json"
     },
     "plugins": [
+        "deprecation",
         "eslint-plugin-import",
         "@typescript-eslint",
     ],
     "rules": {
+        "deprecation/deprecation": "warn",
         "@typescript-eslint/dot-notation": "off",
         "@typescript-eslint/indent": "off",
         "@typescript-eslint/lines-between-class-members": "off",
@@ -73,20 +75,27 @@ module.exports = {
             "error",
             "always"
         ],
-        "import/extensions": [
-            "error",
-            "never"
-        ],
-        "import/extensions": "off",
-        "import/no-extraneous-dependencies": "off",
-        "import/no-useless-path-segments": "off",
-        "import/prefer-default-export": "off",
         "arrow-body-style": "off",
         "arrow-parens": "off",
         "class-methods-use-this": "off",
         "default-case": "off",
         "function-paren-newline": "off",
         "implicit-arrow-linebreak": "off",
+        "import/extensions": "off",
+        "import/no-extraneous-dependencies": "off",
+        "import/no-useless-path-segments": "off",
+        "import/order": ["error", {
+            "pathGroupsExcludedImportTypes": ["builtin"],
+            "pathGroups": [{
+                "pattern": "@app/**",
+                "group": "external",
+                "position": "after"
+            }],
+            "alphabetize": {
+                "order": "asc"
+            }
+        }],
+        "import/prefer-default-export": "off",
         "linebreak-style": "off",
         "max-classes-per-file": "off",
         "max-len": "off",
@@ -100,12 +109,12 @@ module.exports = {
         "no-restricted-syntax": "off",
         "no-underscore-dangle": "off",
         "object-curly-newline": [
-            "error", 
+            "error",
             {
-                "ObjectExpression": { 
+                "ObjectExpression": {
                     "consistent": true
                 },
-                "ObjectPattern": { 
+                "ObjectPattern": {
                     "consistent": true
                 },
                 "ImportDeclaration": "never",
@@ -113,6 +122,13 @@ module.exports = {
             }
         ],
         "operator-linebreak": "off",
-        "prefer-destructuring": "off"
+        "prefer-destructuring": "off",
+        "sort-imports": [
+            "error",
+            {
+                "ignoreCase": true,
+                "ignoreDeclarationSort": true
+            }
+        ],
     }
 };

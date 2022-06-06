@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -31,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards.Triggers
         {
             var trigger = new ContentChangedTriggerV2
             {
-                Schemas = ImmutableList.Create(new ContentChangedTriggerSchemaV2())
+                Schemas = ReadonlyList.Create(new ContentChangedTriggerSchemaV2())
             };
 
             var errors = await RuleTriggerValidator.ValidateAsync(appId.Id, trigger, appProvider);
@@ -42,19 +40,19 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards.Triggers
                     new ValidationError("Schema ID is required.", "Schemas")
                 });
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false, default))
                 .MustNotHaveHappened();
         }
 
         [Fact]
         public async Task Should_add_error_if_schemas_ids_are_not_valid()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, default))
                 .Returns(Task.FromResult<ISchemaEntity?>(null));
 
             var trigger = new ContentChangedTriggerV2
             {
-                Schemas = ImmutableList.Create(new ContentChangedTriggerSchemaV2 { SchemaId = schemaId.Id })
+                Schemas = ReadonlyList.Create(new ContentChangedTriggerSchemaV2 { SchemaId = schemaId.Id })
             };
 
             var errors = await RuleTriggerValidator.ValidateAsync(appId.Id, trigger, appProvider);
@@ -81,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards.Triggers
         {
             var trigger = new ContentChangedTriggerV2
             {
-                Schemas = ImmutableList.Empty<ContentChangedTriggerSchemaV2>()
+                Schemas = ReadonlyList.Empty<ContentChangedTriggerSchemaV2>()
             };
 
             var errors = await RuleTriggerValidator.ValidateAsync(appId.Id, trigger, appProvider);
@@ -92,12 +90,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards.Triggers
         [Fact]
         public async Task Should_not_add_error_if_schemas_ids_are_valid()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false, default))
                 .Returns(Mocks.Schema(appId, schemaId));
 
             var trigger = new ContentChangedTriggerV2
             {
-                Schemas = ImmutableList.Create(new ContentChangedTriggerSchemaV2 { SchemaId = schemaId.Id })
+                Schemas = ReadonlyList.Create(new ContentChangedTriggerSchemaV2 { SchemaId = schemaId.Id })
             };
 
             var errors = await RuleTriggerValidator.ValidateAsync(appId.Id, trigger, appProvider);

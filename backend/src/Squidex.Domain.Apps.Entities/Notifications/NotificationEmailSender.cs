@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Email;
-using Squidex.Log;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
@@ -21,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
     {
         private readonly IEmailSender emailSender;
         private readonly IUrlGenerator urlGenerator;
-        private readonly ISemanticLog log;
+        private readonly ILogger<NotificationEmailSender> log;
         private readonly NotificationEmailTextOptions texts;
 
         private sealed class TemplatesVars
@@ -48,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
             IOptions<NotificationEmailTextOptions> texts,
             IEmailSender emailSender,
             IUrlGenerator urlGenerator,
-            ISemanticLog log)
+            ILogger<NotificationEmailSender> log)
         {
             this.texts = texts.Value;
             this.emailSender = emailSender;
@@ -59,8 +57,8 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
         public Task SendUsageAsync(IUser user, string appName, long usage, long usageLimit)
         {
-            Guard.NotNull(user, nameof(user));
-            Guard.NotNull(appName, nameof(appName));
+            Guard.NotNull(user);
+            Guard.NotNull(appName);
 
             var vars = new TemplatesVars
             {
@@ -77,9 +75,9 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
         public Task SendInviteAsync(IUser assigner, IUser user, string appName)
         {
-            Guard.NotNull(assigner, nameof(assigner));
-            Guard.NotNull(user, nameof(user));
-            Guard.NotNull(appName, nameof(appName));
+            Guard.NotNull(assigner);
+            Guard.NotNull(user);
+            Guard.NotNull(appName);
 
             var vars = new TemplatesVars { Assigner = assigner, AppName = appName };
 
@@ -103,13 +101,13 @@ namespace Squidex.Domain.Apps.Entities.Notifications
         {
             if (string.IsNullOrWhiteSpace(emailBody))
             {
-                LogWarning($"No email subject configured for {template}");
+                log.LogWarning("Cannot send email to {email}: No email subject configured for template {template}.", template, user.Email);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(emailSubj))
             {
-                LogWarning($"No email body configured for {template}");
+                log.LogWarning("Cannot send email to {email}: No email body configured for template {template}.", template, user.Email);
                 return;
             }
 
@@ -126,49 +124,38 @@ namespace Squidex.Domain.Apps.Entities.Notifications
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "SendNotification")
-                    .WriteProperty("status", "Failed"));
-
+                log.LogError(ex, "Failed to send notification to {email}.", user.Email);
                 throw;
             }
         }
 
-        private void LogWarning(string reason)
-        {
-            log.LogWarning(w => w
-                .WriteProperty("action", "SendNotification")
-                .WriteProperty("status", "Failed")
-                .WriteProperty("reason", reason));
-        }
-
         private static string Format(string text, TemplatesVars vars)
         {
-            text = text.Replace("$APP_NAME", vars.AppName);
+            text = text.Replace("$APP_NAME", vars.AppName, StringComparison.Ordinal);
 
             if (vars.Assigner != null)
             {
-                text = text.Replace("$ASSIGNER_EMAIL", vars.Assigner.Email);
-                text = text.Replace("$ASSIGNER_NAME", vars.Assigner.Claims.DisplayName());
+                text = text.Replace("$ASSIGNER_EMAIL", vars.Assigner.Email, StringComparison.Ordinal);
+                text = text.Replace("$ASSIGNER_NAME", vars.Assigner.Claims.DisplayName(), StringComparison.Ordinal);
             }
 
             if (vars.User != null)
             {
-                text = text.Replace("$USER_EMAIL", vars.User.Email);
-                text = text.Replace("$USER_NAME", vars.User.Claims.DisplayName());
+                text = text.Replace("$USER_EMAIL", vars.User.Email, StringComparison.Ordinal);
+                text = text.Replace("$USER_NAME", vars.User.Claims.DisplayName(), StringComparison.Ordinal);
             }
 
             if (vars.ApiCallsLimit != null)
             {
-                text = text.Replace("$API_CALLS_LIMIT", vars.ApiCallsLimit.ToString());
+                text = text.Replace("$API_CALLS_LIMIT", vars.ApiCallsLimit.ToString(), StringComparison.Ordinal);
             }
 
             if (vars.ApiCalls != null)
             {
-                text = text.Replace("$API_CALLS", vars.ApiCalls.ToString());
+                text = text.Replace("$API_CALLS", vars.ApiCalls.ToString(), StringComparison.Ordinal);
             }
 
-            text = text.Replace("$UI_URL", vars.URL);
+            text = text.Replace("$UI_URL", vars.URL, StringComparison.Ordinal);
 
             return text;
         }

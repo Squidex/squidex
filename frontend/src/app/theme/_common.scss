@@ -1,0 +1,349 @@
+@import 'mixins';
+@import 'vars';
+
+/* stylelint-disable */
+
+body {
+    // Default body with padding for fixed navbar and sidebar.
+    & {
+        background: $color-background;
+        padding-left: 0;
+        padding-top: $size-navbar-height;
+    }
+
+    // White body for login and profile page.
+    &.white {
+        background: $color-white;
+    }
+}
+
+* {
+    @include scrollbars(8px, darken($color-border, 15%), transparent);
+}
+
+hr {
+    background-color: $color-border;
+}
+
+// Common style for user email.
+.user-email {
+    font-size: .8rem;
+    font-style: italic;
+}
+
+.text-decent {
+    color: $color-text-decent;
+}
+
+.text-nowrap {
+    white-space: nowrap;
+}
+
+.drag-handle {
+    color: $color-text-decent;
+    cursor: move;
+    font-size: 1.1rem;
+    font-weight: normal;
+}
+
+.drag-none {
+    @include no-drag;
+}
+
+//
+// Rich editor icon. Must be placed here, because element is not created by angular.
+//
+.mce-i-assets {
+    & {
+        font-family: 'icomoon' !important;
+    }
+
+    &::before {
+        content: '\e948';
+    }
+}
+
+.cdk-drag-placeholder {
+    opacity: 0;
+}
+
+.cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, .2, 1);
+}
+
+.cdk-drop-list-dragging {
+    * {
+        transition: transform 250ms cubic-bezier(0, 0, .2, 1);
+    }
+
+    .cdk-drag-placeholder {
+        transition: none;
+    }
+}
+
+.cdk-drag-preview {
+    opacity: .7;
+
+    &.table-drag {
+        background: $color-white;
+        border: 2px dashed darken($color-border, 5%);
+        display: table;
+
+        * {
+            display: none;
+        }
+    }
+}
+
+.icon-bold {
+    font-weight: bold;
+}
+
+//
+// Help texts
+//
+.help {
+    & {
+        font-size: 90%;
+    }
+
+    h2,
+    h3,
+    h4 {
+        margin-top: 1rem;
+    }
+
+    pre {
+        @include text-code;
+        background: $color-code-background;
+        margin: .25rem 0;
+        padding-left: .5rem;
+        padding-right: 3rem;
+    }
+
+    table {
+        width: 100%;
+
+        td, th {
+            border: 1px solid $color-border;
+            border-radius: 0;
+            padding: .25rem .5rem;
+        }
+    }
+}
+
+//
+// Profile picture in circle
+//
+.user-picture {
+    & {
+        @include circle(2rem);
+    }
+
+    &:not([src]) {
+        opacity: 0;
+    }
+}
+
+.truncate {
+    @include truncate;
+}
+
+//
+// Green or red circle if element is published or unpublished
+//
+.item-published {
+    & {
+        @include circle(.5rem);
+        background: $color-theme-success;
+        border: 0;
+        margin-left: .4rem;
+    }
+
+    &.unpublished {
+        background: $color-theme-error;
+    }
+}
+
+.dropdown-item {
+    cursor: pointer;
+}
+
+//
+// Landing page with loading spinner.
+//
+.landing-page {
+    & {
+        margin: 8rem auto;
+        max-width: 32rem;
+        text-align: center;
+    }
+
+    h1 {
+        margin-top: 2.5rem;
+    }
+
+    .logo {
+        height: 4rem;
+    }
+}
+
+// Hidden helper (fast *ngIf replacement)
+.hidden {
+    display: none;
+}
+
+.hidden-important {
+    display: none !important;
+}
+
+// Hidden helper (fast *ngIf replacement)
+.invisible {
+    visibility: hidden;
+}
+
+//
+// Drop area for drag and drop features.
+//
+.drop-container {
+    & {
+        position: relative;
+    }
+
+    .drop-area {
+        & {
+            @include absolute(30px, 30px, 30px, 30px);
+            align-content: center;
+            align-items: center;
+            border: 2px dashed $color-border;
+            border-radius: $border-radius;
+            color: darken($color-border, 30%);
+            display: none;
+            font-size: 1.2rem;
+            font-weight: normal;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        &.dragging {
+            display: flex;
+        }
+
+        &.drag {
+            border-color: darken($color-border, 10%);
+            color: darken($color-border, 40%);
+            cursor: copy;
+            text-decoration: none;
+        }
+    }
+
+    .drop-text {
+        background: $color-white;
+    }
+}
+
+.sorting {
+    &,
+    & > * {
+        opacity: .5;
+    }
+}
+
+.sidebar {
+    @include absolute($size-navbar-height, null, 0, 0);
+    background: $color-theme-brand;
+    color: $color-white;
+    font-size: $font-small;
+    font-weight: default;
+    overflow: hidden;
+    width: $size-sidebar-width;
+
+    .bottom {
+        @include absolute(null, 0, 0, 0);
+    }
+
+    .nav-item {
+        max-width: 100%;
+    }
+
+    .nav-link {
+        background: $color-theme-brand;
+        color: $color-white !important;
+        cursor: pointer;
+        padding: 1rem 0;
+        transition: background-color .4s ease;
+        text-align: center;
+        text-decoration: none;
+
+        &:hover {
+            background: $color-theme-brand-darker;
+        }
+
+        &.active {
+            background: $color-theme-brand-darker;
+        }
+
+        i {
+            font-size: 1.1rem;
+        }
+    }
+
+    .nav-text {
+        @include truncate;
+        margin-top: .5rem;
+    }
+}
+
+//
+// Status Icon
+//
+.status-icon {
+    & {
+        @include circle-icon(2rem);
+        background: $color-border;
+        border: 0;
+        color: $color-white;
+        display: inline-block;
+    }
+
+    &-sm {
+        @include circle-icon(1.6rem);
+    }
+
+    &-lg {
+        @include circle-icon(2.8rem);
+    }
+
+    &-pending {
+        color: inherit;
+    }
+
+    &-warning {
+        background: $color-theme-warning;
+    }
+
+    &-failed {
+        background: $color-theme-error;
+    }
+
+    &-success {
+        background: $color-theme-success;
+    }
+}
+
+//
+// ACE
+//
+.ace_tooltip {
+    background: $color-white;
+    border: 1px solid $color-input;
+    border-radius: 0;
+    font-size: 14px;
+    max-width: 300px;
+    min-width: 100px;
+    white-space: pre-wrap;
+
+    hr {
+        margin: .5rem 0;
+    }
+}

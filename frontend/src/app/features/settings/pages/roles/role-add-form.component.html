@@ -1,0 +1,29 @@
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">{{ 'roles.add.title' | sqxTranslate }}</h5>
+
+        <form [formGroup]="addRoleForm.form" (ngSubmit)="addRole()">
+            <div class="row gx-2">
+                <div class="col">
+                    <sqx-control-errors for="name"></sqx-control-errors>
+    
+                    <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="{{ 'roles.roleNamePlaceholder' | sqxTranslate }}" autocomplete="off">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-success" [disabled]="addRoleForm.hasNoName | async">
+                        {{ 'roles.add' | sqxTranslate }}
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <button type="reset" class="btn btn-text-secondary" (click)="cancel()">
+                        {{ 'common.cancel' | sqxTranslate }}
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <sqx-form-hint>
+            {{ 'roles.add.description' | sqxTranslate }}
+        </sqx-form-hint>
+    </div>
+</div>

@@ -12,33 +12,24 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
     public sealed class JsonValueValidator : IFieldVisitor<bool, JsonValueValidator.Args>
     {
         private static readonly JsonValueValidator Instance = new JsonValueValidator();
 
-        public readonly struct Args
-        {
-            public readonly IJsonValue Value;
-            public readonly IJsonSerializer JsonSerializer;
-
-            public Args(IJsonValue value, IJsonSerializer jsonSerializer)
-            {
-                Value = value;
-
-                JsonSerializer = jsonSerializer;
-            }
-        }
+        public record struct Args(JsonValue Value, IJsonSerializer JsonSerializer);
 
         private JsonValueValidator()
         {
         }
 
-        public static bool IsValid(IField field, IJsonValue value, IJsonSerializer jsonSerializer)
+        public static bool IsValid(IField field, JsonValue value, IJsonSerializer jsonSerializer)
         {
-            Guard.NotNull(field, nameof(field));
-            Guard.NotNull(value, nameof(value));
+            Guard.NotNull(field);
+            Guard.NotNull(value);
 
             var args = new Args(value, jsonSerializer);
 
@@ -57,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public bool Visit(IField<BooleanFieldProperties> field, Args args)
         {
-            return args.Value is JsonBoolean;
+            return args.Value.Type == JsonValueType.Boolean;
         }
 
         public bool Visit(IField<ComponentFieldProperties> field, Args args)
@@ -96,7 +87,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public bool Visit(IField<NumberFieldProperties> field, Args args)
         {
-            return args.Value is JsonNumber;
+            return args.Value.Type == JsonValueType.Number;
         }
 
         public bool Visit(IField<ReferencesFieldProperties> field, Args args)
@@ -106,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public bool Visit(IField<StringFieldProperties> field, Args args)
         {
-            return args.Value is JsonString;
+            return args.Value.Type == JsonValueType.String;
         }
 
         public bool Visit(IField<TagsFieldProperties> field, Args args)
@@ -119,61 +110,61 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return true;
         }
 
-        private static bool IsValidStringList(IJsonValue value)
+        private static bool IsValidStringList(JsonValue value)
         {
-            if (value is JsonArray array)
+            if (value.Type != JsonValueType.Array)
             {
-                for (var i = 0; i < array.Count; i++)
-                {
-                    if (array[i] is not JsonString)
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
+                return false;
             }
 
-            return false;
-        }
-
-        private static bool IsValidObjectList(IJsonValue value)
-        {
-            if (value is JsonArray array)
+            foreach (var item in value.AsArray)
             {
-                for (var i = 0; i < array.Count; i++)
+                if (item.Type != JsonValueType.String)
                 {
-                    if (array[i] is not JsonObject)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
-
-                return true;
             }
 
-            return false;
+            return true;
         }
 
-        private static bool IsValidComponentList(IJsonValue value)
+        private static bool IsValidObjectList(JsonValue value)
         {
-            if (value is JsonArray array)
+            if (value.Type != JsonValueType.Array)
             {
-                for (var i = 0; i < array.Count; i++)
-                {
-                    if (!IsValidComponent(array[i]))
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
+                return false;
             }
 
-            return false;
+            foreach (var item in value.AsArray)
+            {
+                if (item.Type != JsonValueType.Object)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
-        private static bool IsValidComponent(IJsonValue value)
+        private static bool IsValidComponentList(JsonValue value)
+        {
+            if (value.Type != JsonValueType.Array)
+            {
+                return false;
+            }
+
+            foreach (var item in value.AsArray)
+            {
+                if (!IsValidComponent(item))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool IsValidComponent(JsonValue value)
         {
             return Component.IsValid(value, out _);
         }

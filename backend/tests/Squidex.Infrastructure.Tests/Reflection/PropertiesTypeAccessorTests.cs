@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Infrastructure.Reflection.Internal;
 using Xunit;
 
@@ -45,7 +44,7 @@ namespace Squidex.Infrastructure.Reflection
         [Fact]
         public void Should_set_read_write_property()
         {
-            var sut = new PropertyAccessor(typeof(TestClass), typeof(TestClass).GetProperty("ReadWrite")!);
+            var sut = new PropertyAccessor(typeof(TestClass).GetProperty("ReadWrite")!);
 
             sut.Set(target, 123);
 
@@ -55,7 +54,7 @@ namespace Squidex.Infrastructure.Reflection
         [Fact]
         public void Should_set_write_property()
         {
-            var accessor = new PropertyAccessor(typeof(TestClass), typeof(TestClass).GetProperty("Write")!);
+            var accessor = new PropertyAccessor(typeof(TestClass).GetProperty("Write")!);
 
             accessor.Set(target, 123);
 
@@ -65,7 +64,7 @@ namespace Squidex.Infrastructure.Reflection
         [Fact]
         public void Should_throw_exception_if_setting_readonly()
         {
-            var sut = new PropertyAccessor(typeof(TestClass), typeof(TestClass).GetProperty("Read")!);
+            var sut = new PropertyAccessor(typeof(TestClass).GetProperty("Read")!);
 
             Assert.Throws<NotSupportedException>(() => sut.Set(target, 123));
         }
@@ -73,7 +72,7 @@ namespace Squidex.Infrastructure.Reflection
         [Fact]
         public void Should_get_read_write_property()
         {
-            var sut = new PropertyAccessor(typeof(TestClass), typeof(TestClass).GetProperty("ReadWrite")!);
+            var sut = new PropertyAccessor(typeof(TestClass).GetProperty("ReadWrite")!);
 
             target.Write = 123;
 
@@ -83,7 +82,7 @@ namespace Squidex.Infrastructure.Reflection
         [Fact]
         public void Should_get_read_property()
         {
-            var sut = new PropertyAccessor(typeof(TestClass), typeof(TestClass).GetProperty("Read")!);
+            var sut = new PropertyAccessor(typeof(TestClass).GetProperty("Read")!);
 
             target.Write = 123;
 
@@ -93,7 +92,7 @@ namespace Squidex.Infrastructure.Reflection
         [Fact]
         public void Should_throw_exception_if_getting_writeonly_property()
         {
-            var sut = new PropertyAccessor(typeof(TestClass), typeof(TestClass).GetProperty("Write")!);
+            var sut = new PropertyAccessor(typeof(TestClass).GetProperty("Write")!);
 
             Assert.Throws<NotSupportedException>(() => sut.Get(target));
         }

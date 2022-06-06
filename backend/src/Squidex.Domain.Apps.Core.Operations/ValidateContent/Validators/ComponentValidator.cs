@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 
@@ -21,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.validatorFactory = validatorFactory;
         }
 
-        public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public async ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value is Component component)
             {

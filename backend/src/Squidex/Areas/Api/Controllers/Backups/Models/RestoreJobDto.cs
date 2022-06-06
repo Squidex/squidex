@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Reflection;
@@ -43,7 +41,7 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         /// </summary>
         public JobStatus Status { get; set; }
 
-        public static RestoreJobDto FromJob(IRestoreJob job)
+        public static RestoreJobDto FromDomain(IRestoreJob job)
         {
             return SimpleMapper.Map(job, new RestoreJobDto());
         }

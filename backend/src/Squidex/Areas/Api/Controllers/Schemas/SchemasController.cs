@@ -5,14 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
+using Squidex.Domain.Apps.Core.GenerateFilters;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -20,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Queries;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -54,11 +52,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(0)]
         public async Task<IActionResult> GetSchemas(string app)
         {
-            var schemas = await appProvider.GetSchemasAsync(AppId);
+            var schemas = await appProvider.GetSchemasAsync(AppId, HttpContext.RequestAborted);
 
             var response = Deferred.Response(() =>
             {
-                return SchemasDto.FromSchemas(schemas, Resources);
+                return SchemasDto.FromDomain(schemas, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = schemas.ToEtag();
@@ -84,7 +82,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var response = Deferred.Response(() =>
             {
-                return SchemaDto.FromSchema(Schema, Resources);
+                return SchemaDto.FromDomain(Schema, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = Schema.ToEtag();
@@ -337,14 +335,46 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         [OpenApiIgnore]
-        public IActionResult GetScriptCompletion(string app, string schema)
+        public async Task<IActionResult> GetScriptCompletion(string app, string schema,
+            [FromServices] ScriptingCompleter completer)
         {
-            var completer = new ScriptingCompletion();
-            var completion = completer.GetCompletion(Schema.SchemaDef, App.PartitionResolver());
+            var completion = completer.ContentScript(await BuildModel());
 
-            var result = completion.Select(x => new { x.Name, x.Description });
+            return Ok(completion);
+        }
 
-            return Ok(result);
+        [HttpGet]
+        [Route("apps/{app}/schemas/{schema}/completion/triggers")]
+        [ApiPermissionOrAnonymous]
+        [ApiCosts(1)]
+        [OpenApiIgnore]
+        public async Task<IActionResult> GetScriptTriggerCompletion(string app, string schema,
+            [FromServices] ScriptingCompleter completer)
+        {
+            var completion = completer.ContentTrigger(await BuildModel());
+
+            return Ok(completion);
+        }
+
+        [HttpGet]
+        [Route("apps/{app}/schemas/{schema}/filters")]
+        [ApiPermissionOrAnonymous]
+        [ApiCosts(1)]
+        [OpenApiIgnore]
+        public async Task<IActionResult> GetFilters(string app, string schema)
+        {
+            var components = await appProvider.GetComponentsAsync(Schema, HttpContext.RequestAborted);
+
+            var filters = ContentQueryModel.Build(Schema.SchemaDef, App.PartitionResolver(), components).Flatten();
+
+            return Ok(filters);
+        }
+
+        private async Task<FilterSchema> BuildModel()
+        {
+            var components = await appProvider.GetComponentsAsync(Schema, HttpContext.RequestAborted);
+
+            return Schema.SchemaDef.BuildDataSchema(App.PartitionResolver(), components);
         }
 
         private Task<ISchemaEntity?> GetSchemaAsync(string schema)
@@ -353,11 +383,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas
             {
                 var schemaId = DomainId.Create(guid);
 
-                return appProvider.GetSchemaAsync(AppId, schemaId);
+                return appProvider.GetSchemaAsync(AppId, schemaId, ct: HttpContext.RequestAborted);
             }
             else
             {
-                return appProvider.GetSchemaAsync(AppId, schema);
+                return appProvider.GetSchemaAsync(AppId, schema, ct: HttpContext.RequestAborted);
             }
         }
 
@@ -366,7 +396,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<ISchemaEntity>();
-            var response = SchemaDto.FromSchema(result, Resources);
+            var response = SchemaDto.FromDomain(result, Resources);
 
             return response;
         }

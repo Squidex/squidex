@@ -1,47 +1,45 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Globalization;
 using Jint;
 using Jint.Native;
 using Jint.Native.Object;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 {
     public static class JsonMapper
     {
-        public static JsValue Map(IJsonValue? value, Engine engine)
+        public static JsValue Map(JsonValue value, Engine engine)
         {
-            if (value == null)
+            switch (value.Type)
             {
-                return JsValue.Null;
-            }
-
-            switch (value)
-            {
-                case JsonNull:
+                case JsonValueType.Null:
                     return JsValue.Null;
-                case JsonString s:
-                    return new JsString(s.Value);
-                case JsonBoolean b:
-                    return new JsBoolean(b.Value);
-                case JsonNumber b:
-                    return new JsNumber(b.Value);
-                case JsonObject obj:
-                    return FromObject(obj, engine);
-                case JsonArray arr:
-                    return FromArray(arr, engine);
+                case JsonValueType.String:
+                    return new JsString(value.AsString);
+                case JsonValueType.Boolean:
+                    return new JsBoolean(value.AsBoolean);
+                case JsonValueType.Number:
+                    return new JsNumber(value.AsNumber);
+                case JsonValueType.Object:
+                    return FromObject(value.AsObject, engine);
+                case JsonValueType.Array:
+                    return FromArray(value.AsArray, engine);
             }
 
-            throw new ArgumentException("Invalid json type.", nameof(value));
+            ThrowInvalidType(nameof(value));
+            return JsValue.Null;
         }
 
-        private static JsValue FromArray(JsonArray arr, Engine engine)
+        private static JsValue FromArray(List<JsonValue> arr, Engine engine)
         {
             var target = new JsValue[arr.Count];
 
@@ -50,64 +48,69 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 target[i] = Map(arr[i], engine);
             }
 
-            return engine.Array.Construct(target);
+            return engine.Realm.Intrinsics.Array.Construct(target);
         }
 
-        private static JsValue FromObject(JsonObject obj, Engine engine)
+        private static JsValue FromObject(ListDictionary<string, JsonValue> obj, Engine engine)
         {
             var target = new ObjectInstance(engine);
 
             foreach (var (key, value) in obj)
             {
-                target.FastAddProperty(key, Map(value, engine), false, true, true);
+                target.FastAddProperty(key, Map(value, engine), true, true, true);
             }
-
-            target.PreventExtensions();
 
             return target;
         }
 
-        public static IJsonValue Map(JsValue? value)
+        public static JsonValue Map(JsValue? value)
         {
             if (value == null || value.IsNull() || value.IsUndefined())
             {
-                return JsonValue.Null;
+                return default;
             }
 
             if (value.IsString())
             {
-                return JsonValue.Create(value.AsString());
+                return value.AsString();
             }
 
             if (value.IsBoolean())
             {
-                return JsonValue.Create(value.AsBoolean());
-            }
-
-            if (value.IsNumber())
-            {
-                return JsonValue.Create(value.AsNumber());
+                return value.AsBoolean();
             }
 
             if (value.IsDate())
             {
-                return JsonValue.Create(value.AsDate().ToString());
+                return value.AsDate().ToString();
             }
 
             if (value.IsRegExp())
             {
-                return JsonValue.Create(value.AsRegExp().Value?.ToString());
+                return value.AsRegExp().Value?.ToString();
+            }
+
+            if (value.IsNumber())
+            {
+                var number = value.AsNumber();
+
+                if (double.IsNaN(number) || double.IsPositiveInfinity(number) || double.IsNegativeInfinity(number))
+                {
+                    return 0;
+                }
+
+                return number;
             }
 
             if (value.IsArray())
             {
                 var arr = value.AsArray();
 
-                var result = JsonValue.Array();
+                var result = new JsonArray((int)arr.Length);
 
                 for (var i = 0; i < arr.Length; i++)
                 {
-                    result.Add(Map(arr.Get(i.ToString())));
+                    result.Add(Map(arr.Get(i.ToString(CultureInfo.InvariantCulture))));
                 }
 
                 return result;
@@ -117,7 +120,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             {
                 var obj = value.AsObject();
 
-                var result = JsonValue.Object();
+                var result = new JsonObject((int)obj.Length);
 
                 foreach (var (key, propertyDescriptor) in obj.GetOwnProperties())
                 {
@@ -127,7 +130,13 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 return result;
             }
 
-            throw new ArgumentException("Invalid json type.", nameof(value));
+            ThrowInvalidType(nameof(value));
+            return default;
+        }
+
+        private static void ThrowInvalidType(string argument)
+        {
+            ThrowHelper.ArgumentException("Invalid json type.", argument);
         }
     }
 }

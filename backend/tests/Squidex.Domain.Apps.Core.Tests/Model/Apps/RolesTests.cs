@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.Json.Objects;
@@ -41,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var roles_1 = roles_0.Add(role);
 
-            Assert.Equal(Role.Create(role), roles_1[role]);
+            Assert.Equal(new Role(role, null, new JsonObject()), roles_1[role]);
         }
 
         [Fact]
@@ -72,9 +70,9 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_update_role_properties()
         {
-            var roles_1 = roles_0.Update(firstRole, properties: JsonValue.Object().Add("P1", true));
+            var roles_1 = roles_0.Update(firstRole, properties: new JsonObject().Add("P1", true));
 
-            roles_1[firstRole].Should().BeEquivalentTo(Role.WithProperties(firstRole, JsonValue.Object().Add("P1", true)));
+            roles_1[firstRole].Should().BeEquivalentTo(Role.WithProperties(firstRole, new JsonObject().Add("P1", true)));
         }
 
         [Fact]
@@ -166,8 +164,8 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 
             foreach (var permission in result.Permissions)
             {
-                Assert.StartsWith("squidex.apps.app.", permission.Id);
-                Assert.DoesNotContain("{app}", permission.Id);
+                Assert.StartsWith("squidex.apps.app.", permission.Id, StringComparison.Ordinal);
+                Assert.DoesNotContain("{app}", permission.Id, StringComparison.Ordinal);
             }
 
             Assert.Equal(permissionCount, result!.Permissions.Count);

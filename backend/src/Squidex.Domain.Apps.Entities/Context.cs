@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Security.Claims;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
@@ -14,6 +12,8 @@ using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using ClaimsPermissions = Squidex.Infrastructure.Security.PermissionSet;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Domain.Apps.Entities
 {
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities
         public Context(ClaimsPrincipal user, IAppEntity app)
             : this(app, user, user.Claims.Permissions(), EmptyHeaders)
         {
-            Guard.NotNull(user, nameof(user));
+            Guard.NotNull(user);
         }
 
         private Context(IAppEntity app, ClaimsPrincipal user, ClaimsPermissions userPermissions, IReadOnlyDictionary<string, string> headers)

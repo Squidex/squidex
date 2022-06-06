@@ -5,11 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
@@ -36,7 +34,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         public ContentsBulkUpdateCommandMiddlewareTests()
         {
-            sut = new ContentsBulkUpdateCommandMiddleware(contentQuery, contextProvider);
+            var log = A.Fake<ILogger<ContentsBulkUpdateCommandMiddleware>>();
+
+            sut = new ContentsBulkUpdateCommandMiddleware(contentQuery, contextProvider, log);
         }
 
         [Fact]
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Should_upsert_content_with_with_resolved_id()
+        public async Task Should_upsert_content_with_resolved_id()
         {
             var requestContext = SetupContext(Permissions.AppContentsUpsert);
 
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Should_upsert_content_with_with_resolved_ids()
+        public async Task Should_upsert_content_with_resolved_ids()
         {
             var requestContext = SetupContext(Permissions.AppContentsUpsert);
 
@@ -193,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             SetupContext(Permissions.AppContentsUpsert);
 
-            var (_, data, query) = CreateTestData(false);
+            var (_, data, query) = CreateTestData(true);
 
             var command = BulkCommand(BulkUpdateContentType.Upsert, query: query, data: data);
 
@@ -493,7 +493,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             return (context.PlainResult as BulkUpdateResult)!;
         }
 
-        private BulkUpdateContents BulkCommand(BulkUpdateContentType type, Query<IJsonValue>? query = null,
+        private BulkUpdateContents BulkCommand(BulkUpdateContentType type, Query<JsonValue>? query = null,
             DomainId? id = null, ContentData? data = null, Instant? dueTime = null)
         {
             return new BulkUpdateContents
@@ -531,9 +531,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             return requestContext;
         }
 
-        private static (DomainId Id, ContentData Data, Query<IJsonValue>? Query) CreateTestData(bool withQuery)
+        private static (DomainId Id, ContentData Data, Query<JsonValue>? Query) CreateTestData(bool withQuery)
         {
-            Query<IJsonValue>? query = withQuery ? new Query<IJsonValue>() : null;
+            Query<JsonValue>? query = withQuery ? new Query<JsonValue>() : null;
 
             var data =
                 new ContentData()

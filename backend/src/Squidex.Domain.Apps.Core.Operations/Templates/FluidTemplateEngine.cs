@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Fluid;
 using Fluid.Values;
 using Squidex.Infrastructure;
@@ -65,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Templates
 
         public async Task<string> RenderAsync(string template, TemplateVars variables)
         {
-            Guard.NotNull(variables, nameof(variables));
+            Guard.NotNull(variables);
 
             if (SquidexTemplate.TryParse(template, out var parsed, out var errors))
             {

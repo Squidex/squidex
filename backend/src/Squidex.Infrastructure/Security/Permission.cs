@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-
 namespace Squidex.Infrastructure.Security
 {
     public sealed partial class Permission : IComparable<Permission>, IEquatable<Permission>
@@ -25,7 +23,7 @@ namespace Squidex.Infrastructure.Security
 
         public Permission(string id)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNullOrEmpty(id);
 
             Id = id;
         }
@@ -93,12 +91,12 @@ namespace Squidex.Infrastructure.Security
 
         public bool Equals(Permission? other)
         {
-            return other != null && other.Id.Equals(Id);
+            return other != null && other.Id.Equals(Id, StringComparison.Ordinal);
         }
 
         public override int GetHashCode()
         {
-            return Id.GetHashCode();
+            return Id.GetHashCode(StringComparison.Ordinal);
         }
 
         public override string ToString()

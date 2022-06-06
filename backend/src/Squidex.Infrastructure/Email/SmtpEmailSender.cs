@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
@@ -29,7 +27,8 @@ namespace Squidex.Infrastructure.Email
             clientPool = new DefaultObjectPoolProvider().Create(new DefaultPooledObjectPolicy<SmtpClient>());
         }
 
-        public async Task SendAsync(string recipient, string subject, string body, CancellationToken ct = default)
+        public async Task SendAsync(string recipient, string subject, string body,
+            CancellationToken ct = default)
         {
             var smtpClient = clientPool.Get();
             try
@@ -65,7 +64,8 @@ namespace Squidex.Infrastructure.Email
             }
         }
 
-        private async Task EnsureConnectedAsync(SmtpClient smtpClient, CancellationToken ct)
+        private async Task EnsureConnectedAsync(SmtpClient smtpClient,
+            CancellationToken ct)
         {
             if (!smtpClient.IsConnected)
             {

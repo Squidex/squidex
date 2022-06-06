@@ -5,18 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
-    public delegate IJsonValue? ValueConverter(IJsonValue value, IField field, IArrayField? parent);
+    public delegate JsonValue? ValueConverter(JsonValue value, IField field, IArrayField? parent);
 
     public static class ValueConverters
     {
@@ -24,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static readonly ValueConverter ExcludeHidden = (value, field, parent) =>
         {
-            return field.IsForApi() ? value : null;
+            return field.IsForApi() ? (JsonValue?)value : null;
         };
 
         public static ValueConverter ExcludeChangedTypes(IJsonSerializer jsonSerializer)
@@ -97,13 +96,15 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
             return (value, field, parent) =>
             {
-                if (field is IField<AssetsFieldProperties> && value is JsonArray array && shouldHandle(field, parent))
+                if (field is IField<AssetsFieldProperties> && value.Type == JsonValueType.Array && shouldHandle(field, parent))
                 {
+                    var array = value.AsArray;
+
                     for (var i = 0; i < array.Count; i++)
                     {
                         var id = array[i].ToString();
 
-                        array[i] = JsonValue.Create(urlGenerator.AssetContent(appId, id));
+                        array[i] = urlGenerator.AssetContent(appId, id);
                     }
                 }
 

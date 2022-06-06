@@ -1,0 +1,49 @@
+<div class="table-items-row table-items-row-summary">
+    <div class="row">
+        <div class="col-auto" [ngSwitch]="backup.status">
+            <sqx-status-icon size="lg" [status]="backup.status"></sqx-status-icon>
+        </div>
+        <div class="col-auto">
+            <div>
+                {{ 'backups.startedLabel' | sqxTranslate }}:
+            </div>
+            <div>
+                {{ 'backups.backupDuration' | sqxTranslate }}:
+            </div>
+        </div>
+        <div class="col text-nowrap">
+            <div>
+                {{backup.started | sqxFromNow}}
+            </div>
+            <div *ngIf="backup.stopped">
+                {{duration}}
+            </div>
+        </div>
+        <div class="col">
+            <div class="text-nowrap">
+                <span title="i18n:backups.backupCountEventsTooltip">
+                    {{ 'backups.backupCountEventsLabel' | sqxTranslate }}: <strong class="backup-progress">{{backup.handledEvents | sqxKNumber}}</strong>
+                </span>,
+                <span title="i18n:backups.backupCountAssetsTooltip">
+                    {{ 'backups.backupCountAssetsLabel' | sqxTranslate }}: <strong class="backup-progress">{{backup.handledAssets | sqxKNumber}}</strong>
+                </span>
+            </div>
+            <div *ngIf="backup.canDownload">
+                {{ 'backups.backupDownload' | sqxTranslate }}:
+
+                <a href="{{apiUrl.buildUrl(backup.downloadUrl)}}" sqxExternalLink="noicon">
+                    {{ 'backups.backupDownloadLink' | sqxTranslate }} <i class="icon-external-link"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-text-danger mt-1" [disabled]="!backup.canDelete"
+                (sqxConfirmClick)="delete()"
+                confirmTitle="i18n:backups.deleteConfirmTitle"
+                confirmText="i18n:backups.deleteConfirmText"
+                confirmRememberKey="deleteBackup">
+                <i class="icon-bin2"></i>
+            </button>
+        </div>
+    </div>
+</div>

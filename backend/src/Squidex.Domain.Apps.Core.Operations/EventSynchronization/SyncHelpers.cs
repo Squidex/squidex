@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-
 namespace Squidex.Domain.Apps.Core.EventSynchronization
 {
     public static class SyncHelpers
@@ -16,7 +14,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
             return lhs == (rhs ?? false);
         }
 
-        public static bool StringEquals(this string lhs, string rhs)
+        public static bool StringEquals(this string? lhs, string? rhs)
         {
             return string.Equals(lhs ?? string.Empty, rhs ?? string.Empty, StringComparison.Ordinal);
         }

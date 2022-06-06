@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -52,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
                         new PermissionSet(
                             "Permission1",
                             "Permission2"),
-                        JsonValue.Object()
+                        new JsonObject()
                             .Add("Property1", true)
                             .Add("Property2", true));
 

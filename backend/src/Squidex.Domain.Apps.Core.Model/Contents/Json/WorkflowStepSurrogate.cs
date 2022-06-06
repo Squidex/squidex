@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
@@ -50,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
             }
 
             var transitions =
-                Transitions?.ToImmutableDictionary(
+                Transitions?.ToReadonlyDictionary(
                     x => x.Key,
                     x => x.Value.ToSource());
 

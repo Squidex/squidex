@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Squidex.Shared.Identity;
 
@@ -16,7 +15,7 @@ namespace Squidex.Config.Authentication
     {
         private readonly MyIdentityOptions options;
 
-        public OidcHandler(MyIdentityOptions options )
+        public OidcHandler(MyIdentityOptions options)
         {
             this.options = options;
         }
@@ -27,14 +26,14 @@ namespace Squidex.Config.Authentication
 
             if (!string.IsNullOrWhiteSpace(options.OidcRoleClaimType) && options.OidcRoleMapping?.Count >= 0)
             {
-                var role = identity.FindFirst(x => x.Type == options.OidcRoleClaimType)?.Value;
+                var permissions = options.OidcRoleMapping
+                    .Where(r => identity.HasClaim(options.OidcRoleClaimType, r.Key))
+                    .SelectMany(r => r.Value)
+                    .Distinct();
 
-                if (!string.IsNullOrWhiteSpace(role) && options.OidcRoleMapping.TryGetValue(role, out var permissions) && permissions != null)
+                foreach (var permission in permissions)
                 {
-                    foreach (var permission in permissions)
-                    {
-                        identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
-                    }
+                    identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
                 }
             }
 

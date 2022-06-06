@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.Rules.Triggers
     [TypeName(nameof(ContentChangedTriggerV2))]
     public sealed record ContentChangedTriggerV2 : RuleTrigger
     {
-        public ImmutableList<ContentChangedTriggerSchemaV2>? Schemas { get; init; }
+        public ReadonlyList<ContentChangedTriggerSchemaV2>? Schemas { get; init; }
 
         public bool HandleAll { get; init; }
 

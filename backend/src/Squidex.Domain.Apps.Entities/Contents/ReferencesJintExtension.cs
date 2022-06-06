@@ -5,22 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Jint.Native;
 using Jint.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Properties;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ReferencesJintExtension : IJintExtension
+    public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
     {
         private delegate void GetReferencesDelegate(JsValue references, Action<JsValue> callback);
         private readonly IServiceProvider serviceProvider;
@@ -30,63 +26,68 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.serviceProvider = serviceProvider;
         }
 
-        public void ExtendAsync(ExecutionContext context)
+        public void ExtendAsync(ScriptExecutionContext context)
         {
-            if (!context.TryGetValue<DomainId>(nameof(ScriptVars.AppId), out var appId))
+            if (!context.TryGetValue<DomainId>("appId", out var appId))
             {
                 return;
             }
 
-            if (!context.TryGetValue<ClaimsPrincipal>(nameof(ScriptVars.User), out var user))
+            if (!context.TryGetValue<ClaimsPrincipal>("user", out var user))
             {
                 return;
             }
 
-            var action = new GetReferencesDelegate((references, callback) => GetReferences(context, appId, user, references, callback));
+            var action = new GetReferencesDelegate((references, callback) =>
+            {
+                GetReferences(context, appId, user, references, callback);
+            });
 
             context.Engine.SetValue("getReference", action);
             context.Engine.SetValue("getReferences", action);
         }
 
-        private void GetReferences(ExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
+        public void Describe(AddDescription describe, ScriptScope scope)
         {
-            GetReferencesAsync(context, appId, user, references, callback).Forget();
-        }
-
-        private async Task GetReferencesAsync(ExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
-        {
-            Guard.NotNull(callback, nameof(callback));
-
-            var ids = new List<DomainId>();
-
-            if (references.IsString())
+            if (!scope.HasFlag(ScriptScope.Async))
             {
-                ids.Add(DomainId.Create(references.ToString()));
-            }
-            else if (references.IsArray())
-            {
-                foreach (var value in references.AsArray())
-                {
-                    if (value.IsString())
-                    {
-                        ids.Add(DomainId.Create(value.ToString()));
-                    }
-                }
-            }
-
-            if (ids.Count == 0)
-            {
-                var emptyContents = Array.Empty<IEnrichedContentEntity>();
-
-                callback(JsValue.FromObject(context.Engine, emptyContents));
                 return;
             }
 
-            context.MarkAsync();
+            describe(JsonType.Function, "getReferences(ids, callback)",
+                Resources.ScriptingGetReferences);
 
-            try
+            describe(JsonType.Function, "getReference(ids, callback)",
+                Resources.ScriptingGetReference);
+        }
+
+        private void GetReferences(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
+        {
+            Guard.NotNull(callback);
+
+            context.Schedule(async (scheduler, ct) =>
             {
+                var ids = references.ToIds();
+
+                if (ids.Count == 0)
+                {
+                    var emptyContents = Array.Empty<IEnrichedContentEntity>();
+
+                    scheduler.Run(callback, JsValue.FromObject(context.Engine, emptyContents));
+                    return;
+                }
+
                 var app = await GetAppAsync(appId);
+
+                if (app == null)
+                {
+                    var emptyContents = Array.Empty<IEnrichedContentEntity>();
+
+                    scheduler.Run(callback, JsValue.FromObject(context.Engine, emptyContents));
+                    return;
+                }
+
+                var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
 
                 var requestContext =
                     new Context(user, app).Clone(b => b
@@ -94,16 +95,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         .WithUnpublished()
                         .WithoutTotal());
 
-                var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
+                var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids), ct);
 
-                var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids).WithoutTotal(), context.CancellationToken);
-
-                callback(JsValue.FromObject(context.Engine, contents.ToArray()));
-            }
-            catch (Exception ex)
-            {
-                context.Fail(ex);
-            }
+                scheduler.Run(callback, JsValue.FromObject(context.Engine, contents.ToArray()));
+            });
         }
 
         private async Task<IAppEntity> GetAppAsync(DomainId appId)

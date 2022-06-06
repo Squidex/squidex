@@ -1,0 +1,19 @@
+<ng-container *ngIf="snapshot.previewNameSelected">
+    <span class="ms-2">{{ 'common.preview' | sqxTranslate }}: </span>
+
+    <div class="btn-group ms-2" #buttonGroup>
+        <button type="button" class="btn btn-secondary" (click)="follow(snapshot.previewNameSelected)">
+            <i class="icon-external-link"></i> {{snapshot.previewNameSelected}}
+        </button>
+
+        <div class="btn-group" *ngIf="snapshot.previewNamesMore.length > 0">
+            <button type="button" class="btn btn-secondary dropdown-toggle" (click)="dropdown.toggle()"></button>
+            
+            <ng-container *sqxModal="dropdown;closeAlways:true">
+                <sqx-dropdown-menu [sqxAnchoredTo]="buttonGroup" [scrollY]="true">
+                    <a *ngFor="let name of snapshot.previewNamesMore" class="dropdown-item" (click)="follow(name)">{{name}}</a>
+                </sqx-dropdown-menu>
+            </ng-container>
+        </div>
+    </div>
+</ng-container>

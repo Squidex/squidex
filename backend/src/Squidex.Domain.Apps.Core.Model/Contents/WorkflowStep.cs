@@ -7,26 +7,12 @@
 
 using Squidex.Infrastructure.Collections;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed record WorkflowStep
+    public sealed record WorkflowStep(ReadonlyDictionary<Status, WorkflowTransition>? Transitions = null, string? Color = null, NoUpdate? NoUpdate = null, bool Validate = false)
     {
-        public ImmutableDictionary<Status, WorkflowTransition> Transitions { get; } = ImmutableDictionary.Empty<Status, WorkflowTransition>();
-
-        public string? Color { get; }
-
-        public NoUpdate? NoUpdate { get; }
-
-        public WorkflowStep(ImmutableDictionary<Status, WorkflowTransition>? transitions = null, string? color = null, NoUpdate? noUpdate = null)
-        {
-            Color = color;
-
-            if (transitions != null)
-            {
-                Transitions = transitions;
-            }
-
-            NoUpdate = noUpdate;
-        }
+        public ReadonlyDictionary<Status, WorkflowTransition> Transitions { get; } = Transitions ?? ReadonlyDictionary.Empty<Status, WorkflowTransition>();
     }
 }

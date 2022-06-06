@@ -5,27 +5,29 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Runtime.Serialization;
 using Squidex.Shared.Users;
 
 #pragma warning disable CA1822 // Mark members as static
+#pragma warning disable SA1133 // Do not combine attributes
 
 namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 {
     public sealed class EnrichedCommentEvent : EnrichedUserEventBase
     {
+        [FieldDescription(nameof(FieldDescriptions.CommentText))]
         public string Text { get; set; }
 
+        [FieldDescription(nameof(FieldDescriptions.CommentUrl))]
         public Uri? Url { get; set; }
 
-        [IgnoreDataMember]
+        [FieldDescription(nameof(FieldDescriptions.CommentMentionedUser)), IgnoreDataMember]
         public IUser MentionedUser { get; set; }
 
         [IgnoreDataMember]
         public override long Partition
         {
-            get => MentionedUser?.Id.GetHashCode() ?? 0;
+            get => MentionedUser?.Id.GetHashCode(StringComparison.Ordinal) ?? 0;
         }
 
         public bool ShouldSerializeMentionedUser()

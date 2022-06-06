@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Jint.Runtime;
 using Microsoft.Extensions.Caching.Memory;
@@ -39,28 +35,28 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new StringWordsJintExtension()
             };
 
-            var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-
-            sut = new JintScriptEngine(cache, extensions)
-            {
-                TimeoutScript = TimeSpan.FromSeconds(2),
-                TimeoutExecution = TimeSpan.FromSeconds(10)
-            };
+            sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                Options.Create(new JintScriptOptions
+                {
+                    TimeoutScript = TimeSpan.FromSeconds(2),
+                    TimeoutExecution = TimeSpan.FromSeconds(10)
+                }),
+                extensions);
         }
 
         [Fact]
         public void Should_convert_html_to_text()
         {
-            const string script = @"
-                return html2Text(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "<script>Invalid</script><STYLE>Invalid</STYLE><p>Hello World</p>"
             };
 
-            var result = sut.Execute(vars, script).ToString();
+            const string script = @"
+                return html2Text(value);
+            ";
+
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("Hello World", result);
         }
@@ -68,16 +64,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_convert_markdown_to_text()
         {
-            const string script = @"
-                return markdown2Text(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "## Hello World"
             };
 
-            var result = sut.Execute(vars, script).ToString();
+            const string script = @"
+                return markdown2Text(value);
+            ";
+
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("Hello World", result);
         }
@@ -85,16 +81,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_count_words()
         {
-            const string script = @"
-                return wordCount(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "Hello, World"
             };
 
-            var result = ((JsonNumber)sut.Execute(vars, script)).Value;
+            const string script = @"
+                return wordCount(value);
+            ";
+
+            var result = sut.Execute(vars, script).AsNumber;
 
             Assert.Equal(2, result);
         }
@@ -102,16 +98,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_count_characters()
         {
-            const string script = @"
-                return characterCount(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "Hello, World"
             };
 
-            var result = ((JsonNumber)sut.Execute(vars, script)).Value;
+            const string script = @"
+                return characterCount(value);
+            ";
+
+            var result = sut.Execute(vars, script).AsNumber;
 
             Assert.Equal(10, result);
         }
@@ -119,16 +115,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_camel_case_value()
         {
-            const string script = @"
-                return toCamelCase(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "Hello World"
             };
 
-            var result = sut.Execute(vars, script).ToString();
+            const string script = @"
+                return toCamelCase(value);
+            ";
+
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("helloWorld", result);
         }
@@ -136,16 +132,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_pascal_case_value()
         {
-            const string script = @"
-                return toPascalCase(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "Hello World"
             };
 
-            var result = sut.Execute(vars, script).ToString();
+            const string script = @"
+                return toPascalCase(value);
+            ";
+
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("HelloWorld", result);
         }
@@ -153,16 +149,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_slugify_value()
         {
-            const string script = @"
-                return slugify(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "4 Häuser"
             };
 
-            var result = sut.Execute(vars, script).ToString();
+            const string script = @"
+                return slugify(value);
+            ";
+
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("4-haeuser", result);
         }
@@ -170,16 +166,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_slugify_value_with_single_char()
         {
-            const string script = @"
-                return slugify(value, true);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "4 Häuser"
             };
 
-            var result = sut.Execute(vars, script).ToString();
+            const string script = @"
+                return slugify(value, true);
+            ";
+
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("4-hauser", result);
         }
@@ -187,50 +183,85 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_compute_sha256_hash()
         {
-            const string script = @"
-                return sha256(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "HelloWorld"
             };
 
-            var result = sut.Execute(vars, script).ToString();
+            const string script = @"
+                return sha256(value);
+            ";
+
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("HelloWorld".ToSha256(), result);
         }
 
         [Fact]
-        public void Should_compute_md5_hash()
+        public void Should_compute_sha512_hash()
         {
-            const string script = @"
-                return md5(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "HelloWorld"
             };
 
-            var result = sut.Execute(vars, script).ToString();
+            const string script = @"
+                return sha512(value);
+            ";
+
+            var result = sut.Execute(vars, script).AsString;
+
+            Assert.Equal("HelloWorld".ToSha512(), result);
+        }
+
+        [Fact]
+        public void Should_compute_md5_hash()
+        {
+            var vars = new ScriptVars
+            {
+                ["value"] = "HelloWorld"
+            };
+
+            const string script = @"
+                return md5(value);
+            ";
+
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("HelloWorld".ToMD5(), result);
         }
 
         [Fact]
-        public async Task Should_throw_validation_exception_if_calling_reject()
+        public void Should_compute_guid()
         {
+            var vars = new ScriptVars
+            {
+            };
+
             const string script = @"
-                reject()
+                return guid();
             ";
 
+            var result = sut.Execute(vars, script).AsString;
+
+            Assert.True(Guid.TryParse(result, out _));
+        }
+
+        [Fact]
+        public async Task Should_throw_validation_exception_if_calling_reject()
+        {
             var options = new ScriptOptions
             {
                 CanReject = true
             };
 
-            var vars = new ScriptVars();
+            var vars = new ScriptVars
+            {
+            };
+
+            const string script = @"
+                reject()
+            ";
 
             var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, options));
 
@@ -240,16 +271,18 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task Should_throw_validation_exception_if_calling_reject_with_message()
         {
-            const string script = @"
-                reject('Not valid')
-            ";
-
             var options = new ScriptOptions
             {
                 CanReject = true
             };
 
-            var vars = new ScriptVars();
+            var vars = new ScriptVars
+            {
+            };
+
+            const string script = @"
+                reject('Not valid')
+            ";
 
             var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, options));
 
@@ -259,16 +292,18 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task Should_throw_security_exception_if_calling_reject()
         {
-            const string script = @"
-                disallow()
-            ";
-
             var options = new ScriptOptions
             {
                 CanDisallow = true
             };
 
-            var vars = new ScriptVars();
+            var vars = new ScriptVars
+            {
+            };
+
+            const string script = @"
+                disallow()
+            ";
 
             var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(vars, script, options));
 
@@ -287,7 +322,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 CanDisallow = true
             };
 
-            var vars = new ScriptVars();
+            var vars = new ScriptVars
+            {
+            };
 
             var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(vars, script, options));
 
@@ -297,13 +334,15 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task Should_throw_exception_if_getJson_url_is_null()
         {
+            var vars = new ScriptVars
+            {
+            };
+
             const string script = @"
                 getJSON(null, function(result) {
                     complete(result);
                 });
             ";
-
-            var vars = new ScriptVars();
 
             await Assert.ThrowsAsync<JavaScriptException>(() => sut.ExecuteAsync(vars, script));
         }
@@ -311,21 +350,27 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task Should_throw_exception_if_getJson_callback_is_null()
         {
+            var vars = new ScriptVars
+            {
+            };
+
             const string script = @"
                 var url = 'http://squidex.io';
 
                 getJSON(url, null);
             ";
 
-            var vars = new ScriptVars();
-
             await Assert.ThrowsAsync<JavaScriptException>(() => sut.ExecuteAsync(vars, script));
         }
 
         [Fact]
-        public async Task Should_make_json_request()
+        public async Task Should_make_getJson_request()
         {
             var httpHandler = SetupRequest();
+
+            var vars = new ScriptVars
+            {
+            };
 
             const string script = @"
                 var url = 'http://squidex.io';
@@ -335,22 +380,24 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 });
             ";
 
-            var vars = new ScriptVars();
-
             var result = await sut.ExecuteAsync(vars, script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Get);
             httpHandler.ShouldBeUrl("http://squidex.io/");
 
-            var expectedResult = JsonValue.Object().Add("key", 42);
+            var expectedResult = new JsonObject().Add("key", 42);
 
             Assert.Equal(expectedResult, result);
         }
 
         [Fact]
-        public async Task Should_make_json_request_with_headers()
+        public async Task Should_make_getJson_request_with_headers()
         {
             var httpHandler = SetupRequest();
+
+            var vars = new ScriptVars
+            {
+            };
 
             const string script = @"
                 var headers = {
@@ -365,8 +412,6 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 }, headers);
             ";
 
-            var vars = new ScriptVars();
-
             var result = await sut.ExecuteAsync(vars, script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Get);
@@ -374,7 +419,124 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             httpHandler.ShouldBeHeader("X-Header1", "1");
             httpHandler.ShouldBeHeader("X-Header2", "2");
 
-            var expectedResult = JsonValue.Object().Add("key", 42);
+            var expectedResult = new JsonObject().Add("key", 42);
+
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public async Task Should_make_deleteJson_request()
+        {
+            var httpHandler = SetupRequest();
+
+            var vars = new ScriptVars
+            {
+            };
+
+            const string script = @"
+                var url = 'http://squidex.io';
+
+                deleteJSON(url, function(result) {
+                    complete(result);
+                });
+            ";
+
+            var result = await sut.ExecuteAsync(vars, script);
+
+            httpHandler.ShouldBeMethod(HttpMethod.Delete);
+            httpHandler.ShouldBeUrl("http://squidex.io/");
+
+            var expectedResult = new JsonObject().Add("key", 42);
+
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public async Task Should_make_patchJson_request()
+        {
+            var httpHandler = SetupRequest();
+
+            var vars = new ScriptVars
+            {
+            };
+
+            const string script = @"
+                var url = 'http://squidex.io';
+
+                var body = { key: 42 };
+
+                patchJSON(url, body, function(result) {
+                    complete(result);
+                });
+            ";
+
+            var result = await sut.ExecuteAsync(vars, script);
+
+            httpHandler.ShouldBeMethod(HttpMethod.Patch);
+            httpHandler.ShouldBeUrl("http://squidex.io/");
+            httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
+
+            var expectedResult = new JsonObject().Add("key", 42);
+
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public async Task Should_make_postJson_request()
+        {
+            var httpHandler = SetupRequest();
+
+            var vars = new ScriptVars
+            {
+            };
+
+            const string script = @"
+                var url = 'http://squidex.io';
+
+                var body = { key: 42 };
+
+                postJSON(url, body, function(result) {
+                    complete(result);
+                });
+            ";
+
+            var result = await sut.ExecuteAsync(vars, script);
+
+            httpHandler.ShouldBeMethod(HttpMethod.Post);
+            httpHandler.ShouldBeUrl("http://squidex.io/");
+            httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
+
+            var expectedResult = new JsonObject().Add("key", 42);
+
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public async Task Should_make_putJson_request()
+        {
+            var httpHandler = SetupRequest();
+
+            var vars = new ScriptVars
+            {
+            };
+
+            const string script = @"
+                var url = 'http://squidex.io';
+
+                var body = { key: 42 };
+
+                putJSON(url, body, function(result) {
+                    complete(result);
+                });
+            ";
+
+            var result = await sut.ExecuteAsync(vars, script);
+
+            httpHandler.ShouldBeMethod(HttpMethod.Put);
+            httpHandler.ShouldBeUrl("http://squidex.io/");
+            httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
+
+            var expectedResult = new JsonObject().Add("key", 42);
 
             Assert.Equal(expectedResult, result);
         }

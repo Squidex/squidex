@@ -5,12 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Migrations.Migrations;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
@@ -23,27 +18,25 @@ namespace Migrations
         private readonly RebuildFiles rebuildFiles;
         private readonly IAssetRepository assetRepository;
         private readonly Rebuilder rebuilder;
-        private readonly PopulateGrainIndexes populateGrainIndexes;
-        private readonly IContentRepository contentRepository;
         private readonly RebuildOptions rebuildOptions;
+        private readonly IContentRepository contentRepository;
 
         public RebuildRunner(
             IOptions<RebuildOptions> rebuildOptions,
             IAssetRepository assetRepository,
             Rebuilder rebuilder,
             RebuildFiles rebuildFiles,
-            PopulateGrainIndexes populateGrainIndexes,
             IContentRepository contentRepository)
         {
             this.assetRepository = assetRepository;
             this.rebuildFiles = rebuildFiles;
             this.rebuilder = rebuilder;
             this.rebuildOptions = rebuildOptions.Value;
-            this.populateGrainIndexes = populateGrainIndexes;
             this.contentRepository = contentRepository;
         }
 
-        public async Task RunAsync(CancellationToken ct)
+        public async Task RunAsync(
+            CancellationToken ct)
         {
             var batchSize = rebuildOptions.CalculateBatchSize();
 
@@ -86,11 +79,6 @@ namespace Migrations
             if (rebuildOptions.ContentsCount)
             {
                 await contentRepository.RebuildCountsAsync(ct);
-            }
-
-            if (rebuildOptions.Indexes)
-            {
-                await populateGrainIndexes.UpdateAsync(ct);
             }
         }
     }

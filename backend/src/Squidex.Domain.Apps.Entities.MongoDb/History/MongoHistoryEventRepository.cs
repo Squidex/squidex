@@ -5,12 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Infrastructure;
@@ -18,7 +15,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.History
 {
-    public class MongoHistoryEventRepository : MongoRepositoryBase<HistoryEvent>, IHistoryEventRepository
+    public sealed class MongoHistoryEventRepository : MongoRepositoryBase<HistoryEvent>, IHistoryEventRepository, IDeleter
     {
         static MongoHistoryEventRepository()
         {
@@ -42,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<HistoryEvent> collection,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             return collection.Indexes.CreateManyAsync(new[]
             {
@@ -56,23 +53,33 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
                     Index
                         .Ascending(x => x.AppId)
                         .Descending(x => x.Created)
-                        .Descending(x => x.Version)),
+                        .Descending(x => x.Version))
             }, ct);
         }
 
-        public async Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(DomainId appId, string channelPrefix, int count)
+        async Task IDeleter.DeleteAppAsync(IAppEntity app,
+            CancellationToken ct)
+        {
+            await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
+        }
+
+        public async Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(DomainId appId, string channelPrefix, int count,
+            CancellationToken ct = default)
         {
             if (!string.IsNullOrWhiteSpace(channelPrefix))
             {
-                return await Collection.Find(x => x.AppId == appId && x.Channel == channelPrefix).SortByDescending(x => x.Created).ThenByDescending(x => x.Version).Limit(count).ToListAsync();
+                return await Collection.Find(x => x.AppId == appId && x.Channel == channelPrefix)
+                    .SortByDescending(x => x.Created).ThenByDescending(x => x.Version).Limit(count).ToListAsync(ct);
             }
             else
             {
-                return await Collection.Find(x => x.AppId == appId).SortByDescending(x => x.Created).ThenByDescending(x => x.Version).Limit(count).ToListAsync();
+                return await Collection.Find(x => x.AppId == appId)
+                    .SortByDescending(x => x.Created).ThenByDescending(x => x.Version).Limit(count).ToListAsync(ct);
             }
         }
 
-        public async Task InsertManyAsync(IEnumerable<HistoryEvent> historyEvents)
+        public Task InsertManyAsync(IEnumerable<HistoryEvent> historyEvents,
+            CancellationToken ct = default)
         {
             var writes = historyEvents
                 .Select(x =>
@@ -82,10 +89,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
                     })
                 .ToList();
 
-            if (writes.Count > 0)
+            if (writes.Count == 0)
             {
-                await Collection.BulkWriteAsync(writes);
+                return Task.CompletedTask;
             }
+
+            return Collection.BulkWriteAsync(writes, BulkUnordered, ct);
         }
     }
 }

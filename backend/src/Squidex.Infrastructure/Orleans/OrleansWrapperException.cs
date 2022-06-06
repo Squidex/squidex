@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Globalization;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -39,7 +39,7 @@ namespace Squidex.Infrastructure.Orleans
         {
             var sb = new StringBuilder();
 
-            sb.AppendLine($"Wrapping exception of type {exceptionType}, because original exception is not serialized.");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"Wrapping exception of type {exceptionType}, because original exception is not serialized.");
             sb.AppendLine();
             sb.AppendLine("Original exception:");
             sb.AppendLine(wrapped.ToString());

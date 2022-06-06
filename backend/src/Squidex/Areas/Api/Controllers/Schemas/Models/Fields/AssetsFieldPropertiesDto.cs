@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
@@ -22,12 +22,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The language specific default value as a list of asset ids.
         /// </summary>
-        public LocalizedValue<ImmutableList<string>?> DefaultValues { get; set; }
+        public LocalizedValue<ReadonlyList<string>?> DefaultValues { get; set; }
 
         /// <summary>
         /// The default value as a list of asset ids.
         /// </summary>
-        public ImmutableList<string>? DefaultValue { get; set; }
+        public ReadonlyList<string>? DefaultValue { get; set; }
 
         /// <summary>
         /// The initial id to the folder.
@@ -85,14 +85,24 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public int? AspectHeight { get; set; }
 
         /// <summary>
-        /// Defines if the asset must be an image.
+        /// The expected type.
         /// </summary>
-        public bool MustBeImage { get; set; }
+        public AssetType? ExpectedType { get; set; }
 
         /// <summary>
         /// True to resolve first asset in the content list.
         /// </summary>
         public bool ResolveFirst { get; set; }
+
+        /// <summary>
+        /// True to resolve first image in the content list.
+        /// </summary>
+        [Obsolete("Use 'expectedType' field now")]
+        public bool MustBeImage
+        {
+            get => ExpectedType == AssetType.Image;
+            set => ExpectedType = value ? AssetType.Image : ExpectedType;
+        }
 
         /// <summary>
         /// True to resolve first image in the content list.
@@ -107,7 +117,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The allowed file extensions.
         /// </summary>
-        public ImmutableList<string>? AllowedExtensions { get; set; }
+        public ReadonlyList<string>? AllowedExtensions { get; set; }
 
         /// <summary>
         /// True, if duplicate values are allowed.

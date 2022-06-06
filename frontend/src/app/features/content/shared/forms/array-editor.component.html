@@ -1,0 +1,123 @@
+<ng-container *ngIf="formModel.itemChanges | async; let items">
+    <div class="array-container" *ngIf="items.length > 0 && items.length <= 20;"
+        cdkDropList
+        [cdkDropListDisabled]="false"
+        [cdkDropListData]="items"
+        (cdkDropListDropped)="sort($event)">
+        <div *ngFor="let itemForm of items; index as i; last as isLast; first as isFirst;" class="table-drag item"
+            cdkDrag
+            cdkDragLockAxis="y"
+            [class.first]="isFirst"
+            [class.last]="isLast">
+            <sqx-array-item
+                [canUnset]="canUnset"
+                (clone)="addCopy(itemForm)"
+                [form]="form"
+                [formContext]="formContext"
+                [formLevel]="formLevel + 1"
+                [formModel]="itemForm"
+                [index]="i"
+                [isComparing]="isComparing"
+                [isCollapsedInitial]="isCollapsedInitial"
+                [isDisabled]="isDisabled | async"
+                [isFirst]="isFirst"
+                [isLast]="isLast"
+                (itemRemove)="removeItem(i)"
+                (itemMove)="move(itemForm, $event)" 
+                [language]="language"
+                [languages]="languages">
+                <i cdkDragHandle class="icon-drag2"></i>
+            </sqx-array-item>
+        </div>
+    </div>
+
+    <div class="array-container" *ngIf="items.length > 20">
+        <virtual-scroller #scroll [items]="$any(items)" [enableUnequalChildrenSizes]="true">
+            <div *ngFor="let itemForm of scroll.viewPortItems; index as i" class="item"
+                [class.first]="scroll.viewPortInfo.startIndexWithBuffer + i === 0"
+                [class.last]="scroll.viewPortInfo.startIndexWithBuffer + i === items.length - 1">
+                <sqx-array-item
+                    [canUnset]="canUnset"
+                    (clone)="addCopy(itemForm)"
+                    [form]="form"
+                    [formContext]="formContext"
+                    [formLevel]="formLevel + 1"
+                    [formModel]="itemForm"
+                    [index]="scroll.viewPortInfo.startIndexWithBuffer + i"
+                    [isCollapsedInitial]="isCollapsedInitial"
+                    [isComparing]="isComparing"
+                    [isDisabled]="isDisabled | async"
+                    [isFirst]="scroll.viewPortInfo.startIndexWithBuffer + i === 0"
+                    [isLast]="scroll.viewPortInfo.startIndexWithBuffer + i === items.length - 1"
+                    (itemExpanded)="scroll.invalidateCachedMeasurementAtIndex(scroll.viewPortInfo.startIndexWithBuffer + i)"
+                    (itemRemove)="removeItem(scroll.viewPortInfo.startIndexWithBuffer + i)"
+                    (itemMove)="move(itemForm, $event)"
+                    [language]="language"
+                    [languages]="languages">
+                </sqx-array-item>
+            </div>
+        </virtual-scroller>
+    </div>
+
+    <div class="row g-0 align-items-center">
+        <div class="col-auto">
+            <ng-container *ngIf="isArray; else component">
+                <ng-container *ngIf="hasField">
+                    <button type="button" class="btn btn-outline-success" [disabled]="isFull | async" (click)="addItem()">
+                        {{ 'contents.arrayAddItem' | sqxTranslate }}
+                    </button>
+                </ng-container>
+                <ng-container *ngIf="!hasField">
+                    <sqx-form-hint>
+                        {{ 'contents.arrayNoFields' | sqxTranslate }}
+                    </sqx-form-hint>
+                </ng-container>
+            </ng-container>
+            
+            <ng-template #component>
+                <ng-container *ngIf="schemasList.length > 1">
+                    <button type="button" class="btn btn-outline-success dropdown-toggle" [disabled]="isFull | async" (click)="schemasDropdown.show()" #buttonSelect>
+                        {{ 'contents.addComponent' | sqxTranslate}}
+                    </button>
+                    
+                    <ng-container *sqxModal="schemasDropdown;closeAlways:true">
+                        <sqx-dropdown-menu [sqxAnchoredTo]="buttonSelect" [scrollY]="true">
+                            <a class="dropdown-item" *ngFor="let schema of schemasList" (click)="addComponent(schema)">
+                                {{schema.displayName}}
+                            </a>
+                        </sqx-dropdown-menu>
+                    </ng-container>
+                </ng-container>
+                <ng-container *ngIf="schemasList.length === 1">
+                    <button type="button" class="btn btn-outline-success" [disabled]="isFull | async" (click)="addComponent(schemasList[0])">
+                        {{ 'contents.addComponent' | sqxTranslate}}
+                    </button>
+                </ng-container>
+                <ng-container *ngIf="schemasList.length === 0">
+                    <sqx-form-hint>
+                        {{ 'contents.componentsNoSchema' | sqxTranslate }}
+                    </sqx-form-hint>
+                </ng-container>
+            </ng-template>
+        </div>
+
+        <div class="col">            
+            <button type="button" class="btn btn-text-danger ms-2" *ngIf="items.length > 0"
+                (sqxConfirmClick)="clear()"
+                confirmTitle="i18n:contents.arrayClearConfirmTitle"
+                confirmText="i18n:contents.arrayClearConfirmText"
+                confirmRememberKey="leaveApp">
+                {{ 'contents.arrayClear' | sqxTranslate }}
+            </button>
+        </div>
+    
+        <div class="col-auto" *ngIf="items.length > 0">
+            <button type="button" class="btn btn-text-secondary" (click)="expandAll()" title="i18n:contents.arrayExpandAll">
+                <i class="icon-plus-square"></i>
+            </button>
+            <button type="button" class="btn btn-text-secondary" (click)="collapseAll()" title="i18n:contents.arrayCollapseAll">
+                <i class="icon-minus-square"></i>
+            </button>
+        </div>
+    </div>
+</ng-container>

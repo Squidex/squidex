@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
@@ -23,16 +21,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Diagnostics
             this.grainFactory = grainFactory;
         }
 
-        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
+            CancellationToken cancellationToken = default)
         {
-            await GetGrain().CountAsync();
+            await GetGrain().GetAppIdsAsync(new[] { "test" });
 
             return HealthCheckResult.Healthy("Orleans must establish communication.");
         }
 
-        private IAppsByNameIndexGrain GetGrain()
+        private IAppsCacheGrain GetGrain()
         {
-            return grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id);
+            return grainFactory.GetGrain<IAppsCacheGrain>(SingleGrain.Id);
         }
     }
 }

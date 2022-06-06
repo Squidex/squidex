@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
@@ -21,30 +21,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public UserGraphType()
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = "User";
 
             AddField(new FieldType
             {
                 Name = "id",
                 Resolver = Resolve(x => x.Id),
-                ResolvedType = AllTypes.NonNullString,
-                Description = "The id of the user."
+                ResolvedType = Scalars.NonNullString,
+                Description = FieldDescriptions.UserId
             });
 
             AddField(new FieldType
             {
                 Name = "displayName",
                 Resolver = Resolve(x => x.Claims.DisplayName()),
-                ResolvedType = AllTypes.String,
-                Description = "The display name of the user."
+                ResolvedType = Scalars.String,
+                Description = FieldDescriptions.UserDisplayName
             });
 
             AddField(new FieldType
             {
                 Name = "email",
                 Resolver = Resolve(x => x.Email),
-                ResolvedType = AllTypes.String,
-                Description = "The email of the user."
+                ResolvedType = Scalars.String,
+                Description = FieldDescriptions.UserEmail
             });
 
             Description = "A user that created or modified a content or asset.";

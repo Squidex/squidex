@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Infrastructure;
@@ -24,16 +22,17 @@ namespace Migrations.Migrations
             this.stateForAssets = stateForAssets;
         }
 
-        public Task UpdateAsync(CancellationToken ct)
+        public async Task UpdateAsync(
+            CancellationToken ct)
         {
-            return stateForAssets.ReadAllAsync(async (state, version) =>
+            await foreach (var (state, version) in stateForAssets.ReadAllAsync(ct))
             {
                 state.Slug = state.FileName.ToAssetSlug();
 
                 var key = DomainId.Combine(state.AppId.Id, state.Id);
 
-                await stateForAssets.WriteAsync(key, state, version, version);
-            }, ct);
+                await stateForAssets.WriteAsync(key, state, version, version, ct);
+            }
         }
     }
 }

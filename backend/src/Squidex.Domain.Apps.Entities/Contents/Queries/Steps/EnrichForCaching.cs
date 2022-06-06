@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
@@ -39,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             {
                 ct.ThrowIfCancellationRequested();
 
-                var schema = await schemas(group.Key);
+                var (schema, _) = await schemas(group.Key);
 
                 foreach (var content in group)
                 {

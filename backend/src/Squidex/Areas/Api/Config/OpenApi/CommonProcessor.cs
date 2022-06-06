@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using NSwag;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
@@ -37,12 +36,15 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
         public void Process(DocumentProcessorContext context)
         {
-            context.Document.BasePath = Constants.PrefixApi;
-
             context.Document.Info.Version = version;
             context.Document.Info.ExtensionData = new Dictionary<string, object>
             {
-                ["x-logo"] = new { url = logoUrl, backgroundColor = logoBackground }
+                ["x-logo"] = new
+                {
+                    url = logoUrl,
+                    backgroundStyle = string.Empty,
+                    backgroundColor = logoBackground
+                }
             };
 
             context.Document.ExternalDocumentation = documentation;

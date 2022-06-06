@@ -22,21 +22,21 @@ namespace Squidex.Extensions.Actions.CreateContent
     {
         [LocalizedRequired]
         [Display(Name = "Data", Description = "The content data.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Data { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Schema", Description = "The name of the schema.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string Schema { get; set; }
 
         [Display(Name = "Client", Description = "An optional client name.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string Client { get; set; }
 
         [Display(Name = "Publish", Description = "Publish the content.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public bool Publish { get; set; }
     }
 }

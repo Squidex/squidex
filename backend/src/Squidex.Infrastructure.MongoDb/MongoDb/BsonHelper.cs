@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.MongoDb
                 return TypeJson;
             }
 
-            var result = value.ReplaceFirst('§', '$').Replace(DotReplacement, DotSource);
+            var result = value.ReplaceFirst('§', '$').Replace(DotReplacement, DotSource, StringComparison.Ordinal);
 
             return result;
         }
@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.MongoDb
                 return TypeBson;
             }
 
-            var result = value.ReplaceFirst('$', '§').Replace(DotSource, DotReplacement);
+            var result = value.ReplaceFirst('$', '§').Replace(DotSource, DotReplacement, StringComparison.Ordinal);
 
             return result;
         }

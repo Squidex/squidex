@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
 using FakeItEasy;
 using GraphQL;
 using Squidex.Domain.Apps.Core.Contents;
@@ -61,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var asset = TestAsset.Create(DomainId.NewGuid());
 
             A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
-                    A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query" && x.NoTotal == true), A<CancellationToken>._))
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5&$filter=my-query" && x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, asset));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -96,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var asset = TestAsset.Create(DomainId.NewGuid());
 
             A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
-                    A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query" && x.NoTotal == false), A<CancellationToken>._))
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5&$filter=my-query" && !x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(10, asset));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -120,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_null_single_asset_if_not_found()
+        public async Task Should_return_null_if_single_asset_not_found()
         {
             var assetId = DomainId.NewGuid();
 
@@ -131,7 +129,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", assetId);
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.HasIdsWithoutTotal(assetId), A<CancellationToken>._))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
+                    A<Q>.That.HasIdsWithoutTotal(assetId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom<IEnrichedAssetEntity>(1));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -160,7 +159,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", assetId);
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.HasIdsWithoutTotal(assetId), A<CancellationToken>._))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
+                    A<Q>.That.HasIdsWithoutTotal(assetId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, asset));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -190,7 +190,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var content = TestContent.Create(contentId);
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
-                    A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5" && x.NoTotal == true), A<CancellationToken>._))
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -223,7 +223,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var content = TestContent.Create(contentId);
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
-                    A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5" && x.NoTotal == true), A<CancellationToken>._))
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -259,7 +259,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var content = TestContent.Create(contentId);
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
-                    A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5" && x.NoTotal == false), A<CancellationToken>._))
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && !x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(10, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -283,7 +283,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_null_single_content_if_not_found()
+        public async Task Should_return_null_if_single_content_not_found()
         {
             var contentId = DomainId.NewGuid();
 
@@ -294,8 +294,39 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentId);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom<IEnrichedContentEntity>(1));
+
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = (object?)null
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_return_null_if_single_content_from_another_schema()
+        {
+            var contentId = DomainId.NewGuid();
+            var content = TestContent.CreateRef(TestSchemas.Ref1Id, contentId, "ref1-field", "ref1");
+
+            var query = CreateQuery(@"
+                query {
+                  findMySchemaContent(id: '<ID>') {
+                    id
+                  }
+                }", contentId);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(10, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
 
@@ -323,7 +354,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentId);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -369,6 +401,89 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_also_fetch_embedded_contents_if_field_is_included_in_query()
+        {
+            var contentRefId = DomainId.NewGuid();
+            var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "schemaRef1Field", "ref1");
+
+            var contentId = DomainId.NewGuid();
+            var content = TestContent.Create(contentId, contentRefId);
+
+            var query = CreateQuery(@"
+                query {
+                  findMySchemaContent(id: '<ID>') {
+                    id
+                    data {
+                      myEmbeds {
+                        iv {
+                          text
+                          contents {
+                            ... on Content {
+                              id
+                            }
+                            ... on MyRefSchema1 {
+                              data {
+                                schemaRef1Field {
+                                  iv
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }", contentId);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(0, contentRef));
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(1, content));
+
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = new
+                    {
+                        id = content.Id,
+                        data = new
+                        {
+                            myEmbeds = new
+                            {
+                                iv = new
+                                {
+                                    text = $"assets:{DomainId.Empty}, contents:{contentRefId}",
+                                    contents = new[]
+                                    {
+                                        new
+                                        {
+                                            id = contentRefId,
+                                            data = new
+                                            {
+                                                schemaRef1Field = new
+                                                {
+                                                    iv = "ref1"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
         public async Task Should_also_fetch_referenced_contents_if_field_is_included_in_query()
         {
             var contentRefId = DomainId.NewGuid();
@@ -396,10 +511,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentId);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, contentRef));
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -439,6 +556,122 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_also_fetch_referenced_contents_from_flat_data_if_field_is_included_in_query()
+        {
+            var contentRefId = DomainId.NewGuid();
+            var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "schemaRef1Field", "ref1");
+
+            var contentId = DomainId.NewGuid();
+            var content = TestContent.Create(contentId, contentRefId);
+
+            var query = CreateQuery(@"
+                query {
+                  findMySchemaContent(id: '<ID>') {
+                    id
+                    flatData {
+                      myReferences {
+                        id
+                      }
+                    }
+                  }
+                }", contentId);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(0, contentRef));
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(1, content));
+
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = new
+                    {
+                        id = content.Id,
+                        flatData = new
+                        {
+                            myReferences = new[]
+                            {
+                                new
+                                {
+                                    id = contentRefId
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_cache_referenced_contents_from_flat_data_if_field_is_included_in_query()
+        {
+            var contentRefId = DomainId.NewGuid();
+            var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "schemaRef1Field", "ref1");
+
+            var contentId = DomainId.NewGuid();
+            var content = TestContent.Create(contentId, contentRefId);
+
+            var query = CreateQuery(@"
+                query {
+                  findMySchemaContent(id: '<ID>') {
+                    id
+                    flatData {
+                      myReferences @cache(duration: 1000) {
+                        id
+                      }
+                    }
+                  }
+                }", contentId);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(0, contentRef));
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(1, content));
+
+            var result1 = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var result2 = await ExecuteAsync(new ExecutionOptions { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = new
+                    {
+                        id = content.Id,
+                        flatData = new
+                        {
+                            myReferences = new[]
+                            {
+                                new
+                                {
+                                    id = contentRefId
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result1);
+            AssertResult(expected, result2);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
+                .MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
         public async Task Should_also_fetch_referencing_contents_if_field_is_included_in_query()
         {
             var contentRefId = DomainId.NewGuid();
@@ -462,11 +695,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentRefId);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, contentRef));
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), content.SchemaId.Id.ToString(),
-                    A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5" && x.Reference == contentRefId && x.NoTotal == true), A<CancellationToken>._))
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Reference == contentRefId && x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -526,12 +760,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentRefId);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, contentRef));
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), content.SchemaId.Id.ToString(),
-                    A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5" && x.Reference == contentRefId && x.NoTotal == false), A<CancellationToken>._))
-                .Returns(ResultList.CreateFrom(1, content));
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Reference == contentRefId && !x.NoTotal), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(10, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
 
@@ -544,7 +779,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         id = contentRefId,
                         referencingMySchemaContentsWithTotal = new
                         {
-                            total = 1,
+                            total = 10,
                             items = new[]
                             {
                                 new
@@ -557,6 +792,113 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                             de_DE = "de-DE"
                                         }
                                     }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_also_fetch_references_contents_if_field_is_included_in_query()
+        {
+            var contentRefId = DomainId.NewGuid();
+            var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "ref1-field", "ref1");
+
+            var contentId = DomainId.NewGuid();
+            var content = TestContent.Create(contentId, contentRefId);
+
+            var query = CreateQuery(@"
+                query {
+                  findMySchemaContent(id: '<ID>') {
+                    id
+                    referencesMyRefSchema1Contents(top: 30, skip: 5) {
+                      id
+                    }
+                  }
+                }", contentId);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(1, content));
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), contentRef.SchemaId.Id.ToString(),
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Referencing == contentId && x.NoTotal), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(1, contentRef));
+
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = new
+                    {
+                        id = contentId,
+                        referencesMyRefSchema1Contents = new[]
+                        {
+                            new
+                            {
+                                id = contentRefId
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_also_fetch_references_contents_with_total_if_field_is_included_in_query()
+        {
+            var contentRefId = DomainId.NewGuid();
+            var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "ref1-field", "ref1");
+
+            var contentId = DomainId.NewGuid();
+            var content = TestContent.Create(contentId, contentRefId);
+
+            var query = CreateQuery(@"
+                query {
+                  findMySchemaContent(id: '<ID>') {
+                    id
+                    referencesMyRefSchema1ContentsWithTotal(top: 30, skip: 5) {
+                      total
+                      items {
+                        id
+                      }
+                    }
+                  }
+                }", contentId);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(1, content));
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), contentRef.SchemaId.Id.ToString(),
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Referencing == contentId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(10, contentRef));
+
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = new
+                    {
+                        id = contentId,
+                        referencesMyRefSchema1ContentsWithTotal = new
+                        {
+                            total = 10,
+                            items = new[]
+                            {
+                                new
+                                {
+                                    id = contentRefId
                                 }
                             }
                         }
@@ -600,10 +942,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentId);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, contentRef));
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -644,6 +988,73 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_also_fetch_embedded_assets_if_field_is_included_in_query()
+        {
+            var assetRefId = DomainId.NewGuid();
+            var assetRef = TestAsset.Create(assetRefId);
+
+            var contentId = DomainId.NewGuid();
+            var content = TestContent.Create(contentId, assetId: assetRefId);
+
+            var query = CreateQuery(@"
+                query {
+                  findMySchemaContent(id: '<ID>') {
+                    id
+                    data {
+                      myEmbeds {
+                        iv {
+                          text
+                          assets {
+                            id
+                          }
+                        }
+                      }
+                    }
+                  }
+                }", contentId);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(1, content));
+
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
+                    A<Q>.That.HasIdsWithoutTotal(assetRefId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(0, assetRef));
+
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = new
+                    {
+                        id = content.Id,
+                        data = new
+                        {
+                            myEmbeds = new
+                            {
+                                iv = new
+                                {
+                                    text = $"assets:{assetRefId}, contents:{DomainId.Empty}",
+                                    assets = new[]
+                                    {
+                                        new
+                                        {
+                                            id = assetRefId
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
         public async Task Should_also_fetch_referenced_assets_if_field_is_included_in_query()
         {
             var assetRefId = DomainId.NewGuid();
@@ -666,10 +1077,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentId);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.HasIdsWithoutTotal(assetRefId), A<CancellationToken>._))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
+                    A<Q>.That.HasIdsWithoutTotal(assetRefId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, assetRef));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -725,24 +1138,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentId);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var json = serializer.Serialize(result);
 
-            Assert.Contains("\"errors\"", json);
+            Assert.Contains("\"errors\"", json, StringComparison.Ordinal);
         }
 
         private static string CreateQuery(string query, DomainId id = default)
         {
             return query
-                .Replace("'", "\"")
-                .Replace("<ID>", id.ToString())
-                .Replace("<FIELDS_ASSET>", TestAsset.AllFields)
-                .Replace("<FIELDS_CONTENT>", TestContent.AllFields)
-                .Replace("<FIELDS_CONTENT_FLAT>", TestContent.AllFlatFields);
+                .Replace("'", "\"", StringComparison.Ordinal)
+                .Replace("<ID>", id.ToString(), StringComparison.Ordinal)
+                .Replace("<FIELDS_ASSET>", TestAsset.AllFields, StringComparison.Ordinal)
+                .Replace("<FIELDS_CONTENT>", TestContent.AllFields, StringComparison.Ordinal)
+                .Replace("<FIELDS_CONTENT_FLAT>", TestContent.AllFlatFields, StringComparison.Ordinal);
         }
 
         private Context MatchsAssetContext()

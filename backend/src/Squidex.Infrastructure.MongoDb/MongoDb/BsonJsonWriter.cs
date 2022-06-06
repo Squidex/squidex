@@ -5,19 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using MongoDB.Bson.IO;
-using NewtonsoftJSonWriter = Newtonsoft.Json.JsonWriter;
+using NewtonsoftJsonWriter = Newtonsoft.Json.JsonWriter;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public sealed class BsonJsonWriter : NewtonsoftJSonWriter
+    public sealed class BsonJsonWriter : NewtonsoftJsonWriter
     {
         private readonly IBsonWriter bsonWriter;
 
         public BsonJsonWriter(IBsonWriter bsonWriter)
         {
-            Guard.NotNull(bsonWriter, nameof(bsonWriter));
+            Guard.NotNull(bsonWriter);
 
             this.bsonWriter = bsonWriter;
         }

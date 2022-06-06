@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -27,7 +25,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public string? Label { get; set; }
 
         /// <summary>
-        /// Hints to describe the schema.
+        /// Hints to describe the field.
         /// </summary>
         [LocalizedStringLength(1000)]
         public string? Hints { get; set; }
@@ -61,7 +59,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// Tags for automation processes.
         /// </summary>
-        public ImmutableList<string>? Tags { get; set; }
+        public ReadonlyList<string>? Tags { get; set; }
 
         public abstract FieldProperties ToProperties();
 

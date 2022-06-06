@@ -1,97 +1,61 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Orleans;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
+using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 using Squidex.Shared;
-using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
     public sealed class AppsIndex : IAppsIndex, ICommandMiddleware
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
+        private readonly IAppRepository appRepository;
         private readonly IGrainFactory grainFactory;
         private readonly IReplicatedCache grainCache;
 
-        public AppsIndex(IGrainFactory grainFactory, IReplicatedCache grainCache)
+        public AppsIndex(IAppRepository appRepository, IGrainFactory grainFactory, IReplicatedCache grainCache)
         {
+            this.appRepository = appRepository;
             this.grainFactory = grainFactory;
             this.grainCache = grainCache;
         }
 
-        public async Task RebuildByContributorsAsync(DomainId appId, HashSet<string> contributors)
+        public Task RegisterAsync(DomainId id, string name,
+            CancellationToken ct = default)
         {
-            foreach (var contributorId in contributors)
-            {
-                await Index(contributorId).AddAsync(appId);
-            }
+            return Cache().AddAsync(id, name);
         }
 
-        public Task RebuildByContributorsAsync(string contributorId, HashSet<DomainId> apps)
+        public Task RemoveReservationAsync(string? token,
+            CancellationToken ct = default)
         {
-            return Index(contributorId).RebuildAsync(apps);
+            return Cache().RemoveReservationAsync(token);
         }
 
-        public Task RebuildAsync(Dictionary<string, DomainId> appsByName)
+        public async Task<string?> ReserveAsync(DomainId id, string name,
+            CancellationToken ct = default)
         {
-            return Index().RebuildAsync(appsByName);
+            return await Cache().ReserveAsync(id, name);
         }
 
-        public Task RemoveReservationAsync(string? token)
+        public async Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions,
+            CancellationToken ct = default)
         {
-            return Index().RemoveReservationAsync(token);
-        }
-
-        public Task<List<DomainId>> GetIdsAsync()
-        {
-            return Index().GetIdsAsync();
-        }
-
-        public Task<bool> AddAsync(string? token)
-        {
-            return Index().AddAsync(token);
-        }
-
-        public Task<string?> ReserveAsync(DomainId id, string name)
-        {
-            return Index().ReserveAsync(id, name);
-        }
-
-        public async Task<List<IAppEntity>> GetAppsAsync()
-        {
-            using (Profiler.TraceMethod<AppsIndex>())
-            {
-                var ids = await GetAppIdsAsync();
-
-                var apps =
-                    await Task.WhenAll(ids
-                        .Select(id => GetAppAsync(id, false)));
-
-                return apps.NotNull().ToList();
-            }
-        }
-
-        public async Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions)
-        {
-            using (Profiler.TraceMethod<AppsIndex>())
+            using (Telemetry.Activities.StartActivity("AppProvider/GetAppsForUserAsync"))
             {
                 var ids =
                     await Task.WhenAll(
@@ -101,15 +65,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 var apps =
                     await Task.WhenAll(ids
                         .SelectMany(x => x).Distinct()
-                        .Select(id => GetAppAsync(id, false)));
+                        .Select(id => GetAppAsync(id, false, ct)));
 
                 return apps.NotNull().ToList();
             }
         }
 
-        public async Task<IAppEntity?> GetAppByNameAsync(string name, bool canCache = false)
+        public async Task<IAppEntity?> GetAppAsync(string name, bool canCache = false,
+            CancellationToken ct = default)
         {
-            using (Profiler.TraceMethod<AppsIndex>())
+            using (Telemetry.Activities.StartActivity("AppProvider/GetAppByNameAsync"))
             {
                 if (canCache)
                 {
@@ -126,17 +91,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                     return null;
                 }
 
-                return await GetAppAsync(appId, canCache);
+                return await GetAppAsync(appId, canCache, ct);
             }
         }
 
-        public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache)
+        public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
+            CancellationToken ct = default)
         {
-            using (Profiler.TraceMethod<AppsIndex>())
+            using (Telemetry.Activities.StartActivity("AppProvider/GetAppAsync"))
             {
                 if (canCache)
                 {
-                    if (grainCache.TryGetValue(GetCacheKey(appId), out var v) && v is IAppEntity cachedApp)
+                    if (grainCache.TryGetValue(GetCacheKey(appId), out var cached) && cached is IAppEntity cachedApp)
                     {
                         return cachedApp;
                     }
@@ -153,162 +119,117 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        private async Task<List<DomainId>> GetAppIdsByUserAsync(string userId)
+        private async Task<IReadOnlyCollection<DomainId>> GetAppIdsByUserAsync(string userId)
         {
-            using (Profiler.TraceMethod<AppProvider>())
+            using (Telemetry.Activities.StartActivity("AppProvider/GetAppIdsByUserAsync"))
             {
-                return await grainFactory.GetGrain<IAppsByUserIndexGrain>(userId).GetIdsAsync();
+                var result = await appRepository.QueryIdsAsync(userId);
+
+                return result.Values;
             }
         }
 
-        private async Task<List<DomainId>> GetAppIdsAsync()
+        private async Task<IReadOnlyCollection<DomainId>> GetAppIdsAsync(string[] names)
         {
-            using (Profiler.TraceMethod<AppProvider>())
+            using (Telemetry.Activities.StartActivity("AppProvider/GetAppIdsAsync"))
             {
-                return await grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id).GetIdsAsync();
-            }
-        }
+                var result = await Cache().GetAppIdsAsync(names);
 
-        private async Task<List<DomainId>> GetAppIdsAsync(string[] names)
-        {
-            using (Profiler.TraceMethod<AppProvider>())
-            {
-                return await grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id).GetIdsAsync(names);
+                return result;
             }
         }
 
         private async Task<DomainId> GetAppIdAsync(string name)
         {
-            using (Profiler.TraceMethod<AppProvider>())
+            using (Telemetry.Activities.StartActivity("AppProvider/GetAppIdAsync"))
             {
-                return await grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id).GetIdAsync(name);
+                var result = await Cache().GetAppIdsAsync(new[] { name });
+
+                return result.FirstOrDefault();
             }
         }
 
         public async Task HandleAsync(CommandContext context, NextDelegate next)
         {
-            if (context.Command is CreateApp createApp)
+            var command = context.Command;
+
+            if (command is CreateApp createApp)
             {
-                var index = Index();
+                var cache = Cache();
 
-                var token = await CheckAppAsync(index, createApp);
-
+                var token = await CheckAppAsync(cache, createApp);
                 try
                 {
                     await next(context);
                 }
                 finally
                 {
-                    if (token != null)
-                    {
-                        if (context.IsCompleted)
-                        {
-                            await index.AddAsync(token);
-
-                            await Index(createApp.Actor.Identifier).AddAsync(createApp.AppId);
-                        }
-                        else
-                        {
-                            await index.RemoveReservationAsync(token);
-                        }
-                    }
+                    await cache.RemoveReservationAsync(token);
                 }
             }
             else
             {
                 await next(context);
+            }
 
-                if (context.IsCompleted && context.Command is AppCommand appCommand)
+            if (context.IsCompleted)
+            {
+                switch (command)
                 {
-                    var app = context.PlainResult as IAppEntity;
-
-                    if (app == null)
-                    {
-                        app = await GetAppCoreAsync(appCommand.AggregateId, true);
-                    }
-
-                    if (app != null)
-                    {
-                        await InvalidateItAsync(app);
-
-                        switch (context.Command)
-                        {
-                            case AssignContributor assignContributor:
-                                await AssignContributorAsync(assignContributor);
-                                break;
-
-                            case RemoveContributor removeContributor:
-                                await RemoveContributorAsync(removeContributor);
-                                break;
-
-                            case ArchiveApp:
-                                await ArchiveAppAsync(app);
-                                break;
-                        }
-                    }
+                    case CreateApp create:
+                        await OnCreateAsync(create);
+                        break;
+                    case DeleteApp delete:
+                        await OnDeleteAsync(delete);
+                        break;
+                    case AppUpdateCommand update:
+                        await OnUpdateAsync(update);
+                        break;
                 }
             }
         }
 
-        private static async Task<string?> CheckAppAsync(IAppsByNameIndexGrain index, CreateApp command)
+        private static async Task<string?> CheckAppAsync(IAppsCacheGrain cache, CreateApp command)
         {
-            var name = command.Name;
+            var token = await cache.ReserveAsync(command.AppId, command.Name);
 
-            if (name.IsSlug())
+            if (token == null)
             {
-                var token = await index.ReserveAsync(command.AppId, name);
-
-                if (token == null)
-                {
-                    throw new ValidationException(T.Get("apps.nameAlreadyExists"));
-                }
-
-                return token;
+                throw new ValidationException(T.Get("apps.nameAlreadyExists"));
             }
 
-            return null;
+            return token;
         }
 
-        private async Task AssignContributorAsync(AssignContributor command)
+        private async Task OnCreateAsync(CreateApp create)
         {
-            await Index(command.ContributorId).AddAsync(command.AggregateId);
+            await InvalidateItAsync(create.AppId, create.Name);
+
+            await Cache().AddAsync(create.AppId, create.Name);
         }
 
-        private async Task RemoveContributorAsync(RemoveContributor command)
+        private async Task OnDeleteAsync(DeleteApp delete)
         {
-            await Index(command.ContributorId).RemoveAsync(command.AggregateId);
+            await InvalidateItAsync(delete.AppId.Id, delete.AppId.Name);
+
+            await Cache().RemoveAsync(delete.AppId.Id);
         }
 
-        private async Task ArchiveAppAsync(IAppEntity app)
+        private async Task OnUpdateAsync(AppUpdateCommand update)
         {
-            await Index().RemoveAsync(app.Id);
-
-            foreach (var contributorId in app.Contributors.Keys)
-            {
-                await Index(contributorId).RemoveAsync(app.Id);
-            }
-
-            if (app.CreatedBy.IsClient || !app.Contributors.ContainsKey(app.CreatedBy.Identifier))
-            {
-                await Index(app.CreatedBy.Identifier).RemoveAsync(app.Id);
-            }
+            await InvalidateItAsync(update.AppId.Id, update.AppId.Name);
         }
 
-        private IAppsByNameIndexGrain Index()
+        private IAppsCacheGrain Cache()
         {
-            return grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id);
-        }
-
-        private IAppsByUserIndexGrain Index(string id)
-        {
-            return grainFactory.GetGrain<IAppsByUserIndexGrain>(id);
+            return grainFactory.GetGrain<IAppsCacheGrain>(SingleGrain.Id);
         }
 
         private async Task<IAppEntity?> GetAppCoreAsync(DomainId id, bool allowArchived = false)
         {
             var app = (await grainFactory.GetGrain<IAppGrain>(id.ToString()).GetStateAsync()).Value;
 
-            if (app.Version <= EtagVersion.Empty || (app.IsArchived && !allowArchived))
+            if (app.Version <= EtagVersion.Empty || (app.IsDeleted && !allowArchived))
             {
                 return null;
             }
@@ -326,11 +247,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return $"{typeof(AppsIndex)}_Apps_Name_{name}";
         }
 
-        private Task InvalidateItAsync(IAppEntity app)
+        private Task InvalidateItAsync(DomainId id, string name)
         {
             return grainCache.RemoveAsync(
-                GetCacheKey(app.Id),
-                GetCacheKey(app.Name));
+                GetCacheKey(id),
+                GetCacheKey(name));
         }
 
         private Task CacheItAsync(IAppEntity app)

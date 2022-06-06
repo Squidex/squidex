@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -34,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             var result = new SearchResults();
 
-            var schemas = await appProvider.GetSchemasAsync(context.App.Id);
+            var schemas = await appProvider.GetSchemasAsync(context.App.Id, ct);
 
             if (schemas.Count > 0)
             {
@@ -46,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
                     var name = schema.SchemaDef.DisplayNameUnchanged();
 
-                    if (name.Contains(query))
+                    if (name.Contains(query, StringComparison.OrdinalIgnoreCase))
                     {
                         AddSchemaUrl(result, appId, schemaId, name);
 

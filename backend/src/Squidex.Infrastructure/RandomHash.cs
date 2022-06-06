@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -18,14 +17,14 @@ namespace Squidex.Infrastructure
             return Guid.NewGuid()
                 .ToString().ToSha256Base64()
                 .ToLowerInvariant()
-                .Replace("+", "x")
-                .Replace("=", "x")
-                .Replace("/", "x");
+                .Replace("+", "x", StringComparison.Ordinal)
+                .Replace("=", "x", StringComparison.Ordinal)
+                .Replace("/", "x", StringComparison.Ordinal);
         }
 
         public static string Simple()
         {
-            return Guid.NewGuid().ToString().Replace("-", string.Empty);
+            return Guid.NewGuid().ToString().Replace("-", string.Empty, StringComparison.Ordinal);
         }
 
         public static string ToSha256Base64(this string value)
@@ -48,6 +47,11 @@ namespace Squidex.Infrastructure
         public static string ToSha256(this string value)
         {
             return value.ToHashed(SHA256.Create());
+        }
+
+        public static string ToSha512(this string value)
+        {
+            return value.ToHashed(SHA512.Create());
         }
 
         public static string ToSha256(this byte[] bytes)

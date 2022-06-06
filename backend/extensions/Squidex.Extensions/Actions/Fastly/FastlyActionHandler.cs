@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Extensions.Actions.Fastly
 {
@@ -46,7 +44,8 @@ namespace Squidex.Extensions.Actions.Fastly
             return (Description, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(FastlyJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(FastlyJob job,
+            CancellationToken ct = default)
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {

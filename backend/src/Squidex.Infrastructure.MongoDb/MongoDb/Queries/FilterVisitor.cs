@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections;
-using System.Linq;
 using System.Text.RegularExpressions;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -88,7 +86,8 @@ namespace Squidex.Infrastructure.MongoDb.Queries
                     return Filter.In(propertyName, ((IList)value!).OfType<object>());
             }
 
-            throw new NotSupportedException();
+            ThrowHelper.NotSupportedException();
+            return default!;
         }
 
         private static BsonRegularExpression BuildMatchRegex(CompareFilter<ClrValue> node)

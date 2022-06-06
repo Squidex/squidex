@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -48,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 PreviewUrls = new Dictionary<string, string>
                 {
                     ["mobile"] = "http://mobile"
-                }.ToImmutableDictionary(),
+                }.ToReadonlyDictionary(),
                 Category = "myCategory"
             };
 
@@ -70,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     .SetPreviewUrls(new Dictionary<string, string>
                     {
                         ["mobile"] = "http://mobile"
-                    }.ToImmutableDictionary())
+                    }.ToReadonlyDictionary())
                     .Publish();
 
             var actual = command.BuildSchema("my-schema", SchemaType.Default);

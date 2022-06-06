@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
@@ -26,12 +23,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         private readonly Dictionary<SchemaInfo, ComponentGraphType> componentTypes = new Dictionary<SchemaInfo, ComponentGraphType>(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<SchemaInfo, ContentGraphType> contentTypes = new Dictionary<SchemaInfo, ContentGraphType>(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<SchemaInfo, ContentResultGraphType> contentResultTypes = new Dictionary<SchemaInfo, ContentResultGraphType>(ReferenceEqualityComparer.Instance);
+        private readonly Dictionary<FieldInfo, EmbeddableStringGraphType> embeddableStringTypes = new Dictionary<FieldInfo, EmbeddableStringGraphType>();
+        private readonly Dictionary<string, EnumerationGraphType?> enumTypes = new Dictionary<string, EnumerationGraphType?>();
         private readonly FieldVisitor fieldVisitor;
         private readonly FieldInputVisitor fieldInputVisitor;
         private readonly PartitionResolver partitionResolver;
         private readonly List<SchemaInfo> allSchemas = new List<SchemaInfo>();
-
-        public SharedTypes SharedTypes { get; }
 
         static Builder()
         {
@@ -39,10 +36,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             ValueConverter.Register<string, Status>(x => new Status(x));
         }
 
-        public Builder(IAppEntity app, SharedTypes sharedTypes)
-        {
-            SharedTypes = sharedTypes;
+        public IInterfaceGraphType ContentInterface { get; } = new ContentInterfaceGraphType();
 
+        public IInterfaceGraphType ComponentInterface { get; } = new ComponentInterfaceGraphType();
+
+        public Builder(IAppEntity app)
+        {
             partitionResolver = app.PartitionResolver();
 
             fieldVisitor = new FieldVisitor(this);
@@ -59,10 +58,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             foreach (var schemaInfo in schemaInfos)
             {
-                var contentType = new ContentGraphType(this, schemaInfo);
+                var contentType = new ContentGraphType(schemaInfo);
 
                 contentTypes[schemaInfo] = contentType;
                 contentResultTypes[schemaInfo] = new ContentResultGraphType(contentType, schemaInfo);
+            }
+
+            foreach (var schemaInfo in allSchemas)
+            {
+                var componentType = new ComponentGraphType(schemaInfo);
+
+                componentTypes[schemaInfo] = componentType;
             }
 
             var newSchema = new GraphQLSchema
@@ -70,8 +76,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Query = new AppQueriesGraphType(this, schemaInfos)
             };
 
-            newSchema.RegisterType(SharedTypes.ComponentInterface);
-            newSchema.RegisterType(SharedTypes.ContentInterface);
+            newSchema.RegisterType(ComponentInterface);
+            newSchema.RegisterType(ContentInterface);
+
+            newSchema.Directives.Register(SharedTypes.MemoryCacheDirective);
 
             if (schemaInfos.Any())
             {
@@ -103,6 +111,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return newSchema;
         }
 
+        public FieldGraphSchema GetGraphType(FieldInfo fieldInfo)
+        {
+            return fieldInfo.Field.Accept(fieldVisitor, fieldInfo);
+        }
+
         public IFieldPartitioning ResolvePartition(Partitioning key)
         {
             return partitionResolver(key);
@@ -111,11 +124,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public IGraphType? GetInputGraphType(FieldInfo fieldInfo)
         {
             return fieldInfo.Field.Accept(fieldInputVisitor, fieldInfo);
-        }
-
-        public (IGraphType?, IFieldResolver?, QueryArguments?) GetGraphType(FieldInfo fieldInfo)
-        {
-            return fieldInfo.Field.Accept(fieldVisitor, fieldInfo);
         }
 
         public IObjectGraphType GetContentResultType(SchemaInfo schemaId)
@@ -142,7 +150,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 return null;
             }
 
-            return componentTypes.GetOrAdd(schema, x => new ComponentGraphType(this, schema));
+            return componentTypes.GetOrDefault(schema);
+        }
+
+        public EmbeddableStringGraphType GetEmbeddableString(FieldInfo fieldInfo, StringFieldProperties properties)
+        {
+            return embeddableStringTypes.GetOrAdd(fieldInfo, x => new EmbeddableStringGraphType(this, x, properties));
+        }
+
+        public EnumerationGraphType? GetEnumeration(string name, IEnumerable<string> values)
+        {
+            return enumTypes.GetOrAdd(name, x => FieldEnumType.TryCreate(name, values));
         }
 
         public IEnumerable<KeyValuePair<SchemaInfo, ContentGraphType>> GetAllContentTypes()

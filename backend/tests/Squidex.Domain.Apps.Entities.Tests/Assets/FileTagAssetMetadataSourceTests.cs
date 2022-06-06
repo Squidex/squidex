@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
@@ -41,6 +38,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             Assert.Equal(272, command.Metadata.GetPixelWidth());
             Assert.Equal(170, command.Metadata.GetPixelHeight());
+        }
+
+        [Fact]
+        public async Task Should_not_set_image_height_and_width_metadata_when_file_does_not_have_those_values()
+        {
+            var command = Command("SampleAudio_0.4mb.mp3");
+
+            await sut.EnhanceAsync(command);
+
+            Assert.Null(command.Metadata.GetPixelWidth());
+            Assert.Null(command.Metadata.GetPixelHeight());
         }
 
         [Fact]

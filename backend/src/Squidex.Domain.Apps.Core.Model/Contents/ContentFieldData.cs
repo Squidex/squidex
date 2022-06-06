@@ -5,24 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed class ContentFieldData : Dictionary<string, IJsonValue>, IEquatable<ContentFieldData>
+    public sealed class ContentFieldData : ListDictionary<string, JsonValue>, IEquatable<ContentFieldData>
     {
         public ContentFieldData()
-            : base(StringComparer.OrdinalIgnoreCase)
-        {
-        }
-
-        public ContentFieldData(ContentFieldData source)
-            : base(source, StringComparer.OrdinalIgnoreCase)
+            : base(0, StringComparer.OrdinalIgnoreCase)
         {
         }
 
@@ -31,11 +24,20 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
-        public bool TryGetNonNull(string key, [MaybeNullWhen(false)] out IJsonValue result)
+        public ContentFieldData(ContentFieldData source)
+            : base(source.Count, StringComparer.OrdinalIgnoreCase)
         {
-            result = null!;
+            foreach (var (key, value) in source)
+            {
+                this[key] = value;
+            }
+        }
 
-            if (TryGetValue(key, out var found) && found != null && found.Type != JsonValueType.Null)
+        public bool TryGetNonNull(string key, [MaybeNullWhen(false)] out JsonValue result)
+        {
+            result = JsonValue.Null;
+
+            if (TryGetValue(key, out var found) && found.Type != JsonValueType.Null)
             {
                 result = found;
                 return true;
@@ -44,19 +46,16 @@ namespace Squidex.Domain.Apps.Core.Contents
             return false;
         }
 
-        public ContentFieldData AddInvariant(object? value)
+        public ContentFieldData AddInvariant(JsonValue value)
         {
-            return AddValue(InvariantPartitioning.Key, JsonValue.Create(value));
+            this[InvariantPartitioning.Key] = value;
+
+            return this;
         }
 
-        public ContentFieldData AddLocalized(string key, object? value)
+        public ContentFieldData AddLocalized(string key, JsonValue value)
         {
-            return AddValue(key, JsonValue.Create(value));
-        }
-
-        public ContentFieldData AddValue(string key, IJsonValue? value)
-        {
-            this[key] = JsonValue.Create(value);
+            this[key] = value;
 
             return this;
         }
@@ -67,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             foreach (var (key, value) in this)
             {
-                clone[key] = value?.Clone()!;
+                clone[key] = value.Clone()!;
             }
 
             return clone;
@@ -90,7 +89,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public override string ToString()
         {
-            return $"{{{string.Join(", ", this.Select(x => $"\"{x.Key}\":{x.Value.ToJsonString()}"))}}}";
+            return $"{{{string.Join(", ", this.Select(x => $"\"{x.Key}\":{x.Value}"))}}}";
         }
     }
 }

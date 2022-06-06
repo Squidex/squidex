@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         protected BackupContextBase(DomainId appId, IUserMapping userMapping)
         {
-            Guard.NotNull(userMapping, nameof(userMapping));
+            Guard.NotNull(userMapping);
 
             AppId = appId;
 

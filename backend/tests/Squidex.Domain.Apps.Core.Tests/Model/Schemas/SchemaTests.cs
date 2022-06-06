@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -80,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.AddField(CreateField(1));
 
-            Assert.Throws<ArgumentException>(() => schema_1.AddNumber(2, "my-field-1", Partitioning.Invariant));
+            Assert.Throws<ArgumentException>(() => schema_1.AddNumber(2, "myField1", Partitioning.Invariant));
         }
 
         [Fact]
@@ -88,7 +85,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.AddField(CreateField(1));
 
-            Assert.Throws<ArgumentException>(() => schema_1.AddNumber(1, "my-field-2", Partitioning.Invariant));
+            Assert.Throws<ArgumentException>(() => schema_1.AddNumber(1, "myField2", Partitioning.Invariant));
         }
 
         [Fact]
@@ -438,11 +435,11 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var urls1 = new Dictionary<string, string>
             {
                 ["web"] = "Url"
-            }.ToImmutableDictionary();
+            }.ToReadonlyDictionary();
             var urls2 = new Dictionary<string, string>
             {
                 ["web"] = "Url"
-            }.ToImmutableDictionary();
+            }.ToReadonlyDictionary();
 
             var schema_1 = schema_0.SetPreviewUrls(urls1);
             var schema_2 = schema_1.SetPreviewUrls(urls2);
@@ -458,7 +455,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         public void Should_serialize_and_deserialize_schema()
         {
             var schemaSource =
-                TestUtils.MixedSchema(SchemaType.Singleton, false)
+                TestUtils.MixedSchema(SchemaType.Singleton).Schema
                     .ChangeCategory("Category")
                     .SetFieldRules(FieldRule.Hide("2"))
                     .SetFieldsInLists("field2")
@@ -470,7 +467,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
                     .SetPreviewUrls(new Dictionary<string, string>
                     {
                         ["web"] = "Url"
-                    }.ToImmutableDictionary());
+                    }.ToReadonlyDictionary());
 
             var schemaTarget = schemaSource.SerializeAndDeserialize();
 
@@ -498,7 +495,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
 
         private static RootField<NumberFieldProperties> CreateField(int id)
         {
-            return Fields.Number(id, $"my-field-{id}", Partitioning.Invariant);
+            return Fields.Number(id, $"myField{id}", Partitioning.Invariant);
         }
     }
 }

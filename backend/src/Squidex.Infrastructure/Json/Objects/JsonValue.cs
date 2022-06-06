@@ -5,42 +5,206 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+using System.Globalization;
 using NodaTime;
 
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
 
 namespace Squidex.Infrastructure.Json.Objects
 {
-    public static class JsonValue
+    public readonly struct JsonValue : IEquatable<JsonValue>
     {
         private static readonly char[] PathSeparators = { '.', '[', ']' };
 
-        public static readonly IJsonValue Empty = new JsonString(string.Empty);
+        public static readonly JsonValue Null;
+        public static readonly JsonValue True = new JsonValue(true);
+        public static readonly JsonValue False = new JsonValue(false);
+        public static readonly JsonValue Zero = new JsonValue(0);
 
-        public static readonly IJsonValue True = JsonBoolean.True;
-        public static readonly IJsonValue False = JsonBoolean.False;
+        public readonly object? Value;
 
-        public static readonly IJsonValue Null = JsonNull.Null;
-
-        public static readonly IJsonValue Zero = new JsonNumber(0);
-
-        public static JsonArray Array()
+        public JsonValueType Type
         {
-            return new JsonArray();
+            get
+            {
+                switch (Value)
+                {
+                    case null:
+                        return JsonValueType.Null;
+                    case bool:
+                        return JsonValueType.Boolean;
+                    case double:
+                        return JsonValueType.Number;
+                    case string:
+                        return JsonValueType.String;
+                    case JsonArray:
+                        return JsonValueType.Array;
+                    case JsonObject:
+                        return JsonValueType.Object;
+                    default:
+                        ThrowInvalidType();
+                        return default!;
+                }
+            }
         }
 
-        public static JsonArray Array<T>(IEnumerable<T> values)
+        public bool AsBoolean
         {
-            return new JsonArray(values?.OfType<object>());
+            get
+            {
+                if (Value is bool typed)
+                {
+                    return typed;
+                }
+
+                ThrowInvalidType();
+                return default!;
+            }
         }
 
-        public static JsonArray Array<T>(params T?[] values)
+        public double AsNumber
         {
-            return new JsonArray(values?.OfType<object>());
+            get
+            {
+                if (Value is double typed)
+                {
+                    return typed;
+                }
+
+                ThrowInvalidType();
+                return default!;
+            }
+        }
+
+        public string AsString
+        {
+            get
+            {
+                if (Value is string typed)
+                {
+                    return typed;
+                }
+
+                ThrowInvalidType();
+                return default!;
+            }
+        }
+
+        public JsonArray AsArray
+        {
+            get
+            {
+                if (Value is JsonArray typed)
+                {
+                    return typed;
+                }
+
+                ThrowInvalidType();
+                return default!;
+            }
+        }
+
+        public JsonObject AsObject
+        {
+            get
+            {
+                if (Value is JsonObject typed)
+                {
+                    return typed;
+                }
+
+                ThrowInvalidType();
+                return default!;
+            }
+        }
+
+        public JsonValue(double value)
+        {
+            Guard.ValidNumber(value);
+
+            this.Value = value;
+        }
+
+        public JsonValue(bool value)
+        {
+            this.Value = value;
+        }
+
+        public JsonValue(string? value)
+        {
+            this.Value = value;
+        }
+
+        public JsonValue(JsonArray? value)
+        {
+            this.Value = value;
+        }
+
+        public JsonValue(JsonObject? value)
+        {
+            this.Value = value;
+        }
+
+        public static JsonValue Create<T>(IReadOnlyDictionary<string, T>? values)
+        {
+            var source = new JsonObject(values?.Count ?? 0);
+
+            if (values != null)
+            {
+                foreach (var (key, value) in values)
+                {
+                    source[key] = Create(value);
+                }
+            }
+
+            return source;
+        }
+
+        public static JsonValue Create(object? value)
+        {
+            if (value == null)
+            {
+                return default;
+            }
+
+            if (value is JsonValue v)
+            {
+                return v;
+            }
+
+            switch (value)
+            {
+                case Guid typed:
+                    return Create(typed.ToString());
+                case DomainId typed:
+                    return Create(typed);
+                case Instant typed:
+                    return Create(typed);
+                case bool typed:
+                    return Create(typed);
+                case float typed:
+                    return Create(typed);
+                case double typed:
+                    return Create(typed);
+                case int typed:
+                    return Create(typed);
+                case long typed:
+                    return Create(typed);
+                case string typed:
+                    return Create(typed);
+                case object[] typed:
+                    return Array(typed);
+                case JsonArray typed:
+                    return typed;
+                case JsonObject typed:
+                    return typed;
+                case IReadOnlyDictionary<string, object?> typed:
+                    return Create(typed);
+            }
+
+            ThrowArgumentException(nameof(value));
+            return default!;
         }
 
         public static JsonObject Object()
@@ -48,151 +212,325 @@ namespace Squidex.Infrastructure.Json.Objects
             return new JsonObject();
         }
 
-        public static IJsonValue Create(object? value)
+        public static JsonArray Array()
         {
-            if (value == null)
+            return new JsonArray();
+        }
+
+        public static JsonValue Array<T>(IEnumerable<T> values)
+        {
+            return new JsonArray(values?.OfType<object?>().Select(Create));
+        }
+
+        public static JsonValue Array<T>(params T?[] values)
+        {
+            return new JsonArray(values?.OfType<object?>().Select(Create));
+        }
+
+        public static JsonValue Create(DomainId value)
+        {
+            return new JsonValue(value.ToString());
+        }
+
+        public static JsonValue Create(Instant value)
+        {
+            return new JsonValue(value.ToString());
+        }
+
+        public static JsonValue Create(double value)
+        {
+            return new JsonValue(value);
+        }
+
+        public static JsonValue Create(bool value)
+        {
+            return new JsonValue(value);
+        }
+
+        public static JsonValue Create(string? value)
+        {
+            return new JsonValue(value);
+        }
+
+        public static JsonValue Create(JsonArray? array)
+        {
+            return new JsonValue(array);
+        }
+
+        public static JsonValue Create(JsonObject? @object)
+        {
+            return new JsonValue(@object);
+        }
+
+        public static implicit operator JsonValue(DomainId value)
+        {
+            return Create(value);
+        }
+
+        public static implicit operator JsonValue(Instant value)
+        {
+            return Create(value);
+        }
+
+        public static implicit operator JsonValue(bool value)
+        {
+            return Create(value);
+        }
+
+        public static implicit operator JsonValue(double value)
+        {
+            return Create(value);
+        }
+
+        public static implicit operator JsonValue(string? value)
+        {
+            return Create(value);
+        }
+
+        public static implicit operator JsonValue(JsonArray? value)
+        {
+            return Create(value);
+        }
+
+        public static implicit operator JsonValue(JsonObject? value)
+        {
+            return Create(value);
+        }
+
+        public static bool operator ==(JsonValue left, JsonValue right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(JsonValue left, JsonValue right)
+        {
+            return !(left == right);
+        }
+
+        public override bool Equals([NotNullWhen(true)] object? obj)
+        {
+            return obj is JsonValue typed && Equals(typed);
+        }
+
+        public bool Equals(JsonValue other)
+        {
+            if (other.Type != Type)
             {
-                return Null;
+                return false;
             }
 
-            if (value is IJsonValue v)
+            switch (Value)
             {
-                return v;
-            }
-
-            switch (value)
-            {
-                case string s:
-                    return Create(s);
+                case null:
+                    return true;
                 case bool b:
-                    return Create(b);
-                case float f:
-                    return Create(f);
+                    return b == (bool)other.Value!;
                 case double d:
-                    return Create(d);
-                case int i:
-                    return Create(i);
-                case long l:
-                    return Create(l);
-                case Guid g:
-                    return Create(g);
-                case DomainId i:
-                    return Create(i);
-                case Instant i:
-                    return Create(i);
+                    return d == (double)other.Value!;
+                case string s:
+                    return s == (string)other.Value!;
+                case JsonArray a:
+                    return a.Equals((JsonArray)other.Value!);
+                case JsonObject o:
+                    return o.Equals((JsonObject)other.Value!);
+                default:
+                    ThrowInvalidType();
+                    return default!;
             }
-
-            throw new ArgumentException("Invalid json type");
         }
 
-        public static IJsonValue Create(Guid value)
+        public override int GetHashCode()
         {
-            return Create(value.ToString());
-        }
-
-        public static IJsonValue Create(DomainId value)
-        {
-            return Create(value.ToString());
-        }
-
-        public static IJsonValue Create(Guid? value)
-        {
-            if (value == null)
+            switch (Value)
             {
-                return Null;
+                case null:
+                    return 0;
+                case bool b:
+                    return b.GetHashCode();
+                case double d:
+                    return d.GetHashCode();
+                case string s:
+                    return s.GetHashCode(StringComparison.OrdinalIgnoreCase);
+                case JsonArray a:
+                    return a.GetHashCode();
+                case JsonObject o:
+                    return o.GetHashCode();
+                default:
+                    ThrowInvalidType();
+                    return default!;
             }
-
-            return Create(value.Value);
         }
 
-        public static IJsonValue Create(Instant value)
+        public override string ToString()
         {
-            return Create(value.ToString());
-        }
-
-        public static IJsonValue Create(Instant? value)
-        {
-            if (value == null)
+            switch (Value)
             {
-                return Null;
+                case null:
+                    return "null";
+                case bool b:
+                    return b ? "true" : "false";
+                case double d:
+                    return d.ToString(CultureInfo.InvariantCulture);
+                case string s:
+                    return s;
+                case JsonArray a:
+                    return a.ToString();
+                case JsonObject o:
+                    return o.ToString();
+                default:
+                    ThrowInvalidType();
+                    return default!;
             }
-
-            return Create(value.Value);
         }
 
-        public static IJsonValue Create(double value)
+        public string ToJsonString()
         {
-            Guard.ValidNumber(value, nameof(value));
-
-            if (value == 0)
+            switch (Value)
             {
-                return Zero;
+                case null:
+                    return "null";
+                case bool b:
+                    return b ? "true" : "false";
+                case double d:
+                    return d.ToString(CultureInfo.InvariantCulture);
+                case string s:
+                    return $"\"{s}\"";
+                case JsonArray a:
+                    return a.ToString();
+                case JsonObject o:
+                    return o.ToString();
+                default:
+                    ThrowInvalidType();
+                    return default!;
             }
-
-            return new JsonNumber(value);
         }
 
-        public static IJsonValue Create(double? value)
+        public JsonValue Clone()
         {
-            if (value == null)
+            switch (Value)
             {
-                return Null;
-            }
-
-            return Create(value.Value);
-        }
-
-        public static IJsonValue Create(bool value)
-        {
-            return value ? True : False;
-        }
-
-        public static IJsonValue Create(bool? value)
-        {
-            if (value == null)
-            {
-                return Null;
-            }
-
-            return Create(value.Value);
-        }
-
-        public static IJsonValue Create(string? value)
-        {
-            if (value == null)
-            {
-                return Null;
-            }
-
-            if (value.Length == 0)
-            {
-                return Empty;
-            }
-
-            return new JsonString(value);
-        }
-
-        public static bool TryGetByPath(this IJsonValue value, string? path, [MaybeNullWhen(false)] out IJsonValue result)
-        {
-            return TryGetByPath(value, path?.Split(PathSeparators, StringSplitOptions.RemoveEmptyEntries), out result!);
-        }
-
-        public static bool TryGetByPath(this IJsonValue? value, IEnumerable<string>? path, [MaybeNullWhen(false)] out IJsonValue result)
-        {
-            result = value!;
-
-            if (path != null)
-            {
-                foreach (var pathSegment in path)
-                {
-                    if (result == null || !result.TryGet(pathSegment, out result!))
+                case null:
+                    return this;
+                case bool:
+                    return this;
+                case double:
+                    return this;
+                case string:
+                    return this;
+                case JsonArray a:
                     {
-                        break;
+                        var result = new JsonArray(a.Count);
+
+                        foreach (var item in a)
+                        {
+                            result.Add(item.Clone());
+                        }
+
+                        return result;
                     }
+
+                case JsonObject o:
+                    {
+                        var result = new JsonObject(o.Count);
+
+                        foreach (var (key, value) in o)
+                        {
+                            result.Add(key, value.Clone());
+                        }
+
+                        return result;
+                    }
+
+                default:
+                    ThrowInvalidType();
+                    return default!;
+            }
+        }
+
+        public bool TryGetByPath(string? path, out JsonValue result)
+        {
+            return TryGetByPath(path?.Split(PathSeparators, StringSplitOptions.RemoveEmptyEntries), out result!);
+        }
+
+        public bool TryGetByPath(IEnumerable<string>? path, [MaybeNullWhen(false)] out JsonValue result)
+        {
+            result = this;
+
+            if (path == null)
+            {
+                return false;
+            }
+
+            var hasSegment = false;
+
+            foreach (var pathSegment in path)
+            {
+                hasSegment = true;
+
+                if (!result.TryGetValue(pathSegment, out var found))
+                {
+                    result = default;
+                    return false;
+                }
+                else
+                {
+                    result = found;
                 }
             }
 
-            return result != null && !ReferenceEquals(result, value);
+            return hasSegment;
+        }
+
+        public bool TryGetValue(JsonValueType type, string pathSegment, out JsonValue result)
+        {
+            result = default!;
+
+            if (TryGetValue(pathSegment, out var temp) && temp.Type == type)
+            {
+                result = temp;
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool TryGetValue(string pathSegment, out JsonValue result)
+        {
+            result = default!;
+
+            if (pathSegment == null)
+            {
+                return false;
+            }
+
+            switch (Value)
+            {
+                case null:
+                    return false;
+                case bool:
+                    return false;
+                case double:
+                    return false;
+                case string:
+                    return false;
+                case JsonArray a:
+                    return a.TryGetValue(pathSegment, out result);
+                case JsonObject o:
+                    return o.TryGetValue(pathSegment, out result);
+                default:
+                    ThrowInvalidType();
+                    return default!;
+            }
+        }
+
+        private static void ThrowInvalidType()
+        {
+            ThrowHelper.InvalidOperationException("Invalid type.");
+        }
+
+        private static void ThrowArgumentException(string parameterName)
+        {
+            ThrowHelper.ArgumentException("Invalid type.", parameterName);
         }
     }
 }

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Orleans;
 using Orleans.Runtime;
@@ -22,7 +20,8 @@ namespace Squidex.Infrastructure.Diagnostics
             managementGrain = grainFactory.GetGrain<IManagementGrain>(0);
         }
 
-        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
+            CancellationToken cancellationToken = default)
         {
             var activationCount = await managementGrain.GetTotalActivationCount();
 

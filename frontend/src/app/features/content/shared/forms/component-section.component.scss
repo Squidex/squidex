@@ -1,0 +1,20 @@
+@import 'mixins';
+@import 'vars';
+
+.header {
+    line-height: 2rem;
+    margin-bottom: .5rem;
+    margin-top: 1.5rem;
+
+    h3 {
+        line-height: 2rem;
+    }
+}
+
+.col-6 {
+    margin-bottom: 0;
+
+    & ~ .col-12 {
+        margin-top: 1.25rem;
+    }
+}

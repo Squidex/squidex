@@ -15,10 +15,27 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
     public sealed record SimulatedRuleEventDto
     {
         /// <summary>
+        /// The unique event id.
+        /// </summary>
+        [Required]
+        public Guid EventId { get; init; }
+
+        /// <summary>
         /// The name of the event.
         /// </summary>
         [Required]
         public string EventName { get; set; }
+
+        /// <summary>
+        /// The source event.
+        /// </summary>
+        [Required]
+        public object Event { get; set; }
+
+        /// <summary>
+        /// The enriched event.
+        /// </summary>
+        public object? EnrichedEvent { get; set; }
 
         /// <summary>
         /// The data for the action.
@@ -39,11 +56,24 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// The reason why the event has been skipped.
         /// </summary>
         [Required]
-        public SkipReason SkipReason { get; set; }
+        public List<SkipReason> SkipReasons { get; set; }
 
-        public static SimulatedRuleEventDto FromSimulatedRuleEvent(SimulatedRuleEvent ruleEvent)
+        public static SimulatedRuleEventDto FromDomain(SimulatedRuleEvent ruleEvent)
         {
-            return SimpleMapper.Map(ruleEvent, new SimulatedRuleEventDto());
+            var result = SimpleMapper.Map(ruleEvent, new SimulatedRuleEventDto
+            {
+                SkipReasons = new List<SkipReason>()
+            });
+
+            foreach (var reason in Enum.GetValues<SkipReason>())
+            {
+                if (reason != SkipReason.None && ruleEvent.SkipReason.HasFlag(reason))
+                {
+                    result.SkipReasons.Add(reason);
+                }
+            }
+
+            return result;
         }
     }
 }

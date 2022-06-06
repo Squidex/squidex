@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
@@ -47,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         .AddAssets(31, "nested"));
 
             schema = Mocks.Schema(appId, schemaId, schemaDef);
-            schemaProvider = x => Task.FromResult(schema);
+            schemaProvider = x => Task.FromResult((schema, ResolvedComponents.Empty));
 
             sut = new ConvertData(urlGenerator, TestUtils.DefaultSerializer, assetRepository, contentRepository);
         }
@@ -86,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
-                                    JsonValue.Object()
+                                    new JsonObject()
                                         .Add("nested", JsonValue.Array(id2)))));
 
             A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), A<CancellationToken>._))
@@ -124,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
-                                    JsonValue.Object()
+                                    new JsonObject()
                                         .Add("nested", JsonValue.Array()))));
 
             A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), A<CancellationToken>._))
@@ -153,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("nested", JsonValue.Array(id1, id2)))));
         }
 

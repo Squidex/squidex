@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Collections;
@@ -43,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The optional preview urls.
         /// </summary>
-        public ImmutableDictionary<string, string>? PreviewUrls { get; set; }
+        public ReadonlyDictionary<string, string>? PreviewUrls { get; set; }
 
         /// <summary>
         /// The optional field Rules.

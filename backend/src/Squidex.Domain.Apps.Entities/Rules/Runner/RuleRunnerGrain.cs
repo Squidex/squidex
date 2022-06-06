@@ -1,13 +1,11 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Runtime;
 using Squidex.Caching;
@@ -18,7 +16,6 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Translations;
-using Squidex.Log;
 using TaskExtensions = Squidex.Infrastructure.Tasks.TaskExtensions;
 
 #pragma warning disable RECS0015 // If an extension method is called as static method convert it to method syntax
@@ -35,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly IRuleService ruleService;
-        private readonly ISemanticLog log;
+        private readonly ILogger<RuleRunnerGrain> log;
         private CancellationTokenSource? currentJobToken;
         private IGrainReminder? currentReminder;
         private bool isStopping;
@@ -58,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             IEventDataFormatter eventDataFormatter,
             IRuleEventRepository ruleEventRepository,
             IRuleService ruleService,
-            ISemanticLog log)
+            ILogger<RuleRunnerGrain> log)
         {
             this.state = state;
             this.appProvider = appProvider;
@@ -137,23 +134,27 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                 {
                     currentJobToken = new CancellationTokenSource();
 
+#pragma warning disable MA0042 // Do not use blocking calls in an async method
                     Process(state.Value, currentJobToken.Token);
+#pragma warning restore MA0042 // Do not use blocking calls in an async method
                 }
             }
         }
 
-        private void Process(State job, CancellationToken ct)
+        private void Process(State job,
+            CancellationToken ct)
         {
             TaskExtensions.Forget(ProcessAsync(job, ct));
         }
 
-        private async Task ProcessAsync(State currentState, CancellationToken ct)
+        private async Task ProcessAsync(State currentState,
+            CancellationToken ct)
         {
             try
             {
                 currentReminder = await RegisterOrUpdateReminder("KeepAlive", TimeSpan.Zero, TimeSpan.FromMinutes(2));
 
-                var rule = await appProvider.GetRuleAsync(DomainId.Create(Key), currentState.RuleId!.Value);
+                var rule = await appProvider.GetRuleAsync(DomainId.Create(Key), currentState.RuleId!.Value, ct);
 
                 if (rule == null)
                 {
@@ -167,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                         AppId = rule.AppId,
                         Rule = rule.RuleDef,
                         RuleId = rule.Id,
-                        IgnoreStale = true
+                        IncludeStale = true
                     };
 
                     if (currentState.RunFromSnapshots && ruleService.CanCreateSnapshotEvents(context))
@@ -186,10 +187,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "runRule")
-                    .WriteProperty("status", "failed")
-                    .WriteProperty("ruleId", currentState.RuleId?.ToString()));
+                log.LogError(ex, "Failed to run rule with ID {ruleId}.", currentState.RuleId);
             }
             finally
             {
@@ -213,33 +211,33 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             }
         }
 
-        private async Task EnqueueFromSnapshotsAsync(RuleContext context, CancellationToken ct)
+        private async Task EnqueueFromSnapshotsAsync(RuleContext context,
+            CancellationToken ct)
         {
             var errors = 0;
 
-            await foreach (var (job, ex, _) in ruleService.CreateSnapshotJobsAsync(context, ct))
+            await foreach (var job in ruleService.CreateSnapshotJobsAsync(context, ct))
             {
-                if (job != null)
+                if (job.Job != null && job.SkipReason == SkipReason.None)
                 {
-                    await ruleEventRepository.EnqueueAsync(job, ex);
+                    await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError, ct);
                 }
-                else if (ex != null)
+                else if (job.EnrichmentError != null)
                 {
                     errors++;
 
                     if (errors >= MaxErrors)
                     {
-                        throw ex;
+                        throw job.EnrichmentError;
                     }
 
-                    log.LogWarning(ex, w => w
-                        .WriteProperty("action", "runRule")
-                        .WriteProperty("status", "failedPartially"));
+                    log.LogWarning(job.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", context.RuleId);
                 }
             }
         }
 
-        private async Task EnqueueFromEventsAsync(State currentState, RuleContext context, CancellationToken ct)
+        private async Task EnqueueFromEventsAsync(State currentState, RuleContext context,
+            CancellationToken ct)
         {
             var errors = 0;
 
@@ -255,11 +253,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                     {
                         var jobs = ruleService.CreateJobsAsync(@event, context, ct);
 
-                        await foreach (var (job, ex, _) in jobs)
+                        await foreach (var job in jobs.WithCancellation(ct))
                         {
-                            if (job != null)
+                            if (job.Job != null && job.SkipReason == SkipReason.None)
                             {
-                                await ruleEventRepository.EnqueueAsync(job, ex);
+                                await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError, ct);
                             }
                         }
                     }
@@ -273,9 +271,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                         throw;
                     }
 
-                    log.LogWarning(ex, w => w
-                        .WriteProperty("action", "runRule")
-                        .WriteProperty("status", "failedPartially"));
+                    log.LogWarning(ex, "Failed to run rule with ID {ruleId}, continue with next job.", context.RuleId);
                 }
                 finally
                 {

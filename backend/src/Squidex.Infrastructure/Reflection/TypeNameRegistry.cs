@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace Squidex.Infrastructure.Reflection
@@ -29,8 +27,8 @@ namespace Squidex.Infrastructure.Reflection
 
         public TypeNameRegistry MapObsolete(Type type, string name)
         {
-            Guard.NotNull(type, nameof(type));
-            Guard.NotNull(name, nameof(name));
+            Guard.NotNull(type);
+            Guard.NotNull(name);
 
             lock (namesByType)
             {
@@ -38,7 +36,7 @@ namespace Squidex.Infrastructure.Reflection
                 {
                     var message = $"The name '{name}' is already registered with type '{typesByName[name]}'";
 
-                    throw new ArgumentException(message, nameof(type));
+                    ThrowHelper.ArgumentException(message, nameof(type));
                 }
 
                 typesByName[name] = type;
@@ -49,7 +47,7 @@ namespace Squidex.Infrastructure.Reflection
 
         public TypeNameRegistry Map(ITypeProvider provider)
         {
-            Guard.NotNull(provider, nameof(provider));
+            Guard.NotNull(provider);
 
             provider.Map(this);
 
@@ -58,7 +56,7 @@ namespace Squidex.Infrastructure.Reflection
 
         public TypeNameRegistry Map(Type type)
         {
-            Guard.NotNull(type, nameof(type));
+            Guard.NotNull(type);
 
             var typeNameAttribute = type.GetCustomAttribute<TypeNameAttribute>();
 
@@ -72,8 +70,8 @@ namespace Squidex.Infrastructure.Reflection
 
         public TypeNameRegistry Map(Type type, string name)
         {
-            Guard.NotNull(type, nameof(type));
-            Guard.NotNull(name, nameof(name));
+            Guard.NotNull(type);
+            Guard.NotNull(name);
 
             lock (namesByType)
             {
@@ -81,7 +79,7 @@ namespace Squidex.Infrastructure.Reflection
                 {
                     var message = $"The type '{type}' is already registered with name '{namesByType[type]}'";
 
-                    throw new ArgumentException(message, nameof(type));
+                    ThrowHelper.ArgumentException(message, nameof(type));
                 }
 
                 namesByType[type] = name;
@@ -90,7 +88,7 @@ namespace Squidex.Infrastructure.Reflection
                 {
                     var message = $"The name '{name}' is already registered with type '{typesByName[name]}'";
 
-                    throw new ArgumentException(message, nameof(type));
+                    ThrowHelper.ArgumentException(message, nameof(type));
                 }
 
                 typesByName[name] = type;

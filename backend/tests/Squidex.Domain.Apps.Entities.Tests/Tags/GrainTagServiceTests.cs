@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
 using Squidex.Domain.Apps.Core.Tags;
@@ -36,6 +34,15 @@ namespace Squidex.Domain.Apps.Entities.Tags
             await sut.ClearAsync(appId, TagGroups.Assets);
 
             A.CallTo(() => grain.ClearAsync())
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_call_grain_if_renaming()
+        {
+            await sut.RenameTagAsync(appId, TagGroups.Assets, "name", "newName");
+
+            A.CallTo(() => grain.RenameTagAsync("name", "newName"))
                 .MustHaveHappened();
         }
 

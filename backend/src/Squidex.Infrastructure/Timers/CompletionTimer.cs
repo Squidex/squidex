@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Squidex.Infrastructure.Timers
 {
     public sealed class CompletionTimer
@@ -23,8 +19,8 @@ namespace Squidex.Infrastructure.Timers
 
         public CompletionTimer(int delayInMs, Func<CancellationToken, Task> callback, int initialDelay = 0)
         {
-            Guard.NotNull(callback, nameof(callback));
-            Guard.GreaterThan(delayInMs, 0, nameof(delayInMs));
+            Guard.NotNull(callback);
+            Guard.GreaterThan(delayInMs, 0);
 
             runTask = RunInternalAsync(delayInMs, initialDelay, callback);
         }

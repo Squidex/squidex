@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
@@ -44,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public bool IsOptional { get; set; }
 
-        public static AppLanguageDto FromLanguage(Language language, LanguageConfig config, LanguagesConfig languages)
+        public static AppLanguageDto FromDomain(Language language, LanguageConfig config, LanguagesConfig languages)
         {
             var result = new AppLanguageDto
             {

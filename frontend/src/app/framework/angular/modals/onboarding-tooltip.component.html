@@ -1,0 +1,34 @@
+<ng-container *sqxModal="tooltipModal">
+    <div class="onboarding-rect" 
+        [sqxAnchoredTo]="for" 
+        [offsetX]="-4" 
+        [offsetY]="-4"
+        [spaceX]="4"
+        [spaceY]="4"
+        [adjustWidth]="true"
+        [adjustHeight]="true"
+        anchorX="left-to-left"
+        anchorY="top-to-top"></div>
+
+    <div class="onboarding-help" 
+        [sqxAnchoredTo]="for" 
+        [offsetX]="-4" 
+        [offsetY]="-4"
+        [spaceX]="4"
+        [spaceY]="4"
+        [position]="position" @fade>
+        <small class="onboarding-text">
+            <ng-content></ng-content>
+        </small>
+
+        <div class="onboarding-buttons clearfix">
+            <button (click)="hideAll()" class="btn btn-text-primary btn-sm float-start">
+                {{ 'tour.tooltipStop' | sqxTranslate }}
+            </button>
+
+            <button (click)="hideThis()" class="btn btn-text-success btn-sm float-end">
+                {{ 'tour.tooltipConfirm' | sqxTranslate }}
+            </button>
+        </div>
+    </div>
+</ng-container>

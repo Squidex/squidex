@@ -15,6 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         public NestedGraphType(Builder builder, FieldInfo fieldInfo)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = fieldInfo.NestedType;
 
             foreach (var nestedFieldInfo in fieldInfo.Fields)
@@ -25,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     {
                         Name = nestedFieldInfo.FieldNameDynamic,
                         Arguments = ContentActions.Json.Arguments,
-                        ResolvedType = AllTypes.Json,
+                        ResolvedType = Scalars.Json,
                         Resolver = FieldVisitor.JsonPath,
                         Description = nestedFieldInfo.Field.RawProperties.Hints
                     }).WithSourceName(nestedFieldInfo);

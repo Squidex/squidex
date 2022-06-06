@@ -12,27 +12,27 @@ namespace Squidex.Web
 {
     public static class Constants
     {
-        public static readonly string SecurityDefinition = "squidex-oauth-auth";
+        public const string SecurityDefinition = "squidex-oauth-auth";
 
-        public static readonly string OrleansClusterId = "squidex-v2";
+        public const string OrleansClusterId = "squidex-v2";
 
-        public static readonly string ApiSecurityScheme = "API";
+        public const string ApiSecurityScheme = "API";
 
-        public static readonly string PrefixApi = "/api";
+        public const string PrefixApi = "/api";
 
-        public static readonly string PrefixOrleans = "/orleans";
+        public const string PrefixOrleans = "/orleans";
 
-        public static readonly string PrefixPortal = "/portal";
+        public const string PrefixPortal = "/portal";
 
-        public static readonly string PrefixIdentityServer = "/identity-server";
+        public const string PrefixIdentityServer = "/identity-server";
 
-        public static readonly string ScopePermissions = "permissions";
+        public const string ScopePermissions = "permissions";
 
-        public static readonly string ScopeProfile = "squidex-profile";
+        public const string ScopeProfile = "squidex-profile";
 
-        public static readonly string ScopeRole = "role";
+        public const string ScopeRole = "role";
 
-        public static readonly string ScopeApi = "squidex-api";
+        public const string ScopeApi = "squidex-api";
 
         public static readonly string ClientFrontendId = DefaultClients.Frontend;
 

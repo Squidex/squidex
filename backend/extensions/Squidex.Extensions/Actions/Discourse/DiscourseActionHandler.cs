@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Extensions.Actions.Discourse
 {
@@ -53,6 +51,8 @@ namespace Squidex.Extensions.Actions.Discourse
 
             var ruleJob = new DiscourseJob
             {
+                ApiKey = action.ApiKey,
+                ApiUserName = action.ApiUsername,
                 RequestUrl = url,
                 RequestBody = requestBody
             };
@@ -65,7 +65,8 @@ namespace Squidex.Extensions.Actions.Discourse
             return (description, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(DiscourseJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(DiscourseJob job,
+            CancellationToken ct = default)
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {
@@ -74,6 +75,9 @@ namespace Squidex.Extensions.Actions.Discourse
                     Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
                 })
                 {
+                    request.Headers.TryAddWithoutValidation("Api-Key", job.ApiKey);
+                    request.Headers.TryAddWithoutValidation("Api-Username", job.ApiUserName);
+
                     return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
                 }
             }
@@ -82,6 +86,10 @@ namespace Squidex.Extensions.Actions.Discourse
 
     public sealed class DiscourseJob
     {
+        public string ApiKey { get; set; }
+
+        public string ApiUserName { get; set; }
+
         public string RequestUrl { get; set; }
 
         public string RequestBody { get; set; }

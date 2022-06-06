@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -152,7 +148,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var trigger = new ContentChangedTriggerV2
             {
-                Schemas = ImmutableList.Create(
+                Schemas = ReadonlyList.Create(
                     new ContentChangedTriggerSchemaV2
                     {
                         SchemaId = schemaMatch.Id
@@ -361,10 +357,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 trigger = trigger with
                 {
-                    Schemas = ImmutableList.Create(
+                    Schemas = ReadonlyList.Create(
                         new ContentChangedTriggerSchemaV2
                         {
-                            SchemaId = schemaId.Id, Condition = condition
+                            SchemaId = schemaId.Id,
+                            Condition = condition
                         })
                 };
             }

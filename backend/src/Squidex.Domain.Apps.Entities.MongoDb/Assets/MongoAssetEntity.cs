@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
@@ -73,6 +71,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonRequired]
         [BsonElement("vs")]
         public long Version { get; set; }
+
+        [BsonIgnoreIfDefault]
+        [BsonElement("ts")]
+        public long TotalSize { get; set; }
 
         [BsonRequired]
         [BsonElement("at")]

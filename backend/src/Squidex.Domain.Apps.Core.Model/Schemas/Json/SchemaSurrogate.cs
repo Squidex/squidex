@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
@@ -35,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
         public FieldSurrogate[] Fields { get; set; }
 
-        public ImmutableDictionary<string, string>? PreviewUrls { get; set; }
+        public ReadonlyDictionary<string, string>? PreviewUrls { get; set; }
 
         public bool IsSingleton
         {

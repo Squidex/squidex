@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Text;
-using EventStore.ClientAPI;
+using EventStore.Client;
 using Squidex.Infrastructure.Json;
-using EventStoreData = EventStore.ClientAPI.EventData;
+using EventStoreData = EventStore.Client.EventData;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -23,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var @event = resolvedEvent.Event;
 
-            var eventPayload = Encoding.UTF8.GetString(@event.Data);
+            var eventPayload = Encoding.UTF8.GetString(@event.Data.Span);
             var eventHeaders = GetHeaders(serializer, @event);
 
             var eventData = new EventData(@event.EventType, eventHeaders, eventPayload);
@@ -32,12 +30,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
             return new StoredEvent(
                 streamName,
-                resolvedEvent.OriginalEventNumber.ToString(),
-                resolvedEvent.Event.EventNumber,
+                resolvedEvent.OriginalEventNumber.ToInt64().ToString(CultureInfo.InvariantCulture),
+                resolvedEvent.Event.EventNumber.ToInt64(),
                 eventData);
         }
 
-        private static string GetStreamName(string? prefix, RecordedEvent @event)
+        private static string GetStreamName(string? prefix, EventRecord @event)
         {
             var streamName = @event.EventStreamId;
 
@@ -49,10 +47,9 @@ namespace Squidex.Infrastructure.EventSourcing
             return streamName;
         }
 
-        private static EnvelopeHeaders GetHeaders(IJsonSerializer serializer, RecordedEvent @event)
+        private static EnvelopeHeaders GetHeaders(IJsonSerializer serializer, EventRecord @event)
         {
-            var headersJson = Encoding.UTF8.GetString(@event.Metadata);
-            var headers = serializer.Deserialize<EnvelopeHeaders>(headersJson);
+            var headers = Deserialize<EnvelopeHeaders>(serializer, @event.Metadata);
 
             foreach (var key in headers.Keys.ToList())
             {
@@ -65,6 +62,13 @@ namespace Squidex.Infrastructure.EventSourcing
             return headers;
         }
 
+        private static T Deserialize<T>(IJsonSerializer serializer, ReadOnlyMemory<byte> source)
+        {
+            var json = Encoding.UTF8.GetString(source.Span);
+
+            return serializer.Deserialize<T>(json);
+        }
+
         public static EventStoreData Write(EventData eventData, IJsonSerializer serializer)
         {
             var payload = Encoding.UTF8.GetBytes(eventData.Payload);
@@ -72,7 +76,7 @@ namespace Squidex.Infrastructure.EventSourcing
             var headersJson = serializer.Serialize(eventData.Headers);
             var headersBytes = Encoding.UTF8.GetBytes(headersJson);
 
-            return new EventStoreData(Guid.NewGuid(), eventData.Type, true, payload, headersBytes);
+            return new EventStoreData(Uuid.FromGuid(Guid.NewGuid()), eventData.Type, payload, headersBytes);
         }
     }
 }

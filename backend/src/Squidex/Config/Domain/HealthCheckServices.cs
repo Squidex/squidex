@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities.Apps.Diagnostics;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
@@ -18,7 +16,7 @@ namespace Squidex.Config.Domain
         public static void AddSquidexHealthChecks(this IServiceCollection services, IConfiguration config)
         {
             services.Configure<GCHealthCheckOptions>(config,
-                "healthz:gc");
+                "diagnostics:gc");
 
             services.AddHealthChecks()
                 .AddCheck<GCHealthCheck>("GC", tags: new[] { "node" })

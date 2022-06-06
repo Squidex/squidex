@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -25,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new StringFieldProperties());
 
-            Assert.Equal("my-string", sut.Name);
+            Assert.Equal("myString", sut.Name);
         }
 
         [Fact]
@@ -107,7 +105,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_string_not_allowed()
         {
-            var sut = Field(new StringFieldProperties { AllowedValues = ImmutableList.Create("Foo") });
+            var sut = Field(new StringFieldProperties { AllowedValues = ReadonlyList.Create("Foo") });
 
             await sut.ValidateAsync(CreateValue("Bar"), errors);
 
@@ -137,14 +135,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Custom Error Message." });
         }
 
-        private static IJsonValue CreateValue(string? v)
+        private static JsonValue CreateValue(string? v)
         {
             return JsonValue.Create(v);
         }
 
         private static RootField<StringFieldProperties> Field(StringFieldProperties properties)
         {
-            return Fields.String(1, "my-string", Partitioning.Invariant, properties);
+            return Fields.String(1, "myString", Partitioning.Invariant, properties);
         }
     }
 }

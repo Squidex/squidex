@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-
 namespace Squidex.Config
 {
     public sealed class MyIdentityOptions
@@ -39,6 +37,8 @@ namespace Squidex.Config
 
         public string MicrosoftTenant { get; set; }
 
+        public Dictionary<string, string[]> OidcRoleMapping { get; set; }
+
         public string OidcName { get; set; }
 
         public string OidcClient { get; set; }
@@ -59,19 +59,21 @@ namespace Squidex.Config
 
         public bool OidcGetClaimsFromUserInfoEndpoint { get; set; }
 
-        public Dictionary<string, string[]> OidcRoleMapping { get; set; }
-
         public bool AdminRecreate { get; set; }
 
         public bool AllowPasswordAuth { get; set; }
 
         public bool LockAutomatically { get; set; }
 
+        public bool MultipleDomains { get; set; }
+
         public bool NoConsent { get; set; }
 
         public bool RequiresHttps { get; set; }
 
         public bool ShowPII { get; set; }
+
+        public bool SuppressXFrameOptionsHeader { get; set; }
 
         public bool IsAdminConfigured()
         {

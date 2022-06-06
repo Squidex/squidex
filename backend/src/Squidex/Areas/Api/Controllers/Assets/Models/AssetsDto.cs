@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
@@ -26,31 +25,38 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [LocalizedRequired]
         public AssetDto[] Items { get; set; }
 
-        public static AssetsDto FromAssets(IResultList<IEnrichedAssetEntity> assets, Resources resources)
+        public static AssetsDto FromDomain(IResultList<IEnrichedAssetEntity> assets, Resources resources)
         {
-            var response = new AssetsDto
+            var result = new AssetsDto
             {
                 Total = assets.Total,
-                Items = assets.Select(x => AssetDto.FromAsset(x, resources)).ToArray()
+                Items = assets.Select(x => AssetDto.FromDomain(x, resources)).ToArray()
             };
 
-            return CreateLinks(response, resources);
+            return result.CreateLinks(resources);
         }
 
-        private static AssetsDto CreateLinks(AssetsDto response, Resources resources)
+        private AssetsDto CreateLinks(Resources resources)
         {
             var values = new { app = resources.App };
 
-            response.AddSelfLink(resources.Url<AssetsController>(x => nameof(x.GetAssets), values));
+            AddSelfLink(resources.Url<AssetsController>(x => nameof(x.GetAssets), values));
 
             if (resources.CanCreateAsset)
             {
-                response.AddPostLink("create", resources.Url<AssetsController>(x => nameof(x.PostAsset), values));
+                AddPostLink("create", resources.Url<AssetsController>(x => nameof(x.PostAsset), values));
             }
 
-            response.AddGetLink("tags", resources.Url<AssetsController>(x => nameof(x.GetTags), values));
+            if (resources.CanUpdateAsset)
+            {
+                var tagValue = new { values.app, name = "tag" };
 
-            return response;
+                AddPutLink("tags/rename", resources.Url<AssetsController>(x => nameof(x.PutTag), tagValue));
+            }
+
+            AddGetLink("tags", resources.Url<AssetsController>(x => nameof(x.GetTags), values));
+
+            return this;
         }
     }
 }

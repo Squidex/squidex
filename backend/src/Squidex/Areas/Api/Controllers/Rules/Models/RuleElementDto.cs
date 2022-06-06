@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
@@ -52,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         [LocalizedRequired]
         public RuleElementPropertyDto[] Properties { get; set; }
 
-        public static RuleElementDto FromDefinition(RuleActionDefinition definition)
+        public static RuleElementDto FromDomain(RuleActionDefinition definition)
         {
             var result = SimpleMapper.Map(definition, new RuleElementDto());
 

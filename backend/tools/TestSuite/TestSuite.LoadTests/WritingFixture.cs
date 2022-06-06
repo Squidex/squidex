@@ -9,7 +9,7 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.LoadTests
 {
-    public sealed class WritingFixture : ContentFixture
+    public sealed class WritingFixture : TestSchemaFixtureBase
     {
         public WritingFixture()
             : base("benchmark_writing")

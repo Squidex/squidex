@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Domain.Apps.Entities.Apps
@@ -34,10 +35,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         AppContributors Contributors { get; }
 
+        AssetScripts AssetScripts { get; }
+
         LanguagesConfig Languages { get; }
 
         Workflows Workflows { get; }
 
-        bool IsArchived { get; }
+        bool IsDeleted { get; }
     }
 }

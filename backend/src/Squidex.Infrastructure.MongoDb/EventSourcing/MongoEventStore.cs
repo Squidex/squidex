@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Clusters;
@@ -77,10 +74,10 @@ namespace Squidex.Infrastructure.EventSourcing
                     })
             }, ct);
 
-            var clusterVersion = await Database.GetVersionAsync();
-            var clustered = Database.Client.Cluster.Description.Type == ClusterType.ReplicaSet;
+            var clusterVersion = await Database.GetMajorVersionAsync(ct);
+            var clusteredAsReplica = Database.Client.Cluster.Description.Type == ClusterType.ReplicaSet;
 
-            CanUseChangeStreams = clustered && clusterVersion >= new Version("4.0");
+            CanUseChangeStreams = clusteredAsReplica && clusterVersion >= 4;
         }
     }
 }

@@ -5,18 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Esprima;
 using Jint;
 using Jint.Native;
 using Jint.Runtime;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Properties;
 using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 using Squidex.Domain.Apps.Core.Scripting.Internal;
 using Squidex.Infrastructure;
@@ -26,167 +23,125 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
-    public sealed class JintScriptEngine : IScriptEngine
+    public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
     {
         private readonly IJintExtension[] extensions;
         private readonly Parser parser;
+        private readonly TimeSpan timeoutScript;
+        private readonly TimeSpan timeoutExecution;
 
-        public TimeSpan TimeoutScript { get; set; } = TimeSpan.FromMilliseconds(200);
-
-        public TimeSpan TimeoutExecution { get; set; } = TimeSpan.FromMilliseconds(4000);
-
-        private TimeSpan ActualTimeoutScript
-        {
-            get
-            {
-                if (Debugger.IsAttached)
-                {
-                    return TimeSpan.FromHours(1);
-                }
-
-                return TimeoutScript;
-            }
-        }
-
-        private TimeSpan ActualTimeoutExecution
-        {
-            get
-            {
-                if (Debugger.IsAttached)
-                {
-                    return TimeSpan.FromHours(1);
-                }
-
-                return TimeoutExecution;
-            }
-        }
-
-        public JintScriptEngine(IMemoryCache cache, IEnumerable<IJintExtension>? extensions = null)
+        public JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOptions> options, IEnumerable<IJintExtension>? extensions = null)
         {
             parser = new Parser(cache);
+
+            timeoutScript = options.Value.TimeoutScript;
+            timeoutExecution = options.Value.TimeoutExecution;
 
             this.extensions = extensions?.ToArray() ?? Array.Empty<IJintExtension>();
         }
 
-        public async Task<IJsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default,
+        public async Task<JsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default,
             CancellationToken ct = default)
         {
-            Guard.NotNull(vars, nameof(vars));
-            Guard.NotNullOrEmpty(script, nameof(script));
+            Guard.NotNull(vars);
+            Guard.NotNullOrEmpty(script);
 
-            using (var cts = new CancellationTokenSource(ActualTimeoutExecution))
+            using (var cts = new CancellationTokenSource(timeoutExecution))
             {
                 using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct))
                 {
-                    var tcs = new TaskCompletionSource<IJsonValue>();
+                    var context =
+                        CreateEngine<JsonValue?>(options, combined.Token)
+                            .Extend(vars, options)
+                            .Extend(extensions)
+                            .ExtendAsync(extensions);
 
-                    using (combined.Token.Register(() => tcs.TrySetCanceled()))
+                    context.Engine.SetValue("complete", new Action<JsValue?>(value =>
                     {
-                        var context =
-                            CreateEngine(options)
-                                .Extend(vars, options)
-                                .Extend(extensions)
-                                .ExtendAsync(extensions, tcs.TrySetException, combined.Token);
+                        context.Complete(JsonMapper.Map(value));
+                    }));
 
-                        context.Engine.SetValue("complete", new Action<JsValue?>(value =>
-                        {
-                            tcs.TrySetResult(JsonMapper.Map(value));
-                        }));
+                    var result = Execute(context.Engine, script);
 
-                        Execute(context.Engine, script);
-
-                        if (!context.IsAsync)
-                        {
-                            tcs.TrySetResult(JsonMapper.Map(context.Engine.GetCompletionValue()));
-                        }
-
-                        return await tcs.Task;
-                    }
+                    return await context.CompleteAsync() ?? JsonMapper.Map(result);
                 }
             }
         }
 
-        public async Task<ContentData> TransformAsync(ScriptVars vars, string script, ScriptOptions options = default,
+        public async Task<ContentData> TransformAsync(DataScriptVars vars, string script, ScriptOptions options = default,
             CancellationToken ct = default)
         {
-            Guard.NotNull(vars, nameof(vars));
-            Guard.NotNullOrEmpty(script, nameof(script));
+            Guard.NotNull(vars);
+            Guard.NotNullOrEmpty(script);
 
-            using (var cts = new CancellationTokenSource(ActualTimeoutExecution))
+            using (var cts = new CancellationTokenSource(timeoutExecution))
             {
                 using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct))
                 {
-                    var tcs = new TaskCompletionSource<ContentData>();
+                    var context =
+                        CreateEngine<ContentData>(options, combined.Token)
+                            .Extend(vars, options)
+                            .Extend(extensions)
+                            .ExtendAsync(extensions);
 
-                    using (combined.Token.Register(() => tcs.TrySetCanceled()))
+                    context.Engine.SetValue("complete", new Action<JsValue?>(_ =>
                     {
-                        var context =
-                            CreateEngine(options)
-                                .Extend(vars, options)
-                                .Extend(extensions)
-                                .ExtendAsync(extensions, tcs.TrySetException, combined.Token);
+                        context.Complete(vars.Data!);
+                    }));
 
-                        context.Engine.SetValue("complete", new Action<JsValue?>(_ =>
+                    context.Engine.SetValue("replace", new Action(() =>
+                    {
+                        var dataInstance = context.Engine.GetValue("ctx").AsObject().Get("data");
+
+                        if (dataInstance != null && dataInstance.IsObject() && dataInstance.AsObject() is ContentDataObject data)
                         {
-                            tcs.TrySetResult(vars.Data!);
-                        }));
-
-                        context.Engine.SetValue("replace", new Action(() =>
-                        {
-                            var dataInstance = context.Engine.GetValue("ctx").AsObject().Get("data");
-
-                            if (dataInstance != null && dataInstance.IsObject() && dataInstance.AsObject() is ContentDataObject data)
+                            if (!context.IsCompleted && data.TryUpdate(out var modified))
                             {
-                                if (!tcs.Task.IsCompleted)
-                                {
-                                    if (data.TryUpdate(out var modified))
-                                    {
-                                        tcs.TrySetResult(modified);
-                                    }
-                                    else
-                                    {
-                                        tcs.TrySetResult(vars.Data!);
-                                    }
-                                }
+                                context.Complete(modified);
                             }
-                        }));
-
-                        Execute(context.Engine, script);
-
-                        if (!context.IsAsync)
-                        {
-                            tcs.TrySetResult(vars.Data!);
                         }
+                    }));
 
-                        return await tcs.Task;
-                    }
+                    Execute(context.Engine, script);
+
+                    return await context.CompleteAsync() ?? vars.Data!;
                 }
             }
         }
 
-        public IJsonValue Execute(ScriptVars vars, string script, ScriptOptions options = default)
+        public JsonValue Execute(ScriptVars vars, string script, ScriptOptions options = default)
         {
-            Guard.NotNull(vars, nameof(vars));
-            Guard.NotNullOrEmpty(script, nameof(script));
+            Guard.NotNull(vars);
+            Guard.NotNullOrEmpty(script);
 
             var context =
-                CreateEngine(options)
+                CreateEngine<object>(options, default)
                     .Extend(vars, options)
                     .Extend(extensions);
 
-            Execute(context.Engine, script);
+            var result = Execute(context.Engine, script);
 
-            return JsonMapper.Map(context.Engine.GetCompletionValue());
+            return JsonMapper.Map(result);
         }
 
-        private ExecutionContext CreateEngine(ScriptOptions options)
+        private ScriptExecutionContext<T> CreateEngine<T>(ScriptOptions options, CancellationToken ct)
         {
+            if (Debugger.IsAttached)
+            {
+                ct = default;
+            }
+
             var engine = new Engine(engineOptions =>
             {
                 engineOptions.AddObjectConverter(DefaultConverter.Instance);
                 engineOptions.SetReferencesResolver(NullPropagation.Instance);
                 engineOptions.Strict();
-                engineOptions.TimeoutInterval(ActualTimeoutScript);
+
+                if (!Debugger.IsAttached)
+                {
+                    engineOptions.TimeoutInterval(timeoutScript);
+                    engineOptions.CancellationToken(ct);
+                }
             });
 
             if (options.CanDisallow)
@@ -204,18 +159,16 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 extension.Extend(engine);
             }
 
-            var context = new ExecutionContext(engine);
-
-            return context;
+            return new ScriptExecutionContext<T>(engine, ct);
         }
 
-        private void Execute(Engine engine, string script)
+        private JsValue Execute(Engine engine, string script)
         {
             try
             {
                 var program = parser.Parse(script);
 
-                engine.Execute(program);
+                return engine.Evaluate(program);
             }
             catch (ArgumentException ex)
             {
@@ -233,10 +186,33 @@ namespace Squidex.Domain.Apps.Core.Scripting
             {
                 throw;
             }
-            catch
+            catch (Exception ex)
             {
-                throw new ValidationException(T.Get("common.jsError", new { message = "RuntimeError" }));
+                throw new ValidationException(T.Get("common.jsError", new { message = ex.GetType().Name }), ex);
             }
+        }
+
+        public void Describe(AddDescription describe, ScriptScope scope)
+        {
+            if (scope.HasFlag(ScriptScope.ContentTrigger) || scope.HasFlag(ScriptScope.AssetTrigger))
+            {
+                return;
+            }
+
+            if (scope.HasFlag(ScriptScope.Transform) || scope.HasFlag(ScriptScope.ContentScript))
+            {
+                describe(JsonType.Function, "replace()",
+                    Resources.ScriptingReplace);
+            }
+
+            describe(JsonType.Function, "disallow(reason)",
+                Resources.ScriptingDisallow);
+
+            describe(JsonType.Function, "reject(reason)",
+                Resources.ScriptingReject);
+
+            describe(JsonType.Function, "complete()",
+                Resources.ScriptingComplete);
         }
     }
 }

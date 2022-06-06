@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
@@ -19,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards
     {
         public static void CanCreate(CreateComment command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(e =>
             {
@@ -32,11 +31,11 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards
 
         public static void CanUpdate(UpdateComment command, string commentsId, List<Envelope<CommentsEvent>> events)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var comment = FindComment(events, command.CommentId);
 
-            if (!string.Equals(commentsId, command.Actor.Identifier) && !comment.Payload.Actor.Equals(command.Actor))
+            if (!string.Equals(commentsId, command.Actor.Identifier, StringComparison.Ordinal) && !comment.Payload.Actor.Equals(command.Actor))
             {
                 throw new DomainException(T.Get("comments.notUserComment"));
             }
@@ -52,11 +51,11 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards
 
         public static void CanDelete(DeleteComment command, string commentsId, List<Envelope<CommentsEvent>> events)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var comment = FindComment(events, command.CommentId);
 
-            if (!string.Equals(commentsId, command.Actor.Identifier) && !comment.Payload.Actor.Equals(command.Actor))
+            if (!string.Equals(commentsId, command.Actor.Identifier, StringComparison.Ordinal) && !comment.Payload.Actor.Equals(command.Actor))
             {
                 throw new DomainException(T.Get("comments.notUserComment"));
             }

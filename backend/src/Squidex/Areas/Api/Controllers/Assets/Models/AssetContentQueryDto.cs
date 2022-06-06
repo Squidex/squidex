@@ -82,26 +82,26 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public bool IgnoreFocus { get; set; }
 
         /// <summary>
-        /// True to not use JPEG encoding when quality is set and the image is not a JPEG. Default: false.
+        /// True to use auto format.
         /// </summary>
-        [FromQuery(Name = "keepformat")]
-        public bool KeepFormat { get; set; }
+        [FromQuery(Name = "auto")]
+        public bool Auto { get; set; }
 
         /// <summary>
         /// True to force a new resize even if it already stored.
         /// </summary>
         [FromQuery(Name = "force")]
-        public bool ForceResize { get; set; }
+        public bool Force { get; set; }
 
         /// <summary>
         /// True to force a new resize even if it already stored.
         /// </summary>
         [FromQuery(Name = "format")]
-        public ImageFormat Format { get; set; }
+        public ImageFormat? Format { get; set; }
 
-        public ResizeOptions ToResizeOptions(IAssetEntity asset)
+        public ResizeOptions ToResizeOptions(IAssetEntity asset, IAssetThumbnailGenerator assetThumbnailGenerator, HttpRequest request)
         {
-            Guard.NotNull(asset, nameof(asset));
+            Guard.NotNull(asset);
 
             var result = SimpleMapper.Map(this, new ResizeOptions());
 
@@ -109,26 +109,63 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
             result.FocusX = x;
             result.FocusY = y;
+            result.TargetWidth = Width;
+            result.TargetHeight = Height;
+            result.Format = GetFormat(asset, assetThumbnailGenerator, request);
 
             return result;
         }
 
+        private ImageFormat? GetFormat(IAssetEntity asset, IAssetThumbnailGenerator assetThumbnailGenerator, HttpRequest request)
+        {
+            if (Format.HasValue || !Auto)
+            {
+                return Format;
+            }
+
+            bool Accepts(string mimeType)
+            {
+                if (string.Equals(asset.MimeType, mimeType, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+
+                request.Headers.TryGetValue("Accept", out var accept);
+
+                return accept.Any(x => x.Contains(mimeType, StringComparison.OrdinalIgnoreCase)) && assetThumbnailGenerator.CanReadAndWrite(mimeType);
+            }
+#if ENABLE_AVIF
+            if (Accepts("image/avif"))
+            {
+                return ImageFormat.AVIF;
+            }
+#endif
+            if (Accepts("image/webp"))
+            {
+                return ImageFormat.WEBP;
+            }
+
+            return Format;
+        }
+
         private (float?, float?) GetFocusPoint(IAssetEntity asset)
         {
-            if (!IgnoreFocus)
+            if (IgnoreFocus)
             {
-                if (FocusX != null && FocusY != null)
-                {
-                    return (FocusX.Value, FocusY.Value);
-                }
+                return (null, null);
+            }
 
-                var focusX = asset.Metadata.GetFocusX();
-                var focusY = asset.Metadata.GetFocusY();
+            if (FocusX != null && FocusY != null)
+            {
+                return (FocusX.Value, FocusY.Value);
+            }
 
-                if (focusX != null && focusY != null)
-                {
-                    return (focusX.Value, focusY.Value);
-                }
+            var focusX = asset.Metadata.GetFocusX();
+            var focusY = asset.Metadata.GetFocusY();
+
+            if (focusX != null && focusY != null)
+            {
+                return (focusX.Value, focusY.Value);
             }
 
             return (null, null);

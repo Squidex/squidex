@@ -5,17 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Log;
 using EventFilter = MongoDB.Driver.FilterDefinition<Squidex.Infrastructure.EventSourcing.MongoEventCommit>;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -27,7 +23,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
         {
-            Guard.NotNull(subscriber, nameof(subscriber));
+            Guard.NotNull(subscriber);
 
             if (CanUseChangeStreams)
             {
@@ -39,21 +35,23 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public async Task<IReadOnlyList<StoredEvent>> QueryLatestAsync(string streamName, int count)
+        public async Task<IReadOnlyList<StoredEvent>> QueryReverseAsync(string streamName, int count = int.MaxValue,
+            CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNullOrEmpty(streamName);
 
             if (count <= 0)
             {
                 return EmptyEvents;
             }
 
-            using (Profiler.TraceMethod<MongoEventStore>())
+            using (Telemetry.Activities.StartActivity("MongoEventStore/QueryLatestAsync"))
             {
+                var filter = Filter.Eq(EventStreamField, streamName);
+
                 var commits =
-                    await Collection.Find(
-                            Filter.Eq(EventStreamField, streamName))
-                        .Sort(Sort.Descending(TimestampField)).Limit(count).ToListAsync();
+                    await Collection.Find(filter).Sort(Sort.Descending(TimestampField)).Limit(count)
+                        .ToListAsync(ct);
 
                 var result = commits.Select(x => x.Filtered()).Reverse().SelectMany(x => x).TakeLast(count).ToList();
 
@@ -61,18 +59,21 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)
+        public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0,
+            CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNullOrEmpty(streamName);
 
-            using (Profiler.TraceMethod<MongoEventStore>())
+            using (Telemetry.Activities.StartActivity("MongoEventStore/QueryAsync"))
             {
+                var filter =
+                    Filter.And(
+                        Filter.Eq(EventStreamField, streamName),
+                        Filter.Gte(EventStreamOffsetField, streamPosition - MaxCommitSize));
+
                 var commits =
-                    await Collection.Find(
-                        Filter.And(
-                            Filter.Eq(EventStreamField, streamName),
-                            Filter.Gte(EventStreamOffsetField, streamPosition - MaxCommitSize)))
-                        .Sort(Sort.Ascending(TimestampField)).ToListAsync();
+                    await Collection.Find(filter).Sort(Sort.Ascending(TimestampField))
+                        .ToListAsync(ct);
 
                 var result = commits.SelectMany(x => x.Filtered(streamPosition)).ToList();
 
@@ -80,20 +81,23 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public async Task<IReadOnlyDictionary<string, IReadOnlyList<StoredEvent>>> QueryManyAsync(IEnumerable<string> streamNames)
+        public async Task<IReadOnlyDictionary<string, IReadOnlyList<StoredEvent>>> QueryManyAsync(IEnumerable<string> streamNames,
+            CancellationToken ct = default)
         {
-            Guard.NotNull(streamNames, nameof(streamNames));
+            Guard.NotNull(streamNames);
 
-            using (Profiler.TraceMethod<MongoEventStore>())
+            using (Telemetry.Activities.StartActivity("MongoEventStore/QueryManyAsync"))
             {
                 var position = EtagVersion.Empty;
 
+                var filter =
+                    Filter.And(
+                        Filter.In(EventStreamField, streamNames),
+                        Filter.Gte(EventStreamOffsetField, position));
+
                 var commits =
-                    await Collection.Find(
-                        Filter.And(
-                            Filter.In(EventStreamField, streamNames),
-                            Filter.Gte(EventStreamOffsetField, position)))
-                        .Sort(Sort.Ascending(TimestampField)).ToListAsync();
+                    await Collection.Find(filter).Sort(Sort.Ascending(TimestampField))
+                        .ToListAsync(ct);
 
                 var result = commits.GroupBy(x => x.EventStream)
                     .ToDictionary(
@@ -117,7 +121,7 @@ namespace Squidex.Infrastructure.EventSourcing
             var filterDefinition = CreateFilter(streamFilter, lastPosition);
 
             var find =
-                Collection.Find(filterDefinition, options: Batching.Options)
+                Collection.Find(filterDefinition, Batching.Options)
                     .Limit(take).Sort(Sort.Descending(TimestampField).Ascending(EventStreamField));
 
             var taken = 0;
@@ -162,28 +166,17 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var taken = 0;
 
-            using (var cursor = await find.ToCursorAsync(ct))
+            await foreach (var current in find.ToAsyncEnumerable(ct))
             {
-                while (taken < take && await cursor.MoveNextAsync(ct))
+                foreach (var @event in current.Filtered(lastPosition))
                 {
-                    foreach (var current in cursor.Current)
+                    yield return @event;
+
+                    taken++;
+
+                    if (taken == take)
                     {
-                        foreach (var @event in current.Filtered(lastPosition))
-                        {
-                            yield return @event;
-
-                            taken++;
-
-                            if (taken == take)
-                            {
-                                break;
-                            }
-                        }
-
-                        if (taken == take)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
             }

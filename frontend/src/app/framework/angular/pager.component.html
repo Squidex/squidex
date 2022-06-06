@@ -1,0 +1,28 @@
+<div class="d-flex align-items-center justify-content-end" *ngIf="!autoHide || canGoPrev || canGoNext">
+    <div class="float-end pagination" *ngIf="paging">
+        <select class="form-select form-select-sm" [ngModel]="paging.pageSize" (ngModelChange)="setPageSize($event)">
+            <option *ngFor="let pageSize of pageSizes" [ngValue]="pageSize">{{pageSize}}</option>
+        </select>
+
+        <span class="page-info d-flex align-items-center justify-content-end">
+            <ng-container *ngIf="paging.count > 0 && paging.total > 0">
+                <button class="btn deactivated">
+                    {{ 'common.pagerInfo' | sqxTranslate: translationInfo }}
+                </button>
+            </ng-container>
+    
+            <ng-container *ngIf="paging.count > 0 && paging.total <= 0">
+                <button class="btn" title="{{ 'common.pagerReload' | sqxTranslate }}" (click)="loadTotal.emit()">
+                    {{ 'common.pagerInfoNoTotal' | sqxTranslate: translationInfo }}
+                </button>
+            </ng-container>
+    
+            <button type="button" class="btn btn-sm btn-text-secondary ms-2" [disabled]="!canGoPrev" (click)="goPrev()">
+                <i class="icon-angle-left"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-text-secondary ms-2" [disabled]="!canGoNext" (click)="goNext()">
+                <i class="icon-angle-right"></i>
+            </button>
+        </span>
+    </div>
+</div>

@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Squidex.Infrastructure;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Error
 {
@@ -30,7 +30,14 @@ namespace Squidex.Areas.IdentityServer.Controllers.Error
             {
                 var exception = HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
 
-                vm.ErrorMessage = exception?.Message;
+                if (exception is DomainException domainException1)
+                {
+                    vm.ErrorMessage = domainException1.Message;
+                }
+                else if (exception?.InnerException is DomainException domainException2)
+                {
+                    vm.ErrorMessage = domainException2.Message;
+                }
             }
 
             return View("Error", vm);

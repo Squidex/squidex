@@ -8,6 +8,8 @@
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Infrastructure.TestHelpers
 {
     public sealed record MyDomainState : IDomainState<MyDomainState>
@@ -19,6 +21,11 @@ namespace Squidex.Infrastructure.TestHelpers
         public long Version { get; set; }
 
         public long Value { get; set; }
+
+        public MyDomainState Copy()
+        {
+            return (MyDomainState)MemberwiseClone();
+        }
 
         public MyDomainState Apply(Envelope<IEvent> @event)
         {

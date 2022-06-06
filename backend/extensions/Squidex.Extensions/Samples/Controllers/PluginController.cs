@@ -18,7 +18,7 @@ namespace Squidex.Extensions.Samples.Controllers
         {
         }
 
-        [Route("/plugins/sample")]
+        [Route("plugins/sample")]
         public IActionResult Test()
         {
             return Ok(new { text = "I am Plugin" });

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 #pragma warning disable RECS0026 // Possible unassigned object created by 'new'

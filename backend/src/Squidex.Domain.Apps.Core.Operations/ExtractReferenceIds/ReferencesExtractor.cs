@@ -5,11 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
+
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
@@ -17,40 +18,26 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
     {
         private static readonly ReferencesExtractor Instance = new ReferencesExtractor();
 
-        public readonly struct Args
-        {
-            public readonly IJsonValue Value;
-
-            public readonly HashSet<DomainId> Result;
-
-            public readonly int ResultLimit;
-
-            public Args(IJsonValue value, HashSet<DomainId> result, int take)
-            {
-                Value = value;
-                Result = result;
-                ResultLimit = take;
-            }
-        }
+        public record struct Args(JsonValue Value, ISet<DomainId> Result, int Take, ResolvedComponents Components);
 
         private ReferencesExtractor()
         {
         }
 
-        public static None Extract(IField field, IJsonValue? value, HashSet<DomainId> result, int take)
+        public static None Extract(IField field, JsonValue value, HashSet<DomainId> result, int take, ResolvedComponents components)
         {
-            var args = new Args(value ?? JsonValue.Null, result, take);
+            var args = new Args(value, result, take, components);
 
             return field.Accept(Instance, args);
         }
 
         public None Visit(IArrayField field, Args args)
         {
-            if (args.Value is JsonArray array)
+            if (args.Value.Type == JsonValueType.Array)
             {
-                for (var i = 0; i < array.Count; i++)
+                foreach (var value in args.Value.AsArray)
                 {
-                    ExtractFromArrayItem(field, array[i], args);
+                    ExtractFromArrayItem(field, value, args);
                 }
             }
 
@@ -78,18 +65,18 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public None Visit(IField<ComponentFieldProperties> field, Args args)
         {
-            ExtractFromComponent(field, args.Value, args);
+            ExtractFromComponent(args.Value, args);
 
             return None.Value;
         }
 
         public None Visit(IField<ComponentsFieldProperties> field, Args args)
         {
-            if (args.Value is JsonArray array)
+            if (args.Value.Type == JsonValueType.Array)
             {
-                for (var i = 0; i < array.Count; i++)
+                foreach (var value in args.Value.AsArray)
                 {
-                    ExtractFromComponent(field, array[i], args);
+                    ExtractFromComponent(value, args);
                 }
             }
 
@@ -131,29 +118,41 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return None.Value;
         }
 
-        private void ExtractFromArrayItem(IArrayField field, IJsonValue value, Args args)
+        private void ExtractFromArrayItem(IArrayField field, JsonValue value, Args args)
         {
-            if (value is JsonObject obj)
+            if (value.Type == JsonValueType.Object)
             {
+                var obj = value.AsObject;
+
                 foreach (var nestedField in field.Fields)
                 {
                     if (obj.TryGetValue(nestedField.Name, out var nestedValue))
                     {
-                        nestedField.Accept(this, new Args(nestedValue, args.Result, args.ResultLimit));
+                        nestedField.Accept(this, args with { Value = nestedValue });
                     }
                 }
             }
         }
 
-        private void ExtractFromComponent(IField field, IJsonValue value, Args args)
+        private void ExtractFromComponent(JsonValue value, Args args)
         {
-            if (value is JsonObject obj && obj.TryGetValue<JsonString>(Component.Discriminator, out var type) && field.TryGetResolvedSchema(type.Value, out var schema))
+            if (value.Type == JsonValueType.Object)
             {
-                foreach (var componentField in schema.Fields)
+                var obj = value.AsObject;
+
+                if (obj.TryGetValue(Component.Discriminator, out var type) && type.Type == JsonValueType.String)
                 {
-                    if (obj.TryGetValue(componentField.Name, out var componentValue))
+                    var id = DomainId.Create(type.AsString);
+
+                    if (args.Components.TryGetValue(id, out var schema))
                     {
-                        componentField.Accept(this, new Args(componentValue, args.Result, args.ResultLimit));
+                        foreach (var componentField in schema.Fields)
+                        {
+                            if (obj.TryGetValue(componentField.Name, out var componentValue))
+                            {
+                                componentField.Accept(this, args with { Value = componentValue });
+                            }
+                        }
                     }
                 }
             }
@@ -163,17 +162,17 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             var added = 0;
 
-            if (args.Value is JsonArray array)
+            if (args.Value.Type == JsonValueType.Array)
             {
-                foreach (var id in array)
+                foreach (var id in args.Value.AsArray)
                 {
-                    if (id is JsonString s)
+                    if (id.Type == JsonValueType.String)
                     {
-                        args.Result.Add(DomainId.Create(s.Value));
+                        args.Result.Add(DomainId.Create(id.AsString));
 
                         added++;
 
-                        if (added >= args.ResultLimit)
+                        if (added >= args.Take)
                         {
                             break;
                         }

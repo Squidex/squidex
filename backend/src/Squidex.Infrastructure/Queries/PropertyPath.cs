@@ -5,14 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed class PropertyPath : ImmutableList<string>
+    public sealed class PropertyPath : ReadonlyList<string>
     {
         private static readonly char[] Separators = { '.', '/' };
 
@@ -21,7 +18,7 @@ namespace Squidex.Infrastructure.Queries
         {
             if (items.Count == 0)
             {
-                throw new ArgumentException("Path cannot be empty.", nameof(items));
+                ThrowHelper.ArgumentException("Path cannot be empty.", nameof(items));
             }
         }
 
@@ -51,7 +48,8 @@ namespace Squidex.Infrastructure.Queries
 
             if (inner == null || inner.Count == 0)
             {
-                throw new ArgumentException("Path cannot be empty.", nameof(source));
+                ThrowHelper.ArgumentException("Path cannot be empty.", nameof(source));
+                return null!;
             }
             else
             {

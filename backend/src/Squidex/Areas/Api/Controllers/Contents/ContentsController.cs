@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Core.Contents;
@@ -23,17 +19,17 @@ using Squidex.Web.GraphQL;
 
 namespace Squidex.Areas.Api.Controllers.Contents
 {
-    [SchemaMustBePublishedAttribute]
+    [SchemaMustBePublished]
     public sealed class ContentsController : ApiController
     {
         private readonly IContentQueryService contentQuery;
         private readonly IContentWorkflow contentWorkflow;
-        private readonly GraphQLMiddleware graphQLMiddleware;
+        private readonly GraphQLRunner graphQLMiddleware;
 
         public ContentsController(ICommandBus commandBus,
             IContentQueryService contentQuery,
             IContentWorkflow contentWorkflow,
-            GraphQLMiddleware graphQLMiddleware)
+            GraphQLRunner graphQLMiddleware)
             : base(commandBus)
         {
             this.contentQuery = contentQuery;
@@ -68,7 +64,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Queries contents.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="ids">The optional ids of the content to fetch.</param>
+        /// <param name="query">The required query object.</param>
         /// <returns>
         /// 200 => Contents returned.
         /// 404 => App not found.
@@ -81,9 +77,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids)
+        public async Task<IActionResult> GetAllContents(string app, AllContentsByGetDto query)
         {
-            var contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(ids), HttpContext.RequestAborted);
+            var contents = await contentQuery.QueryAsync(Context, query?.ToQuery() ?? Q.Empty, HttpContext.RequestAborted);
 
             var response = Deferred.AsyncResponse(() =>
             {
@@ -110,9 +106,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAllContentsPost(string app, [FromBody] ContentsIdsQueryDto query)
+        public async Task<IActionResult> GetAllContentsPost(string app, [FromBody] AllContentsByPostDto query)
         {
-            var contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(query.Ids), HttpContext.RequestAborted);
+            var contents = await contentQuery.QueryAsync(Context, query?.ToQuery() ?? Q.Empty, HttpContext.RequestAborted);
 
             var response = Deferred.AsyncResponse(() =>
             {
@@ -210,7 +206,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 return NotFound();
             }
 
-            var response = ContentDto.FromContent(content, Resources);
+            var response = Deferred.Response(() =>
+            {
+                return ContentDto.FromDomain(content, Resources);
+            });
 
             return Ok(response);
         }
@@ -331,7 +330,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 return NotFound();
             }
 
-            var response = ContentDto.FromContent(content, Resources);
+            var response = ContentDto.FromDomain(content, Resources);
 
             return Ok(response.Data);
         }
@@ -391,7 +390,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<BulkUpdateResult>();
-            var response = result.Select(x => BulkResultDto.FromBulkResult(x, HttpContext)).ToArray();
+            var response = result.Select(x => BulkResultDto.FromDomain(x, HttpContext)).ToArray();
 
             return Ok(response);
         }
@@ -422,7 +421,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<BulkUpdateResult>();
-            var response = result.Select(x => BulkResultDto.FromBulkResult(x, HttpContext)).ToArray();
+            var response = result.Select(x => BulkResultDto.FromDomain(x, HttpContext)).ToArray();
 
             return Ok(response);
         }
@@ -544,6 +543,34 @@ namespace Squidex.Areas.Api.Controllers.Contents
         }
 
         /// <summary>
+        /// Cancel status change of a content item.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="schema">The name of the schema.</param>
+        /// <param name="id">The id of the content item to cancel.</param>
+        /// <returns>
+        /// 200 => Content status change cancelled.
+        /// 400 => Content request not valid.
+        /// 404 => Content, schema or app not found.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+        /// </remarks>
+        [HttpDelete]
+        [Route("content/{app}/{schema}/{id}/status/")]
+        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsChangeStatusOwn)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> DeleteContentStatus(string app, string schema, DomainId id)
+        {
+            var command = new CancelContentSchedule { ContentId = id };
+
+            var response = await InvokeCommandAsync(command);
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Create a new draft version.
         /// </summary>
         /// <param name="app">The name of the app.</param>
@@ -586,7 +613,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpDelete]
         [Route("content/{app}/{schema}/{id}/draft/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppContentsDeleteOwn)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsVersionDeleteOwn)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteVersion(string app, string schema, DomainId id)
         {
@@ -630,7 +657,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<IEnrichedContentEntity>();
-            var response = ContentDto.FromContent(result, Resources);
+            var response = ContentDto.FromDomain(result, Resources);
 
             return response;
         }

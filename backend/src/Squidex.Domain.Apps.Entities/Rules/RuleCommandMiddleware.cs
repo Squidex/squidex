@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
@@ -32,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             if (payload is IRuleEntity rule && payload is not IEnrichedRuleEntity)
             {
-                payload = await ruleEnricher.EnrichAsync(rule, contextProvider.Context);
+                payload = await ruleEnricher.EnrichAsync(rule, contextProvider.Context, default);
             }
 
             return payload;

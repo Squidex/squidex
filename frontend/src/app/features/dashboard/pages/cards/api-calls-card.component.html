@@ -1,0 +1,14 @@
+<div class="card card-lg">
+    <div class="card-header">
+        {{ 'dashboard.apiCallsCard' | sqxTranslate }}
+
+        <div class="float-end">
+            <a class="force" (click)="downloadLog()">
+                <small>{{ 'dashboard.downloadLog' | sqxTranslate }}</small>
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <chart type="bar" [data]="chartData" [options]="chartOptions"></chart>
+    </div>
+</div>

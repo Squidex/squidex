@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,12 +25,13 @@ namespace Squidex.Areas.IdentityServer.Controllers.UserInfo
         }
 
         [Authorize(AuthenticationSchemes = OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)]
-        [HttpGet("connect/userinfo")]
-        [HttpPost("connect/userinfo")]
+        [HttpGet]
+        [HttpPost]
+        [Route("connect/userinfo")]
         [Produces("application/json")]
         public async Task<IActionResult> UserInfo()
         {
-            var user = await userService.GetAsync(User);
+            var user = await userService.GetAsync(User, HttpContext.RequestAborted);
 
             if (user == null)
             {

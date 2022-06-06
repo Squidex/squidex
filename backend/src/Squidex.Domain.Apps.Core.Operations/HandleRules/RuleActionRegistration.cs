@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
@@ -16,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         internal RuleActionRegistration(Type actionType)
         {
-            Guard.NotNull(actionType, nameof(actionType));
+            Guard.NotNull(actionType);
 
             ActionType = actionType;
         }

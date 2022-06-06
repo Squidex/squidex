@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities;
@@ -25,7 +22,7 @@ namespace Squidex.Web.Pipeline
 
         public SchemaResolver(IAppProvider appProvider)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(appProvider);
 
             this.appProvider = appProvider;
         }
@@ -36,10 +33,16 @@ namespace Squidex.Web.Pipeline
 
             if (appId != default)
             {
-                var schemaIdOrName = context.RouteData.Values["schema"]?.ToString();
-
-                if (!string.IsNullOrWhiteSpace(schemaIdOrName))
+                if (context.RouteData.Values.TryGetValue("schema", out var schemaValue))
                 {
+                    var schemaIdOrName = schemaValue?.ToString();
+
+                    if (string.IsNullOrWhiteSpace(schemaIdOrName))
+                    {
+                        context.Result = new NotFoundResult();
+                        return;
+                    }
+
                     var schema = await GetSchemaAsync(appId, schemaIdOrName, context.HttpContext.User);
 
                     if (schema == null)

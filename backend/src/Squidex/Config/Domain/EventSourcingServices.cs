@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using EventStore.Client;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.States;
@@ -36,6 +35,19 @@ namespace Squidex.Config.Domain
                             return new MongoEventStore(mongDatabase, c.GetRequiredService<IEventNotifier>());
                         })
                         .As<IEventStore>();
+                },
+                ["GetEventStore"] = () =>
+                {
+                    var configuration = config.GetRequiredValue("eventStore:getEventStore:configuration");
+
+                    services.AddSingletonAs(_ => EventStoreClientSettings.Create(configuration))
+                        .AsSelf();
+
+                    services.AddSingletonAs<GetEventStore>()
+                        .As<IEventStore>();
+
+                    services.AddHealthChecks()
+                        .AddCheck<GetEventStoreHealthCheck>("EventStore", tags: new[] { "node" });
                 }
             });
 

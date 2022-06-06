@@ -5,15 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Jint;
 using Jint.Native;
+using Squidex.Domain.Apps.Core.Properties;
 using Squidex.Infrastructure;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 {
-    public sealed class StringJintExtension : IJintExtension
+    public sealed class StringJintExtension : IJintExtension, IScriptDescriptor
     {
         private delegate JsValue StringSlugifyDelegate(string text, bool single = false);
 
@@ -22,6 +22,18 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             try
             {
                 return text.ToSha256();
+            }
+            catch
+            {
+                return JsValue.Undefined;
+            }
+        };
+
+        private readonly Func<string, JsValue> sha512 = (text) =>
+        {
+            try
+            {
+                return text.ToSha512();
             }
             catch
             {
@@ -81,7 +93,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
         {
             try
             {
-                return TextHelpers.Html2Text(text);
+                return text.Html2Text();
             }
             catch
             {
@@ -93,7 +105,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
         {
             try
             {
-                return TextHelpers.Markdown2Text(text);
+                return text.Markdown2Text();
             }
             catch
             {
@@ -101,21 +113,54 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             }
         };
 
+        private readonly Func<string> guid = () =>
+        {
+            return Guid.NewGuid().ToString();
+        };
+
         public Func<string, JsValue> Html2Text => html2Text;
 
         public void Extend(Engine engine)
         {
-            engine.SetValue("slugify", slugify);
-
-            engine.SetValue("sha256", sha256);
+            engine.SetValue("guid", guid);
+            engine.SetValue("html2Text", Html2Text);
+            engine.SetValue("markdown2Text", markdown2Text);
             engine.SetValue("md5", md5);
-
+            engine.SetValue("sha256", sha256);
+            engine.SetValue("sha512", sha512);
+            engine.SetValue("slugify", slugify);
             engine.SetValue("toCamelCase", toCamelCase);
             engine.SetValue("toPascalCase", toPascalCase);
+        }
 
-            engine.SetValue("html2Text", Html2Text);
+        public void Describe(AddDescription describe, ScriptScope scope)
+        {
+            describe(JsonType.Function, "html2Text(text)",
+                Resources.ScriptingHtml2Text);
 
-            engine.SetValue("markdown2Text", markdown2Text);
+            describe(JsonType.Function, "markdown2Text(text)",
+                Resources.ScriptingMarkdown2Text);
+
+            describe(JsonType.Function, "toCamelCase(text)",
+                Resources.ScriptingToCamelCase);
+
+            describe(JsonType.Function, "toPascalCase(text)",
+                Resources.ScriptingToPascalCase);
+
+            describe(JsonType.Function, "md5(text)",
+                Resources.ScriptingMD5);
+
+            describe(JsonType.Function, "sha256(text)",
+                Resources.ScriptingSHA256);
+
+            describe(JsonType.Function, "sha512(text)",
+                Resources.ScriptingSHA512);
+
+            describe(JsonType.Function, "slugify(text)",
+                Resources.ScriptingSlugify);
+
+            describe(JsonType.Function, "guid()",
+                Resources.ScriptingGuid);
         }
     }
 }

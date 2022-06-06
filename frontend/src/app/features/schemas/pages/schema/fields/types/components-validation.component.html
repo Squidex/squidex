@@ -1,0 +1,38 @@
+<div [formGroup]="fieldForm">
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.references.count' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <div class="row g-0">
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="minItems" placeholder="{{ 'schemas.fieldTypes.references.countMin' | sqxTranslate }}">
+                </div>
+                <div class="col-auto">
+                    <label class="col-form-label minmax">-</label>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="maxItems" placeholder="{{ 'schemas.fieldTypes.references.countMax' | sqxTranslate }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldSchemaIds">{{ 'common.schemas' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-tag-editor placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" formControlName="schemaIds" 
+                [converter]="(schemasSource.converter | async)!" [suggestions]="(schemasSource.converter | async)?.suggestions">
+            </sqx-tag-editor>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.array.uniqueFields' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-tag-editor formControlName="uniqueFields"></sqx-tag-editor>
+        </div>
+    </div>
+</div>
+

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Web;
 
@@ -19,11 +17,11 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers.Models
         /// </summary>
         public EventConsumerDto[] Items { get; set; }
 
-        public static EventConsumersDto FromResults(IEnumerable<EventConsumerInfo> items, Resources resources)
+        public static EventConsumersDto FromDomain(IEnumerable<EventConsumerInfo> items, Resources resources)
         {
             var result = new EventConsumersDto
             {
-                Items = items.Select(x => EventConsumerDto.FromEventConsumerInfo(x, resources)).ToArray()
+                Items = items.Select(x => EventConsumerDto.FromDomain(x, resources)).ToArray()
             };
 
             return result.CreateLinks(resources);

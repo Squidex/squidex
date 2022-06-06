@@ -5,39 +5,29 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public sealed class ContentEnricher : IContentEnricher
     {
         private readonly IEnumerable<IContentEnricherStep> steps;
-        private readonly Lazy<IContentQueryService> contentQuery;
+        private readonly IAppProvider appProvider;
 
-        private IContentQueryService ContentQuery
-        {
-            get => contentQuery.Value;
-        }
-
-        public ContentEnricher(IEnumerable<IContentEnricherStep> steps, Lazy<IContentQueryService> contentQuery)
+        public ContentEnricher(IEnumerable<IContentEnricherStep> steps, IAppProvider appProvider)
         {
             this.steps = steps;
 
-            this.contentQuery = contentQuery;
+            this.appProvider = appProvider;
         }
 
         public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, bool cloneData, Context context,
             CancellationToken ct)
         {
-            Guard.NotNull(content, nameof(content));
+            Guard.NotNull(content);
 
             var enriched = await EnrichInternalAsync(Enumerable.Repeat(content, 1), cloneData, context, ct);
 
@@ -47,8 +37,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context,
             CancellationToken ct)
         {
-            Guard.NotNull(contents, nameof(contents));
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(contents);
+            Guard.NotNull(context);
 
             return EnrichInternalAsync(contents, false, context, ct);
         }
@@ -56,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichInternalAsync(IEnumerable<IContentEntity> contents, bool cloneData, Context context,
             CancellationToken ct)
         {
-            using (Profiler.TraceMethod<ContentEnricher>())
+            using (Telemetry.Activities.StartActivity("ContentEnricher/EnrichInternalAsync"))
             {
                 var results = new List<ContentEntity>();
 
@@ -84,18 +74,30 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                     if (context.App != null)
                     {
-                        var schemaCache = new Dictionary<DomainId, Task<ISchemaEntity>>();
+                        var schemaCache = new Dictionary<DomainId, Task<(ISchemaEntity, ResolvedComponents)>>();
 
-                        Task<ISchemaEntity> GetSchema(DomainId id)
+                        Task<(ISchemaEntity, ResolvedComponents)> GetSchema(DomainId id)
                         {
-                            return schemaCache.GetOrAdd(id, x => ContentQuery.GetSchemaOrThrowAsync(context, x.ToString()));
+                            return schemaCache.GetOrAdd(id, async x =>
+                            {
+                                var schema = await appProvider.GetSchemaAsync(context.App.Id, x, false, ct);
+
+                                if (schema == null)
+                                {
+                                    throw new DomainObjectNotFoundException(x.ToString());
+                                }
+
+                                var components = await appProvider.GetComponentsAsync(schema, ct);
+
+                                return (schema, components);
+                            });
                         }
 
                         foreach (var step in steps)
                         {
                             ct.ThrowIfCancellationRequested();
 
-                            using (Profiler.TraceMethod(step.ToString()!))
+                            using (Telemetry.Activities.StartActivity(step.ToString()!))
                             {
                                 await step.EnrichAsync(context, results, GetSchema, ct);
                             }

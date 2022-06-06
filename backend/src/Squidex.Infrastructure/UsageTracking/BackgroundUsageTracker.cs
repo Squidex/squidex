@@ -5,14 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Timers;
-using Squidex.Log;
 
 namespace Squidex.Infrastructure.UsageTracking
 {
@@ -21,17 +16,20 @@ namespace Squidex.Infrastructure.UsageTracking
         private const int Intervall = 60 * 1000;
         private const string FallbackCategory = "*";
         private readonly IUsageRepository usageRepository;
-        private readonly ISemanticLog log;
+        private readonly ILogger<BackgroundUsageTracker> log;
         private readonly CompletionTimer timer;
         private ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters> jobs = new ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters>();
 
-        public BackgroundUsageTracker(IUsageRepository usageRepository, ISemanticLog log)
+        public bool ForceWrite { get; set; }
+
+        public BackgroundUsageTracker(IUsageRepository usageRepository,
+            ILogger<BackgroundUsageTracker> log)
         {
             this.usageRepository = usageRepository;
 
             this.log = log;
 
-            timer = new CompletionTimer(Intervall, ct => TrackAsync(), Intervall);
+            timer = new CompletionTimer(Intervall, TrackAsync, Intervall);
         }
 
         protected override void DisposeObject(bool disposing)
@@ -49,7 +47,8 @@ namespace Squidex.Infrastructure.UsageTracking
             timer.SkipCurrentDelay();
         }
 
-        private async Task TrackAsync()
+        private async Task TrackAsync(
+            CancellationToken ct)
         {
             try
             {
@@ -62,6 +61,11 @@ namespace Squidex.Infrastructure.UsageTracking
 
                     foreach (var (key, value) in localUsages)
                     {
+                        if (updateIndex >= updates.Length)
+                        {
+                            break;
+                        }
+
                         updates[updateIndex].Key = key.Key;
                         updates[updateIndex].Category = key.Category;
                         updates[updateIndex].Counters = value;
@@ -70,38 +74,53 @@ namespace Squidex.Infrastructure.UsageTracking
                         updateIndex++;
                     }
 
-                    await usageRepository.TrackUsagesAsync(updates);
+                    if (ForceWrite)
+                    {
+                        ct = default;
+                    }
+
+                    await usageRepository.TrackUsagesAsync(updates, ct);
                 }
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "TrackUsage")
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to track usage in background.");
             }
         }
 
-        public Task TrackAsync(DateTime date, string key, string? category, Counters counters)
+        public Task DeleteAsync(string key,
+            CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
-            Guard.NotNull(counters, nameof(counters));
+            Guard.NotNull(key);
+
+            return usageRepository.DeleteAsync(key, ct);
+        }
+
+        public Task TrackAsync(DateTime date, string key, string? category, Counters counters,
+            CancellationToken ct = default)
+        {
+            Guard.NotNullOrEmpty(key);
+            Guard.NotNull(counters);
 
             ThrowIfDisposed();
 
             category = GetCategory(category);
 
+#pragma warning disable MA0105 // Use the lambda parameters instead of using a closure
             jobs.AddOrUpdate((key, category, date), counters, (k, p) => p.SumUp(counters));
+#pragma warning restore MA0105 // Use the lambda parameters instead of using a closure
 
             return Task.CompletedTask;
         }
 
-        public async Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
+        public async Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate,
+            CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
+            Guard.NotNullOrEmpty(key);
 
             ThrowIfDisposed();
 
-            var usages = await usageRepository.QueryAsync(key, fromDate, toDate);
+            var usages = await usageRepository.QueryAsync(key, fromDate, toDate, ct);
 
             var result = new Dictionary<string, List<(DateTime Date, Counters Counters)>>();
 
@@ -125,7 +144,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
                 for (var date = fromDate; date <= toDate; date = date.AddDays(1))
                 {
-                    var counters = value.FirstOrDefault(x => x.Date == date)?.Counters;
+                    var counters = value.Find(x => x.Date == date)?.Counters;
 
                     enriched.Add((date, counters ?? new Counters()));
                 }
@@ -136,21 +155,23 @@ namespace Squidex.Infrastructure.UsageTracking
             return result;
         }
 
-        public Task<Counters> GetForMonthAsync(string key, DateTime date, string? category)
+        public Task<Counters> GetForMonthAsync(string key, DateTime date, string? category,
+            CancellationToken ct = default)
         {
             var dateFrom = new DateTime(date.Year, date.Month, 1);
             var dateTo = dateFrom.AddMonths(1).AddDays(-1);
 
-            return GetAsync(key, dateFrom, dateTo, category);
+            return GetAsync(key, dateFrom, dateTo, category, ct);
         }
 
-        public async Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate, string? category)
+        public async Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate, string? category,
+            CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
+            Guard.NotNullOrEmpty(key);
 
             ThrowIfDisposed();
 
-            var queried = await usageRepository.QueryAsync(key, fromDate, toDate);
+            var queried = await usageRepository.QueryAsync(key, fromDate, toDate, ct);
 
             if (category != null)
             {

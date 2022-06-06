@@ -1,0 +1,80 @@
+<sqx-title message="i18n:assets.listPageTitle"></sqx-title>
+
+<sqx-layout layout="main" titleText="i18n:common.assets" titleIcon="assets">    
+    <ng-container menu>
+        <div class="row flex-nowrap flex-grow-1 gx-2">
+            <div class="col-auto offset-xl-2">
+                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:assets.refreshTooltip" shortcut="CTRL + B">
+                    <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+                </button>
+            </div>
+            <div class="col" style="width: 300px;">
+                <div class="row g-0 search">
+                    <div class="col-6">
+                        <sqx-tag-editor class="tags" [singleLine]="true" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
+                            [suggestions]="assetsState.tagsNames | async"
+                            [ngModel]="assetsState.selectedTagNames | async"
+                            (ngModelChange)="selectTags($event)"
+                            [undefinedWhenEmpty]="false">
+                        </sqx-tag-editor>
+                    </div>
+                    <div class="col-6">
+                        <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" fieldExample="fileSize"
+                            [enableShortcut]="true"
+                            [queries]="queries"
+                            [queriesTypes]="'common.assets' | sqxTranslate"
+                            [query]="assetsState.query | async"
+                            (queryChange)="search($event)">
+                        </sqx-search-form>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="col-auto">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="isListView" [disabled]="isListView" (click)="changeView(true)">
+                        <i class="icon-list"></i>
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="!isListView" [disabled]="!isListView" (click)="changeView(false)">
+                        <i class="icon-grid"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-success" (click)="addAssetFolderDialog.show()" title="i18n:assets.createFolderTooltip" shortcut="CTRL + U">
+                    <i class="icon-create_new_folder"></i>
+                </button>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container>
+        <sqx-list-view [isLoading]="assetsState.isLoading | async">
+            <ng-container header>
+                <sqx-asset-path [path]="assetsState.path | async" (navigate)="assetsState.navigate($event.id)"></sqx-asset-path>
+            </ng-container>
+
+            <div>
+                <sqx-assets-list [assetsState]="assetsState" [showPager]="false" [isListView]="isListView"></sqx-assets-list>
+            </div>
+
+            <ng-container footer>
+                <sqx-pager (loadTotal)="reloadTotal()" [paging]="assetsState.paging | async" (pagingChange)="assetsState.page($event)"></sqx-pager>
+            </ng-container>
+        </sqx-list-view>
+    </ng-container>
+
+    <ng-container sidebarMenu>   
+        <div class="panel-nav">
+            <a class="panel-link" routerLink="filters" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.filters" titlePosition="left-center">
+                <i class="icon-filter"></i>
+            </a>    
+        </div> 
+    </ng-container>
+</sqx-layout>
+
+<router-outlet></router-outlet>
+
+<ng-container *sqxModal="addAssetFolderDialog">
+    <sqx-asset-folder-dialog (complete)="addAssetFolderDialog.hide()"></sqx-asset-folder-dialog>
+</ng-container>

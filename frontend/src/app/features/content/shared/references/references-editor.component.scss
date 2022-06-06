@@ -1,0 +1,45 @@
+@import 'mixins';
+@import 'vars';
+
+.disabled {
+    pointer-events: none;
+}
+
+.invalid {
+    color: darken($color-border, 30%);
+    font-size: 1.2rem;
+    font-weight: normal;
+    padding: 2rem;
+    text-align: center;
+}
+
+.references-container {
+    background: $color-background;
+    max-height: 20rem;
+    min-height: 6rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.drop-area {
+    border: 2px dashed darken($color-border, 10%);
+    border-radius: $border-radius;
+    color: darken($color-border, 30%);
+    cursor: pointer;
+    padding: 1rem;
+    text-align: center;
+    text-decoration: none;
+    transition: border-color .4s ease;
+
+    a {
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.table {
+    margin-bottom: -.25rem;
+    margin-top: 1rem;
+}

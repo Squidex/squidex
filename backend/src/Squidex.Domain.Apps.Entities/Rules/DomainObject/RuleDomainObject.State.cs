@@ -23,6 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
             public Rule RuleDef { get; set; }
 
+            public bool IsDeleted { get; set; }
+
             [IgnoreDataMember]
             public DomainId UniqueId
             {
@@ -68,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                             {
                                 RuleDef = RuleDef.Enable();
                             }
-                            else
+                            else if (e.IsEnabled == false)
                             {
                                 RuleDef = RuleDef.Disable();
                             }

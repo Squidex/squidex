@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Globalization;
 using FluentAssertions;
 using Xunit;
 
@@ -50,7 +46,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         protected EventStoreTests()
         {
+#pragma warning disable MA0056 // Do not call overridable members in constructor
             sut = new Lazy<T>(CreateStore);
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
         public abstract T CreateStore();
@@ -318,7 +316,7 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 var expected = allExpected.TakeLast(take).ToArray();
 
-                var readEvents = await Sut.QueryLatestAsync(streamName, take);
+                var readEvents = await Sut.QueryReverseAsync(streamName, take);
 
                 ShouldBeEquivalentTo(readEvents, expected);
             }
@@ -360,6 +358,39 @@ namespace Squidex.Infrastructure.EventSourcing
         }
 
         [Fact]
+        public async Task Should_delete_by_filter()
+        {
+            var streamName = $"test-{Guid.NewGuid()}";
+
+            var events = new[]
+            {
+                CreateEventData(1),
+                CreateEventData(2)
+            };
+
+            await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
+
+            IReadOnlyList<StoredEvent>? readEvents = null;
+
+            for (var i = 0; i < 5; i++)
+            {
+                await Sut.DeleteAsync($"^{streamName[..10]}");
+
+                readEvents = await QueryAsync(streamName);
+
+                if (readEvents.Count == 0)
+                {
+                    break;
+                }
+
+                // Get event store needs a little bit of time for the projections.
+                await Task.Delay(1000);
+            }
+
+            Assert.Empty(readEvents);
+        }
+
+        [Fact]
         public async Task Should_delete_stream()
         {
             var streamName = $"test-{Guid.NewGuid()}";
@@ -372,9 +403,22 @@ namespace Squidex.Infrastructure.EventSourcing
 
             await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
 
-            await Sut.DeleteStreamAsync(streamName);
+            IReadOnlyList<StoredEvent>? readEvents = null;
 
-            var readEvents = await QueryAsync(streamName);
+            for (var i = 0; i < 5; i++)
+            {
+                await Sut.DeleteStreamAsync(streamName);
+
+                readEvents = await QueryAsync(streamName);
+
+                if (readEvents.Count == 0)
+                {
+                    break;
+                }
+
+                // Get event store needs a little bit of time for the projections.
+                await Task.Delay(1000);
+            }
 
             Assert.Empty(readEvents);
         }
@@ -386,7 +430,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static EventData CreateEventData(int i)
         {
-            return new EventData($"Type{i}", new EnvelopeHeaders(), i.ToString());
+            return new EventData($"Type{i}", new EnvelopeHeaders(), i.ToString(CultureInfo.InvariantCulture));
         }
 
         private async Task<IReadOnlyList<StoredEvent>?> QueryAllAsync(string? streamFilter = null, string? position = null)
@@ -401,7 +445,8 @@ namespace Squidex.Infrastructure.EventSourcing
             return readEvents;
         }
 
-        private async Task<IReadOnlyList<StoredEvent>?> QueryWithSubscriptionAsync(string streamFilter, Func<Task>? subscriptionRunning = null, bool fromBeginning = false)
+        private async Task<IReadOnlyList<StoredEvent>?> QueryWithSubscriptionAsync(string streamFilter,
+            Func<Task>? subscriptionRunning = null, bool fromBeginning = false)
         {
             var subscriber = new EventSubscriber();
 

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -34,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
 
         public GuardRuleTests()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, default))
                 .Returns(Mocks.Schema(appId, schemaId));
         }
 
@@ -61,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             {
                 Trigger = new ContentChangedTriggerV2
                 {
-                    Schemas = ImmutableList.Empty<ContentChangedTriggerSchemaV2>()
+                    Schemas = ReadonlyList.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = null!,
             });
@@ -77,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             {
                 Trigger = new ContentChangedTriggerV2
                 {
-                    Schemas = ImmutableList.Empty<ContentChangedTriggerSchemaV2>()
+                    Schemas = ReadonlyList.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = new TestAction
                 {
@@ -111,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             {
                 Trigger = new ContentChangedTriggerV2
                 {
-                    Schemas = ImmutableList.Empty<ContentChangedTriggerSchemaV2>()
+                    Schemas = ReadonlyList.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = new TestAction
                 {

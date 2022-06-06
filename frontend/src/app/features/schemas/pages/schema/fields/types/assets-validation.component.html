@@ -1,0 +1,168 @@
+<div [formGroup]="fieldForm">
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.assets.count' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <div class="row g-0">
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="minItems" placeholder="{{ 'schemas.fieldTypes.assets.countMin' | sqxTranslate }}">  
+                </div>
+                <div class="col-auto">
+                    <label class="col-form-label minmax">-</label>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="maxItems" placeholder="{{ 'schemas.fieldTypes.assets.countMax' | sqxTranslate }}">
+                </div>
+                <div class="col col-label">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.assets.size' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <div class="row g-0">
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="minSize" placeholder="{{ 'schemas.fieldTypes.assets.sizeMin' | sqxTranslate }}">
+                </div>
+                <div class="col-auto">
+                    <label class="col-form-label minmax">-</label>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="maxSize" placeholder="{{ 'schemas.fieldTypes.assets.sizeMax' | sqxTranslate }}">
+                </div>
+                <div class="col col-label">
+                    <label class="col-form-label">{{ 'common.bytes' | sqxTranslate }}</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.assets.expectedType' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <div class="row g-0">
+                <div class="col">
+                    <select class="form-select" formControlName="expectedType">
+                        <option></option>
+                        <option ngValue="Image">Image</option>
+                        <option ngValue="Audio">Audio</option>
+                        <option ngValue="Video">Video</option>
+                        <option ngValue="Unknown">Unknown</option>
+                    </select>
+                </div>
+                <div class="col col-label">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'common.width' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <div class="row g-0">
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="minWidth">
+                </div>
+                <div class="col-auto">
+                    <label class="col-form-label minmax">-</label>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="maxWidth">
+                </div>
+                <div class="col col-label">
+                    <label class="col-form-label">px</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'common.height' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <div class="row g-0">
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="minHeight">
+                </div>
+                <div class="col-auto">
+                    <label class="col-form-label minmax">-</label>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="maxHeight">
+                </div>
+                <div class="col col-label">
+                    <label class="col-form-label">px</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'common.aspectRatio' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <div class="row g-0">
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="aspectWidth">
+                </div>
+                <div class="col-auto">
+                    <label class="col-form-label minmax">:</label>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="aspectHeight">
+                </div>
+                <div class="col col-label">
+                    <label class="col-form-label">px</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="form-group row">
+        <div class="col-9 offset-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldAllowDuplicates" formControlName="allowDuplicates">
+                <label class="form-check-label" for="{{field.fieldId}}_fieldAllowDuplicates">
+                    {{ 'schemas.fieldTypes.assets.allowDuplicates' | sqxTranslate }}
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.assets.fileExtensions' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-tag-editor formControlName="allowedExtensions"></sqx-tag-editor>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'schemas.field.defaultValue' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-tag-editor formControlName="defaultValue"></sqx-tag-editor>
+        </div>
+    </div>
+
+    <div class="form-group row" *ngIf="isLocalizable">
+        <label class="col-3 col-form-label">{{ 'schemas.field.defaultValues' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-localized-input type="tags" [languages]="languages" formControlName="defaultValues"></sqx-localized-input>
+
+            <sqx-form-hint>
+                {{ 'schemas.field.defaultValuesHint' | sqxTranslate }}
+            </sqx-form-hint>
+        </div>
+    </div>
+</div>

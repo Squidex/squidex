@@ -1,0 +1,28 @@
+<div [formGroup]="triggerForm.form" class="form-horizontal">
+    <div class="form-group">
+        <label for="condition">{{ 'common.condition' | sqxTranslate }}</label>
+
+        <sqx-control-errors for="condition"></sqx-control-errors>
+
+        <textarea class="form-control code" id="condition" formControlName="condition" placeholder="{{ 'i18n:rules.conditionHint' | sqxTranslate }}"></textarea>
+    </div>
+
+    <div class="help">
+        <h4>{{ 'common.conditions' | sqxTranslate }}</h4>
+    
+        <p>{{ 'rules.conditionHint2' | sqxTranslate }}:</p>
+    
+        <ul class="help-examples">
+            <li class="help-example">
+                {{ 'rules.conditions.commentUser' | sqxTranslate }}:<br>
+
+                <sqx-code>event.mentionedUser.email === 'mail2stehle@gmail.com'</sqx-code>
+            </li>
+            <li class="help-example">
+                {{ 'rules.conditions.commentKeyword' | sqxTranslate }}:<br>
+
+                <sqx-code>event.text.indexOf('urgent') >= 0</sqx-code>
+            </li>
+        </ul>
+    </div>
+</div>

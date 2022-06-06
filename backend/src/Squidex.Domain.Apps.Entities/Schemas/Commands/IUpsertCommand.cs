@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Collections;
@@ -31,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         FieldRuleCommand[]? FieldRules { get; set; }
 
-        ImmutableDictionary<string, string>? PreviewUrls { get; set; }
+        ReadonlyDictionary<string, string>? PreviewUrls { get; set; }
 
         Schema ToSchema(string name, SchemaType type)
         {

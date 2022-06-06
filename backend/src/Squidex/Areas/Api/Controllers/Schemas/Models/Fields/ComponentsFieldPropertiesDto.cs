@@ -27,7 +27,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The id of the embedded schemas.
         /// </summary>
-        public ImmutableList<DomainId>? SchemaIds { get; set; }
+        public ReadonlyList<DomainId>? SchemaIds { get; set; }
+
+        /// <summary>
+        /// The fields that must be unique.
+        /// </summary>
+        public ReadonlyList<string>? UniqueFields { get; set; }
 
         public override FieldProperties ToProperties()
         {

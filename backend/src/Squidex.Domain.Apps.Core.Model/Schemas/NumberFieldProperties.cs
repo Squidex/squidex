@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed record NumberFieldProperties : FieldProperties
     {
-        public ImmutableList<double>? AllowedValues { get; init; }
+        public ReadonlyList<double>? AllowedValues { get; init; }
 
         public LocalizedValue<double?> DefaultValues { get; init; }
 

@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
     {
         public static readonly SchemaProperties Empty = new SchemaProperties();
 
-        public ImmutableList<string>? Tags { get; init; }
+        public ReadonlyList<string>? Tags { get; init; }
 
         public string? ContentsSidebarUrl { get; init; }
 

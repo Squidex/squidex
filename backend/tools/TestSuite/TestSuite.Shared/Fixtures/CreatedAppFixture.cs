@@ -5,40 +5,65 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
 
 namespace TestSuite.Fixtures
 {
     public class CreatedAppFixture : ClientFixture
     {
-        private static bool isCreated;
-
-        public CreatedAppFixture()
+        public override async Task InitializeAsync()
         {
-            if (!isCreated)
+            await base.InitializeAsync();
+
+            await Factories.CreateAsync(AppName, async () =>
             {
-                Task.Run(async () =>
+                try
                 {
-                    try
+                    await Apps.PostAppAsync(new CreateAppDto
                     {
-                        await Apps.PostAppAsync(new CreateAppDto { Name = AppName });
-                    }
-                    catch (SquidexManagementException ex)
+                        Name = AppName
+                    });
+                }
+                catch (SquidexManagementException ex)
+                {
+                    if (ex.StatusCode != 400)
                     {
-                        if (ex.StatusCode != 400)
-                        {
-                            throw;
-                        }
+                        throw;
                     }
+                }
 
-                    var invite = new AssignContributorDto { ContributorId = "sebastian@squidex.io", Invite = true, Role = "Owner" };
+                try
+                {
+                    await Apps.PostLanguageAsync(AppName, new AddLanguageDto
+                    {
+                        Language = "de"
+                    });
+                }
+                catch (SquidexManagementException ex)
+                {
+                    if (ex.StatusCode != 400)
+                    {
+                        throw;
+                    }
+                }
 
-                    await Apps.PostContributorAsync(AppName, invite);
-                }).Wait();
+                try
+                {
+                    await Apps.PostLanguageAsync(AppName, new AddLanguageDto
+                    {
+                        Language = "custom"
+                    });
+                }
+                catch (SquidexManagementException ex)
+                {
+                    if (ex.StatusCode != 400)
+                    {
+                        throw;
+                    }
+                }
 
-                isCreated = true;
-            }
+                return true;
+            });
         }
     }
 }

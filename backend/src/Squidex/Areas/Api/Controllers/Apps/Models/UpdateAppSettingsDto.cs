@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Collections;
@@ -43,10 +42,10 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 Settings = new AppSettings
                 {
-                    Editors = Editors?.Select(x => x.ToEditor()).ToImmutableList()!,
+                    Editors = Editors?.Select(x => x.ToEditor()).ToReadonlyList()!,
                     HideScheduler = HideScheduler,
                     HideDateTimeModeButton = HideDateTimeModeButton,
-                    Patterns = Patterns?.Select(x => x.ToPattern()).ToImmutableList()!,
+                    Patterns = Patterns?.Select(x => x.ToPattern()).ToReadonlyList()!
                 }
             };
         }

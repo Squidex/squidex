@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using Xunit;
@@ -48,7 +45,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Check anonymous permission
-            var url = $"{_.ClientManager.Options.Url}/api/apps/{appName}/settings";
+            var url = $"{_.ClientManager.Options.Url}api/apps/{appName}/settings";
 
             using (var httpClient = new HttpClient())
             {
@@ -85,7 +82,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Create a content.
-            var url = $"{_.ClientManager.Options.Url}/api/content/{appName}/my-content";
+            var url = $"{_.ClientManager.Options.Url}api/content/{appName}/my-content";
 
             using (var httpClient = new HttpClient())
             {

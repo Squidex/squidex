@@ -27,5 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         ContentData Data { get; }
 
         ScheduleJob? ScheduleJob { get; }
+
+        bool IsDeleted { get; }
     }
 }

@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -16,10 +14,11 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Web
 {
-    [Area("Api")]
+    [Area("api")]
     [ApiController]
     [ApiExceptionFilter]
     [ApiModelValidation(false)]
+    [Route(Constants.PrefixApi)]
     public abstract class ApiController : Controller
     {
         private readonly Lazy<Resources> resources;
@@ -34,7 +33,8 @@ namespace Squidex.Web
 
                 if (app == null)
                 {
-                    throw new InvalidOperationException("Not in a app context.");
+                    ThrowHelper.InvalidOperationException("Not in a app context.");
+                    return default!;
                 }
 
                 return app;
@@ -49,7 +49,8 @@ namespace Squidex.Web
 
                 if (schema == null)
                 {
-                    throw new InvalidOperationException("Not in a schema context.");
+                    ThrowHelper.InvalidOperationException("Not in a schema context.");
+                    return default!;
                 }
 
                 return schema;
@@ -76,16 +77,6 @@ namespace Squidex.Web
             CommandBus = commandBus;
 
             resources = new Lazy<Resources>(() => new Resources(this));
-        }
-
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            var request = context.HttpContext.Request;
-
-            if (!request.PathBase.HasValue || request.PathBase.Value?.EndsWith("/api", StringComparison.OrdinalIgnoreCase) != true)
-            {
-                context.Result = new RedirectResult("/");
-            }
         }
     }
 }

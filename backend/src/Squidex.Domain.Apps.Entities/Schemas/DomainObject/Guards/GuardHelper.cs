@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
@@ -17,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         {
             if (!schema.FieldsById.TryGetValue(parentId, out var rootField) || rootField is not IArrayField arrayField)
             {
-                throw new DomainObjectNotFoundException(parentId.ToString());
+                throw new DomainObjectNotFoundException(parentId.ToString(CultureInfo.InvariantCulture));
             }
 
             if (!allowLocked)
@@ -36,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
 
                 if (!arrayField.FieldsById.TryGetValue(fieldId, out var nestedField))
                 {
-                    throw new DomainObjectNotFoundException(fieldId.ToString());
+                    throw new DomainObjectNotFoundException(fieldId.ToString(CultureInfo.InvariantCulture));
                 }
 
                 return nestedField;
@@ -44,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
 
             if (!schema.FieldsById.TryGetValue(fieldId, out var field))
             {
-                throw new DomainObjectNotFoundException(fieldId.ToString());
+                throw new DomainObjectNotFoundException(fieldId.ToString(CultureInfo.InvariantCulture));
             }
 
             if (!allowLocked)

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Migrations;
 using Migrations.Migrations;
 using Squidex.Infrastructure.Migrations;
@@ -44,9 +42,6 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<CreateAssetSlugs>()
                 .As<IMigration>();
 
-            services.AddTransientAs<PopulateGrainIndexes>()
-                .As<IMigration>();
-
             services.AddTransientAs<RebuildContents>()
                 .As<IMigration>();
 
@@ -57,6 +52,12 @@ namespace Squidex.Config.Domain
                 .As<IMigration>();
 
             services.AddTransientAs<RebuildApps>()
+                .As<IMigration>();
+
+            services.AddTransientAs<RebuildSchemas>()
+                .As<IMigration>();
+
+            services.AddTransientAs<RebuildRules>()
                 .As<IMigration>();
 
             services.AddTransientAs<RebuildAssets>()

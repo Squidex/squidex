@@ -5,15 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules
@@ -21,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
     public class RuleDequeuerGrainTests
     {
         private readonly IClock clock = A.Fake<IClock>();
-        private readonly ISemanticLog log = A.Dummy<ISemanticLog>();
+        private readonly ILogger<RuleDequeuerGrain> log = A.Dummy<ILogger<RuleDequeuerGrain>>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly IRuleService ruleService = A.Fake<IRuleService>();
         private readonly RuleDequeuerGrain sut;
@@ -51,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.QueryAsync();
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log).Where(x => x.Method.Name == "Log")
                 .MustHaveHappened();
         }
 
@@ -60,12 +58,12 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var @event = CreateEvent(1, "MyAction", "{}");
 
-            A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._))
+            A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._, default))
                 .Throws(new InvalidOperationException());
 
             await sut.HandleAsync(@event);
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log).Where(x => x.Method.Name == "Log")
                 .MustHaveHappened();
         }
 
@@ -77,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var event1 = CreateEvent(1, "MyAction", "{}", id);
             var event2 = CreateEvent(1, "MyAction", "{}", id);
 
-            A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._))
+            A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._, default))
                 .ReturnsLazily(async () =>
                 {
                     await Task.Delay(500);
@@ -89,17 +87,17 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 sut.HandleAsync(event1),
                 sut.HandleAsync(event2));
 
-            A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._))
+            A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._, default))
                 .MustHaveHappenedOnceExactly();
         }
 
         [Theory]
-        [InlineData(0, 0,   RuleResult.Success, RuleJobResult.Success)]
-        [InlineData(0, 5,   RuleResult.Timeout, RuleJobResult.Retry)]
-        [InlineData(1, 60,  RuleResult.Timeout, RuleJobResult.Retry)]
-        [InlineData(2, 360, RuleResult.Failed,  RuleJobResult.Retry)]
-        [InlineData(3, 720, RuleResult.Failed,  RuleJobResult.Retry)]
-        [InlineData(4, 0,   RuleResult.Failed,  RuleJobResult.Failed)]
+        [InlineData(0, 0, RuleResult.Success, RuleJobResult.Success)]
+        [InlineData(0, 5, RuleResult.Timeout, RuleJobResult.Retry)]
+        [InlineData(1, 60, RuleResult.Timeout, RuleJobResult.Retry)]
+        [InlineData(2, 360, RuleResult.Failed, RuleJobResult.Retry)]
+        [InlineData(3, 720, RuleResult.Failed, RuleJobResult.Retry)]
+        [InlineData(4, 0, RuleResult.Failed, RuleJobResult.Failed)]
         public async Task Should_set_next_attempt_based_on_num_calls(int calls, int minutes, RuleResult result, RuleJobResult jobResult)
         {
             var actionData = "{}";
@@ -110,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var requestElapsed = TimeSpan.FromMinutes(1);
             var requestDump = "Dump";
 
-            A.CallTo(() => ruleService.InvokeAsync(@event.Job.ActionName, @event.Job.ActionData))
+            A.CallTo(() => ruleService.InvokeAsync(@event.Job.ActionName, @event.Job.ActionData, default))
                 .Returns((Result.Create(requestDump, result), requestElapsed));
 
             var now = clock.GetCurrentInstant();
@@ -126,12 +124,12 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             if (result == RuleResult.Failed)
             {
-                A.CallTo(() => log.Log(SemanticLogLevel.Warning, A<Exception?>._, A<LogFormatter>._))
+                A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Warning)
                     .MustHaveHappened();
             }
             else
             {
-                A.CallTo(() => log.Log(SemanticLogLevel.Warning, A<Exception?>._, A<LogFormatter>._))
+                A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Warning)
                     .MustNotHaveHappened();
             }
 
@@ -142,7 +140,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
                         x.ExecutionResult == result &&
                         x.Finished == now &&
                         x.JobNext == nextCall &&
-                        x.JobResult == jobResult)))
+                        x.JobResult == jobResult),
+                    A<CancellationToken>._))
                 .MustHaveHappened();
         }
 

@@ -1,0 +1,195 @@
+@import 'mixins';
+@import 'vars';
+
+$focus-color: #b3d3ff;
+$focus-shadow: rgba(51, 137, 255, 25%);
+$inner-height: 1.75rem;
+
+/* stylelint-disable no-descending-specificity */
+
+:host {
+    text-align: left;
+}
+
+.form-container {
+    position: relative;
+}
+
+.form-check {
+    margin: 0;
+}
+
+.form-control {
+    cursor: text;
+    padding: .25rem;
+    padding-bottom: 0;
+    position: relative;
+    text-align: left;
+    text-decoration: none;
+    user-select: none;
+
+    &.suggested {
+        padding-right: 2rem;
+    }
+
+    &.disabled {
+        cursor: inherit;
+    }
+
+    &.disabled,
+    &:disabled {
+        background: $color-input-disabled;
+    }
+
+    &.focus {
+        border-color: $focus-color;
+        border-width: 1px;
+        box-shadow: 0 0 0 .2rem $focus-shadow;
+    }
+
+    &.singleline {
+        overflow-x: hidden;
+        overflow-y: hidden;
+        white-space: nowrap;
+    }
+
+    &.dashed {
+        border-style: dashed;
+        border-width: 1px;
+        box-shadow: none;
+    }
+
+    &.readonly {
+        pointer-events: none;
+
+        input {
+            display: none !important;
+        }
+
+        .item {
+            padding-right: .5rem;
+        }
+
+        .icon-close {
+            display: none !important;
+        }
+    }
+}
+
+div {
+    &.blank {
+        height: auto;
+    }
+}
+
+.multiline {
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: hidden;
+
+    .item {
+        @include truncate;
+        display: inline-block;
+    }
+}
+
+.blank {
+    @include placeholder-color($color-input-placeholder);
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+
+    &:focus,
+    &.focus {
+        outline: none;
+    }
+
+    &.disabled,
+    &:disabled,
+    &.readonly {
+        background: transparent;
+    }
+
+    &:hover {
+        background: transparent;
+    }
+
+    &.singleline {
+        .item {
+            margin-bottom: 0;
+        }
+
+        .blank {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.text-input {
+    height: $inner-height;
+    margin-bottom: .25rem;
+    margin-left: .25rem;
+    max-width: 100%;
+    min-width: 50px;
+    padding-left: .25rem;
+}
+
+.icon-close {
+    font-size: .6rem;
+}
+
+.item {
+    background: $color-input;
+    border: 0;
+    border-radius: 3px;
+    color: $color-text;
+    cursor: default;
+    display: inline-block;
+    height: $inner-height;
+    margin-bottom: .25rem;
+    margin-right: 2px;
+    padding: 1px .5rem;
+    padding-right: 1.5rem;
+    position: relative;
+    vertical-align: top;
+    white-space: nowrap;
+
+    .icon-close {
+        @include absolute(.6125rem, .5rem);
+    }
+
+    &.disabled {
+        pointer-events: none;
+
+        i {
+            opacity: .5;
+        }
+    }
+
+    &:hover {
+        background: darken($color-input, 10%);
+    }
+}
+
+.btn {
+    @include absolute(.25rem, 0, null, null);
+    border: 0;
+    cursor: pointer;
+    font-size: $font-small;
+    font-weight: normal;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.suggestions-dropdown {
+    @include force-width(450px);
+    max-height: none;
+    min-height: 4rem;
+    padding: 1rem;
+}
+
+sqx-loader {
+    margin-top: .25rem;
+}

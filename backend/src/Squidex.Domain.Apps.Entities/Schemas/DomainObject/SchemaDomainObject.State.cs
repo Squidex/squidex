@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -27,6 +25,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
             public Schema SchemaDef { get; set; }
 
             public long SchemaFieldsTotal { get; set; }
+
+            public bool IsDeleted { get; set; }
 
             [IgnoreDataMember]
             public DomainId UniqueId

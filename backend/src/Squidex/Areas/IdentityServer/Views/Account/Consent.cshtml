@@ -11,7 +11,7 @@
     }
 }
 
-<form asp-controller="Account" asp-action="Consent" asp-route-returnurl="@Model.ReturnUrl" method="post">
+<form asp-controller="Account" asp-action="Consent" asp-route-returnurl="@Model!.ReturnUrl" method="post">
     <h2>@T.Get("users.consent.headline")</h2>
         
     <label for="consentToAutomatedEmails">
@@ -41,7 +41,7 @@
                         <input type="checkbox" id="consentToCookies" name="consentToCookies" value="True" />
                     </div>
                     <div class="col">
-                        @Html.Raw(T.Get("users.consent.cookiesText", new { privacyUrl = Model.PrivacyUrl }))
+                        @Html.Raw(T.Get("users.consent.cookiesText", new { privacyUrl = Model!.PrivacyUrl }))
                     </div>
                 </div>
             </div>

@@ -5,20 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.Text;
 using Jint;
 using Jint.Native;
 using Jint.Native.Json;
 using Jint.Runtime;
-using Squidex.Infrastructure.Tasks;
+using Squidex.Domain.Apps.Core.Properties;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 {
-    public sealed class HttpJintExtension : IJintExtension
+    public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
     {
-        private delegate void GetJsonDelegate(string url, Action<JsValue> callback, JsValue? headers = null);
+        private delegate void HttpJson(string url, Action<JsValue> callback, JsValue? headers = null);
+        private delegate void HttpJsonWithBody(string url, JsValue post, Action<JsValue> callback, JsValue? headers = null);
         private readonly IHttpClientFactory httpClientFactory;
 
         public HttpJintExtension(IHttpClientFactory httpClientFactory)
@@ -26,67 +25,104 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             this.httpClientFactory = httpClientFactory;
         }
 
-        public void ExtendAsync(ExecutionContext context)
+        public void ExtendAsync(ScriptExecutionContext context)
         {
-            var action = new GetJsonDelegate((url, callback, headers) => GetJson(context, url, callback, headers));
-
-            context.Engine.SetValue("getJSON", action);
+            AddBodyMethod(context, HttpMethod.Patch, "patchJSON");
+            AddBodyMethod(context, HttpMethod.Post, "postJSON");
+            AddBodyMethod(context, HttpMethod.Put, "putJSON");
+            AddMethod(context, HttpMethod.Delete, "deleteJSON");
+            AddMethod(context, HttpMethod.Get, "getJSON");
         }
 
-        private void GetJson(ExecutionContext context, string url, Action<JsValue> callback, JsValue? headers)
+        public void Describe(AddDescription describe, ScriptScope scope)
         {
-            GetJsonAsync(context, url, callback, headers).Forget();
-        }
-
-        private async Task GetJsonAsync(ExecutionContext context, string url, Action<JsValue> callback, JsValue? headers)
-        {
-            if (callback == null)
+            if (!scope.HasFlag(ScriptScope.Async))
             {
-                context.Fail(new JavaScriptException("Callback cannot be null."));
                 return;
             }
 
-            if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
-            {
-                context.Fail(new JavaScriptException("URL is not valid."));
-                return;
-            }
+            describe(JsonType.Function, "getJSON(url, callback, headers?)",
+                Resources.ScriptingGetJSON);
 
-            context.MarkAsync();
+            describe(JsonType.Function, "postJSON(url, body, callback, headers?)",
+                Resources.ScriptingPostJSON);
 
-            try
+            describe(JsonType.Function, "putJSON(url, body, callback, headers?)",
+                Resources.ScriptingPutJson);
+
+            describe(JsonType.Function, "patchJSON(url, body, callback, headers?)",
+                Resources.ScriptingPatchJson);
+
+            describe(JsonType.Function, "deleteJSON(url, body, callback, headers?)",
+                Resources.ScriptingDeleteJson);
+        }
+
+        private void AddMethod(ScriptExecutionContext context, HttpMethod method, string name)
+        {
+            var action = new HttpJson((url, callback, headers) =>
             {
+                Request(context, method, url, null, callback, headers);
+            });
+
+            context.Engine.SetValue(name, action);
+        }
+
+        private void AddBodyMethod(ScriptExecutionContext context, HttpMethod method, string name)
+        {
+            var action = new HttpJsonWithBody((url, body, callback, headers) =>
+            {
+                Request(context, method, url, body, callback, headers);
+            });
+
+            context.Engine.SetValue(name, action);
+        }
+
+        private void Request(ScriptExecutionContext context, HttpMethod method, string url, JsValue? body, Action<JsValue> callback, JsValue? headers)
+        {
+            context.Schedule(async (scheduler, ct) =>
+            {
+                if (callback == null)
+                {
+                    throw new JavaScriptException("Callback cannot be null.");
+                }
+
+                if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+                {
+                    throw new JavaScriptException("URL is not valid.");
+                }
+
                 using (var httpClient = httpClientFactory.CreateClient())
                 {
-                    using (var request = CreateRequest(url, headers))
+                    using (var request = CreateRequest(context, method, uri, body, headers))
                     {
-                        using (var response = await httpClient.SendAsync(request, context.CancellationToken))
+                        using (var response = await httpClient.SendAsync(request, ct))
                         {
                             response.EnsureSuccessStatusCode();
 
-                            var responseObject = await ParseResponse(context, response);
+                            var responseObject = await ParseResponseasync(context, response, ct);
 
-                            context.Engine.ResetConstraints();
-
-                            callback(responseObject);
+                            scheduler.Run(callback, responseObject);
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                context.Fail(ex);
-            }
+            });
         }
 
-        private static HttpRequestMessage CreateRequest(string url, JsValue? headers)
+        private static HttpRequestMessage CreateRequest(ScriptExecutionContext context, HttpMethod method, Uri uri, JsValue? body, JsValue? headers)
         {
-            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
-            {
-                throw new ArgumentException("Url must be an absolute URL");
-            }
+            var request = new HttpRequestMessage(method, uri);
 
-            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            if (body != null)
+            {
+                var serializer = new JsonSerializer(context.Engine);
+
+                var json = serializer.Serialize(body, JsValue.Undefined, JsValue.Undefined)?.ToString();
+
+                if (json != null)
+                {
+                    request.Content = new StringContent(json, Encoding.UTF8, "text/json");
+                }
+            }
 
             if (headers != null && headers.Type == Types.Object)
             {
@@ -108,16 +144,17 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             return request;
         }
 
-        private static async Task<JsValue> ParseResponse(ExecutionContext context, HttpResponseMessage response)
+        private static async Task<JsValue> ParseResponseasync(ScriptExecutionContext context, HttpResponseMessage response,
+            CancellationToken ct)
         {
-            var responseString = await response.Content.ReadAsStringAsync();
+            var responseString = await response.Content.ReadAsStringAsync(ct);
 
-            context.CancellationToken.ThrowIfCancellationRequested();
+            ct.ThrowIfCancellationRequested();
 
             var jsonParser = new JsonParser(context.Engine);
             var jsonValue = jsonParser.Parse(responseString);
 
-            context.CancellationToken.ThrowIfCancellationRequested();
+            ct.ThrowIfCancellationRequested();
 
             return jsonValue;
         }

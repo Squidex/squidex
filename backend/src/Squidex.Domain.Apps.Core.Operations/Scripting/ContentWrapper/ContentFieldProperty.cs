@@ -1,10 +1,11 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Diagnostics;
 using Jint.Native;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -13,17 +14,18 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
     public sealed class ContentFieldProperty : CustomProperty
     {
         private readonly ContentFieldObject contentField;
-        private IJsonValue? contentValue;
+        private JsonValue contentValue;
         private JsValue? value;
         private bool isChanged;
 
+        [DebuggerHidden]
         protected override JsValue? CustomValue
         {
             get
             {
                 if (value == null)
                 {
-                    if (contentValue != null)
+                    if (contentValue != default)
                     {
                         value = JsonMapper.Map(contentValue, contentField.Engine);
                     }
@@ -33,11 +35,13 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             }
             set
             {
-                if (!Equals(this.value, value))
+                var newContentValue = JsonMapper.Map(value);
+
+                if (!Equals(contentValue, newContentValue))
                 {
                     this.value = value;
 
-                    contentValue = null;
+                    contentValue = newContentValue;
                     contentField.MarkChanged();
 
                     isChanged = true;
@@ -45,9 +49,9 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             }
         }
 
-        public IJsonValue ContentValue
+        public JsonValue ContentValue
         {
-            get => contentValue ??= JsonMapper.Map(value);
+            get => contentValue;
         }
 
         public bool IsChanged
@@ -55,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             get => isChanged;
         }
 
-        public ContentFieldProperty(ContentFieldObject contentField, IJsonValue? contentValue = null)
+        public ContentFieldProperty(ContentFieldObject contentField, JsonValue contentValue = default)
         {
             this.contentField = contentField;
             this.contentValue = contentValue;

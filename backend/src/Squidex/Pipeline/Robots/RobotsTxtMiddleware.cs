@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace Squidex.Pipeline.Robots
@@ -29,7 +27,7 @@ namespace Squidex.Pipeline.Robots
                 context.Response.ContentType = "text/plain";
                 context.Response.StatusCode = 200;
 
-                await context.Response.WriteAsync(text);
+                await context.Response.WriteAsync(text, context.RequestAborted);
             }
             else
             {

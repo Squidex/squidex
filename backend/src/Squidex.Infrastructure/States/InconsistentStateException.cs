@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Runtime.Serialization;
 
 namespace Squidex.Infrastructure.States
@@ -13,37 +12,35 @@ namespace Squidex.Infrastructure.States
     [Serializable]
     public class InconsistentStateException : Exception
     {
-        public long CurrentVersion { get; }
+        public long VersionCurrent { get; }
 
-        public long ExpectedVersion { get; }
+        public long VersionExpected { get; }
 
-        public InconsistentStateException(long currentVersion, long expectedVersion, Exception? inner = null)
-            : base(FormatMessage(currentVersion, expectedVersion), inner)
+        public InconsistentStateException(long current, long expected, Exception? inner = null)
+            : base(FormatMessage(current, expected), inner)
         {
-            CurrentVersion = currentVersion;
-
-            ExpectedVersion = expectedVersion;
+            VersionCurrent = current;
+            VersionExpected = expected;
         }
 
         protected InconsistentStateException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            CurrentVersion = info.GetInt64(nameof(CurrentVersion));
-
-            ExpectedVersion = info.GetInt64(nameof(ExpectedVersion));
+            VersionCurrent = info.GetInt64(nameof(VersionCurrent));
+            VersionExpected = info.GetInt64(nameof(VersionExpected));
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(nameof(CurrentVersion), CurrentVersion);
-            info.AddValue(nameof(ExpectedVersion), ExpectedVersion);
+            info.AddValue(nameof(VersionCurrent), VersionCurrent);
+            info.AddValue(nameof(VersionExpected), VersionExpected);
 
             base.GetObjectData(info, context);
         }
 
-        private static string FormatMessage(long currentVersion, long expectedVersion)
+        private static string FormatMessage(long current, long expected)
         {
-            return $"Requested version {expectedVersion}, but found {currentVersion}.";
+            return $"Requested version {expected}, but found {current}.";
         }
     }
 }

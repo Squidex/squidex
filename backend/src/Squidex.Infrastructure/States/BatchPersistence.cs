@@ -5,14 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    internal class BatchPersistence<T> : IPersistence<T>
+    internal sealed class BatchPersistence<T> : IPersistence<T>
     {
         private readonly DomainId ownerKey;
         private readonly BatchContext<T> context;

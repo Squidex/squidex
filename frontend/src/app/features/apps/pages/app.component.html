@@ -1,0 +1,43 @@
+<div class="card card-href card-app" [routerLink]="['/app', app.name]">
+    <div class="card-body">
+        <div class="row g-0">
+            <div class="col-auto card-left">
+                <sqx-avatar [image]="app.image" [identifier]="app.name"></sqx-avatar>
+            </div>
+            <div class="col card-right">
+                <h3 class="card-title">{{app.displayName}}</h3>
+
+                <div class="card-text card-links truncate">
+                    <a [routerLink]="['/app', app.name]" sqxStopClick>{{ 'common.edit' | sqxTranslate }}</a>
+
+                    <span class="deeplinks">
+                        &nbsp;|
+                        <a [routerLink]="['/app', app.name, 'content']" sqxStopClick>{{ 'common.content' | sqxTranslate }}</a> &middot;
+                        <a [routerLink]="['/app', app.name, 'assets']" sqxStopClick>{{ 'common.assets' | sqxTranslate }}</a> &middot;
+                        <a [routerLink]="['/app', app.name, 'settings']" sqxStopClick>{{ 'common.settings' | sqxTranslate }}</a>
+                    </span>
+                </div>
+
+                <div class="card-text" *ngIf="app.description">
+                    {{app.description}}
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-sm btn-text-secondary" (click)="dropdown.toggle()" sqxStopClick #buttonOptions>
+            <i class="icon-dots"></i>
+        </button>
+
+        <ng-container *sqxModal="dropdown;closeAlways:true">
+            <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
+                <a class="dropdown-item dropdown-item-delete"
+                    (sqxConfirmClick)="leave.emit(app)"
+                    confirmTitle="i18n:apps.leaveConfirmTitle"
+                    confirmText="i18n:apps.leaveConfirmText"
+                    confirmRememberKey="leaveApp">
+                    {{ 'apps.leave' | sqxTranslate }}
+                </a>
+            </sqx-dropdown-menu>
+        </ng-container>
+    </div>
+</div>

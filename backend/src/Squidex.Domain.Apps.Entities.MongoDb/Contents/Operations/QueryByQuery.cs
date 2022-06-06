@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
@@ -63,11 +59,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
             CancellationToken ct)
         {
-            Guard.NotNull(filterNode, nameof(filterNode));
+            Guard.NotNull(filterNode);
 
             try
             {
-                var schema = await appProvider.GetSchemaAsync(appId, schemaId);
+                var schema = await appProvider.GetSchemaAsync(appId, schemaId, ct: ct);
 
                 if (schema == null)
                 {
@@ -84,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             {
                 throw new DomainException(T.Get("common.resultTooLarge"));
             }
-            catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
+            catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
             {
                 throw new DomainException(T.Get("common.resultTooLarge"));
             }
@@ -93,8 +89,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q,
             CancellationToken ct)
         {
-            Guard.NotNull(app, nameof(app));
-            Guard.NotNull(q, nameof(q));
+            Guard.NotNull(app);
+            Guard.NotNull(q);
 
             try
             {
@@ -127,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             {
                 throw new DomainException(T.Get("common.resultTooLarge"));
             }
-            catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
+            catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
             {
                 throw new DomainException(T.Get("common.resultTooLarge"));
             }
@@ -136,9 +132,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q,
             CancellationToken ct)
         {
-            Guard.NotNull(app, nameof(app));
-            Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(q, nameof(q));
+            Guard.NotNull(app);
+            Guard.NotNull(schema);
+            Guard.NotNull(q);
 
             try
             {
@@ -175,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             {
                 throw new DomainException(T.Get("common.resultTooLarge"));
             }
-            catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
+            catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
             {
                 throw new DomainException(T.Get("common.resultTooLarge"));
             }
@@ -257,7 +253,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 Filter.Gt(x => x.LastModified, default),
                 Filter.Gt(x => x.Id, default),
                 Filter.Eq(x => x.IndexedAppId, appId),
-                Filter.In(x => x.IndexedSchemaId, schemaIds),
+                Filter.In(x => x.IndexedSchemaId, schemaIds)
             };
 
             var isDefault = false;

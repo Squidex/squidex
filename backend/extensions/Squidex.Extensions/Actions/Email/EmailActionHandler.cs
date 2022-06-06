@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using MimeKit;
 using MimeKit.Text;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Extensions.Actions.Email
 {
@@ -41,7 +41,8 @@ namespace Squidex.Extensions.Actions.Email
             return (description, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(EmailJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(EmailJob job,
+            CancellationToken ct = default)
         {
             using (var smtpClient = new SmtpClient())
             {

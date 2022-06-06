@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Squidex.Infrastructure.Commands
 {
     public sealed class SnapshotList<T> where T : class, IDomainState<T>, new()
@@ -39,7 +35,7 @@ namespace Squidex.Infrastructure.Commands
 
         public T Current
         {
-            get => items.Last()!;
+            get => items[^1]!;
         }
 
         public SnapshotList()
@@ -73,11 +69,11 @@ namespace Squidex.Infrastructure.Commands
             return (null, false);
         }
 
-        public bool Contains(long version)
+        public bool ContainsThisAndNewer(long version)
         {
             var index = GetIndex(version);
 
-            return items.ElementAtOrDefault(index) != null;
+            return items.Skip(index).All(x => x != null);
         }
 
         public void Add(T snapshot, long version, bool clean = false)

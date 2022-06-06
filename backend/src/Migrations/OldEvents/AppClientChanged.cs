@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
@@ -23,7 +22,10 @@ namespace Migrations.OldEvents
 
         public IEvent Migrate()
         {
-            var permission = IsReader ? AppClientPermission.Reader : AppClientPermission.Editor;
+            var permission =
+                IsReader ?
+                AppClientPermission.Reader :
+                AppClientPermission.Editor;
 
             return SimpleMapper.Map(this, new AppClientUpdated { Permission = permission });
         }

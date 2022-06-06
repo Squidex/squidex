@@ -1,0 +1,19 @@
+@import 'mixins';
+@import 'vars';
+
+:host ::ng-deep {
+    img {
+        @include box-shadow-outer(0, 4px, 20px, .2);
+        display: block;
+        margin: 10px auto;
+        max-width: 80%;
+    }
+
+    p {
+        margin-bottom: 1.5rem;
+    }
+}
+
+hr {
+    margin: 3rem 7rem;
+}

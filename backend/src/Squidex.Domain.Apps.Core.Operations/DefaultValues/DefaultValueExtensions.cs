@@ -17,8 +17,8 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
     {
         public static void GenerateDefaultValues(this ContentData data, Schema schema, PartitionResolver partitionResolver)
         {
-            Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
+            Guard.NotNull(schema);
+            Guard.NotNull(partitionResolver);
 
             foreach (var field in schema.Fields)
             {
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
         {
             var defaultValue = DefaultValueFactory.CreateDefaultValue(field, SystemClock.Instance.GetCurrentInstant(), partitionKey);
 
-            if (field.RawProperties.IsRequired || defaultValue == null || defaultValue.Type == JsonValueType.Null)
+            if (field.RawProperties.IsRequired || defaultValue.Type == JsonValueType.Null)
             {
                 return;
             }

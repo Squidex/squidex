@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -24,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new GeolocationFieldProperties());
 
-            Assert.Equal("my-geolocation", sut.Name);
+            Assert.Equal("myGeolocation", sut.Name);
         }
 
         [Fact]
@@ -42,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new GeolocationFieldProperties());
 
-            var geolocation = JsonValue.Object()
+            var geolocation = new JsonObject()
                 .Add("coordinates",
                     JsonValue.Array(
                         JsonValue.Create(12),
@@ -98,14 +96,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Field is required." });
         }
 
-        private static JsonObject CreateValue(double lat, double lon)
+        private static JsonValue CreateValue(double lat, double lon)
         {
-            return JsonValue.Object().Add("latitude", lat).Add("longitude", lon);
+            return new JsonObject().Add("latitude", lat).Add("longitude", lon);
         }
 
         private static RootField<GeolocationFieldProperties> Field(GeolocationFieldProperties properties)
         {
-            return Fields.Geolocation(1, "my-geolocation", Partitioning.Invariant, properties);
+            return Fields.Geolocation(1, "myGeolocation", Partitioning.Invariant, properties);
         }
     }
 }

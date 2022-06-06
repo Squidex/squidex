@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -47,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             if (commentCreated.Mentions?.Length > 0)
             {
-                var users = await userResolver.QueryManyAsync(commentCreated.Mentions);
+                var users = await userResolver.QueryManyAsync(commentCreated.Mentions, ct);
 
                 if (users.Count > 0)
                 {
@@ -77,9 +74,10 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 return true;
             }
 
-            var vars = new ScriptVars
+            // Script vars are just wrappers over dictionaries for better performance.
+            var vars = new EventScriptVars
             {
-                ["event"] = @event
+                Event = @event
             };
 
             return scriptEngine.Evaluate(vars, trigger.Condition);

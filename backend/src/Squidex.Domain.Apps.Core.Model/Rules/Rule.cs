@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 
@@ -23,8 +22,8 @@ namespace Squidex.Domain.Apps.Core.Rules
 
         public Rule(RuleTrigger trigger, RuleAction action)
         {
-            Guard.NotNull(trigger, nameof(trigger));
-            Guard.NotNull(action, nameof(action));
+            Guard.NotNull(trigger);
+            Guard.NotNull(action);
 
             Action = action;
 
@@ -34,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.Rules
         [Pure]
         public Rule Rename(string newName)
         {
-            if (string.Equals(Name, newName))
+            if (string.Equals(Name, newName, StringComparison.Ordinal))
             {
                 return this;
             }
@@ -76,11 +75,11 @@ namespace Squidex.Domain.Apps.Core.Rules
         [Pure]
         public Rule Update(RuleTrigger newTrigger)
         {
-            Guard.NotNull(newTrigger, nameof(newTrigger));
+            Guard.NotNull(newTrigger);
 
             if (newTrigger.GetType() != Trigger.GetType())
             {
-                throw new ArgumentException("New trigger has another type.", nameof(newTrigger));
+                ThrowHelper.ArgumentException("New trigger has another type.", nameof(newTrigger));
             }
 
             if (Trigger.Equals(newTrigger))
@@ -97,11 +96,11 @@ namespace Squidex.Domain.Apps.Core.Rules
         [Pure]
         public Rule Update(RuleAction newAction)
         {
-            Guard.NotNull(newAction, nameof(newAction));
+            Guard.NotNull(newAction);
 
             if (newAction.GetType() != Action.GetType())
             {
-                throw new ArgumentException("New action has another type.", nameof(newAction));
+                ThrowHelper.ArgumentException("New action has another type.", nameof(newAction));
             }
 
             if (Action.Equals(newAction))

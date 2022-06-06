@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
 using Squidex.Assets;
@@ -65,8 +62,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var file = new NoopAssetFile();
 
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._))
-                .Returns(new ImageInfo(100, 100, false));
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, default))
+                .Returns(new ImageInfo(100, 100, ImageOrientation.None, ImageFormat.PNG));
 
             await HandleAsync(new UploadAppImage { File = file }, None.Value);
 
@@ -81,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             var command = new UploadAppImage { File = file };
 
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._))
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, default))
                 .Returns(Task.FromResult<ImageInfo?>(null));
 
             await Assert.ThrowsAsync<ValidationException>(() => HandleAsync(sut, command));

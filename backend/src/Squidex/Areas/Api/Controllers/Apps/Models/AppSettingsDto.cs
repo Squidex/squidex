@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Validation;
 using Squidex.Web;
@@ -41,13 +40,13 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static AppSettingsDto FromApp(IAppEntity app, Resources resources)
+        public static AppSettingsDto FromDomain(IAppEntity app, Resources resources)
         {
             var settings = app.Settings;
 
             var result = new AppSettingsDto
             {
-                Editors = settings.Editors.Select(EditorDto.FromEditor).ToArray(),
+                Editors = settings.Editors.Select(EditorDto.FromDomain).ToArray(),
                 HideDateTimeModeButton = settings.HideDateTimeModeButton,
                 HideScheduler = settings.HideScheduler,
                 Patterns = settings.Patterns.Select(PatternDto.FromPattern).ToArray(),
@@ -61,11 +60,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         {
             var values = new { app = resources.App };
 
-            AddSelfLink(resources.Url<AppsController>(x => nameof(x.GetAppSettings), values));
+            AddSelfLink(resources.Url<AppSettingsController>(x => nameof(x.GetSettings), values));
 
             if (resources.CanUpdateSettings)
             {
-                AddPutLink("update", resources.Url<AppsController>(x => nameof(x.PutAppSettings), values));
+                AddPutLink("update", resources.Url<AppSettingsController>(x => nameof(x.PutSettings), values));
             }
 
             return this;

@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
@@ -72,7 +69,8 @@ namespace Squidex.Extensions.Actions.CreateContent
             return (Description, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(Command job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(Command job,
+            CancellationToken ct = default)
         {
             var command = job;
 

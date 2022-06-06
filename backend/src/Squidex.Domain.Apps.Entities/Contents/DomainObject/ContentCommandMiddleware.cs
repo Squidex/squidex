@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
@@ -31,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (payload is IContentEntity content && payload is not IEnrichedContentEntity)
             {
-                payload = await contentEnricher.EnrichAsync(content, true, contextProvider.Context);
+                payload = await contentEnricher.EnrichAsync(content, true, contextProvider.Context, default);
             }
 
             return payload;

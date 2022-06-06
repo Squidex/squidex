@@ -1,0 +1,45 @@
+@import 'mixins';
+@import 'vars';
+
+.badge,
+.badge-secondary,
+.btn-rename {
+    height: 1.5rem;
+}
+
+.badge {
+    min-width: 2rem;
+}
+
+.active {
+    .badge {
+        background: none;
+        border: 0;
+        border-radius: 0;
+        color: $color-theme-brand;
+    }
+}
+
+.btn-rename {
+    display: none;
+
+    i {
+        margin: 0;
+    }
+}
+
+.nav-item {
+    &:hover {
+        .btn-rename {
+            display: block;
+        }
+
+        .badge {
+            display: none;
+        }
+    }
+}
+
+a {
+    text-decoration: none;
+}

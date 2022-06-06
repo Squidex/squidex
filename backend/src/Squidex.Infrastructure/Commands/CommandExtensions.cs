@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.Commands
 {
@@ -14,6 +14,18 @@ namespace Squidex.Infrastructure.Commands
         public static Task HandleAsync(this ICommandMiddleware commandMiddleware, CommandContext context)
         {
             return commandMiddleware.HandleAsync(context, x => Task.CompletedTask);
+        }
+
+        public static Envelope<IEvent> Migrate<T>(this Envelope<IEvent> @event, T snapshot)
+        {
+            if (@event.Payload is IMigratedStateEvent<T> migratable)
+            {
+                var payload = migratable.Migrate(snapshot);
+
+                @event = new Envelope<IEvent>(payload, @event.Headers);
+            }
+
+            return @event;
         }
     }
 }

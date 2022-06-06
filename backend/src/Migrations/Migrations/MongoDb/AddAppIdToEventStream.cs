@@ -5,16 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Tasks;
 
 namespace Migrations.Migrations.MongoDb
 {
@@ -27,13 +25,14 @@ namespace Migrations.Migrations.MongoDb
             this.database = database;
         }
 
-        public async Task UpdateAsync(CancellationToken ct)
+        public async Task UpdateAsync(
+            CancellationToken ct)
         {
             const int SizeOfBatch = 1000;
             const int SizeOfQueue = 20;
 
-            var collectionOld = database.GetCollection<BsonDocument>("Events");
-            var collectionNew = database.GetCollection<BsonDocument>("Events2");
+            var collectionV1 = database.GetCollection<BsonDocument>("Events");
+            var collectionV2 = database.GetCollection<BsonDocument>("Events2");
 
             var batchBlock = new BatchBlock<BsonDocument>(SizeOfBatch, new GroupingDataflowBlockOptions
             {
@@ -59,7 +58,7 @@ namespace Migrations.Migrations.MongoDb
                         {
                             if (!eventStream.StartsWith("app-", StringComparison.OrdinalIgnoreCase))
                             {
-                                var indexOfType = eventStream.IndexOf('-');
+                                var indexOfType = eventStream.IndexOf('-', StringComparison.Ordinal);
                                 var indexOfId = indexOfType + 1;
 
                                 var indexOfOldId = eventStream.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
@@ -69,7 +68,7 @@ namespace Migrations.Migrations.MongoDb
                                     indexOfId = indexOfOldId + 2;
                                 }
 
-                                var domainType = eventStream.Substring(0, indexOfType);
+                                var domainType = eventStream[..indexOfType];
                                 var domainId = eventStream[indexOfId..];
 
                                 var newDomainId = DomainId.Combine(DomainId.Create(appId), DomainId.Create(domainId)).ToString();
@@ -103,7 +102,7 @@ namespace Migrations.Migrations.MongoDb
 
                     if (writes.Count > 0)
                     {
-                        await collectionNew.BulkWriteAsync(writes, writeOptions);
+                        await collectionV2.BulkWriteAsync(writes, writeOptions, ct);
                     }
                 }
                 catch (OperationCanceledException ex)
@@ -118,12 +117,15 @@ namespace Migrations.Migrations.MongoDb
                 BoundedCapacity = SizeOfQueue
             });
 
-            batchBlock.LinkTo(actionBlock, new DataflowLinkOptions
-            {
-                PropagateCompletion = true
-            });
+            batchBlock.BidirectionalLinkTo(actionBlock);
 
-            await collectionOld.Find(new BsonDocument()).ForEachAsync(batchBlock.SendAsync, ct);
+            await foreach (var commit in collectionV1.Find(new BsonDocument()).ToAsyncEnumerable(ct: ct))
+            {
+                if (!await batchBlock.SendAsync(commit, ct))
+                {
+                    break;
+                }
+            }
 
             batchBlock.Complete();
 

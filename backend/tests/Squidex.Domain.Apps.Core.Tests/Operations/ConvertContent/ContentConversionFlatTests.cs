@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Infrastructure;
@@ -24,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         .AddLocalized("en", 2))
                 .AddField("field2",
                     new ContentFieldData()
-                        .AddLocalized("de", null)
+                        .AddLocalized("de", JsonValue.Null)
                         .AddLocalized("it", 4))
                 .AddField("field3",
                     new ContentFieldData()
@@ -51,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 {
                     "field2",
                     new ContentFieldData()
-                        .AddLocalized("de", null)
+                        .AddLocalized("de", JsonValue.Null)
                         .AddLocalized("it", 4)
                 },
                 { "field3", JsonValue.Create(6) },

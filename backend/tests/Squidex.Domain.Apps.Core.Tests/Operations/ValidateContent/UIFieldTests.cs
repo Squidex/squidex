@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -27,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new UIFieldProperties());
 
-            Assert.Equal("my-ui", sut.Name);
+            Assert.Equal("myUI", sut.Name);
         }
 
         [Fact]
@@ -67,14 +65,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var schema =
                 new Schema("my-schema")
-                    .AddUI(1, "my-ui1", Partitioning.Invariant)
-                    .AddUI(2, "my-ui2", Partitioning.Invariant);
+                    .AddUI(1, "myUI1", Partitioning.Invariant)
+                    .AddUI(2, "myUI2", Partitioning.Invariant);
 
             var data =
                 new ContentData()
-                    .AddField("my-ui1", new ContentFieldData())
-                    .AddField("my-ui2", new ContentFieldData()
-                        .AddInvariant(null));
+                    .AddField("myUI1", new ContentFieldData())
+                    .AddField("myUI2", new ContentFieldData()
+                        .AddInvariant(JsonValue.Null));
 
             var dataErrors = new List<ValidationError>();
 
@@ -83,8 +81,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             dataErrors.Should().BeEquivalentTo(
                 new[]
                 {
-                    new ValidationError("Value must not be defined.", "my-ui1"),
-                    new ValidationError("Value must not be defined.", "my-ui2")
+                    new ValidationError("Value must not be defined.", "myUI1"),
+                    new ValidationError("Value must not be defined.", "myUI2")
                 });
         }
 
@@ -93,16 +91,16 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var schema =
                 new Schema("my-schema")
-                    .AddArray(1, "my-array", Partitioning.Invariant, array => array
-                        .AddUI(101, "my-ui"));
+                    .AddArray(1, "myArray", Partitioning.Invariant, array => array
+                        .AddUI(101, "myUI"));
 
             var data =
                 new ContentData()
-                    .AddField("my-array", new ContentFieldData()
+                    .AddField("myArray", new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                JsonValue.Object()
-                                    .Add("my-ui", null))));
+                                new JsonObject()
+                                    .Add("myUI", default))));
 
             var dataErrors = new List<ValidationError>();
 
@@ -111,13 +109,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             dataErrors.Should().BeEquivalentTo(
                 new[]
                 {
-                    new ValidationError("Value must not be defined.", "my-array.iv[1].my-ui")
+                    new ValidationError("Value must not be defined.", "myArray.iv[1].myUI")
                 });
         }
 
         private static NestedField<UIFieldProperties> Field(UIFieldProperties properties)
         {
-            return new NestedField<UIFieldProperties>(1, "my-ui", properties);
+            return new NestedField<UIFieldProperties>(1, "myUI", properties);
         }
     }
 }

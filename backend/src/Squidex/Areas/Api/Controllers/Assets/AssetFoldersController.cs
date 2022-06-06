@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
@@ -39,6 +38,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="parentId">The optional parent folder id.</param>
+        /// <param name="scope">The scope of the query.</param>
         /// <returns>
         /// 200 => Asset folders returned.
         /// 404 => App not found.
@@ -51,15 +51,15 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetFoldersDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] DomainId parentId)
+        public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] DomainId parentId, [FromQuery] AssetFolderScope scope = AssetFolderScope.PathAndItems)
         {
             var (folders, path) = await AsyncHelper.WhenAll(
-                assetQuery.QueryAssetFoldersAsync(Context, parentId, HttpContext.RequestAborted),
-                assetQuery.FindAssetFolderAsync(Context.App.Id, parentId, HttpContext.RequestAborted));
+                GetAssetFoldersAsync(parentId, scope),
+                GetAssetPathAsync(parentId, scope));
 
             var response = Deferred.Response(() =>
             {
-                return AssetFoldersDto.FromAssets(folders, path, Resources);
+                return AssetFoldersDto.FromDomain(folders, path, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = folders.ToEtag();
@@ -168,7 +168,27 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var context = await CommandBus.PublishAsync(command);
 
-            return AssetFolderDto.FromAssetFolder(context.Result<IAssetFolderEntity>(), Resources);
+            return AssetFolderDto.FromDomain(context.Result<IAssetFolderEntity>(), Resources);
+        }
+
+        private Task<IReadOnlyList<IAssetFolderEntity>> GetAssetPathAsync(DomainId parentId, AssetFolderScope scope)
+        {
+            if (scope == AssetFolderScope.Items)
+            {
+                return Task.FromResult<IReadOnlyList<IAssetFolderEntity>>(ReadonlyList.Empty<IAssetFolderEntity>());
+            }
+
+            return assetQuery.FindAssetFolderAsync(Context.App.Id, parentId, HttpContext.RequestAborted);
+        }
+
+        private Task<IResultList<IAssetFolderEntity>> GetAssetFoldersAsync(DomainId parentId, AssetFolderScope scope)
+        {
+            if (scope == AssetFolderScope.Path)
+            {
+                return Task.FromResult(ResultList.CreateFrom<IAssetFolderEntity>(0));
+            }
+
+            return assetQuery.QueryAssetFoldersAsync(Context, parentId, HttpContext.RequestAborted);
         }
     }
 }

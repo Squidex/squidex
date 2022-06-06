@@ -1,0 +1,84 @@
+@import 'mixins';
+@import 'vars';
+
+.table-items-row {
+    border-left-width: 4px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding-top: 1.125rem;
+}
+
+.languages {
+    &-container {
+        position: relative;
+    }
+
+    &-buttons,
+    &-buttons-compare {
+        background: $color-white;
+        display: flex;
+        flex-grow: 1;
+        flex-wrap: nowrap;
+        justify-content: right;
+        margin: 0;
+        margin-top: -1px;
+        white-space: nowrap;
+        z-index: 1;
+    }
+
+    &-buttons {
+        @include absolute(-.75rem, 4.25rem);
+    }
+
+    &-buttons-compare {
+        @include absolute(-.75rem, 0);
+    }
+}
+
+.col-6 {
+    padding-right: .5rem;
+
+    &.col-right {
+        padding-left: .5rem;
+    }
+}
+
+.copy-button-container {
+    position: relative;
+}
+
+.field {
+    &-required {
+        color: $color-theme-error;
+    }
+
+    &-invalid {
+        border-left-color: $color-theme-error;
+    }
+
+    &-disabled {
+        color: $color-border-dark;
+    }
+
+    &-copy {
+        @include absolute($t: 1rem, $l: -1.5rem);
+        z-index: 1000;
+    }
+}
+
+.compare {
+    border: 0;
+    border-bottom: 1px solid $color-border;
+    padding-bottom: .25rem;
+    padding-top: .5rem;
+}
+
+:host {
+    &:last-child {
+        margin-bottom: 0;
+
+        .compare {
+            border: 0;
+        }
+    }
+}

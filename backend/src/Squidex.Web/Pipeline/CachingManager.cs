@@ -5,12 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
@@ -18,7 +15,6 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
-using Squidex.Log;
 
 namespace Squidex.Web.Pipeline
 {
@@ -73,9 +69,9 @@ namespace Squidex.Web.Pipeline
                 }
             }
 
-            public void AddDependency(object? value)
+            public void AddDependency<T>(T value)
             {
-                if (value != null)
+                if (value is not null)
                 {
                     try
                     {
@@ -99,10 +95,10 @@ namespace Squidex.Web.Pipeline
             {
                 if (hasDependency && !response.Headers.ContainsKey(HeaderNames.ETag))
                 {
-                    using (Profiler.Trace("CalculateEtag"))
+                    using (Telemetry.Activities.StartActivity("CalculateEtag"))
                     {
                         var cacheBuffer = hasher.GetHashAndReset();
-                        var cacheString = BitConverter.ToString(cacheBuffer).Replace("-", string.Empty).ToUpperInvariant();
+                        var cacheString = BitConverter.ToString(cacheBuffer).Replace("-", string.Empty, StringComparison.Ordinal).ToUpperInvariant();
 
                         response.Headers.Add(HeaderNames.ETag, cacheString);
                     }
@@ -115,16 +111,18 @@ namespace Squidex.Web.Pipeline
                     {
                         foreach (var key in keys)
                         {
+                            var encoded = Uri.EscapeDataString(key);
+
                             if (stringBuilder.Length == 0)
                             {
-                                if (stringBuilder.Length + key.Length > maxKeysSize)
+                                if (stringBuilder.Length + encoded.Length > maxKeysSize)
                                 {
                                     break;
                                 }
                             }
                             else
                             {
-                                if (stringBuilder.Length + key.Length + 1 > maxKeysSize)
+                                if (stringBuilder.Length + encoded.Length + 1 > maxKeysSize)
                                 {
                                     break;
                                 }
@@ -132,12 +130,12 @@ namespace Squidex.Web.Pipeline
                                 stringBuilder.Append(' ');
                             }
 
-                            stringBuilder.Append(key);
+                            stringBuilder.Append(encoded);
                         }
 
                         if (stringBuilder.Length > 0)
                         {
-                            response.Headers.Add("Surrogate-Key", stringBuilder.ToString());
+                            response.Headers["Surrogate-Key"] = stringBuilder.ToString();
                         }
                     }
                     finally
@@ -148,11 +146,11 @@ namespace Squidex.Web.Pipeline
 
                 if (headers.Count > 0)
                 {
-                    response.Headers.Add(HeaderNames.Vary, new StringValues(headers.ToArray()));
+                    response.Headers[HeaderNames.Vary] = new StringValues(headers.ToArray());
                 }
             }
 
-            public void AddHeader(string header)
+            public void AddHeader(string header, StringValues values)
             {
                 if (!string.IsNullOrWhiteSpace(header))
                 {
@@ -165,6 +163,11 @@ namespace Squidex.Web.Pipeline
                     finally
                     {
                         slimLock.ExitWriteLock();
+                    }
+
+                    foreach (var value in values)
+                    {
+                        AddDependency(value);
                     }
                 }
             }
@@ -184,7 +187,7 @@ namespace Squidex.Web.Pipeline
 
         public void Start(HttpContext httpContext)
         {
-            Guard.NotNull(httpContext, nameof(httpContext));
+            Guard.NotNull(httpContext);
 
             var maxKeysSize = GetKeysSize(httpContext);
 
@@ -195,7 +198,7 @@ namespace Squidex.Web.Pipeline
         {
             var headers = httpContext.Request.Headers;
 
-            if (!headers.TryGetValue(SurrogateKeySizeHeader, out var header) || !int.TryParse(header, out var size))
+            if (!headers.TryGetValue(SurrogateKeySizeHeader, out var header) || !int.TryParse(header, NumberStyles.Integer, CultureInfo.InvariantCulture, out var size))
             {
                 size = cachingOptions.MaxSurrogateKeysSize;
             }
@@ -210,7 +213,7 @@ namespace Squidex.Web.Pipeline
             cacheContext?.AddDependency(key.ToString(), version);
         }
 
-        public void AddDependency(object? value)
+        public void AddDependency<T>(T value)
         {
             var cacheContext = httpContextAccessor.HttpContext?.Features.Get<CacheContext>();
 
@@ -219,14 +222,28 @@ namespace Squidex.Web.Pipeline
 
         public void AddHeader(string header)
         {
-            var cacheContext = httpContextAccessor.HttpContext?.Features.Get<CacheContext>();
+            var httpContext = httpContextAccessor.HttpContext;
 
-            cacheContext?.AddHeader(header);
+            if (httpContext == null)
+            {
+                return;
+            }
+
+            var cacheContext = httpContext.Features.Get<CacheContext>();
+
+            if (cacheContext == null)
+            {
+                return;
+            }
+
+            httpContext.Request.Headers.TryGetValue(header, out var value);
+
+            cacheContext?.AddHeader(header, value);
         }
 
         public void Finish(HttpContext httpContext)
         {
-            Guard.NotNull(httpContext, nameof(httpContext));
+            Guard.NotNull(httpContext);
 
             var cacheContext = httpContext.Features.Get<CacheContext>();
 

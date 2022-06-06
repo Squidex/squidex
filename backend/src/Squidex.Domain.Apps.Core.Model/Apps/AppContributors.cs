@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed class AppContributors : ImmutableDictionary<string, string>
+    public sealed class AppContributors : ReadonlyDictionary<string, string>
     {
         public static readonly AppContributors Empty = new AppContributors();
 
@@ -28,8 +27,8 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppContributors Assign(string contributorId, string role)
         {
-            Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
-            Guard.NotNullOrEmpty(role, nameof(role));
+            Guard.NotNullOrEmpty(contributorId);
+            Guard.NotNullOrEmpty(role);
 
             if (!this.TrySet(contributorId, role, out var updated))
             {
@@ -42,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppContributors Remove(string contributorId)
         {
-            Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
+            Guard.NotNullOrEmpty(contributorId);
 
             if (!this.TryRemove(contributorId, out var updated))
             {

@@ -5,20 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Squidex.Areas.Api;
+using Orleans;
 using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Areas.Frontend;
-using Squidex.Areas.IdentityServer;
 using Squidex.Areas.IdentityServer.Config;
-using Squidex.Areas.OrleansDashboard;
-using Squidex.Areas.Portal;
+using Squidex.Areas.OrleansDashboard.Middlewares;
+using Squidex.Areas.Portal.Middlewares;
 using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
 using Squidex.Config.Web;
 using Squidex.Pipeline.Plugins;
+using Squidex.Web;
 using Squidex.Web.Pipeline;
 
 namespace Squidex
@@ -36,14 +33,19 @@ namespace Squidex
         {
             services.AddHttpClient();
             services.AddMemoryCache();
-            services.AddNonBreakingSameSiteCookies();
+            services.AddHealthChecks();
+            services.AddDefaultWebServices(config);
+            services.AddDefaultForwardRules();
 
+            // They must be called in this order.
             services.AddSquidexMvcWithPlugins(config);
+            services.AddSquidexIdentity(config);
+            services.AddSquidexIdentityServer();
+            services.AddSquidexAuthentication(config);
 
-            services.AddSquidexApps();
+            services.AddSquidexApps(config);
             services.AddSquidexAssetInfrastructure(config);
             services.AddSquidexAssets(config);
-            services.AddSquidexAuthentication(config);
             services.AddSquidexBackups();
             services.AddSquidexCommands(config);
             services.AddSquidexComments();
@@ -54,8 +56,7 @@ namespace Squidex
             services.AddSquidexGraphQL();
             services.AddSquidexHealthChecks(config);
             services.AddSquidexHistory(config);
-            services.AddSquidexIdentity(config);
-            services.AddSquidexIdentityServer();
+            services.AddSquidexImageResizing(config);
             services.AddSquidexInfrastructure(config);
             services.AddSquidexLocalization();
             services.AddSquidexMigration(config);
@@ -68,6 +69,7 @@ namespace Squidex
             services.AddSquidexSerializers();
             services.AddSquidexStoreServices(config);
             services.AddSquidexSubscriptions(config);
+            services.AddSquidexTelemetry(config);
             services.AddSquidexTranslation(config);
             services.AddSquidexUsageTracking(config);
         }
@@ -79,19 +81,59 @@ namespace Squidex
             app.UseDefaultPathBase();
             app.UseDefaultForwardRules();
 
-            app.UseSquidexCacheKeys();
             app.UseSquidexHealthCheck();
             app.UseSquidexRobotsTxt();
-            app.UseSquidexTracking();
+            app.UseSquidexLogging();
             app.UseSquidexLocalization();
             app.UseSquidexLocalCache();
             app.UseSquidexCors();
+            app.UseOpenApi(options =>
+            {
+                options.Path = "/api/swagger/v1/swagger.json";
+            });
 
-            app.ConfigureApi();
-            app.ConfigurePortal();
-            app.ConfigureOrleansDashboard();
-            app.ConfigureIdentityServer();
-            app.ConfigureFrontend();
+            app.UseWhen(c => c.Request.Path.StartsWithSegments(Constants.PrefixIdentityServer, StringComparison.OrdinalIgnoreCase), builder =>
+            {
+                builder.UseExceptionHandler("/identity-server/error");
+            });
+
+            app.UseWhen(c => c.Request.Path.StartsWithSegments(Constants.PrefixApi, StringComparison.OrdinalIgnoreCase), builder =>
+            {
+                builder.UseSquidexCacheKeys();
+                builder.UseSquidexExceptionHandling();
+                builder.UseSquidexUsage();
+                builder.UseAccessTokenQueryString();
+            });
+
+            app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.Map(Constants.PrefixPortal, builder =>
+            {
+                builder.UseMiddleware<PortalDashboardAuthenticationMiddleware>();
+                builder.UseMiddleware<PortalRedirectMiddleware>();
+            });
+
+            app.Map(Constants.PrefixOrleans, builder =>
+            {
+                builder.UseMiddleware<OrleansDashboardAuthenticationMiddleware>();
+                builder.UseOrleansDashboard();
+            });
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+
+            // Return a 404 for all unresolved api requests.
+            app.Map(Constants.PrefixApi, builder =>
+            {
+                builder.Use404();
+            });
+
+            app.UseFrontend();
 
             app.UsePlugins();
         }

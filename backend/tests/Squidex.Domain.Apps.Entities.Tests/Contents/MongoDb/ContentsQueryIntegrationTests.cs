@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -93,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var time = SystemClock.Instance.GetCurrentInstant();
 
-            await _.ContentRepository.QueryScheduledWithoutDataAsync(time, _ => Task.CompletedTask);
+            await _.ContentRepository.QueryScheduledWithoutDataAsync(time).ToListAsync();
         }
 
         [Fact]

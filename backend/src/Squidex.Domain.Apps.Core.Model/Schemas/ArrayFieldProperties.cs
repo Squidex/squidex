@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
@@ -14,6 +14,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public int? MinItems { get; init; }
 
         public int? MaxItems { get; init; }
+
+        public ReadonlyList<string>? UniqueFields { get; init; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

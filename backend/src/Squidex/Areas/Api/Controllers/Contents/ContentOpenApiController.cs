@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
@@ -36,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var vm = new DocsVM
             {
-                Specification = $"~/content/{app}/swagger/v1/swagger.json"
+                Specification = $"~/api/content/{app}/swagger/v1/swagger.json"
             };
 
             return View(nameof(Docs), vm);
@@ -50,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var vm = new DocsVM
             {
-                Specification = $"~/content/{app}/flat/swagger/v1/swagger.json"
+                Specification = $"~/api/content/{app}/flat/swagger/v1/swagger.json"
             };
 
             return View(nameof(Docs), vm);
@@ -62,9 +61,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [AllowAnonymous]
         public async Task<IActionResult> GetOpenApi(string app)
         {
-            var schemas = await appProvider.GetSchemasAsync(AppId);
+            var schemas = await appProvider.GetSchemasAsync(AppId, HttpContext.RequestAborted);
 
-            var openApiDocument = schemasOpenApiGenerator.Generate(HttpContext, App, schemas);
+            var openApiDocument = await schemasOpenApiGenerator.GenerateAsync(HttpContext, App, schemas, false);
 
             return Content(openApiDocument.ToJson(), "application/json");
         }
@@ -75,9 +74,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [AllowAnonymous]
         public async Task<IActionResult> GetFlatOpenApi(string app)
         {
-            var schemas = await appProvider.GetSchemasAsync(AppId);
+            var schemas = await appProvider.GetSchemasAsync(AppId, HttpContext.RequestAborted);
 
-            var openApiDocument = schemasOpenApiGenerator.Generate(HttpContext, App, schemas, true);
+            var openApiDocument = await schemasOpenApiGenerator.GenerateAsync(HttpContext, App, schemas, true);
 
             return Content(openApiDocument.ToJson(), "application/json");
         }

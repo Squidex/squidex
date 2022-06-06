@@ -5,19 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Security;
-using Squidex.Log;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 
@@ -36,22 +33,25 @@ namespace Squidex.Web.Pipeline
         {
             var user = context.HttpContext.User;
 
-            var appName = context.RouteData.Values["app"]?.ToString();
-
-            if (!string.IsNullOrWhiteSpace(appName))
+            if (context.RouteData.Values.TryGetValue("app", out var appValue))
             {
+                var appName = appValue?.ToString();
+
+                if (string.IsNullOrWhiteSpace(appName))
+                {
+                    context.Result = new NotFoundResult();
+                    return;
+                }
+
                 var isFrontend = user.IsInClient(DefaultClients.Frontend);
 
-                var app = await appProvider.GetAppAsync(appName, !isFrontend);
+                var app = await appProvider.GetAppAsync(appName, !isFrontend, context.HttpContext.RequestAborted);
 
                 if (app == null)
                 {
-                    var log = context.HttpContext.RequestServices?.GetService<ISemanticLog>();
+                    var log = context.HttpContext.RequestServices?.GetService<ILogger<AppResolver>>();
 
-                    log?.LogWarning(w => w
-                        .WriteProperty("message", "Cannot find app with the given name.")
-                        .WriteProperty("appId", "404")
-                        .WriteProperty("appName", appName));
+                    log?.LogWarning("Cannot find app with the given name {name}.", appName);
 
                     context.Result = new NotFoundResult();
                     return;
@@ -101,12 +101,11 @@ namespace Squidex.Web.Pipeline
                     }
                     else
                     {
-                        var log = context.HttpContext.RequestServices?.GetService<ISemanticLog>();
+                        var log = context.HttpContext.RequestServices?.GetService<ILogger<AppResolver>>();
 
-                        log?.LogWarning(w => w
-                            .WriteProperty("message", "Authenticated user has no permission to access the app.")
-                            .WriteProperty("appId", app.Id.ToString())
-                            .WriteProperty("appName", appName));
+                        log?.LogWarning("Authenticated user has no permission to access the app {name} with ID {id}.",
+                            app.Id,
+                            app.Name);
 
                         context.Result = new NotFoundResult();
                     }

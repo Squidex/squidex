@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
@@ -32,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
             }
             else
             {
-                return new LanguageConfig(IsOptional, ImmutableList.Create(Fallback));
+                return new LanguageConfig(IsOptional, ReadonlyList.Create(Fallback));
             }
         }
     }

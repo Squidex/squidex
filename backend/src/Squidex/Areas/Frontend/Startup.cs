@@ -5,15 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Frontend.Middlewares;
+using Squidex.Hosting.Web;
 using Squidex.Pipeline.Squid;
 using Squidex.Web.Pipeline;
 
@@ -21,72 +16,96 @@ namespace Squidex.Areas.Frontend
 {
     public static class Startup
     {
-        public static void ConfigureFrontend(this IApplicationBuilder app)
+        public static void UseFrontend(this IApplicationBuilder app)
         {
             var environment = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
 
-            app.Map("/squid.svg", builder => builder.UseMiddleware<SquidMiddleware>());
+            var fileProvider = environment.WebRootFileProvider;
+
+            app.UseMiddleware<EmbedMiddleware>();
+
+            if (!environment.IsDevelopment())
+            {
+                fileProvider = new CompositeFileProvider(fileProvider,
+                    new PhysicalFileProvider(Path.Combine(environment.WebRootPath, "build")));
+            }
+
+            app.Map("/squid.svg", builder =>
+            {
+                builder.UseMiddleware<SquidMiddleware>();
+            });
 
             app.UseMiddleware<NotifoMiddleware>();
 
-            var indexFile =
-                environment.IsProduction() ?
-                    new PathString("/build/index.html") :
-                    new PathString("/index.html");
-
-            app.Use((context, next) =>
-            {
-                if (context.Request.Path == "/client-callback-popup")
-                {
-                    context.Request.Path = new PathString("/client-callback-popup.html");
-                }
-                else if (context.Request.Path == "/client-callback-silent")
-                {
-                    context.Request.Path = new PathString("/client-callback-silent.html");
-                }
-                else if (!Path.HasExtension(context.Request.Path.Value))
-                {
-                    context.Request.Path = indexFile;
-                }
-
-                return next();
-            });
-
-            app.UseWhen(x => x.Request.Path.StartsWithSegments(indexFile), builder =>
+            app.UseWhen(c => c.IsSpaFile(), builder =>
             {
                 builder.UseMiddleware<SetupMiddleware>();
             });
 
-            app.UseMiddleware<IndexMiddleware>();
-
-            if (environment.IsDevelopment())
+            app.UseWhen(c => c.IsSpaFile() || c.IsHtmlPath(), builder =>
             {
-                app.UseMiddleware<WebpackMiddleware>();
-            }
+                // Adjust the base for all potential html files.
+                builder.UseHtmlTransform(new HtmlTransformOptions
+                {
+                    Transform = (html, context) =>
+                    {
+                        return new ValueTask<string>(html.AddOptions(context));
+                    }
+                });
+            });
 
+            app.Use((context, next) =>
+            {
+                return next();
+            });
+
+            app.UseSquidexStaticFiles(fileProvider);
+
+            if (!environment.IsDevelopment())
+            {
+                // Try static files again to serve index.html.
+                app.UsePathOverride("/index.html");
+                app.UseSquidexStaticFiles(fileProvider);
+            }
+            else
+            {
+                // Forward requests to SPA development server.
+                app.UseSpa(builder =>
+                {
+                    builder.UseProxyToSpaDevelopmentServer("https://localhost:3000");
+                });
+            }
+        }
+
+        private static void UseSquidexStaticFiles(this IApplicationBuilder app, IFileProvider fileProvider)
+        {
             app.UseStaticFiles(new StaticFileOptions
             {
                 OnPrepareResponse = context =>
                 {
                     var response = context.Context.Response;
-                    var responseHeaders = response.GetTypedHeaders();
 
-                    if (!string.Equals(response.ContentType, "text/html", StringComparison.OrdinalIgnoreCase))
+                    if (!string.IsNullOrWhiteSpace(context.Context.Request.QueryString.ToString()))
                     {
-                        responseHeaders.CacheControl = new CacheControlHeaderValue
-                        {
-                            MaxAge = TimeSpan.FromDays(60)
-                        };
+                        response.Headers[HeaderNames.CacheControl] = "max-age=5184000";
                     }
-                    else
+                    else if (string.Equals(response.ContentType, "text/html", StringComparison.OrdinalIgnoreCase))
                     {
-                        responseHeaders.CacheControl = new CacheControlHeaderValue
-                        {
-                            NoCache = true
-                        };
+                        response.Headers[HeaderNames.CacheControl] = "no-cache";
                     }
-                }
+                },
+                FileProvider = fileProvider
             });
+        }
+
+        private static bool IsSpaFile(this HttpContext context)
+        {
+            return (context.IsIndex() || !Path.HasExtension(context.Request.Path)) && !context.IsDevServer();
+        }
+
+        private static bool IsDevServer(this HttpContext context)
+        {
+            return context.Request.Path.StartsWithSegments("/ws", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

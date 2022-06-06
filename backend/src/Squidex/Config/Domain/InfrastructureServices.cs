@@ -5,13 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodaTime;
-using Orleans;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Areas.Api.Controllers.News;
 using Squidex.Areas.Api.Controllers.News.Service;
@@ -27,7 +23,9 @@ using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.UsageTracking;
@@ -50,6 +48,12 @@ namespace Squidex.Config.Domain
             services.Configure<ReplicatedCacheOptions>(config,
                 "caching:replicated");
 
+            services.Configure<JintScriptOptions>(config,
+                "scripting");
+
+            services.Configure<DiagnoserOptions>(config,
+                "diagnostics");
+
             services.AddReplicatedCache();
             services.AddAsyncLocalCache();
             services.AddBackgroundCache();
@@ -60,26 +64,35 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<GrainBootstrap<IEventConsumerManagerGrain>>()
                 .AsSelf();
 
+            services.AddSingletonAs<BackgroundRequestLogStore>()
+                .AsOptional<IRequestLogStore>();
+
+            services.AddSingletonAs<Diagnoser>()
+                .AsSelf();
+
+            services.AddSingletonAs<ScriptingCompleter>()
+                .AsSelf();
+
+            services.AddSingletonAs<JintScriptEngine>()
+                .As<IScriptEngine>().As<IScriptDescriptor>();
+
             services.AddSingletonAs<GrainTagService>()
                 .As<ITagService>();
 
-            services.AddSingletonAs<JintScriptEngine>()
-                .AsOptional<IScriptEngine>();
-
             services.AddSingletonAs<CounterJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<DateTimeJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<StringJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<StringWordsJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<HttpJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<FluidTemplateEngine>()
                 .AsOptional<ITemplateEngine>();
@@ -99,7 +112,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<UserFluidExtension>()
                 .As<IFluidExtension>();
 
-            services.AddSingleton<Func<IIncomingGrainCallContext, string>>(DomainObjectGrainFormatter.Format);
+            services.AddSingleton(DomainObjectGrainFormatter.Format);
         }
 
         public static void AddSquidexUsageTracking(this IServiceCollection services, IConfiguration config)

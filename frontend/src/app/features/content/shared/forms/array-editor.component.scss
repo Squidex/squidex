@@ -1,0 +1,30 @@
+@import 'mixins';
+@import 'vars';
+
+/* stylelint-disable no-descending-specificity */
+
+virtual-scroller {
+    height: 700px;
+}
+
+.item {
+    padding: .25rem 1rem;
+
+    &.first {
+        padding-top: .75rem;
+    }
+
+    &.last {
+        padding-bottom: .75rem;
+    }
+}
+
+.array-container {
+    background: $color-border-lighter;
+    margin: 0;
+    margin-bottom: 1rem;
+}
+
+.drag-container {
+    position: relative;
+}

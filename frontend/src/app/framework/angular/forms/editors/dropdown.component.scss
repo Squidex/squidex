@@ -1,0 +1,68 @@
+@import 'mixins';
+@import 'vars';
+
+$color-input-disabled: #eef1f4;
+
+.form-select {
+    cursor: default;
+
+    &[readonly] {
+        background-color: $color-input-background;
+    }
+
+    &:disabled {
+        background-color: $color-input-disabled;
+    }
+}
+
+.no-wrap {
+    white-space: nowrap;
+}
+
+.no-events {
+    pointer-events: none;
+}
+
+.search-form {
+    padding: .5rem;
+}
+
+.control-dropdown {
+    max-height: none;
+    max-width: 40rem;
+    overflow-y: hidden;
+}
+
+.control-dropdown-items {
+    max-height: 15rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.selection {
+    position: relative;
+
+    .control-dropdown-item {
+        @include absolute(0, 1.75rem, 0, 0);
+        align-items: center;
+        display: flex;
+        line-height: 1.2rem;
+        overflow: hidden;
+        padding-top: 0;
+        padding-bottom: 0;
+        pointer-events: none;
+        position: absolute;
+    }
+
+    .truncate {
+        min-height: 1.2rem;
+    }
+
+    .form-control {
+        cursor: default;
+    }
+}
+
+sqx-loader {
+    margin-top: .25rem;
+}

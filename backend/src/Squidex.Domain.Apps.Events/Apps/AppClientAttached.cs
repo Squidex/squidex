@@ -15,5 +15,7 @@ namespace Squidex.Domain.Apps.Events.Apps
         public string Id { get; set; }
 
         public string Secret { get; set; }
+
+        public string? Role { get; set; }
     }
 }
