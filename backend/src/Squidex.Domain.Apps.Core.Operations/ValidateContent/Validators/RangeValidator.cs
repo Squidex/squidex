@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
@@ -18,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             if (min != null && max != null && min.Value.CompareTo(max.Value) > 0)
             {
-                throw new ArgumentException("Min value must be greater than max value.", nameof(min));
+                ThrowHelper.ArgumentException("Min value must be greater than max value.", nameof(min));
             }
 
             this.min = min;

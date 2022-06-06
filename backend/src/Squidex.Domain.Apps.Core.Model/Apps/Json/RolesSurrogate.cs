@@ -11,21 +11,21 @@ using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Core.Apps.Json
 {
-    public sealed class RolesSurrogate : Dictionary<string, IJsonValue>, ISurrogate<Roles>
+    public sealed class RolesSurrogate : Dictionary<string, JsonValue>, ISurrogate<Roles>
     {
         public void FromSource(Roles source)
         {
             foreach (var customRole in source.Custom)
             {
-                var permissions = JsonValue.Array();
+                var permissions = new JsonArray();
 
                 foreach (var permission in customRole.Permissions)
                 {
-                    permissions.Add(JsonValue.Create(permission.Id));
+                    permissions.Add(permission.Id);
                 }
 
                 var role =
-                    JsonValue.Object()
+                    new JsonObject()
                         .Add("permissions", permissions)
                         .Add("properties", customRole.Properties);
 
@@ -44,26 +44,28 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
             {
                 var (key, value) = x;
 
-                var properties = JsonValue.Object();
+                var properties = new JsonObject();
                 var permissions = PermissionSet.Empty;
 
-                if (value is JsonArray array)
+                if (value.Type == JsonValueType.Array)
                 {
+                    var array = value.AsArray;
+
                     if (array.Count > 0)
                     {
-                        permissions = new PermissionSet(array.OfType<JsonString>().Select(x => x.ToString()));
+                        permissions = new PermissionSet(array.Where(x => x.Type == JsonValueType.String).Select(x => x.AsString));
                     }
                 }
-                else if (value is JsonObject obj)
+                else if (value.Type == JsonValueType.Object)
                 {
-                    if (obj.TryGetValue("permissions", out array!) && array.Count > 0)
+                    if (value.TryGetValue(JsonValueType.Array, "permissions", out var array))
                     {
-                        permissions = new PermissionSet(array.OfType<JsonString>().Select(x => x.ToString()));
+                        permissions = new PermissionSet(array.AsArray.Where(x => x.Type == JsonValueType.String).Select(x => x.AsString));
                     }
 
-                    if (!obj.TryGetValue<JsonObject>("properties", out properties))
+                    if (value.TryGetValue(JsonValueType.Object, "properties", out var obj))
                     {
-                        properties = JsonValue.Object();
+                        properties = obj.AsObject;
                     }
                 }
 

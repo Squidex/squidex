@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [CollectionName("UISettings")]
         public sealed class State
         {
-            public JsonObject Settings { get; set; } = JsonValue.Object();
+            public JsonObject Settings { get; set; } = new JsonObject();
         }
 
         public AppUISettingsGrain(IGrainState<State> state)
@@ -46,13 +46,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return state.WriteAsync();
         }
 
-        public Task SetAsync(string path, J<IJsonValue> value)
+        public Task SetAsync(string path, J<JsonValue> value)
         {
             var container = GetContainer(path, true, out var key);
 
             if (container == null)
             {
-                throw new InvalidOperationException("Path does not lead to an object.");
+                ThrowHelper.InvalidOperationException("Path does not lead to an object.");
+                return Task.CompletedTask;
             }
 
             container[key] = value.Value;
@@ -90,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     {
                         if (add)
                         {
-                            temp = JsonValue.Object();
+                            temp = new JsonObject();
 
                             current[segment] = temp;
                         }
@@ -100,9 +101,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         }
                     }
 
-                    if (temp is JsonObject next)
+                    if (temp.Type == JsonValueType.Object)
                     {
-                        current = next;
+                        current = temp.AsObject;
                     }
                     else
                     {

@@ -614,7 +614,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         [Fact]
         public async Task UpdateRole_should_create_events_and_update_role()
         {
-            var command = new UpdateRole { Name = roleName, Permissions = new[] { "clients.read" }, Properties = JsonValue.Object() };
+            var command = new UpdateRole { Name = roleName, Permissions = new[] { "clients.read" }, Properties = new JsonObject() };
 
             await ExecuteCreateAsync();
             await ExecuteAddRoleAsync();

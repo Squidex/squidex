@@ -80,7 +80,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 if (schema == null)
                 {
-                    throw new InvalidOperationException();
+                    ThrowHelper.InvalidOperationException();
+                    return;
                 }
 
                 var textQuery = new TextQuery(query.FullText, 1000)
@@ -168,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        private ClrQuery ParseJson(Context context, ISchemaEntity? schema, Query<IJsonValue> query,
+        private ClrQuery ParseJson(Context context, ISchemaEntity? schema, Query<JsonValue> query,
             ResolvedComponents components)
         {
             var queryModel = BuildQueryModel(context, schema, components);

@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             .AddLocalized("de-DE", "de-DE"))
                     .AddField("my-string",
                         new ContentFieldData()
-                            .AddInvariant(null))
+                            .AddInvariant(JsonValue.Null))
                     .AddField("my-string-enum",
                         new ContentFieldData()
                             .AddInvariant("EnumA"))
@@ -202,37 +202,37 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddField("my-geolocation",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("latitude", 10)
                                     .Add("longitude", 20)))
                     .AddField("my-component",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add(Component.Discriminator, TestSchemas.Ref1.Id)
                                     .Add("schemaRef1Field", "Component1")))
                     .AddField("my-components",
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
-                                    JsonValue.Object()
+                                    new JsonObject()
                                         .Add(Component.Discriminator, TestSchemas.Ref1.Id)
                                         .Add("schemaRef1Field", "Component1"),
-                                    JsonValue.Object()
+                                    new JsonObject()
                                         .Add(Component.Discriminator, TestSchemas.Ref2.Id)
                                         .Add("schemaRef2Field", "Component2"))))
                     .AddField("my-json",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("value", 1)))
                     .AddField("my-array",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("nested-number", 10)
                                     .Add("nested-boolean", true),
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("nested-number", 20)
                                     .Add("nested-boolean", false))));
 

@@ -45,7 +45,8 @@ namespace Squidex.Web.CommandMiddlewares
 
             if (feature == null)
             {
-                throw new InvalidOperationException("Cannot resolve schema.");
+                ThrowHelper.InvalidOperationException("Cannot resolve schema.");
+                return default!;
             }
 
             return feature.Schema.NamedId();

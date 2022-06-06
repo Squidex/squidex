@@ -86,7 +86,8 @@ namespace Squidex.Infrastructure.MongoDb.Queries
                     return Filter.In(propertyName, ((IList)value!).OfType<object>());
             }
 
-            throw new NotSupportedException();
+            ThrowHelper.NotSupportedException();
+            return default!;
         }
 
         private static BsonRegularExpression BuildMatchRegex(CompareFilter<ClrValue> node)

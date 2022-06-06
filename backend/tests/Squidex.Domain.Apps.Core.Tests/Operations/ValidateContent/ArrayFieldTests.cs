@@ -132,19 +132,19 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Must not contain items with duplicate 'myString' fields." });
         }
 
-        private static IJsonValue CreateValue(params JsonObject[]? objects)
+        private static JsonValue CreateValue(params JsonObject[]? objects)
         {
-            return objects == null ? JsonValue.Null : JsonValue.Array(objects);
+            return objects == null ? default : JsonValue.Array(objects);
         }
 
         private static JsonObject Object()
         {
-            return JsonValue.Object();
+            return new JsonObject();
         }
 
-        private static JsonObject Object(string key, object value)
+        private static JsonObject Object(string key, JsonValue value)
         {
-            return JsonValue.Object().Add(key, value);
+            return new JsonObject().Add(key, value);
         }
 
         private static RootField<ArrayFieldProperties> Field(ArrayFieldProperties properties)

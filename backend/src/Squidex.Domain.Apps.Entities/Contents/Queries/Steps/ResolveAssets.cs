@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                             if (referencedAsset != null)
                             {
-                                IJsonValue array;
+                                var array = new JsonArray();
 
                                 if (IsImage(referencedAsset))
                                 {
@@ -89,12 +89,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                                         referencedAsset.AppId,
                                         referencedAsset.Id.ToString());
 
-                                    array = JsonValue.Array(url, referencedAsset.FileName);
+                                    array.Add(url);
                                 }
-                                else
-                                {
-                                    array = JsonValue.Array(referencedAsset.FileName);
-                                }
+
+                                array.Add(referencedAsset.FileName);
 
                                 requestCache.AddDependency(referencedAsset.UniqueId, referencedAsset.Version);
 

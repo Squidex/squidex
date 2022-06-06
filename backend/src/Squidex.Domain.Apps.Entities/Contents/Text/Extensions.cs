@@ -81,25 +81,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return result;
         }
 
-        private static void AppendJsonText(Dictionary<string, StringBuilder> languages, string language, IJsonValue value)
+        private static void AppendJsonText(Dictionary<string, StringBuilder> languages, string language, JsonValue value)
         {
-            if (value.Type == JsonValueType.String)
+            switch (value.Type)
             {
-                AppendText(languages, language, value.ToString());
-            }
-            else if (value is JsonArray array)
-            {
-                foreach (var item in array)
-                {
-                    AppendJsonText(languages, language, item);
-                }
-            }
-            else if (value is JsonObject obj)
-            {
-                foreach (var (_, item) in obj)
-                {
-                    AppendJsonText(languages, language, item);
-                }
+                case JsonValueType.String:
+                    AppendText(languages, language, value.AsString);
+                    break;
+                case JsonValueType.Array:
+                    foreach (var item in value.AsArray)
+                    {
+                        AppendJsonText(languages, language, item);
+                    }
+
+                    break;
+                case JsonValueType.Object:
+                    foreach (var (_, item) in value.AsObject)
+                    {
+                        AppendJsonText(languages, language, item);
+                    }
+
+                    break;
             }
         }
 

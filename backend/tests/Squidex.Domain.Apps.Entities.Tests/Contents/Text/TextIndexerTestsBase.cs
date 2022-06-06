@@ -381,7 +381,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return new ContentData()
                 .AddField(field,
                     new ContentFieldData()
-                        .AddInvariant(JsonValue.Object().Add("latitude", latitude).Add("longitude", longitude)));
+                        .AddInvariant(new JsonObject().Add("latitude", latitude).Add("longitude", longitude)));
         }
 
         protected async Task SearchGeo(List<DomainId>? expected, string field, double latitude, double longitude, SearchScope target = SearchScope.All)

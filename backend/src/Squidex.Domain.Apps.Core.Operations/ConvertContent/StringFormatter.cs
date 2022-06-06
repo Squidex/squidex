@@ -17,22 +17,22 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
     {
         private static readonly StringFormatter Instance = new StringFormatter();
 
-        public record struct Args(IJsonValue Value);
+        public record struct Args(JsonValue Value);
 
         private StringFormatter()
         {
         }
 
-        public static string Format(IField field, IJsonValue? value)
+        public static string Format(IField field, JsonValue value)
         {
             Guard.NotNull(field);
 
-            if (value == null || value is JsonNull)
+            if (value.Type == JsonValueType.Null)
             {
                 return string.Empty;
             }
 
-            var args = new Args(value ?? JsonValue.Null);
+            var args = new Args(value);
 
             return field.RawProperties.Accept(Instance, args);
         }
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public string Visit(BooleanFieldProperties properties, Args args)
         {
-            if (args.Value is JsonBoolean { Value: true })
+            if (args.Value.Type == JsonValueType.Boolean && args.Value.AsBoolean)
             {
                 return "Yes";
             }
@@ -76,11 +76,11 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public string Visit(GeolocationFieldProperties properties, Args args)
         {
-            if (args.Value is JsonObject jsonObject &&
-                jsonObject.TryGetValue<JsonNumber>("latitude", out var lat) &&
-                jsonObject.TryGetValue<JsonNumber>("longitude", out var lon))
+            if (args.Value.Type == JsonValueType.Object &&
+                args.Value.TryGetValue(JsonValueType.Number, "latitude", out var lat) &&
+                args.Value.TryGetValue(JsonValueType.Number, "longitude", out var lon))
             {
-                return $"{lat}, {lon}";
+                return $"{lat.AsNumber}, {lon.AsNumber}";
             }
             else
             {
@@ -117,9 +117,9 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public string Visit(TagsFieldProperties properties, Args args)
         {
-            if (args.Value is JsonArray array)
+            if (args.Value.Type == JsonValueType.Array)
             {
-                return string.Join(", ", array);
+                return string.Join(", ", args.Value.AsArray);
             }
             else
             {
@@ -132,10 +132,12 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return string.Empty;
         }
 
-        private static string FormatArray(IJsonValue value, string singularName, string pluralName)
+        private static string FormatArray(JsonValue value, string singularName, string pluralName)
         {
-            if (value is JsonArray array)
+            if (value.Type == JsonValueType.Array)
             {
+                var array = value.AsArray;
+
                 if (array.Count > 1)
                 {
                     return $"{array.Count} {pluralName}";

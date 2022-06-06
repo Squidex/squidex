@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public Instant? ScheduledTo { get; init; }
 
-        public Query<IJsonValue>? JsonQuery { get; init; }
+        public Query<JsonValue>? JsonQuery { get; init; }
 
         public RefToken? CreatedBy { get; init; }
 
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities
             return this with { QueryAsJson = query };
         }
 
-        public Q WithJsonQuery(Query<IJsonValue>? query)
+        public Q WithJsonQuery(Query<JsonValue>? query)
         {
             return this with { JsonQuery = query };
         }

@@ -11,6 +11,7 @@ using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Util;
 using MongoDB.Bson;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 {
@@ -50,7 +51,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
                 case TermRangeQuery termRangeQuery:
                     return VisitTermRange(termRangeQuery);
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         }
 
@@ -59,7 +61,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
             if (!TryParseValue(termRangeQuery.LowerTerm, out var min) ||
                 !TryParseValue(termRangeQuery.UpperTerm, out var max))
             {
-                throw new NotSupportedException();
+                ThrowHelper.NotSupportedException();
+                return default!;
             }
 
             var minField = termRangeQuery.IncludesLower ? "gte" : "gt";

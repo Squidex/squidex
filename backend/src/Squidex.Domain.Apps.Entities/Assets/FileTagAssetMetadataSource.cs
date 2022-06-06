@@ -9,7 +9,6 @@ using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
 using TagLib;
 using TagLib.Image;
 using static TagLib.File;
@@ -34,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             public Stream WriteStream
             {
-                get { throw new NotSupportedException(); }
+                get => throw new NotSupportedException();
             }
 
             public FileAbstraction(AssetFile file)
@@ -87,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         if (!string.IsNullOrWhiteSpace(value))
                         {
-                            command.Metadata.Add(name, JsonValue.Create(value));
+                            command.Metadata.Add(name, value);
                         }
                     }
 
@@ -95,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         if (value > 0)
                         {
-                            command.Metadata.Add(name, JsonValue.Create(value));
+                            command.Metadata.Add(name, (double)value.Value);
                         }
                     }
 
@@ -103,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         if (value > 0)
                         {
-                            command.Metadata.Add(name, JsonValue.Create(value));
+                            command.Metadata.Add(name, value.Value);
                         }
                     }
 
@@ -111,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         if (value != TimeSpan.Zero)
                         {
-                            command.Metadata.Add(name, JsonValue.Create(value.ToString()));
+                            command.Metadata.Add(name, value.ToString());
                         }
                     }
 

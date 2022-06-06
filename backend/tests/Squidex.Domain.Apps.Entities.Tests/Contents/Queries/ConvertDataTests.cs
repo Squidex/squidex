@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
-                                    JsonValue.Object()
+                                    new JsonObject()
                                         .Add("nested", JsonValue.Array(id2)))));
 
             A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), A<CancellationToken>._))
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
-                                    JsonValue.Object()
+                                    new JsonObject()
                                         .Add("nested", JsonValue.Array()))));
 
             A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), A<CancellationToken>._))
@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("nested", JsonValue.Array(id1, id2)))));
         }
 

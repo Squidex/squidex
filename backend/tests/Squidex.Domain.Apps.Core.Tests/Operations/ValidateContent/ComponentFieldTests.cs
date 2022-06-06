@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var (id, sut, components) = Field(new ComponentFieldProperties { SchemaId = schemaId1, IsRequired = true }, true);
 
-            await sut.ValidateAsync(CreateValue(id.ToString(), "componentField", null), errors, components: components);
+            await sut.ValidateAsync(CreateValue(id.ToString(), "componentField", default), errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "componentField: Field is required." });
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(value, errors, components: components);
 
             Assert.Empty(errors);
-            Assert.Equal(value[Component.Discriminator].ToString(), schemaId1.ToString());
+            Assert.Equal(value.AsObject[Component.Discriminator].AsString, schemaId1.ToString());
         }
 
         [Fact]
@@ -139,12 +139,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(value, errors, components: components);
 
             Assert.Empty(errors);
-            Assert.Equal(value[Component.Discriminator].ToString(), schemaId1.ToString());
+            Assert.Equal(value.AsObject[Component.Discriminator].AsString, schemaId1.ToString());
         }
 
-        private static JsonObject CreateValue(string? type, string key, object? value, string? discriminator = null)
+        private static JsonValue CreateValue(string? type, string key, JsonValue value, string? discriminator = null)
         {
-            var obj = JsonValue.Object();
+            var obj = new JsonObject();
 
             if (type != null)
             {

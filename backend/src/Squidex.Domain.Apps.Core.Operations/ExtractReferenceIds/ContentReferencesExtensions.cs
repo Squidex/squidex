@@ -22,16 +22,16 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 return false;
             }
 
-            static bool CanHaveReference(IJsonValue value)
+            static bool CanHaveReference(JsonValue value)
             {
-                if (value is JsonArray)
+                if (value.Type == JsonValueType.Array)
                 {
                     return true;
                 }
 
-                if (value is JsonObject obj)
+                if (value.Type == JsonValueType.Object)
                 {
-                    foreach (var (_, nested) in obj)
+                    foreach (var (_, nested) in value.AsObject)
                     {
                         if (CanHaveReference(nested))
                         {
@@ -107,17 +107,14 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             }
         }
 
-        public static HashSet<DomainId> GetReferencedIds(this IField field, IJsonValue? value,
+        public static HashSet<DomainId> GetReferencedIds(this IField field, JsonValue value,
             ResolvedComponents components, int referencesPerField = int.MaxValue)
         {
             Guard.NotNull(components);
 
             var result = new HashSet<DomainId>();
 
-            if (value != null)
-            {
-                ReferencesExtractor.Extract(field, value, result, referencesPerField, components);
-            }
+            ReferencesExtractor.Extract(field, value, result, referencesPerField, components);
 
             return result;
         }
@@ -127,11 +124,11 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             Guard.NotNull(schema);
             Guard.NotNull(partitioning);
 
-            var result = JsonValue.Object();
+            var result = new JsonObject();
 
             foreach (var partitionKey in partitioning.AllKeys)
             {
-                result[partitionKey] = JsonValue.Create(data.FormatReferenceFields(schema, partitionKey, separator));
+                result[partitionKey] = data.FormatReferenceFields(schema, partitionKey, separator);
             }
 
             return result;

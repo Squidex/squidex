@@ -22,20 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public sealed class BackupContents : IBackupHandler
     {
         private const int BatchSize = 100;
-        private delegate void ObjectSetter(IReadOnlyDictionary<string, IJsonValue> obj, string key, IJsonValue value);
-
         private const string UrlsFile = "Urls.json";
-
-        private static readonly ObjectSetter JsonSetter = (obj, key, value) =>
-        {
-            ((JsonObject)obj).Add(key, value);
-        };
-
-        private static readonly ObjectSetter FieldSetter = (obj, key, value) =>
-        {
-            ((ContentFieldData)obj)[key] = value;
-        };
-
         private readonly Dictionary<DomainId, HashSet<DomainId>> contentIdsBySchemaId = new Dictionary<DomainId, HashSet<DomainId>>();
         private readonly Rebuilder rebuilder;
         private readonly IUrlGenerator urlGenerator;
@@ -109,26 +96,26 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 if (field != null)
                 {
-                    ReplaceAssetUrl(field, FieldSetter);
+                    ReplaceAssetUrl(field);
                 }
             }
         }
 
-        private void ReplaceAssetUrl(IReadOnlyDictionary<string, IJsonValue> source, ObjectSetter setter)
+        private void ReplaceAssetUrl(IDictionary<string, JsonValue> source)
         {
             List<(string, string)>? replacements = null;
 
             foreach (var (key, value) in source)
             {
-                switch (value)
+                switch (value.Type)
                 {
-                    case JsonString s:
+                    case JsonValueType.String:
                         {
-                            var newValue = s.Value;
+                            var oldValue = value.AsString;
 
-                            newValue = newValue.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
+                            var newValue = oldValue.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
 
-                            if (!ReferenceEquals(newValue, s.Value))
+                            if (!ReferenceEquals(newValue, oldValue))
                             {
                                 replacements ??= new List<(string, string)>();
                                 replacements.Add((key, newValue));
@@ -137,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                             newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets, StringComparison.Ordinal);
 
-                            if (!ReferenceEquals(newValue, s.Value))
+                            if (!ReferenceEquals(newValue, oldValue))
                             {
                                 replacements ??= new List<(string, string)>();
                                 replacements.Add((key, newValue));
@@ -147,12 +134,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         break;
 
-                    case JsonArray arr:
-                        ReplaceAssetUrl(arr);
+                    case JsonValueType.Array:
+                        ReplaceAssetUrl(value.AsArray);
                         break;
 
-                    case JsonObject obj:
-                        ReplaceAssetUrl(obj, JsonSetter);
+                    case JsonValueType.Object:
+                        ReplaceAssetUrl(value.AsObject);
                         break;
                 }
             }
@@ -161,47 +148,47 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 foreach (var (key, newValue) in replacements)
                 {
-                    setter(source, key, JsonValue.Create(newValue));
+                    source[key] = newValue;
                 }
             }
         }
 
-        private void ReplaceAssetUrl(JsonArray source)
+        private void ReplaceAssetUrl(List<JsonValue> source)
         {
             for (var i = 0; i < source.Count; i++)
             {
                 var value = source[i];
 
-                switch (value)
+                switch (value.Type)
                 {
-                    case JsonString s:
+                    case JsonValueType.String:
                         {
-                            var newValue = s.Value;
+                            var oldValue = value.AsString;
 
-                            newValue = newValue.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
+                            var newValue = oldValue.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
 
-                            if (!ReferenceEquals(newValue, s.Value))
+                            if (!ReferenceEquals(newValue, oldValue))
                             {
-                                source[i] = JsonValue.Create(newValue);
+                                source[i] = newValue;
                                 break;
                             }
 
                             newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets, StringComparison.Ordinal);
 
-                            if (!ReferenceEquals(newValue, s.Value))
+                            if (!ReferenceEquals(newValue, oldValue))
                             {
-                                source[i] = JsonValue.Create(newValue);
+                                source[i] = newValue;
                                 break;
                             }
                         }
 
                         break;
 
-                    case JsonArray:
+                    case JsonValueType.Array:
                         break;
 
-                    case JsonObject obj:
-                        ReplaceAssetUrl(obj, JsonSetter);
+                    case JsonValueType.Object:
+                        ReplaceAssetUrl(value.AsObject);
                         break;
                 }
             }

@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_call_grain_if_retrieving_settings()
         {
-            var settings = JsonValue.Object();
+            var settings = new JsonObject();
 
             A.CallTo(() => grain.GetAsync())
                 .Returns(settings.AsJ());
@@ -45,18 +45,18 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_call_grain_if_setting_value()
         {
-            var value = JsonValue.Object();
+            var value = new JsonObject();
 
             await sut.SetAsync(DomainId.NewGuid(), "user", "the.path", value);
 
-            A.CallTo(() => grain.SetAsync("the.path", A<J<IJsonValue>>.That.Matches(x => x.Value == value)))
+            A.CallTo(() => grain.SetAsync("the.path", A<J<JsonValue>>.That.Matches(x => x.Value == value)))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_call_grain_if_replacing_settings()
         {
-            var value = JsonValue.Object();
+            var value = new JsonObject();
 
             await sut.SetAsync(DomainId.NewGuid(), "user", value);
 

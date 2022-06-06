@@ -46,9 +46,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 ResolveType = value =>
                 {
-                    if (value is JsonObject component && component.TryGetValue<JsonString>(Component.Discriminator, out var schemaId))
+                    if (value is JsonObject json && Component.IsValid(json, out var schemaId))
                     {
-                        return types.GetOrDefault(schemaId.Value);
+                        return types.GetOrDefault(schemaId);
                     }
 
                     return null;

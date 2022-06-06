@@ -22,6 +22,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
         {
             var extensions = new IFluidExtension[]
             {
+                new ContentFluidExtension(),
                 new DateTimeFluidExtension(),
                 new StringFluidExtension(),
                 new StringWordsFluidExtension()

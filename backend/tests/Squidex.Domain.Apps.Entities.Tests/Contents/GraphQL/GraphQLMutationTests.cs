@@ -8,7 +8,6 @@
 using System.Text.RegularExpressions;
 using FakeItEasy;
 using GraphQL;
-using GraphQL.NewtonsoftJson;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NodaTime.Text;

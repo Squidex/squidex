@@ -152,7 +152,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Must not contain duplicate values." });
         }
 
-        private static IJsonValue CreateValue(params DomainId[]? ids)
+        private static JsonValue CreateValue(params DomainId[]? ids)
         {
             return ids == null ?
                 JsonValue.Null :

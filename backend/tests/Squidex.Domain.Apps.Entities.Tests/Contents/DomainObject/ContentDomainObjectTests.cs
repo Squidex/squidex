@@ -22,6 +22,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
@@ -41,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             new ContentData()
                 .AddField("my-field1",
                 new ContentFieldData()
-                        .AddInvariant(null))
+                        .AddInvariant(JsonValue.Null))
                 .AddField("my-field2",
                     new ContentFieldData()
                         .AddInvariant(1));

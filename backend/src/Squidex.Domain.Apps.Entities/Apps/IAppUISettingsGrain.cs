@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
     {
         Task<J<JsonObject>> GetAsync();
 
-        Task SetAsync(string path, J<IJsonValue> value);
+        Task SetAsync(string path, J<JsonValue> value);
 
         Task SetAsync(J<JsonObject> settings);
 

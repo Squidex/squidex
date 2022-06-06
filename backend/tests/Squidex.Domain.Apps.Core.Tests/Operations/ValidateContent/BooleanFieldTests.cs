@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Invalid json type, expected boolean." });
         }
 
-        private static IJsonValue CreateValue(bool? v)
+        private static JsonValue CreateValue(bool? v)
         {
             return JsonValue.Create(v);
         }

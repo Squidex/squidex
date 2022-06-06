@@ -10,10 +10,13 @@ using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
+
+#pragma warning disable MA0022 // Return Task.FromResult instead of returning null
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
@@ -80,7 +83,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     });
 
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         }
 

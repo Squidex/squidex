@@ -411,9 +411,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
-                                    JsonValue.Object(),
-                                    JsonValue.Object().Add("myNested", 1),
-                                    JsonValue.Object())));
+                                    new JsonObject(),
+                                    new JsonObject().Add("myNested", 1),
+                                    new JsonObject())));
 
             await data.ValidatePartialAsync(languagesConfig.ToResolver(), errors, schema);
 
@@ -450,7 +450,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
-                                    JsonValue.Object())));
+                                    new JsonObject())));
 
             await data.ValidateAsync(languagesConfig.ToResolver(), errors, schema);
 

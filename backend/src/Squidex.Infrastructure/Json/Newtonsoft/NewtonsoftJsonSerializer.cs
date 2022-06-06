@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             }
             catch (NewtonsoftException ex)
             {
-                throw new JsonException(ex.Message, ex);
+                ThrowHelper.JsonException(ex.Message, ex);
             }
         }
 
@@ -64,7 +64,8 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             }
             catch (NewtonsoftException ex)
             {
-                throw new JsonException(ex.Message, ex);
+                ThrowHelper.JsonException(ex.Message, ex);
+                return default!;
             }
         }
 
@@ -84,7 +85,8 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             }
             catch (NewtonsoftException ex)
             {
-                throw new JsonException(ex.Message, ex);
+                ThrowHelper.JsonException(ex.Message, ex);
+                return default!;
             }
         }
 

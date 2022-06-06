@@ -36,7 +36,7 @@ namespace Squidex.Web.Pipeline
 
         public override long Length
         {
-            get { throw new NotSupportedException(); }
+            get => throw new NotSupportedException();
         }
 
         public override long Position

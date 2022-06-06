@@ -54,9 +54,9 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 return data;
             }
 
-            for (var i = 0; i < converters.Length; i++)
+            foreach (var converter in converters)
             {
-                data = converters[i](data!, field)!;
+                data = converter(data!, field)!;
 
                 if (data == null)
                 {

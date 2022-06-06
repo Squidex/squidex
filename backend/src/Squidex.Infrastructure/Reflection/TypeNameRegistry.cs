@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure.Reflection
                 {
                     var message = $"The name '{name}' is already registered with type '{typesByName[name]}'";
 
-                    throw new ArgumentException(message, nameof(type));
+                    ThrowHelper.ArgumentException(message, nameof(type));
                 }
 
                 typesByName[name] = type;
@@ -79,7 +79,7 @@ namespace Squidex.Infrastructure.Reflection
                 {
                     var message = $"The type '{type}' is already registered with name '{namesByType[type]}'";
 
-                    throw new ArgumentException(message, nameof(type));
+                    ThrowHelper.ArgumentException(message, nameof(type));
                 }
 
                 namesByType[type] = name;
@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.Reflection
                 {
                     var message = $"The name '{name}' is already registered with type '{typesByName[name]}'";
 
-                    throw new ArgumentException(message, nameof(type));
+                    ThrowHelper.ArgumentException(message, nameof(type));
                 }
 
                 typesByName[name] = type;

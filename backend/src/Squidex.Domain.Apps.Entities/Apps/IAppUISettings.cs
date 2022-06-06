@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
     {
         Task<JsonObject> GetAsync(DomainId appId, string? userId);
 
-        Task SetAsync(DomainId appId, string? userId, string path, IJsonValue value);
+        Task SetAsync(DomainId appId, string? userId, string path, JsonValue value);
 
         Task SetAsync(DomainId appId, string? userId, JsonObject settings);
 

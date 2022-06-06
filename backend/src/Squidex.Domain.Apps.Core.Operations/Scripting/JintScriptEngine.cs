@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             this.extensions = extensions?.ToArray() ?? Array.Empty<IJintExtension>();
         }
 
-        public async Task<IJsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default,
+        public async Task<JsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default,
             CancellationToken ct = default)
         {
             Guard.NotNull(vars);
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct))
                 {
                     var context =
-                        CreateEngine<IJsonValue>(options, combined.Token)
+                        CreateEngine<JsonValue?>(options, combined.Token)
                             .Extend(vars, options)
                             .Extend(extensions)
                             .ExtendAsync(extensions);
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
         }
 
-        public IJsonValue Execute(ScriptVars vars, string script, ScriptOptions options = default)
+        public JsonValue Execute(ScriptVars vars, string script, ScriptOptions options = default)
         {
             Guard.NotNull(vars);
             Guard.NotNullOrEmpty(script);
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             return JsonMapper.Map(result);
         }
 
-        private ScriptExecutionContext<T> CreateEngine<T>(ScriptOptions options, CancellationToken ct) where T : class
+        private ScriptExecutionContext<T> CreateEngine<T>(ScriptOptions options, CancellationToken ct)
         {
             if (Debugger.IsAttached)
             {

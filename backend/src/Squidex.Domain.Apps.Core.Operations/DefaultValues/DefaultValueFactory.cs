@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.DefaultValues
 {
-    public sealed class DefaultValueFactory : IFieldPropertiesVisitor<IJsonValue, DefaultValueFactory.Args>
+    public sealed class DefaultValueFactory : IFieldPropertiesVisitor<JsonValue, DefaultValueFactory.Args>
     {
         private static readonly DefaultValueFactory Instance = new DefaultValueFactory();
 
@@ -25,87 +25,89 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
         {
         }
 
-        public static IJsonValue CreateDefaultValue(IField field, Instant now, string partition)
+        public static JsonValue CreateDefaultValue(IField field, Instant now, string partition)
         {
             Guard.NotNull(field);
             Guard.NotNull(partition);
 
-            return field.RawProperties.Accept(Instance, new Args(now, partition));
+            var x = field.RawProperties.Accept(Instance, new Args(now, partition));
+
+            return x;
         }
 
-        public IJsonValue Visit(ArrayFieldProperties properties, Args args)
+        public JsonValue Visit(ArrayFieldProperties properties, Args args)
         {
-            return JsonValue.Array();
+            return new JsonArray();
         }
 
-        public IJsonValue Visit(AssetsFieldProperties properties, Args args)
-        {
-            var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
-
-            return Array(value);
-        }
-
-        public IJsonValue Visit(BooleanFieldProperties properties, Args args)
-        {
-            var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
-
-            return JsonValue.Create(value);
-        }
-
-        public IJsonValue Visit(ComponentFieldProperties properties, Args args)
-        {
-            return JsonValue.Null;
-        }
-
-        public IJsonValue Visit(ComponentsFieldProperties properties, Args args)
-        {
-            return JsonValue.Array();
-        }
-
-        public IJsonValue Visit(GeolocationFieldProperties properties, Args args)
-        {
-            return JsonValue.Null;
-        }
-
-        public IJsonValue Visit(JsonFieldProperties properties, Args args)
-        {
-            return JsonValue.Null;
-        }
-
-        public IJsonValue Visit(NumberFieldProperties properties, Args args)
-        {
-            var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
-
-            return JsonValue.Create(value);
-        }
-
-        public IJsonValue Visit(ReferencesFieldProperties properties, Args args)
+        public JsonValue Visit(AssetsFieldProperties properties, Args args)
         {
             var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
 
             return Array(value);
         }
 
-        public IJsonValue Visit(StringFieldProperties properties, Args args)
+        public JsonValue Visit(BooleanFieldProperties properties, Args args)
         {
             var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
 
-            return JsonValue.Create(value);
+            return value ?? JsonValue.Null;
         }
 
-        public IJsonValue Visit(TagsFieldProperties properties, Args args)
+        public JsonValue Visit(ComponentFieldProperties properties, Args args)
+        {
+            return JsonValue.Null;
+        }
+
+        public JsonValue Visit(ComponentsFieldProperties properties, Args args)
+        {
+            return new JsonArray();
+        }
+
+        public JsonValue Visit(GeolocationFieldProperties properties, Args args)
+        {
+            return JsonValue.Null;
+        }
+
+        public JsonValue Visit(JsonFieldProperties properties, Args args)
+        {
+            return JsonValue.Null;
+        }
+
+        public JsonValue Visit(NumberFieldProperties properties, Args args)
+        {
+            var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
+
+            return value ?? JsonValue.Null;
+        }
+
+        public JsonValue Visit(ReferencesFieldProperties properties, Args args)
         {
             var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
 
             return Array(value);
         }
 
-        public IJsonValue Visit(UIFieldProperties properties, Args args)
+        public JsonValue Visit(StringFieldProperties properties, Args args)
+        {
+            var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
+
+            return value;
+        }
+
+        public JsonValue Visit(TagsFieldProperties properties, Args args)
+        {
+            var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
+
+            return Array(value);
+        }
+
+        public JsonValue Visit(UIFieldProperties properties, Args args)
         {
             return JsonValue.Null;
         }
 
-        public IJsonValue Visit(DateTimeFieldProperties properties, Args args)
+        public JsonValue Visit(DateTimeFieldProperties properties, Args args)
         {
             if (properties.CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Now)
             {
@@ -119,7 +121,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
             var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
 
-            return JsonValue.Create(value);
+            return value ?? JsonValue.Null;
         }
 
         private static T GetDefaultValue<T>(T value, LocalizedValue<T>? values, string partition)
@@ -132,7 +134,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
             return value;
         }
 
-        private static IJsonValue Array(IEnumerable<string>? values)
+        private static JsonValue Array(IEnumerable<string>? values)
         {
             if (values != null)
             {
@@ -140,7 +142,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
             }
             else
             {
-                return JsonValue.Array();
+                return new JsonArray();
             }
         }
     }

@@ -20,30 +20,32 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public string Type { get; } = Guard.NotNullOrEmpty(Type);
 
-        public JsonObject Data { get; } = Guard.NotNull(Data);
-
         public Schema Schema { get; } = Guard.NotNull(Schema);
 
-        public static bool IsValid(IJsonValue? value, [MaybeNullWhen(false)] out string discriminator)
+        public JsonObject Data { get; } = Guard.NotNull(Data);
+
+        public static bool IsValid(JsonValue value, [MaybeNullWhen(false)] out string discriminator)
         {
             discriminator = null!;
 
-            if (value is not JsonObject obj)
+            if (value.Type != JsonValueType.Object)
             {
                 return false;
             }
 
-            if (!obj.TryGetValue<JsonString>(Discriminator, out var type))
+            if (!value.AsObject.TryGetValue(Discriminator, out var type) || type.Type != JsonValueType.String)
             {
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(type.Value))
+            var typed = type.AsString;
+
+            if (string.IsNullOrWhiteSpace(typed))
             {
                 return false;
             }
 
-            discriminator = type.Value;
+            discriminator = typed;
 
             return true;
         }

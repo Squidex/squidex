@@ -54,7 +54,8 @@ namespace Squidex.Infrastructure
         {
             if (converter == null)
             {
-                throw new NotSupportedException();
+                ThrowHelper.NotSupportedException();
+                return default!;
             }
 
             return converter((string)value);

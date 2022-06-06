@@ -12,19 +12,19 @@ namespace Squidex.Domain.Apps.Core.Scripting
 {
     public interface IScriptEngine
     {
-        Task<IJsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default,
+        Task<JsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default,
             CancellationToken ct = default);
 
         Task<ContentData> TransformAsync(DataScriptVars vars, string script, ScriptOptions options = default,
             CancellationToken ct = default);
 
-        IJsonValue Execute(ScriptVars vars, string script, ScriptOptions options = default);
+        JsonValue Execute(ScriptVars vars, string script, ScriptOptions options = default);
 
         bool Evaluate(ScriptVars vars, string script, ScriptOptions options = default)
         {
             try
             {
-                return Execute(vars, script, options).Equals(JsonValue.True);
+                return Execute(vars, script, options).Equals(true);
             }
             catch
             {

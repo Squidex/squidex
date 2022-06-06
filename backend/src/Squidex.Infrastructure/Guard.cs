@@ -21,7 +21,8 @@ namespace Squidex.Infrastructure
         {
             if (float.IsNaN(target) || float.IsPositiveInfinity(target) || float.IsNegativeInfinity(target))
             {
-                throw new ArgumentException("Value must be a valid number.", parameterName);
+                ThrowHelper.ArgumentException("Value must be a valid number.", parameterName);
+                return default!;
             }
 
             return target;
@@ -34,7 +35,8 @@ namespace Squidex.Infrastructure
         {
             if (double.IsNaN(target) || double.IsPositiveInfinity(target) || double.IsNegativeInfinity(target))
             {
-                throw new ArgumentException("Value must be a valid number.", parameterName);
+                ThrowHelper.ArgumentException("Value must be a valid number.", parameterName);
+                return default!;
             }
 
             return target;
@@ -49,7 +51,8 @@ namespace Squidex.Infrastructure
 
             if (!target!.IsSlug())
             {
-                throw new ArgumentException("Target is not a valid slug.", parameterName);
+                ThrowHelper.ArgumentException("Target is not a valid slug.", parameterName);
+                return default!;
             }
 
             return target!;
@@ -64,7 +67,8 @@ namespace Squidex.Infrastructure
 
             if (!target!.IsPropertyName())
             {
-                throw new ArgumentException("Target is not a valid property name.", parameterName);
+                ThrowHelper.ArgumentException("Target is not a valid property name.", parameterName);
+                return default!;
             }
 
             return target!;
@@ -77,7 +81,8 @@ namespace Squidex.Infrastructure
         {
             if (target != null && target.GetType() != typeof(T))
             {
-                throw new ArgumentException($"The parameter must be of type {typeof(T)}", parameterName);
+                ThrowHelper.ArgumentException($"The parameter must be of type {typeof(T)}", parameterName);
+                return default!;
             }
 
             return target;
@@ -90,7 +95,8 @@ namespace Squidex.Infrastructure
         {
             if (target != null && expectedType != null && target.GetType() != expectedType)
             {
-                throw new ArgumentException($"The parameter must be of type {expectedType}", parameterName);
+                ThrowHelper.ArgumentException($"The parameter must be of type {expectedType}", parameterName);
+                return default!;
             }
 
             return target;
@@ -103,7 +109,8 @@ namespace Squidex.Infrastructure
         {
             if (!target.IsBetween(lower, upper))
             {
-                throw new ArgumentException($"Value must be between {lower} and {upper}", parameterName);
+                ThrowHelper.ArgumentException($"Value must be between {lower} and {upper}", parameterName);
+                return default!;
             }
 
             return target;
@@ -116,7 +123,8 @@ namespace Squidex.Infrastructure
         {
             if (!target.IsEnumValue())
             {
-                throw new ArgumentException($"Value must be a valid enum type {typeof(TEnum)}", parameterName);
+                ThrowHelper.ArgumentException($"Value must be a valid enum type {typeof(TEnum)}", parameterName);
+                return default!;
             }
 
             return target;
@@ -129,7 +137,8 @@ namespace Squidex.Infrastructure
         {
             if (target.CompareTo(lower) <= 0)
             {
-                throw new ArgumentException($"Value must be greater than {lower}", parameterName);
+                ThrowHelper.ArgumentException($"Value must be greater than {lower}", parameterName);
+                return default!;
             }
 
             return target;
@@ -142,7 +151,8 @@ namespace Squidex.Infrastructure
         {
             if (target.CompareTo(lower) < 0)
             {
-                throw new ArgumentException($"Value must be greater or equal to {lower}", parameterName);
+                ThrowHelper.ArgumentException($"Value must be greater or equal to {lower}", parameterName);
+                return default!;
             }
 
             return target;
@@ -155,7 +165,8 @@ namespace Squidex.Infrastructure
         {
             if (target.CompareTo(upper) >= 0)
             {
-                throw new ArgumentException($"Value must be less than {upper}", parameterName);
+                ThrowHelper.ArgumentException($"Value must be less than {upper}", parameterName);
+                return default!;
             }
 
             return target;
@@ -168,7 +179,8 @@ namespace Squidex.Infrastructure
         {
             if (target.CompareTo(upper) > 0)
             {
-                throw new ArgumentException($"Value must be less or equal to {upper}", parameterName);
+                ThrowHelper.ArgumentException($"Value must be less or equal to {upper}", parameterName);
+                return default!;
             }
 
             return target;
@@ -183,7 +195,8 @@ namespace Squidex.Infrastructure
 
             if (target != null && target.Count == 0)
             {
-                throw new ArgumentException("Collection does not contain an item.", parameterName);
+                ThrowHelper.ArgumentException("Collection does not contain an item.", parameterName);
+                return default!;
             }
 
             return target!;
@@ -196,7 +209,8 @@ namespace Squidex.Infrastructure
         {
             if (target == Guid.Empty)
             {
-                throw new ArgumentException("Value cannot be empty.", parameterName);
+                ThrowHelper.ArgumentException("Value cannot be empty.", parameterName);
+                return default!;
             }
 
             return target;
@@ -209,7 +223,8 @@ namespace Squidex.Infrastructure
         {
             if (target == DomainId.Empty)
             {
-                throw new ArgumentException("Value cannot be empty.", parameterName);
+                ThrowHelper.ArgumentException("Value cannot be empty.", parameterName);
+                return default!;
             }
 
             return target;
@@ -222,7 +237,8 @@ namespace Squidex.Infrastructure
         {
             if (target == null)
             {
-                throw new ArgumentNullException(parameterName);
+                ThrowHelper.ArgumentNullException(parameterName);
+                return default!;
             }
 
             return target;
@@ -235,7 +251,8 @@ namespace Squidex.Infrastructure
         {
             if (target == null)
             {
-                throw new ArgumentNullException(parameterName);
+                ThrowHelper.ArgumentNullException(parameterName);
+                return default!;
             }
 
             return target;
@@ -248,7 +265,8 @@ namespace Squidex.Infrastructure
         {
             if (Equals(target, default(TValue)!))
             {
-                throw new ArgumentException("Value cannot be an the default value.", parameterName);
+                ThrowHelper.ArgumentException("Value cannot be an the default value.", parameterName);
+                return default!;
             }
 
             return target;
@@ -263,7 +281,8 @@ namespace Squidex.Infrastructure
 
             if (string.IsNullOrWhiteSpace(target))
             {
-                throw new ArgumentException("String parameter cannot be null or empty and cannot contain only blanks.", parameterName);
+                ThrowHelper.ArgumentException("String parameter cannot be null or empty and cannot contain only blanks.", parameterName);
+                return default!;
             }
 
             return target;
@@ -278,7 +297,8 @@ namespace Squidex.Infrastructure
 
             if (target != null && target.Intersect(Path.GetInvalidFileNameChars()).Any())
             {
-                throw new ArgumentException("Value contains an invalid character.", parameterName);
+                ThrowHelper.ArgumentException("Value contains an invalid character.", parameterName);
+                return default!;
             }
 
             return target!;

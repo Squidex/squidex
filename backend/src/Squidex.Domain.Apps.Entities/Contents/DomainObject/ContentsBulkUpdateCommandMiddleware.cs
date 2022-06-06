@@ -261,7 +261,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     }
 
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         }
 

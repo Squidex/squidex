@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Queries.Json
             return Convert(model, query);
         }
 
-        public static ClrQuery Convert(this QueryModel model, Query<IJsonValue> query)
+        public static ClrQuery Convert(this QueryModel model, Query<JsonValue> query)
         {
             if (query == null)
             {
@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure.Queries.Json
             return result;
         }
 
-        private static void ConvertFilters(this QueryModel model, ClrQuery result, List<string> errors, Query<IJsonValue> query)
+        private static void ConvertFilters(this QueryModel model, ClrQuery result, List<string> errors, Query<JsonValue> query)
         {
             if (query.Filter == null)
             {
@@ -76,11 +76,11 @@ namespace Squidex.Infrastructure.Queries.Json
             }
         }
 
-        public static Query<IJsonValue> ParseFromJson(string json, IJsonSerializer jsonSerializer)
+        public static Query<JsonValue> ParseFromJson(string json, IJsonSerializer jsonSerializer)
         {
             try
             {
-                return jsonSerializer.Deserialize<Query<IJsonValue>>(json);
+                return jsonSerializer.Deserialize<Query<JsonValue>>(json);
             }
             catch (JsonException ex)
             {

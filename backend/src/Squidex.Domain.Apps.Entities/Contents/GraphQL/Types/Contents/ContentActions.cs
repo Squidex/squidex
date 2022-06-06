@@ -14,7 +14,6 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 

@@ -7,7 +7,6 @@
 
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Directives;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types

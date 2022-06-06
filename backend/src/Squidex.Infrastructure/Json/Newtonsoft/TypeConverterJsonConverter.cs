@@ -32,7 +32,8 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             }
             catch (Exception ex)
             {
-                throw new JsonException("Error while converting from string.", ex);
+                ThrowHelper.JsonException("Error while converting from string.", ex);
+                return default;
             }
         }
 

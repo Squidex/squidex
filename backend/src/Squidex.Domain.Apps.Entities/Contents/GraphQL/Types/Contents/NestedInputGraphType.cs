@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public override object ParseDictionary(IDictionary<string, object?> value)
         {
-            var result = JsonValue.Object();
+            var result = new JsonObject();
 
             foreach (var field in Fields)
             {
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 }
             }
 
-            return result;
+            return new JsonValue(result);
         }
     }
 }

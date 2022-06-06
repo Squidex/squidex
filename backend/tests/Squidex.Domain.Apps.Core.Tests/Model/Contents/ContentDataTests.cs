@@ -205,8 +205,8 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             newData.UseSameFields(oldData);
 
-            Assert.Same(newData["field1"]!["en"], oldData["field1"]!["en"]);
-            Assert.NotSame(newData["field1"]!["de"], oldData["field1"]!["de"]);
+            Assert.Same(newData["field1"]!["en"].Value, oldData["field1"]!["en"].Value);
+            Assert.NotSame(newData["field1"]!["de"].Value, oldData["field1"]!["de"].Value);
             Assert.NotSame(newData["field1"], oldData["field1"]);
         }
     }

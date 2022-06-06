@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return GetGrain(appId, userId).RemoveAsync(path);
         }
 
-        public Task SetAsync(DomainId appId, string? userId, string path, IJsonValue value)
+        public Task SetAsync(DomainId appId, string? userId, string path, JsonValue value)
         {
             return GetGrain(appId, userId).SetAsync(path, value.AsJ());
         }

@@ -20,6 +20,8 @@ using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 using Squidex.Shared;
 
+#pragma warning disable MA0022 // Return Task.FromResult instead of returning null
+
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 {
     public sealed partial class ContentDomainObject : DomainObject<ContentDomainObject.State>
@@ -220,7 +222,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     });
 
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         }
 

@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
 
         public override string ToStringValue()
         {
-            return value.ToString();
+            return value.ToString()!;
         }
 
         protected override FluidValue GetValue(string name, TemplateContext context)
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
 
         public override void WriteTo(TextWriter writer, TextEncoder encoder, CultureInfo cultureInfo)
         {
-            writer.Write(value.ToString());
+            writer.Write(value);
         }
     }
 }

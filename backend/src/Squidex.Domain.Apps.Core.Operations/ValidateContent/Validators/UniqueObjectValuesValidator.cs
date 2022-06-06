@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         private void Validate(ValidationContext context, AddError addError, IEnumerable<JsonObject> items)
         {
-            var duplicates = new HashSet<IJsonValue>(10);
+            var duplicates = new HashSet<JsonValue>(10);
 
             foreach (var field in fields)
             {

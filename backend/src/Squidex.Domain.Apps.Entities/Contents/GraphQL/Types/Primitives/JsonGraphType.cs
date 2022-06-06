@@ -23,28 +23,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
             return ParseJson(value);
         }
 
-        public static IJsonValue ParseJson(object? input)
+        public static JsonValue ParseJson(object? input)
         {
             switch (input)
             {
                 case GraphQLBooleanValue booleanValue:
-                    return JsonValue.Create(booleanValue.BoolValue);
+                    return booleanValue.BoolValue;
 
                 case GraphQLFloatValue floatValue:
-                    return JsonValue.Create(double.Parse((string)floatValue.Value, NumberStyles.Integer, CultureInfo.InvariantCulture));
+                    return double.Parse((string)floatValue.Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
 
                 case GraphQLIntValue intValue:
-                    return JsonValue.Create(int.Parse((string)intValue.Value, NumberStyles.Integer, CultureInfo.InvariantCulture));
+                    return double.Parse((string)intValue.Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
 
                 case GraphQLNullValue:
-                    return JsonValue.Null;
+                    return default;
 
                 case GraphQLStringValue stringValue:
-                    return JsonValue.Create((string)stringValue.Value);
+                    return (string)stringValue.Value;
 
                 case GraphQLListValue listValue:
                     {
-                        var json = JsonValue.Array();
+                        var json = new JsonArray();
 
                         if (listValue.Values != null)
                         {
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 
                 case GraphQLObjectValue objectValue:
                     {
-                        var json = JsonValue.Object();
+                        var json = new JsonObject();
 
                         if (objectValue.Fields != null)
                         {
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 
                 case IEnumerable<object> list:
                     {
-                        var json = JsonValue.Array();
+                        var json = new JsonArray();
 
                         foreach (var item in list)
                         {
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 
                 case IDictionary<string, object> obj:
                     {
-                        var json = JsonValue.Object();
+                        var json = new JsonObject();
 
                         foreach (var (key, value) in obj)
                         {

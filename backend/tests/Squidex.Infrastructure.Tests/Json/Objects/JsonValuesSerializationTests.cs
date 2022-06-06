@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.Json.Objects
         [Fact]
         public void Should_deserialize_integer()
         {
-            var serialized = TestUtils.Deserialize<IJsonValue>(123);
+            var serialized = TestUtils.Deserialize<JsonValue>(123);
 
             Assert.Equal(JsonValue.Create(123), serialized);
         }
@@ -94,7 +94,7 @@ namespace Squidex.Infrastructure.Json.Objects
         public void Should_serialize_and_deserialize_object()
         {
             var value =
-                JsonValue.Object()
+                new JsonObject()
                     .Add("1", 1)
                     .Add("2", 1);
 
@@ -107,13 +107,13 @@ namespace Squidex.Infrastructure.Json.Objects
         public void Should_serialize_and_deserialize_complex_object()
         {
             var value =
-                JsonValue.Object()
+                new JsonObject()
                     .Add("1",
                         JsonValue.Array(
-                            JsonValue.Object().Add("1_1", 11),
-                            JsonValue.Object().Add("1_2", 12)))
+                            new JsonObject().Add("1_1", 11),
+                            new JsonObject().Add("1_2", 12)))
                     .Add("2",
-                        JsonValue.Object().Add("2_1", 11));
+                        new JsonObject().Add("2_1", 11));
 
             var serialized = value.SerializeAndDeserialize();
 

@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             public (bool Match, ValueTask<string?>) Format(EnrichedEvent @event, object value, string[] path)
             {
-                if (path[0] == "data" && value is JsonArray)
+                if (path[0] == "data" && value is JsonValue jsonValue && jsonValue.Type == JsonValueType.Array)
                 {
                     return (true, GetValueAsync());
                 }
@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddInvariant(JsonValue.Array()))
+                                .AddInvariant(new JsonArray()))
             };
 
             var result = await sut.FormatAsync("${CONTENT_DATA.city.iv.data.name}", @event);

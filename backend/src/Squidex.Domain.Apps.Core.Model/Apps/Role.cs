@@ -37,9 +37,9 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public string Name { get; } = Guard.NotNullOrEmpty(Name);
 
-        public PermissionSet Permissions { get; } = Permissions ?? PermissionSet.Empty;
-
         public JsonObject Properties { get; } = Properties ?? new JsonObject();
+
+        public PermissionSet Permissions { get; } = Permissions ?? PermissionSet.Empty;
 
         public bool IsDefault
         {
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public static Role WithPermissions(string name, params string[] permissions)
         {
-            return new Role(name, new PermissionSet(permissions), JsonValue.Object());
+            return new Role(name, new PermissionSet(permissions), new JsonObject());
         }
 
         public static Role WithProperties(string name, JsonObject properties)

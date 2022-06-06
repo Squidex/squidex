@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             if (ids.Count != fieldsOrdered.Length || ids.Any(x => !ById.ContainsKey(x)))
             {
-                throw new ArgumentException("Ids must cover all fields.", nameof(ids));
+                ThrowHelper.ArgumentException("Ids must cover all fields.", nameof(ids));
             }
 
             if (ids.SequenceEqual(fieldsOrdered.Select(x => x.Id)))
@@ -119,12 +119,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             if (ByName.ContainsKey(field.Name))
             {
-                throw new ArgumentException($"A field with name '{field.Name}' already exists.", nameof(field));
+                ThrowHelper.ArgumentException($"A field with name '{field.Name}' already exists.", nameof(field));
             }
 
             if (ById.ContainsKey(field.Id))
             {
-                throw new ArgumentException($"A field with ID {field.Id} already exists.", nameof(field));
+                ThrowHelper.ArgumentException($"A field with ID {field.Id} already exists.", nameof(field));
             }
 
             return new FieldCollection<T>(fieldsOrdered.Union(Enumerable.Repeat(field, 1)));
@@ -149,7 +149,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             if (newField is null)
             {
-                throw new InvalidOperationException($"Field must be of type {typeof(T)}");
+                ThrowHelper.InvalidOperationException($"Field must be of type {typeof(T)}");
+                return default!;
             }
 
             return new FieldCollection<T>(fieldsOrdered.Select(x => ReferenceEquals(x, field) ? newField : x));

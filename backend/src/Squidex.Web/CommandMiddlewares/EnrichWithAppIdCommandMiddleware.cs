@@ -39,7 +39,8 @@ namespace Squidex.Web.CommandMiddlewares
 
             if (context.App == null)
             {
-                throw new InvalidOperationException("Cannot resolve app.");
+                ThrowHelper.InvalidOperationException("Cannot resolve app.");
+                return default!;
             }
 
             return context.App.NamedId();

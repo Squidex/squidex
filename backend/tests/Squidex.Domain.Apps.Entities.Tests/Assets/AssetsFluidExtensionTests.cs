@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
+using Squidex.Domain.Apps.Core.Templates.Extensions;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -41,6 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var extensions = new IFluidExtension[]
             {
+                new ContentFluidExtension(),
                 new AssetsFluidExtension(services)
             };
 

@@ -14,6 +14,8 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 
+#pragma warning disable MA0022 // Return Task.FromResult instead of returning null
+
 namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 {
     public sealed class CommentsGrain : GrainOfString, ICommentsGrain
@@ -88,7 +90,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                     });
 
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         }
 

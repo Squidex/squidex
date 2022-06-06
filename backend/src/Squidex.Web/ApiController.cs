@@ -33,7 +33,8 @@ namespace Squidex.Web
 
                 if (app == null)
                 {
-                    throw new InvalidOperationException("Not in a app context.");
+                    ThrowHelper.InvalidOperationException("Not in a app context.");
+                    return default!;
                 }
 
                 return app;
@@ -48,7 +49,8 @@ namespace Squidex.Web
 
                 if (schema == null)
                 {
-                    throw new InvalidOperationException("Not in a schema context.");
+                    ThrowHelper.InvalidOperationException("Not in a schema context.");
+                    return default!;
                 }
 
                 return schema;

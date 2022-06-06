@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new TagsFieldProperties { IsRequired = true });
 
-            await sut.ValidateAsync(JsonValue.Array(JsonValue.Null), errors);
+            await sut.ValidateAsync((JsonValue)JsonValue.Array(JsonValue.Null), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Invalid json type, expected array of strings." });
@@ -144,9 +144,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "[1]: Not an allowed value." });
         }
 
-        private static IJsonValue CreateValue(params string?[]? ids)
+        private static JsonValue CreateValue(params string?[]? ids)
         {
-            return ids == null ? JsonValue.Null : JsonValue.Array(ids.OfType<object>().ToArray());
+            return ids == null ? JsonValue.Null : JsonValue.Array(ids);
         }
 
         private static RootField<TagsFieldProperties> Field(TagsFieldProperties properties)

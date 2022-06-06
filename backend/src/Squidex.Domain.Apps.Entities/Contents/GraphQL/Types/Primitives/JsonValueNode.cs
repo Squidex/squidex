@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GraphQLParser;
 using GraphQLParser.AST;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -15,9 +14,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
     {
         public override ASTNodeKind Kind => ASTNodeKind.ObjectValue;
 
-        public IJsonValue Value { get; }
+        public JsonValue Value { get; }
 
-        public JsonValueNode(IJsonValue value)
+        public JsonValueNode(JsonValue value)
         {
             Value = value;
         }

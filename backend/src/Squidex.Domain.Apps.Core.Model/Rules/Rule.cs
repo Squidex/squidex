@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Core.Rules
 
             if (newTrigger.GetType() != Trigger.GetType())
             {
-                throw new ArgumentException("New trigger has another type.", nameof(newTrigger));
+                ThrowHelper.ArgumentException("New trigger has another type.", nameof(newTrigger));
             }
 
             if (Trigger.Equals(newTrigger))
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Core.Rules
 
             if (newAction.GetType() != Action.GetType())
             {
-                throw new ArgumentException("New action has another type.", nameof(newAction));
+                ThrowHelper.ArgumentException("New action has another type.", nameof(newAction));
             }
 
             if (Action.Equals(newAction))

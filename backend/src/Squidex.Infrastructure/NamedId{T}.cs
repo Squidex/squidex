@@ -81,7 +81,8 @@ namespace Squidex.Infrastructure
         {
             if (!TryParse(value, parser, out var result))
             {
-                throw new ArgumentException("Named id must have at least 2 parts divided by commata.", nameof(value));
+                ThrowHelper.ArgumentException("Named id must have at least 2 parts divided by commata.", nameof(value));
+                return default!;
             }
 
             return result;

@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 nestedValidators[nestedField.Name] = (false, args.Factory(nestedField));
             }
 
-            yield return new CollectionItemValidator(new ObjectValidator<IJsonValue>(nestedValidators, false, "field"));
+            yield return new CollectionItemValidator(new ObjectValidator<JsonValue>(nestedValidators, false, "field"));
         }
 
         public IEnumerable<IValidator> Visit(IField<AssetsFieldProperties> field, Args args)
@@ -277,7 +277,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                     nestedValidators[nestedField.Name] = (false, factory(nestedField));
                 }
 
-                return new ObjectValidator<IJsonValue>(nestedValidators, false, "field");
+                return new ObjectValidator<JsonValue>(nestedValidators, false, "field");
             });
         }
     }

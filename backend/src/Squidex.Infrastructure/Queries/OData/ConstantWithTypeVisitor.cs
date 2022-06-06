@@ -83,7 +83,8 @@ namespace Squidex.Infrastructure.Queries.OData
                 return nodeIn.Collection.Select(x => (string)x.Value).ToList();
             }
 
-            throw new NotSupportedException();
+            ThrowHelper.NotSupportedException();
+            return default!;
         }
 
         public override ClrValue Visit(ConstantNode nodeIn)
@@ -95,7 +96,8 @@ namespace Squidex.Infrastructure.Queries.OData
 
             if (nodeIn.TypeReference == null)
             {
-                throw new NotSupportedException();
+                ThrowHelper.NotSupportedException();
+                return default!;
             }
 
             if (nodeIn.TypeReference.Definition == DateTimeType || nodeIn.TypeReference.Definition == DateType)
@@ -138,7 +140,8 @@ namespace Squidex.Infrastructure.Queries.OData
                 return (string)nodeIn.Value;
             }
 
-            throw new NotSupportedException();
+            ThrowHelper.NotSupportedException();
+            return default!;
         }
 
         private static Instant ParseInstant(object value)

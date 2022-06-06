@@ -16,6 +16,7 @@ using OpenIddict.Server.AspNetCore;
 using Squidex.Areas.IdentityServer.Config;
 using Squidex.Areas.IdentityServer.Controllers;
 using Squidex.Domain.Users;
+using Squidex.Infrastructure;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Squidex.Web;
@@ -46,7 +47,8 @@ namespace Notifo.Areas.Account.Controllers
             var request = HttpContext.GetOpenIddictServerRequest();
             if (request == null)
             {
-                throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
+                ThrowHelper.InvalidOperationException("The OpenID Connect request cannot be retrieved.");
+                return default!;
             }
 
             if (request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType() || request.IsImplicitFlow())
@@ -54,7 +56,8 @@ namespace Notifo.Areas.Account.Controllers
                 var principal = (await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)).Principal;
                 if (principal == null)
                 {
-                    throw new InvalidOperationException("The user details cannot be retrieved.");
+                    ThrowHelper.InvalidOperationException("The user details cannot be retrieved.");
+                    return default!;
                 }
 
                 var user = await userService.GetAsync(principal, HttpContext.RequestAborted);
@@ -92,13 +95,15 @@ namespace Notifo.Areas.Account.Controllers
             {
                 if (request.ClientId == null)
                 {
-                    throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
+                    ThrowHelper.InvalidOperationException("The OpenID Connect request cannot be retrieved.");
+                    return default!;
                 }
 
                 var application = await applicationManager.FindByClientIdAsync(request.ClientId, HttpContext.RequestAborted);
                 if (application == null)
                 {
-                    throw new InvalidOperationException("The application details cannot be found in the database.");
+                    ThrowHelper.InvalidOperationException("The application details cannot be found in the database.");
+                    return default!;
                 }
 
                 var principal = await CreateApplicationPrincipalAsync(request, application);
@@ -106,7 +111,8 @@ namespace Notifo.Areas.Account.Controllers
                 return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
 
-            throw new InvalidOperationException("The specified grant type is not supported.");
+            ThrowHelper.InvalidOperationException("The specified grant type is not supported.");
+            return default!;
         }
 
         [HttpGet("connect/authorize")]
@@ -115,7 +121,8 @@ namespace Notifo.Areas.Account.Controllers
             var request = HttpContext.GetOpenIddictServerRequest();
             if (request == null)
             {
-                throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
+                ThrowHelper.InvalidOperationException("The OpenID Connect request cannot be retrieved.");
+                return default!;
             }
 
             if (User.Identity?.IsAuthenticated != true)
@@ -149,7 +156,8 @@ namespace Notifo.Areas.Account.Controllers
 
             if (user == null)
             {
-                throw new InvalidOperationException("The user details cannot be retrieved.");
+                ThrowHelper.InvalidOperationException("The user details cannot be retrieved.");
+                return default!;
             }
 
             var principal = await CreatePrincipalAsync(request, user);
