@@ -93,17 +93,17 @@ namespace Squidex.Domain.Apps.Entities.History
 
             try
             {
-                var settings = new Dictionary<string, NotificationSettingDto>
+                var settings = new Dictionary<string, ChannelSettingDto>
                 {
-                    [Providers.WebPush] = new NotificationSettingDto
+                    [Providers.WebPush] = new ChannelSettingDto
                     {
-                        Send = NotificationSend.Send,
+                        Send = ChannelSend.Send,
                         DelayInSeconds = null
                     },
 
-                    [Providers.Email] = new NotificationSettingDto
+                    [Providers.Email] = new ChannelSettingDto
                     {
-                        Send = NotificationSend.Send,
+                        Send = ChannelSend.Send,
                         DelayInSeconds = 5 * 60
                     }
                 };
