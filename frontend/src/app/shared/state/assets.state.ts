@@ -468,7 +468,7 @@ function updateTags(snapshot: Snapshot, newAsset?: AssetDto, oldAsset?: AssetDto
     return { tagsAvailable, tagsSelected };
 }
 
-function createQuery(snapshot: Snapshot, optimizeTotal: boolean) {
+function createQuery(snapshot: Snapshot, noSlowTotal: boolean) {
     const {
         ref,
         page,
@@ -478,7 +478,7 @@ function createQuery(snapshot: Snapshot, optimizeTotal: boolean) {
         total,
     } = snapshot;
 
-    const result: any = { take: pageSize, skip: pageSize * page, optimizeTotal };
+    const result: any = { take: pageSize, skip: pageSize * page, noSlowTotal };
 
     const tags = Object.keys(tagsSelected);
 

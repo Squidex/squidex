@@ -161,7 +161,7 @@ export type MoveAssetItemDto =
     Readonly<{ parentId?: string }>;
 
 export type AssetsQuery =
-    Readonly<{ noTotal?: boolean; optimizeTotal?: boolean }>;
+    Readonly<{ noTotal?: boolean; noSlowTotal?: boolean }>;
 
 export type AssetsByRef =
     Readonly<{ ref: string }>;
@@ -200,23 +200,7 @@ export class AssetsService {
 
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/query`);
 
-        let options = {};
-
-        if (q?.noTotal || q?.['ref']) {
-            options = {
-                headers: {
-                    'X-NoTotal': '1',
-                },
-            };
-        } else if (q?.optimizeTotal) {
-            options = {
-                headers: {
-                    'X-NoSlowTotal': '1',
-                },
-            };
-        }
-
-        return this.http.post<any>(url, body, options).pipe(
+        return this.http.post<any>(url, body, buildHeaders(q, q?.['ref'])).pipe(
             map(body => {
                 return parseAssets(body);
             }),
@@ -387,6 +371,22 @@ export class AssetsService {
 
         return this.http.get<AssetCompletions>(url);
     }
+}
+
+function buildHeaders(q: AssetsQuery | undefined, noTotal: boolean) {
+    let options = {
+        headers: {},
+    };
+
+    if (q?.noTotal || noTotal) {
+        options.headers['X-NoTotal'] = '1';
+    }
+
+    if (q?.noSlowTotal) {
+        options.headers['X-NoSlowTotal'] = '1';
+    }
+
+    return options;
 }
 
 function buildQuery(q?: AssetsQuery & AssetsByQuery & AssetsByIds & AssetsByRef) {

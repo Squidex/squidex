@@ -128,7 +128,7 @@ export type BulkUpdateJobDto =
     Readonly<{ id: string; type: BulkUpdateType; schema?: string; expectedVersion?: number }> & BulkStatusDto;
 
 export type ContentsQuery =
-    Readonly<{ noTotal?: boolean; optimizeTotal?: boolean  }>;
+    Readonly<{ noTotal?: boolean; noSlowTotal?: boolean  }>;
 
 export type ContentsByIds =
     Readonly<{ ids: ReadonlyArray<string> }> & ContentsQuery;
@@ -153,23 +153,7 @@ export class ContentsService {
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/query`);
 
-        let options = {};
-
-        if (q?.noTotal) {
-            options = {
-                headers: {
-                    'X-NoTotal': '1',
-                },
-            };
-        } else if (q?.optimizeTotal) {
-            options = {
-                headers: {
-                    'X-NoSlowTotal': '1',
-                },
-            };
-        }
-
-        return this.http.post<any>(url, body, options).pipe(
+        return this.http.post<any>(url, body, buildHeaders(q, false)).pipe(
             map(body => {
                 return parseContents(body);
             }),
@@ -194,21 +178,11 @@ export class ContentsService {
     }
 
     public getAllContents(appName: string, q: ContentsByIds | ContentsBySchedule): Observable<ContentsDto> {
-        const { noTotal, ...body } = q;
+        const { ...body } = q;
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}`);
 
-        let options = {};
-
-        if (noTotal) {
-            options = {
-                headers: {
-                    'X-NoTotal': '1',
-                },
-            };
-        }
-
-        return this.http.post<any>(url, body, options).pipe(
+        return this.http.post<any>(url, body, buildHeaders(q, false)).pipe(
             map(body => {
                 return parseContents(body);
             }),
@@ -220,17 +194,7 @@ export class ContentsService {
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/references?${fullQuery}`);
 
-        let options = {};
-
-        if (q?.noTotal) {
-            options = {
-                headers: {
-                    'X-NoTotal': '1',
-                },
-            };
-        }
-
-        return this.http.get<any>(url, options).pipe(
+        return this.http.get<any>(url, buildHeaders(q, false)).pipe(
             map(body => {
                 return parseContents(body);
             }),
@@ -359,6 +323,22 @@ export class ContentsService {
             }),
             pretifyError('i18n:contents.bulkFailed'));
     }
+}
+
+function buildHeaders(q: ContentsQuery | undefined, noTotal: boolean) {
+    let options = {
+        headers: {},
+    };
+
+    if (q?.noTotal || noTotal) {
+        options.headers['X-NoTotal'] = '1';
+    }
+
+    if (q?.noSlowTotal) {
+        options.headers['X-NoSlowTotal'] = '1';
+    }
+
+    return options;
 }
 
 function buildQuery(q?: ContentsByQuery) {
