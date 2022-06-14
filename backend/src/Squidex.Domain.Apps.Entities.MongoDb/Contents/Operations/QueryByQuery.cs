@@ -101,13 +101,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 var contentEntities = await FindContentsAsync(query, filter, ct);
                 var contentTotal = (long)contentEntities.Count;
 
-                if (q.NoTotal || (q.NoSlowTotal && q.Query.Filter != null))
+                if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
                 {
-                    contentTotal = -1;
-                }
-                else if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
-                {
-                    if (IsSatisfiedByIndex(query))
+                    if (q.NoTotal || (q.NoSlowTotal && q.Query.Filter != null))
+                    {
+                        contentTotal = -1;
+                    }
+                    else if (IsSatisfiedByIndex(query))
                     {
                         contentTotal = await Collection.Find(filter).QuerySort(query).CountDocumentsAsync(ct);
                     }
@@ -145,13 +145,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 var contentEntities = await FindContentsAsync(query, filter, ct);
                 var contentTotal = (long)contentEntities.Count;
 
-                if (q.NoTotal || (q.NoSlowTotal && q.Query.Filter != null))
+                if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
                 {
-                    contentTotal = -1;
-                }
-                else if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
-                {
-                    if (isDefault && countCollection != null)
+                    if (q.NoTotal || (q.NoSlowTotal && q.Query.Filter != null))
+                    {
+                        contentTotal = -1;
+                    }
+                    else if (isDefault && countCollection != null)
                     {
                         contentTotal = await countCollection.CountAsync(DomainId.Combine(app.Id, schema.Id), ct);
                     }

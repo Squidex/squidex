@@ -187,7 +187,7 @@ export class UsersState extends State<Snapshot> {
     }
 
     public search(query: string) {
-        if (!this.next({ query, page: 0 }, 'Loading Search')) {
+        if (!this.next({ query, page: 0, total: 0 }, 'Loading Search')) {
             return EMPTY;
         }
 

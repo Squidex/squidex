@@ -141,12 +141,12 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.loadInternal(false, true);
     }
 
-    public load(isReload = false, optimizeTotal = true, update: Partial<Snapshot> = {}): Observable<any> {
+    public load(isReload = false, noSlowTotal = true, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
             this.resetState({ selectedContent: this.snapshot.selectedContent, ...update }, 'Loading Intial');
         }
 
-        return this.loadInternal(isReload, optimizeTotal);
+        return this.loadInternal(isReload, noSlowTotal);
     }
 
     public loadIfNotLoaded(): Observable<any> {
@@ -157,11 +157,11 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.loadInternal(false, true);
     }
 
-    private loadInternal(isReload: boolean, optimizeTotal: boolean) {
-        return this.loadInternalCore(isReload, optimizeTotal).pipe(shareSubscribed(this.dialogs));
+    private loadInternal(isReload: boolean, noSlowTotal: boolean) {
+        return this.loadInternalCore(isReload, noSlowTotal).pipe(shareSubscribed(this.dialogs));
     }
 
-    private loadInternalCore(isReload: boolean, optimizeTotal: boolean) {
+    private loadInternalCore(isReload: boolean, noSlowTotal: boolean) {
         if (!this.appName || !this.schemaName) {
             return EMPTY;
         }
@@ -170,7 +170,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
         const { page, pageSize, query, reference, referencing, total } = this.snapshot;
 
-        const q: any = { take: pageSize, skip: pageSize * page, optimizeTotal };
+        const q: any = { take: pageSize, skip: pageSize * page, noSlowTotal };
 
         if (query) {
             q.query = query;
@@ -321,7 +321,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public search(query?: Query): Observable<any> {
-        if (!this.next({ query, page: 0 }, 'Loading Searched')) {
+        if (!this.next({ query, page: 0, total: 0 }, 'Loading Searched')) {
             return EMPTY;
         }
 

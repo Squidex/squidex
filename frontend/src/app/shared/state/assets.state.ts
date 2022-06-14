@@ -143,18 +143,18 @@ export abstract class AssetsStateBase extends State<Snapshot> {
         }, name);
     }
 
-    public load(isReload = false, optimizeTotal = true, update: Partial<Snapshot> = {}): Observable<any> {
+    public load(isReload = false, noSlowTotal = true, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
             this.resetState(update, 'Loading Initial');
         }
 
-        return this.loadInternal(isReload, optimizeTotal);
+        return this.loadInternal(isReload, noSlowTotal);
     }
 
-    private loadInternal(isReload: boolean, optimizeTotal: boolean): Observable<any> {
+    private loadInternal(isReload: boolean, noSlowTotal: boolean): Observable<any> {
         this.next({ isLoading: true }, 'Loading Started');
 
-        const query = createQuery(this.snapshot, optimizeTotal);
+        const query = createQuery(this.snapshot, noSlowTotal);
 
         const assets$ =
             this.assetsService.getAssets(this.appName, query);
@@ -410,7 +410,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
     }
 
     private searchInternal(query?: Query | null, tags?: TagsSelected) {
-        const update: Partial<Snapshot> = { page: 0, ref: null };
+        const update: Partial<Snapshot> = { page: 0, ref: null, total: 0 };
 
         if (query !== null) {
             update.query = query;

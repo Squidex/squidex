@@ -138,13 +138,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                                 .ToListAsync(ct);
                         long assetTotal = assetEntities.Count;
 
-                        if (q.NoTotal)
+                        if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
                         {
-                            assetTotal = -1;
-                        }
-                        else if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
-                        {
-                            assetTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
+                            if (q.NoTotal)
+                            {
+                                assetTotal = -1;
+                            }
+                            else
+                            {
+                                assetTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
+                            }
                         }
 
                         return ResultList.Create(assetTotal, assetEntities.OfType<IAssetEntity>());
@@ -163,13 +166,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                                 .ToListAsync(ct);
                         long assetTotal = assetEntities.Count;
 
-                        if (q.NoTotal || (q.NoSlowTotal && (q.Query.Filter != null || parentId != null)))
+                        if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
                         {
-                            assetTotal = -1;
-                        }
-                        else if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
-                        {
-                            if (isDefault && countCollection != null)
+                            if (q.NoTotal || (q.NoSlowTotal && (q.Query.Filter != null || parentId != null)))
+                            {
+                                assetTotal = -1;
+                            }
+                            else if (isDefault && countCollection != null)
                             {
                                 assetTotal = await countCollection.CountAsync(appId, ct);
                             }
