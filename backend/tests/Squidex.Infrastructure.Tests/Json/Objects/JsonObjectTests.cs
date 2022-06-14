@@ -22,8 +22,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             var objOtherValue = new JsonObject().Add("key1", 2);
             var objOtherKey = new JsonObject().Add("key2", 1);
-
-            var objOtherCount = new JsonObject().Add("key1", 1).Add("key2", 2);
+            var objOtherSize = new JsonObject().Add("key1", 1).Add("key2", 2);
 
             var number = JsonValue.Create(1);
 
@@ -39,9 +38,9 @@ namespace Squidex.Infrastructure.Json.Objects
             Assert.NotEqual(obj1a.GetHashCode(), objOtherKey.GetHashCode());
             Assert.False(obj1a.Equals((object)objOtherKey));
 
-            Assert.NotEqual(obj1a, objOtherCount);
-            Assert.NotEqual(obj1a.GetHashCode(), objOtherCount.GetHashCode());
-            Assert.False(obj1a.Equals((object)objOtherCount));
+            Assert.NotEqual(obj1a, objOtherSize);
+            Assert.NotEqual(obj1a.GetHashCode(), objOtherSize.GetHashCode());
+            Assert.False(obj1a.Equals((object)objOtherSize));
 
             Assert.NotEqual(obj1a, number);
             Assert.NotEqual(obj1a.GetHashCode(), number.GetHashCode());
@@ -77,43 +76,43 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_make_correct_array_scalar_comparisons()
+        public void Should_make_correct_scalar_comparisons()
         {
-            var number_val1_a = JsonValue.Create(1);
-            var number_val1_b = JsonValue.Create(1);
+            var number1a = JsonValue.Create(1);
+            var number1b = JsonValue.Create(1);
 
-            var number_val2 = JsonValue.Create(2);
+            var number2 = JsonValue.Create(2);
 
             var boolean = JsonValue.True;
 
-            Assert.Equal(number_val1_a, number_val1_b);
-            Assert.Equal(number_val1_a.GetHashCode(), number_val1_b.GetHashCode());
-            Assert.True(number_val1_a.Equals((object)number_val1_b));
+            Assert.Equal(number1a, number1b);
+            Assert.Equal(number1a.GetHashCode(), number1b.GetHashCode());
+            Assert.True(number1a.Equals((object)number1b));
 
-            Assert.NotEqual(number_val1_a, number_val2);
-            Assert.NotEqual(number_val1_a.GetHashCode(), number_val2.GetHashCode());
-            Assert.False(number_val1_a.Equals((object)number_val2));
+            Assert.NotEqual(number1a, number2);
+            Assert.NotEqual(number1a.GetHashCode(), number2.GetHashCode());
+            Assert.False(number1a.Equals((object)number2));
 
-            Assert.NotEqual(number_val1_a, boolean);
-            Assert.NotEqual(number_val1_a.GetHashCode(), boolean.GetHashCode());
-            Assert.False(number_val1_a.Equals((object)boolean));
+            Assert.NotEqual(number1a, boolean);
+            Assert.NotEqual(number1a.GetHashCode(), boolean.GetHashCode());
+            Assert.False(number1a.Equals((object)boolean));
         }
 
         [Fact]
         public void Should_make_correct_null_comparisons()
         {
-            var null_a = JsonValue.Null;
-            var null_b = JsonValue.Null;
+            var null1 = JsonValue.Null;
+            var null2 = JsonValue.Null;
 
             var boolean = JsonValue.True;
 
-            Assert.Equal(null_a, null_b);
-            Assert.Equal(null_a.GetHashCode(), null_b.GetHashCode());
-            Assert.True(null_a.Equals((object)null_b));
+            Assert.Equal(null1, null2);
+            Assert.Equal(null1.GetHashCode(), null2.GetHashCode());
+            Assert.True(null1.Equals((object)null2));
 
-            Assert.NotEqual(null_a, boolean);
-            Assert.NotEqual(null_a.GetHashCode(), boolean.GetHashCode());
-            Assert.False(null_a.Equals((object)boolean));
+            Assert.NotEqual(null1, boolean);
+            Assert.NotEqual(null1.GetHashCode(), boolean.GetHashCode());
+            Assert.False(null1.Equals((object)boolean));
         }
 
         [Fact]

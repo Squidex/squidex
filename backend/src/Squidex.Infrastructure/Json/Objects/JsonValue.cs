@@ -314,51 +314,12 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public bool Equals(JsonValue other)
         {
-            if (other.Type != Type)
-            {
-                return false;
-            }
-
-            switch (Value)
-            {
-                case null:
-                    return true;
-                case bool b:
-                    return b == (bool)other.Value!;
-                case double d:
-                    return d == (double)other.Value!;
-                case string s:
-                    return s == (string)other.Value!;
-                case JsonArray a:
-                    return a.Equals((JsonArray)other.Value!);
-                case JsonObject o:
-                    return o.Equals((JsonObject)other.Value!);
-                default:
-                    ThrowInvalidType();
-                    return default!;
-            }
+            return Equals(other.Value, Value);
         }
 
         public override int GetHashCode()
         {
-            switch (Value)
-            {
-                case null:
-                    return 0;
-                case bool b:
-                    return b.GetHashCode();
-                case double d:
-                    return d.GetHashCode();
-                case string s:
-                    return s.GetHashCode(StringComparison.OrdinalIgnoreCase);
-                case JsonArray a:
-                    return a.GetHashCode();
-                case JsonObject o:
-                    return o.GetHashCode();
-                default:
-                    ThrowInvalidType();
-                    return default!;
-            }
+            return Value?.GetHashCode() ?? 0;
         }
 
         public override string ToString()
