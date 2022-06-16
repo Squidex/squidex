@@ -248,10 +248,10 @@ namespace Squidex.Infrastructure
 
         public static bool EqualsDictionary<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, IReadOnlyDictionary<TKey, TValue>? other) where TKey : notnull
         {
-            return EqualsDictionary(dictionary, other, EqualityComparer<TKey>.Default, EqualityComparer<TValue>.Default);
+            return EqualsDictionary(dictionary, other, EqualityComparer<TValue>.Default);
         }
 
-        public static bool EqualsDictionary<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, IReadOnlyDictionary<TKey, TValue>? other, IEqualityComparer<TKey> keyComparer, IEqualityComparer<TValue> valueComparer) where TKey : notnull
+        public static bool EqualsDictionary<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, IReadOnlyDictionary<TKey, TValue>? other, IEqualityComparer<TValue> valueComparer) where TKey : notnull
         {
             if (other == null)
             {
@@ -268,9 +268,15 @@ namespace Squidex.Infrastructure
                 return false;
             }
 
-            var comparer = new KeyValuePairComparer<TKey, TValue>(keyComparer, valueComparer);
+            foreach (var (key, value) in dictionary)
+            {
+                if (!other.TryGetValue(key, out var otherValue) || !valueComparer.Equals(value, otherValue))
+                {
+                    return false;
+                }
+            }
 
-            return !dictionary.Except(other, comparer).Any();
+            return true;
         }
 
         public static bool EqualsList<T>(this IReadOnlyList<T> list, IReadOnlyList<T>? other)
@@ -391,38 +397,6 @@ namespace Squidex.Infrastructure
                 action(item, index);
 
                 index++;
-            }
-        }
-
-        public sealed class KeyValuePairComparer<TKey, TValue> : IEqualityComparer<KeyValuePair<TKey, TValue>> where TKey : notnull
-        {
-            private readonly IEqualityComparer<TKey> keyComparer;
-            private readonly IEqualityComparer<TValue> valueComparer;
-
-            public KeyValuePairComparer(IEqualityComparer<TKey> keyComparer, IEqualityComparer<TValue> valueComparer)
-            {
-                this.keyComparer = keyComparer;
-                this.valueComparer = valueComparer;
-            }
-
-            public bool Equals(KeyValuePair<TKey, TValue> x, KeyValuePair<TKey, TValue> y)
-            {
-                return keyComparer.Equals(x.Key, y.Key) && valueComparer.Equals(x.Value, y.Value);
-            }
-
-            public int GetHashCode(KeyValuePair<TKey, TValue> obj)
-            {
-                return keyComparer.GetHashCode(obj.Key) ^ ValueHashCode(obj);
-            }
-
-            private int ValueHashCode(KeyValuePair<TKey, TValue> obj)
-            {
-                if (Equals(obj.Value, null))
-                {
-                    return 0;
-                }
-
-                return valueComparer.GetHashCode(obj.Value);
             }
         }
     }
