@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             return JsValue.Null;
         }
 
-        private static JsValue FromArray(List<JsonValue> arr, Engine engine)
+        private static JsValue FromArray(JsonArray arr, Engine engine)
         {
             var target = new JsValue[arr.Count];
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             return engine.Realm.Intrinsics.Array.Construct(target);
         }
 
-        private static JsValue FromObject(ListDictionary<string, JsonValue> obj, Engine engine)
+        private static JsValue FromObject(JsonObject obj, Engine engine)
         {
             var target = new ObjectInstance(engine);
 

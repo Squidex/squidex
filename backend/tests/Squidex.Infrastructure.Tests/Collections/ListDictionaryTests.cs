@@ -10,6 +10,7 @@ using Xunit;
 
 #pragma warning disable xUnit2017 // Do not use Contains() to check if a value exists in a collection
 #pragma warning disable IDE0028 // Simplify collection initialization
+#pragma warning disable CA1841 // Prefer Dictionary.Contains methods
 
 namespace Squidex.Infrastructure.Collections
 {
@@ -62,6 +63,17 @@ namespace Squidex.Infrastructure.Collections
             var sut = new ListDictionary<int, int>();
 
             sut.Add(1, 10);
+
+            Assert.Single(sut);
+            Assert.Equal(10, sut[1]);
+        }
+
+        [Fact]
+        public void Should_add_item_unsafe()
+        {
+            var sut = new ListDictionary<int, int>();
+
+            sut.AddUnsafe(1, 10);
 
             Assert.Single(sut);
             Assert.Equal(10, sut[1]);

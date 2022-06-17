@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.validatorFactory = validatorFactory;
         }
 
-        public async ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public void Validate(object? value, ValidationContext context)
         {
             if (value is Component component)
             {
@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                 if (validator != null)
                 {
-                    await validator.ValidateAsync(component.Data, context, addError);
+                    validator.Validate(component.Data, context);
                 }
             }
         }

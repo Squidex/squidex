@@ -43,20 +43,23 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.checkReferences = checkReferences;
         }
 
-        public async ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public void Validate(object? value, ValidationContext context)
+        {
+            context.Root.AddTask(ct => ValidateCoreAsync(value, context));
+        }
+
+        private async Task ValidateCoreAsync(object? value, ValidationContext context)
         {
             var foundIds = new List<DomainId>();
 
             if (value is ICollection<DomainId> { Count: > 0 } contentIds)
             {
                 var references = await checkReferences(contentIds.ToHashSet());
-                var index = 0;
+                var referenceIndex = 1;
 
                 foreach (var id in contentIds)
                 {
-                    index++;
-
-                    var path = context.Path.Enqueue($"[{index}]");
+                    var path = context.Path.Enqueue($"[{referenceIndex}]");
 
                     var (schemaId, _, status) = references.FirstOrDefault(x => x.Id == id);
 
@@ -64,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     {
                         if (context.Action == ValidationAction.Upsert)
                         {
-                            addError(path, T.Get("contents.validation.referenceNotFound", new { id }));
+                            context.AddError(path, T.Get("contents.validation.referenceNotFound", new { id }));
                         }
 
                         continue;
@@ -76,7 +79,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     {
                         if (context.Action == ValidationAction.Upsert)
                         {
-                            addError(path, T.Get("contents.validation.referenceToInvalidSchema", new { id }));
+                            context.AddError(path, T.Get("contents.validation.referenceToInvalidSchema", new { id }));
                         }
 
                         isValid = false;
@@ -88,17 +91,19 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     {
                         foundIds.Add(id);
                     }
+
+                    referenceIndex++;
                 }
             }
 
             if (collectionValidator != null)
             {
-                await collectionValidator.ValidateAsync(foundIds, context, addError);
+                collectionValidator.Validate(foundIds, context);
             }
 
             if (uniqueValidator != null)
             {
-                await uniqueValidator.ValidateAsync(foundIds, context, addError);
+                uniqueValidator.Validate(foundIds, context);
             }
         }
     }

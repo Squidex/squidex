@@ -6,37 +6,29 @@
 // ==========================================================================
 
 using System.Collections.Immutable;
-using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
-    public sealed class ValidationContext : ValidatorContext
+    public sealed record ValidationContext
     {
         public ImmutableQueue<string> Path { get; private set; } = ImmutableQueue<string>.Empty;
 
-        public IJsonSerializer JsonSerializer { get; }
+        public bool IsOptional { get; init; }
 
-        public ResolvedComponents Components { get; }
+        public RootContext Root { get; }
 
-        public DomainId ContentId { get; }
+        public ValidationMode Mode { get; init; }
 
-        public bool IsOptional { get; private set; }
+        public ValidationAction Action { get; init; }
 
-        public ValidationContext(
-            IJsonSerializer jsonSerializer,
-            NamedId<DomainId> appId,
-            NamedId<DomainId> schemaId,
-            Schema schema,
-            ResolvedComponents components,
-            DomainId contentId)
-            : base(appId, schemaId, schema)
+        public ValidationContext(RootContext rootContext)
         {
-            JsonSerializer = jsonSerializer;
+            Root = rootContext;
+        }
 
-            Components = components;
-            ContentId = contentId;
+        public void AddError(IEnumerable<string> path, string message)
+        {
+            Root.AddError(path, message);
         }
 
         public ValidationContext Optimized(bool optimized = true)
@@ -56,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 return this;
             }
 
-            return Clone(clone => clone.IsOptional = isOptional);
+            return this with { IsOptional = isOptional };
         }
 
         public ValidationContext WithAction(ValidationAction action)
@@ -66,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 return this;
             }
 
-            return Clone(clone => clone.Action = action);
+            return this with { Action = action };
         }
 
         public ValidationContext WithMode(ValidationMode mode)
@@ -76,21 +68,17 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 return this;
             }
 
-            return Clone(clone => clone.Mode = mode);
+            return this with { Mode = mode };
         }
 
         public ValidationContext Nested(string property)
         {
-            return Clone(clone => clone.Path = clone.Path.Enqueue(property));
+            return this with { Path = Path.Enqueue(property) };
         }
 
-        private ValidationContext Clone(Action<ValidationContext> updater)
+        public ValidationContext Nested(string property, bool isOptional)
         {
-            var clone = (ValidationContext)MemberwiseClone();
-
-            updater(clone);
-
-            return clone;
+            return this with { Path = Path.Enqueue(property), IsOptional = isOptional };
         }
     }
 }

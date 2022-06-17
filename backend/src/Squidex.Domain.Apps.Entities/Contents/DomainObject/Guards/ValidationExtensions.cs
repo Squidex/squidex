@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.DefaultValues;
@@ -79,8 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var validator = GetValidator(operation, optimize, published);
 
-            await validator.ValidateInputAsync(data);
-            await validator.ValidateContentAsync(data);
+            await validator.ValidateInputAndContentAsync(data);
 
             operation.AddErrors(validator.Errors).ThrowOnErrors();
         }
@@ -104,20 +102,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         private static ContentValidator GetValidator(this ContentOperation operation, bool optimize, bool published)
         {
-            var validationContext =
-                new ValidationContext(operation.Resolve<IJsonSerializer>(),
+            var rootContext =
+                new RootContext(operation.Resolve<IJsonSerializer>(),
                     operation.App.NamedId(),
                     operation.Schema.NamedId(),
                     operation.SchemaDef,
-                    operation.Components,
-                    operation.CommandId)
-                .Optimized(optimize).AsPublishing(published);
+                    operation.CommandId,
+                    operation.Components);
+
+            var validationContext = new ValidationContext(rootContext).Optimized(optimize).AsPublishing(published);
 
             var validator =
                 new ContentValidator(operation.Partition(),
                     validationContext,
-                    operation.Resolve<IEnumerable<IValidatorsFactory>>(),
-                    operation.Resolve<ILogger<ContentValidator>>());
+                    operation.Resolve<IEnumerable<IValidatorsFactory>>());
 
             return validator;
         }

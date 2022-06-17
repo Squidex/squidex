@@ -9,8 +9,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using NodaTime;
 
-#pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
-
 namespace Squidex.Infrastructure.Json.Objects
 {
     public readonly struct JsonValue : IEquatable<JsonValue>

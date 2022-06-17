@@ -114,10 +114,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
                 if (response.Status == RuleResult.Failed)
                 {
-                    log.LogWarning(response.Exception, "Failed to execute rule event with rule id {ruleId}/{description}: {dump}",
+                    log.LogWarning(response.Exception, "Failed to execute rule event with rule id {ruleId}/{description}.",
                         @event.Job.RuleId,
-                        @event.Job.Description,
-                        response.Dump);
+                        @event.Job.Description);
                 }
             }
             catch (Exception ex)

@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 this.schemaId = schemaId;
             }
 
-            public IEnumerable<IValidator> CreateValueValidators(ValidatorContext context, IField field, ValidatorFactory createFieldValidator)
+            public IEnumerable<IValidator> CreateValueValidators(ValidationContext context, IField field, ValidatorFactory createFieldValidator)
             {
                 if (field is IField<ReferencesFieldProperties> references)
                 {

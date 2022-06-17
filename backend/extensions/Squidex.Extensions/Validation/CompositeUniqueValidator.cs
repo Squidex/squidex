@@ -27,34 +27,39 @@ namespace Squidex.Extensions.Validation
             this.contentRepository = contentRepository;
         }
 
-        public async ValueTask ValidateAsync(object value, ValidationContext context, AddError addError)
+        public void Validate(object value, ValidationContext context)
         {
             if (value is ContentData data)
             {
-                var validateableFields = context.Schema.Fields.Where(IsValidateableField);
+                context.Root.AddTask(async ct => await ValidateAsync(data, context));
+            }
+        }
 
-                var filters = new List<FilterNode<ClrValue>>();
+        private async Task ValidateAsync(ContentData data, ValidationContext context)
+        {
+            var validateableFields = context.Root.Schema.Fields.Where(IsValidateableField);
 
-                foreach (var field in validateableFields)
+            var filters = new List<FilterNode<ClrValue>>();
+
+            foreach (var field in validateableFields)
+            {
+                var fieldValue = TryGetValue(field, data);
+
+                if (fieldValue != null)
                 {
-                    var fieldValue = TryGetValue(field, data);
-
-                    if (fieldValue != null)
-                    {
-                        filters.Add(ClrFilter.Eq($"data.{field.Name}.iv", fieldValue));
-                    }
+                    filters.Add(ClrFilter.Eq($"data.{field.Name}.iv", fieldValue));
                 }
+            }
 
-                if (filters.Count > 0)
+            if (filters.Count > 0)
+            {
+                var filter = ClrFilter.And(filters);
+
+                var found = await contentRepository.QueryIdsAsync(context.Root.AppId.Id, context.Root.SchemaId.Id, filter);
+
+                if (found.Any(x => x.Id != context.Root.ContentId))
                 {
-                    var filter = ClrFilter.And(filters);
-
-                    var found = await contentRepository.QueryIdsAsync(context.AppId.Id, context.SchemaId.Id, filter);
-
-                    if (found.Any(x => x.Id != context.ContentId))
-                    {
-                        addError(Enumerable.Empty<string>(), "A content with the same values already exist.");
-                    }
+                    context.AddError(Enumerable.Empty<string>(), "A content with the same values already exist.");
                 }
             }
         }

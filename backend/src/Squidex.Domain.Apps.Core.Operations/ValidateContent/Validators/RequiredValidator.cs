@@ -11,14 +11,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public class RequiredValidator : IValidator
     {
-        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public void Validate(object? value, ValidationContext context)
         {
             if (value.IsNullOrUndefined() && !context.IsOptional)
             {
-                addError(context.Path, T.Get("contents.validation.required"));
+                context.AddError(context.Path, T.Get("contents.validation.required"));
             }
-
-            return default;
         }
     }
 }

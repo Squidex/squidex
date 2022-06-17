@@ -29,43 +29,41 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.maxItems = maxItems;
         }
 
-        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public void Validate(object? value, ValidationContext context)
         {
             if (value is not ICollection items || items.Count == 0)
             {
                 if (isRequired && !context.IsOptional)
                 {
-                    addError(context.Path, T.Get("contents.validation.required"));
+                    context.AddError(context.Path, T.Get("contents.validation.required"));
                 }
 
-                return default;
+                return;
             }
 
             if (minItems != null && maxItems != null)
             {
                 if (minItems == maxItems && minItems != items.Count)
                 {
-                    addError(context.Path, T.Get("contents.validation.itemCount", new { count = minItems }));
+                    context.AddError(context.Path, T.Get("contents.validation.itemCount", new { count = minItems }));
                 }
                 else if (items.Count < minItems || items.Count > maxItems)
                 {
-                    addError(context.Path, T.Get("contents.validation.itemCountBetween", new { min = minItems, max = maxItems }));
+                    context.AddError(context.Path, T.Get("contents.validation.itemCountBetween", new { min = minItems, max = maxItems }));
                 }
             }
             else
             {
                 if (minItems != null && items.Count < minItems)
                 {
-                    addError(context.Path, T.Get("contents.validation.minItems", new { min = minItems }));
+                    context.AddError(context.Path, T.Get("contents.validation.minItems", new { min = minItems }));
                 }
 
                 if (maxItems != null && items.Count > maxItems)
                 {
-                    addError(context.Path, T.Get("contents.validation.maxItems", new { max = maxItems }));
+                    context.AddError(context.Path, T.Get("contents.validation.maxItems", new { max = maxItems }));
                 }
             }
-
-            return default;
         }
     }
 }

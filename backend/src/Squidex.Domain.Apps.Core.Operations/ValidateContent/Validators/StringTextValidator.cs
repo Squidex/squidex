@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.maxWords = maxWords;
         }
 
-        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public void Validate(object? value, ValidationContext context)
         {
             if (value is string stringValue && !string.IsNullOrEmpty(stringValue))
             {
@@ -59,23 +59,23 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     {
                         if (minWords == maxWords && minWords != words)
                         {
-                            addError(context.Path, T.Get("contents.validation.wordCount", new { count = minWords }));
+                            context.AddError(context.Path, T.Get("contents.validation.wordCount", new { count = minWords }));
                         }
                         else if (words < minWords || words > maxWords)
                         {
-                            addError(context.Path, T.Get("contents.validation.wordsBetween", new { min = minWords, max = maxWords }));
+                            context.AddError(context.Path, T.Get("contents.validation.wordsBetween", new { min = minWords, max = maxWords }));
                         }
                     }
                     else
                     {
                         if (words < minWords)
                         {
-                            addError(context.Path, T.Get("contents.validation.minWords", new { min = minWords }));
+                            context.AddError(context.Path, T.Get("contents.validation.minWords", new { min = minWords }));
                         }
 
                         if (words > maxWords)
                         {
-                            addError(context.Path, T.Get("contents.validation.maxWords", new { max = maxWords }));
+                            context.AddError(context.Path, T.Get("contents.validation.maxWords", new { max = maxWords }));
                         }
                     }
                 }
@@ -88,29 +88,27 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     {
                         if (minCharacters == maxCharacters && minCharacters != characters)
                         {
-                            addError(context.Path, T.Get("contents.validation.normalCharacterCount", new { count = minCharacters }));
+                            context.AddError(context.Path, T.Get("contents.validation.normalCharacterCount", new { count = minCharacters }));
                         }
                         else if (characters < minCharacters || characters > maxCharacters)
                         {
-                            addError(context.Path, T.Get("contents.validation.normalCharactersBetween", new { min = minCharacters, max = maxCharacters }));
+                            context.AddError(context.Path, T.Get("contents.validation.normalCharactersBetween", new { min = minCharacters, max = maxCharacters }));
                         }
                     }
                     else
                     {
                         if (characters < minCharacters)
                         {
-                            addError(context.Path, T.Get("contents.validation.minNormalCharacters", new { min = minCharacters }));
+                            context.AddError(context.Path, T.Get("contents.validation.minNormalCharacters", new { min = minCharacters }));
                         }
 
                         if (characters > maxCharacters)
                         {
-                            addError(context.Path, T.Get("contents.validation.maxCharacters", new { max = maxCharacters }));
+                            context.AddError(context.Path, T.Get("contents.validation.maxCharacters", new { max = maxCharacters }));
                         }
                     }
                 }
             }
-
-            return default;
         }
     }
 }

@@ -122,11 +122,9 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             if (value.Type == JsonValueType.Object)
             {
-                var obj = value.AsObject;
-
-                foreach (var nestedField in field.Fields)
+                foreach (var (key, nestedValue) in value.AsObject)
                 {
-                    if (obj.TryGetValue(nestedField.Name, out var nestedValue))
+                    if (field.FieldsByName.TryGetValue(key, out var nestedField))
                     {
                         nestedField.Accept(this, args with { Value = nestedValue });
                     }

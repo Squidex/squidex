@@ -9,7 +9,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Infrastructure.Json.Objects
 {
-    public class JsonObject : ListDictionary<string, JsonValue>, IEquatable<JsonObject>
+    public class JsonObject : Dictionary<string, JsonValue>, IEquatable<JsonObject>
     {
         public JsonObject()
         {

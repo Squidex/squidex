@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
             Assert.True(isFactoryCalled);
 
-            A.CallTo(() => validator.ValidateAsync(componentData, A<ValidationContext>._, A<AddError>._))
+            A.CallTo(() => validator.Validate(componentData, A<ValidationContext>._))
                 .MustHaveHappened();
         }
 

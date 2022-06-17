@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             return GeoJsonParseResult.InvalidValue;
         }
 
-        private static bool TryParseGeoJson(ListDictionary<string, JsonValue> obj, IJsonSerializer serializer, out GeoJSONObject? geoJSON)
+        private static bool TryParseGeoJson(JsonObject obj, IJsonSerializer serializer, out GeoJSONObject? geoJSON)
         {
             geoJSON = null;
 

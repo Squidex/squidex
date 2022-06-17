@@ -60,7 +60,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                     {
                         var result = new JsonObject(4);
 
-                        ListDictionary<string, JsonValue> dictionary = result;
+                        Dictionary<string, JsonValue> dictionary = result;
 
                         while (reader.Read())
                         {
@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
                                     var value = ReadJsonCore(reader);
 
-                                    dictionary.AddUnsafe(propertyName, value);
+                                    dictionary.Add(propertyName, value);
                                     break;
                                 case JsonToken.EndObject:
                                     result.TrimExcess();
