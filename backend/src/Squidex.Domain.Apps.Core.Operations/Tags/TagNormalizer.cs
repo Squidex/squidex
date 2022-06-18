@@ -110,13 +110,13 @@ namespace Squidex.Domain.Apps.Core.Tags
                                 {
                                     foreach (var partition in fieldData)
                                     {
-                                        if (partition.Value.Type == JsonValueType.Array)
+                                        if (partition.Value.Value is JsonArray a)
                                         {
-                                            foreach (var value in partition.Value.AsArray)
+                                            foreach (var value in a)
                                             {
-                                                if (value.Type == JsonValueType.Object)
+                                                if (value.Value is JsonObject o)
                                                 {
-                                                    if (value.AsObject.TryGetValue(nestedField.Name, out var nestedValue))
+                                                    if (o.TryGetValue(nestedField.Name, out var nestedValue))
                                                     {
                                                         ExtractTags(nestedValue, values, arrays);
                                                     }
@@ -134,13 +134,13 @@ namespace Squidex.Domain.Apps.Core.Tags
 
         private static void ExtractTags(JsonValue value, ISet<string> values, ICollection<JsonValue> arrays)
         {
-            if (value.Type == JsonValueType.Array)
+            if (value.Value is JsonArray a)
             {
-                foreach (var item in value.AsArray)
+                foreach (var item in a)
                 {
-                    if (item.Type == JsonValueType.String)
+                    if (item.Value is string s)
                     {
-                        values.Add(item.ToString());
+                        values.Add(s);
                     }
                 }
 

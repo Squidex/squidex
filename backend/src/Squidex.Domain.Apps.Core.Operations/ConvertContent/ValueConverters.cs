@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             return (value, field, parent) =>
             {
-                if (value.Type == JsonValueType.Null)
+                if (value == default)
                 {
                     return value;
                 }
@@ -96,15 +96,11 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
             return (value, field, parent) =>
             {
-                if (field is IField<AssetsFieldProperties> && value.Type == JsonValueType.Array && shouldHandle(field, parent))
+                if (field is IField<AssetsFieldProperties> && value.Value is JsonArray a && shouldHandle(field, parent))
                 {
-                    var array = value.AsArray;
-
-                    for (var i = 0; i < array.Count; i++)
+                    for (var i = 0; i < a.Count; i++)
                     {
-                        var id = array[i].ToString();
-
-                        array[i] = urlGenerator.AssetContent(appId, id);
+                        a[i] = urlGenerator.AssetContent(appId, a[i].ToString());
                     }
                 }
 

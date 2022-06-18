@@ -83,20 +83,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private static void AppendJsonText(Dictionary<string, StringBuilder> languages, string language, JsonValue value)
         {
-            switch (value.Type)
+            switch (value.Value)
             {
-                case JsonValueType.String:
-                    AppendText(languages, language, value.AsString);
+                case string s:
+                    AppendText(languages, language, s);
                     break;
-                case JsonValueType.Array:
-                    foreach (var item in value.AsArray)
+                case JsonArray a:
+                    foreach (var item in a)
                     {
                         AppendJsonText(languages, language, item);
                     }
 
                     break;
-                case JsonValueType.Object:
-                    foreach (var (_, item) in value.AsObject)
+                case JsonObject o:
+                    foreach (var (_, item) in o)
                     {
                         AppendJsonText(languages, language, item);
                     }

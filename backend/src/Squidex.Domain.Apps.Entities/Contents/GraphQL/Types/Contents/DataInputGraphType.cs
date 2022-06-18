@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                             foreach (var item in list)
                             {
-                                if (item is JsonValue nested && nested.Type == JsonValueType.Object)
+                                if (item is JsonValue nested && nested.Value is JsonObject)
                                 {
                                     array.Add(nested);
                                 }

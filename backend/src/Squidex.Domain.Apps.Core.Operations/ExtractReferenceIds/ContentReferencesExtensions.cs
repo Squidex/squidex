@@ -24,14 +24,14 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
             static bool CanHaveReference(JsonValue value)
             {
-                if (value.Type == JsonValueType.Array)
+                if (value.Value is JsonArray)
                 {
                     return true;
                 }
 
-                if (value.Type == JsonValueType.Object)
+                if (value.Value is JsonObject o)
                 {
-                    foreach (var (_, nested) in value.AsObject)
+                    foreach (var (_, nested) in o)
                     {
                         if (CanHaveReference(nested))
                         {
@@ -60,61 +60,42 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return false;
         }
 
-        public static HashSet<DomainId> GetReferencedIds(this ContentData source, Schema schema,
-            ResolvedComponents components, int referencesPerField = int.MaxValue)
-        {
-            Guard.NotNull(schema);
-
-            var ids = new HashSet<DomainId>();
-
-            AddReferencedIds(source, schema, ids, components, referencesPerField);
-
-            return ids;
-        }
-
         public static void AddReferencedIds(this ContentData source, Schema schema, HashSet<DomainId> result,
-            ResolvedComponents components, int referencesPerField = int.MaxValue)
+            ResolvedComponents components, int take = int.MaxValue)
         {
             Guard.NotNull(schema);
+            Guard.NotNull(result);
+            Guard.NotNull(components);
 
-            AddReferencedIds(source, schema.Fields, result, components, referencesPerField);
+            ReferencesExtractor.Extract(schema.Fields, source, result, take, components);
         }
 
         public static void AddReferencedIds(this ContentData source, IEnumerable<IField> fields, HashSet<DomainId> result,
-            ResolvedComponents components, int referencesPerField = int.MaxValue)
+            ResolvedComponents components, int take = int.MaxValue)
         {
             Guard.NotNull(fields);
             Guard.NotNull(result);
             Guard.NotNull(components);
 
-            foreach (var field in fields)
-            {
-                AddReferencedIds(field, source, result, components, referencesPerField);
-            }
+            ReferencesExtractor.Extract(fields, source, result, take, components);
         }
 
-        private static void AddReferencedIds(IField field, ContentData source, HashSet<DomainId> result,
-            ResolvedComponents components, int referencesPerField = int.MaxValue)
+        public static void AddReferencedIds(this JsonValue value, IField field, HashSet<DomainId> result,
+            ResolvedComponents components, int take = int.MaxValue)
         {
+            Guard.NotNull(field);
+            Guard.NotNull(result);
             Guard.NotNull(components);
 
-            if (source.TryGetValue(field.Name, out var fieldData) && fieldData != null)
-            {
-                foreach (var partitionValue in fieldData)
-                {
-                    ReferencesExtractor.Extract(field, partitionValue.Value, result, referencesPerField, components);
-                }
-            }
+            ReferencesExtractor.Extract(field, value, result, take, components);
         }
 
         public static HashSet<DomainId> GetReferencedIds(this IField field, JsonValue value,
-            ResolvedComponents components, int referencesPerField = int.MaxValue)
+            ResolvedComponents components, int take = int.MaxValue)
         {
-            Guard.NotNull(components);
-
             var result = new HashSet<DomainId>();
 
-            ReferencesExtractor.Extract(field, value, result, referencesPerField, components);
+            AddReferencedIds(value, field, result, components, take);
 
             return result;
         }

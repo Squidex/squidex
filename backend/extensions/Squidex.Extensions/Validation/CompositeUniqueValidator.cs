@@ -78,24 +78,22 @@ namespace Squidex.Extensions.Validation
 
             switch (field.RawProperties)
             {
-                case BooleanFieldProperties when value.Type == JsonValueType.Boolean:
-                    return value.AsBoolean;
-                case BooleanFieldProperties when value.Type == JsonValueType.Null:
+                case BooleanFieldProperties when value.Value is bool b:
+                    return b;
+                case BooleanFieldProperties when value.Value == default:
                     return ClrValue.Null;
-                case NumberFieldProperties when value.Type == JsonValueType.Number:
-                    return value.AsNumber;
-                case NumberFieldProperties when value.Type == JsonValueType.Null:
+                case NumberFieldProperties when value.Value is double n:
+                    return n;
+                case NumberFieldProperties when value.Value == default:
                     return ClrValue.Null;
-                case StringFieldProperties when value.Type == JsonValueType.String:
-                    return value.AsString;
-                case StringFieldProperties when value.Type == JsonValueType.Null:
+                case StringFieldProperties when value.Value is string s:
+                    return s;
+                case StringFieldProperties when value.Value == default:
                     return ClrValue.Null;
-                case ReferencesFieldProperties when value.Type == JsonValueType.Array:
-                    var first = value.AsArray.FirstOrDefault();
-
-                    if (first.Type == JsonValueType.String)
+                case ReferencesFieldProperties when value.Value is JsonArray a:
+                    if (a.FirstOrDefault().Value is string first)
                     {
-                        return first.AsString;
+                        return first;
                     }
 
                     break;

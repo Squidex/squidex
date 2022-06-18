@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             {
                 if (value is JsonValue jsonValue)
                 {
-                    if (jsonValue.Type == JsonValueType.Null)
+                    if (jsonValue == default)
                     {
                         typedValue = null;
                     }

@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.Queries.Json
 
             var type = field.Schema.Type;
 
-            if (value.Type == JsonValueType.Null && type != FilterSchemaType.GeoObject && field.IsNullable)
+            if (value == default && type != FilterSchemaType.GeoObject && field.IsNullable)
             {
                 return ClrValue.Null;
             }
@@ -47,9 +47,9 @@ namespace Squidex.Infrastructure.Queries.Json
 
                 case FilterSchemaType.Any:
                     {
-                        if (value.Type == JsonValueType.Array)
+                        if (value.Value is JsonArray a)
                         {
-                            var array = ParseArray<ClrValue?>(errors, path, value.AsArray, TryParseDynamic);
+                            var array = ParseArray<ClrValue?>(errors, path, a, TryParseDynamic);
 
                             result = array.Select(x => x?.Value).ToList();
                         }
@@ -63,9 +63,9 @@ namespace Squidex.Infrastructure.Queries.Json
 
                 case FilterSchemaType.Boolean:
                     {
-                        if (value.Type == JsonValueType.Array)
+                        if (value.Value is JsonArray a)
                         {
-                            result = ParseArray<bool>(errors, path, value.AsArray, TryParseBoolean);
+                            result = ParseArray<bool>(errors, path, a, TryParseBoolean);
                         }
                         else if (TryParseBoolean(errors, path, value, out var temp))
                         {
@@ -77,9 +77,9 @@ namespace Squidex.Infrastructure.Queries.Json
 
                 case FilterSchemaType.Number:
                     {
-                        if (value.Type == JsonValueType.Array)
+                        if (value.Value is JsonArray a)
                         {
-                            result = ParseArray<double>(errors, path, value.AsArray, TryParseNumber);
+                            result = ParseArray<double>(errors, path, a, TryParseNumber);
                         }
                         else if (TryParseNumber(errors, path, value, out var temp))
                         {
@@ -91,9 +91,9 @@ namespace Squidex.Infrastructure.Queries.Json
 
                 case FilterSchemaType.Guid:
                     {
-                        if (value.Type == JsonValueType.Array)
+                        if (value.Value is JsonArray a)
                         {
-                            result = ParseArray<Guid>(errors, path, value.AsArray, TryParseGuid);
+                            result = ParseArray<Guid>(errors, path, a, TryParseGuid);
                         }
                         else if (TryParseGuid(errors, path, value, out var temp))
                         {
@@ -105,9 +105,9 @@ namespace Squidex.Infrastructure.Queries.Json
 
                 case FilterSchemaType.DateTime:
                     {
-                        if (value.Type == JsonValueType.Array)
+                        if (value.Value is JsonArray a)
                         {
-                            result = ParseArray<Instant>(errors, path, value.AsArray, TryParseDateTime);
+                            result = ParseArray<Instant>(errors, path, a, TryParseDateTime);
                         }
                         else if (TryParseDateTime(errors, path, value, out var temp))
                         {
@@ -120,9 +120,9 @@ namespace Squidex.Infrastructure.Queries.Json
                 case FilterSchemaType.StringArray:
                 case FilterSchemaType.String:
                     {
-                        if (value.Type == JsonValueType.Array)
+                        if (value.Value is JsonArray a)
                         {
-                            result = ParseArray<string>(errors, path, value.AsArray, TryParseString!);
+                            result = ParseArray<string>(errors, path, a, TryParseString!);
                         }
                         else if (TryParseString(errors, path, value, out var temp))
                         {
@@ -163,12 +163,12 @@ namespace Squidex.Infrastructure.Queries.Json
 
             result = default!;
 
-            if (value.Type == JsonValueType.Object &&
-                value.TryGetValue("latitude", out var lat) && lat.Type == JsonValueType.Number &&
-                value.TryGetValue("longitude", out var lon) && lon.Type == JsonValueType.Number &&
-                value.TryGetValue("distance", out var distance) && distance.Type == JsonValueType.Number)
+            if (value.Value is JsonObject o &&
+                o.TryGetValue("latitude", out var found) && found.Value is double lat &&
+                o.TryGetValue("longitude", out found) && found.Value is double lon &&
+                o.TryGetValue("distance", out found) && found.Value is double distance)
             {
-                result = new FilterSphere(lon.AsNumber, lat.AsNumber, distance.AsNumber);
+                result = new FilterSphere(lon, lat, distance);
 
                 return true;
             }
@@ -184,9 +184,9 @@ namespace Squidex.Infrastructure.Queries.Json
 
             result = default;
 
-            if (value.Type == JsonValueType.Boolean)
+            if (value.Value is bool b)
             {
-                result = value.AsBoolean;
+                result = b;
 
                 return true;
             }
@@ -202,9 +202,9 @@ namespace Squidex.Infrastructure.Queries.Json
 
             result = default;
 
-            if (value.Type == JsonValueType.Number)
+            if (value.Value is double n)
             {
-                result = value.AsNumber;
+                result = n;
 
                 return true;
             }
@@ -220,9 +220,9 @@ namespace Squidex.Infrastructure.Queries.Json
 
             result = default;
 
-            if (value.Type == JsonValueType.String)
+            if (value.Value is string s)
             {
-                result = value.AsString;
+                result = s;
 
                 return true;
             }
@@ -238,9 +238,9 @@ namespace Squidex.Infrastructure.Queries.Json
 
             result = default;
 
-            if (value.Type == JsonValueType.String)
+            if (value.Value is string s)
             {
-                if (Guid.TryParse(value.AsString, out result))
+                if (Guid.TryParse(s, out result))
                 {
                     return true;
                 }
@@ -261,13 +261,11 @@ namespace Squidex.Infrastructure.Queries.Json
 
             result = default;
 
-            if (value.Type == JsonValueType.String)
+            if (value.Value is string s)
             {
-                var typed = value.AsString;
-
                 foreach (var pattern in InstantPatterns)
                 {
-                    var parsed = pattern.Parse(typed);
+                    var parsed = pattern.Parse(s);
 
                     if (parsed.Success)
                     {
@@ -291,21 +289,19 @@ namespace Squidex.Infrastructure.Queries.Json
         {
             result = null;
 
-            switch (value.Type)
+            switch (value.Value)
             {
-                case JsonValueType.Null:
+                case null:
                     return true;
-                case JsonValueType.Number:
-                    result = value.AsNumber;
+                case bool b:
+                    result = b;
                     return true;
-                case JsonValueType.Boolean:
-                    result = value.AsBoolean;
+                case double n:
+                    result = n;
                     return true;
-                case JsonValueType.String:
+                case string s:
                     {
-                        var typed = value.AsString;
-
-                        if (Guid.TryParse(typed, out var guid))
+                        if (Guid.TryParse(s, out var guid))
                         {
                             result = guid;
 
@@ -314,7 +310,7 @@ namespace Squidex.Infrastructure.Queries.Json
 
                         foreach (var pattern in InstantPatterns)
                         {
-                            var parsed = pattern.Parse(typed);
+                            var parsed = pattern.Parse(s);
 
                             if (parsed.Success)
                             {
@@ -324,7 +320,7 @@ namespace Squidex.Infrastructure.Queries.Json
                             }
                         }
 
-                        result = typed;
+                        result = s;
 
                         return true;
                     }

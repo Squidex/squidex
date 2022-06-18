@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
         {
             var defaultValue = DefaultValueFactory.CreateDefaultValue(field, SystemClock.Instance.GetCurrentInstant(), partitionKey);
 
-            if (field.RawProperties.IsRequired || defaultValue.Type == JsonValueType.Null)
+            if (field.RawProperties.IsRequired || defaultValue == default)
             {
                 return;
             }

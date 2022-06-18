@@ -28,24 +28,22 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             discriminator = null!;
 
-            if (value.Type != JsonValueType.Object)
+            if (value.Value is not JsonObject o)
             {
                 return false;
             }
 
-            if (!value.AsObject.TryGetValue(Discriminator, out var type) || type.Type != JsonValueType.String)
+            if (!o.TryGetValue(Discriminator, out var found) || found.Value is not string s)
             {
                 return false;
             }
 
-            var typed = type.AsString;
-
-            if (string.IsNullOrWhiteSpace(typed))
+            if (string.IsNullOrWhiteSpace(s))
             {
                 return false;
             }
 
-            discriminator = typed;
+            discriminator = s;
 
             return true;
         }

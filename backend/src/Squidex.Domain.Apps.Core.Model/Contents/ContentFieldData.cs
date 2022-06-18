@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             result = JsonValue.Null;
 
-            if (TryGetValue(key, out var found) && found.Type != JsonValueType.Null)
+            if (TryGetValue(key, out var found) && found != default)
             {
                 result = found;
                 return true;

@@ -25,26 +25,24 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             geoJSON = null;
 
-            if (value.Type == JsonValueType.Object)
+            if (value.Value is JsonObject o)
             {
-                var obj = value.AsObject;
-
-                if (TryParseGeoJson(obj, serializer, out geoJSON))
+                if (TryParseGeoJson(o, serializer, out geoJSON))
                 {
                     return GeoJsonParseResult.Success;
                 }
 
-                if (!obj.TryGetValue("latitude", out var lat) || lat.Type != JsonValueType.Number || !lat.AsNumber.IsBetween(-90, 90))
+                if (!o.TryGetValue("latitude", out var found) || found.Value is not double lat || !lat.IsBetween(-90, 90))
                 {
                     return GeoJsonParseResult.InvalidLatitude;
                 }
 
-                if (!obj.TryGetValue("longitude", out var lon) || lon.Type != JsonValueType.Number || !lon.AsNumber.IsBetween(-180, 180))
+                if (!o.TryGetValue("longitude", out found) || found.Value is not double lon || !lon.IsBetween(-180, 180))
                 {
                     return GeoJsonParseResult.InvalidLongitude;
                 }
 
-                geoJSON = new Point(new Position(lat.AsNumber, lon.AsNumber));
+                geoJSON = new Point(new Position(lat, lon));
 
                 return GeoJsonParseResult.Success;
             }
@@ -56,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             geoJSON = null;
 
-            if (!obj.TryGetValue("type", out var type) || type.Type != JsonValueType.String)
+            if (!obj.TryGetValue("type", out var type) || type.Value is not string)
             {
                 return false;
             }

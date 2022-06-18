@@ -152,34 +152,32 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         private static void WriteJson(JsonWriter writer, JsonValue value)
         {
-            switch (value.Type)
+            switch (value.Value)
             {
-                case JsonValueType.Null:
+                case null:
                     writer.WriteNull();
                     break;
-                case JsonValueType.Boolean:
-                    writer.WriteValue(value.AsBoolean);
+                case bool b:
+                    writer.WriteValue(b);
                     break;
-                case JsonValueType.String:
-                    writer.WriteValue(value.AsString);
+                case string s:
+                    writer.WriteValue(s);
                     break;
-                case JsonValueType.Number:
-                    var number = value.AsNumber;
-
-                    if (number % 1 == 0)
+                case double n:
+                    if (n % 1 == 0)
                     {
-                        writer.WriteValue((long)number);
+                        writer.WriteValue((long)n);
                     }
                     else
                     {
-                        writer.WriteValue(number);
+                        writer.WriteValue(n);
                     }
 
                     break;
-                case JsonValueType.Array:
+                case JsonArray a:
                     writer.WriteStartArray();
 
-                    foreach (var item in value.AsArray)
+                    foreach (var item in a)
                     {
                         WriteJson(writer, item);
                     }
@@ -187,10 +185,10 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                     writer.WriteEndArray();
                     break;
 
-                case JsonValueType.Object:
+                case JsonObject o:
                     writer.WriteStartObject();
 
-                    foreach (var (key, jsonValue) in value.AsObject)
+                    foreach (var (key, jsonValue) in o)
                     {
                         writer.WritePropertyName(key);
 

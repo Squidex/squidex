@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             {
                 foreach (var (_, value) in data)
                 {
-                    if (value.Type == JsonValueType.Null)
+                    if (value.Value == default)
                     {
                         continue;
                     }
@@ -252,27 +252,25 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         private static JsonValue? ConvertArray(IArrayField field, JsonValue value, ValueConverter[] converters,
             ResolvedComponents components)
         {
-            if (value.Type == JsonValueType.Array)
+            if (value.Value is JsonArray a)
             {
-                var array = value.AsArray;
-
                 JsonArray? result = null;
 
-                for (int i = 0, j = 0; i < array.Count; i++, j++)
+                for (int i = 0, j = 0; i < a.Count; i++, j++)
                 {
-                    var oldValue = array[i];
+                    var oldValue = a[i];
 
                     var newValue = ConvertArrayItem(field, oldValue, converters, components);
 
                     if (newValue == null)
                     {
-                        result ??= new JsonArray(array);
+                        result ??= new JsonArray(a);
                         result.RemoveAt(j);
                         j--;
                     }
                     else if (!ReferenceEquals(newValue.Value.Value, oldValue.Value))
                     {
-                        result ??= new JsonArray(array);
+                        result ??= new JsonArray(a);
                         result[j] = newValue.Value;
                     }
                 }
@@ -286,27 +284,25 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         private static JsonValue? ConvertComponents(JsonValue? value, ValueConverter[] converters,
             ResolvedComponents components)
         {
-            if (value?.Type == JsonValueType.Array)
+            if (value?.Value is JsonArray a)
             {
-                var array = value.Value.AsArray;
-
                 JsonArray? result = null;
 
-                for (int i = 0, j = 0; i < array.Count; i++, j++)
+                for (int i = 0, j = 0; i < a.Count; i++, j++)
                 {
-                    var oldValue = array[i];
+                    var oldValue = a[i];
 
                     var newValue = ConvertComponent(oldValue, converters, components);
 
                     if (newValue == null)
                     {
-                        result ??= new JsonArray(array);
+                        result ??= new JsonArray(a);
                         result.RemoveAt(j);
                         j--;
                     }
-                    else if (!ReferenceEquals(newValue.Value.Value, array[i].Value))
+                    else if (!ReferenceEquals(newValue.Value.Value, a[i].Value))
                     {
-                        result ??= new JsonArray(array);
+                        result ??= new JsonArray(a);
                         result[j] = newValue.Value;
                     }
                 }
@@ -320,9 +316,9 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         private static JsonValue? ConvertComponent(JsonValue? value, ValueConverter[] converters,
             ResolvedComponents components)
         {
-            if (value.HasValue && value.Value.Type == JsonValueType.Object && value.Value.AsObject.TryGetValue(Component.Discriminator, out var type) && type.Type == JsonValueType.String)
+            if (value?.Value is JsonObject o && o.TryGetValue(Component.Discriminator, out var found) && found.Value is string s)
             {
-                var id = DomainId.Create(type.AsString);
+                var id = DomainId.Create(s);
 
                 if (components.TryGetValue(id, out var schema))
                 {
@@ -340,7 +336,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         private static JsonValue? ConvertArrayItem(IArrayField field, JsonValue value, ValueConverter[] converters,
             ResolvedComponents components)
         {
-            if (value.Type == JsonValueType.Object)
+            if (value.Value is JsonObject)
             {
                 return ConvertNested(field.FieldCollection, value, field, converters, components);
             }

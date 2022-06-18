@@ -87,13 +87,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
             {
                 foreach (var segment in segments.Take(segments.Length - 1))
                 {
-                    if (!current.TryGetValue(segment, out var temp))
+                    if (!current.TryGetValue(segment, out var found))
                     {
                         if (add)
                         {
-                            temp = new JsonObject();
+                            found = new JsonObject();
 
-                            current[segment] = temp;
+                            current[segment] = found;
                         }
                         else
                         {
@@ -101,9 +101,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         }
                     }
 
-                    if (temp.Type == JsonValueType.Object)
+                    if (found.Value is JsonObject o)
                     {
-                        current = temp.AsObject;
+                        current = o;
                     }
                     else
                     {

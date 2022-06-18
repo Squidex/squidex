@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
             return (value, field, parent) =>
             {
-                if (value.Type == JsonValueType.Null)
+                if (value == default)
                 {
                     return value;
                 }

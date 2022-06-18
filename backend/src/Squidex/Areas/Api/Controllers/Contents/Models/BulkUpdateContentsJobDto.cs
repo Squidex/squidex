@@ -18,7 +18,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// An optional query to identify the content to update.
         /// </summary>
-        public JsonQueryDto? Query { get; set; }
+        public QueryJsonDto? Query { get; set; }
 
         /// <summary>
         /// An optional id of the content to update.
