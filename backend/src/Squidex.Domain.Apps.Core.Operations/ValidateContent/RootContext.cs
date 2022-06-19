@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public void AddTask(SchedulerTask task)
         {
-            scheduler.AddTask(task);
+            scheduler.Schedule(task);
         }
 
         public void ThrowOnErrors()
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         public ValueTask CompleteAsync(
             CancellationToken ct = default)
         {
-            return scheduler.RunAsync(ct);
+            return scheduler.CompleteAsync(ct);
         }
     }
 }

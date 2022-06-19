@@ -75,10 +75,12 @@ namespace Squidex.Config.Orleans
                 options.HostSelf = false;
             });
 
-            builder.AddIncomingGrainCallFilter<LoggingFilter>();
+            builder.AddOutgoingGrainCallFilter<ActivityPropagationOutgoingGrainCallFilter>();
             builder.AddIncomingGrainCallFilter<ExceptionWrapperFilter>();
+            builder.AddIncomingGrainCallFilter<ActivityPropagationIncomingGrainCallFilter>();
             builder.AddIncomingGrainCallFilter<ActivationLimiterFilter>();
             builder.AddIncomingGrainCallFilter<LocalCacheFilter>();
+            builder.AddIncomingGrainCallFilter<LoggingFilter>();
             builder.AddIncomingGrainCallFilter<StateFilter>();
 
             var (siloPort, gatewayPort) = GetPorts(config);

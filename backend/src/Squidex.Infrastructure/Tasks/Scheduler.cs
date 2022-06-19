@@ -28,12 +28,18 @@ namespace Squidex.Infrastructure.Tasks
             semaphore = new SemaphoreSlim(maxDegreeOfParallelism);
         }
 
-        public void AddTask(SchedulerTask task)
+        public void Schedule(SchedulerTask task)
         {
+            if (pendingTasks < 0)
+            {
+                // Already completed.
+                return;
+            }
+
             if (pendingTasks >= 1)
             {
                 // If we already in a tasks we just queue it with the semaphore.
-                RunTask(task, default).Forget();
+                ScheduleTask(task, default).Forget();
                 return;
             }
 
@@ -41,7 +47,7 @@ namespace Squidex.Infrastructure.Tasks
             tasks.Add(task);
         }
 
-        public async ValueTask RunAsync(
+        public async ValueTask CompleteAsync(
             CancellationToken ct = default)
         {
             if (tasks == null || tasks.Count == 0)
@@ -51,42 +57,51 @@ namespace Squidex.Infrastructure.Tasks
 
             // Use the value to indicate that the task have been started.
             pendingTasks = 1;
+            try
+            {
+                RunTasks(ct).AsTask().Forget();
 
-            RunTasks(tasks, ct).AsTask().Forget();
-
-            await tcs.Task;
+                await tcs.Task;
+            }
+            finally
+            {
+                pendingTasks = -1;
+            }
         }
 
-        private async ValueTask RunTasks(List<SchedulerTask>? validationTasks,
+        private async ValueTask RunTasks(
             CancellationToken ct)
         {
-            if (validationTasks == null || validationTasks.Count == 0)
+            // If nothing needs to be done, we can just stop here.
+            if (tasks == null || tasks.Count == 0)
             {
                 tcs.TrySetResult(true);
                 return;
             }
 
-            if (validationTasks.Count == 1)
+            // Quick check to avoid the allocation of the list.
+            if (tasks.Count == 1)
             {
-                await RunTask(validationTasks[0], ct);
+                await ScheduleTask(tasks[0], ct);
                 return;
             }
 
             var runningTasks = new List<Task>();
 
-            foreach (var validationTask in validationTasks)
+            foreach (var validationTask in tasks)
             {
-                runningTasks.Add(RunTask(validationTask, ct));
+                runningTasks.Add(ScheduleTask(validationTask, ct));
             }
 
             await Task.WhenAll(runningTasks);
         }
 
-        private async Task RunTask(SchedulerTask task,
+        private async Task ScheduleTask(SchedulerTask task,
             CancellationToken ct)
         {
             try
             {
+                // Use the interlock to reduce degree of parallelization.
                 Interlocked.Increment(ref pendingTasks);
 
                 await semaphore.WaitAsync(ct);

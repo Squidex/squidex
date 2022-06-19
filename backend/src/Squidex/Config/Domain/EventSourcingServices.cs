@@ -29,7 +29,7 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c =>
                         {
-                            var mongoClient = Singletons<IMongoClient>.GetOrAdd(mongoConfiguration, s => new MongoClient(s));
+                            var mongoClient = StoreServices.GetMongoClient(mongoConfiguration);
                             var mongDatabase = mongoClient.GetDatabase(mongoDatabaseName);
 
                             return new MongoEventStore(mongDatabase, c.GetRequiredService<IEventNotifier>());

@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Identity;
 using Migrations.Migrations.MongoDb;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 using Newtonsoft.Json;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities;
@@ -61,7 +62,7 @@ namespace Squidex.Config.Domain
 
                     services.AddSingleton(typeof(ISnapshotStore<>), typeof(MongoSnapshotStore<>));
 
-                    services.AddSingletonAs(c => GetClient(mongoConfiguration))
+                    services.AddSingletonAs(c => GetMongoClient(mongoConfiguration))
                         .As<IMongoClient>();
 
                     services.AddSingletonAs(c => GetDatabase(c, mongoDatabaseName))
@@ -189,9 +190,19 @@ namespace Squidex.Config.Domain
             });
         }
 
-        private static IMongoClient GetClient(string configuration)
+        public static IMongoClient GetMongoClient(string configuration)
         {
-            return Singletons<IMongoClient>.GetOrAdd(configuration, s => new MongoClient(s));
+            return Singletons<IMongoClient>.GetOrAdd(configuration, connectionString =>
+            {
+                var clientSettings = MongoClientSettings.FromConnectionString(connectionString);
+
+                clientSettings.ClusterConfigurator = builder =>
+                {
+                    builder.Subscribe(new DiagnosticsActivityEventSubscriber());
+                };
+
+                return new MongoClient(clientSettings);
+            });
         }
 
         private static IMongoDatabase GetDatabase(IServiceProvider serviceProvider, string name)
