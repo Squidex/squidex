@@ -128,7 +128,7 @@ export class FileDropDirective {
         for (const item of items) {
             const file = item.getAsFile();
 
-            if (file && !!file.type && this.isAllowedFile(file)) {
+            if (file && this.isAllowedFile(file)) {
                 files.push(file);
             }
         }
