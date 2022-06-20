@@ -97,10 +97,8 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         private static JsonValue CleanIds(Args args)
         {
-            if (args.Value.Type == JsonValueType.Array)
+            if (args.Value.Value is JsonArray array)
             {
-                var array = args.Value.AsArray;
-
                 var result = args.Value.AsArray;
 
                 for (var i = 0; i < result.Count; i++)
@@ -125,7 +123,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         private static bool IsValidReference(JsonValue item, Args args)
         {
-            return item.Type == JsonValueType.String && args.ValidIds.Contains(DomainId.Create(item.AsString));
+            return item.Value is string s && args.ValidIds.Contains(DomainId.Create(s));
         }
     }
 }

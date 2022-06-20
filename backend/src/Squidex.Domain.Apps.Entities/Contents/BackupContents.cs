@@ -107,15 +107,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             foreach (var (key, value) in source)
             {
-                switch (value.Type)
+                switch (value.Value)
                 {
-                    case JsonValueType.String:
+                    case string s:
                         {
-                            var oldValue = value.AsString;
+                            var newValue = s.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
 
-                            var newValue = oldValue.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
-
-                            if (!ReferenceEquals(newValue, oldValue))
+                            if (!ReferenceEquals(newValue, s))
                             {
                                 replacements ??= new List<(string, string)>();
                                 replacements.Add((key, newValue));
@@ -124,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                             newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets, StringComparison.Ordinal);
 
-                            if (!ReferenceEquals(newValue, oldValue))
+                            if (!ReferenceEquals(newValue, s))
                             {
                                 replacements ??= new List<(string, string)>();
                                 replacements.Add((key, newValue));
@@ -134,12 +132,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         break;
 
-                    case JsonValueType.Array:
-                        ReplaceAssetUrl(value.AsArray);
+                    case JsonArray a:
+                        ReplaceAssetUrl(a);
                         break;
 
-                    case JsonValueType.Object:
-                        ReplaceAssetUrl(value.AsObject);
+                    case JsonObject o:
+                        ReplaceAssetUrl(o);
                         break;
                 }
             }
@@ -159,15 +157,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var value = source[i];
 
-                switch (value.Type)
+                switch (value.Value)
                 {
-                    case JsonValueType.String:
+                    case string s:
                         {
-                            var oldValue = value.AsString;
+                            var newValue = s.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
 
-                            var newValue = oldValue.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
-
-                            if (!ReferenceEquals(newValue, oldValue))
+                            if (!ReferenceEquals(newValue, s))
                             {
                                 source[i] = newValue;
                                 break;
@@ -175,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                             newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets, StringComparison.Ordinal);
 
-                            if (!ReferenceEquals(newValue, oldValue))
+                            if (!ReferenceEquals(newValue, s))
                             {
                                 source[i] = newValue;
                                 break;
@@ -184,11 +180,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         break;
 
-                    case JsonValueType.Array:
-                        break;
-
-                    case JsonValueType.Object:
-                        ReplaceAssetUrl(value.AsObject);
+                    case JsonObject o:
+                        ReplaceAssetUrl(o);
                         break;
                 }
             }

@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.maxLength = maxLength;
         }
 
-        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public void Validate(object? value, ValidationContext context)
         {
             if (value is string stringValue && !string.IsNullOrEmpty(stringValue))
             {
@@ -34,28 +34,26 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 {
                     if (minLength == maxLength && minLength != stringValue.Length)
                     {
-                        addError(context.Path, T.Get("contents.validation.characterCount", new { count = minLength }));
+                        context.AddError(context.Path, T.Get("contents.validation.characterCount", new { count = minLength }));
                     }
                     else if (stringValue.Length < minLength || stringValue.Length > maxLength)
                     {
-                        addError(context.Path, T.Get("contents.validation.charactersBetween", new { min = minLength, max = maxLength }));
+                        context.AddError(context.Path, T.Get("contents.validation.charactersBetween", new { min = minLength, max = maxLength }));
                     }
                 }
                 else
                 {
                     if (minLength != null && stringValue.Length < minLength)
                     {
-                        addError(context.Path, T.Get("contents.validation.minLength", new { min = minLength }));
+                        context.AddError(context.Path, T.Get("contents.validation.minLength", new { min = minLength }));
                     }
 
                     if (maxLength != null && stringValue.Length > maxLength)
                     {
-                        addError(context.Path, T.Get("contents.validation.maxLength", new { max = maxLength }));
+                        context.AddError(context.Path, T.Get("contents.validation.maxLength", new { max = maxLength }));
                     }
                 }
             }
-
-            return default;
         }
     }
 }

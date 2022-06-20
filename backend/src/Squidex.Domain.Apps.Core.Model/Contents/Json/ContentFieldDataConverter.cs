@@ -46,9 +46,13 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
 
                         var value = serializer.Deserialize<JsonValue>(reader)!;
 
-                        if (Language.IsDefault(propertyName) || propertyName == InvariantPartitioning.Key)
+                        if (propertyName == InvariantPartitioning.Key)
                         {
-                            propertyName = string.Intern(propertyName);
+                            propertyName = InvariantPartitioning.Key;
+                        }
+                        else if (Language.TryGetLanguage(propertyName, out var language))
+                        {
+                            propertyName = language.Iso2Code;
                         }
 
                         result[propertyName] = value;

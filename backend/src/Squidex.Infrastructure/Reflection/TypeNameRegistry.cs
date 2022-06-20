@@ -127,7 +127,7 @@ namespace Squidex.Infrastructure.Reflection
             return result;
         }
 
-        public Type GetTypeOrNull(string name)
+        public Type? GetTypeOrNull(string name)
         {
             var result = typesByName.GetOrDefault(name);
 

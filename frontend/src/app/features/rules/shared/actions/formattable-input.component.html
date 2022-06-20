@@ -3,7 +3,7 @@
         <input class="form-control" ngDefaultControl />
 
         <div class="input-group-apppend">
-            <select class="form-select" [ngModel]="mode" (ngModelChange)="setMode($event)" [disabled]="disabled">
+            <select class="form-select" [ngModel]="mode" (ngModelChange)="setMode($event)" [disabled]="disabled" tabindex="-1">
                 <option *ngFor="let supportedMode of modes" [ngValue]="supportedMode">{{supportedMode}}</option>
             </select>
         </div>
@@ -12,7 +12,7 @@
 
 <ng-template #textarea>
     <div class="btn-group btn-group-sm">
-        <button type="button" class="btn btn-toggle" *ngFor="let supportedMode of modes" [class.active]="mode === supportedMode" (click)="setMode(supportedMode)">
+        <button type="button" class="btn btn-toggle" *ngFor="let supportedMode of modes" [class.active]="mode === supportedMode" (click)="setMode(supportedMode)" tabindex="-1">
             {{supportedMode}}
         </button>
     </div>

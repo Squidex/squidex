@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var validator = A.Fake<IValidator>();
 
-            A.CallTo(() => validator.ValidateAsync(A<object?>._, A<ValidationContext>._, A<AddError>._))
+            A.CallTo(() => validator.Validate(A<object?>._, A<ValidationContext>._))
                 .Throws(new InvalidOperationException());
 
             var validatorFactory = A.Fake<IValidatorsFactory>();
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var validator = A.Fake<IValidator>();
 
-            A.CallTo(() => validator.ValidateAsync(A<object?>._, A<ValidationContext>._, A<AddError>._))
+            A.CallTo(() => validator.Validate(A<object?>._, A<ValidationContext>._))
                 .Throws(new InvalidOperationException());
 
             var validatorFactory = A.Fake<IValidatorsFactory>();

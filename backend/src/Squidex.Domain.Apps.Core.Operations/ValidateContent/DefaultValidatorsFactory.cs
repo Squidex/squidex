@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 {
     public sealed class DefaultValidatorsFactory : IValidatorsFactory
     {
-        public IEnumerable<IValidator> CreateFieldValidators(ValidatorContext context, IField field, ValidatorFactory factory)
+        public IEnumerable<IValidator> CreateFieldValidators(ValidationContext context, IField field, ValidatorFactory factory)
         {
             if (field is IField<UIFieldProperties>)
             {
@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
         }
 
-        public IEnumerable<IValidator> CreateValueValidators(ValidatorContext context, IField field, ValidatorFactory factory)
+        public IEnumerable<IValidator> CreateValueValidators(ValidationContext context, IField field, ValidatorFactory factory)
         {
             return DefaultFieldValueValidatorsFactory.CreateValidators(context, field, factory);
         }

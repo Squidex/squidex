@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private sealed class CustomFactory : IValidatorsFactory
         {
-            public IEnumerable<IValidator> CreateValueValidators(ValidatorContext context, IField field, ValidatorFactory createFieldValidator)
+            public IEnumerable<IValidator> CreateValueValidators(ValidationContext context, IField field, ValidatorFactory createFieldValidator)
             {
                 if (field is IField<AssetsFieldProperties> assets)
                 {

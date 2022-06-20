@@ -155,7 +155,7 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c =>
                         {
-                            var mongoClient = Singletons<IMongoClient>.GetOrAdd(mongoConfiguration, s => new MongoClient(s));
+                            var mongoClient = StoreServices.GetMongoClient(mongoConfiguration);
                             var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
 
                             var gridFsbucket = new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions

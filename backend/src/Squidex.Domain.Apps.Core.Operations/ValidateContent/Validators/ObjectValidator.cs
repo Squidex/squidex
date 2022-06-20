@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
@@ -21,11 +20,10 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             this.fields = fields;
             this.fieldType = fieldType;
-
             this.isPartial = isPartial;
         }
 
-        public async ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public void Validate(object? value, ValidationContext context)
         {
             if (value.IsNullOrUndefined())
             {
@@ -40,17 +38,15 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                     if (!fields.ContainsKey(name))
                     {
-                        addError(context.Path.Enqueue(name), T.Get("contents.validation.unknownField", new { fieldType }));
+                        context.AddError(context.Path.Enqueue(name), T.Get("contents.validation.unknownField", new { fieldType }));
                     }
                 }
 
-                await AsyncHelper.WhenAllThrottledAsync(fields, async (kvp, _) =>
+                foreach (var (name, field) in fields)
                 {
-                    var (isOptional, validator) = kvp.Value;
-
                     var fieldValue = Undefined.Value;
 
-                    if (!values.TryGetValue(kvp.Key, out var nestedValue))
+                    if (!values.TryGetValue(name, out var nestedValue))
                     {
                         if (isPartial)
                         {
@@ -62,10 +58,10 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                         fieldValue = nestedValue!;
                     }
 
-                    var fieldContext = context.Nested(kvp.Key).Optional(isOptional);
+                    var fieldContext = context.Nested(name, field.IsOptional);
 
-                    await validator.ValidateAsync(fieldValue, fieldContext, addError);
-                });
+                    field.Validator.Validate(fieldValue, fieldContext);
+                }
             }
         }
     }

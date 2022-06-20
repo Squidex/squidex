@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Newtonsoft.Json;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
@@ -26,19 +27,40 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
-            return ReadJson(reader);
+            var previousDateParseHandling = reader.DateParseHandling;
+
+            reader.DateParseHandling = DateParseHandling.None;
+            try
+            {
+                return ReadJsonCore(reader);
+            }
+            finally
+            {
+                reader.DateParseHandling = previousDateParseHandling;
+            }
         }
 
-        private static JsonValue ReadJson(JsonReader reader)
+        private static JsonValue ReadJsonCore(JsonReader reader)
         {
             switch (reader.TokenType)
             {
-                case JsonToken.Comment:
-                    reader.Read();
-                    break;
+                case JsonToken.Null:
+                    return default;
+                case JsonToken.Undefined:
+                    return default;
+                case JsonToken.String:
+                    return new JsonValue((string)reader.Value!);
+                case JsonToken.Integer:
+                    return new JsonValue((long)reader.Value!);
+                case JsonToken.Float:
+                    return new JsonValue((double)reader.Value!);
+                case JsonToken.Boolean:
+                    return (bool)reader.Value! ? JsonValue.True : JsonValue.False;
                 case JsonToken.StartObject:
                     {
-                        var result = new JsonObject(1);
+                        var result = new JsonObject(4);
+
+                        Dictionary<string, JsonValue> dictionary = result;
 
                         while (reader.Read())
                         {
@@ -49,26 +71,27 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
                                     if (!reader.Read())
                                     {
-                                        throw new JsonSerializationException("Unexpected end when reading Object.");
+                                        ThrowInvalidObjectException();
                                     }
 
-                                    var value = ReadJson(reader);
+                                    var value = ReadJsonCore(reader);
 
-                                    result[propertyName] = value;
+                                    dictionary.Add(propertyName, value);
                                     break;
                                 case JsonToken.EndObject:
                                     result.TrimExcess();
 
-                                    return result;
+                                    return new JsonValue(result);
                             }
                         }
 
-                        throw new JsonSerializationException("Unexpected end when reading Object.");
+                        ThrowInvalidObjectException();
+                        return default!;
                     }
 
                 case JsonToken.StartArray:
                     {
-                        var result = new JsonArray(1);
+                        var result = new JsonArray(4);
 
                         while (reader.Read())
                         {
@@ -79,40 +102,41 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                                 case JsonToken.EndArray:
                                     result.TrimExcess();
 
-                                    return result;
+                                    return new JsonValue(result);
                                 default:
-                                    var value = ReadJson(reader);
+                                    var value = ReadJsonCore(reader);
 
                                     result.Add(value);
                                     break;
                             }
                         }
 
-                        throw new JsonSerializationException("Unexpected end when reading Object.");
+                        ThrowInvalidArrayException();
+                        return default!;
                     }
 
-                case JsonToken.Integer when reader.Value is int i:
-                    return i;
-                case JsonToken.Integer when reader.Value is long l:
-                    return l;
-                case JsonToken.Float when reader.Value is float f:
-                    return f;
-                case JsonToken.Float when reader.Value is double d:
-                    return d;
-                case JsonToken.Boolean when reader.Value is bool b:
-                    return b;
-                case JsonToken.Date when reader.Value is DateTime d:
-                    return d.ToIso8601();
-                case JsonToken.String when reader.Value is string s:
-                    return s;
-                case JsonToken.Null:
-                    return default;
-                case JsonToken.Undefined:
-                    return default;
+                case JsonToken.Comment:
+                    reader.Read();
+                    break;
             }
 
-            ThrowHelper.NotSupportedException();
+            ThrowUnsupportedTypeException();
             return default;
+        }
+
+        private static void ThrowUnsupportedTypeException()
+        {
+            throw new JsonSerializationException("Unsupported type.");
+        }
+
+        private static void ThrowInvalidArrayException()
+        {
+            throw new JsonSerializationException("Unexpected end when reading Array.");
+        }
+
+        private static void ThrowInvalidObjectException()
+        {
+            throw new JsonSerializationException("Unexpected end when reading Object.");
         }
 
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
@@ -128,34 +152,32 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         private static void WriteJson(JsonWriter writer, JsonValue value)
         {
-            switch (value.Type)
+            switch (value.Value)
             {
-                case JsonValueType.Null:
+                case null:
                     writer.WriteNull();
                     break;
-                case JsonValueType.Boolean:
-                    writer.WriteValue(value.AsBoolean);
+                case bool b:
+                    writer.WriteValue(b);
                     break;
-                case JsonValueType.String:
-                    writer.WriteValue(value.AsString);
+                case string s:
+                    writer.WriteValue(s);
                     break;
-                case JsonValueType.Number:
-                    var number = value.AsNumber;
-
-                    if (number % 1 == 0)
+                case double n:
+                    if (n % 1 == 0)
                     {
-                        writer.WriteValue((long)number);
+                        writer.WriteValue((long)n);
                     }
                     else
                     {
-                        writer.WriteValue(number);
+                        writer.WriteValue(n);
                     }
 
                     break;
-                case JsonValueType.Array:
+                case JsonArray a:
                     writer.WriteStartArray();
 
-                    foreach (var item in value.AsArray)
+                    foreach (var item in a)
                     {
                         WriteJson(writer, item);
                     }
@@ -163,10 +185,10 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                     writer.WriteEndArray();
                     break;
 
-                case JsonValueType.Object:
+                case JsonObject o:
                     writer.WriteStartObject();
 
-                    foreach (var (key, jsonValue) in value.AsObject)
+                    foreach (var (key, jsonValue) in o)
                     {
                         writer.WritePropertyName(key);
 

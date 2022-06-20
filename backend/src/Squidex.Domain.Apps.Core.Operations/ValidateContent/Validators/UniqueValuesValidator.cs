@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class UniqueValuesValidator<TValue> : IValidator
     {
-        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public void Validate(object? value, ValidationContext context)
         {
             if (value is IEnumerable<TValue> items && items.Any())
             {
@@ -19,11 +19,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                 if (itemsArray.Length != itemsArray.Distinct().Count())
                 {
-                    addError(context.Path, T.Get("contents.validation.duplicates"));
+                    context.AddError(context.Path, T.Get("contents.validation.duplicates"));
                 }
             }
-
-            return default;
         }
     }
 }

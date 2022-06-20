@@ -9,8 +9,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using NodaTime;
 
-#pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
-
 namespace Squidex.Infrastructure.Json.Objects
 {
     public readonly struct JsonValue : IEquatable<JsonValue>
@@ -330,8 +328,8 @@ namespace Squidex.Infrastructure.Json.Objects
                     return "null";
                 case bool b:
                     return b ? "true" : "false";
-                case double d:
-                    return d.ToString(CultureInfo.InvariantCulture);
+                case double n:
+                    return n.ToString(CultureInfo.InvariantCulture);
                 case string s:
                     return s;
                 case JsonArray a:
@@ -352,8 +350,8 @@ namespace Squidex.Infrastructure.Json.Objects
                     return "null";
                 case bool b:
                     return b ? "true" : "false";
-                case double d:
-                    return d.ToString(CultureInfo.InvariantCulture);
+                case double n:
+                    return n.ToString(CultureInfo.InvariantCulture);
                 case string s:
                     return $"\"{s}\"";
                 case JsonArray a:
@@ -370,14 +368,6 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             switch (Value)
             {
-                case null:
-                    return this;
-                case bool:
-                    return this;
-                case double:
-                    return this;
-                case string:
-                    return this;
                 case JsonArray a:
                     {
                         var result = new JsonArray(a.Count);
@@ -403,8 +393,7 @@ namespace Squidex.Infrastructure.Json.Objects
                     }
 
                 default:
-                    ThrowInvalidType();
-                    return default!;
+                    return this;
             }
         }
 
@@ -440,19 +429,6 @@ namespace Squidex.Infrastructure.Json.Objects
             }
 
             return hasSegment;
-        }
-
-        public bool TryGetValue(JsonValueType type, string pathSegment, out JsonValue result)
-        {
-            result = default!;
-
-            if (TryGetValue(pathSegment, out var temp) && temp.Type == type)
-            {
-                result = temp;
-                return true;
-            }
-
-            return false;
         }
 
         public bool TryGetValue(string pathSegment, out JsonValue result)

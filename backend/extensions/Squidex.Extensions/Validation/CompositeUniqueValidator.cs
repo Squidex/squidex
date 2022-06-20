@@ -27,34 +27,39 @@ namespace Squidex.Extensions.Validation
             this.contentRepository = contentRepository;
         }
 
-        public async ValueTask ValidateAsync(object value, ValidationContext context, AddError addError)
+        public void Validate(object value, ValidationContext context)
         {
             if (value is ContentData data)
             {
-                var validateableFields = context.Schema.Fields.Where(IsValidateableField);
+                context.Root.AddTask(async ct => await ValidateAsync(data, context));
+            }
+        }
 
-                var filters = new List<FilterNode<ClrValue>>();
+        private async Task ValidateAsync(ContentData data, ValidationContext context)
+        {
+            var validateableFields = context.Root.Schema.Fields.Where(IsValidateableField);
 
-                foreach (var field in validateableFields)
+            var filters = new List<FilterNode<ClrValue>>();
+
+            foreach (var field in validateableFields)
+            {
+                var fieldValue = TryGetValue(field, data);
+
+                if (fieldValue != null)
                 {
-                    var fieldValue = TryGetValue(field, data);
-
-                    if (fieldValue != null)
-                    {
-                        filters.Add(ClrFilter.Eq($"data.{field.Name}.iv", fieldValue));
-                    }
+                    filters.Add(ClrFilter.Eq($"data.{field.Name}.iv", fieldValue));
                 }
+            }
 
-                if (filters.Count > 0)
+            if (filters.Count > 0)
+            {
+                var filter = ClrFilter.And(filters);
+
+                var found = await contentRepository.QueryIdsAsync(context.Root.AppId.Id, context.Root.SchemaId.Id, filter);
+
+                if (found.Any(x => x.Id != context.Root.ContentId))
                 {
-                    var filter = ClrFilter.And(filters);
-
-                    var found = await contentRepository.QueryIdsAsync(context.AppId.Id, context.SchemaId.Id, filter);
-
-                    if (found.Any(x => x.Id != context.ContentId))
-                    {
-                        addError(Enumerable.Empty<string>(), "A content with the same values already exist.");
-                    }
+                    context.AddError(Enumerable.Empty<string>(), "A content with the same values already exist.");
                 }
             }
         }
@@ -73,24 +78,22 @@ namespace Squidex.Extensions.Validation
 
             switch (field.RawProperties)
             {
-                case BooleanFieldProperties when value.Type == JsonValueType.Boolean:
-                    return value.AsBoolean;
-                case BooleanFieldProperties when value.Type == JsonValueType.Null:
+                case BooleanFieldProperties when value.Value is bool b:
+                    return b;
+                case BooleanFieldProperties when value.Value == default:
                     return ClrValue.Null;
-                case NumberFieldProperties when value.Type == JsonValueType.Number:
-                    return value.AsNumber;
-                case NumberFieldProperties when value.Type == JsonValueType.Null:
+                case NumberFieldProperties when value.Value is double n:
+                    return n;
+                case NumberFieldProperties when value.Value == default:
                     return ClrValue.Null;
-                case StringFieldProperties when value.Type == JsonValueType.String:
-                    return value.AsString;
-                case StringFieldProperties when value.Type == JsonValueType.Null:
+                case StringFieldProperties when value.Value is string s:
+                    return s;
+                case StringFieldProperties when value.Value == default:
                     return ClrValue.Null;
-                case ReferencesFieldProperties when value.Type == JsonValueType.Array:
-                    var first = value.AsArray.FirstOrDefault();
-
-                    if (first.Type == JsonValueType.String)
+                case ReferencesFieldProperties when value.Value is JsonArray a:
+                    if (a.FirstOrDefault().Value is string first)
                     {
-                        return first.AsString;
+                        return first;
                     }
 
                     break;

@@ -160,12 +160,17 @@ namespace Squidex.Infrastructure.Collections
                 ThrowHelper.ArgumentException("Key already exists.", nameof(key));
             }
 
-            entries.Add(new KeyValuePair<TKey, TValue>(key, value));
+            AddUnsafe(key, value);
         }
 
         public void Add(KeyValuePair<TKey, TValue> item)
         {
             Add(item.Key, item.Value);
+        }
+
+        public void AddUnsafe(TKey key, TValue value)
+        {
+            entries.Add(new KeyValuePair<TKey, TValue>(key, value));
         }
 
         public void Clear()

@@ -28,7 +28,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(12.5, errors, updater: c => c.Nested("property").Nested("de"));
 
             Assert.Empty(errors);
-
             Assert.Empty(filter);
         }
 
@@ -45,11 +44,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         [Fact]
         public async Task Should_not_add_error_if_same_content_with_string_value_found()
         {
-            var ctx = ValidationTestExtensions.CreateContext().Nested("property").Nested("iv");
+            var contentId = DomainId.NewGuid();
 
-            var sut = new UniqueValidator(FoundDuplicates(ctx.ContentId));
+            var sut = new UniqueValidator(FoundDuplicates(contentId));
 
-            await sut.ValidateAsync("hi", ctx, ValidationTestExtensions.CreateFormatter(errors));
+            await sut.ValidateAsync("hello", errors, contentId: contentId, updater: ctx => ctx.Nested("property").Nested("iv"));
 
             Assert.Empty(errors);
         }
@@ -57,11 +56,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         [Fact]
         public async Task Should_not_add_error_if_same_content_with_double_value_found()
         {
-            var ctx = ValidationTestExtensions.CreateContext().Nested("property").Nested("iv");
+            var contentId = DomainId.NewGuid();
 
-            var sut = new UniqueValidator(FoundDuplicates(ctx.ContentId));
+            var sut = new UniqueValidator(FoundDuplicates(contentId));
 
-            await sut.ValidateAsync(12.5, ctx, ValidationTestExtensions.CreateFormatter(errors));
+            await sut.ValidateAsync(12.5, errors, contentId: contentId, updater: ctx => ctx.Nested("property").Nested("iv"));
 
             Assert.Empty(errors);
         }
@@ -73,12 +72,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
             var sut = new UniqueValidator(FoundDuplicates(DomainId.NewGuid(), f => filter = f));
 
-            await sut.ValidateAsync("hi", errors, updater: c => c.Nested("property").Nested("iv"));
+            await sut.ValidateAsync("hello", errors, updater: c => c.Nested("property").Nested("iv"));
 
             errors.Should().BeEquivalentTo(
                 new[] { "property.iv: Another content with the same value exists." });
 
-            Assert.Equal("Data.property.iv == 'hi'", filter);
+            Assert.Equal("Data.property.iv == 'hello'", filter);
         }
 
         [Fact]

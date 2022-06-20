@@ -66,7 +66,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                         if (cloneData)
                         {
-                            result.Data = result.Data.Clone();
+                            using (Telemetry.Activities.StartActivity("ContentEnricher/CloneData"))
+                            {
+                                result.Data = result.Data.Clone();
+                            }
                         }
 
                         results.Add(result);

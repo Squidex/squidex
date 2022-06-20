@@ -26,14 +26,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.allowedValues = allowedValues;
         }
 
-        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public void Validate(object? value, ValidationContext context)
         {
             if (value is TValue typedValue && !allowedValues.Contains(typedValue))
             {
-                addError(context.Path, T.Get("contents.validation.notAllowed"));
+                context.AddError(context.Path, T.Get("contents.validation.notAllowed"));
             }
-
-            return default;
         }
     }
 }

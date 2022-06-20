@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
@@ -21,68 +19,81 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         private readonly PartitionResolver partitionResolver;
         private readonly ValidationContext context;
         private readonly IEnumerable<IValidatorsFactory> factories;
-        private readonly ILogger<ContentValidator> log;
-        private readonly ConcurrentBag<ValidationError> errors = new ConcurrentBag<ValidationError>();
 
-        public IReadOnlyCollection<ValidationError> Errors
+        public IEnumerable<ValidationError> Errors
         {
-            get => errors;
+            get => context.Root.Errors;
         }
 
-        public ContentValidator(PartitionResolver partitionResolver, ValidationContext context, IEnumerable<IValidatorsFactory> factories,
-            ILogger<ContentValidator> log)
+        public ContentValidator(PartitionResolver partitionResolver, ValidationContext context,
+            IEnumerable<IValidatorsFactory> factories)
         {
             Guard.NotNull(context);
             Guard.NotNull(factories);
             Guard.NotNull(partitionResolver);
-            Guard.NotNull(log);
 
             this.context = context;
             this.factories = factories;
             this.partitionResolver = partitionResolver;
-
-            this.log = log;
-        }
-
-        private void AddError(IEnumerable<string> path, string message)
-        {
-            var pathString = path.ToPathString();
-
-            errors.Add(new ValidationError(message, pathString));
         }
 
         public ValueTask ValidateInputPartialAsync(ContentData data)
         {
             Guard.NotNull(data);
 
-            var validator = CreateSchemaValidator(true);
+            ValidateInputCore(data, true);
 
-            return validator.ValidateAsync(data, context, AddError);
+            return context.Root.CompleteAsync();
         }
 
         public ValueTask ValidateInputAsync(ContentData data)
         {
             Guard.NotNull(data);
 
-            var validator = CreateSchemaValidator(false);
+            ValidateInputCore(data, false);
 
-            return validator.ValidateAsync(data, context, AddError);
+            return context.Root.CompleteAsync();
+        }
+
+        public ValueTask ValidateInputAndContentAsync(ContentData data)
+        {
+            Guard.NotNull(data);
+
+            ValidateInputCore(data, false);
+            ValidateContentCore(data);
+
+            return context.Root.CompleteAsync();
         }
 
         public ValueTask ValidateContentAsync(ContentData data)
         {
             Guard.NotNull(data);
 
-            var validator = new AggregateValidator(CreateContentValidators(), log);
+            ValidateContentCore(data);
 
-            return validator.ValidateAsync(data, context, AddError);
+            return context.Root.CompleteAsync();
+        }
+
+        private void ValidateInputCore(ContentData data, bool partial)
+        {
+            CreateSchemaValidator(partial).Validate(data, context);
+        }
+
+        private void ValidateContentCore(ContentData data)
+        {
+            CreatecSchemaValidator().Validate(data, context);
+        }
+
+        private IValidator CreatecSchemaValidator()
+        {
+            return new AggregateValidator(CreateContentValidators());
         }
 
         private IValidator CreateSchemaValidator(bool isPartial)
         {
-            var fieldValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>(context.Schema.Fields.Count);
+            var fieldValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>(context.Root.Schema.Fields.Count);
 
-            foreach (var field in context.Schema.Fields)
+            foreach (var field in context.Root.Schema.Fields)
             {
                 fieldValidators[field.Name] = (!field.RawProperties.IsRequired, CreateFieldValidator(field, isPartial));
             }
@@ -109,12 +120,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return new AggregateValidator(
                 CreateFieldValidators(field)
                     .Union(Enumerable.Repeat(
-                        new ObjectValidator<JsonValue>(partitioningValidators, isPartial, typeName), 1)), log);
+                        new ObjectValidator<JsonValue>(partitioningValidators, isPartial, typeName), 1)));
         }
 
         private IValidator CreateValueValidator(IField field)
         {
-            return new FieldValidator(new AggregateValidator(CreateValueValidators(field), log), field);
+            return new FieldValidator(new AggregateValidator(CreateValueValidators(field)), field);
         }
 
         private IEnumerable<IValidator> CreateContentValidators()

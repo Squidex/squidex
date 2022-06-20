@@ -20,9 +20,9 @@ namespace Squidex.Extensions.Validation
             this.contentRepository = contentRepository;
         }
 
-        public IEnumerable<IValidator> CreateContentValidators(ValidatorContext context, ValidatorFactory createFieldValidator)
+        public IEnumerable<IValidator> CreateContentValidators(ValidationContext context, ValidatorFactory createFieldValidator)
         {
-            foreach (var validatorTag in ValidatorTags(context.Schema.Properties.Tags))
+            foreach (var validatorTag in ValidatorTags(context.Root.Schema.Properties.Tags))
             {
                 yield return new CompositeUniqueValidator(validatorTag, contentRepository);
             }

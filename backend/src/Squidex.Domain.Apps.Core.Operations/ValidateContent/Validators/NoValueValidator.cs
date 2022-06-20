@@ -17,14 +17,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
         }
 
-        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public void Validate(object? value, ValidationContext context)
         {
             if (!value.IsUndefined())
             {
-                addError(context.Path, T.Get("contents.validation.mustBeEmpty"));
+                context.AddError(context.Path, T.Get("contents.validation.mustBeEmpty"));
             }
-
-            return default;
         }
     }
 }

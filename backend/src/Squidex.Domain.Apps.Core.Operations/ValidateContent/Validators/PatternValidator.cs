@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             regex = new Regex($"^{pattern}$", options, Timeout);
         }
 
-        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public void Validate(object? value, ValidationContext context)
         {
             if (value is string stringValue)
             {
@@ -45,22 +45,20 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                         {
                             if (string.IsNullOrWhiteSpace(errorMessage))
                             {
-                                addError(context.Path, T.Get("contents.validation.pattern"));
+                                context.AddError(context.Path, T.Get("contents.validation.pattern"));
                             }
                             else
                             {
-                                addError(context.Path, errorMessage);
+                                context.AddError(context.Path, errorMessage);
                             }
                         }
                     }
                     catch
                     {
-                        addError(context.Path, T.Get("contents.validation.regexTooSlow"));
+                        context.AddError(context.Path, T.Get("contents.validation.regexTooSlow"));
                     }
                 }
             }
-
-            return default;
         }
     }
 }

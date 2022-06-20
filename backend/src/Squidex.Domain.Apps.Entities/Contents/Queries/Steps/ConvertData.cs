@@ -62,7 +62,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         private async Task<ValueConverter?> CleanReferencesAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
             CancellationToken ct)
         {
-            if (!context.ShouldSkipCleanup())
+            if (context.ShouldSkipCleanup())
+            {
+                return null;
+            }
+
+            using (Telemetry.Activities.StartActivity("ConvertData/CleanReferencesAsync"))
             {
                 var ids = new HashSet<DomainId>();
 

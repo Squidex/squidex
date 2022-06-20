@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.checkUniqueness = checkUniqueness;
         }
 
-        public async ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public void Validate(object? value, ValidationContext context)
         {
             var count = context.Path.Count();
 
@@ -44,13 +44,18 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                 if (filter != null)
                 {
-                    var found = await checkUniqueness(filter);
-
-                    if (found.Any(x => x.Id != context.ContentId))
-                    {
-                        addError(context.Path, T.Get("contents.validation.unique"));
-                    }
+                    context.Root.AddTask(ct => ValidateCoreAsync(context, filter));
                 }
+            }
+        }
+
+        private async Task ValidateCoreAsync(ValidationContext context, FilterNode<ClrValue> filter)
+        {
+            var found = await checkUniqueness(filter);
+
+            if (found.Any(x => x.Id != context.Root.ContentId))
+            {
+                context.AddError(context.Path, T.Get("contents.validation.unique"));
             }
         }
 

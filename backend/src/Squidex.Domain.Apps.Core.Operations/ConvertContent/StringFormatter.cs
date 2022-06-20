@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             Guard.NotNull(field);
 
-            if (value.Type == JsonValueType.Null)
+            if (value == default)
             {
                 return string.Empty;
             }
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public string Visit(BooleanFieldProperties properties, Args args)
         {
-            if (args.Value.Type == JsonValueType.Boolean && args.Value.AsBoolean)
+            if (Equals(args.Value.Value, true))
             {
                 return "Yes";
             }
@@ -76,11 +76,11 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public string Visit(GeolocationFieldProperties properties, Args args)
         {
-            if (args.Value.Type == JsonValueType.Object &&
-                args.Value.TryGetValue(JsonValueType.Number, "latitude", out var lat) &&
-                args.Value.TryGetValue(JsonValueType.Number, "longitude", out var lon))
+            if (args.Value.Value is JsonObject o &&
+                o.TryGetValue("latitude", out var found) && found.Value is double lat &&
+                o.TryGetValue("longitude", out found) && found.Value is double lon)
             {
-                return $"{lat.AsNumber}, {lon.AsNumber}";
+                return $"{lat}, {lon}";
             }
             else
             {
@@ -117,9 +117,9 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public string Visit(TagsFieldProperties properties, Args args)
         {
-            if (args.Value.Type == JsonValueType.Array)
+            if (args.Value.Value is JsonArray a)
             {
-                return string.Join(", ", args.Value.AsArray);
+                return string.Join(", ", a);
             }
             else
             {
@@ -134,15 +134,13 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         private static string FormatArray(JsonValue value, string singularName, string pluralName)
         {
-            if (value.Type == JsonValueType.Array)
+            if (value.Value is JsonArray a)
             {
-                var array = value.AsArray;
-
-                if (array.Count > 1)
+                if (a.Count > 1)
                 {
-                    return $"{array.Count} {pluralName}";
+                    return $"{a.Count} {pluralName}";
                 }
-                else if (array.Count == 1)
+                else if (a.Count == 1)
                 {
                     return $"1 {singularName}";
                 }

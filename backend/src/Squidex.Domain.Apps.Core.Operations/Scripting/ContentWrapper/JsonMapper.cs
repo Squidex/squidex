@@ -19,27 +19,27 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
     {
         public static JsValue Map(JsonValue value, Engine engine)
         {
-            switch (value.Type)
+            switch (value.Value)
             {
-                case JsonValueType.Null:
+                case null:
                     return JsValue.Null;
-                case JsonValueType.String:
-                    return new JsString(value.AsString);
-                case JsonValueType.Boolean:
-                    return new JsBoolean(value.AsBoolean);
-                case JsonValueType.Number:
-                    return new JsNumber(value.AsNumber);
-                case JsonValueType.Object:
-                    return FromObject(value.AsObject, engine);
-                case JsonValueType.Array:
-                    return FromArray(value.AsArray, engine);
+                case bool b:
+                    return new JsBoolean(b);
+                case double n:
+                    return new JsNumber(n);
+                case string s:
+                    return new JsString(s);
+                case JsonObject o:
+                    return FromObject(o, engine);
+                case JsonArray a:
+                    return FromArray(a, engine);
             }
 
             ThrowInvalidType(nameof(value));
             return JsValue.Null;
         }
 
-        private static JsValue FromArray(List<JsonValue> arr, Engine engine)
+        private static JsValue FromArray(JsonArray arr, Engine engine)
         {
             var target = new JsValue[arr.Count];
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             return engine.Realm.Intrinsics.Array.Construct(target);
         }
 
-        private static JsValue FromObject(ListDictionary<string, JsonValue> obj, Engine engine)
+        private static JsValue FromObject(JsonObject obj, Engine engine)
         {
             var target = new ObjectInstance(engine);
 

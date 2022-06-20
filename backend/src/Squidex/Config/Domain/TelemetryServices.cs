@@ -33,6 +33,7 @@ namespace Squidex.Config.Domain
 
                 builder.AddAspNetCoreInstrumentation();
                 builder.AddHttpClientInstrumentation();
+                builder.AddMongoDBInstrumentation();
 
                 foreach (var configurator in serviceProvider.GetRequiredService<IEnumerable<ITelemetryConfigurator>>())
                 {

@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Queries;
 namespace Squidex.Areas.Api.Controllers
 {
     [JsonSchemaFlatten]
-    public sealed class JsonQueryDto : Query<JsonValue>
+    public sealed class QueryJsonDto : Query<JsonValue>
     {
     }
 }

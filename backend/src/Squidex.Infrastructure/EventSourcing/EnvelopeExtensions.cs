@@ -100,13 +100,13 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static long GetLong(this EnvelopeHeaders obj, string key)
         {
-            if (obj.TryGetValue(key, out var v))
+            if (obj.TryGetValue(key, out var found))
             {
-                if (v.Type == JsonValueType.Number)
+                if (found.Value is double d)
                 {
-                    return (long)v.AsNumber;
+                    return (long)d;
                 }
-                else if (v.Type == JsonValueType.String && double.TryParse(v.AsString, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+                else if (found.Value is string s && double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
                 {
                     return (long)result;
                 }
@@ -117,7 +117,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Guid GetGuid(this EnvelopeHeaders obj, string key)
         {
-            if (obj.TryGetValue(key, out var v) && v.Type == JsonValueType.String && Guid.TryParse(v.AsString, out var guid))
+            if (obj.TryGetValue(key, out var found) && found.Value is string s && Guid.TryParse(s, out var guid))
             {
                 return guid;
             }
@@ -127,7 +127,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Instant GetInstant(this EnvelopeHeaders obj, string key)
         {
-            if (obj.TryGetValue(key, out var v) && v.Type == JsonValueType.String && InstantPattern.ExtendedIso.Parse(v.AsString).TryGetValue(default, out var instant))
+            if (obj.TryGetValue(key, out var found) && found.Value is string s && InstantPattern.ExtendedIso.Parse(s).TryGetValue(default, out var instant))
             {
                 return instant;
             }
@@ -137,9 +137,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static string GetString(this EnvelopeHeaders obj, string key)
         {
-            if (obj.TryGetValue(key, out var v))
+            if (obj.TryGetValue(key, out var found))
             {
-                return v.ToString();
+                return found.ToString();
             }
 
             return string.Empty;
@@ -147,9 +147,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static bool GetBoolean(this EnvelopeHeaders obj, string key)
         {
-            if (obj.TryGetValue(key, out var v) && v.Type == JsonValueType.Boolean)
+            if (obj.TryGetValue(key, out var found) && found.Value is bool b)
             {
-                return v.AsBoolean;
+                return b;
             }
 
             return false;

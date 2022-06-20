@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 {
@@ -59,10 +58,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                     await scriptEngine.ExecuteAsync(vars, preScript, options, ct);
                 }
 
-                await AsyncHelper.WhenAllThrottledAsync(group, async (content, _) =>
+                foreach (var content in group)
                 {
                     await TransformAsync(vars, script, content, ct);
-                }, ct: ct);
+                }
             }
         }
 
