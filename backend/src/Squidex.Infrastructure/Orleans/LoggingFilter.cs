@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public async Task Invoke(IIncomingGrainCallContext context)
         {
-            var name = $"Grain/{context.ImplementationMethod?.DeclaringType.FullName}/{context.ImplementationMethod?.Name}";
+            var name = $"Grain/{context.ImplementationMethod?.DeclaringType?.FullName}/{context.ImplementationMethod?.Name}";
 
             using (Telemetry.Activities.StartActivity(name))
             {
