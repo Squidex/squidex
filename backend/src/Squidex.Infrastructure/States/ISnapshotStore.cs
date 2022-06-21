@@ -5,17 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+#pragma warning disable MA0048 // File name must match type name
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Infrastructure.States
 {
     public interface ISnapshotStore<T>
     {
-        Task WriteAsync(DomainId key, T value, long oldVersion, long newVersion, PersistenceAction action,
+        Task WriteAsync(SnapshotWriteJob<T> job,
             CancellationToken ct = default);
 
-        Task WriteManyAsync(IEnumerable<(DomainId Key, T Value, long Version, PersistenceAction Action)> snapshots,
+        Task WriteManyAsync(IEnumerable<SnapshotWriteJob<T>> jobs,
             CancellationToken ct = default);
 
-        Task<(T Value, bool Valid, long Version)> ReadAsync(DomainId key,
+        Task<SnapshotResult<T>> ReadAsync(DomainId key,
             CancellationToken ct = default);
 
         Task ClearAsync(
@@ -24,7 +27,11 @@ namespace Squidex.Infrastructure.States
         Task RemoveAsync(DomainId key,
             CancellationToken ct = default);
 
-        IAsyncEnumerable<(T State, long Version)> ReadAllAsync(
+        IAsyncEnumerable<SnapshotResult<T>> ReadAllAsync(
             CancellationToken ct = default);
     }
+
+    public record struct SnapshotResult<T>(DomainId Key, T Value, long NewVersion, bool IsValid = true);
+
+    public record struct SnapshotWriteJob<T>(DomainId Key, T Value, long NewVersion, long OldVersion, PersistenceAction Action);
 }

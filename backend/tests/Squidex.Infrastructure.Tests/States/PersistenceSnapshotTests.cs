@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_read_from_store()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns((20, true, 10));
+                .Returns(new SnapshotResult<int>(key, 20, 10));
 
             var persistedState = Save.Snapshot(0);
             var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);
@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_not_read_from_store_if_not_valid()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns((20, false, 10));
+                .Returns(new SnapshotResult<int>(key, 20, 10, false));
 
             var persistedState = Save.Snapshot(0);
             var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);
@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_return_empty_version_if_version_negative()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns((20, true, -10));
+                .Returns(new SnapshotResult<int>(key, 20, -10));
 
             var persistedState = Save.Snapshot(0);
             var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);
@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_set_to_empty_if_store_returns_not_found()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns((20, true, EtagVersion.Empty));
+                .Returns(new SnapshotResult<int>(key, 20, EtagVersion.Empty));
 
             var persistedState = Save.Snapshot(0);
             var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);
@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_throw_exception_if_not_found_and_version_expected()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns((123, true, EtagVersion.Empty));
+                .Returns(new SnapshotResult<int>(key, 42, EtagVersion.Empty));
 
             var persistedState = Save.Snapshot(0);
             var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);
@@ -100,7 +100,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_throw_exception_if_other_version_found()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns((123, true, 2));
+                .Returns(new SnapshotResult<int>(key, 42, EtagVersion.Empty));
 
             var persistedState = Save.Snapshot(0);
             var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);
@@ -112,7 +112,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_write_to_store_with_previous_version()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns((20, true, 10));
+                .Returns(new SnapshotResult<int>(key, 20, 10));
 
             var persistedState = Save.Snapshot(0);
             var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);
@@ -124,7 +124,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.WriteSnapshotAsync(100, PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, 100, 10, 11, PersistenceAction.Update, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<int>(key, 100, 10, 11, PersistenceAction.Update), A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -135,7 +135,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.WriteSnapshotAsync(100, PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, 100, EtagVersion.Empty, 0, PersistenceAction.Update, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<int>(key, 100, EtagVersion.Empty, 0, PersistenceAction.Update), A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -143,9 +143,9 @@ namespace Squidex.Infrastructure.States
         public async Task Should_not_wrap_exception_if_writing_to_store_with_previous_version()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns((20, true, 10));
+                .Returns(new SnapshotResult<int>(key, 42, EtagVersion.Empty));
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, 100, 10, 11, A<PersistenceAction>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<int>(key, 100, 10, 11, A<PersistenceAction>._), A<CancellationToken>._))
                 .Throws(new InconsistentStateException(1, 1, new InvalidOperationException()));
 
             var persistedState = Save.Snapshot(0);

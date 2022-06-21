@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
 #pragma warning disable MA0048 // File name must match type name
@@ -26,13 +25,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, app.Id), ct);
         }
 
-        IAsyncEnumerable<(AssetDomainObject.State State, long Version)> ISnapshotStore<AssetDomainObject.State>.ReadAllAsync(
+        IAsyncEnumerable<SnapshotResult<AssetDomainObject.State>> ISnapshotStore<AssetDomainObject.State>.ReadAllAsync(
             CancellationToken ct)
         {
-            return Collection.Find(new BsonDocument(), Batching.Options).ToAsyncEnumerable(ct).Select(x => (Map(x), x.Version));
+            return Collection.Find(new BsonDocument(), Batching.Options).ToAsyncEnumerable(ct)
+                .Select(x => new SnapshotResult<AssetDomainObject.State>(x.DocumentId, x.ToState(), x.Version));
         }
 
-        async Task<(AssetDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<AssetDomainObject.State>.ReadAsync(DomainId key,
+        async Task<SnapshotResult<AssetDomainObject.State>> ISnapshotStore<AssetDomainObject.State>.ReadAsync(DomainId key,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoAssetRepository/ReadAsync"))
@@ -43,35 +43,35 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 if (existing != null)
                 {
-                    return (Map(existing), true, existing.Version);
+                    return new SnapshotResult<AssetDomainObject.State>(existing.DocumentId, existing.ToState(), existing.Version);
                 }
 
-                return (null!, true, EtagVersion.Empty);
+                return new SnapshotResult<AssetDomainObject.State>(default, null!, EtagVersion.Empty);
             }
         }
 
-        async Task ISnapshotStore<AssetDomainObject.State>.WriteAsync(DomainId key, AssetDomainObject.State value, long oldVersion, long newVersion, PersistenceAction action,
+        async Task ISnapshotStore<AssetDomainObject.State>.WriteAsync(SnapshotWriteJob<AssetDomainObject.State> job,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoAssetRepository/WriteAsync"))
             {
-                var entity = Map(value);
+                var entity = MongoAssetEntity.Create(job);
 
-                await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity, ct);
+                await Collection.UpsertVersionedAsync(job.Key, job.OldVersion, job.NewVersion, entity, ct);
 
                 if (countCollection != null)
                 {
-                    await countCollection.UpdateAsync(entity.IndexedAppId, action, ct);
+                    await countCollection.UpdateAsync(entity.IndexedAppId, job.Action, ct);
                 }
             }
         }
 
-        async Task ISnapshotStore<AssetDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, AssetDomainObject.State Value, long Version, PersistenceAction Action)> snapshots,
+        async Task ISnapshotStore<AssetDomainObject.State>.WriteManyAsync(IEnumerable<SnapshotWriteJob<AssetDomainObject.State>> jobs,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoAssetRepository/WriteManyAsync"))
             {
-                var updates = snapshots.Select(Map).Select(x =>
+                var updates = jobs.Select(MongoAssetEntity.Create).Select(x =>
                     new ReplaceOneModel<MongoAssetEntity>(
                         Filter.Eq(y => y.DocumentId, x.DocumentId),
                         x)
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 if (countCollection != null)
                 {
-                    await countCollection.UpdateAsync(snapshots.Select(x => (x.Value.AppId.Id, x.Action)), ct);
+                    await countCollection.UpdateAsync(jobs.Select(x => (x.Value.AppId.Id, x.Action)), ct);
                 }
             }
         }
@@ -112,29 +112,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         )
         {
             return Task.WhenAll(base.ClearAsync(ct), countCollection?.ClearAsync(ct) ?? Task.CompletedTask);
-        }
-
-        private static MongoAssetEntity Map(AssetDomainObject.State value)
-        {
-            var entity = SimpleMapper.Map(value, new MongoAssetEntity());
-
-            entity.IndexedAppId = value.AppId.Id;
-
-            return entity;
-        }
-
-        private static MongoAssetEntity Map((DomainId Key, AssetDomainObject.State Value, long Version, PersistenceAction Action) snapshot)
-        {
-            var entity = Map(snapshot.Value);
-
-            entity.DocumentId = snapshot.Key;
-
-            return entity;
-        }
-
-        private static AssetDomainObject.State Map(MongoAssetEntity existing)
-        {
-            return SimpleMapper.Map(existing, new AssetDomainObject.State());
         }
     }
 }

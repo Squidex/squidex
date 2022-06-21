@@ -25,13 +25,13 @@ namespace Migrations.Migrations
         public async Task UpdateAsync(
             CancellationToken ct)
         {
-            await foreach (var (state, version) in stateForAssets.ReadAllAsync(ct))
+            await foreach (var (key, state, version, _) in stateForAssets.ReadAllAsync(ct))
             {
                 state.Slug = state.FileName.ToAssetSlug();
 
-                var key = DomainId.Combine(state.AppId.Id, state.Id);
+                var job = new SnapshotWriteJob<AssetDomainObject.State>(key, state, version, default, default);
 
-                await stateForAssets.WriteAsync(key, state, version, version, default, ct);
+                await stateForAssets.WriteAsync(job, ct);
             }
         }
     }

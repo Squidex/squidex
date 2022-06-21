@@ -212,12 +212,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<long> FindVersionAsync(DomainId documentId,
+        public Task<MongoContentEntity> FindAsync(DomainId documentId,
             CancellationToken ct = default)
         {
-            var result = await Collection.Find(x => x.DocumentId == documentId).Only(x => x.Version).FirstOrDefaultAsync(ct);
+            return Collection.Find(x => x.DocumentId == documentId).FirstOrDefaultAsync(ct);
+        }
 
-            return result?["vs"].AsInt64 ?? EtagVersion.Empty;
+        public IAsyncEnumerable<MongoContentEntity> StreamAll(
+            CancellationToken ct)
+        {
+            return Collection.Find(new BsonDocument()).ToAsyncEnumerable(ct);
         }
 
         public async Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity value, PersistenceAction action,

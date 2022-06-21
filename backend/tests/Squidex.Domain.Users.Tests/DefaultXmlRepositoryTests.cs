@@ -29,11 +29,11 @@ namespace Squidex.Domain.Users
             A.CallTo(() => store.ReadAllAsync(default))
                 .Returns(new[]
                 {
-                    (new DefaultXmlRepository.State
+                    new SnapshotResult<DefaultXmlRepository.State>(default, new DefaultXmlRepository.State
                     {
                         Xml = new XElement("xml").ToString()
                     }, 0L),
-                    (new DefaultXmlRepository.State
+                    new SnapshotResult<DefaultXmlRepository.State>(default, new DefaultXmlRepository.State
                     {
                         Xml = new XElement("xml").ToString()
                     }, 0L)
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Users
 
             sut.StoreElement(xml, "name");
 
-            A.CallTo(() => store.WriteAsync(DomainId.Create("name"), A<DefaultXmlRepository.State>._, A<long>._, 0, default, default))
+            A.CallTo(() => store.WriteAsync(A<SnapshotWriteJob<DefaultXmlRepository.State>>.That.Matches(x => x.Key == DomainId.Create("name")), default))
                 .MustHaveHappened();
         }
     }

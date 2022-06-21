@@ -111,16 +111,16 @@ namespace Squidex.Infrastructure.States
             await persistence1.WriteSnapshotAsync(12, PersistenceAction.Update);
             await persistence2.WriteSnapshotAsync(12, PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._, PersistenceAction.Update, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(A<SnapshotWriteJob<int>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long, PersistenceAction)>>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<SnapshotWriteJob<int>>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             await bulk.CommitAsync();
             await bulk.DisposeAsync();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long, PersistenceAction)>>.That.Matches(x => x.Count() == 2), A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<SnapshotWriteJob<int>>>.That.Matches(x => x.Count() == 2), A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -143,16 +143,16 @@ namespace Squidex.Infrastructure.States
             await persistence1_1.WriteSnapshotAsync(12, PersistenceAction.Update);
             await persistence1_2.WriteSnapshotAsync(12, PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._, A<PersistenceAction>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(A<SnapshotWriteJob<int>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long, PersistenceAction)>>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<SnapshotWriteJob<int>>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             await bulk.CommitAsync();
             await bulk.DisposeAsync();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long, PersistenceAction)>>.That.Matches(x => x.Count() == 1), A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<SnapshotWriteJob<int>>>.That.Matches(x => x.Count() == 1), A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -172,16 +172,16 @@ namespace Squidex.Infrastructure.States
             await persistence1.WriteSnapshotAsync(12, PersistenceAction.Update);
             await persistence1.WriteSnapshotAsync(13, PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._, A<PersistenceAction>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(A<SnapshotWriteJob<int>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long, PersistenceAction)>>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<SnapshotWriteJob<int>>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             await bulk.CommitAsync();
             await bulk.DisposeAsync();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long, PersistenceAction)>>.That.Matches(x => x.Count() == 1), A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<SnapshotWriteJob<int>>>.That.Matches(x => x.Count() == 1), A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
         }
 

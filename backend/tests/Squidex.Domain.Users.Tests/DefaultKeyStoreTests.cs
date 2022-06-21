@@ -30,7 +30,7 @@ namespace Squidex.Domain.Users
         public void Should_configure_new_keys()
         {
             A.CallTo(() => store.ReadAsync(A<DomainId>._, default))
-                .Returns((null!, true, 0));
+                .Returns(new SnapshotResult<DefaultKeyStore.State>(default, null!, 0));
 
             var options = new OpenIddictServerOptions();
 
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Users
             Assert.NotEmpty(options.SigningCredentials);
             Assert.NotEmpty(options.EncryptionCredentials);
 
-            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, default, default))
+            A.CallTo(() => store.WriteAsync(A<SnapshotWriteJob<DefaultKeyStore.State>>._, default))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Users
         public void Should_configure_existing_keys()
         {
             A.CallTo(() => store.ReadAsync(A<DomainId>._, default))
-                .Returns((ExistingKey(), true, 0));
+                .Returns(new SnapshotResult<DefaultKeyStore.State>(default, ExistingKey(), 0));
 
             var options = new OpenIddictServerOptions();
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Users
             Assert.NotEmpty(options.SigningCredentials);
             Assert.NotEmpty(options.EncryptionCredentials);
 
-            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, default, default))
+            A.CallTo(() => store.WriteAsync(A<SnapshotWriteJob<DefaultKeyStore.State>>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -64,11 +64,11 @@ namespace Squidex.Domain.Users
         public void Should_configure_existing_keys_when_initial_setup_failed()
         {
             A.CallTo(() => store.ReadAsync(A<DomainId>._, default))
-                .Returns((null!, true, 0)).Once()
+                .Returns(new SnapshotResult<DefaultKeyStore.State>(default, null!, 0)).Once()
                 .Then
-                .Returns((ExistingKey(), true, 0));
+                .Returns(new SnapshotResult<DefaultKeyStore.State>(default, ExistingKey(), 0));
 
-            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, default, default))
+            A.CallTo(() => store.WriteAsync(A<SnapshotWriteJob<DefaultKeyStore.State>>._, default))
                 .Throws(new InconsistentStateException(0, 0));
 
             var options = new OpenIddictServerOptions();
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Users
             Assert.NotEmpty(options.SigningCredentials);
             Assert.NotEmpty(options.EncryptionCredentials);
 
-            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, default, default))
+            A.CallTo(() => store.WriteAsync(A<SnapshotWriteJob<DefaultKeyStore.State>>._, default))
                 .MustHaveHappened();
         }
 

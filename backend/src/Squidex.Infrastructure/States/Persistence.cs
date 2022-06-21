@@ -119,7 +119,7 @@ namespace Squidex.Infrastructure.States
         private async Task ReadSnapshotAsync(
             CancellationToken ct)
         {
-            var (state, valid, version) = await snapshotStore.ReadAsync(ownerKey, ct);
+            var (_, state, version, valid) = await snapshotStore.ReadAsync(ownerKey, ct);
 
             version = Math.Max(version, EtagVersion.Empty);
             versionSnapshot = version;
@@ -184,7 +184,7 @@ namespace Squidex.Infrastructure.States
 
             using (Telemetry.Activities.StartActivity("Persistence/WriteState"))
             {
-                await snapshotStore.WriteAsync(ownerKey, state, oldVersion, newVersion, action, ct);
+                await snapshotStore.WriteAsync(new SnapshotWriteJob<T>(ownerKey, state, oldVersion, newVersion, action), ct);
             }
 
             versionSnapshot = newVersion;

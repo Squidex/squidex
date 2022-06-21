@@ -86,7 +86,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_read_read_from_snapshot_store()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns(("2", true, 2L));
+                .Returns(new SnapshotResult<string>(key, "2", 2));
 
             SetupEventStore(3, 2);
 
@@ -106,7 +106,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_mark_as_stale_if_snapshot_old_than_events()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns(("2", true, 1L));
+                .Returns(new SnapshotResult<string>(key, "2", 1));
 
             SetupEventStore(3, 2, 2);
 
@@ -126,7 +126,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_throw_exception_if_events_are_older_than_snapshot()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns(("2", true, 2L));
+                .Returns(new SnapshotResult<string>(key, "2", 2));
 
             SetupEventStore(3, 0, 3);
 
@@ -141,7 +141,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_throw_exception_if_events_have_gaps_to_snapshot()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns(("2", true, 2L));
+                .Returns(new SnapshotResult<string>(key, "2", 2));
 
             SetupEventStore(3, 4, 3);
 
@@ -178,7 +178,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_throw_exception_if_other_version_found_from_snapshot()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns(("2", true, 2L));
+                .Returns(new SnapshotResult<string>(key, "2", 2));
 
             SetupEventStore(0);
 
@@ -219,7 +219,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key.ToString(), 3, A<ICollection<EventData>>.That.Matches(x => x.Count == 1), A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<string>._, A<long>._, A<long>._, A<PersistenceAction>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(A<SnapshotWriteJob<string>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -238,7 +238,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_write_snapshot_to_store()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns(("2", true, 2L));
+                .Returns(new SnapshotResult<string>(key, "2", 2));
 
             SetupEventStore(3);
 
@@ -254,9 +254,9 @@ namespace Squidex.Infrastructure.States
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
             await persistence.WriteSnapshotAsync("5", PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, "4", 2, 3, PersistenceAction.Update, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<string>(key, "4", 2, 3, PersistenceAction.Update), A<CancellationToken>._))
                 .MustHaveHappened();
-            A.CallTo(() => snapshotStore.WriteAsync(key, "5", 3, 4, PersistenceAction.Update, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<string>(key, "5", 3, 4, PersistenceAction.Update), A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -264,7 +264,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_write_snapshot_to_store_if_not_read_before()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns((null!, true, EtagVersion.Empty));
+                .Returns(new SnapshotResult<string>(key, null!, EtagVersion.Empty));
 
             SetupEventStore(3);
 
@@ -280,9 +280,9 @@ namespace Squidex.Infrastructure.States
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
             await persistence.WriteSnapshotAsync("5", PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, "4", 2, 3, PersistenceAction.Update, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<string>(key, "4", 2, 3, PersistenceAction.Update), A<CancellationToken>._))
                 .MustHaveHappened();
-            A.CallTo(() => snapshotStore.WriteAsync(key, "5", 3, 4, PersistenceAction.Update, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<string>(key, "5", 3, 4, PersistenceAction.Update), A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -290,7 +290,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_not_write_snapshot_to_store_if_not_changed()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns(("0", true, 2));
+                .Returns(new SnapshotResult<string>(key, "0", 2));
 
             SetupEventStore(3);
 
@@ -302,7 +302,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.WriteSnapshotAsync("4", PersistenceAction.Delete);
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, A<string>._, A<long>._, A<long>._, A<PersistenceAction>._, A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(A<SnapshotWriteJob<string>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
