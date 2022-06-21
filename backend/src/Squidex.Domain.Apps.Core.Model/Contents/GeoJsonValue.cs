@@ -8,7 +8,6 @@
 using GeoJSON.Net;
 using GeoJSON.Net.Geometry;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.ObjectPool;

@@ -7,8 +7,6 @@
 
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Assets.Repositories;
-using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure.Commands;
 
 namespace Migrations
@@ -16,23 +14,17 @@ namespace Migrations
     public sealed class RebuildRunner
     {
         private readonly RebuildFiles rebuildFiles;
-        private readonly IAssetRepository assetRepository;
         private readonly Rebuilder rebuilder;
         private readonly RebuildOptions rebuildOptions;
-        private readonly IContentRepository contentRepository;
 
         public RebuildRunner(
             IOptions<RebuildOptions> rebuildOptions,
-            IAssetRepository assetRepository,
             Rebuilder rebuilder,
-            RebuildFiles rebuildFiles,
-            IContentRepository contentRepository)
+            RebuildFiles rebuildFiles)
         {
-            this.assetRepository = assetRepository;
             this.rebuildFiles = rebuildFiles;
             this.rebuilder = rebuilder;
             this.rebuildOptions = rebuildOptions.Value;
-            this.contentRepository = contentRepository;
         }
 
         public async Task RunAsync(
@@ -61,11 +53,6 @@ namespace Migrations
                 await rebuilder.RebuildAssetFoldersAsync(batchSize, ct);
             }
 
-            if (rebuildOptions.AssetsCount)
-            {
-                await assetRepository.RebuildCountsAsync(ct);
-            }
-
             if (rebuildOptions.AssetFiles)
             {
                 await rebuildFiles.RepairAsync(ct);
@@ -74,11 +61,6 @@ namespace Migrations
             if (rebuildOptions.Contents)
             {
                 await rebuilder.RebuildContentAsync(batchSize, ct);
-            }
-
-            if (rebuildOptions.ContentsCount)
-            {
-                await contentRepository.RebuildCountsAsync(ct);
             }
         }
     }

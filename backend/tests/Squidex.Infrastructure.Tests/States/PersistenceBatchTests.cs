@@ -108,8 +108,8 @@ namespace Squidex.Infrastructure.States
             var persistedEvents2 = Save.Events();
             var persistence2 = bulk.WithEventSourcing(None.Type, key2, persistedEvents2.Write);
 
-            await persistence1.WriteSnapshotAsync(12, PersistenceAction.Update);
-            await persistence2.WriteSnapshotAsync(12, PersistenceAction.Update);
+            await persistence1.WriteSnapshotAsync(12);
+            await persistence2.WriteSnapshotAsync(12);
 
             A.CallTo(() => snapshotStore.WriteAsync(A<SnapshotWriteJob<int>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -140,8 +140,8 @@ namespace Squidex.Infrastructure.States
             var persistedEvents1_2 = Save.Events();
             var persistence1_2 = bulk.WithEventSourcing(None.Type, key1, persistedEvents1_2.Write);
 
-            await persistence1_1.WriteSnapshotAsync(12, PersistenceAction.Update);
-            await persistence1_2.WriteSnapshotAsync(12, PersistenceAction.Update);
+            await persistence1_1.WriteSnapshotAsync(12);
+            await persistence1_2.WriteSnapshotAsync(12);
 
             A.CallTo(() => snapshotStore.WriteAsync(A<SnapshotWriteJob<int>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -169,8 +169,8 @@ namespace Squidex.Infrastructure.States
             var persistedEvents1 = Save.Events();
             var persistence1 = bulk.WithEventSourcing(None.Type, key1, persistedEvents1.Write);
 
-            await persistence1.WriteSnapshotAsync(12, PersistenceAction.Update);
-            await persistence1.WriteSnapshotAsync(13, PersistenceAction.Update);
+            await persistence1.WriteSnapshotAsync(12);
+            await persistence1.WriteSnapshotAsync(13);
 
             A.CallTo(() => snapshotStore.WriteAsync(A<SnapshotWriteJob<int>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();

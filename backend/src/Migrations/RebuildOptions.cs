@@ -13,13 +13,9 @@ namespace Migrations
 
         public bool Assets { get; set; }
 
-        public bool AssetsCount { get; set; }
-
         public bool AssetFiles { get; set; }
 
         public bool Contents { get; set; }
-
-        public bool ContentsCount { get; set; }
 
         public bool Indexes { get; set; }
 

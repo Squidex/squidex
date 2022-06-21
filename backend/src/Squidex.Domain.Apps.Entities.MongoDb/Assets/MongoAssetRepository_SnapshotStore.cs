@@ -58,11 +58,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 var entity = MongoAssetEntity.Create(job);
 
                 await Collection.UpsertVersionedAsync(job.Key, job.OldVersion, job.NewVersion, entity, ct);
-
-                if (countCollection != null)
-                {
-                    await countCollection.UpdateAsync(entity.IndexedAppId, job.Action, ct);
-                }
             }
         }
 
@@ -85,11 +80,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 }
 
                 await Collection.BulkWriteAsync(updates, BulkUnordered, ct);
-
-                if (countCollection != null)
-                {
-                    await countCollection.UpdateAsync(jobs.Select(x => (x.Value.AppId.Id, x.Action)), ct);
-                }
             }
         }
 
@@ -98,20 +88,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             using (Telemetry.Activities.StartActivity("MongoAssetRepository/RemoveAsync"))
             {
-                var entity = await Collection.FindOneAndDeleteAsync(x => x.DocumentId == key, null, ct);
-
-                if (entity != null && !entity.IsDeleted && countCollection != null)
-                {
-                    await countCollection.UpdateAsync(entity.IndexedAppId, PersistenceAction.Delete, ct);
-                }
+                await Collection.DeleteOneAsync(x => x.DocumentId == key, null, ct);
             }
-        }
-
-        public override Task ClearAsync(
-            CancellationToken ct = default
-        )
-        {
-            return Task.WhenAll(base.ClearAsync(ct), countCollection?.ClearAsync(ct) ?? Task.CompletedTask);
         }
     }
 }

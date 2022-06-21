@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.EnsureLoadedAsync();
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._, PersistenceAction.Undefined, default))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._, default))
                 .MustHaveHappened();
         }
 
@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.EnsureLoadedAsync();
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._, A<PersistenceAction>._, default))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -67,7 +67,7 @@ namespace Squidex.Infrastructure.Commands
 
             var result = await sut.ExecuteAsync(new CreateAuto { Value = 4 });
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 4), PersistenceAction.Create, default))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 4), default))
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1), default))
                 .MustHaveHappened();
@@ -221,7 +221,7 @@ namespace Squidex.Infrastructure.Commands
 
             var result = await sut.ExecuteAsync(new UpdateAuto { Value = 8, ExpectedVersion = 0 });
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 8), PersistenceAction.Update, default))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 8), default))
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1), default))
                 .MustHaveHappened();
@@ -243,7 +243,7 @@ namespace Squidex.Infrastructure.Commands
 
             var result = await sut.ExecuteAsync(new UpdateAuto { Value = 8, ExpectedVersion = 0 });
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 8), PersistenceAction.Update, default))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 8), default))
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1), default))
                 .MustHaveHappened();
@@ -291,7 +291,7 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.RebuildStateAsync();
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 4), PersistenceAction.Undefined, default))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 4), default))
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, default))
                 .MustNotHaveHappened();
@@ -396,7 +396,7 @@ namespace Squidex.Infrastructure.Commands
         {
             SetupEmpty();
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._, A<PersistenceAction>._, default))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._, default))
                 .Throws(new InvalidOperationException());
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(new CreateAuto()));
@@ -410,7 +410,7 @@ namespace Squidex.Infrastructure.Commands
         {
             SetupCreated(4);
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._, A<PersistenceAction>._, default))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._, default))
                 .Throws(new InvalidOperationException());
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(new UpdateAuto()));

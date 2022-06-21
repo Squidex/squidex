@@ -36,13 +36,13 @@ namespace Squidex.Infrastructure.States
             this.streamNameResolver = streamNameResolver;
         }
 
-        internal void Add(DomainId key, T snapshot, long version, PersistenceAction action)
+        internal void Add(DomainId key, T snapshot, long version)
         {
             snapshots ??= new ();
 
             if (!snapshots.TryGetValue(key, out var existing) || existing.NewVersion < version)
             {
-                snapshots[key] = new SnapshotWriteJob<T>(key, snapshot, version, action);
+                snapshots[key] = new SnapshotWriteJob<T>(key, snapshot, version);
             }
         }
 

@@ -21,7 +21,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
     internal sealed class QueryByQuery : OperationBase
     {
         private readonly IAppProvider appProvider;
-        private readonly MongoCountCollection? countCollection;
 
         [BsonIgnoreExtraElements]
         internal sealed class IdOnly
@@ -33,11 +32,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             public MongoContentEntity[] Joined { get; set; }
         }
 
-        public QueryByQuery(IAppProvider appProvider, MongoCountCollection? countCollection)
+        public QueryByQuery(IAppProvider appProvider)
         {
             this.appProvider = appProvider;
-
-            this.countCollection = countCollection;
         }
 
         public override IEnumerable<CreateIndexModel<MongoContentEntity>> CreateIndexes()
@@ -150,10 +147,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     if (q.NoTotal || (q.NoSlowTotal && q.Query.Filter != null))
                     {
                         contentTotal = -1;
-                    }
-                    else if (isDefault && countCollection != null)
-                    {
-                        contentTotal = await countCollection.CountAsync(DomainId.Combine(app.Id, schema.Id), ct);
                     }
                     else if (IsSatisfiedByIndex(query))
                     {

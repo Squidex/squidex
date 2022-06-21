@@ -249,14 +249,14 @@ namespace Squidex.Infrastructure.States
             await persistence.ReadAsync();
 
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
-            await persistence.WriteSnapshotAsync("4", PersistenceAction.Update);
+            await persistence.WriteSnapshotAsync("4");
 
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
-            await persistence.WriteSnapshotAsync("5", PersistenceAction.Update);
+            await persistence.WriteSnapshotAsync("5");
 
-            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<string>(key, "4", 3, PersistenceAction.Update, 2), A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<string>(key, "4", 3, 2), A<CancellationToken>._))
                 .MustHaveHappened();
-            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<string>(key, "5", 4, PersistenceAction.Update, 3), A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<string>(key, "5", 4, 3), A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -275,14 +275,14 @@ namespace Squidex.Infrastructure.States
             await persistence.ReadAsync();
 
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
-            await persistence.WriteSnapshotAsync("4", PersistenceAction.Update);
+            await persistence.WriteSnapshotAsync("4");
 
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
-            await persistence.WriteSnapshotAsync("5", PersistenceAction.Update);
+            await persistence.WriteSnapshotAsync("5");
 
-            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<string>(key, "4", 3, PersistenceAction.Update, 2), A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<string>(key, "4", 3, 2), A<CancellationToken>._))
                 .MustHaveHappened();
-            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<string>(key, "5", 4, PersistenceAction.Update, 3), A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<string>(key, "5", 4, 3), A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -300,7 +300,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.ReadAsync();
 
-            await persistence.WriteSnapshotAsync("4", PersistenceAction.Delete);
+            await persistence.WriteSnapshotAsync("4");
 
             A.CallTo(() => snapshotStore.WriteAsync(A<SnapshotWriteJob<string>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();

@@ -165,7 +165,7 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public async Task WriteSnapshotAsync(T state, PersistenceAction action,
+        public async Task WriteSnapshotAsync(T state,
             CancellationToken ct = default)
         {
             var oldVersion = versionSnapshot;
@@ -184,7 +184,7 @@ namespace Squidex.Infrastructure.States
 
             using (Telemetry.Activities.StartActivity("Persistence/WriteState"))
             {
-                var job = new SnapshotWriteJob<T>(ownerKey, state, newVersion, action)
+                var job = new SnapshotWriteJob<T>(ownerKey, state, newVersion)
                 {
                     OldVersion = oldVersion
                 };

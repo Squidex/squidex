@@ -72,10 +72,10 @@ namespace Squidex.Infrastructure.States
             return Task.CompletedTask;
         }
 
-        public Task WriteSnapshotAsync(T state, PersistenceAction action,
+        public Task WriteSnapshotAsync(T state,
             CancellationToken ct = default)
         {
-            context.Add(ownerKey, state, Version, action);
+            context.Add(ownerKey, state, Version);
 
             return Task.CompletedTask;
         }

@@ -34,6 +34,5 @@ namespace Squidex.Infrastructure.States
     public record struct SnapshotResult<T>(DomainId Key, T Value, long Version,
         bool IsValid = true);
 
-    public record struct SnapshotWriteJob<T>(DomainId Key, T Value, long NewVersion, PersistenceAction Action = default,
-        long OldVersion = EtagVersion.Any);
+    public record struct SnapshotWriteJob<T>(DomainId Key, T Value, long NewVersion, long OldVersion = EtagVersion.Any);
 }

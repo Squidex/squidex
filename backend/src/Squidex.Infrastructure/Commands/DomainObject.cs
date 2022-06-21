@@ -221,18 +221,7 @@ namespace Squidex.Infrastructure.Commands
 
                 try
                 {
-                    var action = PersistenceAction.Update;
-
-                    if (IsDeleted(Snapshot))
-                    {
-                        action = PersistenceAction.Delete;
-                    }
-                    else if (previousVersion == EtagVersion.Empty || wasDeleted)
-                    {
-                        action = PersistenceAction.Create;
-                    }
-
-                    await WriteAsync(events, action);
+                    await WriteAsync(events);
                 }
                 catch (InconsistentStateException)
                 {
@@ -249,7 +238,7 @@ namespace Squidex.Infrastructure.Commands
                                 ApplyEvent(@event, false, Snapshot, Version, true);
                             }
 
-                            await WriteAsync(events, PersistenceAction.Create);
+                            await WriteAsync(events);
                         }
                         else
                         {
@@ -355,7 +344,7 @@ namespace Squidex.Infrastructure.Commands
                 {
                     try
                     {
-                        await persistence.WriteSnapshotAsync(Snapshot, PersistenceAction.Undefined);
+                        await persistence.WriteSnapshotAsync(Snapshot);
                     }
                     catch (Exception ex)
                     {
@@ -365,12 +354,12 @@ namespace Squidex.Infrastructure.Commands
             }
         }
 
-        private async Task WriteAsync(Envelope<IEvent>[] newEvents, PersistenceAction action)
+        private async Task WriteAsync(Envelope<IEvent>[] newEvents)
         {
             if (newEvents.Length > 0 && persistence != null)
             {
                 await persistence.WriteEventsAsync(newEvents);
-                await persistence.WriteSnapshotAsync(Snapshot, action);
+                await persistence.WriteSnapshotAsync(Snapshot);
             }
         }
 
@@ -385,7 +374,7 @@ namespace Squidex.Infrastructure.Commands
 
             if (persistence != null)
             {
-                await persistence.WriteSnapshotAsync(Snapshot, PersistenceAction.Undefined);
+                await persistence.WriteSnapshotAsync(Snapshot);
             }
         }
 

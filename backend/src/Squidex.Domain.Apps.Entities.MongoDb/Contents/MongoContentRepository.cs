@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -33,14 +32,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider)
         {
-            var options = Options.Create(new ContentOptions());
-
             collectionAll =
-                new MongoContentCollection("States_Contents_All3", database, appProvider, options,
+                new MongoContentCollection("States_Contents_All3", database, appProvider,
                     ReadPreference.Primary);
 
             collectionPublished =
-                new MongoContentCollection("States_Contents_Published3", database, appProvider, options,
+                new MongoContentCollection("States_Contents_Published3", database, appProvider,
                     ReadPreference.Secondary);
 
             this.appProvider = appProvider;
@@ -146,13 +143,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             yield return collectionAll.GetInternalCollection();
             yield return collectionPublished.GetInternalCollection();
-        }
-
-        public async Task RebuildCountsAsync(
-            CancellationToken ct = default)
-        {
-            await collectionAll.RebuildCountsAsync(ct);
-            await collectionPublished.RebuildCountsAsync(ct);
         }
     }
 }

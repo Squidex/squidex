@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {

@@ -42,8 +42,5 @@ namespace Squidex.Domain.Apps.Entities.Contents.Repositories
 
         IAsyncEnumerable<IContentEntity> QueryScheduledWithoutDataAsync(Instant now,
             CancellationToken ct = default);
-
-        Task RebuildCountsAsync(
-            CancellationToken ct = default);
     }
 }

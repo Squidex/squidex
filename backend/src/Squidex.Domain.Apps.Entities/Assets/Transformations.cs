@@ -77,7 +77,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public static async Task<string?> GetBlurHashAsync(this AssetRef asset, BlurOptions options,
             IAssetFileStore assetFileStore,
-            IAssetThumbnailGenerator thumbnailGenerator, CancellationToken ct = default)
+            IAssetThumbnailGenerator thumbnailGenerator,
+            CancellationToken ct = default)
         {
             using (var stream = DefaultPools.MemoryStream.GetStream())
             {

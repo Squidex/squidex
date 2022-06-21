@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public Task WriteAsync()
         {
-            return persistence.WriteSnapshotAsync(Value, default);
+            return persistence.WriteSnapshotAsync(Value);
         }
 
         public Task WriteEventAsync(Envelope<IEvent> envelope)

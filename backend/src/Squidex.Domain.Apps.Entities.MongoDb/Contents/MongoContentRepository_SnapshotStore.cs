@@ -92,17 +92,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteManyAsync"))
             {
-                var entitiesPublished = new List<(MongoContentEntity, PersistenceAction)>();
-                var entitiesAll = new List<(MongoContentEntity, PersistenceAction)>();
+                var entitiesPublished = new List<MongoContentEntity>();
+                var entitiesAll = new List<MongoContentEntity>();
 
                 foreach (var job in jobs.Where(IsValid))
                 {
                     if (ShouldWritePublished(job.Value))
                     {
-                        entitiesPublished.Add((await MongoContentEntity.CreatePublishedAsync(job, appProvider), job.Action));
+                        entitiesPublished.Add(await MongoContentEntity.CreatePublishedAsync(job, appProvider));
                     }
 
-                    entitiesAll.Add((await MongoContentEntity.CreateDraftAsync(job, appProvider), job.Action));
+                    entitiesAll.Add(await MongoContentEntity.CreateDraftAsync(job, appProvider));
                 }
 
                 await Task.WhenAll(
@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             var entity = await MongoContentEntity.CreateDraftAsync(job, appProvider);
 
-            await collectionAll.UpsertVersionedAsync(entity.DocumentId, job.OldVersion, entity, job.Action, ct);
+            await collectionAll.UpsertVersionedAsync(entity.DocumentId, job.OldVersion, entity, ct);
         }
 
         private async Task UpsertPublishedContentAsync(SnapshotWriteJob<ContentDomainObject.State> job,
@@ -145,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             var entity = await MongoContentEntity.CreatePublishedAsync(job, appProvider);
 
-            await collectionPublished.UpsertVersionedAsync(entity.DocumentId, job.OldVersion, entity, job.Action, ct);
+            await collectionPublished.UpsertVersionedAsync(entity.DocumentId, job.OldVersion, entity, ct);
         }
 
         private static bool ShouldWritePublished(ContentDomainObject.State value)

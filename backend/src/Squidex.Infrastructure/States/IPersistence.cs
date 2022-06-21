@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.States
         Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events,
             CancellationToken ct = default);
 
-        Task WriteSnapshotAsync(TState state, PersistenceAction action,
+        Task WriteSnapshotAsync(TState state,
             CancellationToken ct = default);
 
         Task ReadAsync(long expectedVersion = EtagVersion.Any,
