@@ -47,25 +47,23 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
                 var properties = new JsonObject();
                 var permissions = PermissionSet.Empty;
 
-                if (value.Type == JsonValueType.Array)
+                if (value.Value is JsonArray a)
                 {
-                    var array = value.AsArray;
-
-                    if (array.Count > 0)
+                    if (a.Count > 0)
                     {
-                        permissions = new PermissionSet(array.Where(x => x.Type == JsonValueType.String).Select(x => x.AsString));
+                        permissions = new PermissionSet(a.Select(x => x.Value).OfType<string>());
                     }
                 }
-                else if (value.Type == JsonValueType.Object)
+                else if (value.Value is JsonObject o)
                 {
-                    if (value.TryGetValue(JsonValueType.Array, "permissions", out var array))
+                    if (o.TryGetValue("permissions", out var found) && found.Value is JsonArray permissionArray)
                     {
-                        permissions = new PermissionSet(array.AsArray.Where(x => x.Type == JsonValueType.String).Select(x => x.AsString));
+                        permissions = new PermissionSet(permissionArray.Select(x => x.Value).OfType<string>());
                     }
 
-                    if (value.TryGetValue(JsonValueType.Object, "properties", out var obj))
+                    if (o.TryGetValue("properties", out found) && found.Value is JsonObject propertiesObject)
                     {
-                        properties = obj.AsObject;
+                        properties = propertiesObject;
                     }
                 }
 

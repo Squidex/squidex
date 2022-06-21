@@ -64,6 +64,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         private async Task ResolveReferencesAsync(Context context, ISchemaEntity schema, ResolvedComponents components,
             IEnumerable<ContentEntity> contents, ILookup<DomainId, IEnrichedContentEntity> references, ProvideSchema schemas)
         {
+            HashSet<DomainId>? fieldIds = null;
+
             var formatted = new Dictionary<IContentEntity, JsonObject>();
 
             foreach (var field in schema.SchemaDef.ResolvingReferences())
@@ -80,8 +82,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                         {
                             foreach (var (partition, partitionValue) in fieldData)
                             {
+                                fieldIds ??= new HashSet<DomainId>();
+                                fieldIds.Clear();
+
+                                partitionValue.AddReferencedIds(field, fieldIds, components);
+
                                 var referencedContents =
-                                    field.GetReferencedIds(partitionValue, components)
+                                    fieldIds
                                         .Select(x => references[x])
                                         .SelectMany(x => x)
                                         .ToList();

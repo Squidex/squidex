@@ -19,13 +19,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         private static readonly DefaultFieldValueValidatorsFactory Instance = new DefaultFieldValueValidatorsFactory();
 
-        public record struct Args(ValidatorContext Context, ValidatorFactory Factory);
+        public record struct Args(ValidationContext Context, ValidatorFactory Factory);
 
         private DefaultFieldValueValidatorsFactory()
         {
         }
 
-        public static IEnumerable<IValidator> CreateValidators(ValidatorContext context, IField field, ValidatorFactory factory)
+        public static IEnumerable<IValidator> CreateValidators(ValidationContext context, IField field, ValidatorFactory factory)
         {
             var args = new Args(context, factory);
 
@@ -254,7 +254,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
         }
 
-        private static bool IsRequired(FieldProperties properties, ValidatorContext context)
+        private static bool IsRequired(FieldProperties properties, ValidationContext context)
         {
             var isRequired = properties.IsRequired;
 

@@ -28,10 +28,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static readonly IFieldResolver JsonBoolean = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value.Type)
+            switch (value.Value)
             {
-                case JsonValueType.Boolean:
-                    return value.AsBoolean;
+                case bool b:
+                    return b;
                 default:
                     ThrowHelper.NotSupportedException();
                     return default!;
@@ -40,10 +40,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static readonly IFieldResolver JsonComponents = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value.Type)
+            switch (value.Value)
             {
-                case JsonValueType.Array:
-                    return value.AsArray.Select(x => x.AsObject).ToList();
+                case JsonArray a:
+                    return a.Select(x => x.AsObject).ToList();
                 default:
                     ThrowHelper.NotSupportedException();
                     return default!;
@@ -52,10 +52,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static readonly IFieldResolver JsonDateTime = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value.Type)
+            switch (value.Value)
             {
-                case JsonValueType.String:
-                    return value.AsString;
+                case string s:
+                    return s;
                 default:
                     ThrowHelper.NotSupportedException();
                     return default!;
@@ -64,10 +64,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static readonly IFieldResolver JsonNumber = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value.Type)
+            switch (value.Value)
             {
-                case JsonValueType.Number:
-                    return value.AsNumber;
+                case double n:
+                    return n;
                 default:
                     ThrowHelper.NotSupportedException();
                     return default!;
@@ -76,10 +76,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static readonly IFieldResolver JsonString = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value.Type)
+            switch (value.Value)
             {
-                case JsonValueType.String:
-                    return value.AsString;
+                case string s:
+                    return s;
                 default:
                     ThrowHelper.NotSupportedException();
                     return default!;
@@ -88,10 +88,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static readonly IFieldResolver JsonStrings = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value.Type)
+            switch (value.Value)
             {
-                case JsonValueType.Array:
-                    return value.AsArray.Select(x => x.ToString()).ToList();
+                case JsonArray a:
+                    return a.Select(x => x.ToString()).ToList();
                 default:
                     ThrowHelper.NotSupportedException();
                     return default!;

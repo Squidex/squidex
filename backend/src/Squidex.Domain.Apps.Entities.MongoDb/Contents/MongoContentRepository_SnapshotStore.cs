@@ -179,6 +179,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             entity.DocumentId = value.UniqueId;
             entity.IndexedAppId = value.AppId.Id;
             entity.IndexedSchemaId = value.SchemaId.Id;
+            entity.ReferencedIds ??= new HashSet<DomainId>();
             entity.Version = newVersion;
 
             if (data.CanHaveReference())
@@ -189,11 +190,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 {
                     var components = await appProvider.GetComponentsAsync(schema);
 
-                    entity.ReferencedIds = entity.Data.GetReferencedIds(schema.SchemaDef, components);
+                    entity.Data.AddReferencedIds(schema.SchemaDef, entity.ReferencedIds, components);
                 }
             }
-
-            entity.ReferencedIds ??= new HashSet<DomainId>();
 
             return entity;
         }

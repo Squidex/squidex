@@ -14,143 +14,109 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
-    internal sealed class ReferencesExtractor : IFieldVisitor<None, ReferencesExtractor.Args>
+    internal static class ReferencesExtractor
     {
-        private static readonly ReferencesExtractor Instance = new ReferencesExtractor();
-
         public record struct Args(JsonValue Value, ISet<DomainId> Result, int Take, ResolvedComponents Components);
 
-        private ReferencesExtractor()
-        {
-        }
-
-        public static None Extract(IField field, JsonValue value, HashSet<DomainId> result, int take, ResolvedComponents components)
+        public static void Extract(IField field, JsonValue value, HashSet<DomainId> result, int take, ResolvedComponents components)
         {
             var args = new Args(value, result, take, components);
 
-            return field.Accept(Instance, args);
+            ExtractCore(field, args);
         }
 
-        public None Visit(IArrayField field, Args args)
+        public static void Extract(IEnumerable<IField> schema, ContentData data, HashSet<DomainId> result, int take, ResolvedComponents components)
         {
-            if (args.Value.Type == JsonValueType.Array)
+            foreach (var field in schema)
             {
-                foreach (var value in args.Value.AsArray)
+                Extract(field, data, result, take, components);
+            }
+        }
+
+        public static void Extract(IField field, ContentData data, HashSet<DomainId> result, int take, ResolvedComponents components)
+        {
+            if (CanHaveReferences(field.RawProperties) && data.TryGetValue(field.Name, out var fieldData) && fieldData != null)
+            {
+                foreach (var (_, value) in fieldData)
                 {
-                    ExtractFromArrayItem(field, value, args);
+                    Extract(field, value, result, take, components);
                 }
             }
-
-            return None.Value;
         }
 
-        public None Visit(IField<AssetsFieldProperties> field, Args args)
+        private static void ExtractCore(IField field, Args args)
         {
-            AddIds(ref args);
-
-            return None.Value;
-        }
-
-        public None Visit(IField<ReferencesFieldProperties> field, Args args)
-        {
-            AddIds(ref args);
-
-            return None.Value;
-        }
-
-        public None Visit(IField<BooleanFieldProperties> field, Args args)
-        {
-            return None.Value;
-        }
-
-        public None Visit(IField<ComponentFieldProperties> field, Args args)
-        {
-            ExtractFromComponent(args.Value, args);
-
-            return None.Value;
-        }
-
-        public None Visit(IField<ComponentsFieldProperties> field, Args args)
-        {
-            if (args.Value.Type == JsonValueType.Array)
+            switch (field)
             {
-                foreach (var value in args.Value.AsArray)
+                case IField<AssetsFieldProperties>:
+                    AddIds(ref args);
+                    break;
+                case IField<ReferencesFieldProperties>:
+                    AddIds(ref args);
+                    break;
+                case IField<ComponentFieldProperties>:
+                    ExtractFromComponent(args.Value, args);
+                    break;
+                case IField<ComponentsFieldProperties>:
+                    ExtractFromComponents(args);
+                    break;
+                case IArrayField arrayField:
+                    ExtractFromArray(arrayField, args);
+                    break;
+            }
+        }
+
+        private static void ExtractFromArray(IArrayField field, Args args)
+        {
+            if (args.Value.Value is JsonArray a)
+            {
+                foreach (var value in a)
+                {
+                    ExtractFromItem(field, value, args);
+                }
+            }
+        }
+
+        private static void ExtractFromComponents(Args args)
+        {
+            if (args.Value.Value is JsonArray a)
+            {
+                foreach (var value in a)
                 {
                     ExtractFromComponent(value, args);
                 }
             }
-
-            return None.Value;
         }
 
-        public None Visit(IField<DateTimeFieldProperties> field, Args args)
+        private static void ExtractFromItem(IArrayField field, JsonValue value, Args args)
         {
-            return None.Value;
-        }
-
-        public None Visit(IField<GeolocationFieldProperties> field, Args args)
-        {
-            return None.Value;
-        }
-
-        public None Visit(IField<JsonFieldProperties> field, Args args)
-        {
-            return None.Value;
-        }
-
-        public None Visit(IField<NumberFieldProperties> field, Args args)
-        {
-            return None.Value;
-        }
-
-        public None Visit(IField<StringFieldProperties> field, Args args)
-        {
-            return None.Value;
-        }
-
-        public None Visit(IField<TagsFieldProperties> field, Args args)
-        {
-            return None.Value;
-        }
-
-        public None Visit(IField<UIFieldProperties> field, Args args)
-        {
-            return None.Value;
-        }
-
-        private void ExtractFromArrayItem(IArrayField field, JsonValue value, Args args)
-        {
-            if (value.Type == JsonValueType.Object)
+            if (value.Value is JsonObject o)
             {
-                var obj = value.AsObject;
-
                 foreach (var nestedField in field.Fields)
                 {
-                    if (obj.TryGetValue(nestedField.Name, out var nestedValue))
+                    if (CanHaveReferences(nestedField.RawProperties) && o.TryGetValue(nestedField.Name, out var nested))
                     {
-                        nestedField.Accept(this, args with { Value = nestedValue });
+                        ExtractCore(nestedField, args with { Value = nested });
                     }
                 }
             }
         }
 
-        private void ExtractFromComponent(JsonValue value, Args args)
+        private static void ExtractFromComponent(JsonValue value, Args args)
         {
-            if (value.Type == JsonValueType.Object)
+            if (value.Value is JsonObject o)
             {
-                var obj = value.AsObject;
-
-                if (obj.TryGetValue(Component.Discriminator, out var type) && type.Type == JsonValueType.String)
+                if (o.TryGetValue(Component.Discriminator, out var found) && found.Value is string s)
                 {
-                    var id = DomainId.Create(type.AsString);
+                    var id = DomainId.Create(s);
 
                     if (args.Components.TryGetValue(id, out var schema))
                     {
                         foreach (var componentField in schema.Fields)
                         {
-                            if (obj.TryGetValue(componentField.Name, out var componentValue))
+                            if (CanHaveReferences(componentField.RawProperties) && o.TryGetValue(componentField.Name, out var nested))
                             {
-                                componentField.Accept(this, args with { Value = componentValue });
+                                ExtractCore(componentField, args with { Value = nested });
                             }
                         }
                     }
@@ -158,17 +124,27 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             }
         }
 
+        private static bool CanHaveReferences(FieldProperties properties)
+        {
+            return
+                properties is ArrayFieldProperties ||
+                properties is ReferencesFieldProperties ||
+                properties is AssetsFieldProperties ||
+                properties is ComponentFieldProperties ||
+                properties is ComponentsFieldProperties;
+        }
+
         private static void AddIds(ref Args args)
         {
             var added = 0;
 
-            if (args.Value.Type == JsonValueType.Array)
+            if (args.Value.Value is JsonArray a)
             {
-                foreach (var id in args.Value.AsArray)
+                foreach (var id in a)
                 {
-                    if (id.Type == JsonValueType.String)
+                    if (id.Value is string s)
                     {
-                        args.Result.Add(DomainId.Create(id.AsString));
+                        args.Result.Add(DomainId.Create(s));
 
                         added++;
 

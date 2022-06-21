@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         public async Task<List<DomainId>> QueryIdsAsync(DomainId appId,
             CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartActivity("MongoSchemaRepository/QueryIdsAsync"))
+            using (Telemetry.Activities.StartActivity("MongoRuleRepository/QueryIdsAsync"))
             {
                 var entities = await Collection.Find(x => x.IndexedAppId == appId && !x.IndexedDeleted).Only(x => x.IndexedId).ToListAsync(ct);
 

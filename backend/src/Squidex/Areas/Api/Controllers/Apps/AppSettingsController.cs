@@ -30,7 +30,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </summary>
         /// <param name="app">The name of the app to get the settings for.</param>
         /// <returns>
-        /// 200 => App settingsd returned.
+        /// 200 => App settings returned.
         /// 404 => App not found.
         /// </returns>
         [HttpGet]

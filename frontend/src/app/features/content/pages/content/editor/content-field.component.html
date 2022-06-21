@@ -23,7 +23,7 @@
             <ng-container *ngIf="showAllControls; else singleControl">
                 <div class="form-group" *ngFor="let language of languages">
                     <sqx-field-editor
-                        [canUnset]="!formModel.field.isDisabled"
+                        [canUnset]="!(isDisabled | async)"
                         [displaySuffix]="prefix(language)"
                         [form]="form"
                         [formContext]="formContext"
@@ -38,7 +38,7 @@
         
             <ng-template #singleControl>
                 <sqx-field-editor
-                    [canUnset]="!formModel.field.isDisabled"
+                    [canUnset]="!(isDisabled | async)"
                     [form]="form"
                     [formContext]="formContext"
                     [formLevel]="formLevel"

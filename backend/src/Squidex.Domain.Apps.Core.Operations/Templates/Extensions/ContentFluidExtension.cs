@@ -24,20 +24,20 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
 
             FluidValue.SetTypeMapping<JsonValue>(source =>
             {
-                switch (source.Type)
+                switch (source.Value)
                 {
-                    case JsonValueType.Null:
+                    case null:
                         return FluidValue.Create(null);
-                    case JsonValueType.Boolean:
-                        return FluidValue.Create(source.AsBoolean);
-                    case JsonValueType.Number:
-                        return FluidValue.Create(source.AsNumber);
-                    case JsonValueType.String:
-                        return FluidValue.Create(source.AsString);
-                    case JsonValueType.Array:
-                        return new JsonArrayFluidValue(source.AsArray);
-                    case JsonValueType.Object:
-                        return new ObjectValue(source.AsObject);
+                    case bool b:
+                        return FluidValue.Create(b);
+                    case double n:
+                        return FluidValue.Create(n);
+                    case string s:
+                        return FluidValue.Create(s);
+                    case JsonObject o:
+                        return new ObjectValue(o);
+                    case JsonArray a:
+                        return new JsonArrayFluidValue(a);
                 }
 
                 ThrowHelper.InvalidOperationException();
@@ -46,9 +46,9 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
 
             memberAccessStrategy.Register<JsonValue, object?>((value, name) =>
             {
-                if (value.Type == JsonValueType.Object)
+                if (value.Value is JsonObject o)
                 {
-                    return value.AsObject.GetOrDefault(name);
+                    return o.GetOrDefault(name);
                 }
 
                 return null;

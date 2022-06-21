@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
-using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -26,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         private static readonly NamedId<DomainId> AppId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private static readonly NamedId<DomainId> SchemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
 
-        public static ValueTask ValidateAsync(this IValidator validator, object? value, IList<string> errors,
+        public static async ValueTask ValidateAsync(this IValidator validator, object? value, IList<string> errors,
             Schema? schema = null,
             ValidationMode mode = ValidationMode.Default,
             ValidationUpdater? updater = null,
@@ -36,10 +34,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var context = CreateContext(schema, mode, updater, action, components, contentId);
 
-            return validator.ValidateAsync(value, context, CreateFormatter(errors));
+            validator.Validate(value, context);
+
+            await context.Root.CompleteAsync();
+
+            AddErrors(context.Root, errors);
         }
 
-        public static ValueTask ValidateAsync(this IField field, object? value, IList<string> errors,
+        public static async ValueTask ValidateAsync(this IField field, object? value, IList<string> errors,
             Schema? schema = null,
             ValidationMode mode = ValidationMode.Default,
             ValidationUpdater? updater = null,
@@ -50,9 +52,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var context = CreateContext(schema, mode, updater, action, components, contentId);
 
-            var validator = new ValidatorBuilder(factory, context).ValueValidator(field);
+            new ValidatorBuilder(factory, context).ValueValidator(field)
+                .Validate(value, context);
 
-            return validator.ValidateAsync(value, context, CreateFormatter(errors));
+            await context.Root.CompleteAsync();
+
+            AddErrors(context.Root, errors);
         }
 
         public static async Task ValidatePartialAsync(this ContentData data, PartitionResolver partitionResolver, IList<ValidationError> errors,
@@ -66,14 +71,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var context = CreateContext(schema, mode, updater, action, components, contentId);
 
-            var validator = new ValidatorBuilder(factory, context).ContentValidator(partitionResolver);
+            await new ValidatorBuilder(factory, context).ContentValidator(partitionResolver)
+                .ValidateInputPartialAsync(data);
 
-            await validator.ValidateInputPartialAsync(data);
-
-            foreach (var error in validator.Errors)
-            {
-                errors.Add(error);
-            }
+            errors.AddRange(context.Root.Errors);
         }
 
         public static async Task ValidateAsync(this ContentData data, PartitionResolver partitionResolver, IList<ValidationError> errors,
@@ -87,48 +88,49 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var context = CreateContext(schema, mode, updater, action, components, contentId);
 
-            var validator = new ValidatorBuilder(factory, context).ContentValidator(partitionResolver);
+            await new ValidatorBuilder(factory, context).ContentValidator(partitionResolver)
+                .ValidateInputAsync(data);
 
-            await validator.ValidateInputAsync(data);
-
-            foreach (var error in validator.Errors)
-            {
-                errors.Add(error);
-            }
+            errors.AddRange(context.Root.Errors);
         }
 
-        public static AddError CreateFormatter(IList<string> errors)
+        private static void AddErrors(RootContext context, IList<string> errors)
         {
-            return (field, message) =>
+            foreach (var error in context.Errors)
             {
-                if (field == null || !field.Any())
+                var propertyName = error.PropertyNames?.FirstOrDefault();
+
+                if (string.IsNullOrWhiteSpace(propertyName))
                 {
-                    errors.Add(message);
+                    errors.Add(error.Message);
                 }
                 else
                 {
-                    errors.Add($"{field.ToPathString()}: {message}");
+                    errors.Add($"{propertyName}: {error.Message}");
                 }
-            };
+            }
         }
 
-        public static ValidationContext CreateContext(
-            Schema? schema = null,
-            ValidationMode mode = ValidationMode.Default,
-            ValidationUpdater? updater = null,
+        private static ValidationContext CreateContext(
+            Schema? schema,
+            ValidationMode mode,
+            ValidationUpdater? updater,
             ValidationAction action = ValidationAction.Upsert,
             ResolvedComponents? components = null,
             DomainId? contentId = null)
         {
-            var context = new ValidationContext(
+            var rootContext = new RootContext(
                 TestUtils.DefaultSerializer,
                 AppId,
                 SchemaId,
                 schema ?? new Schema(SchemaId.Name),
-                components ?? ResolvedComponents.Empty,
-                contentId ?? DomainId.NewGuid());
+                contentId ?? DomainId.NewGuid(),
+                components ?? ResolvedComponents.Empty);
 
-            context = context.WithMode(mode).WithAction(action);
+            var context =
+                new ValidationContext(rootContext)
+                    .WithMode(mode)
+                    .WithAction(action);
 
             if (updater != null)
             {
@@ -152,16 +154,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             public ContentValidator ContentValidator(PartitionResolver partitionResolver)
             {
-                var log = A.Fake<ILogger<ContentValidator>>();
-
-                return new ContentValidator(partitionResolver, validationContext, CreateFactories(), log);
+                return new ContentValidator(partitionResolver, validationContext, CreateFactories());
             }
 
             private IValidator CreateValueValidator(IField field)
             {
-                var log = A.Fake<ILogger<ContentValidator>>();
-
-                return new FieldValidator(new AggregateValidator(CreateValueValidators(field), log), field);
+                return new FieldValidator(new AggregateValidator(CreateValueValidators(field)), field);
             }
 
             public IValidator ValueValidator(IField field)

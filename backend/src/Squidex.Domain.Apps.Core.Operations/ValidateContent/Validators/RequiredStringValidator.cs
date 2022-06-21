@@ -18,19 +18,17 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.validateEmptyStrings = validateEmptyStrings;
         }
 
-        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public void Validate(object? value, ValidationContext context)
         {
             if (context.IsOptional)
             {
-                return default;
+                return;
             }
 
             if (value.IsNullOrUndefined() || IsEmptyString(value))
             {
-                addError(context.Path, T.Get("contents.validation.required"));
+                context.AddError(context.Path, T.Get("contents.validation.required"));
             }
-
-            return default;
         }
 
         private bool IsEmptyString(object? value)

@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.validator = validator;
         }
 
-        public async ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public void Validate(object? value, ValidationContext context)
         {
             var typedValue = value;
 
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             {
                 if (value is JsonValue jsonValue)
                 {
-                    if (jsonValue.Type == JsonValueType.Null)
+                    if (jsonValue == default)
                     {
                         typedValue = null;
                     }
@@ -42,11 +42,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     {
                         typedValue = jsonValue.Value;
 
-                        var (json, error) = JsonValueConverter.ConvertValue(field, jsonValue, context.JsonSerializer, context.Components);
+                        var (json, error) = JsonValueConverter.ConvertValue(field, jsonValue,
+                            context.Root.JsonSerializer,
+                            context.Root.Components);
 
                         if (error != null)
                         {
-                            addError(context.Path, error.Error);
+                            context.AddError(context.Path, error.Error);
                         }
                         else
                         {
@@ -57,11 +59,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             }
             catch
             {
-                addError(context.Path, T.Get("contents.validation.invalid"));
+                context.AddError(context.Path, T.Get("contents.validation.invalid"));
                 return;
             }
 
-            await validator.ValidateAsync(typedValue, context, addError);
+            validator.Validate(typedValue, context);
         }
     }
 }

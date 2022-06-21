@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure.EventSourcing
             Guard.NotNull(events);
             Guard.GreaterEquals(expectedVersion, EtagVersion.Any);
 
-            using (Telemetry.Activities.StartActivity("ContentQueryService/AppendAsync"))
+            using (Telemetry.Activities.StartActivity("MongoEventStore/AppendAsync"))
             {
                 if (events.Count == 0)
                 {
@@ -111,7 +111,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             Guard.NotNull(commits);
 
-            using (Telemetry.Activities.StartActivity("ContentQueryService/AppendUnsafeAsync"))
+            using (Telemetry.Activities.StartActivity("MongoEventStore/AppendUnsafeAsync"))
             {
                 var writes = new List<WriteModel<MongoEventCommit>>();
 

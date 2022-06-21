@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Diagnostics;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
@@ -26,36 +25,40 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Envelope<IEvent>? ParseIfKnown(StoredEvent storedEvent)
         {
-            try
-            {
-                return Parse(storedEvent);
-            }
-            catch (TypeNameNotFoundException)
-            {
-                return null;
-            }
+            return ParseCore(storedEvent);
         }
 
         public Envelope<IEvent> Parse(StoredEvent storedEvent)
         {
+            var envelope = ParseCore(storedEvent);
+
+            if (envelope == null)
+            {
+                throw new TypeNameNotFoundException($"Cannot find event with type name '{storedEvent.Data.Type}'.");
+            }
+
+            return envelope;
+        }
+
+        private Envelope<IEvent>? ParseCore(StoredEvent storedEvent)
+        {
             Guard.NotNull(storedEvent);
 
-            var eventData = storedEvent.Data;
+            var payloadType = typeNameRegistry.GetTypeOrNull(storedEvent.Data.Type);
 
-            var payloadType = typeNameRegistry.GetType(eventData.Type);
-            var payloadValue = serializer.Deserialize<IEvent>(eventData.Payload, payloadType);
+            if (payloadType == null)
+            {
+                return null;
+            }
+
+            var payloadValue = serializer.Deserialize<IEvent>(storedEvent.Data.Payload, payloadType);
 
             if (payloadValue is IMigrated<IEvent> migratedEvent)
             {
                 payloadValue = migratedEvent.Migrate();
-
-                if (ReferenceEquals(migratedEvent, payloadValue))
-                {
-                    Debug.WriteLine("Migration should return new event.");
-                }
             }
 
-            var envelope = new Envelope<IEvent>(payloadValue, eventData.Headers);
+            var envelope = new Envelope<IEvent>(payloadValue, storedEvent.Data.Headers);
 
             envelope.SetEventPosition(storedEvent.EventPosition);
             envelope.SetEventStreamNumber(storedEvent.EventStreamNumber);
@@ -65,19 +68,14 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public EventData ToEventData(Envelope<IEvent> envelope, Guid commitId, bool migrate = true)
         {
-            var eventPayload = envelope.Payload;
+            var payloadValue = envelope.Payload;
 
-            if (migrate && eventPayload is IMigrated<IEvent> migratedEvent)
+            if (migrate && payloadValue is IMigrated<IEvent> migratedEvent)
             {
-                eventPayload = migratedEvent.Migrate();
-
-                if (ReferenceEquals(migratedEvent, eventPayload))
-                {
-                    Debug.WriteLine("Migration should return new event.");
-                }
+                payloadValue = migratedEvent.Migrate();
             }
 
-            var payloadType = typeNameRegistry.GetName(eventPayload.GetType());
+            var payloadType = typeNameRegistry.GetName(payloadValue.GetType());
             var payloadJson = serializer.Serialize(envelope.Payload);
 
             envelope.SetCommitId(commitId);

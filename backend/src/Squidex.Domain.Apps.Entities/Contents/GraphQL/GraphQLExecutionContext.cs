@@ -188,14 +188,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 List<DomainId>? result = null;
 
-                if (value.Type == JsonValueType.Array)
+                if (value.Value is JsonArray a)
                 {
-                    foreach (var item in value.AsArray)
+                    foreach (var item in a)
                     {
-                        if (item.Type == JsonValueType.String)
+                        if (item.Value is string id)
                         {
                             result ??= new List<DomainId>();
-                            result.Add(DomainId.Create(item.AsString));
+                            result.Add(DomainId.Create(id));
                         }
                     }
                 }

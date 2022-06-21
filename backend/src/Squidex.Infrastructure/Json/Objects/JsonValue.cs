@@ -9,8 +9,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using NodaTime;
 
-#pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
-
 namespace Squidex.Infrastructure.Json.Objects
 {
     public readonly struct JsonValue : IEquatable<JsonValue>
@@ -314,51 +312,12 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public bool Equals(JsonValue other)
         {
-            if (other.Type != Type)
-            {
-                return false;
-            }
-
-            switch (Value)
-            {
-                case null:
-                    return true;
-                case bool b:
-                    return b == (bool)other.Value!;
-                case double d:
-                    return d == (double)other.Value!;
-                case string s:
-                    return s == (string)other.Value!;
-                case JsonArray a:
-                    return a.Equals((JsonArray)other.Value!);
-                case JsonObject o:
-                    return o.Equals((JsonObject)other.Value!);
-                default:
-                    ThrowInvalidType();
-                    return default!;
-            }
+            return Equals(other.Value, Value);
         }
 
         public override int GetHashCode()
         {
-            switch (Value)
-            {
-                case null:
-                    return 0;
-                case bool b:
-                    return b.GetHashCode();
-                case double d:
-                    return d.GetHashCode();
-                case string s:
-                    return s.GetHashCode(StringComparison.OrdinalIgnoreCase);
-                case JsonArray a:
-                    return a.GetHashCode();
-                case JsonObject o:
-                    return o.GetHashCode();
-                default:
-                    ThrowInvalidType();
-                    return default!;
-            }
+            return Value?.GetHashCode() ?? 0;
         }
 
         public override string ToString()
@@ -369,8 +328,8 @@ namespace Squidex.Infrastructure.Json.Objects
                     return "null";
                 case bool b:
                     return b ? "true" : "false";
-                case double d:
-                    return d.ToString(CultureInfo.InvariantCulture);
+                case double n:
+                    return n.ToString(CultureInfo.InvariantCulture);
                 case string s:
                     return s;
                 case JsonArray a:
@@ -391,8 +350,8 @@ namespace Squidex.Infrastructure.Json.Objects
                     return "null";
                 case bool b:
                     return b ? "true" : "false";
-                case double d:
-                    return d.ToString(CultureInfo.InvariantCulture);
+                case double n:
+                    return n.ToString(CultureInfo.InvariantCulture);
                 case string s:
                     return $"\"{s}\"";
                 case JsonArray a:
@@ -409,14 +368,6 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             switch (Value)
             {
-                case null:
-                    return this;
-                case bool:
-                    return this;
-                case double:
-                    return this;
-                case string:
-                    return this;
                 case JsonArray a:
                     {
                         var result = new JsonArray(a.Count);
@@ -442,8 +393,7 @@ namespace Squidex.Infrastructure.Json.Objects
                     }
 
                 default:
-                    ThrowInvalidType();
-                    return default!;
+                    return this;
             }
         }
 
@@ -479,19 +429,6 @@ namespace Squidex.Infrastructure.Json.Objects
             }
 
             return hasSegment;
-        }
-
-        public bool TryGetValue(JsonValueType type, string pathSegment, out JsonValue result)
-        {
-            result = default!;
-
-            if (TryGetValue(pathSegment, out var temp) && temp.Type == type)
-            {
-                result = temp;
-                return true;
-            }
-
-            return false;
         }
 
         public bool TryGetValue(string pathSegment, out JsonValue result)

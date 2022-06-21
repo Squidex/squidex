@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.States
         public async Task<(T Value, bool Valid, long Version)> ReadAsync(DomainId key,
             CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartActivity("ContentQueryService/ReadAsync"))
+            using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/ReadAsync"))
             {
                 var existing =
                     await Collection.Find(x => x.DocumentId.Equals(key))
@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.States
         public async Task WriteAsync(DomainId key, T value, long oldVersion, long newVersion, PersistenceAction action,
             CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartActivity("ContentQueryService/WriteAsync"))
+            using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/WriteAsync"))
             {
                 var document = CreateDocument(key, value, newVersion);
 
@@ -70,7 +70,7 @@ namespace Squidex.Infrastructure.States
         public async Task WriteManyAsync(IEnumerable<(DomainId Key, T Value, long Version, PersistenceAction Action)> snapshots,
             CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartActivity("ContentQueryService/WriteManyAsync"))
+            using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/WriteManyAsync"))
             {
                 var writes = snapshots.Select(x =>
                     new ReplaceOneModel<TState>(Filter.Eq(y => y.DocumentId, x.Key), CreateDocument(x.Key, x.Value, x.Version))
@@ -90,7 +90,7 @@ namespace Squidex.Infrastructure.States
         public async Task RemoveAsync(DomainId key,
             CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartActivity("ContentQueryService/RemoveAsync"))
+            using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/RemoveAsync"))
             {
                 await Collection.DeleteOneAsync(x => x.DocumentId.Equals(key), ct);
             }
@@ -99,7 +99,7 @@ namespace Squidex.Infrastructure.States
         public async IAsyncEnumerable<(T State, long Version)> ReadAllAsync(
             [EnumeratorCancellation] CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartActivity("ContentQueryService/ReadAllAsync"))
+            using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/ReadAllAsync"))
             {
                 var find = Collection.Find(new BsonDocument(), Batching.Options);
 

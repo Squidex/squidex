@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public bool Visit(IField<BooleanFieldProperties> field, Args args)
         {
-            return args.Value.Type == JsonValueType.Boolean;
+            return args.Value.Value is bool;
         }
 
         public bool Visit(IField<ComponentFieldProperties> field, Args args)
@@ -63,9 +63,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public bool Visit(IField<DateTimeFieldProperties> field, Args args)
         {
-            if (args.Value.Type == JsonValueType.String)
+            if (args.Value.Value is string s)
             {
-                var parseResult = InstantPattern.ExtendedIso.Parse(args.Value.ToString());
+                var parseResult = InstantPattern.ExtendedIso.Parse(s);
 
                 return parseResult.Success;
             }
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public bool Visit(IField<NumberFieldProperties> field, Args args)
         {
-            return args.Value.Type == JsonValueType.Number;
+            return args.Value.Value is double;
         }
 
         public bool Visit(IField<ReferencesFieldProperties> field, Args args)
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public bool Visit(IField<StringFieldProperties> field, Args args)
         {
-            return args.Value.Type == JsonValueType.String;
+            return args.Value.Value is string;
         }
 
         public bool Visit(IField<TagsFieldProperties> field, Args args)
@@ -112,14 +112,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         private static bool IsValidStringList(JsonValue value)
         {
-            if (value.Type != JsonValueType.Array)
+            if (value.Value is not JsonArray a)
             {
                 return false;
             }
 
-            foreach (var item in value.AsArray)
+            foreach (var item in a)
             {
-                if (item.Type != JsonValueType.String)
+                if (item.Value is not string)
                 {
                     return false;
                 }
@@ -130,14 +130,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         private static bool IsValidObjectList(JsonValue value)
         {
-            if (value.Type != JsonValueType.Array)
+            if (value.Value is not JsonArray a)
             {
                 return false;
             }
 
-            foreach (var item in value.AsArray)
+            foreach (var item in a)
             {
-                if (item.Type != JsonValueType.Object)
+                if (item.Value is not JsonObject)
                 {
                     return false;
                 }
@@ -148,12 +148,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         private static bool IsValidComponentList(JsonValue value)
         {
-            if (value.Type != JsonValueType.Array)
+            if (value.Value is not JsonArray a)
             {
                 return false;
             }
 
-            foreach (var item in value.AsArray)
+            foreach (var item in a)
             {
                 if (!IsValidComponent(item))
                 {

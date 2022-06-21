@@ -95,9 +95,9 @@ namespace Squidex.Domain.Apps.Core.Assets
 
         public int? GetIn32(string name)
         {
-            if (TryGetValue(name, out var n) && n.Type == JsonValueType.Number)
+            if (TryGetValue(name, out var value) && value.Value is double n)
             {
-                return (int)n.AsNumber;
+                return (int)n;
             }
 
             return null;
@@ -105,9 +105,9 @@ namespace Squidex.Domain.Apps.Core.Assets
 
         public float? GetSingle(string name)
         {
-            if (TryGetValue(name, out var n) && n.Type == JsonValueType.Number)
+            if (TryGetValue(name, out var value) && value.Value is double n)
             {
-                return (float)n.AsNumber;
+                return (float)n;
             }
 
             return null;
@@ -115,9 +115,9 @@ namespace Squidex.Domain.Apps.Core.Assets
 
         public bool TryGetNumber(string name, out double result)
         {
-            if (TryGetValue(name, out var n) && n.Type == JsonValueType.Number)
+            if (TryGetValue(name, out var value) && value.Value is double n)
             {
-                result = n.AsNumber;
+                result = n;
 
                 return true;
             }
@@ -129,9 +129,9 @@ namespace Squidex.Domain.Apps.Core.Assets
 
         public bool TryGetString(string name, [MaybeNullWhen(false)] out string result)
         {
-            if (TryGetValue(name, out var s) && s.Type == JsonValueType.String)
+            if (TryGetValue(name, out var value) && value.Value is string s)
             {
-                result = s.AsString;
+                result = s;
 
                 return true;
             }

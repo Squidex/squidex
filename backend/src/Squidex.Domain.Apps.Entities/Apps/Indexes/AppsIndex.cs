@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         public async Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions,
             CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartActivity("AppProvider/GetAppsForUserAsync"))
+            using (Telemetry.Activities.StartActivity("AppsIndex/GetAppsForUserAsync"))
             {
                 var ids =
                     await Task.WhenAll(
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         public async Task<IAppEntity?> GetAppAsync(string name, bool canCache = false,
             CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartActivity("AppProvider/GetAppByNameAsync"))
+            using (Telemetry.Activities.StartActivity("AppsIndex/GetAppByNameAsync"))
             {
                 if (canCache)
                 {
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
             CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartActivity("AppProvider/GetAppAsync"))
+            using (Telemetry.Activities.StartActivity("AppsIndex/GetAppAsync"))
             {
                 if (canCache)
                 {
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private async Task<IReadOnlyCollection<DomainId>> GetAppIdsByUserAsync(string userId)
         {
-            using (Telemetry.Activities.StartActivity("AppProvider/GetAppIdsByUserAsync"))
+            using (Telemetry.Activities.StartActivity("AppsIndex/GetAppIdsByUserAsync"))
             {
                 var result = await appRepository.QueryIdsAsync(userId);
 
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private async Task<IReadOnlyCollection<DomainId>> GetAppIdsAsync(string[] names)
         {
-            using (Telemetry.Activities.StartActivity("AppProvider/GetAppIdsAsync"))
+            using (Telemetry.Activities.StartActivity("AppsIndex/GetAppIdsAsync"))
             {
                 var result = await Cache().GetAppIdsAsync(names);
 
@@ -141,7 +141,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private async Task<DomainId> GetAppIdAsync(string name)
         {
-            using (Telemetry.Activities.StartActivity("AppProvider/GetAppIdAsync"))
+            using (Telemetry.Activities.StartActivity("AppsIndex/GetAppIdAsync"))
             {
                 var result = await Cache().GetAppIdsAsync(new[] { name });
 

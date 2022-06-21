@@ -61,6 +61,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         private void ResolveAssetsUrls(ISchemaEntity schema, ResolvedComponents components,
             IGrouping<DomainId, ContentEntity> contents, ILookup<DomainId, IEnrichedAssetEntity> assets)
         {
+            HashSet<DomainId>? fieldIds = null;
+
             foreach (var field in schema.SchemaDef.ResolvingAssets())
             {
                 foreach (var content in contents)
@@ -73,8 +75,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                     {
                         foreach (var (partitionKey, partitionValue) in fieldData)
                         {
+                            fieldIds ??= new HashSet<DomainId>();
+                            fieldIds.Clear();
+
+                            partitionValue.AddReferencedIds(field, fieldIds, components);
+
                             var referencedAsset =
-                                field.GetReferencedIds(partitionValue, components)
+                                fieldIds
                                     .Select(x => assets[x])
                                     .SelectMany(x => x)
                                     .FirstOrDefault();

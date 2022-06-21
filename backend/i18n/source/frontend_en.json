@@ -867,7 +867,7 @@
   "schemas.fieldTypes.references.countMax": "Max Items",
   "schemas.fieldTypes.references.countMin": "Min Items",
   "schemas.fieldTypes.references.description": "Links to other content items.",
-  "schemas.fieldTypes.references.mustBePublished": "References must be published",
+  "schemas.fieldTypes.references.mustBePublished": "Only take published references into account when validating.",
   "schemas.fieldTypes.references.resolve": "Resolve references",
   "schemas.fieldTypes.references.resolveHint": "Show the name of the referenced item in content list when MaxItems is set to 1.",
   "schemas.fieldTypes.string.characters": "Characters",

@@ -213,11 +213,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 typeNameRegistry.Map(actionType.Type, actionType.Type.Name);
             }
 
-            var eventTypes = typeof(EnrichedEvent).Assembly.GetTypes().Where(x => typeof(EnrichedEvent).IsAssignableFrom(x) && !x.IsAbstract);
-
             var addedTypes = new HashSet<Type>();
 
-            foreach (var type in eventTypes)
+            static IEnumerable<Type> FindTypes(Type baseType)
+            {
+                return baseType.Assembly.GetTypes().Where(x => baseType.IsAssignableFrom(x) && !x.IsAbstract);
+            }
+
+            foreach (var type in FindTypes(typeof(EnrichedEvent)))
             {
                 if (addedTypes.Add(type))
                 {
@@ -225,9 +228,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 }
             }
 
-            var triggerTypes = typeof(RuleTrigger).Assembly.GetTypes().Where(x => typeof(RuleTrigger).IsAssignableFrom(x) && !x.IsAbstract);
-
-            foreach (var type in triggerTypes)
+            foreach (var type in FindTypes(typeof(RuleTrigger)))
             {
                 if (addedTypes.Add(type))
                 {

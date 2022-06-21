@@ -7,12 +7,11 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed class ContentFieldData : ListDictionary<string, JsonValue>, IEquatable<ContentFieldData>
+    public sealed class ContentFieldData : Dictionary<string, JsonValue>, IEquatable<ContentFieldData>
     {
         public ContentFieldData()
             : base(0, StringComparer.OrdinalIgnoreCase)
@@ -37,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             result = JsonValue.Null;
 
-            if (TryGetValue(key, out var found) && found.Type != JsonValueType.Null)
+            if (TryGetValue(key, out var found) && found != default)
             {
                 result = found;
                 return true;
