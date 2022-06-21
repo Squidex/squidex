@@ -29,7 +29,7 @@ namespace Migrations.Migrations
             {
                 state.Slug = state.FileName.ToAssetSlug();
 
-                var job = new SnapshotWriteJob<AssetDomainObject.State>(key, state, version, default, default);
+                var job = new SnapshotWriteJob<AssetDomainObject.State>(key, state, version);
 
                 await stateForAssets.WriteAsync(job, ct);
             }

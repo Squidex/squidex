@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.States
 
             if (!snapshots.TryGetValue(key, out var existing) || existing.NewVersion < version)
             {
-                snapshots[key] = new SnapshotWriteJob<T>(key, snapshot, version, 0, action);
+                snapshots[key] = new SnapshotWriteJob<T>(key, snapshot, version, action);
             }
         }
 

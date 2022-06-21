@@ -227,13 +227,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity value, PersistenceAction action,
             CancellationToken ct = default)
         {
-            var entity = value;
-
-            await Collection.UpsertVersionedAsync(documentId, oldVersion, entity.Version, entity, ct);
+            var isUpdated = await Collection.UpsertVersionedAsync(documentId, oldVersion, value.Version, value, ct);
 
             if (countCollection != null)
             {
-                await countCollection.UpdateAsync(DomainId.Combine(entity.IndexedAppId, entity.IndexedSchemaId), action, ct);
+                if (!isUpdated && action == PersistenceAction.Update)
+                {
+                    action = PersistenceAction.Create;
+                }
+
+                await countCollection.UpdateAsync(DomainId.Combine(value.IndexedAppId, value.IndexedSchemaId), action, ct);
             }
         }
 

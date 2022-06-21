@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
                 Version = 42,
             };
 
-            var snapshotJob = new SnapshotWriteJob<AssetDomainObject.State>(source.UniqueId, source, source.Version, 0, default);
+            var snapshotJob = new SnapshotWriteJob<AssetDomainObject.State>(source.UniqueId, source, source.Version);
             var snapshot = MongoAssetEntity.Create(snapshotJob);
 
             var mapped = snapshot.ToState();
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
                 Version = 42,
             };
 
-            var snapshotJob = new SnapshotWriteJob<AssetFolderDomainObject.State>(source.UniqueId, source, source.Version, 0, default);
+            var snapshotJob = new SnapshotWriteJob<AssetFolderDomainObject.State>(source.UniqueId, source, source.Version);
             var snapshot = MongoAssetFolderEntity.Create(snapshotJob);
 
             var mapped = snapshot.ToState();

@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var source = CreateContentWithoutNewVersion();
 
-            var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version, 0, default);
+            var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version);
             var snapshot = await MongoContentEntity.CreateDraftAsync(snapshotJob, appProvider);
 
             Assert.Equal(source.CurrentVersion.Data, snapshot.Data);
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var source = CreateContentWithoutNewVersion();
 
-            var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version, 0, default);
+            var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version);
             var snapshot = await MongoContentEntity.CreatePublishedAsync(snapshotJob, appProvider);
 
             Assert.Equal(source.CurrentVersion.Data, snapshot.Data);
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var source = CreateContentWithNewVersion();
 
-            var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version, 0, default);
+            var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version);
             var snapshot = await MongoContentEntity.CreateDraftAsync(snapshotJob, appProvider);
 
             Assert.Equal(source.NewVersion?.Data, snapshot.Data);
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var source = CreateContentWithNewVersion();
 
-            var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version, 0, default);
+            var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version);
             var snapshot = await MongoContentEntity.CreatePublishedAsync(snapshotJob, appProvider);
 
             Assert.Equal(source.CurrentVersion?.Data, snapshot.Data);

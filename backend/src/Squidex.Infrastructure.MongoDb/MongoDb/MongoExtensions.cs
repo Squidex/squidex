@@ -119,7 +119,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, T document,
+        public static async Task<bool> UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, T document,
             CancellationToken ct = default)
             where T : IVersionedEntity<TKey> where TKey : notnull
         {
@@ -128,14 +128,14 @@ namespace Squidex.Infrastructure.MongoDb
                 document.DocumentId = key;
                 document.Version = newVersion;
 
-                if (oldVersion > EtagVersion.Any)
-                {
-                    await collection.ReplaceOneAsync(x => x.DocumentId.Equals(key) && x.Version == oldVersion, document, UpsertReplace, ct);
-                }
-                else
-                {
-                    await collection.ReplaceOneAsync(x => x.DocumentId.Equals(key), document, UpsertReplace, ct);
-                }
+                Expression<Func<T, bool>> filter =
+                    oldVersion > EtagVersion.Any ?
+                    x => x.DocumentId.Equals(key) && x.Version == oldVersion :
+                    x => x.DocumentId.Equals(key);
+
+                var result = await collection.ReplaceOneAsync(filter, document, UpsertReplace, ct);
+
+                return result.IsAcknowledged && result.ModifiedCount == 1;
             }
             catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
             {

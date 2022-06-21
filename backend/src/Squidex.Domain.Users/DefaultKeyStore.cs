@@ -75,7 +75,7 @@ namespace Squidex.Domain.Users
 
                 try
                 {
-                    await store.WriteAsync(new SnapshotWriteJob<State>(default, state, 0, 0, default));
+                    await store.WriteAsync(new SnapshotWriteJob<State>(default, state, 0));
 
                     return securityKey;
                 }

@@ -100,7 +100,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_throw_exception_if_other_version_found()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns(new SnapshotResult<int>(key, 42, EtagVersion.Empty));
+                .Returns(new SnapshotResult<int>(key, 42, 2));
 
             var persistedState = Save.Snapshot(0);
             var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);
@@ -124,7 +124,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.WriteSnapshotAsync(100, PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<int>(key, 100, 10, 11, PersistenceAction.Update), A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<int>(key, 100, 11, PersistenceAction.Update, 10), A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -135,7 +135,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.WriteSnapshotAsync(100, PersistenceAction.Update);
 
-            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<int>(key, 100, EtagVersion.Empty, 0, PersistenceAction.Update), A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<int>(key, 100, 0, PersistenceAction.Update, -1), A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -143,9 +143,9 @@ namespace Squidex.Infrastructure.States
         public async Task Should_not_wrap_exception_if_writing_to_store_with_previous_version()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
-                .Returns(new SnapshotResult<int>(key, 42, EtagVersion.Empty));
+                .Returns(new SnapshotResult<int>(key, 42, 10));
 
-            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<int>(key, 100, 10, 11, A<PersistenceAction>._), A<CancellationToken>._))
+            A.CallTo(() => snapshotStore.WriteAsync(new SnapshotWriteJob<int>(key, 100, 11, PersistenceAction.Update, 10), A<CancellationToken>._))
                 .Throws(new InconsistentStateException(1, 1, new InvalidOperationException()));
 
             var persistedState = Save.Snapshot(0);

@@ -184,7 +184,12 @@ namespace Squidex.Infrastructure.States
 
             using (Telemetry.Activities.StartActivity("Persistence/WriteState"))
             {
-                await snapshotStore.WriteAsync(new SnapshotWriteJob<T>(ownerKey, state, oldVersion, newVersion, action), ct);
+                var job = new SnapshotWriteJob<T>(ownerKey, state, newVersion, action)
+                {
+                    OldVersion = oldVersion
+                };
+
+                await snapshotStore.WriteAsync(job, ct);
             }
 
             versionSnapshot = newVersion;
