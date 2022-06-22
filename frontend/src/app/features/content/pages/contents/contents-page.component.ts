@@ -102,7 +102,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                             .withSynchronizer(QuerySynchronizer.INSTANCE)
                             .getInitial();
 
-                    this.contentsState.load(false, initial);
+                    this.contentsState.load(false, true, initial);
                     this.contentsRoute.listen();
 
                     const languageKey = this.localStore.get(this.languageKey());
@@ -122,6 +122,10 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public reload() {
         this.contentsState.load(true);
+    }
+
+    public reloadTotal() {
+        this.contentsState.load(true, false);
     }
 
     public delete(content: ContentDto) {

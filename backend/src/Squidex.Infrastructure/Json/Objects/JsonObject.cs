@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Collections;
-
 namespace Squidex.Infrastructure.Json.Objects
 {
     public class JsonObject : Dictionary<string, JsonValue>, IEquatable<JsonObject>

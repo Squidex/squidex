@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using FluentFTP;
-using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities;
@@ -16,7 +15,6 @@ using Squidex.Domain.Apps.Entities.Assets.Queries;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Hosting;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using tusdotnet.Interfaces;

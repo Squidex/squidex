@@ -18,6 +18,9 @@ export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
 })
 export class PagerComponent implements OnChanges {
     @Output()
+    public loadTotal = new EventEmitter();
+
+    @Output()
     public pagingChange = new EventEmitter<{ page: number; pageSize: number }>();
 
     @Input()
@@ -27,6 +30,7 @@ export class PagerComponent implements OnChanges {
     public autoHide?: boolean | null;
 
     public totalPages = 0;
+    public totalItems = 0;
 
     public itemFirst = 0;
     public itemLast = 0;
@@ -45,20 +49,22 @@ export class PagerComponent implements OnChanges {
 
         const { page, pageSize, count, total } = this.paging;
 
-        const totalPages = Math.ceil(total / pageSize);
+        const offset = page * pageSize;
 
-        if (count > 0) {
-            const offset = page * pageSize;
+        this.itemFirst = offset + (count > 0 ? 1 : 0);
+        this.itemLast = offset + count;
 
-            this.itemFirst = offset + 1;
-            this.itemLast = offset + count;
+        if (count > 0 && total >= 0) {
+            const totalPages = Math.ceil(total / pageSize);
 
             this.canGoNext = page < totalPages - 1;
-            this.canGoPrev = page > 0;
+        } else if (count > 0) {
+            this.canGoNext = count === pageSize;
         } else {
             this.canGoNext = false;
-            this.canGoPrev = false;
         }
+
+        this.canGoPrev = page > 0;
 
         this.translationInfo = {
             itemFirst: this.itemFirst,

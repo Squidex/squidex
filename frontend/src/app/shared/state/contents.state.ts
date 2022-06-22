@@ -132,21 +132,21 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public loadReference(contentId: string, update: Partial<Snapshot> = {}) {
         this.resetState({ reference: contentId, referencing: undefined, ...update });
 
-        return this.loadInternal(false);
+        return this.loadInternal(false, true);
     }
 
     public loadReferencing(contentId: string, update: Partial<Snapshot> = {}) {
         this.resetState({ referencing: contentId, reference: undefined, ...update });
 
-        return this.loadInternal(false);
+        return this.loadInternal(false, true);
     }
 
-    public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {
+    public load(isReload = false, noSlowTotal = true, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
             this.resetState({ selectedContent: this.snapshot.selectedContent, ...update }, 'Loading Intial');
         }
 
-        return this.loadInternal(isReload);
+        return this.loadInternal(isReload, noSlowTotal);
     }
 
     public loadIfNotLoaded(): Observable<any> {
@@ -154,14 +154,14 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             return EMPTY;
         }
 
-        return this.loadInternal(false);
+        return this.loadInternal(false, true);
     }
 
-    private loadInternal(isReload: boolean) {
-        return this.loadInternalCore(isReload).pipe(shareSubscribed(this.dialogs));
+    private loadInternal(isReload: boolean, noSlowTotal: boolean) {
+        return this.loadInternalCore(isReload, noSlowTotal).pipe(shareSubscribed(this.dialogs));
     }
 
-    private loadInternalCore(isReload: boolean) {
+    private loadInternalCore(isReload: boolean, noSlowTotal: boolean) {
         if (!this.appName || !this.schemaName) {
             return EMPTY;
         }
@@ -170,7 +170,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
         const { page, pageSize, query, reference, referencing, total } = this.snapshot;
 
-        const q: any = { take: pageSize, skip: pageSize * page };
+        const q: any = { take: pageSize, skip: pageSize * page, noSlowTotal };
 
         if (query) {
             q.query = query;
@@ -277,7 +277,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 'i18n:contents.deleteReferrerConfirmTitle',
                 'i18n:contents.deleteReferrerConfirmText',
                 'deleteReferencngContent').pipe(
-            switchMap(() => this.loadInternalCore(false)), shareSubscribed(this.dialogs));
+            switchMap(() => this.loadInternalCore(false, true)), shareSubscribed(this.dialogs));
 }
 
     public update(content: ContentDto, request: any): Observable<ContentDto> {
@@ -321,11 +321,11 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public search(query?: Query): Observable<any> {
-        if (!this.next({ query, page: 0 }, 'Loading Searched')) {
+        if (!this.next({ query, page: 0, total: 0 }, 'Loading Searched')) {
             return EMPTY;
         }
 
-        return this.loadInternal(false);
+        return this.loadInternal(false, true);
     }
 
     public page(paging: { page: number; pageSize: number }) {
@@ -333,7 +333,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             return EMPTY;
         }
 
-        return this.loadInternal(false);
+        return this.loadInternal(false, true);
     }
 
     private reloadContents(contents: ReadonlyArray<ContentDto>) {

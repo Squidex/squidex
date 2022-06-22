@@ -33,6 +33,7 @@ describe('Pager', () => {
         expect(pager.itemFirst).toEqual(1);
         expect(pager.itemLast).toEqual(10);
     });
+
     it('should init with middle page', () => {
         const pager = new PagerComponent();
 
@@ -83,6 +84,32 @@ describe('Pager', () => {
 
         expect(pager.itemFirst).toEqual(91);
         expect(pager.itemLast).toEqual(99);
+    });
+
+    it('should init without total and full page size', () => {
+        const pager = new PagerComponent();
+
+        pager.paging = { page: 9, pageSize: 10, count: 10, total: -1 };
+        pager.ngOnChanges();
+
+        expect(pager.canGoNext).toBeTrue();
+        expect(pager.canGoPrev).toBeTrue();
+
+        expect(pager.itemFirst).toEqual(91);
+        expect(pager.itemLast).toEqual(100);
+    });
+
+    it('should init without total and partial page size', () => {
+        const pager = new PagerComponent();
+
+        pager.paging = { page: 9, pageSize: 10, count: 5, total: -1 };
+        pager.ngOnChanges();
+
+        expect(pager.canGoNext).toBeFalse();
+        expect(pager.canGoPrev).toBeTrue();
+
+        expect(pager.itemFirst).toEqual(91);
+        expect(pager.itemLast).toEqual(95);
     });
 
     it('should emit if changing size', () => {

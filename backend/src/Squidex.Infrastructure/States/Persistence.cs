@@ -65,13 +65,14 @@ namespace Squidex.Infrastructure.States
             streamName = new Lazy<string>(() => streamNameResolver.GetStreamName(ownerType, ownerKey.ToString()!));
         }
 
-        public async Task DeleteAsync()
+        public async Task DeleteAsync(
+            CancellationToken ct = default)
         {
             if (UseSnapshots)
             {
                 using (Telemetry.Activities.StartActivity("Persistence/ReadState"))
                 {
-                    await snapshotStore.RemoveAsync(ownerKey);
+                    await snapshotStore.RemoveAsync(ownerKey, ct);
                 }
             }
 
@@ -79,24 +80,25 @@ namespace Squidex.Infrastructure.States
             {
                 using (Telemetry.Activities.StartActivity("Persistence/ReadEvents"))
                 {
-                    await eventStore.DeleteStreamAsync(streamName.Value);
+                    await eventStore.DeleteStreamAsync(streamName.Value, ct);
                 }
             }
         }
 
-        public async Task ReadAsync(long expectedVersion = EtagVersion.Any)
+        public async Task ReadAsync(long expectedVersion = EtagVersion.Any,
+            CancellationToken ct = default)
         {
             versionSnapshot = EtagVersion.Empty;
             versionEvents = EtagVersion.Empty;
 
             if (UseSnapshots)
             {
-                await ReadSnapshotAsync();
+                await ReadSnapshotAsync(ct);
             }
 
             if (UseEventSourcing)
             {
-                await ReadEventsAsync();
+                await ReadEventsAsync(ct);
             }
 
             UpdateVersion();
@@ -114,9 +116,10 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        private async Task ReadSnapshotAsync()
+        private async Task ReadSnapshotAsync(
+            CancellationToken ct)
         {
-            var (state, valid, version) = await snapshotStore.ReadAsync(ownerKey);
+            var (_, state, version, valid) = await snapshotStore.ReadAsync(ownerKey, ct);
 
             version = Math.Max(version, EtagVersion.Empty);
             versionSnapshot = version;
@@ -132,9 +135,10 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        private async Task ReadEventsAsync()
+        private async Task ReadEventsAsync(
+            CancellationToken ct)
         {
-            var events = await eventStore.QueryAsync(streamName.Value, versionEvents + 1);
+            var events = await eventStore.QueryAsync(streamName.Value, versionEvents + 1, ct);
 
             var isStopped = false;
 
@@ -161,7 +165,8 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public async Task WriteSnapshotAsync(T state)
+        public async Task WriteSnapshotAsync(T state,
+            CancellationToken ct = default)
         {
             var oldVersion = versionSnapshot;
 
@@ -179,7 +184,12 @@ namespace Squidex.Infrastructure.States
 
             using (Telemetry.Activities.StartActivity("Persistence/WriteState"))
             {
-                await snapshotStore.WriteAsync(ownerKey, state, oldVersion, newVersion);
+                var job = new SnapshotWriteJob<T>(ownerKey, state, newVersion)
+                {
+                    OldVersion = oldVersion
+                };
+
+                await snapshotStore.WriteAsync(job, ct);
             }
 
             versionSnapshot = newVersion;
@@ -187,7 +197,8 @@ namespace Squidex.Infrastructure.States
             UpdateVersion();
         }
 
-        public async Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events)
+        public async Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events,
+            CancellationToken ct = default)
         {
             Guard.NotEmpty(events);
 
@@ -205,7 +216,7 @@ namespace Squidex.Infrastructure.States
             {
                 using (Telemetry.Activities.StartActivity("Persistence/WriteEvents"))
                 {
-                    await eventStore.AppendAsync(eventCommitId, streamName.Value, oldVersion, eventData);
+                    await eventStore.AppendAsync(eventCommitId, streamName.Value, oldVersion, eventData, ct);
                 }
             }
             catch (WrongEventVersionException ex)

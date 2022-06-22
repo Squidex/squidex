@@ -102,6 +102,10 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
         this.contentsState.load(true);
     }
 
+    public reloadTotal() {
+        this.contentsState.load(true, false);
+    }
+
     public search(query: Query) {
         this.contentsState.search(query);
     }

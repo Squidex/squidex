@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.States
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly Dictionary<DomainId, (long, List<Envelope<IEvent>>)> @events = new Dictionary<DomainId, (long, List<Envelope<IEvent>>)>();
-        private Dictionary<DomainId, (T Snapshot, long Version)>? snapshots;
+        private Dictionary<DomainId, SnapshotWriteJob<T>>? snapshots;
 
         internal BatchContext(
             Type owner,
@@ -38,11 +38,11 @@ namespace Squidex.Infrastructure.States
 
         internal void Add(DomainId key, T snapshot, long version)
         {
-            snapshots ??= new Dictionary<DomainId, (T Snapshot, long Version)>();
+            snapshots ??= new ();
 
-            if (!snapshots.TryGetValue(key, out var existing) || existing.Version < version)
+            if (!snapshots.TryGetValue(key, out var existing) || existing.NewVersion < version)
             {
-                snapshots[key] = (snapshot, version);
+                snapshots[key] = new SnapshotWriteJob<T>(key, snapshot, version);
             }
         }
 
@@ -86,9 +86,7 @@ namespace Squidex.Infrastructure.States
                 return Task.CompletedTask;
             }
 
-            var list = current.Select(x => (x.Key, x.Value.Snapshot, x.Value.Version));
-
-            return snapshotStore.WriteManyAsync(list);
+            return snapshotStore.WriteManyAsync(current.Values);
         }
 
         public IPersistence<T> WithEventSourcing(Type owner, DomainId key, HandleEvent? applyEvent)

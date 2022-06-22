@@ -7,7 +7,6 @@
 
 using EventStore.Client;
 using MongoDB.Driver;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;

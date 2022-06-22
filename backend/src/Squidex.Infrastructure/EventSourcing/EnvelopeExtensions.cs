@@ -8,7 +8,6 @@
 using System.Globalization;
 using NodaTime;
 using NodaTime.Text;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Infrastructure.EventSourcing
 {

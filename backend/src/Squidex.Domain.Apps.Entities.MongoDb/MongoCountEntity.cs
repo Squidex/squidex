@@ -5,20 +5,21 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Domain.Apps.Entities.MongoDb
 {
-    public static class InstantExtensions
+    internal sealed class MongoCountEntity
     {
-        public static Instant WithoutMs(this Instant value)
-        {
-            return Instant.FromUnixTimeSeconds(value.ToUnixTimeSeconds());
-        }
+        [BsonId]
+        [BsonRequired]
+        public string Key { get; set; }
 
-        public static Instant WithoutNs(this Instant value)
-        {
-            return Instant.FromUnixTimeMilliseconds(value.ToUnixTimeMilliseconds());
-        }
+        [BsonElement]
+        public long Count { get; set; }
+
+        [BsonElement]
+        public Instant Created { get; set; }
     }
 }

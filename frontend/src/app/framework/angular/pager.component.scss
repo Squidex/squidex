@@ -12,5 +12,9 @@
     display: inline-block;
     text-align: right;
     text-decoration: none;
-    width: 15rem;
+    width: 14rem;
+}
+
+.deactived {
+    pointer-events: none;
 }

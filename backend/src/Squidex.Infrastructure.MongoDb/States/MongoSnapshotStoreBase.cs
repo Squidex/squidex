@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.States
             return $"States_{name}";
         }
 
-        public async Task<(T Value, bool Valid, long Version)> ReadAsync(DomainId key,
+        public async Task<SnapshotResult<T>> ReadAsync(DomainId key,
             CancellationToken ct = default)
         {
             using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/ReadAsync"))
@@ -49,31 +49,31 @@ namespace Squidex.Infrastructure.States
 
                 if (existing != null)
                 {
-                    return (existing.Document, true, existing.Version);
+                    return new SnapshotResult<T>(existing.DocumentId, existing.Document, existing.Version);
                 }
 
-                return (default!, true, EtagVersion.Empty);
+                return new SnapshotResult<T>(default, default!, EtagVersion.Empty);
             }
         }
 
-        public async Task WriteAsync(DomainId key, T value, long oldVersion, long newVersion,
+        public async Task WriteAsync(SnapshotWriteJob<T> job,
             CancellationToken ct = default)
         {
             using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/WriteAsync"))
             {
-                var document = CreateDocument(key, value, newVersion);
+                var document = CreateDocument(job.Key, job.Value, job.OldVersion);
 
-                await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, document, ct);
+                await Collection.UpsertVersionedAsync(job.Key, job.OldVersion, job.NewVersion, document, ct);
             }
         }
 
-        public async Task WriteManyAsync(IEnumerable<(DomainId Key, T Value, long Version)> snapshots,
+        public async Task WriteManyAsync(IEnumerable<SnapshotWriteJob<T>> jobs,
             CancellationToken ct = default)
         {
             using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/WriteManyAsync"))
             {
-                var writes = snapshots.Select(x =>
-                    new ReplaceOneModel<TState>(Filter.Eq(y => y.DocumentId, x.Key), CreateDocument(x.Key, x.Value, x.Version))
+                var writes = jobs.Select(x =>
+                    new ReplaceOneModel<TState>(Filter.Eq(y => y.DocumentId, x.Key), CreateDocument(x.Key, x.Value, x.NewVersion))
                     {
                         IsUpsert = true
                     }).ToList();
@@ -96,7 +96,7 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public async IAsyncEnumerable<(T State, long Version)> ReadAllAsync(
+        public async IAsyncEnumerable<SnapshotResult<T>> ReadAllAsync(
             [EnumeratorCancellation] CancellationToken ct = default)
         {
             using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/ReadAllAsync"))
@@ -105,7 +105,7 @@ namespace Squidex.Infrastructure.States
 
                 await foreach (var document in find.ToAsyncEnumerable(ct))
                 {
-                    yield return (document.Document, document.Version);
+                    yield return new SnapshotResult<T>(document.DocumentId, document.Document, document.Version, true);
                 }
             }
         }

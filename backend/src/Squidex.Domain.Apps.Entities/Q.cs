@@ -38,6 +38,8 @@ namespace Squidex.Domain.Apps.Entities
 
         public bool NoTotal { get; init; }
 
+        public bool NoSlowTotal { get; init; }
+
         private Q()
         {
         }
@@ -52,6 +54,11 @@ namespace Squidex.Domain.Apps.Entities
         public Q WithoutTotal(bool value = true)
         {
             return this with { NoTotal = value };
+        }
+
+        public Q WithoutSlowTotal(bool value = true)
+        {
+            return this with { NoSlowTotal = value };
         }
 
         public Q WithODataQuery(string? query)
