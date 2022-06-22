@@ -21,6 +21,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
     internal sealed class QueryByQuery : OperationBase
     {
         private readonly IAppProvider appProvider;
+        private readonly MongoCountCollection countCollection;
 
         [BsonIgnoreExtraElements]
         internal sealed class IdOnly
@@ -32,9 +33,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             public MongoContentEntity[] Joined { get; set; }
         }
 
-        public QueryByQuery(IAppProvider appProvider)
+        public QueryByQuery(IAppProvider appProvider, MongoCountCollection countCollection)
         {
             this.appProvider = appProvider;
+            this.countCollection = countCollection;
         }
 
         public override IEnumerable<CreateIndexModel<MongoContentEntity>> CreateIndexes()
@@ -93,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             {
                 var query = q.Query.AdjustToModel(app.Id);
 
-                var (filter, _) = CreateFilter(app.Id, schemas.Select(x => x.Id), query, q.Reference, q.CreatedBy);
+                var (filter, isDefault) = CreateFilter(app.Id, schemas.Select(x => x.Id), query, q.Reference, q.CreatedBy);
 
                 var contentEntities = await FindContentsAsync(query, filter, ct);
                 var contentTotal = (long)contentEntities.Count;
@@ -147,6 +149,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     if (q.NoTotal || (q.NoSlowTotal && q.Query.Filter != null))
                     {
                         contentTotal = -1;
+                    }
+                    else if (isDefault)
+                    {
+                        // Cache total count by app and schema.
+                        var totalKey = DomainId.Combine(app.Id, schema.Id);
+
+                        contentTotal = await countCollection.GetOrAddAsync(totalKey, ct => Collection.Find(filter).CountDocumentsAsync(ct), ct);
                     }
                     else if (IsSatisfiedByIndex(query))
                     {

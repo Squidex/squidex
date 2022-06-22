@@ -19,9 +19,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
     {
+        private readonly MongoCountCollection countCollection;
+
         public MongoAssetRepository(IMongoDatabase database)
             : base(database)
         {
+            countCollection = new MongoCountCollection(database, CollectionName());
         }
 
         public IMongoCollection<MongoAssetEntity> GetInternalCollection()
@@ -127,9 +130,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                         if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
                         {
-                            if (q.NoTotal || (q.NoSlowTotal && (q.Query.Filter != null || parentId != null)))
+                            var isDefaultQuery = q.Query.Filter == null;
+
+                            if (q.NoTotal || (q.NoSlowTotal && !isDefaultQuery))
                             {
                                 assetTotal = -1;
+                            }
+                            else if (isDefaultQuery)
+                            {
+                                // Cache total count by app and folder.
+                                var totalKey = parentId.HasValue ? DomainId.Combine(appId, parentId.Value) : appId;
+
+                                assetTotal = await countCollection.GetOrAddAsync(totalKey, ct => Collection.Find(filter).CountDocumentsAsync(ct), ct);
                             }
                             else
                             {

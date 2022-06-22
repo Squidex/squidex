@@ -28,8 +28,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly QueryReferences queryReferences;
         private readonly QueryReferrers queryReferrers;
         private readonly QueryScheduled queryScheduled;
-        private readonly string name;
         private readonly ReadPreference readPreference;
+        private readonly string name;
 
         public MongoContentCollection(string name, IMongoDatabase database, IAppProvider appProvider, ReadPreference readPreference)
             : base(database)
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             queryAsStream = new QueryAsStream();
             queryBdId = new QueryById();
             queryByIds = new QueryByIds();
-            queryByQuery = new QueryByQuery(appProvider);
+            queryByQuery = new QueryByQuery(appProvider, new MongoCountCollection(database, name));
             queryReferences = new QueryReferences(queryByIds);
             queryReferrers = new QueryReferrers();
             queryScheduled = new QueryScheduled();
