@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     else if (isDefault)
                     {
                         // Cache total count by app and schema.
-                        var totalKey = DomainId.Combine(app.Id, schema.Id);
+                        var totalKey = $"{app.Id}_{schema.Id}";
 
                         contentTotal = await countCollection.GetOrAddAsync(totalKey, ct => Collection.Find(filter).CountDocumentsAsync(ct), ct);
                     }

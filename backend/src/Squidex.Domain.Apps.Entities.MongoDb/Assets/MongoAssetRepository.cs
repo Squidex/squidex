@@ -138,8 +138,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                             }
                             else if (isDefaultQuery)
                             {
-                                // Cache total count by app and folder.
-                                var totalKey = parentId.HasValue ? DomainId.Combine(appId, parentId.Value) : appId;
+                                // Cache total count by app and asset folder.
+                                var totalKey = $"{appId}_{parentId}";
 
                                 assetTotal = await countCollection.GetOrAddAsync(totalKey, ct => Collection.Find(filter).CountDocumentsAsync(ct), ct);
                             }

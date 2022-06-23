@@ -43,8 +43,8 @@
     <div class="tooltip2 tooltip2-{{tooltip.textPosition}}" 
         [sqxAnchoredTo]="tooltip.target" 
         [position]="tooltip.textPosition"
-        [offsetY]="6"
-        [offsetX]="6">
+        [offsetY]="tooltip.offsetY"
+        [offsetX]="tooltip.offsetX">
         {{tooltip.text | sqxTranslate}}
 
         <ng-container *ngIf="tooltip.shortcut">

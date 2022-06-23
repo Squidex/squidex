@@ -30,12 +30,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
             return name;
         }
 
-        public Task<long> GetOrAddAsync(DomainId key, Func<CancellationToken, Task<long>> provider,
-            CancellationToken ct)
-        {
-            return GetOrAddAsync(key.ToString(), provider, ct);
-        }
-
         public async Task<long> GetOrAddAsync(string key, Func<CancellationToken, Task<long>> provider,
             CancellationToken ct)
         {
