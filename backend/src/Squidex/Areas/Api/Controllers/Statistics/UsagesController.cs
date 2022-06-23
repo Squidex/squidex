@@ -170,13 +170,12 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         {
             var appId = DomainId.Create(dataProtector.Unprotect(token));
 
-            var today = DateTime.UtcNow.Date;
-
-            var fileName = $"Usage-{today:yyy-MM-dd}.csv";
+            var fileDate = DateTime.UtcNow.Date;
+            var fileName = $"Usage-{fileDate:yyy-MM-dd}.csv";
 
             var callback = new FileCallback((body, range, ct) =>
             {
-                return appLogStore.ReadLogAsync(appId, today.AddDays(-30), today, body, ct);
+                return appLogStore.ReadLogAsync(appId, fileDate.AddDays(-30), fileDate, body, ct);
             });
 
             return new FileCallbackResult("text/csv", callback)
