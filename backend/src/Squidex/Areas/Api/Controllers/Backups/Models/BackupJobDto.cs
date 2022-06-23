@@ -54,14 +54,20 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
 
         private BackupJobDto CreateLinks(Resources resources)
         {
-            var values = new { app = resources.App, id = Id };
-
             if (resources.CanDeleteBackup)
             {
+                var values = new { app = resources.App, id = Id };
+
                 AddDeleteLink("delete", resources.Url<BackupsController>(x => nameof(x.DeleteBackup), values));
             }
 
-            AddGetLink("download", resources.Url<BackupContentController>(x => nameof(x.GetBackupContent), values));
+            if (resources.CanDownloadBackup)
+            {
+                var values = new { app = resources.App, appId = resources.AppId, id = Id };
+
+                AddGetLink("download", resources.Url<BackupContentController>(x => nameof(x.GetBackupContentV2), values));
+            }
+
 
             return this;
         }

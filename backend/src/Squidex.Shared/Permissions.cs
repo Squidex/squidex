@@ -112,6 +112,7 @@ namespace Squidex.Shared
         public const string AppBackupsRead = "squidex.apps.{app}.backups.read";
         public const string AppBackupsCreate = "squidex.apps.{app}.backups.create";
         public const string AppBackupsDelete = "squidex.apps.{app}.backups.delete";
+        public const string AppBackupsDownload = "squidex.apps.{app}.backups.download";
 
         // Plans
         public const string AppPlans = "squidex.apps.{app}.plans";

@@ -170,7 +170,13 @@ namespace Squidex.Web
         public bool CanDeleteBackup => IsAllowed(Permissions.AppBackupsDelete);
 
         [Lazy]
+        public bool CanDownloadBackup => IsAllowed(Permissions.AppBackupsDownload);
+
+        [Lazy]
         public string? App => GetAppName();
+
+        [Lazy]
+        public DomainId AppId => GetAppId();
 
         public ApiController Controller { get; }
 
@@ -243,6 +249,11 @@ namespace Squidex.Web
         private string? GetAppName()
         {
             return Controller.HttpContext.Context().App?.Name;
+        }
+
+        private DomainId GetAppId()
+        {
+            return Controller.HttpContext.Context().App?.Id ?? default;
         }
     }
 }

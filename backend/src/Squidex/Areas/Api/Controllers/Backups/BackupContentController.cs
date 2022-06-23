@@ -36,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         /// Get the backup content.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset.</param>
+        /// <param name="id">The id of the backup.</param>
         /// <returns>
         /// 200 => Backup found and content returned.
         /// 404 => Backup or app not found.
@@ -47,9 +47,35 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
         [ApiCosts(0)]
         [AllowAnonymous]
-        public async Task<IActionResult> GetBackupContent(string app, DomainId id)
+        public Task<IActionResult> GetBackupContent(string app, DomainId id)
         {
-            var backup = await backupservice.GetBackupAsync(AppId, id, HttpContext.RequestAborted);
+            return BackBackupAsync(AppId, app, id);
+        }
+
+        /// <summary>
+        /// Get the backup content.
+        /// </summary>
+        /// <param name="id">The id of the backup.</param>
+        /// <param name="appId">The id of the app.</param>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 200 => Backup found and content returned.
+        /// 404 => Backup or app not found.
+        /// </returns>
+        [HttpGet]
+        [Route("apps/backups/{id}")]
+        [ResponseCache(Duration = 3600 * 24 * 30)]
+        [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
+        [ApiCosts(0)]
+        [AllowAnonymous]
+        public Task<IActionResult> GetBackupContentV2(DomainId id, [FromQuery] DomainId appId = default, [FromQuery] string app = "")
+        {
+            return BackBackupAsync(appId, app, id);
+        }
+
+        private async Task<IActionResult> BackBackupAsync(DomainId appId, string app, DomainId id)
+        {
+            var backup = await backupservice.GetBackupAsync(appId, id, HttpContext.RequestAborted);
 
             if (backup == null || backup.Status != JobStatus.Completed)
             {
@@ -65,7 +91,9 @@ namespace Squidex.Areas.Api.Controllers.Backups
 
             return new FileCallbackResult("application/zip", callback)
             {
-                FileDownloadName = fileName
+                FileDownloadName = fileName,
+                FileSize = null,
+                ErrorAs404 = true
             };
         }
     }
