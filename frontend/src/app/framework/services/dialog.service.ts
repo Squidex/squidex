@@ -60,6 +60,16 @@ export class DialogRequest {
 }
 
 export class Tooltip {
+    private readonly isHorizontal;
+
+    public get offsetX() {
+        return this.isHorizontal ? 6 : 0;
+    }
+    
+    public get offsetY() {
+        return this.isHorizontal ? 0 : 6;
+    }
+
     constructor(
         public readonly target: any,
         public readonly text: string | null | undefined,
@@ -67,6 +77,13 @@ export class Tooltip {
         public readonly multiple?: boolean,
         public readonly shortcut?: string,
     ) {
+        this.isHorizontal =
+            textPosition === 'left-bottom' ||
+            textPosition === 'left-center' ||
+            textPosition === 'left-top' ||
+            textPosition === 'right-bottom' ||
+            textPosition === 'right-center' ||
+            textPosition === 'right-top';
     }
 }
 

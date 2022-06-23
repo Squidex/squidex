@@ -1,5 +1,5 @@
 <ng-container *ngIf="isPlain; else html">
-    <div class="value-container" [title]="value">
+    <div class="value-container" [title]="title" titlePosition="top-left">
         <div #valueElement [class.truncate]="!wrapping">{{value}}</div>
     </div>
 
