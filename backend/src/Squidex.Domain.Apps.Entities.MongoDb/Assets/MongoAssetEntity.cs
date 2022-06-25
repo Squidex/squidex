@@ -9,8 +9,11 @@ using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
@@ -113,6 +116,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         public DomainId UniqueId
         {
             get => DocumentId;
+        }
+
+        public AssetDomainObject.State ToState()
+        {
+            return SimpleMapper.Map(this, new AssetDomainObject.State());
+        }
+
+        public static MongoAssetEntity Create(SnapshotWriteJob<AssetDomainObject.State> job)
+        {
+            var entity = SimpleMapper.Map(job.Value, new MongoAssetEntity());
+
+            entity.DocumentId = job.Key;
+            entity.IndexedAppId = job.Value.AppId.Id;
+
+            return entity;
         }
     }
 }

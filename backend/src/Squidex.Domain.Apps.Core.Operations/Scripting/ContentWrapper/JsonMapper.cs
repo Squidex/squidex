@@ -10,7 +10,6 @@ using Jint;
 using Jint.Native;
 using Jint.Native.Object;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper

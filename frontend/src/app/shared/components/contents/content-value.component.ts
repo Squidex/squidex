@@ -35,6 +35,10 @@ export class ContentValueComponent extends ResourceOwner implements OnChanges {
         return !Types.is(this.value, HtmlValue);
     }
 
+    public get title() {
+        return this.isString ? this.value : undefined;
+    }
+
     constructor(
         private readonly changeDetector: ChangeDetectorRef,
     ) {

@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 
@@ -25,13 +24,13 @@ namespace Migrations.Migrations
         public async Task UpdateAsync(
             CancellationToken ct)
         {
-            await foreach (var (state, version) in stateForAssets.ReadAllAsync(ct))
+            await foreach (var (key, state, version, _) in stateForAssets.ReadAllAsync(ct))
             {
                 state.Slug = state.FileName.ToAssetSlug();
 
-                var key = DomainId.Combine(state.AppId.Id, state.Id);
+                var job = new SnapshotWriteJob<AssetDomainObject.State>(key, state, version);
 
-                await stateForAssets.WriteAsync(key, state, version, version, ct);
+                await stateForAssets.WriteAsync(job, ct);
             }
         }
     }

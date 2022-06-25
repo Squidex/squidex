@@ -6,11 +6,9 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
 #pragma warning disable MA0048 // File name must match type name
@@ -19,20 +17,27 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject.State>, IDeleter
     {
-        IAsyncEnumerable<(ContentDomainObject.State State, long Version)> ISnapshotStore<ContentDomainObject.State>.ReadAllAsync(
+        IAsyncEnumerable<SnapshotResult<ContentDomainObject.State>> ISnapshotStore<ContentDomainObject.State>.ReadAllAsync(
             CancellationToken ct)
         {
-            return AsyncEnumerable.Empty<(ContentDomainObject.State State, long Version)>();
+            return collectionAll.StreamAll(ct)
+                .Select(x => new SnapshotResult<ContentDomainObject.State>(x.DocumentId, x.ToState(), x.Version, true));
         }
 
-        async Task<(ContentDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<ContentDomainObject.State>.ReadAsync(DomainId key,
+        async Task<SnapshotResult<ContentDomainObject.State>> ISnapshotStore<ContentDomainObject.State>.ReadAsync(DomainId key,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/ReadAsync"))
             {
-                var version = await collectionAll.FindVersionAsync(key, ct);
+                var existing =
+                    await collectionAll.FindAsync(key, ct);
 
-                return (null!, false, version);
+                if (existing?.IsSnapshot == true)
+                {
+                    return new SnapshotResult<ContentDomainObject.State>(existing.DocumentId, existing.ToState(), existing.Version);
+                }
+
+                return new SnapshotResult<ContentDomainObject.State>(default, null!, EtagVersion.Empty);
             }
         }
 
@@ -66,23 +71,23 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        async Task ISnapshotStore<ContentDomainObject.State>.WriteAsync(DomainId key, ContentDomainObject.State value, long oldVersion, long newVersion,
+        async Task ISnapshotStore<ContentDomainObject.State>.WriteAsync(SnapshotWriteJob<ContentDomainObject.State> job,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteAsync"))
             {
-                if (value.SchemaId.Id == DomainId.Empty)
+                if (job.Value.SchemaId.Id == DomainId.Empty)
                 {
                     return;
                 }
 
                 await Task.WhenAll(
-                    UpsertDraftContentAsync(value, oldVersion, newVersion, ct),
-                    UpsertOrDeletePublishedAsync(value, oldVersion, newVersion, ct));
+                    UpsertDraftContentAsync(job, ct),
+                    UpsertOrDeletePublishedAsync(job, ct));
             }
         }
 
-        async Task ISnapshotStore<ContentDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, ContentDomainObject.State Value, long Version)> snapshots,
+        async Task ISnapshotStore<ContentDomainObject.State>.WriteManyAsync(IEnumerable<SnapshotWriteJob<ContentDomainObject.State>> jobs,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteManyAsync"))
@@ -90,20 +95,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 var entitiesPublished = new List<MongoContentEntity>();
                 var entitiesAll = new List<MongoContentEntity>();
 
-                foreach (var (_, value, version) in snapshots)
+                foreach (var job in jobs.Where(IsValid))
                 {
-                    // Some data is corrupt and might throw an exception during migration if we do not skip them.
-                    if (value.AppId == null || value.CurrentVersion == null)
+                    if (ShouldWritePublished(job.Value))
                     {
-                        continue;
+                        entitiesPublished.Add(await MongoContentEntity.CreatePublishedAsync(job, appProvider));
                     }
 
-                    if (ShouldWritePublished(value))
-                    {
-                        entitiesPublished.Add(await CreatePublishedContentAsync(value, version));
-                    }
-
-                    entitiesAll.Add(await CreateDraftContentAsync(value, version));
+                    entitiesAll.Add(await MongoContentEntity.CreateDraftAsync(job, appProvider));
                 }
 
                 await Task.WhenAll(
@@ -112,16 +111,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        private async Task UpsertOrDeletePublishedAsync(ContentDomainObject.State value, long oldVersion, long newVersion,
+        private async Task UpsertOrDeletePublishedAsync(SnapshotWriteJob<ContentDomainObject.State> job,
             CancellationToken ct = default)
         {
-            if (ShouldWritePublished(value))
+            if (ShouldWritePublished(job.Value))
             {
-                await UpsertPublishedContentAsync(value, oldVersion, newVersion, ct);
+                await UpsertPublishedContentAsync(job, ct);
             }
             else
             {
-                await DeletePublishedContentAsync(value.AppId.Id, value.Id, ct);
+                await DeletePublishedContentAsync(job.Value.AppId.Id, job.Value.Id, ct);
             }
         }
 
@@ -133,73 +132,32 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return collectionPublished.RemoveAsync(documentId, ct);
         }
 
-        private async Task UpsertDraftContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion,
+        private async Task UpsertDraftContentAsync(SnapshotWriteJob<ContentDomainObject.State> job,
             CancellationToken ct = default)
         {
-            var entity = await CreateDraftContentAsync(value, newVersion);
+            var entity = await MongoContentEntity.CreateDraftAsync(job, appProvider);
 
-            await collectionAll.UpsertVersionedAsync(entity.DocumentId, oldVersion, entity, ct);
+            await collectionAll.UpsertVersionedAsync(entity.DocumentId, job.OldVersion, entity, ct);
         }
 
-        private async Task UpsertPublishedContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion,
+        private async Task UpsertPublishedContentAsync(SnapshotWriteJob<ContentDomainObject.State> job,
             CancellationToken ct = default)
         {
-            var entity = await CreatePublishedContentAsync(value, newVersion);
+            var entity = await MongoContentEntity.CreatePublishedAsync(job, appProvider);
 
-            await collectionPublished.UpsertVersionedAsync(entity.DocumentId, oldVersion, entity, ct);
-        }
-
-        private async Task<MongoContentEntity> CreatePublishedContentAsync(ContentDomainObject.State value, long newVersion)
-        {
-            var entity = await CreateContentAsync(value, value.CurrentVersion.Data, newVersion);
-
-            entity.ScheduledAt = null;
-            entity.ScheduleJob = null;
-            entity.NewStatus = null;
-
-            return entity;
-        }
-
-        private async Task<MongoContentEntity> CreateDraftContentAsync(ContentDomainObject.State value, long newVersion)
-        {
-            var entity = await CreateContentAsync(value, value.Data, newVersion);
-
-            entity.ScheduledAt = value.ScheduleJob?.DueTime;
-            entity.ScheduleJob = value.ScheduleJob;
-            entity.NewStatus = value.NewStatus;
-
-            return entity;
-        }
-
-        private async Task<MongoContentEntity> CreateContentAsync(ContentDomainObject.State value, ContentData data, long newVersion)
-        {
-            var entity = SimpleMapper.Map(value, new MongoContentEntity());
-
-            entity.Data = data;
-            entity.DocumentId = value.UniqueId;
-            entity.IndexedAppId = value.AppId.Id;
-            entity.IndexedSchemaId = value.SchemaId.Id;
-            entity.ReferencedIds ??= new HashSet<DomainId>();
-            entity.Version = newVersion;
-
-            if (data.CanHaveReference())
-            {
-                var schema = await appProvider.GetSchemaAsync(value.AppId.Id, value.SchemaId.Id, true);
-
-                if (schema != null)
-                {
-                    var components = await appProvider.GetComponentsAsync(schema);
-
-                    entity.Data.AddReferencedIds(schema.SchemaDef, entity.ReferencedIds, components);
-                }
-            }
-
-            return entity;
+            await collectionPublished.UpsertVersionedAsync(entity.DocumentId, job.OldVersion, entity, ct);
         }
 
         private static bool ShouldWritePublished(ContentDomainObject.State value)
         {
+            // Only published content is written to the published collection.
             return value.Status == Status.Published && !value.IsDeleted;
+        }
+
+        private static bool IsValid(SnapshotWriteJob<ContentDomainObject.State> job)
+        {
+            // Some data is corrupt and might throw an exception during migration if we do not skip them.
+            return job.Value.AppId != null || job.Value.CurrentVersion != null;
         }
     }
 }

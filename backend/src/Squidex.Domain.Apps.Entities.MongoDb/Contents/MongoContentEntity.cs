@@ -8,9 +8,13 @@
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
@@ -59,6 +63,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public ContentData Data { get; set; }
 
         [BsonIgnoreIfNull]
+        [BsonElement("dd")]
+        [BsonJson]
+        public ContentData? DraftData { get; set; }
+
+        [BsonIgnoreIfNull]
         [BsonElement("sa")]
         public Instant? ScheduledAt { get; set; }
 
@@ -79,6 +88,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public bool IsDeleted { get; set; }
 
         [BsonIgnoreIfDefault]
+        [BsonElement("is")]
+        public bool IsSnapshot { get; set; }
+
+        [BsonIgnoreIfDefault]
         [BsonElement("sj")]
         public ScheduleJob? ScheduleJob { get; set; }
 
@@ -93,6 +106,74 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public DomainId UniqueId
         {
             get => DocumentId;
+        }
+
+        public ContentDomainObject.State ToState()
+        {
+            var state = SimpleMapper.Map(this, new ContentDomainObject.State());
+
+            if (DraftData != null && NewStatus.HasValue)
+            {
+                state.NewVersion = new ContentVersion(NewStatus.Value, Data);
+                state.CurrentVersion = new ContentVersion(Status, DraftData);
+            }
+            else
+            {
+                state.NewVersion = null;
+                state.CurrentVersion = new ContentVersion(Status, Data);
+            }
+
+            return state;
+        }
+
+        public static async Task<MongoContentEntity> CreatePublishedAsync(SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider)
+        {
+            var entity = await CreateContentAsync(job.Value.CurrentVersion.Data, job, appProvider);
+
+            entity.ScheduledAt = null;
+            entity.ScheduleJob = null;
+            entity.NewStatus = null;
+
+            return entity;
+        }
+
+        public static async Task<MongoContentEntity> CreateDraftAsync(SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider)
+        {
+            var entity = await CreateContentAsync(job.Value.Data, job, appProvider);
+
+            entity.ScheduledAt = job.Value.ScheduleJob?.DueTime;
+            entity.ScheduleJob = job.Value.ScheduleJob;
+            entity.NewStatus = job.Value.NewStatus;
+            entity.DraftData = job.Value.NewVersion != null ? job.Value.CurrentVersion.Data : null;
+            entity.IsSnapshot = true;
+
+            return entity;
+        }
+
+        private static async Task<MongoContentEntity> CreateContentAsync(ContentData data, SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider)
+        {
+            var entity = SimpleMapper.Map(job.Value, new MongoContentEntity());
+
+            entity.Data = data;
+            entity.DocumentId = job.Value.UniqueId;
+            entity.IndexedAppId = job.Value.AppId.Id;
+            entity.IndexedSchemaId = job.Value.SchemaId.Id;
+            entity.ReferencedIds ??= new HashSet<DomainId>();
+            entity.Version = job.NewVersion;
+
+            if (data.CanHaveReference())
+            {
+                var schema = await appProvider.GetSchemaAsync(job.Value.AppId.Id, job.Value.SchemaId.Id, true);
+
+                if (schema != null)
+                {
+                    var components = await appProvider.GetComponentsAsync(schema);
+
+                    entity.Data.AddReferencedIds(schema.SchemaDef, entity.ReferencedIds, components);
+                }
+            }
+
+            return entity;
         }
     }
 }

@@ -15,12 +15,16 @@ namespace Squidex.Infrastructure.States
 
         bool IsSnapshotStale { get; }
 
-        Task DeleteAsync();
+        Task DeleteAsync(
+            CancellationToken ct = default);
 
-        Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events);
+        Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events,
+            CancellationToken ct = default);
 
-        Task WriteSnapshotAsync(TState state);
+        Task WriteSnapshotAsync(TState state,
+            CancellationToken ct = default);
 
-        Task ReadAsync(long expectedVersion = EtagVersion.Any);
+        Task ReadAsync(long expectedVersion = EtagVersion.Any,
+            CancellationToken ct = default);
     }
 }

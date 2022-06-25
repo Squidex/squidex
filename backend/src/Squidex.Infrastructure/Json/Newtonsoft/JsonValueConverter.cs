@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Newtonsoft.Json;
-using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator

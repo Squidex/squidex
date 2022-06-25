@@ -47,7 +47,7 @@ namespace Squidex.Domain.Users
 
         private async Task<RsaSecurityKey> GetOrCreateKeyAsync()
         {
-            var (state, _, _) = await store.ReadAsync(default);
+            var (_, state, _, _) = await store.ReadAsync(default);
 
             RsaSecurityKey securityKey;
 
@@ -75,13 +75,13 @@ namespace Squidex.Domain.Users
 
                 try
                 {
-                    await store.WriteAsync(default, state, 0, 0);
+                    await store.WriteAsync(new SnapshotWriteJob<State>(default, state, 0));
 
                     return securityKey;
                 }
                 catch (InconsistentStateException)
                 {
-                    (state, _, _) = await store.ReadAsync(default);
+                    (_, state, _, _) = await store.ReadAsync(default);
                 }
             }
 

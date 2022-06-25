@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
 #pragma warning disable MA0048 // File name must match type name
@@ -26,13 +25,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, app.Id), ct);
         }
 
-        IAsyncEnumerable<(AssetFolderDomainObject.State State, long Version)> ISnapshotStore<AssetFolderDomainObject.State>.ReadAllAsync(
+        IAsyncEnumerable<SnapshotResult<AssetFolderDomainObject.State>> ISnapshotStore<AssetFolderDomainObject.State>.ReadAllAsync(
             CancellationToken ct)
         {
-            return Collection.Find(new BsonDocument(), Batching.Options).ToAsyncEnumerable(ct).Select(x => (Map(x), x.Version));
+            return Collection.Find(new BsonDocument(), Batching.Options).ToAsyncEnumerable(ct)
+                .Select(x => new SnapshotResult<AssetFolderDomainObject.State>(x.DocumentId, x.ToState(), x.Version, true));
         }
 
-        async Task<(AssetFolderDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<AssetFolderDomainObject.State>.ReadAsync(DomainId key,
+        async Task<SnapshotResult<AssetFolderDomainObject.State>> ISnapshotStore<AssetFolderDomainObject.State>.ReadAsync(DomainId key,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/ReadAsync"))
@@ -43,30 +43,30 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 if (existing != null)
                 {
-                    return (Map(existing), true, existing.Version);
+                    return new SnapshotResult<AssetFolderDomainObject.State>(existing.DocumentId, existing.ToState(), existing.Version);
                 }
 
-                return (null!, true, EtagVersion.Empty);
+                return new SnapshotResult<AssetFolderDomainObject.State>(default, null!, EtagVersion.Empty);
             }
         }
 
-        async Task ISnapshotStore<AssetFolderDomainObject.State>.WriteAsync(DomainId key, AssetFolderDomainObject.State value, long oldVersion, long newVersion,
+        async Task ISnapshotStore<AssetFolderDomainObject.State>.WriteAsync(SnapshotWriteJob<AssetFolderDomainObject.State> job,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/WriteAsync"))
             {
-                var entity = Map(value);
+                var entity = MongoAssetFolderEntity.Create(job);
 
-                await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity, ct);
+                await Collection.UpsertVersionedAsync(job.Key, job.OldVersion, job.NewVersion, entity, ct);
             }
         }
 
-        async Task ISnapshotStore<AssetFolderDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, AssetFolderDomainObject.State Value, long Version)> snapshots,
+        async Task ISnapshotStore<AssetFolderDomainObject.State>.WriteManyAsync(IEnumerable<SnapshotWriteJob<AssetFolderDomainObject.State>> jobs,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/WriteManyAsync"))
             {
-                var updates = snapshots.Select(Map).Select(x =>
+                var updates = jobs.Select(MongoAssetFolderEntity.Create).Select(x =>
                     new ReplaceOneModel<MongoAssetFolderEntity>(
                         Filter.Eq(y => y.DocumentId, x.DocumentId),
                         x)
@@ -90,29 +90,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             {
                 await Collection.DeleteOneAsync(x => x.DocumentId == key, ct);
             }
-        }
-
-        private static MongoAssetFolderEntity Map(AssetFolderDomainObject.State value)
-        {
-            var entity = SimpleMapper.Map(value, new MongoAssetFolderEntity());
-
-            entity.IndexedAppId = value.AppId.Id;
-
-            return entity;
-        }
-
-        private static MongoAssetFolderEntity Map((DomainId Key, AssetFolderDomainObject.State Value, long Version) snapshot)
-        {
-            var entity = Map(snapshot.Value);
-
-            entity.DocumentId = snapshot.Key;
-
-            return entity;
-        }
-
-        private static AssetFolderDomainObject.State Map(MongoAssetFolderEntity existing)
-        {
-            return SimpleMapper.Map(existing, new AssetFolderDomainObject.State());
         }
     }
 }

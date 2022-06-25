@@ -19,9 +19,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
     {
+        private readonly MongoCountCollection countCollection;
+
         public MongoAssetRepository(IMongoDatabase database)
             : base(database)
         {
+            countCollection = new MongoCountCollection(database, CollectionName());
         }
 
         public IMongoCollection<MongoAssetEntity> GetInternalCollection()
@@ -50,15 +53,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 new CreateIndexModel<MongoAssetEntity>(
                     Index
                         .Ascending(x => x.IndexedAppId)
-                        .Ascending(x => x.IsDeleted)
                         .Ascending(x => x.Slug)),
                 new CreateIndexModel<MongoAssetEntity>(
                     Index
                         .Ascending(x => x.IndexedAppId)
-                        .Ascending(x => x.IsDeleted)
-                        .Ascending(x => x.FileHash)
-                        .Ascending(x => x.FileName)
-                        .Ascending(x => x.FileSize)),
+                        .Ascending(x => x.FileHash)),
                 new CreateIndexModel<MongoAssetEntity>(
                     Index
                         .Ascending(x => x.Id)
@@ -101,13 +100,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                                 .ToListAsync(ct);
                         long assetTotal = assetEntities.Count;
 
-                        if (q.NoTotal)
+                        if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
                         {
-                            assetTotal = -1;
-                        }
-                        else if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
-                        {
-                            assetTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
+                            if (q.NoTotal)
+                            {
+                                assetTotal = -1;
+                            }
+                            else
+                            {
+                                assetTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
+                            }
                         }
 
                         return ResultList.Create(assetTotal, assetEntities.OfType<IAssetEntity>());
@@ -116,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     {
                         var query = q.Query.AdjustToModel(appId);
 
-                        var filter = query.BuildFilter(appId, parentId);
+                        var (filter, isDefault) = query.BuildFilter(appId, parentId);
 
                         var assetEntities =
                             await Collection.Find(filter)
@@ -126,13 +128,25 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                                 .ToListAsync(ct);
                         long assetTotal = assetEntities.Count;
 
-                        if (q.NoTotal)
+                        if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
                         {
-                            assetTotal = -1;
-                        }
-                        else if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
-                        {
-                            assetTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
+                            var isDefaultQuery = q.Query.Filter == null;
+
+                            if (q.NoTotal || (q.NoSlowTotal && !isDefaultQuery))
+                            {
+                                assetTotal = -1;
+                            }
+                            else if (isDefaultQuery)
+                            {
+                                // Cache total count by app and asset folder.
+                                var totalKey = $"{appId}_{parentId}";
+
+                                assetTotal = await countCollection.GetOrAddAsync(totalKey, ct => Collection.Find(filter).CountDocumentsAsync(ct), ct);
+                            }
+                            else
+                            {
+                                assetTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
+                            }
                         }
 
                         return ResultList.Create<IAssetEntity>(assetTotal, assetEntities);
@@ -166,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             using (Telemetry.Activities.StartActivity("MongoAssetRepository/QueryChildIdsAsync"))
             {
                 var assetEntities =
-                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.Id)
+                    await Collection.Find(BuildFilter(appId, parentId)).Only(x => x.Id)
                         .ToListAsync(ct);
 
                 var field = Field.Of<MongoAssetFolderEntity>(x => nameof(x.Id));
@@ -181,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetByHashAsync"))
             {
                 var assetEntity =
-                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.FileHash == hash && x.FileName == fileName && x.FileSize == fileSize)
+                    await Collection.Find(x => x.IndexedAppId == appId && x.FileHash == hash && !x.IsDeleted && x.FileSize == fileSize && x.FileName == fileName)
                         .FirstOrDefaultAsync(ct);
 
                 return assetEntity;
@@ -194,7 +208,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetBySlugAsync"))
             {
                 var assetEntity =
-                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.Slug == slug)
+                    await Collection.Find(x => x.IndexedAppId == appId && x.Slug == slug && !x.IsDeleted)
                         .FirstOrDefaultAsync(ct);
 
                 return assetEntity;
@@ -236,6 +250,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return Filter.And(
                 Filter.In(x => x.DocumentId, documentIds),
                 Filter.Ne(x => x.IsDeleted, true));
+        }
+
+        private static FilterDefinition<MongoAssetEntity> BuildFilter(DomainId appId, DomainId parentId)
+        {
+            return Filter.And(
+                Filter.Gt(x => x.LastModified, default),
+                Filter.Gt(x => x.Id, DomainId.Create(string.Empty)),
+                Filter.Gt(x => x.IndexedAppId, appId),
+                Filter.Ne(x => x.IsDeleted, true),
+                Filter.Ne(x => x.ParentId, parentId));
         }
     }
 }

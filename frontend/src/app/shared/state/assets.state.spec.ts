@@ -53,7 +53,7 @@ describe('AssetsState', () => {
         });
 
         it('should load assets', () => {
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID }))
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
                 .returns(() => of(new AssetsDto(200, [asset1, asset2]))).verifiable();
 
             assetsState.load().subscribe();
@@ -67,7 +67,7 @@ describe('AssetsState', () => {
         });
 
         it('should show notification on load if reload is true', () => {
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID }))
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
                 .returns(() => of(new AssetsDto(200, [asset1, asset2]))).verifiable();
 
             assetsState.load(true).subscribe();
@@ -77,11 +77,22 @@ describe('AssetsState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
+        it('should load with total', () => {
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: false }))
+                .returns(() => of(new AssetsDto(200, [asset1, asset2]))).verifiable();
+
+            assetsState.load(true, false).subscribe();
+
+            expect().nothing();
+
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+        });
+
         it('should load without tags if tag untoggled', () => {
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, tags: ['tag1'] }))
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, tags: ['tag1'], noSlowTotal: true }))
                 .returns(() => of(new AssetsDto(0, []))).verifiable();
 
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID }))
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
                 .returns(() => of(new AssetsDto(0, []))).verifiable();
 
             assetsState.toggleTag('tag1').subscribe();
@@ -91,7 +102,7 @@ describe('AssetsState', () => {
         });
 
         it('should load without tags if tags reset', () => {
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID }))
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
                 .returns(() => of(new AssetsDto(0, []))).verifiable();
 
             assetsState.resetTags().subscribe();
@@ -100,7 +111,7 @@ describe('AssetsState', () => {
         });
 
         it('should load with new pagination if paging', () => {
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 30, parentId: MathHelper.EMPTY_GUID }))
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 30, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
                 .returns(() => of(new AssetsDto(200, []))).verifiable();
 
             assetsState.page({ page: 1, pageSize: 30 }).subscribe();
@@ -109,10 +120,10 @@ describe('AssetsState', () => {
         });
 
         it('should skip page size if loaded before', () => {
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID }))
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
                 .returns(() => of(new AssetsDto(200, [asset1, asset2]))).verifiable();
 
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 30, parentId: MathHelper.EMPTY_GUID, noTotal: true }))
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 30, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true, noTotal: true }))
                 .returns(() => of(new AssetsDto(200, []))).verifiable();
 
             assetsState.load().subscribe();
@@ -127,7 +138,7 @@ describe('AssetsState', () => {
             assetsService.setup(x => x.getAssetFolders(app, '123', 'PathAndItems'))
                 .returns(() => of(new AssetFoldersDto(2, [assetFolder1, assetFolder2], []))).verifiable();
 
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: '123' }))
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: '123', noSlowTotal: true }))
                 .returns(() => of(new AssetsDto(200, []))).verifiable();
 
             assetsState.navigate('123').subscribe();
@@ -138,7 +149,7 @@ describe('AssetsState', () => {
 
     describe('Searching', () => {
         it('should load with tags if tag toggled', () => {
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, tags: ['tag1'] }))
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, tags: ['tag1'], noSlowTotal: true }))
                 .returns(() => of(new AssetsDto(0, []))).verifiable();
 
             assetsState.toggleTag('tag1').subscribe();
@@ -147,7 +158,7 @@ describe('AssetsState', () => {
         });
 
         it('should load with tags if tags selected', () => {
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, tags: ['tag1', 'tag2'] }))
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, tags: ['tag1', 'tag2'], noSlowTotal: true }))
                 .returns(() => of(new AssetsDto(0, []))).verifiable();
 
             assetsState.selectTags(['tag1', 'tag2']).subscribe();
@@ -158,7 +169,7 @@ describe('AssetsState', () => {
         it('should load with query if searching', () => {
             const query = { fullText: 'my-query' };
 
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, query }))
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, query, noSlowTotal: true }))
                 .returns(() => of(new AssetsDto(0, []))).verifiable();
 
             assetsState.search(query).subscribe();
@@ -169,7 +180,7 @@ describe('AssetsState', () => {
         it('should unset ref when searching', () => {
             const query = { fullText: 'my-query' };
 
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, query }))
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, query, noSlowTotal: true }))
                 .returns(() => of(new AssetsDto(0, []))).verifiable();
 
             assetsState.next({ ref: '1' });
@@ -185,10 +196,10 @@ describe('AssetsState', () => {
             assetsService.setup(x => x.getAssetFolders(app, MathHelper.EMPTY_GUID, 'PathAndItems'))
                 .returns(() => of(new AssetFoldersDto(2, [assetFolder1, assetFolder2], [])));
 
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID }))
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
                 .returns(() => of(new AssetsDto(200, [asset1, asset2]))).verifiable();
 
-            assetsService.setup(x => x.getAssets(app, { take: 2, skip: 0, parentId: MathHelper.EMPTY_GUID }))
+            assetsService.setup(x => x.getAssets(app, { take: 2, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
                 .returns(() => of(new AssetsDto(200, [asset1, asset2])));
 
             assetsState.load(true).subscribe();

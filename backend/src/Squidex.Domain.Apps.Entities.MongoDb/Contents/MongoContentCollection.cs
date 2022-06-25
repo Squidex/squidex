@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -27,8 +28,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly QueryReferences queryReferences;
         private readonly QueryReferrers queryReferrers;
         private readonly QueryScheduled queryScheduled;
-        private readonly string name;
         private readonly ReadPreference readPreference;
+        private readonly string name;
 
         public MongoContentCollection(string name, IMongoDatabase database, IAppProvider appProvider, ReadPreference readPreference)
             : base(database)
@@ -38,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             queryAsStream = new QueryAsStream();
             queryBdId = new QueryById();
             queryByIds = new QueryByIds();
-            queryByQuery = new QueryByQuery(appProvider);
+            queryByQuery = new QueryByQuery(appProvider, new MongoCountCollection(database, name));
             queryReferences = new QueryReferences(queryByIds);
             queryReferrers = new QueryReferrers();
             queryScheduled = new QueryScheduled();
@@ -202,42 +203,34 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<long> FindVersionAsync(DomainId documentId,
+        public Task<MongoContentEntity> FindAsync(DomainId documentId,
             CancellationToken ct = default)
         {
-            var result = await Collection.Find(x => x.DocumentId == documentId).Only(x => x.Version).FirstOrDefaultAsync(ct);
-
-            return result?["vs"].AsInt64 ?? EtagVersion.Empty;
+            return Collection.Find(x => x.DocumentId == documentId).FirstOrDefaultAsync(ct);
         }
 
-        public Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity entity,
-            CancellationToken ct = default)
+        public IAsyncEnumerable<MongoContentEntity> StreamAll(
+            CancellationToken ct)
         {
-            return Collection.UpsertVersionedAsync(documentId, oldVersion, entity.Version, entity, ct);
+            return Collection.Find(new BsonDocument()).ToAsyncEnumerable(ct);
         }
 
-        public Task RemoveAsync(DomainId documentId,
+        public Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity value,
             CancellationToken ct = default)
         {
-            return Collection.DeleteOneAsync(x => x.DocumentId == documentId, ct);
+            return Collection.UpsertVersionedAsync(documentId, oldVersion, value.Version, value, ct);
         }
 
-        public Task InsertManyAsync(IReadOnlyList<MongoContentEntity> entities,
+        public Task RemoveAsync(DomainId key,
             CancellationToken ct = default)
         {
-            if (entities.Count == 0)
-            {
-                return Task.CompletedTask;
-            }
+            return Collection.DeleteOneAsync(x => x.DocumentId == key, null, ct);
+        }
 
-            var writes = entities.Select(x => new ReplaceOneModel<MongoContentEntity>(
-                Filter.Eq(y => y.DocumentId, x.DocumentId),
-                x)
-            {
-                IsUpsert = true
-            }).ToList();
-
-            return Collection.BulkWriteAsync(writes, BulkUnordered, ct);
+        public Task InsertManyAsync(IReadOnlyList<MongoContentEntity> snapshots,
+            CancellationToken ct = default)
+        {
+            return Collection.InsertManyAsync(snapshots, InsertUnordered, ct);
         }
     }
 }

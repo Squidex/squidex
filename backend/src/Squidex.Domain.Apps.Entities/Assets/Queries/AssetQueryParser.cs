@@ -57,6 +57,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 {
                     q = q.WithoutTotal();
                 }
+                else if (context.ShouldSkipSlowTotal())
+                {
+                    q = q.WithoutSlowTotal();
+                }
 
                 return q;
             }
