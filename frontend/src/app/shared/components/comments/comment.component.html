@@ -7,7 +7,7 @@
         <div class="col col-text">
             <div class="comment-message">
                 <div class="user-row">
-                    <div class="user-ref">{{comment.user | sqxUserNameRef}}</div>
+                    <div class="user-ref" [title]="comment.user | sqxUserNameRef:null">{{comment.user | sqxUserNameRef:null}}</div>
                 </div>
     
                 <div [innerHTML]="comment.text | sqxMarkdown | sqxSafeHtml"></div>

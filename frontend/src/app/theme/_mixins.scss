@@ -216,6 +216,15 @@
     width: auto;
 }
 
+@mixin text-variable {
+    @include truncate-nowidth;
+    display: inline-block;
+    font-size: inherit;
+    font-weight: 500;
+    max-width: 150px;
+    vertical-align: top;
+}
+
 @mixin no-drag {
     -webkit-user-drag: none;
 }

@@ -12,8 +12,12 @@
     width: auto;
 }
 
+.marker-ref {
+    @include text-variable;
+}
+
 .user-ref {
-    font-weight: bold;
+    @include text-variable;
 }
 
 .user-picture {

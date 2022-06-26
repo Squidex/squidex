@@ -9,7 +9,7 @@ import { CdkDragDrop, CdkDragStart } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { LocalStoreService, SchemaCategory, SchemaDto, SchemasState } from '@app/shared/internal';
 
-const ITEM_HEIGHT = 2.5;
+const ITEM_HEIGHT = 2.25;
 
 @Component({
     selector: 'sqx-schema-category[schemaCategory]',

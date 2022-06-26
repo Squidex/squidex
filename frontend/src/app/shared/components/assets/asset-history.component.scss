@@ -3,11 +3,11 @@
 
 :host ::ng-deep {
     .user-ref {
-        font-weight: 500;
+        @include text-variable;
     }
 
     .marker-ref {
-        font-weight: 500;
+        @include text-variable;
     }
 }
 

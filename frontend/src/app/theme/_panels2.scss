@@ -268,6 +268,10 @@
     margin-right: -.5rem;
 
     .nav-item {
+        height: 2.25rem;
+    }
+
+    .nav-item {
         max-width: 100%;
     }
 
@@ -278,7 +282,6 @@
         cursor: pointer;
         font-size: inherit;
         font-weight: 500;
-        margin-bottom: .125rem;
         padding-left: 1rem;
         padding-right: 1rem;
         transition: background-color .4s ease-in, color .4s ease-in;

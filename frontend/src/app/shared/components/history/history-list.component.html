@@ -5,7 +5,7 @@
         </div>
         <div class="col ps-2 event-right">
             <div class="event-message">
-                <span class="user-ref">{{event.actor | sqxUserNameRef}}</span>
+                <span class="user-ref" [title]="event.actor | sqxUserNameRef:null">{{event.actor | sqxUserNameRef:null}}</span>
                 <span [innerHTML]="event | sqxHistoryMessage"></span>
             </div>
             <div class="event-created">{{event.created | sqxFromNow}}</div>
