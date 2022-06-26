@@ -1,6 +1,6 @@
 <ng-container *ngIf="(formSection.visibleChanges | async) || formCompare">
     <div class="header" *ngIf="formSection.separator; let separator">
-        <div class="row g-0">
+        <div class="row g-0 align">
             <div class="col-auto">
                 <button type="button" class="btn btn-sm btn-text-secondary" (click)="toggle()">
                     <i [class.icon-caret-right]="snapshot.isCollapsed" [class.icon-caret-down]="!snapshot.isCollapsed"></i> 
