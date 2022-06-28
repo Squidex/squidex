@@ -135,6 +135,10 @@ namespace Squidex.Shared
         public const string AppRules = "squidex.apps.{app}.rules";
         public const string AppRulesRead = "squidex.apps.{app}.rules.read";
         public const string AppRulesEvents = "squidex.apps.{app}.rules.events";
+        public const string AppRulesEventsRun = "squidex.apps.{app}.rules.events.run";
+        public const string AppRulesEventsRead = "squidex.apps.{app}.rules.events.read";
+        public const string AppRulesEventsUpdate = "squidex.apps.{app}.rules.events.update";
+        public const string AppRulesEventsDelete = "squidex.apps.{app}.rules.events.delete";
         public const string AppRulesCreate = "squidex.apps.{app}.rules.create";
         public const string AppRulesUpdate = "squidex.apps.{app}.rules.update";
         public const string AppRulesDisable = "squidex.apps.{app}.rules.disable";

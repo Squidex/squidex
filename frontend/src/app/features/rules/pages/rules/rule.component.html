@@ -10,7 +10,7 @@
                     [isRequired]="false">
                 </sqx-editable-title>
             </div>
-            <div class="col-auto" *ngIf="rule.canDelete || rule.canRun">
+            <div class="col-auto" [class.invisible]="!rule.canDelete && !rule.canRun">
                 <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" #buttonOptions>
                     <i class="icon-dots"></i>
                 </button>
@@ -109,8 +109,8 @@
             <div class="col">
                 {{ 'common.lastExecuted' | sqxTranslate }}: <span>{{rule.lastExecuted | sqxFromNow:'-'}}</span>
             </div>
-            <div class="col-auto">
-                <a routerLink="events" [queryParams]="{ ruleId: rule.id }" *ngIf="rule.canTrigger">
+            <div class="col-auto" *ngIf="rule.canReadLogs">
+                <a routerLink="events" [queryParams]="{ ruleId: rule.id }">
                     {{ 'common.logs' | sqxTranslate }}
                 </a>
                 

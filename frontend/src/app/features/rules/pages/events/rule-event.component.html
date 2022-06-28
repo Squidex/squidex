@@ -34,7 +34,7 @@
                 {{ 'rules.ruleEvents.nextAttemptLabel' | sqxTranslate }}: <ng-container *ngIf="event.nextAttempt">{{event.nextAttempt | sqxFromNow}}</ng-container>
             </div>
             <div class="col-3 text-end">
-                <button type="button" class="btn btn-danger me-1" [class.hidden]="!event.nextAttempt"
+                <button type="button" class="btn btn-danger me-1" *ngIf="event.canDelete"
                     (sqxConfirmClick)="cancel.emit()"
                     confirmTitle="i18n:rules.ruleEvents.cancelConfirmTitle"
                     confirmText="i18n:rules.ruleEvents.cancelConfirmText"
@@ -42,7 +42,7 @@
                     {{ 'common.cancel' | sqxTranslate }}
                 </button>
 
-                <button type="button" class="btn btn-success" (click)="enqueue.emit()">
+                <button type="button" class="btn btn-success" (click)="enqueue.emit()" *ngIf="event.canUpdate">
                     {{ 'rules.ruleEvents.enqueue' | sqxTranslate }}
                 </button>
             </div>

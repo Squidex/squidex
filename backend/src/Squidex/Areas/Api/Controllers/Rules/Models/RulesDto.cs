@@ -54,11 +54,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
             if (resources.CanReadRuleEvents)
             {
                 AddGetLink("events", resources.Url<RulesController>(x => nameof(x.GetEvents), values));
+            }
 
-                if (runningRuleId != null)
-                {
-                    AddDeleteLink("run/cancel", resources.Url<RulesController>(x => nameof(x.DeleteRuleRun), values));
-                }
+            if (resources.CanDeleteRuleEvents && runningRuleId != null)
+            {
+                AddDeleteLink("run/cancel", resources.Url<RulesController>(x => nameof(x.DeleteRuleRun), values));
             }
 
             return this;

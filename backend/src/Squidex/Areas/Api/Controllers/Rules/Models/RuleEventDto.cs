@@ -78,9 +78,12 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         {
             var values = new { app = resources.App, id = Id };
 
-            AddPutLink("update", resources.Url<RulesController>(x => nameof(x.PutEvent), values));
+            if (resources.CanUpdateRuleEvents)
+            {
+                AddPutLink("update", resources.Url<RulesController>(x => nameof(x.PutEvent), values));
+            }
 
-            if (NextAttempt != null)
+            if (resources.CanDeleteRuleEvents && NextAttempt != null)
             {
                 AddDeleteLink("cancel", resources.Url<RulesController>(x => nameof(x.DeleteEvent), values));
             }

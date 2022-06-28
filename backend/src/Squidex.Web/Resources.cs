@@ -114,7 +114,16 @@ namespace Squidex.Web
         public bool CanDeleteRule => IsAllowed(Permissions.AppRulesDelete);
 
         [Lazy]
-        public bool CanReadRuleEvents => IsAllowed(Permissions.AppRulesEvents);
+        public bool CanReadRuleEvents => IsAllowed(Permissions.AppRulesEventsRead);
+
+        [Lazy]
+        public bool CanUpdateRuleEvents => IsAllowed(Permissions.AppRulesEventsUpdate);
+
+        [Lazy]
+        public bool CanRunRuleEvents => IsAllowed(Permissions.AppRulesEventsRun);
+
+        [Lazy]
+        public bool CanDeleteRuleEvents => IsAllowed(Permissions.AppRulesEventsDelete);
 
         // Users
         [Lazy]

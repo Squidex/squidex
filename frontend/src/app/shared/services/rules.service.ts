@@ -127,6 +127,7 @@ export class RuleDto {
     public readonly canDelete: boolean;
     public readonly canDisable: boolean;
     public readonly canEnable: boolean;
+    public readonly canReadLogs: boolean;
     public readonly canRun: boolean;
     public readonly canRunFromSnapshots: boolean;
     public readonly canTrigger: boolean;
@@ -155,9 +156,10 @@ export class RuleDto {
         this.canDelete = hasAnyLink(links, 'delete');
         this.canDisable = hasAnyLink(links, 'disable');
         this.canEnable = hasAnyLink(links, 'enable');
+        this.canReadLogs = hasAnyLink(links, 'logs');
         this.canRun = hasAnyLink(links, 'run');
         this.canRunFromSnapshots = hasAnyLink(links, 'run/snapshots');
-        this.canTrigger = hasAnyLink(links, 'logs');
+        this.canTrigger = hasAnyLink(links, 'trigger');
         this.canUpdate = hasAnyLink(links, 'update');
     }
 }
@@ -186,7 +188,7 @@ export class RuleEventDto extends Model<RuleEventDto> {
 
         this._links = links;
 
-        this.canDelete = hasAnyLink(links, 'delete');
+        this.canDelete = hasAnyLink(links, 'cancel');
         this.canUpdate = hasAnyLink(links, 'update');
     }
 }

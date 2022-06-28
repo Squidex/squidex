@@ -42,15 +42,18 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
             AddSelfLink(resources.Url<RulesController>(x => nameof(x.GetEvents), values));
 
-            if (ruleId != null)
+            if (resources.CanDeleteRuleEvents)
             {
-                var routeValeus = new { values.app, id = ruleId };
+                if (ruleId != null)
+                {
+                    var routeValues = new { values.app, id = ruleId };
 
-                AddDeleteLink("cancel", resources.Url<RulesController>(x => nameof(x.DeleteRuleEvents), routeValeus));
-            }
-            else
-            {
-                AddDeleteLink("cancel", resources.Url<RulesController>(x => nameof(x.DeleteEvents), values));
+                    AddDeleteLink("cancel", resources.Url<RulesController>(x => nameof(x.DeleteRuleEvents), routeValues));
+                }
+                else
+                {
+                    AddDeleteLink("cancel", resources.Url<RulesController>(x => nameof(x.DeleteEvents), values));
+                }
             }
 
             return this;

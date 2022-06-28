@@ -126,7 +126,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                 AddPutLink("update", resources.Url<RulesController>(x => nameof(x.PutRule), values));
             }
 
-            if (resources.CanReadRuleEvents)
+            if (resources.CanRunRuleEvents)
             {
                 AddPutLink("trigger", resources.Url<RulesController>(x => nameof(x.TriggerRule), values));
 
@@ -141,7 +141,10 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
                     AddPutLink("run/snapshots", resources.Url<RulesController>(x => nameof(x.PutRuleRun), snaphshotValues));
                 }
+            }
 
+            if (resources.CanReadRuleEvents)
+            {
                 AddGetLink("logs", resources.Url<RulesController>(x => nameof(x.GetEvents), values));
             }
 
