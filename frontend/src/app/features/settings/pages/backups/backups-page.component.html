@@ -21,7 +21,7 @@
                 <div class="table-items-row table-items-row-summary table-items-row-empty" *ngIf="backups.length === 0">
                     {{ 'backups.empty' | sqxTranslate }}
     
-                    <button type="button" class="btn btn-success btn-sm me-2" (click)="start()">
+                    <button type="button" class="btn btn-success btn-sm me-2" (click)="start()" *ngIf="backupsState.canCreate | async">
                         {{ 'backups.start' | sqxTranslate }}
                     </button>
                 </div>

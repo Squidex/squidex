@@ -61,7 +61,8 @@
                     <label class="col-form-label" for="{{workflow.id}}_name">{{ 'common.name' | sqxTranslate }}</label>
             
                     <div class="col">
-                        <input class="form-control" id="{{workflow.id}}_name" 
+                        <input class="form-control" id="{{workflow.id}}_name"
+                            [disabled]="!isEditable"
                             [ngModelOptions]="onBlur" 
                             [ngModel]="workflow.name"
                             (ngModelChange)="rename($event)">
@@ -77,6 +78,7 @@
             
                     <div class="col">
                         <sqx-tag-editor placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" [converter]="(schemasSource.converter | async)!" 
+                            [disabled]="!isEditable"
                             [ngModel]="workflow.schemaIds" 
                             (ngModelChange)="changeSchemaIds($event)" 
                             [suggestions]="(schemasSource.converter | async)?.suggestions">

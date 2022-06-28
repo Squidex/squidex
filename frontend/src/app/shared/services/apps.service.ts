@@ -17,6 +17,7 @@ export class AppDto {
     public readonly canCreateSchema: boolean;
     public readonly canDelete: boolean;
     public readonly canReadAssets: boolean;
+    public readonly canReadAssetsScripts: boolean;
     public readonly canReadBackups: boolean;
     public readonly canReadClients: boolean;
     public readonly canReadContributors: boolean;
@@ -55,6 +56,7 @@ export class AppDto {
         this.canCreateSchema = hasAnyLink(links, 'schemas/create');
         this.canDelete = hasAnyLink(links, 'delete');
         this.canReadAssets = hasAnyLink(links, 'assets');
+        this.canReadAssetsScripts = hasAnyLink(links, 'assets/scripts');
         this.canReadBackups = hasAnyLink(links, 'backups');
         this.canReadClients = hasAnyLink(links, 'clients');
         this.canReadContributors = hasAnyLink(links, 'contributors');

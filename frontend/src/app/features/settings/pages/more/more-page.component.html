@@ -33,7 +33,7 @@
                         </div>
         
                         <div class="card-footer">
-                            <button type="submit" class="float-end btn btn-primary">
+                            <button type="submit" class="float-end btn btn-primary" [disabled]="!isEditable">
                                 {{ 'common.save' | sqxTranslate }}
                             </button>
                         </div>

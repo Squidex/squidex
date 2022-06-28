@@ -25,7 +25,7 @@
             <li class="nav-item nav-heading">
                 {{ 'common.editing' | sqxTranslate }}
             </li>
-            <li class="nav-item">
+            <li class="nav-item" *ngIf="app.canReadAssetsScripts">
                 <a class="nav-link" routerLink="asset-scripts" routerLinkActive="active">
                     <i class="icon-assets"></i> {{ 'common.assetScripts' | sqxTranslate }}
                 </a>

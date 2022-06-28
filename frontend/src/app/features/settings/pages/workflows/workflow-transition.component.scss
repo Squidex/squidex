@@ -10,13 +10,6 @@
     pointer-events: none;
 }
 
-.form-control {
-    &:disabled,
-    &.disabled {
-        background: $color-white;
-    }
-}
-
 .transition-to {
     @include truncate;
 }
