@@ -16,6 +16,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Tasks;
 
+#pragma warning disable MA0073 // Avoid comparison with bool constant
+
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 {
     public sealed class ConvertData : IContentEnricherStep
@@ -24,8 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         private readonly IJsonSerializer jsonSerializer;
         private readonly IAssetRepository assetRepository;
         private readonly IContentRepository contentRepository;
-        private readonly FieldConverter excludedChangedField;
-        private readonly FieldConverter excludedHiddenField;
+        private readonly ExcludeChangedTypes excludeChangedTypes;
 
         public ConvertData(IUrlGenerator urlGenerator, IJsonSerializer jsonSerializer,
             IAssetRepository assetRepository, IContentRepository contentRepository)
@@ -35,8 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             this.assetRepository = assetRepository;
             this.contentRepository = contentRepository;
 
-            excludedChangedField = FieldConverters.ExcludeChangedTypes(jsonSerializer);
-            excludedHiddenField = FieldConverters.ExcludeHidden;
+            excludeChangedTypes = new ExcludeChangedTypes(jsonSerializer);
         }
 
         public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
@@ -50,16 +50,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 var (schema, components) = await schemas(group.Key);
 
-                var converters = GenerateConverters(context, components, referenceCleaner).ToArray();
+                var converter = GenerateConverter(context, components, schema.SchemaDef, referenceCleaner);
 
                 foreach (var content in group)
                 {
-                    content.Data = content.Data.Convert(schema.SchemaDef, converters);
+                    content.Data = converter.Convert(content.Data);
                 }
             }
         }
 
-        private async Task<ValueConverter?> CleanReferencesAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+        private async Task<ValueReferencesConverter?> CleanReferencesAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
             CancellationToken ct)
         {
             if (context.ShouldSkipCleanup())
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                     var foundIds = assets.Union(refContents).ToHashSet();
 
-                    return ValueReferencesConverter.CleanReferences(foundIds);
+                    return new ValueReferencesConverter(foundIds);
                 }
             }
 
@@ -112,50 +112,43 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             return result;
         }
 
-        private IEnumerable<FieldConverter> GenerateConverters(Context context, ResolvedComponents components, ValueConverter? cleanReferences)
+        private ContentConverter GenerateConverter(Context context, ResolvedComponents components, Schema schema, ValueReferencesConverter? cleanReferences)
         {
+            var converter = new ContentConverter(components, schema);
+
             if (!context.IsFrontendClient)
             {
-                yield return excludedHiddenField;
-                yield return FieldConverters.ForValues(components, ValueConverters.ExcludeHidden);
+                converter.Add(ExcludeHidden.Instance);
             }
 
-            yield return excludedChangedField;
-            yield return FieldConverters.ForValues(components, ValueConverters.ExcludeChangedTypes(jsonSerializer));
+            converter.Add(excludeChangedTypes);
 
             if (cleanReferences != null)
             {
-                yield return FieldConverters.ForValues(components, cleanReferences);
+                converter.Add(cleanReferences);
             }
 
-            yield return FieldConverters.ResolveInvariant(context.App.Languages);
-            yield return FieldConverters.ResolveLanguages(context.App.Languages);
+            converter.Add(new ResolveInvariant(context.App.Languages));
+
+            converter.Add(
+                new ResolveLanguages(context.App.Languages,
+                    context.IsFrontendClient == false &&
+                    context.ShouldResolveLanguages(),
+                    context.Languages().ToArray()));
 
             if (!context.IsFrontendClient)
             {
-                if (context.ShouldResolveLanguages())
-                {
-                    yield return FieldConverters.ResolveFallbackLanguages(context.App.Languages);
-                }
-
-                var languages = context.Languages();
-
-                if (languages.Any())
-                {
-                    yield return FieldConverters.FilterLanguages(context.App.Languages, languages);
-                }
-
                 var assetUrls = context.AssetUrls().ToList();
 
                 if (assetUrls.Count > 0)
                 {
-                    var appId = context.App.NamedId();
-
-                    var resolveAssetUrls = ValueConverters.ResolveAssetUrls(appId, assetUrls, urlGenerator);
-
-                    yield return FieldConverters.ForValues(components, resolveAssetUrls);
+                    converter.Add(new ResolveAssetUrls(context.App.NamedId(), urlGenerator, assetUrls));
                 }
+
+                converter.Add(new AddSchemaNames(components));
             }
+
+            return converter;
         }
     }
 }

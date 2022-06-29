@@ -22,7 +22,7 @@ Write-Host "Recreated '$folderReports' folder"
 New-Item -ItemType directory -Path $folderReports
 
 if ($all -Or $infrastructure) {
-	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
+	&"$folderHome\.nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" `
@@ -34,7 +34,7 @@ if ($all -Or $infrastructure) {
 }
 
 if ($all -Or $appsCore) {
-	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
+	&"$folderHome\.nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Domain.Apps.Core.Tests\Squidex.Domain.Apps.Core.Tests.csproj" `
@@ -46,7 +46,7 @@ if ($all -Or $appsCore) {
 }
 
 if ($all -Or $appsEntities) {
-	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
+	&"$folderHome\.nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Domain.Apps.Entities.Tests\Squidex.Domain.Apps.Entities.Tests.csproj" `
@@ -58,7 +58,7 @@ if ($all -Or $appsEntities) {
 }
 
 if ($all -Or $users) {
-	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
+	&"$folderHome\.nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Domain.Users.Tests\Squidex.Domain.Users.Tests.csproj" `
@@ -70,7 +70,7 @@ if ($all -Or $users) {
 }
 
 if ($all -Or $web) {
-	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
+	&"$folderHome\.nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Web.Tests\Squidex.Web.Tests.csproj" `
@@ -81,6 +81,6 @@ if ($all -Or $web) {
 	-oldStyle
 }
 
-&"$folderHome\.nuget\packages\ReportGenerator\4.8.7\tools\net47\ReportGenerator.exe" `
+&"$folderHome\.nuget\packages\ReportGenerator\5.1.9\tools\net47\ReportGenerator.exe" `
 -reports:"$folderWorking\$folderReports\*.xml" `
 -targetdir:"$folderWorking\$folderReports\Output"

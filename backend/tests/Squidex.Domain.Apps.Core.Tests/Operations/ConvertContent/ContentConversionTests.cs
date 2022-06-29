@@ -82,6 +82,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                                                     .Add("nested", JsonValue.Array(1, 2))))
                                         .Add(Component.Discriminator, DomainId.Empty))));
 
+            var result =
+                new ContentConverter(components, schema)
+                    .Add(new ValueConverter())
+                    .Convert(source);
+
             var expected =
                 new ContentData()
                     .AddField("references",
@@ -116,13 +121,127 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                                                 new JsonObject()))
                                         .Add(Component.Discriminator, DomainId.Empty))));
 
-            var converter = new ValueConverter((data, field, parent) => field.Name != "assets1" ? (JsonValue?)null : data);
+            Assert.Equal(expected, result);
+        }
 
-            var actual =
-                source.Convert(schema,
-                    FieldConverters.ForValues(components, converter));
+        [Fact]
+        public void Should_apply_item_conversion_on_all_levels()
+        {
+            var source =
+                new ContentData()
+                    .AddField("references",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Array(1, 2)))
+                    .AddField("assets1",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Array(1)))
+                    .AddField("array",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Array(
+                                    new JsonObject()
+                                        .Add("nested", JsonValue.Array(1, 2)))))
+                    .AddField("component",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                new JsonObject()
+                                    .Add("references",
+                                        JsonValue.Array(1, 2))
+                                    .Add("assets1",
+                                        JsonValue.Array(1))
+                                    .Add("array",
+                                        JsonValue.Array(
+                                            new JsonObject()
+                                                .Add("nested", JsonValue.Array(1, 2))))
+                                    .Add(Component.Discriminator, DomainId.Empty)))
+                    .AddField("components",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Array(
+                                    new JsonObject()
+                                        .Add("references",
+                                            JsonValue.Array(1, 2))
+                                        .Add("assets1",
+                                            JsonValue.Array(1))
+                                        .Add("array",
+                                            JsonValue.Array(
+                                                new JsonObject()
+                                                    .Add("nested", JsonValue.Array(1, 2))))
+                                        .Add(Component.Discriminator, DomainId.Empty))));
 
-            Assert.Equal(expected, actual);
+            var result =
+                new ContentConverter(components, schema)
+                    .Add(new ItemConverter())
+                    .Convert(source);
+
+            var expected =
+                new ContentData()
+                    .AddField("references",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Array(1, 2)))
+                    .AddField("assets1",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Array(1)))
+                    .AddField("array",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Array(
+                                    new JsonObject()
+                                        .Add("extraField", 42)
+                                        .Add("nested", JsonValue.Array(1, 2)))))
+                    .AddField("component",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                new JsonObject()
+                                    .Add("extraField", 42)
+                                    .Add("references",
+                                        JsonValue.Array(1, 2))
+                                    .Add("assets1",
+                                        JsonValue.Array(1))
+                                    .Add("array",
+                                        JsonValue.Array(
+                                            new JsonObject()
+                                                .Add("extraField", 42)
+                                                .Add("nested", JsonValue.Array(1, 2))))
+                                    .Add(Component.Discriminator, DomainId.Empty)))
+                    .AddField("components",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Array(
+                                    new JsonObject()
+                                        .Add("extraField", 42)
+                                        .Add("references",
+                                            JsonValue.Array(1, 2))
+                                        .Add("assets1",
+                                            JsonValue.Array(1))
+                                        .Add("array",
+                                            JsonValue.Array(
+                                                new JsonObject()
+                                                    .Add("extraField", 42)
+                                                    .Add("nested", JsonValue.Array(1, 2))))
+                                        .Add(Component.Discriminator, DomainId.Empty))));
+
+            Assert.Equal(expected, result);
+        }
+
+        private sealed class ItemConverter : IContentItemConverter
+        {
+            public JsonObject ConvertItem(IField field, JsonObject source)
+            {
+                source["extraField"] = 42;
+
+                return source;
+            }
+        }
+
+        private sealed class ValueConverter : IContentValueConverter
+        {
+            public (bool Remove, JsonValue) ConvertValue(IField field, JsonValue source, IField? parent)
+            {
+                var remove = field.Name != "assets1";
+
+                return (remove, source);
+            }
         }
     }
 }
