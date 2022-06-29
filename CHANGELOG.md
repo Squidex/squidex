@@ -3,6 +3,53 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.8.0] - 2022-06-29
+
+### Fixed
+
+* **Assets**: Allow to add assets without mime type via drag and drop.
+* **Contents**: Do not scroll the markdown editor to the bottom of the text when a content is saved.
+* **Contents**: Fixed the layout of half width editors in components and assets.
+* **Dashboard**: Fixed bottom padding in app dashboard page.
+* **Hosting**: Fixed config and path resolution when Squidex is hosted inside a subfolder.
+* **UI**: Disable or hide several buttons and elements when the user does not have permissions for the corresponding feature.
+* **UI**: Do not load notifications when notifo is enabled.
+* **UI**: Fix layout out of history events.
+* **UI**: Fixed the computed height of the schema lists.
+* **UI**: Several translation fixes.
+* **Usage Tracking**: Improved a index out of bounds exception when collecting usage data in the background.
+
+### Changed
+
+* **Contents**: Improved the performance of content validation for very large content models.
+* **Contents**: New model for JSON values to reduce memory usage.
+* **Contents**: Reduced the height of separator fields in the content UI.
+* **Contents**: Several performance improvements to reduce allocations and memory usage.
+* **GraphQL**: Fixed a minor memory leak.
+* **Identity**: Fix a minor memory leak in a third partyy component.
+* **Monitoring**: Improve health check and collect actual memory usage, not managed memory usage.
+* **Monitoring**: Special setting to collect memory dumps automatically.
+* **Scripting**: Validate content via sscripting.
+
+### Added
+
+* **Assets**: Added `auto` parameter to provide the best image format based on browser settings.
+* **Assets**: Store the total number of assets per folder in MongoDB when the size exceeds 10.000 items. Improves performance for large results with a small extra cost for smaller result sets.
+* **Contents**: Add the schema name to components when queried with a normal client (not the Management UI).
+* **Contents**: Added a reference selector to markdown editor.
+* **Contents**: Added a reference selector to rich text editor.
+* **Contents**: Added a tooltip for string fields in reference lists.
+* **Contents**: Define an option per workflow when a content should be published.
+* **Contents**: Flag to make an patch not an update for upsert content jobs.
+* **Contents**: Store the total number of contents per schema in MongoDB when the size exceeds 10.000 items. Improves performance for large results with a small extra cost for smaller result sets.
+* **GraphQL**: New resolvers to extract embedded contents from string based fields.
+* **Rules**: Readonly mode for rule events.
+
+### Security
+
+* **Identity**: Added an option to remove `X-Frame-Options` header when Squidex is hosted inside an iframe.
+* **Rules**: Fine grained permissions for rule events.
+
 ## [6.7.0] - 2022-04-23
 
 ### Fixed
@@ -36,7 +83,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 * **Routing**: Fixed a bug where the check for apps in a route was causing a 500 in some cases and not a 403, when the route parameter was invalid.
 * **Routing**: Fixed a bug where the check for schemas in a route was causing a 500 in some cases and not a 403, when the route parameter was invalid.
 * **Identity**: Allow request of access token for all domains.
-
 
 ## [6.6.0] - 2022-03-25
 
