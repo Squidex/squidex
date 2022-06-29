@@ -5,30 +5,28 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.ConvertContent;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
+namespace Squidex.Domain.Apps.Core.ConvertContent
 {
-    public sealed class ValueReferencesConverter : IContentValueConverter
+    public sealed class ExcludeHidden : IContentFieldConverter, IContentValueConverter
     {
-        private readonly HashSet<DomainId>? validIds;
+        public static readonly ExcludeHidden Instance = new ExcludeHidden();
 
-        public ValueReferencesConverter(HashSet<DomainId>? validIds = null)
+        private ExcludeHidden()
         {
-            this.validIds = validIds;
+        }
+
+        public ContentFieldData? ConvertField(IRootField field, ContentFieldData source)
+        {
+            return field.IsForApi() ? source : null;
         }
 
         public (bool Remove, JsonValue) ConvertValue(IField field, JsonValue source, IField? parent)
         {
-            if (validIds == null || source == default)
-            {
-                return (false, source);
-            }
-
-            return (false, ReferencesCleaner.Cleanup(field, source, validIds));
+            return field.IsForApi() ? (false, source) : (true, default);
         }
     }
 }
