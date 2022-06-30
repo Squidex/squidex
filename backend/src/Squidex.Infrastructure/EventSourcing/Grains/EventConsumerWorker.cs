@@ -7,21 +7,20 @@
 
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
-using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public class EventConsumerGrain : GrainOfString, IEventConsumerGrain
+    public sealed class EventConsumerWorker : IAsyncDisposable
     {
-        private readonly EventConsumerFactory eventConsumerFactory;
-        private readonly IGrainState<EventConsumerState> state;
+        private readonly SimpleState<EventConsumerState> state;
         private readonly IEventDataFormatter eventDataFormatter;
+        private readonly IEventConsumer? eventConsumer;
         private readonly IEventStore eventStore;
-        private readonly ILogger<EventConsumerGrain> log;
+        private readonly ILogger<EventConsumerWorker> log;
         private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
         private IEventSubscription? currentSubscription;
-        private IEventConsumer? eventConsumer;
 
         private EventConsumerState State
         {
@@ -29,33 +28,32 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             set => state.Value = value;
         }
 
-        public EventConsumerGrain(
-            EventConsumerFactory eventConsumerFactory,
-            IGrainState<EventConsumerState> state,
+        public EventConsumerWorker(
+            IPersistenceFactory<EventConsumerState> persistenceFactory,
+            IEventConsumer eventConsumer,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
-            ILogger<EventConsumerGrain> log)
+            ILogger<EventConsumerWorker> log)
         {
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
-            this.eventConsumerFactory = eventConsumerFactory;
-            this.state = state;
-
+            this.eventConsumer = eventConsumer;
             this.log = log;
+
+            state = new SimpleState<EventConsumerState>(persistenceFactory, GetType(), eventConsumer.Name);
         }
 
-        protected override Task OnActivateAsync(string key)
+        public Task InitializeAsync(
+            CancellationToken ct)
         {
-            eventConsumer = eventConsumerFactory(key);
-
-            return Task.CompletedTask;
+            return state.LoadAsync(ct);
         }
 
-        public override Task OnDeactivateAsync()
+        public ValueTask DisposeAsync()
         {
             CompleteAsync().Forget();
 
-            return Task.CompletedTask;
+            return default;
         }
 
         public async Task CompleteAsync()
@@ -71,16 +69,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                     log.LogCritical(ex, "Failed to complete consumer.");
                 }
             }
-        }
-
-        public Task<EventConsumerInfo> GetStateAsync()
-        {
-            return Task.FromResult(CreateInfo());
-        }
-
-        private EventConsumerInfo CreateInfo()
-        {
-            return State.ToInfo(eventConsumer!.Name);
         }
 
         public Task OnEventsAsync(object sender, IReadOnlyList<Envelope<IEvent>> events, string position)
@@ -130,11 +118,11 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        public async Task<EventConsumerInfo> StartAsync()
+        public async Task StartAsync()
         {
             if (!State.IsStopped)
             {
-                return CreateInfo();
+                return;
             }
 
             await DoAndUpdateStateAsync(() =>
@@ -143,15 +131,13 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 State = State.Started();
             }, State.Position);
-
-            return CreateInfo();
         }
 
-        public async Task<EventConsumerInfo> StopAsync()
+        public async Task StopAsync()
         {
             if (State.IsStopped)
             {
-                return CreateInfo();
+                return;
             }
 
             await DoAndUpdateStateAsync(() =>
@@ -160,11 +146,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 State = State.Stopped();
             }, State.Position);
-
-            return CreateInfo();
         }
 
-        public async Task<EventConsumerInfo> ResetAsync()
+        public async Task ResetAsync()
         {
             await DoAndUpdateStateAsync(async () =>
             {
@@ -176,8 +160,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 Subscribe();
             }, State.Position);
-
-            return CreateInfo();
         }
 
         private async Task DispatchAsync(IReadOnlyList<Envelope<IEvent>> events)
@@ -279,12 +261,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return new BatchSubscriber(this, eventDataFormatter, eventConsumer!, CreateRetrySubscription);
         }
 
-        protected virtual IEventSubscription CreateRetrySubscription(IEventSubscriber subscriber)
+        private IEventSubscription CreateRetrySubscription(IEventSubscriber subscriber)
         {
             return new RetrySubscription(subscriber, CreateSubscription);
         }
 
-        protected virtual IEventSubscription CreateSubscription(IEventSubscriber subscriber)
+        private IEventSubscription CreateSubscription(IEventSubscriber subscriber)
         {
             return eventStore.CreateSubscription(subscriber, eventConsumer!.EventsFilter, State.Position);
         }

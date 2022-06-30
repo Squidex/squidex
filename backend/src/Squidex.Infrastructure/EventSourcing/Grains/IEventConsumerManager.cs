@@ -5,20 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
-
-namespace Squidex.Infrastructure.Orleans
+namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public interface IGrainState<T> where T : class, new()
+    public interface IEventConsumerManager
     {
-        long Version { get; }
+        Task<List<EventConsumerInfo>> GetConsumersAsync(
+            CancellationToken ct = default);
 
-        T Value { get; set; }
+        Task ResetAsync(string consumerName);
 
-        Task ClearAsync();
+        Task StopAsync(string consumerName);
 
-        Task WriteAsync();
-
-        Task WriteEventAsync(Envelope<IEvent> envelope);
+        Task StartAsync(string consumerName);
     }
 }

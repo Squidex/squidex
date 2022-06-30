@@ -5,18 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Orleans;
+#pragma warning disable MA0048 // File name must match type name
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public interface IEventConsumerGrain : IBackgroundGrain
+    public sealed record ResetEventConsumer(string EventConsumer)
     {
-        Task<EventConsumerInfo> GetStateAsync();
+    }
 
-        Task<EventConsumerInfo> StopAsync();
+    public sealed record StartEventConsumer(string EventConsumer)
+    {
+    }
 
-        Task<EventConsumerInfo> StartAsync();
-
-        Task<EventConsumerInfo> ResetAsync();
+    public sealed record StopEventConsumer(string EventConsumer)
+    {
     }
 }

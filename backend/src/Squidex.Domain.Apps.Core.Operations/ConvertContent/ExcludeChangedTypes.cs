@@ -60,7 +60,6 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             {
                 return true;
             }
-
         }
     }
 }

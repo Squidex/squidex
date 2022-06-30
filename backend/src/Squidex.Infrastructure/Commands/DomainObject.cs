@@ -11,7 +11,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract partial class DomainObject<T> where T : class, IDomainState<T>, new()
+    public abstract partial class DomainObject<T> : IExecutable where T : class, IDomainState<T>, new()
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private readonly SnapshotList<T> snapshots = new SnapshotList<T>();

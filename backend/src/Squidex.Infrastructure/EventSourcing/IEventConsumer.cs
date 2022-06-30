@@ -9,8 +9,6 @@
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public delegate IEventConsumer EventConsumerFactory(string name);
-
     public interface IEventConsumer
     {
         int BatchDelay => 500;

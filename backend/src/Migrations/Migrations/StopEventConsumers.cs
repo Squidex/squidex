@@ -14,11 +14,11 @@ namespace Migrations.Migrations
 {
     public sealed class StopEventConsumers : IMigration
     {
-        private readonly IEventConsumerManagerGrain eventConsumerManager;
+        private readonly IEventConsumerManager eventConsumerManager;
 
         public StopEventConsumers(IGrainFactory grainFactory)
         {
-            eventConsumerManager = grainFactory.GetGrain<IEventConsumerManagerGrain>(SingleGrain.Id);
+            eventConsumerManager = grainFactory.GetGrain<IEventConsumerManager>(SingleGrain.Id);
         }
 
         public Task UpdateAsync(

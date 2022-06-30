@@ -5,17 +5,22 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public class GrainCommandMiddleware<TCommand, TGrain> : ICommandMiddleware where TCommand : IAggregateCommand where TGrain : IDomainObjectGrain
+    public class ExecutableMiddleware<TCommand, T> : ICommandMiddleware where TCommand : IAggregateCommand where T : IExecutable
     {
-        private readonly IGrainFactory grainFactory;
+        private readonly Func<DomainId, T> factory;
 
-        public GrainCommandMiddleware(IGrainFactory grainFactory)
+        public ExecutableMiddleware(IServiceProvider serviceProvider)
         {
-            this.grainFactory = grainFactory;
+            var objectFactory = ActivatorUtilities.CreateFactory(typeof(T), new[] { typeof(DomainId) });
+
+            factory = id =>
+            {
+                return (T)objectFactory(serviceProvider, new object?[] { id });
+            };
         }
 
         public virtual async Task HandleAsync(CommandContext context, NextDelegate next)
@@ -29,11 +34,10 @@ namespace Squidex.Infrastructure.Commands
         {
             if (context.Command is TCommand typedCommand)
             {
-                var result = await ExecuteCommandAsync(typedCommand);
+                var commandResult = await ExecuteCommandAsync(typedCommand);
+                var commandPayload = await EnrichResultAsync(context, commandResult);
 
-                var payload = await EnrichResultAsync(context, result);
-
-                context.Complete(payload);
+                context.Complete(commandPayload);
             }
         }
 
@@ -42,13 +46,11 @@ namespace Squidex.Infrastructure.Commands
             return Task.FromResult(result.Payload is None ? result : result.Payload);
         }
 
-        private async Task<CommandResult> ExecuteCommandAsync(TCommand typedCommand)
+        private Task<CommandResult> ExecuteCommandAsync(TCommand typedCommand)
         {
-            var grain = grainFactory.GetGrain<TGrain>(typedCommand.AggregateId.ToString());
+            var executable = factory(typedCommand.AggregateId);
 
-            var result = await grain.ExecuteAsync(CommandRequest.Create(typedCommand));
-
-            return result.Value;
+            return executable.ExecuteAsync(typedCommand);
         }
     }
 }

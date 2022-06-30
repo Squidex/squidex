@@ -5,12 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Orleans
+namespace Squidex.Infrastructure.Commands
 {
-    public interface IActivationLimiter
+    public interface IExecutable
     {
-        void Register(Type grainType, IDeactivater deactivater, int maxActivations);
-
-        void Unregister(Type grainType, IDeactivater deactivater);
+        Task<CommandResult> ExecuteAsync(IAggregateCommand command);
     }
 }

@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
-    public sealed class AssetCommandMiddleware : GrainCommandMiddleware<AssetCommand, IAssetGrain>
+    public sealed class AssetCommandMiddleware : ExecutableMiddleware<AssetCommand, AssetDomainObject>
     {
         private readonly IAssetFileStore assetFileStore;
         private readonly IAssetEnricher assetEnricher;
@@ -23,13 +23,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         private readonly IEnumerable<IAssetMetadataSource> assetMetadataSources;
 
         public AssetCommandMiddleware(
-            IGrainFactory grainFactory,
+            IServiceProvider serviceProvider,
             IAssetEnricher assetEnricher,
             IAssetFileStore assetFileStore,
             IAssetQueryService assetQuery,
             IContextProvider contextProvider,
             IEnumerable<IAssetMetadataSource> assetMetadataSources)
-            : base(grainFactory)
+            : base(serviceProvider)
         {
             this.assetEnricher = assetEnricher;
             this.assetFileStore = assetFileStore;
