@@ -7,42 +7,42 @@
 
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal sealed class QueryByIds : OperationBase
+    internal sealed class QueryByIds : OperationCollectionBase
     {
-        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids,
+        public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(IAppEntity app, HashSet<DomainId> ids,
             CancellationToken ct)
         {
             if (ids == null || ids.Count == 0)
             {
-                return new List<(DomainId SchemaId, DomainId Id, Status Status)>();
+                return ReadonlyList.Empty<ContentIdStatus>();
             }
 
-            var filter = CreateFilter(appId, null, ids);
+            var filter = CreateFilter(app.Id, null, ids);
 
-            var contentItems = await Collection.FindStatusAsync(filter, ct);
+            var contentEntities = await Collection.FindStatusAsync(filter, ct);
 
-            return contentItems.Select(x => (x.IndexedSchemaId, x.Id, x.Status)).ToList();
+            return contentEntities.Select(x => new ContentIdStatus(x.IndexedSchemaId, x.Id, x.Status)).ToList();
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(DomainId appId, List<ISchemaEntity> schemas, Q q,
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q,
             CancellationToken ct)
         {
-            Guard.NotNull(q);
-
             if (q.Ids == null || q.Ids.Count == 0)
             {
-                return ResultList.CreateFrom<IContentEntity>(0);
+                return ResultList.Empty<IContentEntity>();
             }
 
-            var filter = CreateFilter(appId, schemas.Select(x => x.Id), q.Ids.ToHashSet());
+            var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), q.Ids.ToHashSet());
 
             var contentEntities = await FindContentsAsync(q.Query, filter);
             var contentTotal = (long)contentEntities.Count;
@@ -87,11 +87,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             }
             else
             {
-                var first = documentIds[0];
-
                 filters.Add(
                     Filter.Or(
-                        Filter.Eq(x => x.DocumentId, first)));
+                        Filter.Eq(x => x.DocumentId, documentIds[0])));
             }
 
             if (schemaIds != null)

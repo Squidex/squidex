@@ -185,7 +185,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             if (scope == AssetFolderScope.Path)
             {
-                return Task.FromResult(ResultList.CreateFrom<IAssetFolderEntity>(0));
+                return Task.FromResult(ResultList.Empty<IAssetFolderEntity>());
             }
 
             return assetQuery.QueryAssetFoldersAsync(Context, parentId, HttpContext.RequestAborted);

@@ -118,6 +118,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     {
                         var query = q.Query.AdjustToModel(appId);
 
+                        // Default means that no other filters are applied and we only query by app.
                         var (filter, isDefault) = query.BuildFilter(appId, parentId);
 
                         var assetEntities =
@@ -138,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                             }
                             else if (isDefaultQuery)
                             {
-                                // Cache total count by app and asset folder.
+                                // Cache total count by app and asset folder because no other filters are applied (aka default).
                                 var totalKey = $"{appId}_{parentId}";
 
                                 assetTotal = await countCollection.GetOrAddAsync(totalKey, ct => Collection.Find(filter).CountDocumentsAsync(ct), ct);

@@ -58,7 +58,7 @@ namespace Squidex.Domain.Users
 
             if (!ids.Any())
             {
-                return ResultList.CreateFrom<IUser>(0);
+                return ResultList.Empty<IUser>();
             }
 
             var users = userManager.Users.Where(x => ids.Contains(x.Id)).ToList();

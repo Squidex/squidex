@@ -16,6 +16,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
@@ -31,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly ReadPreference readPreference;
         private readonly string name;
 
-        public MongoContentCollection(string name, IMongoDatabase database, IAppProvider appProvider, ReadPreference readPreference)
+        public MongoContentCollection(string name, IMongoDatabase database, ReadPreference readPreference)
             : base(database)
         {
             this.name = name;
@@ -39,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             queryAsStream = new QueryAsStream();
             queryBdId = new QueryById();
             queryByIds = new QueryByIds();
-            queryByQuery = new QueryByQuery(appProvider, new MongoCountCollection(database, name));
+            queryByQuery = new QueryByQuery(new MongoCountCollection(database, name));
             queryReferences = new QueryReferences(queryByIds);
             queryReferrers = new QueryReferrers();
             queryScheduled = new QueryScheduled();
@@ -68,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         protected override Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection,
             CancellationToken ct)
         {
-            var operations = new OperationBase[]
+            var operations = new OperationCollectionBase[]
             {
                 queryAsStream,
                 queryBdId,
@@ -93,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return Collection.UpdateOneAsync(x => x.DocumentId == documentId, Update.Unset(x => x.ScheduleJob).Unset(x => x.ScheduledAt), cancellationToken: ct);
         }
 
-        public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
+        public IAsyncEnumerable<IContentEntity> StreamAll(IAppEntity app, HashSet<DomainId>? schemaIds,
             CancellationToken ct)
         {
             return queryAsStream.StreamAll(appId, schemaIds, ct);
@@ -119,27 +120,38 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryAsync"))
             {
-                if (q.Ids != null && q.Ids.Count > 0)
+                try
                 {
-                    return await queryByIds.QueryAsync(app.Id, schemas, q, ct);
-                }
+                    if (q.Ids != null && q.Ids.Count > 0 && schemas.Count > 0)
+                    {
+                        return await queryByIds.QueryAsync(app, schemas, q, ct);
+                    }
 
-                if (q.ScheduledFrom != null && q.ScheduledTo != null)
+                    if (q.ScheduledFrom != null && q.ScheduledTo != null && schemas.Count > 0)
+                    {
+                        return await queryScheduled.QueryAsync(app, schemas, q, ct);
+                    }
+
+                    if (q.Referencing != default && schemas.Count > 0)
+                    {
+                        return await queryReferences.QueryAsync(app, schemas, q, ct);
+                    }
+
+                    if (q.Reference != default && schemas.Count > 0)
+                    {
+                        return await queryByQuery.QueryAsync(app, schemas, q, ct);
+                    }
+
+                    return ResultList.Empty<IContentEntity>();
+                }
+                catch (MongoCommandException ex) when (ex.Code == 96)
                 {
-                    return await queryScheduled.QueryAsync(app.Id, schemas, q, ct);
+                    throw new DomainException(T.Get("common.resultTooLarge"));
                 }
-
-                if (q.Referencing != default)
+                catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
                 {
-                    return await queryReferences.QueryAsync(app.Id, schemas, q, ct);
+                    throw new DomainException(T.Get("common.resultTooLarge"));
                 }
-
-                if (q.Reference != default)
-                {
-                    return await queryByQuery.QueryAsync(app, schemas, q, ct);
-                }
-
-                return ResultList.CreateFrom<IContentEntity>(0);
             }
         }
 
@@ -148,22 +160,33 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryAsync"))
             {
-                if (q.Ids != null && q.Ids.Count > 0)
+                try
                 {
-                    return await queryByIds.QueryAsync(app.Id, new List<ISchemaEntity> { schema }, q, ct);
-                }
+                    if (q.Ids != null && q.Ids.Count > 0)
+                    {
+                        return await queryByIds.QueryAsync(app, new List<ISchemaEntity> { schema }, q, ct);
+                    }
 
-                if (q.ScheduledFrom != null && q.ScheduledTo != null)
+                    if (q.ScheduledFrom != null && q.ScheduledTo != null)
+                    {
+                        return await queryScheduled.QueryAsync(app, new List<ISchemaEntity> { schema }, q, ct);
+                    }
+
+                    if (q.Referencing == default)
+                    {
+                        return await queryByQuery.QueryAsync(schema, q, ct);
+                    }
+
+                    return ResultList.Empty<IContentEntity>();
+                }
+                catch (MongoCommandException ex) when (ex.Code == 96)
                 {
-                    return await queryScheduled.QueryAsync(app.Id, new List<ISchemaEntity> { schema }, q, ct);
+                    throw new DomainException(T.Get("common.resultTooLarge"));
                 }
-
-                if (q.Referencing == default)
+                catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
                 {
-                    return await queryByQuery.QueryAsync(app, schema, q, ct);
+                    throw new DomainException(T.Get("common.resultTooLarge"));
                 }
-
-                return ResultList.CreateFrom<IContentEntity>(0);
             }
         }
 
@@ -176,21 +199,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids,
+        public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(IAppEntity app, HashSet<DomainId> ids,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryIdsAsync"))
             {
-                return await queryByIds.QueryIdsAsync(appId, ids, ct);
+                return await queryByIds.QueryIdsAsync(app, ids, ct);
             }
         }
 
-        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
+        public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(IAppEntity app, ISchemaEntity schema, FilterNode<ClrValue> filterNode,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryIdsAsync"))
             {
-                return await queryByQuery.QueryIdsAsync(appId, schemaId, filterNode, ct);
+                return await queryByQuery.QueryIdsAsync(app, schema, filterNode, ct);
             }
         }
 

@@ -7,15 +7,15 @@
 
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal sealed class QueryReferences : OperationBase
+    internal sealed class QueryReferences : OperationCollectionBase
     {
-        private static readonly IResultList<IContentEntity> EmptyIds = ResultList.CreateFrom<IContentEntity>(0);
         private readonly QueryByIds queryByIds;
 
         public sealed class ReferencedIdsOnly
@@ -34,14 +34,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             this.queryByIds = queryByIds;
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(DomainId appId, List<ISchemaEntity> schemas, Q q,
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q,
             CancellationToken ct)
         {
-            var documentId = DomainId.Combine(appId, q.Referencing);
-
             var find =
                 Collection
-                    .Find(x => x.DocumentId == documentId)
+                    .Find(Filter.Eq(x => x.DocumentId, DomainId.Combine(app.Id, q.Referencing)))
                     .Project<ReferencedIdsOnly>(Projection.Include(x => x.ReferencedIds));
 
             var contentEntity = await find.FirstOrDefaultAsync(ct);
@@ -53,12 +51,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             if (contentEntity.ReferencedIds == null || contentEntity.ReferencedIds.Count == 0)
             {
-                return EmptyIds;
+                return ResultList.Empty<IContentEntity>();
             }
 
             q = q.WithReferencing(default).WithIds(contentEntity.ReferencedIds!);
 
-            return await queryByIds.QueryAsync(appId, schemas, q, ct);
+            return await queryByIds.QueryAsync(app, schemas, q, ct);
         }
     }
 }

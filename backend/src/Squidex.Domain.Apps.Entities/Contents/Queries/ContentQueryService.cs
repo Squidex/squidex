@@ -18,7 +18,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     public sealed class ContentQueryService : IContentQueryService
     {
         private const string SingletonId = "_schemaId_";
-        private static readonly IResultList<IEnrichedContentEntity> EmptyContents = ResultList.CreateFrom<IEnrichedContentEntity>(0);
         private readonly IAppProvider appProvider;
         private readonly IContentEnricher contentEnricher;
         private readonly IContentRepository contentRepository;
@@ -85,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 if (q == null)
                 {
-                    return EmptyContents;
+                    return ResultList.Empty<IEnrichedContentEntity>();
                 }
 
                 var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName, ct);
@@ -117,14 +116,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 if (q == null)
                 {
-                    return EmptyContents;
+                    return ResultList.Empty<IEnrichedContentEntity>();
                 }
 
                 var schemas = await GetSchemasAsync(context, ct);
 
                 if (schemas.Count == 0)
                 {
-                    return EmptyContents;
+                    return ResultList.Empty<IEnrichedContentEntity>();
                 }
 
                 q = await queryParser.ParseAsync(context, q);

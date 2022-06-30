@@ -11,7 +11,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal sealed class QueryReferrers : OperationBase
+    internal sealed class QueryReferrers : OperationCollectionBase
     {
         public override IEnumerable<CreateIndexModel<MongoContentEntity>> CreateIndexes()
         {
