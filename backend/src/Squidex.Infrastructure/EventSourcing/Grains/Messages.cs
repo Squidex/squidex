@@ -10,15 +10,15 @@
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public sealed record ResetEventConsumer(string EventConsumer)
+    public sealed record EventConsumerReset(string EventConsumer)
     {
     }
 
-    public sealed record StartEventConsumer(string EventConsumer)
+    public sealed record EventConsumerStart(string EventConsumer)
     {
     }
 
-    public sealed record StopEventConsumer(string EventConsumer)
+    public sealed record EventConsumerStop(string EventConsumer)
     {
     }
 }

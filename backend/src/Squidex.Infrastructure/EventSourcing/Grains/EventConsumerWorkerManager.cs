@@ -13,9 +13,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 {
     public sealed class EventConsumerWorkerManager :
         IInitializable,
-        IConsumer<StartEventConsumer>,
-        IConsumer<StopEventConsumer>,
-        IConsumer<ResetEventConsumer>
+        IConsumer<EventConsumerStart>,
+        IConsumer<EventConsumerStop>,
+        IConsumer<EventConsumerReset>
     {
         private readonly Dictionary<string, EventConsumerWorker> workers = new Dictionary<string, EventConsumerWorker>();
 
@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        public async Task Consume(ConsumeContext<StartEventConsumer> context)
+        public async Task Consume(ConsumeContext<EventConsumerStart> context)
         {
             if (workers.TryGetValue(context.Message.EventConsumer, out var worker))
             {
@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        public async Task Consume(ConsumeContext<StopEventConsumer> context)
+        public async Task Consume(ConsumeContext<EventConsumerStop> context)
         {
             if (workers.TryGetValue(context.Message.EventConsumer, out var worker))
             {
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        public async Task Consume(ConsumeContext<ResetEventConsumer> context)
+        public async Task Consume(ConsumeContext<EventConsumerReset> context)
         {
             if (workers.TryGetValue(context.Message.EventConsumer, out var worker))
             {

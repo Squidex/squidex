@@ -32,17 +32,17 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public Task ResetAsync(string consumerName)
         {
-            return bus.Publish(new ResetEventConsumer(consumerName));
+            return bus.Publish(new EventConsumerReset(consumerName));
         }
 
         public Task StartAsync(string consumerName)
         {
-            return bus.Publish(new StartEventConsumer(consumerName));
+            return bus.Publish(new EventConsumerStart(consumerName));
         }
 
         public Task StopAsync(string consumerName)
         {
-            return bus.Publish(new StopEventConsumer(consumerName));
+            return bus.Publish(new EventConsumerStop(consumerName));
         }
     }
 }
