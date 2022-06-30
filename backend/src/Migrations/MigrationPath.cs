@@ -37,8 +37,6 @@ namespace Migrations
 
         private IEnumerable<IMigration?> ResolveMigrators(int version)
         {
-            yield return serviceProvider.GetRequiredService<StopEventConsumers>();
-
             // Version 06: Convert Event store. Must always be executed first.
             if (version < 6)
             {
@@ -121,8 +119,6 @@ namespace Migrations
             {
                 yield return serviceProvider.GetRequiredService<ConvertRuleEventsJson>();
             }
-
-            yield return serviceProvider.GetRequiredService<StartEventConsumers>();
         }
     }
 }

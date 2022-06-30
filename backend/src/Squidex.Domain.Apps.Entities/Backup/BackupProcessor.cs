@@ -9,70 +9,64 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
-using Orleans.Concurrency;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Users;
 
+#pragma warning disable MA0040 // Flow the cancellation token
+
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    [Reentrant]
-    public sealed class BackupGrain : GrainOfString, IBackupGrain
+    public sealed class BackupRunner
     {
         private const int MaxBackups = 10;
         private static readonly Duration UpdateDuration = Duration.FromSeconds(1);
-        private readonly IGrainState<BackupState> state;
+        private readonly SimpleState<BackupState> state;
+        private readonly DomainId appId;
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IBackupArchiveStore backupArchiveStore;
         private readonly IClock clock;
         private readonly IServiceProvider serviceProvider;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
-        private readonly ILogger<BackupGrain> log;
+        private readonly ILogger<BackupRunner> log;
         private readonly IUserResolver userResolver;
         private CancellationTokenSource? currentJobToken;
         private BackupJob? currentJob;
 
-        public BackupGrain(
+        public BackupRunner(
+            DomainId appId,
+            IPersistenceFactory<BackupState> persistenceFactory,
             IBackupArchiveLocation backupArchiveLocation,
             IBackupArchiveStore backupArchiveStore,
             IClock clock,
             IEventDataFormatter eventDataFormatter,
             IEventStore eventStore,
-            IGrainState<BackupState> state,
             IServiceProvider serviceProvider,
             IUserResolver userResolver,
-            ILogger<BackupGrain> log)
+            ILogger<BackupRunner> log)
         {
+            this.appId = appId;
             this.backupArchiveLocation = backupArchiveLocation;
             this.backupArchiveStore = backupArchiveStore;
             this.clock = clock;
             this.eventDataFormatter = eventDataFormatter;
             this.eventStore = eventStore;
             this.serviceProvider = serviceProvider;
-            this.state = state;
             this.userResolver = userResolver;
-
             this.log = log;
+
+            state = new SimpleState<BackupState>(persistenceFactory, GetType(), appId);
         }
 
-        protected override Task OnActivateAsync(string key)
+        public async Task LoadAsync(
+            CancellationToken ct)
         {
-            RecoverAfterRestartAsync().Forget();
-
-            return Task.CompletedTask;
-        }
-
-        private async Task RecoverAfterRestartAsync()
-        {
-            state.Value.Jobs.RemoveAll(x => x.Stopped == null);
-
-            await state.WriteAsync();
+            await state.LoadAsync(ct);
         }
 
         public async Task ClearAsync()
@@ -82,12 +76,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 await backupArchiveStore.DeleteAsync(backup.Id, default);
             }
 
-            TryDeactivateOnIdle();
-
             await state.ClearAsync();
         }
 
-        public async Task BackupAsync(RefToken actor)
+        public async Task BackupAsync(RefToken actor,
+            CancellationToken ct)
         {
             if (currentJobToken != null)
             {
@@ -113,15 +106,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             await state.WriteAsync();
 
-#pragma warning disable MA0042 // Do not use blocking calls in an async method
-            Process(job, actor, currentJobToken.Token);
-#pragma warning restore MA0042 // Do not use blocking calls in an async method
-        }
-
-        private void Process(BackupJob job, RefToken actor,
-            CancellationToken ct)
-        {
-            ProcessAsync(job, actor, ct).Forget();
+            using (var combined = CancellationTokenSource.CreateLinkedTokenSource(currentJobToken.Token, ct))
+            {
+                await ProcessAsync(job, actor, combined.Token);
+            }
         }
 
         private async Task ProcessAsync(BackupJob job, RefToken actor,
@@ -133,8 +121,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             try
             {
-                var appId = DomainId.Create(Key);
-
                 await using (var stream = backupArchiveLocation.OpenStream(job.Id))
                 {
                     using (var writer = await backupArchiveLocation.OpenWriterAsync(stream))
@@ -217,7 +203,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private string GetFilter()
         {
-            return $"^[^\\-]*-{Regex.Escape(Key)}";
+            return $"^[^\\-]*-{Regex.Escape(appId.ToString())}";
         }
 
         private async Task<Instant> WritePeriodically(Instant lastTimestamp)
@@ -264,9 +250,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             try
             {
-#pragma warning disable MA0040 // Flow the cancellation token
                 await backupArchiveStore.DeleteAsync(job.Id);
-#pragma warning restore MA0040 // Flow the cancellation token
             }
             catch (Exception ex)
             {
@@ -281,11 +265,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private IEnumerable<IBackupHandler> CreateHandlers()
         {
             return serviceProvider.GetRequiredService<IEnumerable<IBackupHandler>>();
-        }
-
-        public Task<J<List<IBackupJob>>> GetStateAsync()
-        {
-            return J.AsTask(state.Value.Jobs.OfType<IBackupJob>().ToList());
         }
     }
 }

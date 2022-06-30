@@ -5,76 +5,88 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
+using MassTransit;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class BackupService : IBackupService, IDeleter
     {
-        private readonly IGrainFactory grainFactory;
+        private readonly SimpleState<RestoreJob> restoreState;
+        private readonly IPersistenceFactory<BackupState> persistenceFactoryBackup;
+        private readonly IBus bus;
 
-        public BackupService(IGrainFactory grainFactory)
+        public BackupService(
+            IPersistenceFactory<RestoreJob> persistenceFactoryRestore,
+            IPersistenceFactory<BackupState> persistenceFactoryBackup,
+            IBus bus)
         {
-            this.grainFactory = grainFactory;
+            this.persistenceFactoryBackup = persistenceFactoryBackup;
+
+            restoreState = new SimpleState<RestoreJob>(persistenceFactoryRestore, GetType(), "Default");
+
+            this.bus = bus;
         }
 
         Task IDeleter.DeleteAppAsync(IAppEntity app,
             CancellationToken ct)
         {
-            return BackupGrain(app.Id).ClearAsync();
+            return bus.Publish(new BackupClear(app.Id), ct);
         }
 
-        public Task StartBackupAsync(DomainId appId, RefToken actor)
+        public Task StartBackupAsync(DomainId appId, RefToken actor,
+            CancellationToken ct = default)
         {
-            return BackupGrain(appId).BackupAsync(actor);
+            return bus.Publish(new BackupStart(appId, actor), ct);
         }
 
-        public Task StartRestoreAsync(RefToken actor, Uri url, string? newAppName)
+        public Task StartRestoreAsync(RefToken actor, Uri url, string? newAppName,
+            CancellationToken ct = default)
         {
-            return RestoreGrain().RestoreAsync(url, actor, newAppName);
+            return bus.Publish(new BackupRestore(actor, url, newAppName), ct);
         }
 
         public Task DeleteBackupAsync(DomainId appId, DomainId backupId,
             CancellationToken ct = default)
         {
-            return BackupGrain(appId).DeleteAsync(backupId);
+            return bus.Publish(new BackupRemove(appId, backupId), ct);
         }
 
         public async Task<IRestoreJob?> GetRestoreAsync(
             CancellationToken ct = default)
         {
-            var state = await RestoreGrain().GetStateAsync();
+            await restoreState.LoadAsync(ct);
 
-            return state.Value;
+            return restoreState.Value;
         }
 
         public async Task<List<IBackupJob>> GetBackupsAsync(DomainId appId,
             CancellationToken ct = default)
         {
-            var state = await BackupGrain(appId).GetStateAsync();
+            var state = await GetStateAsync(appId, ct);
 
-            return state.Value;
+            return state.Value.Jobs.OfType<IBackupJob>().ToList();
         }
 
         public async Task<IBackupJob?> GetBackupAsync(DomainId appId, DomainId backupId,
             CancellationToken ct = default)
         {
-            var state = await BackupGrain(appId).GetStateAsync();
+            var state = await GetStateAsync(appId, ct);
 
-            return state.Value.Find(x => x.Id == backupId);
+            return state.Value.Jobs.Find(x => x.Id == backupId);
         }
 
-        private IRestoreGrain RestoreGrain()
+        private async Task<SimpleState<BackupState>> GetStateAsync(DomainId appId,
+            CancellationToken ct)
         {
-            return grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id);
-        }
+            var state = new SimpleState<BackupState>(persistenceFactoryBackup, GetType(), appId);
 
-        private IBackupGrain BackupGrain(DomainId appId)
-        {
-            return grainFactory.GetGrain<IBackupGrain>(appId.ToString());
+            await state.LoadAsync(ct);
+
+            return state;
         }
     }
 }

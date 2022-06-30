@@ -7,27 +7,28 @@
 
 using Microsoft.Extensions.Logging;
 using NodaTime;
-using Orleans;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentSchedulerGrain : Grain, IContentSchedulerGrain, IRemindable
+    public sealed class ContentSchedulerWorker : IInitializable
     {
+        private readonly CompletionTimer timer;
         private readonly IContentRepository contentRepository;
         private readonly ICommandBus commandBus;
         private readonly IClock clock;
-        private readonly ILogger<ContentSchedulerGrain> log;
+        private readonly ILogger<ContentSchedulerWorker> log;
 
-        public ContentSchedulerGrain(
+        public ContentSchedulerWorker(
             IContentRepository contentRepository,
             ICommandBus commandBus,
             IClock clock,
-            ILogger<ContentSchedulerGrain> log)
+            ILogger<ContentSchedulerWorker> log)
         {
             this.clock = clock;
 
@@ -35,28 +36,28 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contentRepository = contentRepository;
 
             this.log = log;
+
+            timer = new CompletionTimer((int)TimeSpan.FromSeconds(10).TotalMilliseconds, PublishAsync);
         }
 
-        public override Task OnActivateAsync()
-        {
-            DelayDeactivation(TimeSpan.FromDays(1));
-
-            RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
-            RegisterTimer(x => PublishAsync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
-
-            return Task.FromResult(true);
-        }
-
-        public Task ActivateAsync()
+        public Task InitializeAsync(
+            CancellationToken ct)
         {
             return Task.CompletedTask;
         }
 
-        public async Task PublishAsync()
+        public Task ReleaseAsync(
+            CancellationToken ct)
+        {
+            return timer.StopAsync();
+        }
+
+        public async Task PublishAsync(
+            CancellationToken ct = default)
         {
             var now = clock.GetCurrentInstant();
 
-            await foreach (var content in contentRepository.QueryScheduledWithoutDataAsync(now))
+            await foreach (var content in contentRepository.QueryScheduledWithoutDataAsync(now, ct))
             {
                 await TryPublishAsync(content);
             }
@@ -93,11 +94,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 log.LogError(ex, "Failed to execute scheduled status change for content '{contentId}'.", content.Id);
             }
-        }
-
-        public Task ReceiveReminder(string reminderName, TickStatus status)
-        {
-            return Task.CompletedTask;
         }
     }
 }

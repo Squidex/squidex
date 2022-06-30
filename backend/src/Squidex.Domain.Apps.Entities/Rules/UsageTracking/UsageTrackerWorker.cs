@@ -5,22 +5,25 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
-using Orleans.Concurrency;
-using Orleans.Runtime;
+using MassTransit;
 using Squidex.Domain.Apps.Events;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Timers;
 using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
-    [Reentrant]
-    public sealed class UsageTrackerGrain : GrainOfString, IRemindable, IUsageTrackerGrain
+    public sealed class UsageTrackerWorker :
+        IConsumer<UsageTrackingAdd>,
+        IConsumer<UsageTrackingUpdate>,
+        IConsumer<UsageTrackingRemove>,
+        IInitializable
     {
-        private readonly IGrainState<State> state;
+        private readonly SimpleState<State> state;
+        private readonly CompletionTimer timer;
         private readonly IApiUsageTracker usageTracker;
 
         public sealed class Target
@@ -61,31 +64,25 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             public Dictionary<DomainId, Target> Targets { get; set; } = new Dictionary<DomainId, Target>();
         }
 
-        public UsageTrackerGrain(IGrainState<State> state, IApiUsageTracker usageTracker)
+        public UsageTrackerWorker(IPersistenceFactory<State> persistenceFactory, IApiUsageTracker usageTracker)
         {
-            this.state = state;
-
             this.usageTracker = usageTracker;
+
+            state = new SimpleState<State>(persistenceFactory, GetType(), "Default");
+
+            timer = new CompletionTimer((int)TimeSpan.FromMinutes(10).TotalMilliseconds, _ => CheckUsagesAsync());
         }
 
-        protected override Task OnActivateAsync(string key)
+        public Task InitializeAsync(
+            CancellationToken ct)
         {
-            DelayDeactivation(TimeSpan.FromDays(1));
-
-            RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
-            RegisterTimer(x => CheckUsagesAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(10));
-
-            return Task.CompletedTask;
+            return state.LoadAsync(ct);
         }
 
-        public Task ActivateAsync()
+        public Task ReleaseAsync(
+            CancellationToken ct)
         {
-            return Task.CompletedTask;
-        }
-
-        public Task ReceiveReminder(string reminderName, TickStatus status)
-        {
-            return Task.CompletedTask;
+            return timer.StopAsync();
         }
 
         public async Task CheckUsagesAsync()
@@ -134,30 +131,23 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             }
         }
 
-        public Task AddTargetAsync(DomainId ruleId, NamedId<DomainId> appId, int limits, int? numDays)
+        public Task Consume(ConsumeContext<UsageTrackingAdd> context)
         {
-            UpdateTarget(ruleId, t => t.SetApp(appId).SetLimit(limits).SetNumDays(numDays));
+            UpdateTarget(context.Message.RuleId, t => t.SetApp(context.Message.AppId).SetLimit(context.Message.Limits).SetNumDays(context.Message.NumDays));
 
             return state.WriteAsync();
         }
 
-        public Task UpdateTargetAsync(DomainId ruleId, int limits, int? numDays)
+        public Task Consume(ConsumeContext<UsageTrackingUpdate> context)
         {
-            UpdateTarget(ruleId, t => t.SetLimit(limits).SetNumDays(numDays));
+            UpdateTarget(context.Message.RuleId, t => t.SetLimit(context.Message.Limits).SetNumDays(context.Message.NumDays));
 
             return state.WriteAsync();
         }
 
-        public Task AddTargetAsync(DomainId ruleId, int limits)
+        public Task Consume(ConsumeContext<UsageTrackingRemove> context)
         {
-            UpdateTarget(ruleId, t => t.SetLimit(limits));
-
-            return state.WriteAsync();
-        }
-
-        public Task RemoveTargetAsync(DomainId ruleId)
-        {
-            state.Value.Targets.Remove(ruleId);
+            state.Value.Targets.Remove(context.Message.RuleId);
 
             return state.WriteAsync();
         }

@@ -6,13 +6,21 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 
-namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
+#pragma warning disable MA0048 // File name must match type name
+
+namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
-    public interface IAssetGrain : IDomainObjectGrain
+    public sealed record UsageTrackingCheck
     {
-        Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Any);
+        public DomainId AppId { get; init; }
+
+        public string AppName { get; init; }
+
+        public long Usage { get; init; }
+
+        public long UsageLimit { get; init; }
+
+        public string[] Users { get; init; }
     }
 }

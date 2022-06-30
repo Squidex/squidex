@@ -5,51 +5,55 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
-    public sealed class AppsIndex : IAppsIndex, ICommandMiddleware
+    public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
         private readonly IAppRepository appRepository;
-        private readonly IGrainFactory grainFactory;
-        private readonly IReplicatedCache grainCache;
+        private readonly IReplicatedCache appCache;
+        private readonly IUniqueNamesState uniqueNamesState;
 
-        public AppsIndex(IAppRepository appRepository, IGrainFactory grainFactory, IReplicatedCache grainCache)
+        public AppsIndex(IAppRepository appRepository, IReplicatedCache appCache, IUniqueNamesState uniqueNamesState)
         {
             this.appRepository = appRepository;
-            this.grainFactory = grainFactory;
-            this.grainCache = grainCache;
+            this.appCache = appCache;
+            this.uniqueNamesState = uniqueNamesState;
         }
 
-        public Task RegisterAsync(DomainId id, string name,
-            CancellationToken ct = default)
+        public Task InitializeAsync(
+            CancellationToken ct)
         {
-            return Cache().AddAsync(id, name);
+            return uniqueNamesState.LoadAsync(ct);
         }
 
         public Task RemoveReservationAsync(string? token,
             CancellationToken ct = default)
         {
-            return Cache().RemoveReservationAsync(token);
+            return uniqueNamesState.RemoveReservationAsync(token, ct);
         }
 
         public async Task<string?> ReserveAsync(DomainId id, string name,
             CancellationToken ct = default)
         {
-            return await Cache().ReserveAsync(id, name);
+            if (await appRepository.FindAsync(name, ct) != null)
+            {
+                return null;
+            }
+
+            return await uniqueNamesState.ReserveAsync(id, name, ct);
         }
 
         public async Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions,
@@ -57,17 +61,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             using (Telemetry.Activities.StartActivity("AppsIndex/GetAppsForUserAsync"))
             {
-                var ids =
+                var appQueries =
                     await Task.WhenAll(
-                        GetAppIdsByUserAsync(userId),
-                        GetAppIdsAsync(permissions.ToAppNames()));
+                        appRepository.QueryAllAsync(userId, ct),
+                        appRepository.QueryAllAsync(permissions.ToAppNames(), ct));
 
-                var apps =
-                    await Task.WhenAll(ids
-                        .SelectMany(x => x).Distinct()
-                        .Select(id => GetAppAsync(id, false, ct)));
+                var apps = appQueries.SelectMany(x => x).NotNull().ToList();
 
-                return apps.NotNull().ToList();
+                foreach (var app in apps)
+                {
+                    await CacheItAsync(app);
+                }
+
+                return apps;
             }
         }
 
@@ -78,37 +84,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             {
                 if (canCache)
                 {
-                    if (grainCache.TryGetValue(GetCacheKey(name), out var v) && v is IAppEntity cacheApp)
+                    if (appCache.TryGetValue(GetCacheKey(name), out var v) && v is IAppEntity cacheApp)
                     {
                         return cacheApp;
                     }
                 }
 
-                var appId = await GetAppIdAsync(name);
-
-                if (appId == DomainId.Empty)
-                {
-                    return null;
-                }
-
-                return await GetAppAsync(appId, canCache, ct);
-            }
-        }
-
-        public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
-            CancellationToken ct = default)
-        {
-            using (Telemetry.Activities.StartActivity("AppsIndex/GetAppAsync"))
-            {
-                if (canCache)
-                {
-                    if (grainCache.TryGetValue(GetCacheKey(appId), out var cached) && cached is IAppEntity cachedApp)
-                    {
-                        return cachedApp;
-                    }
-                }
-
-                var app = await GetAppCoreAsync(appId);
+                var app = await appRepository.FindAsync(name, ct);
 
                 if (app != null)
                 {
@@ -119,33 +101,27 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        private async Task<IReadOnlyCollection<DomainId>> GetAppIdsByUserAsync(string userId)
+        public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
+            CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartActivity("AppsIndex/GetAppIdsByUserAsync"))
+            using (Telemetry.Activities.StartActivity("AppsIndex/GetAppAsync"))
             {
-                var result = await appRepository.QueryIdsAsync(userId);
+                if (canCache)
+                {
+                    if (appCache.TryGetValue(GetCacheKey(appId), out var cached) && cached is IAppEntity cachedApp)
+                    {
+                        return cachedApp;
+                    }
+                }
 
-                return result.Values;
-            }
-        }
+                var app = await appRepository.FindAsync(appId, ct);
 
-        private async Task<IReadOnlyCollection<DomainId>> GetAppIdsAsync(string[] names)
-        {
-            using (Telemetry.Activities.StartActivity("AppsIndex/GetAppIdsAsync"))
-            {
-                var result = await Cache().GetAppIdsAsync(names);
+                if (app != null)
+                {
+                    await CacheItAsync(app);
+                }
 
-                return result;
-            }
-        }
-
-        private async Task<DomainId> GetAppIdAsync(string name)
-        {
-            using (Telemetry.Activities.StartActivity("AppsIndex/GetAppIdAsync"))
-            {
-                var result = await Cache().GetAppIdsAsync(new[] { name });
-
-                return result.FirstOrDefault();
+                return app;
             }
         }
 
@@ -155,16 +131,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             if (command is CreateApp createApp)
             {
-                var cache = Cache();
-
-                var token = await CheckAppAsync(cache, createApp);
+                var token = await CheckAppAsync(createApp);
                 try
                 {
                     await next(context);
                 }
                 finally
                 {
-                    await cache.RemoveReservationAsync(token);
+                    await uniqueNamesState.RemoveReservationAsync(token);
                 }
             }
             else
@@ -189,9 +163,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        private static async Task<string?> CheckAppAsync(IAppsCacheGrain cache, CreateApp command)
+        private async Task<string?> CheckAppAsync(CreateApp command)
         {
-            var token = await cache.ReserveAsync(command.AppId, command.Name);
+            var token = await ReserveAsync(command.AppId, command.Name);
 
             if (token == null)
             {
@@ -204,37 +178,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         private async Task OnCreateAsync(CreateApp create)
         {
             await InvalidateItAsync(create.AppId, create.Name);
-
-            await Cache().AddAsync(create.AppId, create.Name);
         }
 
         private async Task OnDeleteAsync(DeleteApp delete)
         {
             await InvalidateItAsync(delete.AppId.Id, delete.AppId.Name);
-
-            await Cache().RemoveAsync(delete.AppId.Id);
         }
 
         private async Task OnUpdateAsync(AppUpdateCommand update)
         {
             await InvalidateItAsync(update.AppId.Id, update.AppId.Name);
-        }
-
-        private IAppsCacheGrain Cache()
-        {
-            return grainFactory.GetGrain<IAppsCacheGrain>(SingleGrain.Id);
-        }
-
-        private async Task<IAppEntity?> GetAppCoreAsync(DomainId id, bool allowArchived = false)
-        {
-            var app = (await grainFactory.GetGrain<IAppGrain>(id.ToString()).GetStateAsync()).Value;
-
-            if (app.Version <= EtagVersion.Empty || (app.IsDeleted && !allowArchived))
-            {
-                return null;
-            }
-
-            return app;
         }
 
         private static string GetCacheKey(DomainId id)
@@ -249,7 +202,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private Task InvalidateItAsync(DomainId id, string name)
         {
-            return grainCache.RemoveAsync(
+            return appCache.RemoveAsync(
                 GetCacheKey(id),
                 GetCacheKey(name));
         }
@@ -257,8 +210,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         private Task CacheItAsync(IAppEntity app)
         {
             return Task.WhenAll(
-                grainCache.AddAsync(GetCacheKey(app.Id), app, CacheDuration),
-                grainCache.AddAsync(GetCacheKey(app.Name), app, CacheDuration));
+                appCache.AddAsync(GetCacheKey(app.Id), app, CacheDuration),
+                appCache.AddAsync(GetCacheKey(app.Name), app, CacheDuration));
         }
     }
 }

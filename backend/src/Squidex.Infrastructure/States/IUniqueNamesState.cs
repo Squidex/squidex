@@ -5,11 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Commands;
-
-namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
+namespace Squidex.Infrastructure.States
 {
-    public interface IAssetFolderGrain : IDomainObjectGrain
+    public interface IUniqueNamesState
     {
+        Task LoadAsync(
+            CancellationToken ct = default);
+
+        Task<string?> ReserveAsync(DomainId id, string name,
+            CancellationToken ct = default);
+
+        Task RemoveReservationAsync(string? token,
+            CancellationToken ct = default);
     }
 }

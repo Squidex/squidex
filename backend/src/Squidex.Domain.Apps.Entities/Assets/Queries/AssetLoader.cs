@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Infrastructure;
 
@@ -13,11 +13,16 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
     public sealed class AssetLoader : IAssetLoader
     {
-        private readonly IGrainFactory grainFactory;
+        private readonly Func<DomainId, AssetDomainObject> factory;
 
-        public AssetLoader(IGrainFactory grainFactory)
+        public AssetLoader(IServiceProvider serviceProvider)
         {
-            this.grainFactory = grainFactory;
+            var objectFactory = ActivatorUtilities.CreateFactory(typeof(AssetDomainObject), new[] { typeof(DomainId) });
+
+            factory = key =>
+            {
+                return (AssetDomainObject)objectFactory(serviceProvider, new object[] { key });
+            };
         }
 
         public async Task<IAssetEntity?> GetAsync(DomainId appId, DomainId id, long version = EtagVersion.Any)
@@ -26,17 +31,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             {
                 var key = DomainId.Combine(appId, id);
 
-                var assetGrain = grainFactory.GetGrain<IAssetGrain>(key.ToString());
-                var assetState = await assetGrain.GetStateAsync(version);
+                var assetObject = factory(key);
+                var assetState = await assetObject.GetSnapshotAsync(version);
 
-                var asset = assetState.Value;
-
-                if (asset == null || asset.Version <= EtagVersion.Empty || (version > EtagVersion.Any && asset.Version != version))
+                if (assetState == null || assetState.Version <= EtagVersion.Empty || (version > EtagVersion.Any && assetState.Version != version))
                 {
                     return null;
                 }
 
-                return asset;
+                return assetState;
             }
         }
     }

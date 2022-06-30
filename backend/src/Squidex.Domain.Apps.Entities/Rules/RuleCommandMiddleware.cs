@@ -5,20 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public sealed class RuleCommandMiddleware : GrainCommandMiddleware<RuleCommand, IRuleGrain>
+    public sealed class RuleCommandMiddleware : ExecutableMiddleware<RuleCommand, RuleDomainObject>
     {
         private readonly IRuleEnricher ruleEnricher;
         private readonly IContextProvider contextProvider;
 
-        public RuleCommandMiddleware(IGrainFactory grainFactory, IRuleEnricher ruleEnricher, IContextProvider contextProvider)
-            : base(grainFactory)
+        public RuleCommandMiddleware(IServiceProvider serviceProvider,
+            IRuleEnricher ruleEnricher, IContextProvider contextProvider)
+            : base(serviceProvider)
         {
             this.ruleEnricher = ruleEnricher;
 

@@ -5,8 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
+using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -17,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
     public sealed class AppPermanentDeleter : IEventConsumer
     {
         private readonly IEnumerable<IDeleter> deleters;
-        private readonly IGrainFactory grainFactory;
+        private readonly IServiceProvider serviceProvider;
         private readonly HashSet<string> consumingTypes;
 
         public string Name
@@ -30,11 +31,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
             get => "^app-";
         }
 
-        public AppPermanentDeleter(IEnumerable<IDeleter> deleters, IGrainFactory grainFactory, TypeNameRegistry typeNameRegistry)
+        public AppPermanentDeleter(IEnumerable<IDeleter> deleters, IServiceProvider serviceProvider, TypeNameRegistry typeNameRegistry)
         {
             this.deleters = deleters.OrderBy(x => x.Order).ToList();
 
-            this.grainFactory = grainFactory;
+            this.serviceProvider = serviceProvider;
 
             // Compute the event types names once for performance reasons and use hashset for extensibility.
             consumingTypes = new HashSet<string>
@@ -88,12 +89,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
             using (Telemetry.Activities.StartActivity("RemoveAppFromSystem"))
             {
                 // Bypass our normal app resolve process, so that we can also retrieve the deleted app.
-                var appGrain = grainFactory.GetGrain<IAppGrain>(appArchived.AppId.Id.ToString());
+                var app = ActivatorUtilities.CreateInstance<AppDomainObject>(serviceProvider, appArchived.AppId.Id);
 
-                var app = await appGrain.GetStateAsync();
+                await app.EnsureLoadedAsync();
 
                 // If the app does not exist, the version is lower than zero.
-                if (app.Value.Version < 0)
+                if (app.Version < 0)
                 {
                     return;
                 }
@@ -102,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 {
                     using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
                     {
-                        await deleter.DeleteAppAsync(app.Value, default);
+                        await deleter.DeleteAppAsync(app.Snapshot, default);
                     }
                 }
             }

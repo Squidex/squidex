@@ -139,7 +139,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             await rebuilder.InsertManyAsync<AppDomainObject, AppDomainObject.State>(Enumerable.Repeat(context.AppId, 1), 1, default);
 
-            await appsIndex.RegisterAsync(context.AppId, appName);
             await appsIndex.RemoveReservationAsync(appReservation);
         }
 

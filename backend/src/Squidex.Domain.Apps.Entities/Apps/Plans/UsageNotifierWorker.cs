@@ -5,20 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MassTransit;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
-    public sealed class UsageNotifierGrain : GrainOfString, IUsageNotifierGrain
+    public sealed class UsageNotifierWorker : IConsumer<UsageTrackingCheck>
     {
         private static readonly TimeSpan TimeBetweenNotifications = TimeSpan.FromDays(3);
-        private readonly IGrainState<State> state;
+        private readonly SimpleState<State> state;
         private readonly INotificationSender notificationSender;
         private readonly IUserResolver userResolver;
         private readonly IClock clock;
@@ -29,15 +29,22 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             public Dictionary<DomainId, DateTime> NotificationsSent { get; } = new Dictionary<DomainId, DateTime>();
         }
 
-        public UsageNotifierGrain(IGrainState<State> state, INotificationSender notificationSender, IUserResolver userResolver, IClock clock)
+        public UsageNotifierWorker(IPersistenceFactory<State> persistenceFactory,
+            INotificationSender notificationSender, IUserResolver userResolver, IClock clock)
         {
-            this.state = state;
             this.notificationSender = notificationSender;
             this.userResolver = userResolver;
             this.clock = clock;
+
+            state = new SimpleState<State>(persistenceFactory, GetType(), DomainId.Create("Default"));
         }
 
-        public async Task NotifyAsync(UsageNotification notification)
+        public Task Consume(ConsumeContext<UsageTrackingCheck> context)
+        {
+            return NotifyAsync(context.Message);
+        }
+
+        public async Task NotifyAsync(UsageTrackingCheck notification)
         {
             if (!notificationSender.IsActive)
             {

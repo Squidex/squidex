@@ -5,16 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.States;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Counter
+namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
-    public interface ICounterGrain : IGrainWithStringKey
+    [CollectionName("Rules_Runner")]
+    public sealed class RuleRunnerState
     {
-        Task<long> IncrementAsync(string name);
+        public DomainId? RuleId { get; set; }
 
-        Task<long> ResetAsync(string name, long value);
+        public string? Position { get; set; }
 
-        Task ClearAsync();
+        public bool RunFromSnapshots { get; set; }
     }
 }

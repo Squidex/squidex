@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
@@ -14,18 +13,15 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 {
-    public sealed class AppCommandMiddleware : GrainCommandMiddleware<AppCommand, IAppGrain>
+    public sealed class AppCommandMiddleware : ExecutableMiddleware<AppCommand, AppDomainObject>
     {
         private readonly IAppImageStore appImageStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IContextProvider contextProvider;
 
-        public AppCommandMiddleware(
-            IGrainFactory grainFactory,
-            IAppImageStore appImageStore,
-            IAssetThumbnailGenerator assetThumbnailGenerator,
-            IContextProvider contextProvider)
-            : base(grainFactory)
+        public AppCommandMiddleware(IServiceProvider serviceProvider,
+            IAppImageStore appImageStore, IAssetThumbnailGenerator assetThumbnailGenerator, IContextProvider contextProvider)
+            : base(serviceProvider)
         {
             this.appImageStore = appImageStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;

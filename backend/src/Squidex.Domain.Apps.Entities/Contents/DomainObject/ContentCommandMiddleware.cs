@@ -5,20 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 {
-    public sealed class ContentCommandMiddleware : GrainCommandMiddleware<ContentCommand, IContentGrain>
+    public sealed class ContentCommandMiddleware : ExecutableMiddleware<ContentCommand, ContentDomainObject>
     {
         private readonly IContentEnricher contentEnricher;
         private readonly IContextProvider contextProvider;
 
-        public ContentCommandMiddleware(IGrainFactory grainFactory, IContentEnricher contentEnricher, IContextProvider contextProvider)
-            : base(grainFactory)
+        public ContentCommandMiddleware(IServiceProvider serviceProvider,
+            IContentEnricher contentEnricher, IContextProvider contextProvider)
+            : base(serviceProvider)
         {
             this.contentEnricher = contentEnricher;
             this.contextProvider = contextProvider;

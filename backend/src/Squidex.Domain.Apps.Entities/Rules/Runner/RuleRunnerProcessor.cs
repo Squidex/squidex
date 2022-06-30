@@ -6,58 +6,43 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Logging;
-using Orleans;
-using Orleans.Runtime;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Translations;
-using TaskExtensions = Squidex.Infrastructure.Tasks.TaskExtensions;
-
-#pragma warning disable RECS0015 // If an extension method is called as static method convert it to method syntax
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
-    public sealed class RuleRunnerGrain : GrainOfString, IRuleRunnerGrain, IRemindable
+    public sealed class RuleRunnerProcessor
     {
         private const int MaxErrors = 10;
-        private readonly IGrainState<State> state;
+        private readonly SimpleState<RuleRunnerState> state;
+        private readonly DomainId appId;
         private readonly IAppProvider appProvider;
         private readonly ILocalCache localCache;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly IRuleService ruleService;
-        private readonly ILogger<RuleRunnerGrain> log;
+        private readonly ILogger<RuleRunnerProcessor> log;
         private CancellationTokenSource? currentJobToken;
-        private IGrainReminder? currentReminder;
         private bool isStopping;
 
-        [CollectionName("Rules_Runner")]
-        public sealed class State
-        {
-            public DomainId? RuleId { get; set; }
-
-            public string? Position { get; set; }
-
-            public bool RunFromSnapshots { get; set; }
-        }
-
-        public RuleRunnerGrain(
-            IGrainState<State> state,
+        public RuleRunnerProcessor(
+            DomainId appId,
+            IPersistenceFactory<RuleRunnerState> persistenceFactory,
             IAppProvider appProvider,
             ILocalCache localCache,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             IRuleEventRepository ruleEventRepository,
             IRuleService ruleService,
-            ILogger<RuleRunnerGrain> log)
+            ILogger<RuleRunnerProcessor> log)
         {
-            this.state = state;
+            this.appId = appId;
             this.appProvider = appProvider;
             this.localCache = localCache;
             this.eventStore = eventStore;
@@ -65,20 +50,23 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
             this.log = log;
+
+            state = new SimpleState<RuleRunnerState>(persistenceFactory, GetType(), appId);
         }
 
-        protected override Task OnActivateAsync(string key)
+        public Task LoadAsync(
+            CancellationToken ct = default)
         {
-            return EnsureIsRunningAsync(true);
+            return state.LoadAsync(ct);
         }
 
-        public override Task OnDeactivateAsync()
+        public Task ReleaseAsync()
         {
             isStopping = true;
 
             currentJobToken?.Cancel();
 
-            return base.OnDeactivateAsync();
+            return Task.CompletedTask;
         }
 
         public Task CancelAsync()
@@ -95,66 +83,56 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             return Task.CompletedTask;
         }
 
-        public Task<DomainId?> GetRunningRuleIdAsync()
-        {
-            return Task.FromResult(state.Value.RuleId);
-        }
-
-        public async Task RunAsync(DomainId ruleId, bool fromSnapshots)
+        public async Task RunAsync(DomainId ruleId, bool fromSnapshots, bool isRetry,
+            CancellationToken ct)
         {
             if (currentJobToken != null)
             {
                 throw new DomainException(T.Get("rules.ruleAlreadyRunning"));
             }
 
-            state.Value = new State
+            state.Value = new RuleRunnerState
             {
                 RuleId = ruleId,
                 RunFromSnapshots = fromSnapshots
             };
 
-            await EnsureIsRunningAsync(false);
+            await state.WriteAsync(ct);
 
-            await state.WriteAsync();
+            await EnsureIsRunningAsync(isRetry, ct);
         }
 
-        private async Task EnsureIsRunningAsync(bool continues)
+        private async Task EnsureIsRunningAsync(bool isRetry,
+            CancellationToken ct)
         {
             var job = state.Value;
 
             if (job.RuleId != null && currentJobToken == null)
             {
-                if (state.Value.RunFromSnapshots && continues)
+                if (state.Value.RunFromSnapshots && isRetry)
                 {
-                    state.Value = new State();
+                    state.Value = new RuleRunnerState();
 
-                    await state.WriteAsync();
+                    await state.WriteAsync(ct);
                 }
                 else
                 {
                     currentJobToken = new CancellationTokenSource();
 
-#pragma warning disable MA0042 // Do not use blocking calls in an async method
-                    Process(state.Value, currentJobToken.Token);
-#pragma warning restore MA0042 // Do not use blocking calls in an async method
+                    using (var linked = CancellationTokenSource.CreateLinkedTokenSource(currentJobToken.Token, ct))
+                    {
+                        await ProcessAsync(state.Value, ct);
+                    }
                 }
             }
         }
 
-        private void Process(State job,
-            CancellationToken ct)
-        {
-            TaskExtensions.Forget(ProcessAsync(job, ct));
-        }
-
-        private async Task ProcessAsync(State currentState,
+        private async Task ProcessAsync(RuleRunnerState currentState,
             CancellationToken ct)
         {
             try
             {
-                currentReminder = await RegisterOrUpdateReminder("KeepAlive", TimeSpan.Zero, TimeSpan.FromMinutes(2));
-
-                var rule = await appProvider.GetRuleAsync(DomainId.Create(Key), currentState.RuleId!.Value, ct);
+                var rule = await appProvider.GetRuleAsync(appId, currentState.RuleId!.Value, ct);
 
                 if (rule == null)
                 {
@@ -196,14 +174,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                     currentState.RuleId = null;
                     currentState.Position = null;
 
-                    await state.WriteAsync();
-
-                    if (currentReminder != null)
-                    {
-                        await UnregisterReminder(currentReminder);
-
-                        currentReminder = null;
-                    }
+                    await state.WriteAsync(ct);
 
                     currentJobToken?.Dispose();
                     currentJobToken = null;
@@ -236,12 +207,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             }
         }
 
-        private async Task EnqueueFromEventsAsync(State currentState, RuleContext context,
+        private async Task EnqueueFromEventsAsync(RuleRunnerState currentState, RuleContext context,
             CancellationToken ct)
         {
             var errors = 0;
 
-            var filter = $"^([a-z]+)\\-{Key}";
+            var filter = $"^([a-z]+)\\-{appId}";
 
             await foreach (var storedEvent in eventStore.QueryAllAsync(filter, currentState.Position, ct: ct))
             {
@@ -278,13 +249,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                     currentState.Position = storedEvent.EventPosition;
                 }
 
-                await state.WriteAsync();
+                await state.WriteAsync(ct);
             }
-        }
-
-        public Task ReceiveReminder(string reminderName, TickStatus status)
-        {
-            return EnsureIsRunningAsync(true);
         }
     }
 }

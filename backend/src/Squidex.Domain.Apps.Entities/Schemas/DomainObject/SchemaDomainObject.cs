@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
@@ -405,11 +404,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
         private NamedId<long> CreateFieldId(AddField command)
         {
             return NamedId.Of(Snapshot.SchemaFieldsTotal + 1, command.Name);
-        }
-
-        public Task<J<ISchemaEntity>> GetStateAsync()
-        {
-            return J.AsTask<ISchemaEntity>(Snapshot);
         }
     }
 }

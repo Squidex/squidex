@@ -45,7 +45,9 @@ namespace Squidex.Infrastructure.States
             get => UseSnapshots && UseEventSourcing && versionSnapshot < versionEvents;
         }
 
-        public Persistence(DomainId ownerKey, Type ownerType,
+        public Persistence(
+            DomainId ownerKey,
+            Type ownerType,
             ISnapshotStore<T> snapshotStore,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,

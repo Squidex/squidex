@@ -41,31 +41,64 @@ namespace Squidex.Infrastructure.States
             return persistence.ReadAsync(ct: ct);
         }
 
-        public Task ClearAsync()
+        public Task ClearAsync(
+            CancellationToken ct = default)
         {
             Value = new T();
 
-            return persistence.DeleteAsync();
+            return persistence.DeleteAsync(ct);
         }
 
-        public Task WriteAsync()
+        public Task WriteAsync(
+            CancellationToken ct = default)
         {
-            return persistence.WriteSnapshotAsync(Value);
+            return persistence.WriteSnapshotAsync(Value, ct);
         }
 
-        public async Task UpdateAsync(Action<T> updater, int retries = 5)
+        public Task WriteEventAsync(Envelope<IEvent> envelope,
+            CancellationToken ct = default)
+        {
+            return persistence.WriteEventAsync(envelope, ct);
+        }
+
+        public async Task UpdateAsync(Action<T> updater, int retries = 5,
+            CancellationToken ct = default)
         {
             for (var i = 0; i < retries; i++)
             {
                 try
                 {
                     updater(Value);
+
+                    await WriteAsync(ct);
                 }
                 catch (InconsistentStateException) when (i < retries)
                 {
-                    await LoadAsync();
+                    await LoadAsync(ct);
                 }
             }
+        }
+
+        public async Task<TResult> UpdateAsync<TResult>(Func<T, TResult> updater, int retries = 5,
+            CancellationToken ct = default)
+        {
+            for (var i = 0; i < retries; i++)
+            {
+                try
+                {
+                    var result = updater(Value);
+
+                    await WriteAsync(ct);
+
+                    return result;
+                }
+                catch (InconsistentStateException) when (i < retries)
+                {
+                    await LoadAsync(ct);
+                }
+            }
+
+            return default!;
         }
     }
 }

@@ -5,13 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
+namespace Squidex.Domain.Apps.Entities.Contents.Counter
 {
-    public interface ISchemaGrain : IDomainObjectGrain
+    public interface ICounterService
     {
-        Task<J<ISchemaEntity>> GetStateAsync();
+        Task<long> IncrementAsync(DomainId appId, string name);
+
+        Task<long> ResetAsync(DomainId appId, string name, long value);
     }
 }

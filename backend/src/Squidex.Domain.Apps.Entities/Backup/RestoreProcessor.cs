@@ -17,7 +17,6 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
@@ -25,18 +24,18 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class RestoreGrain : GrainOfString, IRestoreGrain
+    public sealed class RestoreRunner
     {
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IClock clock;
         private readonly ICommandBus commandBus;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
-        private readonly ILogger<RestoreGrain> log;
+        private readonly ILogger<RestoreRunner> log;
         private readonly IServiceProvider serviceProvider;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IUserResolver userResolver;
-        private readonly IGrainState<BackupRestoreState> state;
+        private readonly SimpleState<BackupRestoreState> state;
         private RestoreContext runningContext;
         private StreamMapper runningStreamMapper;
 
@@ -45,17 +44,17 @@ namespace Squidex.Domain.Apps.Entities.Backup
             get => state.Value.Job;
         }
 
-        public RestoreGrain(
+        public RestoreRunner(
+            IPersistenceFactory<BackupRestoreState> persistenceFactory,
             IBackupArchiveLocation backupArchiveLocation,
             IClock clock,
             ICommandBus commandBus,
             IEventDataFormatter eventDataFormatter,
             IEventStore eventStore,
-            IGrainState<BackupRestoreState> state,
             IServiceProvider serviceProvider,
             IStreamNameResolver streamNameResolver,
             IUserResolver userResolver,
-            ILogger<RestoreGrain> log)
+            ILogger<RestoreRunner> log)
         {
             this.backupArchiveLocation = backupArchiveLocation;
             this.clock = clock;
@@ -63,17 +62,19 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.eventDataFormatter = eventDataFormatter;
             this.eventStore = eventStore;
             this.serviceProvider = serviceProvider;
-            this.state = state;
             this.streamNameResolver = streamNameResolver;
             this.userResolver = userResolver;
             this.log = log;
+
+            state = new SimpleState<BackupRestoreState>(persistenceFactory, GetType(), "Default");
         }
 
-        protected override Task OnActivateAsync(string key)
+        public async Task LoadAsync(
+            CancellationToken ct)
         {
-            RecoverAfterRestartAsync().Forget();
+            await state.LoadAsync(ct);
 
-            return Task.CompletedTask;
+            await RecoverAfterRestartAsync();
         }
 
         private async Task RecoverAfterRestartAsync()
@@ -88,7 +89,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public async Task RestoreAsync(Uri url, RefToken actor, string? newAppName = null)
+        public async Task RestoreAsync(Uri url, RefToken actor, string? newAppName,
+            CancellationToken ct)
         {
             Guard.NotNull(url);
             Guard.NotNull(actor);
@@ -113,23 +115,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Url = url
             };
 
-            await state.WriteAsync();
+            await state.WriteAsync(ct);
 
-#pragma warning disable MA0042 // Do not use blocking calls in an async method
-            Process();
-#pragma warning restore MA0042 // Do not use blocking calls in an async method
+            await ProcessAsync(ct);
         }
 
-        private void Process()
-        {
-            ProcessAsync().Forget();
-        }
-
-        private async Task ProcessAsync()
+        private async Task ProcessAsync(
+            CancellationToken ct)
         {
             var handlers = CreateHandlers();
-
-            var ct = default(CancellationToken);
 
             using (Telemetry.Activities.StartActivity("RestoreBackup"))
             {
@@ -212,7 +206,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     CurrentJob.Stopped = clock.GetCurrentInstant();
 
-                    await state.WriteAsync();
+                    await state.WriteAsync(ct);
 
                     runningStreamMapper = null!;
                     runningContext = null!;
@@ -428,11 +422,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private IEnumerable<IBackupHandler> CreateHandlers()
         {
             return serviceProvider.GetRequiredService<IEnumerable<IBackupHandler>>();
-        }
-
-        public Task<J<IRestoreJob>> GetStateAsync()
-        {
-            return Task.FromResult<J<IRestoreJob>>(CurrentJob);
         }
     }
 }

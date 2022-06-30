@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Jint.Native;
-using Orleans;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Properties;
 using Squidex.Infrastructure;
@@ -18,11 +17,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
     {
         private delegate long CounterReset(string name, long value = 0);
         private delegate void CounterResetV2(string name, Action<JsValue>? callback = null, long value = 0);
-        private readonly IGrainFactory grainFactory;
+        private readonly ICounterService counterService;
 
-        public CounterJintExtension(IGrainFactory grainFactory)
+        public CounterJintExtension(ICounterService counterService)
         {
-            this.grainFactory = grainFactory;
+            this.counterService = counterService;
         }
 
         public void Extend(ScriptExecutionContext context)
@@ -86,18 +85,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
 
         private long Increment(DomainId appId, string name)
         {
-            var grain = grainFactory.GetGrain<ICounterGrain>(appId.ToString());
-
-            return AsyncHelper.Sync(() => grain.IncrementAsync(name));
+            return AsyncHelper.Sync(() => counterService.IncrementAsync(appId, name));
         }
 
         private void IncrementV2(ScriptExecutionContext context, DomainId appId, string name, Action<JsValue> callback)
         {
             context.Schedule(async (scheduler, ct) =>
             {
-                var grain = grainFactory.GetGrain<ICounterGrain>(appId.ToString());
-
-                var result = await grain.IncrementAsync(name);
+                var result = await counterService.IncrementAsync(appId, name);
 
                 if (callback != null)
                 {
@@ -108,18 +103,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
 
         private long Reset(DomainId appId, string name, long value)
         {
-            var grain = grainFactory.GetGrain<ICounterGrain>(appId.ToString());
-
-            return AsyncHelper.Sync(() => grain.ResetAsync(name, value));
+            return AsyncHelper.Sync(() => counterService.ResetAsync(appId, name, value));
         }
 
         private void ResetV2(ScriptExecutionContext context, DomainId appId, string name, Action<JsValue>? callback, long value)
         {
             context.Schedule(async (scheduler, ct) =>
             {
-                var grain = grainFactory.GetGrain<ICounterGrain>(appId.ToString());
-
-                var result = await grain.ResetAsync(name, value);
+                var result = await counterService.ResetAsync(appId, name, value);
 
                 if (callback != null)
                 {

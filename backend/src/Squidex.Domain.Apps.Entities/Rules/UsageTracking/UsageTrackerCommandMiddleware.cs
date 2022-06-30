@@ -5,21 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
+using MassTransit;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
     public sealed class UsageTrackerCommandMiddleware : ICommandMiddleware
     {
-        private readonly IGrainFactory grainFactory;
+        private readonly IBus bus;
 
-        public UsageTrackerCommandMiddleware(IGrainFactory grainFactory)
+        public UsageTrackerCommandMiddleware(IBus bus)
         {
-            this.grainFactory = grainFactory;
+            this.bus = bus;
         }
 
         public async Task HandleAsync(CommandContext context, NextDelegate next)
@@ -27,13 +26,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             switch (context.Command)
             {
                 case DeleteRule deleteRule:
-                    await GetGrain().RemoveTargetAsync(deleteRule.RuleId);
+                    await bus.Publish(new UsageTrackingRemove(deleteRule.RuleId));
                     break;
                 case CreateRule createRule:
                     {
                         if (createRule.Trigger is UsageTrigger usage)
                         {
-                            await GetGrain().AddTargetAsync(createRule.RuleId, createRule.AppId, usage.Limit, usage.NumDays);
+                            await bus.Publish(new UsageTrackingAdd(createRule.RuleId, createRule.AppId, usage.Limit, usage.NumDays));
                         }
 
                         break;
@@ -43,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
                     {
                         if (ruleUpdated.Trigger is UsageTrigger usage)
                         {
-                            await GetGrain().UpdateTargetAsync(ruleUpdated.RuleId, usage.Limit, usage.NumDays);
+                            await bus.Publish(new UsageTrackingUpdate(ruleUpdated.RuleId, usage.Limit, usage.NumDays));
                         }
 
                         break;
@@ -51,11 +50,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             }
 
             await next(context);
-        }
-
-        private IUsageTrackerGrain GetGrain()
-        {
-            return grainFactory.GetGrain<IUsageTrackerGrain>(SingleGrain.Id);
         }
     }
 }

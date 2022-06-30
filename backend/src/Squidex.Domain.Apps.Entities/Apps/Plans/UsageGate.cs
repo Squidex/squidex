@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MassTransit;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Orleans;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Plans
@@ -21,16 +19,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         private readonly MemoryCache memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IApiUsageTracker apiUsageTracker;
-        private readonly IGrainFactory grainFactory;
+        private readonly IBus bus;
 
-        public UsageGate(IAppPlansProvider appPlansProvider, IApiUsageTracker apiUsageTracker, IGrainFactory grainFactory)
+        public UsageGate(IAppPlansProvider appPlansProvider, IApiUsageTracker apiUsageTracker, IBus bus)
         {
             this.appPlansProvider = appPlansProvider;
             this.apiUsageTracker = apiUsageTracker;
-            this.grainFactory = grainFactory;
+            this.bus = bus;
         }
 
-        public virtual async Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateTime today)
+        public virtual async Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateTime today,
+            CancellationToken ct = default)
         {
             Guard.NotNull(app);
 
@@ -40,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
             if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && client.ApiCallsLimit > 0)
             {
-                var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today, clientId);
+                var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today, clientId, ct);
 
                 isBlocked = usage >= client.ApiCallsLimit;
             }
@@ -51,11 +50,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
             if (limit > 0 || plan.BlockingApiCalls > 0)
             {
-                var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today, null);
+                var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today, null, ct);
 
                 if (IsOver10Percent(limit, usage) && IsAboutToBeLocked(today, limit, usage) && !HasNotifiedBefore(app.Id))
                 {
-                    var notification = new UsageNotification
+                    var notification = new UsageTrackingCheck
                     {
                         AppId = appId,
                         AppName = app.Name,
@@ -64,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                         Users = GetUsers(app)
                     };
 
-                    GetGrain().NotifyAsync(notification).Forget();
+                    await bus.Publish(notification, ct);
 
                     TrackNotified(appId);
                 }
@@ -73,11 +72,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             }
 
             return isBlocked;
-        }
-
-        private IUsageNotifierGrain GetGrain()
-        {
-            return grainFactory.GetGrain<IUsageNotifierGrain>(SingleGrain.Id);
         }
 
         private bool HasNotifiedBefore(DomainId appId)

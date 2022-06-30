@@ -11,17 +11,17 @@ using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 
 #pragma warning disable MA0022 // Return Task.FromResult instead of returning null
 
 namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 {
-    public sealed class CommentsGrain : GrainOfString, ICommentsGrain
+    public sealed class CommentsStream : IExecutable
     {
         private readonly List<Envelope<CommentsEvent>> uncommittedEvents = new List<Envelope<CommentsEvent>>();
         private readonly List<Envelope<CommentsEvent>> events = new List<Envelope<CommentsEvent>>();
+        private readonly DomainId key;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
         private long version = EtagVersion.Empty;
@@ -32,17 +32,22 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             get => version;
         }
 
-        public CommentsGrain(IEventStore eventStore, IEventDataFormatter eventDataFormatter)
+        public CommentsStream(
+            DomainId key,
+            IEventStore eventStore,
+            IEventDataFormatter eventDataFormatter)
         {
+            this.key = key;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
         }
 
-        protected override async Task OnActivateAsync(string key)
+        public async Task LoadAsync(
+            CancellationToken ct)
         {
             streamName = $"comments-{key}";
 
-            var storedEvents = await eventStore.QueryReverseAsync(streamName, 100);
+            var storedEvents = await eventStore.QueryReverseAsync(streamName, 100, ct);
 
             foreach (var @event in storedEvents)
             {
@@ -54,14 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             }
         }
 
-        public async Task<J<CommandResult>> ExecuteAsync(J<CommentsCommand> command)
-        {
-            var result = await ExecuteAsync(command.Value);
-
-            return result.AsJ();
-        }
-
-        private Task<CommandResult> ExecuteAsync(CommentsCommand command)
+        public Task<CommandResult> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {
@@ -76,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 case UpdateComment updateComment:
                     return Upsert(updateComment, c =>
                     {
-                        GuardComments.CanUpdate(c, Key, events);
+                        GuardComments.CanUpdate(c, key.ToString(), events);
 
                         Update(c);
                     });
@@ -84,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 case DeleteComment deleteComment:
                     return Upsert(deleteComment, c =>
                     {
-                        GuardComments.CanDelete(c, Key, events);
+                        GuardComments.CanDelete(c, key.ToString(), events);
 
                         Delete(c);
                     });
@@ -102,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
             {
-                throw new DomainObjectVersionException(Key, Version, command.ExpectedVersion);
+                throw new DomainObjectVersionException(key.ToString(), Version, command.ExpectedVersion);
             }
 
             var previousVersion = version;
@@ -122,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
                 events.AddRange(uncommittedEvents);
 
-                return CommandResult.Empty(DomainId.Create(Key), Version, previousVersion);
+                return CommandResult.Empty(key, Version, previousVersion);
             }
             catch
             {
@@ -163,9 +161,9 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             return uncommittedEvents;
         }
 
-        public Task<CommentsResult> GetCommentsAsync(long sinceVersion = EtagVersion.Any)
+        public CommentsResult GetComments(long sinceVersion = EtagVersion.Any)
         {
-            return Task.FromResult(CommentsResult.FromEvents(events, Version, (int)sinceVersion));
+            return CommentsResult.FromEvents(events, Version, (int)sinceVersion);
         }
     }
 }

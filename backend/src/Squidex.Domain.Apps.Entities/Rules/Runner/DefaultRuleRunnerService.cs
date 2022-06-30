@@ -5,14 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MassTransit;
 using NodaTime;
-using Orleans;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
@@ -20,19 +21,23 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
     {
         private const int MaxSimulatedEvents = 100;
         private readonly IEventDataFormatter eventDataFormatter;
+        private readonly IPersistenceFactory<RuleRunnerState> persistenceFactory;
         private readonly IEventStore eventStore;
-        private readonly IGrainFactory grainFactory;
         private readonly IRuleService ruleService;
+        private readonly IBus bus;
 
-        public DefaultRuleRunnerService(IGrainFactory grainFactory,
+        public DefaultRuleRunnerService(
+            IPersistenceFactory<RuleRunnerState> persistenceFactory,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
-            IRuleService ruleService)
+            IRuleService ruleService,
+            IBus bus)
         {
-            this.grainFactory = grainFactory;
             this.eventDataFormatter = eventDataFormatter;
+            this.persistenceFactory = persistenceFactory;
             this.eventStore = eventStore;
             this.ruleService = ruleService;
+            this.bus = bus;
         }
 
         public Task<List<SimulatedRuleEvent>> SimulateAsync(IRuleEntity rule,
@@ -110,25 +115,31 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         public Task CancelAsync(DomainId appId,
             CancellationToken ct = default)
         {
-            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
-
-            return grain.CancelAsync();
-        }
-
-        public Task<DomainId?> GetRunningRuleIdAsync(DomainId appId,
-            CancellationToken ct = default)
-        {
-            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
-
-            return grain.GetRunningRuleIdAsync();
+            return bus.Publish(new RuleRunnerCancel(appId), ct);
         }
 
         public Task RunAsync(DomainId appId, DomainId ruleId, bool fromSnapshots = false,
             CancellationToken ct = default)
         {
-            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
+            return bus.Publish(new RuleRunnerRun(appId, ruleId, fromSnapshots), ct);
+        }
 
-            return grain.RunAsync(ruleId, fromSnapshots);
+        public async Task<DomainId?> GetRunningRuleIdAsync(DomainId appId,
+            CancellationToken ct = default)
+        {
+            var state = await GetStateAsync(appId, ct);
+
+            return state.Value.RuleId;
+        }
+
+        private async Task<SimpleState<RuleRunnerState>> GetStateAsync(DomainId appId,
+            CancellationToken ct)
+        {
+            var state = new SimpleState<RuleRunnerState>(persistenceFactory, GetType(), appId);
+
+            await state.LoadAsync(ct);
+
+            return state;
         }
 
         private static RuleContext GetContext(IRuleEntity rule)

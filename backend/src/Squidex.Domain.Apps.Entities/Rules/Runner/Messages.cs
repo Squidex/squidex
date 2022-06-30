@@ -5,17 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Rules.Indexes
+#pragma warning disable MA0048 // File name must match type name
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
+namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
-    public interface IRulesCacheGrain : IGrainWithStringKey
-    {
-        Task<IReadOnlyCollection<DomainId>> GetRuleIdsAsync();
+    public sealed record RuleRunnerRun(DomainId AppId, DomainId RuleId, bool FromSnapshots);
 
-        Task AddAsync(DomainId id);
-
-        Task RemoveAsync(DomainId id);
-    }
+    public sealed record RuleRunnerCancel(DomainId AppId);
 }

@@ -5,20 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
+
+#pragma warning disable MA0048 // File name must match type name
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public interface IBackupGrain : IGrainWithStringKey
-    {
-        Task BackupAsync(RefToken actor);
+    public sealed record BackupStart(DomainId AppId, RefToken Actor);
 
-        Task DeleteAsync(DomainId id);
+    public sealed record BackupRemove(DomainId AppId, DomainId Id);
 
-        Task ClearAsync();
+    public sealed record BackupClear(DomainId AppId);
 
-        Task<J<List<IBackupJob>>> GetStateAsync();
-    }
+    public sealed record BackupRestore(RefToken Actor, Uri Url, string? NewAppName = null);
 }

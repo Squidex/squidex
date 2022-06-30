@@ -9,29 +9,30 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.Logging;
 using NodaTime;
-using Orleans;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public class RuleDequeuerGrain : Grain, IRuleDequeuerGrain, IRemindable
+    public sealed class RuleDequeuerWorker : IInitializable
     {
+        private readonly CompletionTimer timer;
+        private readonly ConcurrentDictionary<DomainId, bool> executing = new ConcurrentDictionary<DomainId, bool>();
         private readonly ITargetBlock<IRuleEventEntity> requestBlock;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly IRuleService ruleService;
-        private readonly ConcurrentDictionary<DomainId, bool> executing = new ConcurrentDictionary<DomainId, bool>();
         private readonly IClock clock;
-        private readonly ILogger<RuleDequeuerGrain> log;
+        private readonly ILogger<RuleDequeuerWorker> log;
 
-        public RuleDequeuerGrain(
+        public RuleDequeuerWorker(
             IRuleService ruleService,
             IRuleEventRepository ruleEventRepository,
-            ILogger<RuleDequeuerGrain> log,
+            ILogger<RuleDequeuerWorker> log,
             IClock clock)
         {
             this.ruleEventRepository = ruleEventRepository;
@@ -44,37 +45,34 @@ namespace Squidex.Domain.Apps.Entities.Rules
             requestBlock =
                 new PartitionedActionBlock<IRuleEventEntity>(HandleAsync, x => x.Job.ExecutionPartition,
                     new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 32, BoundedCapacity = 32 });
+
+            timer = new CompletionTimer((int)TimeSpan.FromSeconds(10).TotalMilliseconds, QueryAsync);
         }
 
-        public override Task OnActivateAsync()
+        public Task InitializeAsync(
+            CancellationToken ct)
         {
-            DelayDeactivation(TimeSpan.FromDays(1));
-
-            RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
-            RegisterTimer(x => QueryAsync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
-
             return Task.CompletedTask;
         }
 
-        public override Task OnDeactivateAsync()
+        public async Task ReleaseAsync(
+            CancellationToken ct)
         {
+            await timer.StopAsync();
+
             requestBlock.Complete();
 
-            return requestBlock.Completion;
+            await requestBlock.Completion;
         }
 
-        public Task ActivateAsync()
-        {
-            return Task.CompletedTask;
-        }
-
-        public async Task QueryAsync()
+        public async Task QueryAsync(
+            CancellationToken ct = default)
         {
             try
             {
                 var now = clock.GetCurrentInstant();
 
-                await ruleEventRepository.QueryPendingAsync(now, requestBlock.SendAsync);
+                await ruleEventRepository.QueryPendingAsync(now, requestBlock.SendAsync, ct);
             }
             catch (Exception ex)
             {
@@ -163,11 +161,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             }
 
             return null;
-        }
-
-        public Task ReceiveReminder(string reminderName, TickStatus status)
-        {
-            return Task.CompletedTask;
         }
     }
 }

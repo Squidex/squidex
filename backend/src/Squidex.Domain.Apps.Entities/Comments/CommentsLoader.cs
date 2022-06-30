@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities.Comments.DomainObject;
 using Squidex.Infrastructure;
 
@@ -13,18 +13,26 @@ namespace Squidex.Domain.Apps.Entities.Comments
 {
     public sealed class CommentsLoader : ICommentsLoader
     {
-        private readonly IGrainFactory grainFactory;
+        private readonly Func<DomainId, CommentsStream> factory;
 
-        public CommentsLoader(IGrainFactory grainFactory)
+        public CommentsLoader(IServiceProvider serviceProvider)
         {
-            this.grainFactory = grainFactory;
+            var objectFactory = ActivatorUtilities.CreateFactory(typeof(CommentsStream), new[] { typeof(DomainId) });
+
+            factory = key =>
+            {
+                return (CommentsStream)objectFactory(serviceProvider, new object[] { key });
+            };
         }
 
-        public Task<CommentsResult> GetCommentsAsync(DomainId id, long version = EtagVersion.Any)
+        public async Task<CommentsResult> GetCommentsAsync(DomainId id, long version = EtagVersion.Any,
+            CancellationToken ct = default)
         {
-            var grain = grainFactory.GetGrain<ICommentsGrain>(id.ToString());
+            var stream = factory(id);
 
-            return grain.GetCommentsAsync(version);
+            await stream.LoadAsync(ct);
+
+            return stream.GetComments(version);
         }
     }
 }
