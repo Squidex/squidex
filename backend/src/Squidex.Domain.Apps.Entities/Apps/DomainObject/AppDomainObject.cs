@@ -30,12 +30,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private readonly IAppPlanBillingManager appPlansBillingManager;
         private readonly IUserResolver userResolver;
 
-        public AppDomainObject(IPersistenceFactory<State> persistence, ILogger<AppDomainObject> log,
+        public AppDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<AppDomainObject> log,
             InitialSettings initialSettings,
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
             IUserResolver userResolver)
-            : base(persistence, log)
+            : base(id, persistence, log)
         {
             this.userResolver = userResolver;
             this.appPlansProvider = appPlansProvider;

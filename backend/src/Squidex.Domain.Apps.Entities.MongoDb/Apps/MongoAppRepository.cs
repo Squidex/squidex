@@ -82,5 +82,57 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
 
             return result;
         }
+
+        public async Task<List<IAppEntity>> QueryAllAsync(string contributorId,
+            CancellationToken ct = default)
+        {
+            using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAsync"))
+            {
+                var entities =
+                    await Collection.Find(x => x.IndexedUserIds.Contains(contributorId) && !x.IndexedDeleted)
+                        .ToListAsync(ct);
+
+                return entities.Select(x => (IAppEntity)x.Document).ToList();
+            }
+        }
+
+        public async Task<List<IAppEntity>> QueryAllAsync(IEnumerable<string> names,
+            CancellationToken ct = default)
+        {
+            using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAllAsyncByNames"))
+            {
+                var entities =
+                    await Collection.Find(x => names.Contains(x.IndexedName) && !x.IndexedDeleted)
+                        .ToListAsync(ct);
+
+                return entities.Select(x => (IAppEntity)x.Document).ToList();
+            }
+        }
+
+        public async Task<IAppEntity?> FindAsync(DomainId id,
+            CancellationToken ct = default)
+        {
+            using (Telemetry.Activities.StartActivity("MongoAppRepository/FindAsync"))
+            {
+                var entity =
+                    await Collection.Find(x => x.DocumentId == id && !x.IndexedDeleted)
+                        .FirstOrDefaultAsync(ct);
+
+                return entity?.Document;
+            }
+        }
+
+        public async Task<IAppEntity?> FindAsync(string name,
+            CancellationToken ct = default)
+        {
+            using (Telemetry.Activities.StartActivity("MongoAppRepository/FindAsyncByName"))
+            {
+                var entity =
+                    await Collection.Find(x => x.IndexedName == name && !x.IndexedDeleted)
+                        .FirstOrDefaultAsync(ct);
+
+                return entity?.Document;
+            }
+        }
     }
 }

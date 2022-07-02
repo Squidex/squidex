@@ -16,13 +16,13 @@ using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentSchedulerWorker : IInitializable
+    public sealed class ContentSchedulerWorker : IBackgroundProcess
     {
-        private readonly CompletionTimer timer;
         private readonly IContentRepository contentRepository;
         private readonly ICommandBus commandBus;
         private readonly IClock clock;
         private readonly ILogger<ContentSchedulerWorker> log;
+        private CompletionTimer timer;
 
         public ContentSchedulerWorker(
             IContentRepository contentRepository,
@@ -36,20 +36,20 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contentRepository = contentRepository;
 
             this.log = log;
-
-            timer = new CompletionTimer((int)TimeSpan.FromSeconds(10).TotalMilliseconds, PublishAsync);
         }
 
-        public Task InitializeAsync(
+        public Task StartAsync(
             CancellationToken ct)
         {
+            timer = new CompletionTimer((int)TimeSpan.FromSeconds(10).TotalMilliseconds, PublishAsync);
+
             return Task.CompletedTask;
         }
 
-        public Task ReleaseAsync(
+        public Task StopAsync(
             CancellationToken ct)
         {
-            return timer.StopAsync();
+            return timer?.StopAsync() ?? Task.CompletedTask;
         }
 
         public async Task PublishAsync(

@@ -50,9 +50,6 @@ namespace Squidex.Config.Domain
                 }
             });
 
-            services.AddSingletonAs<OrleansEventNotifier>()
-                .As<IEventNotifier>();
-
             services.AddTransientAs<Rebuilder>()
                 .AsSelf();
 
@@ -62,12 +59,8 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<DefaultEventDataFormatter>()
                 .As<IEventDataFormatter>();
 
-            services.AddSingletonAs(c =>
-            {
-                var allEventConsumers = c.GetServices<IEventConsumer>();
-
-                return new EventConsumerFactory(n => allEventConsumers.First(x => x.Name == n));
-            });
+            services.AddSingletonAs<NoopEventNotifier>()
+                .As<IEventNotifier>();
         }
     }
 }

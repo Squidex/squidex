@@ -182,6 +182,9 @@ namespace Squidex.Config.Domain
             services.AddSingleton(typeof(IPersistenceFactory<>),
                 typeof(Store<>));
 
+            services.AddSingletonAs<UniqueNamesState>()
+                .As<IUniqueNamesState>();
+
             services.AddSingletonAs<IInitializable>(c =>
             {
                 var service = c.GetRequiredService<IAssetKeyValueStore<TusMetadata>>();

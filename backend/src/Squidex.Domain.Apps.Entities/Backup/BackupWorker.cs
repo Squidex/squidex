@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         private readonly ConcurrentDictionary<DomainId, BackupProcessor> backupProcessors = new ConcurrentDictionary<DomainId, BackupProcessor>();
         private readonly Func<DomainId, BackupProcessor> backupFactory;
-        private readonly RestoreRunner restoreProcessor;
+        private readonly RestoreProcessor restoreProcessor;
 
         public BackupWorker(IServiceProvider serviceProvider)
         {
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 return (BackupProcessor)objectFactory(serviceProvider, new object[] { key });
             };
 
-            restoreProcessor = serviceProvider.GetRequiredService<RestoreRunner>();
+            restoreProcessor = serviceProvider.GetRequiredService<RestoreProcessor>();
         }
 
         public Task InitializeAsync(

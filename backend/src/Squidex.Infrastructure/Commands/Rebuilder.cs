@@ -26,11 +26,11 @@ namespace Squidex.Infrastructure.Commands
 
         private static class Factory<T, TState> where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
-            private static readonly ObjectFactory ObjectFactory = ActivatorUtilities.CreateFactory(typeof(T), new[] { typeof(IPersistenceFactory<TState>) });
+            private static readonly ObjectFactory ObjectFactory = ActivatorUtilities.CreateFactory(typeof(T), new[] { typeof(DomainId), typeof(IPersistenceFactory<TState>) });
 
-            public static T Create(IServiceProvider serviceProvider, IPersistenceFactory<TState> persistenceFactory)
+            public static T Create(IServiceProvider serviceProvider, DomainId id, IPersistenceFactory<TState> persistenceFactory)
             {
-                return (T)ObjectFactory(serviceProvider, new object[] { persistenceFactory });
+                return (T)ObjectFactory(serviceProvider, new object[] { id, persistenceFactory });
             }
         }
 
@@ -107,9 +107,7 @@ namespace Squidex.Infrastructure.Commands
                             {
                                 try
                                 {
-                                    var domainObject = Factory<T, TState>.Create(serviceProvider, context);
-
-                                    domainObject.Setup(id);
+                                    var domainObject = Factory<T, TState>.Create(serviceProvider, id, context);
 
                                     await domainObject.RebuildStateAsync();
                                 }

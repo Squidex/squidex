@@ -24,9 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
     {
         private readonly IServiceProvider serviceProvider;
 
-        public AssetFolderDomainObject(IPersistenceFactory<State> factory, ILogger<AssetFolderDomainObject> log,
+        public AssetFolderDomainObject(DomainId id, IPersistenceFactory<State> factory, ILogger<AssetFolderDomainObject> log,
             IServiceProvider serviceProvider)
-            : base(factory, log)
+            : base(id, factory, log)
         {
             this.serviceProvider = serviceProvider;
         }

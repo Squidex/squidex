@@ -20,7 +20,6 @@ using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Config.Domain
@@ -31,9 +30,6 @@ namespace Squidex.Config.Domain
         {
             services.Configure<RuleOptions>(config,
                 "rules");
-
-            services.AddTransientAs<RuleDomainObject>()
-                .AsSelf();
 
             services.AddSingletonAs<EventEnricher>()
                 .As<IEventEnricher>();
@@ -99,9 +95,6 @@ namespace Squidex.Config.Domain
                 .As<IRuleService>();
 
             services.AddSingletonAs<RuleEventFormatter>()
-                .AsSelf();
-
-            services.AddSingletonAs<GrainBootstrap<IRuleDequeuerGrain>>()
                 .AsSelf();
 
             services.AddInitializer<RuleTypeProvider>("Serializer (Rules)", registry =>

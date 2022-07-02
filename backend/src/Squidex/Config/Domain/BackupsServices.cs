@@ -42,6 +42,9 @@ namespace Squidex.Config.Domain
 
             services.AddTransientAs<BackupSchemas>()
                 .As<IBackupHandler>();
+
+            services.AddTransientAs<RestoreProcessor>()
+                .AsSelf();
         }
     }
 }

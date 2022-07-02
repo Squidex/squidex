@@ -11,28 +11,28 @@ using tusdotnet.Interfaces;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetCleanupWorker : IInitializable
+    public sealed class AssetCleanupWorker : IBackgroundProcess
     {
         private readonly ITusExpirationStore expirationStore;
-        private readonly CompletionTimer timer;
+        private CompletionTimer timer;
 
         public AssetCleanupWorker(ITusExpirationStore expirationStore)
         {
             this.expirationStore = expirationStore;
-
-            timer = new CompletionTimer((int)TimeSpan.FromMinutes(10).TotalMilliseconds, CleanupAsync);
         }
 
-        public Task InitializeAsync(
+        public Task StartAsync(
             CancellationToken ct)
         {
+            timer = new CompletionTimer((int)TimeSpan.FromMinutes(10).TotalMilliseconds, CleanupAsync);
+
             return Task.CompletedTask;
         }
 
-        public Task ReleaseAsync(
+        public Task StopAsync(
             CancellationToken ct)
         {
-            return timer.StopAsync();
+            return timer?.StopAsync() ?? Task.CompletedTask;
         }
 
         public Task CleanupAsync(

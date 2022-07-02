@@ -12,9 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
-    public sealed class RuleRunnerWorker :
-        IJobConsumer<RuleRunnerRun>,
-        IConsumer<RuleRunnerCancel>
+    public sealed class RuleRunnerWorker : IJobConsumer<RuleRunnerRun>, IConsumer<RuleRunnerCancel>
     {
         private readonly ConcurrentDictionary<DomainId, RuleRunnerProcessor> processors = new ConcurrentDictionary<DomainId, RuleRunnerProcessor>();
         private readonly Func<DomainId, RuleRunnerProcessor> processorFactory;

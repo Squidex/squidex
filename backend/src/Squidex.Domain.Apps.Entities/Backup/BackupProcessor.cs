@@ -21,7 +21,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class BackupRunner
+    public sealed class BackupProcessor
     {
         private const int MaxBackups = 10;
         private static readonly Duration UpdateDuration = Duration.FromSeconds(1);
@@ -33,12 +33,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IServiceProvider serviceProvider;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
-        private readonly ILogger<BackupRunner> log;
+        private readonly ILogger<BackupProcessor> log;
         private readonly IUserResolver userResolver;
         private CancellationTokenSource? currentJobToken;
         private BackupJob? currentJob;
 
-        public BackupRunner(
+        public BackupProcessor(
             DomainId appId,
             IPersistenceFactory<BackupState> persistenceFactory,
             IBackupArchiveLocation backupArchiveLocation,
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IEventStore eventStore,
             IServiceProvider serviceProvider,
             IUserResolver userResolver,
-            ILogger<BackupRunner> log)
+            ILogger<BackupProcessor> log)
         {
             this.appId = appId;
             this.backupArchiveLocation = backupArchiveLocation;

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Comments;
+using Squidex.Domain.Apps.Entities.Comments.DomainObject;
 
 namespace Squidex.Config.Domain
 {
@@ -13,9 +14,6 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexComments(this IServiceCollection services)
         {
-            services.AddSingletonAs<GrainWatchingService>()
-                .As<IWatchingService>();
-
             services.AddSingletonAs<CommentsLoader>()
                 .As<ICommentsLoader>();
         }

@@ -15,11 +15,11 @@ namespace Squidex.Infrastructure.Commands
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private readonly SnapshotList<T> snapshots = new SnapshotList<T>();
+        private readonly DomainId uniqueId;
         private readonly IPersistenceFactory<T> factory;
         private readonly ILogger log;
         private IPersistence<T>? persistence;
         private bool isLoaded;
-        private DomainId uniqueId;
 
         public DomainId UniqueId
         {
@@ -42,15 +42,28 @@ namespace Squidex.Infrastructure.Commands
             set => snapshots.Capacity = value;
         }
 
-        protected DomainObject(IPersistenceFactory<T> factory,
+        protected DomainObject(DomainId uniqueId, IPersistenceFactory<T> factory,
             ILogger log)
         {
             Guard.NotNull(factory);
             Guard.NotNull(log);
 
+            this.uniqueId = uniqueId;
             this.factory = factory;
-
             this.log = log;
+
+            persistence = factory.WithSnapshotsAndEventSourcing(GetType(), UniqueId,
+                new HandleSnapshot<T>((snapshot, version) =>
+                {
+                    snapshot.Version = version;
+                    snapshots.Add(snapshot, version, true);
+                }),
+                @event =>
+                {
+                    @event = @event.Migrate(Snapshot);
+
+                    return ApplyEvent(@event, true, Snapshot, Version, true).Success;
+                });
         }
 
         public async Task<T> GetSnapshotAsync(long version)
@@ -88,24 +101,6 @@ namespace Squidex.Infrastructure.Commands
             }
 
             return result ?? new T { Version = EtagVersion.Empty };
-        }
-
-        public virtual void Setup(DomainId uniqueId)
-        {
-            this.uniqueId = uniqueId;
-
-            persistence = factory.WithSnapshotsAndEventSourcing(GetType(), UniqueId,
-                new HandleSnapshot<T>((snapshot, version) =>
-                {
-                    snapshot.Version = version;
-                    snapshots.Add(snapshot, version, true);
-                }),
-                @event =>
-                {
-                    @event = @event.Migrate(Snapshot);
-
-                    return ApplyEvent(@event, true, Snapshot, Version, true).Success;
-                });
         }
 
         public virtual async Task EnsureLoadedAsync(bool silent = false)
@@ -184,8 +179,6 @@ namespace Squidex.Infrastructure.Commands
                     if (persistence != null)
                     {
                         await persistence.DeleteAsync();
-
-                        Setup(uniqueId);
                     }
 
                     snapshots.Clear();

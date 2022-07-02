@@ -24,14 +24,14 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class RestoreRunner
+    public sealed class RestoreProcessor
     {
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IClock clock;
         private readonly ICommandBus commandBus;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
-        private readonly ILogger<RestoreRunner> log;
+        private readonly ILogger<RestoreProcessor> log;
         private readonly IServiceProvider serviceProvider;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IUserResolver userResolver;
@@ -44,17 +44,17 @@ namespace Squidex.Domain.Apps.Entities.Backup
             get => state.Value.Job;
         }
 
-        public RestoreRunner(
-            IPersistenceFactory<BackupRestoreState> persistenceFactory,
+        public RestoreProcessor(
             IBackupArchiveLocation backupArchiveLocation,
             IClock clock,
             ICommandBus commandBus,
             IEventDataFormatter eventDataFormatter,
             IEventStore eventStore,
+            IPersistenceFactory<BackupRestoreState> persistenceFactory,
             IServiceProvider serviceProvider,
             IStreamNameResolver streamNameResolver,
             IUserResolver userResolver,
-            ILogger<RestoreRunner> log)
+            ILogger<RestoreProcessor> log)
         {
             this.backupArchiveLocation = backupArchiveLocation;
             this.clock = clock;

@@ -20,11 +20,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         IConsumer<UsageTrackingAdd>,
         IConsumer<UsageTrackingUpdate>,
         IConsumer<UsageTrackingRemove>,
-        IInitializable
+        IBackgroundProcess
     {
         private readonly SimpleState<State> state;
-        private readonly CompletionTimer timer;
         private readonly IApiUsageTracker usageTracker;
+        private CompletionTimer timer;
 
         public sealed class Target
         {
@@ -69,20 +69,20 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             this.usageTracker = usageTracker;
 
             state = new SimpleState<State>(persistenceFactory, GetType(), "Default");
+        }
+
+        public async Task StartAsync(
+            CancellationToken ct)
+        {
+            await state.LoadAsync(ct);
 
             timer = new CompletionTimer((int)TimeSpan.FromMinutes(10).TotalMilliseconds, _ => CheckUsagesAsync());
         }
 
-        public Task InitializeAsync(
+        public Task StopAsync(
             CancellationToken ct)
         {
-            return state.LoadAsync(ct);
-        }
-
-        public Task ReleaseAsync(
-            CancellationToken ct)
-        {
-            return timer.StopAsync();
+            return timer?.StopAsync() ?? Task.CompletedTask;
         }
 
         public async Task CheckUsagesAsync()

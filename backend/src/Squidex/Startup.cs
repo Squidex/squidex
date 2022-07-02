@@ -116,12 +116,6 @@ namespace Squidex
                 builder.UseMiddleware<PortalRedirectMiddleware>();
             });
 
-            app.Map(Constants.PrefixOrleans, builder =>
-            {
-                builder.UseMiddleware<OrleansDashboardAuthenticationMiddleware>();
-                builder.UseOrleansDashboard();
-            });
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

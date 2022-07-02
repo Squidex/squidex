@@ -37,6 +37,9 @@
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.6" />
     <PackageReference Include="GraphQL" Version="5.3.0" />
     <PackageReference Include="GraphQL.MicrosoftDI" Version="5.3.0" />
+    <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.3.1" />
+    <PackageReference Include="MassTransit.MongoDb" Version="8.0.3" />
+    <PackageReference Include="MassTransit.Newtonsoft" Version="8.0.3" />
     <PackageReference Include="Meziantou.Analyzer" Version="1.0.702">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Areas.IdentityServer.Config
 {
-    public sealed class TokenStoreInitializer : IInitializable
+    public sealed class TokenStoreInitializer : IInitializable, IBackgroundProcess
     {
         private readonly OpenIddictMongoDbOptions options;
         private readonly IServiceProvider serviceProvider;
@@ -33,13 +33,20 @@ namespace Squidex.Areas.IdentityServer.Config
             CancellationToken ct)
         {
             await SetupIndexAsync(ct);
+        }
+
+        public async Task StartAsync(
+            CancellationToken ct)
+        {
+            timer = new CompletionTimer((int)TimeSpan.FromHours(6).TotalMilliseconds, PruneAsync);
 
             await PruneAsync(ct);
+        }
 
-            timer = new CompletionTimer((int)TimeSpan.FromHours(6).TotalMilliseconds, async ct =>
-            {
-                await PruneAsync(ct);
-            });
+        public Task StopAsync(
+            CancellationToken ct)
+        {
+            return timer?.StopAsync() ?? Task.CompletedTask;
         }
 
         private async Task PruneAsync(
@@ -67,15 +74,6 @@ namespace Squidex.Areas.IdentityServer.Config
                         Builders<OpenIddictMongoDbToken<string>>.IndexKeys
                             .Ascending(x => x.ReferenceId)),
                     cancellationToken: ct);
-            }
-        }
-
-        public async Task ReleaseAsync(
-            CancellationToken ct)
-        {
-            if (timer != null)
-            {
-                await timer.StopAsync();
             }
         }
     }

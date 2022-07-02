@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Hosting;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 using tusdotnet.Interfaces;
 
 namespace Squidex.Config.Domain
@@ -39,12 +38,6 @@ namespace Squidex.Config.Domain
                 services.AddTransientAs<AssetPermanentDeleter>()
                    .As<IEventConsumer>();
             }
-
-            services.AddTransientAs<AssetDomainObject>()
-                .AsSelf();
-
-            services.AddTransientAs<AssetFolderDomainObject>()
-                .AsSelf();
 
             services.AddSingletonAs<AssetQueryParser>()
                 .AsSelf();
@@ -96,9 +89,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<SvgAssetMetadataSource>()
                 .As<IAssetMetadataSource>();
-
-            services.AddSingletonAs<GrainBootstrap<IAssetCleanupGrain>>()
-                .AsSelf();
         }
 
         public static void AddSquidexAssetInfrastructure(this IServiceCollection services, IConfiguration config)

@@ -11,4 +11,11 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         void NotifyEventsStored(string streamName);
     }
+
+    public sealed class NoopEventNotifier : IEventNotifier
+    {
+        public void NotifyEventsStored(string streamName)
+        {
+        }
+    }
 }

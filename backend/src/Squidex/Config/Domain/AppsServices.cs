@@ -28,9 +28,6 @@ namespace Squidex.Config.Domain
                     .As<IEventConsumer>();
             }
 
-            services.AddTransientAs<AppDomainObject>()
-                .AsSelf();
-
             services.AddSingletonAs<RolePermissionsProvider>()
                 .AsSelf();
 

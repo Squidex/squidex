@@ -19,15 +19,15 @@ using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public sealed class RuleDequeuerWorker : IInitializable
+    public sealed class RuleDequeuerWorker : IBackgroundProcess
     {
-        private readonly CompletionTimer timer;
         private readonly ConcurrentDictionary<DomainId, bool> executing = new ConcurrentDictionary<DomainId, bool>();
         private readonly ITargetBlock<IRuleEventEntity> requestBlock;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly IRuleService ruleService;
         private readonly IClock clock;
         private readonly ILogger<RuleDequeuerWorker> log;
+        private CompletionTimer timer;
 
         public RuleDequeuerWorker(
             IRuleService ruleService,
@@ -45,20 +45,20 @@ namespace Squidex.Domain.Apps.Entities.Rules
             requestBlock =
                 new PartitionedActionBlock<IRuleEventEntity>(HandleAsync, x => x.Job.ExecutionPartition,
                     new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 32, BoundedCapacity = 32 });
-
-            timer = new CompletionTimer((int)TimeSpan.FromSeconds(10).TotalMilliseconds, QueryAsync);
         }
 
-        public Task InitializeAsync(
+        public Task StartAsync(
             CancellationToken ct)
         {
+            timer = new CompletionTimer((int)TimeSpan.FromSeconds(10).TotalMilliseconds, QueryAsync);
+
             return Task.CompletedTask;
         }
 
-        public async Task ReleaseAsync(
+        public async Task StopAsync(
             CancellationToken ct)
         {
-            await timer.StopAsync();
+            await (timer?.StopAsync() ?? Task.CompletedTask);
 
             requestBlock.Complete();
 

@@ -8,6 +8,7 @@
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
@@ -40,14 +41,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, app.Id), ct);
         }
 
-        public async Task<List<DomainId>> QueryIdsAsync(DomainId appId,
+        public async Task<List<IRuleEntity>> QueryAllAsync(DomainId appId,
             CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartActivity("MongoRuleRepository/QueryIdsAsync"))
+            using (Telemetry.Activities.StartActivity("MongoRuleRepository/QueryAllAsync"))
             {
-                var entities = await Collection.Find(x => x.IndexedAppId == appId && !x.IndexedDeleted).Only(x => x.IndexedId).ToListAsync(ct);
+                var entities =
+                    await Collection.Find(x => x.IndexedAppId == appId && !x.IndexedDeleted)
+                        .ToListAsync(ct);
 
-                return entities.Select(x => DomainId.Create(x["_ri"].AsString)).ToList();
+                return entities.Select(x => (IRuleEntity)x.Document).ToList();
             }
         }
     }
