@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public class DefaultEventDataFormatterTests
+    public class DefaultEventFormatterTests
     {
         public sealed class MyOldEvent : IEvent, IMigrated<IEvent>
         {
@@ -25,16 +25,16 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private readonly DefaultEventDataFormatter sut;
+        private readonly DefaultEventFormatter sut;
 
-        public DefaultEventDataFormatterTests()
+        public DefaultEventFormatterTests()
         {
             var typeNameRegistry =
                 new TypeNameRegistry()
                     .Map(typeof(MyEvent), "Event")
                     .Map(typeof(MyOldEvent), "OldEvent");
 
-            sut = new DefaultEventDataFormatter(typeNameRegistry, TestUtils.CreateSerializer(typeNameRegistry));
+            sut = new DefaultEventFormatter(typeNameRegistry, TestUtils.CreateSerializer(typeNameRegistry));
         }
 
         [Fact]

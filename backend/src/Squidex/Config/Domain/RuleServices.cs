@@ -14,7 +14,6 @@ using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Comments;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
-using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Domain.Apps.Entities.Rules.Queries;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
@@ -31,9 +30,6 @@ namespace Squidex.Config.Domain
         {
             services.Configure<RuleOptions>(config,
                 "rules");
-
-            services.AddTransientAs<RuleDomainObject>()
-                .AsSelf();
 
             services.AddSingletonAs<EventEnricher>()
                 .As<IEventEnricher>();

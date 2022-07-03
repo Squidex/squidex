@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using NodaTime;
+using Orleans.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 
@@ -17,7 +18,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
         private readonly Dictionary<string, Dictionary<string, Instant>> users = new Dictionary<string, Dictionary<string, Instant>>();
         private readonly IClock clock;
 
-        public WatchingGrain(IClock clock)
+        public WatchingGrain(IGrainIdentity grainIdentity, IClock clock)
+            : base(grainIdentity)
         {
             this.clock = clock;
         }

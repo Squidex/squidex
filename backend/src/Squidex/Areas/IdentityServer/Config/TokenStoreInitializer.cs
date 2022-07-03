@@ -21,11 +21,9 @@ namespace Squidex.Areas.IdentityServer.Config
         private readonly IServiceProvider serviceProvider;
         private CompletionTimer timer;
 
-        public TokenStoreInitializer(IOptions<OpenIddictMongoDbOptions> options,
-            IServiceProvider serviceProvider)
+        public TokenStoreInitializer(IOptions<OpenIddictMongoDbOptions> options, IServiceProvider serviceProvider)
         {
             this.options = options.Value;
-
             this.serviceProvider = serviceProvider;
         }
 

@@ -5,19 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Orleans.Core;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 {
     public sealed class SchemaDomainObjectGrain : DomainObjectGrain<SchemaDomainObject, SchemaDomainObject.State>, ISchemaGrain
     {
-        public SchemaDomainObjectGrain(IServiceProvider serviceProvider)
-            : base(serviceProvider)
+        public SchemaDomainObjectGrain(IGrainIdentity identity, IDomainObjectFactory factory)
+            : base(identity, factory)
         {
         }
 
-        public async Task<J<ISchemaEntity>> GetStateAsync()
+        public async Task<ISchemaEntity> GetStateAsync()
         {
             await DomainObject.EnsureLoadedAsync();
 

@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Xunit;
 
@@ -117,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var grain = A.Fake<IAppGrain>();
 
             A.CallTo(() => grain.GetStateAsync())
-                .Returns(app.AsJ());
+                .Returns(app);
 
             A.CallTo(() => grainFactory.GetGrain<IAppGrain>(app.Id.ToString(), null))
                 .Returns(grain);

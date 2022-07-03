@@ -20,9 +20,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public class BackupReaderWriterTests
     {
-        private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
+        private readonly IEventFormatter eventFormatter;
+        private readonly IEventStreamNames eventStreamNames = A.Fake<IEventStreamNames>();
         private readonly IJsonSerializer serializer = TestUtils.DefaultSerializer;
-        private readonly IEventDataFormatter formatter;
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
 
         [TypeName(nameof(MyEvent))]
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             typeNameRegistry.Map(typeof(MyEvent));
 
-            formatter = new DefaultEventDataFormatter(typeNameRegistry, serializer);
+            eventFormatter = new DefaultEventFormatter(typeNameRegistry, serializer);
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 foreach (var (stream, envelope) in sourceEvents)
                 {
-                    var eventData = formatter.ToEventData(envelope, Guid.NewGuid(), true);
+                    var eventData = eventFormatter.ToEventData(envelope, Guid.NewGuid(), true);
                     var eventStored = new StoredEvent(stream, "1", 2, eventData);
 
                     var index = int.Parse(envelope.Headers["Index"].ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture);
@@ -214,7 +214,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 var targetEvents = new List<(string Stream, Envelope<IEvent> Event)>();
 
-                await foreach (var @event in reader.ReadEventsAsync(streamNameResolver, formatter))
+                await foreach (var @event in reader.ReadEventsAsync(eventStreamNames, eventFormatter))
                 {
                     var index = int.Parse(@event.Event.Headers["Index"].ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture);
 

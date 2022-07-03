@@ -17,14 +17,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public class RepairFilesTests
     {
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
-        private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
+        private readonly IEventFormatter eventFormatter = A.Fake<IEventFormatter>();
         private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly RebuildFiles sut;
 
         public RepairFilesTests()
         {
-            sut = new RebuildFiles(assetFileStore, eventStore, eventDataFormatter);
+            sut = new RebuildFiles(assetFileStore, eventFormatter, eventStore);
         }
 
         [Fact]
@@ -115,12 +115,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (@event != null)
             {
-                A.CallTo(() => eventDataFormatter.ParseIfKnown(storedEvent))
+                A.CallTo(() => eventFormatter.ParseIfKnown(storedEvent))
                     .Returns(Envelope.Create(@event));
             }
             else
             {
-                A.CallTo(() => eventDataFormatter.ParseIfKnown(storedEvent))
+                A.CallTo(() => eventFormatter.ParseIfKnown(storedEvent))
                     .Returns(null);
             }
 

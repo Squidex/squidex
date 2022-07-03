@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Orleans.Core;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
 using Xunit;
@@ -14,50 +15,51 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public sealed class AppUISettingsGrainTests
     {
-        private readonly IGrainState<AppUISettingsGrain.State> grainState = A.Fake<IGrainState<AppUISettingsGrain.State>>();
+        private readonly IGrainIdentity identity = A.Fake<IGrainIdentity>();
+        private readonly IGrainState<AppUISettingsGrain.State> state = A.Fake<IGrainState<AppUISettingsGrain.State>>();
         private readonly AppUISettingsGrain sut;
 
         public AppUISettingsGrainTests()
         {
-            sut = new AppUISettingsGrain(grainState);
+            sut = new AppUISettingsGrain(identity, state);
         }
 
         [Fact]
         public async Task Should_set_setting()
         {
-            await sut.SetAsync(new JsonObject().Add("key", 15).AsJ());
+            await sut.SetAsync(new JsonObject().Add("key", 15));
 
             var actual = await sut.GetAsync();
 
             var expected =
                 new JsonObject().Add("key", 15);
 
-            Assert.Equal(expected.ToString(), actual.Value.ToString());
+            Assert.Equal(expected.ToString(), actual.ToString());
 
-            A.CallTo(() => grainState.WriteAsync())
+            A.CallTo(() => state.WriteAsync())
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_set_root_value()
         {
-            await sut.SetAsync("key", JsonValue.Create(123).AsJ());
+            await sut.SetAsync("key", JsonValue.Create(123));
 
             var actual = await sut.GetAsync();
 
             var expected =
                 new JsonObject().Add("key", 123);
 
-            Assert.Equal(expected.ToString(), actual.Value.ToString());
+            Assert.Equal(expected.ToString(), actual.ToString());
 
-            A.CallTo(() => grainState.WriteAsync())
+            A.CallTo(() => state.WriteAsync())
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_remove_root_value()
         {
-            await sut.SetAsync("key", JsonValue.Create(123).AsJ());
+            await sut.SetAsync("key", JsonValue.Create(123));
 
             await sut.RemoveAsync("key");
 
@@ -65,16 +67,16 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var expected = new JsonObject();
 
-            Assert.Equal(expected.ToString(), actual.Value.ToString());
+            Assert.Equal(expected.ToString(), actual.ToString());
 
-            A.CallTo(() => grainState.WriteAsync())
+            A.CallTo(() => state.WriteAsync())
                 .MustHaveHappenedTwiceExactly();
         }
 
         [Fact]
         public async Task Should_set_nested_value()
         {
-            await sut.SetAsync("root.nested", JsonValue.Create(123).AsJ());
+            await sut.SetAsync("root.nested", JsonValue.Create(123));
 
             var actual = await sut.GetAsync();
 
@@ -82,16 +84,16 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 new JsonObject().Add("root",
                     new JsonObject().Add("nested", 123));
 
-            Assert.Equal(expected.ToString(), actual.Value.ToString());
+            Assert.Equal(expected.ToString(), actual.ToString());
 
-            A.CallTo(() => grainState.WriteAsync())
+            A.CallTo(() => state.WriteAsync())
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_remove_nested_value()
         {
-            await sut.SetAsync("root.nested", JsonValue.Create(123).AsJ());
+            await sut.SetAsync("root.nested", JsonValue.Create(123));
 
             await sut.RemoveAsync("root.nested");
 
@@ -101,18 +103,18 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 new JsonObject().Add("root",
                     new JsonObject());
 
-            Assert.Equal(expected.ToString(), actual.Value.ToString());
+            Assert.Equal(expected.ToString(), actual.ToString());
 
-            A.CallTo(() => grainState.WriteAsync())
+            A.CallTo(() => state.WriteAsync())
                 .MustHaveHappenedTwiceExactly();
         }
 
         [Fact]
         public async Task Should_throw_exception_if_nested_not_an_object()
         {
-            await sut.SetAsync("root.nested", JsonValue.Create(123).AsJ());
+            await sut.SetAsync("root.nested", JsonValue.Create(123));
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.SetAsync("root.nested.value", JsonValue.Create(123).AsJ()));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.SetAsync("root.nested.value", JsonValue.Create(123)));
         }
 
         [Fact]
@@ -120,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             await sut.RemoveAsync("root.nested");
 
-            A.CallTo(() => grainState.WriteAsync())
+            A.CallTo(() => state.WriteAsync())
                 .MustNotHaveHappened();
         }
 
@@ -129,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             await sut.RemoveAsync("root");
 
-            A.CallTo(() => grainState.WriteAsync())
+            A.CallTo(() => state.WriteAsync())
                 .MustNotHaveHappened();
         }
     }

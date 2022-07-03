@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Orleans.Core;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
@@ -12,35 +13,42 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Tags
 {
-    public sealed class TagGrain : GrainOfString, ITagGrain
+    public sealed class TagGrain : GrainBase, ITagGrain
     {
-        private readonly IGrainState<State> state;
+        private readonly IGrainState<State> grainState;
 
         [CollectionName("Index_Tags")]
         public sealed class State : TagsExport
         {
         }
 
-        private Dictionary<string, Tag> Tags => state.Value.Tags ??= new Dictionary<string, Tag>();
-
-        private Dictionary<string, string> Alias => state.Value.Alias ??= new Dictionary<string, string>();
-
-        public TagGrain(IGrainState<State> state)
+        private Dictionary<string, Tag> Tags
         {
-            this.state = state;
+            get => grainState.Value.Tags ??= new Dictionary<string, Tag>();
+        }
+
+        private Dictionary<string, string> Alias
+        {
+            get => grainState.Value.Alias ??= new Dictionary<string, string>();
+        }
+
+        public TagGrain(IGrainIdentity grainIdentity, IGrainState<State> grainState)
+            : base(grainIdentity)
+        {
+            this.grainState = grainState;
         }
 
         public Task ClearAsync()
         {
-            return state.ClearAsync();
+            return grainState.ClearAsync();
         }
 
         public Task RebuildAsync(TagsExport export)
         {
-            state.Value.Tags = export.Tags;
-            state.Value.Alias = export.Alias;
+            grainState.Value.Tags = export.Tags;
+            grainState.Value.Alias = export.Alias;
 
-            return state.WriteAsync();
+            return grainState.WriteAsync();
         }
 
         public Task RenameTagAsync(string name, string newName)
@@ -73,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             Alias[name] = newName;
 
-            return state.WriteAsync();
+            return grainState.WriteAsync();
         }
 
         public async Task<Dictionary<string, string>> NormalizeTagsAsync(HashSet<string>? names, HashSet<string>? ids)
@@ -112,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
                 }
             }
 
-            await state.WriteAsync();
+            await grainState.WriteAsync();
 
             return result;
         }
@@ -157,12 +165,12 @@ namespace Squidex.Domain.Apps.Entities.Tags
         {
             var tags = Tags.Values.ToDictionary(x => x.Name, x => x.Count);
 
-            return Task.FromResult(new TagsSet(tags, state.Version));
+            return Task.FromResult(new TagsSet(tags, grainState.Version));
         }
 
         public Task<TagsExport> GetExportableTagsAsync()
         {
-            return Task.FromResult(state.Value.Clone());
+            return Task.FromResult(grainState.Value.Clone());
         }
 
         private string GetId(string name, HashSet<string>? ids)

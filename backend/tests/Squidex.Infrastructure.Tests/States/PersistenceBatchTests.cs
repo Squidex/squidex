@@ -15,18 +15,18 @@ namespace Squidex.Infrastructure.States
 {
     public class PersistenceBatchTests
     {
-        private readonly ISnapshotStore<int> snapshotStore = A.Fake<ISnapshotStore<int>>();
-        private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
+        private readonly IEventFormatter eventFormatter = A.Fake<IEventFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
-        private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
+        private readonly IEventStreamNames eventStreamNames = A.Fake<IEventStreamNames>();
+        private readonly ISnapshotStore<int> snapshotStore = A.Fake<ISnapshotStore<int>>();
         private readonly IStore<int> sut;
 
         public PersistenceBatchTests()
         {
-            A.CallTo(() => streamNameResolver.GetStreamName(None.Type, A<string>._))
+            A.CallTo(() => eventStreamNames.GetStreamName(None.Type, A<string>._))
                 .ReturnsLazily(x => x.GetArgument<string>(1)!);
 
-            sut = new Store<int>(snapshotStore, eventStore, eventDataFormatter, streamNameResolver);
+            sut = new Store<int>(eventFormatter, eventStore, eventStreamNames, snapshotStore);
         }
 
         [Fact]
@@ -202,10 +202,10 @@ namespace Squidex.Infrastructure.States
 
                     storedStream.Add(eventStored);
 
-                    A.CallTo(() => eventDataFormatter.Parse(eventStored))
+                    A.CallTo(() => eventFormatter.Parse(eventStored))
                         .Returns(new Envelope<IEvent>(@event));
 
-                    A.CallTo(() => eventDataFormatter.ParseIfKnown(eventStored))
+                    A.CallTo(() => eventFormatter.ParseIfKnown(eventStored))
                         .Returns(new Envelope<IEvent>(@event));
 
                     i++;

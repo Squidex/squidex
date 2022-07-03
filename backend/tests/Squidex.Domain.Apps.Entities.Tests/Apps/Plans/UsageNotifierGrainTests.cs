@@ -7,6 +7,7 @@
 
 using FakeItEasy;
 using NodaTime;
+using Orleans.Core;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Infrastructure.Orleans;
@@ -17,10 +18,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
     public class UsageNotifierGrainTests
     {
+        private readonly IClock clock = A.Fake<IClock>();
+        private readonly IGrainIdentity identity = A.Fake<IGrainIdentity>();
         private readonly IGrainState<UsageNotifierGrain.State> state = A.Fake<IGrainState<UsageNotifierGrain.State>>();
         private readonly INotificationSender notificationSender = A.Fake<INotificationSender>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-        private readonly IClock clock = A.Fake<IClock>();
         private readonly UsageNotifierGrain sut;
         private Instant time = SystemClock.Instance.GetCurrentInstant();
 
@@ -32,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             A.CallTo(() => notificationSender.IsActive)
                 .Returns(true);
 
-            sut = new UsageNotifierGrain(state, notificationSender, userResolver, clock);
+            sut = new UsageNotifierGrain(identity, state, notificationSender, userResolver, clock);
         }
 
         [Fact]

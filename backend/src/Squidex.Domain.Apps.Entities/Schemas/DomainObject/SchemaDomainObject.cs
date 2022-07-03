@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
@@ -25,8 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 {
     public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject.State>
     {
-        public SchemaDomainObject(IPersistenceFactory<State> persistence, ILogger<SchemaDomainObject> log)
-            : base(persistence, log)
+        public SchemaDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<SchemaDomainObject> log)
+            : base(id, persistence, log)
         {
         }
 
@@ -407,9 +406,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
             return NamedId.Of(Snapshot.SchemaFieldsTotal + 1, command.Name);
         }
 
-        public Task<J<ISchemaEntity>> GetStateAsync()
+        public Task<ISchemaEntity> GetStateAsync()
         {
-            return J.AsTask<ISchemaEntity>(Snapshot);
+            return Task.FromResult<ISchemaEntity>(Snapshot);
         }
     }
 }

@@ -5,14 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public interface IEventDataFormatter
+    public interface IBackupHandlerFactory
     {
-        Envelope<IEvent> Parse(StoredEvent storedEvent);
-
-        Envelope<IEvent>? ParseIfKnown(StoredEvent storedEvent);
-
-        EventData ToEventData(Envelope<IEvent> envelope, Guid commitId, bool migrate = true);
+        IEnumerable<IBackupHandler> CreateMany();
     }
 }

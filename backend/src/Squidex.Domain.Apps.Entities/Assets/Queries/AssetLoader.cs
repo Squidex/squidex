@@ -29,14 +29,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 var assetGrain = grainFactory.GetGrain<IAssetGrain>(key.ToString());
                 var assetState = await assetGrain.GetStateAsync(version);
 
-                var asset = assetState.Value;
-
-                if (asset == null || asset.Version <= EtagVersion.Empty || (version > EtagVersion.Any && asset.Version != version))
+                if (assetState == null || assetState.Version <= EtagVersion.Empty || (version > EtagVersion.Any && assetState.Version != version))
                 {
                     return null;
                 }
 
-                return asset;
+                return assetState;
             }
         }
     }

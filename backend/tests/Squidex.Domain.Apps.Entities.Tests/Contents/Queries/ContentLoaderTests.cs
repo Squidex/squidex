@@ -9,7 +9,6 @@ using FakeItEasy;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
@@ -36,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public async Task Should_return_null_if_no_state_returned()
         {
             A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IContentEntity>(null!));
+                .Returns(Task.FromResult<IContentEntity>(null!));
 
             Assert.Null(await sut.GetAsync(appId, id, 10));
         }
@@ -47,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var content = new ContentEntity { Version = EtagVersion.Empty };
 
             A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IContentEntity>(content));
+                .Returns(content);
 
             Assert.Null(await sut.GetAsync(appId, id, 10));
         }
@@ -58,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var content = new ContentEntity { Version = 5 };
 
             A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IContentEntity>(content));
+                .Returns(content);
 
             Assert.Null(await sut.GetAsync(appId, id, 10));
         }
@@ -69,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var content = new ContentEntity { Version = 5 };
 
             A.CallTo(() => grain.GetStateAsync(EtagVersion.Any))
-                .Returns(J.Of<IContentEntity>(content));
+                .Returns(content);
 
             await sut.GetAsync(appId, id, EtagVersion.Any);
         }
@@ -80,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var content = new ContentEntity { Version = 10 };
 
             A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IContentEntity>(content));
+                .Returns(content);
 
             var result = await sut.GetAsync(appId, id, 10);
 

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Orleans.Core;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Xunit;
@@ -14,14 +15,17 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 {
     public class RulesCacheGrainTests
     {
+        private readonly IGrainIdentity identity = A.Fake<IGrainIdentity>();
         private readonly IRuleRepository ruleRepository = A.Fake<IRuleRepository>();
         private readonly DomainId appId = DomainId.NewGuid();
         private readonly RulesCacheGrain sut;
 
         public RulesCacheGrainTests()
         {
-            sut = new RulesCacheGrain(ruleRepository);
-            sut.ActivateAsync(appId.ToString()).Wait();
+            A.CallTo(() => identity.PrimaryKeyString)
+                .Returns(appId.ToString());
+
+            sut = new RulesCacheGrain(identity, ruleRepository);
         }
 
         [Fact]

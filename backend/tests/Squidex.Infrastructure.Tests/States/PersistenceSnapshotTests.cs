@@ -15,14 +15,14 @@ namespace Squidex.Infrastructure.States
     {
         private readonly DomainId key = DomainId.NewGuid();
         private readonly ISnapshotStore<int> snapshotStore = A.Fake<ISnapshotStore<int>>();
-        private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
+        private readonly IEventStreamNames eventStreamNames = A.Fake<IEventStreamNames>();
+        private readonly IEventFormatter eventFormatter = A.Fake<IEventFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
-        private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
         private readonly IStore<int> sut;
 
         public PersistenceSnapshotTests()
         {
-            sut = new Store<int>(snapshotStore, eventStore, eventDataFormatter, streamNameResolver);
+            sut = new Store<int>(eventFormatter, eventStore, eventStreamNames, snapshotStore);
         }
 
         [Fact]

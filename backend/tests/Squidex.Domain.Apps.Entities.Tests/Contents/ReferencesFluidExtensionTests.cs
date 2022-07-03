@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ReferencesFluidExtensionTests()
         {
-            var services =
+            var serviceProvider =
                 new ServiceCollection()
                     .AddSingleton(appProvider)
                     .AddSingleton(contentQuery)
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var extensions = new IFluidExtension[]
             {
                 new ContentFluidExtension(),
-                new ReferencesFluidExtension(services)
+                new ReferencesFluidExtension(serviceProvider)
             };
 
             A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, default))

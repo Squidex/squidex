@@ -6,12 +6,11 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 {
     public interface IRuleGrain : IDomainObjectGrain
     {
-        Task<J<IRuleEntity>> GetStateAsync();
+        Task<IRuleEntity> GetStateAsync();
     }
 }

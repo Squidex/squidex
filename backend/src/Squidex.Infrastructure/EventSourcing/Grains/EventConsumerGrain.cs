@@ -7,21 +7,21 @@
 
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
+using Orleans.Core;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public class EventConsumerGrain : GrainOfString, IEventConsumerGrain
+    public class EventConsumerGrain : GrainBase, IEventConsumerGrain
     {
-        private readonly EventConsumerFactory eventConsumerFactory;
         private readonly IGrainState<EventConsumerState> state;
-        private readonly IEventDataFormatter eventDataFormatter;
+        private readonly IEventConsumer eventConsumer;
+        private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
         private readonly ILogger<EventConsumerGrain> log;
         private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
         private IEventSubscription? currentSubscription;
-        private IEventConsumer? eventConsumer;
 
         private EventConsumerState State
         {
@@ -30,25 +30,19 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         public EventConsumerGrain(
-            EventConsumerFactory eventConsumerFactory,
+            IGrainIdentity identity,
             IGrainState<EventConsumerState> state,
+            IEventConsumerFactory eventConsumerFactory,
+            IEventFormatter eventFormatter,
             IEventStore eventStore,
-            IEventDataFormatter eventDataFormatter,
             ILogger<EventConsumerGrain> log)
+            : base(identity)
         {
+            this.eventConsumer = eventConsumerFactory.Create(identity.PrimaryKeyString);
+            this.eventFormatter = eventFormatter;
             this.eventStore = eventStore;
-            this.eventDataFormatter = eventDataFormatter;
-            this.eventConsumerFactory = eventConsumerFactory;
             this.state = state;
-
             this.log = log;
-        }
-
-        protected override Task OnActivateAsync(string key)
-        {
-            eventConsumer = eventConsumerFactory(key);
-
-            return Task.CompletedTask;
         }
 
         public override Task OnDeactivateAsync()
@@ -276,7 +270,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private BatchSubscriber CreateSubscription()
         {
-            return new BatchSubscriber(this, eventDataFormatter, eventConsumer!, CreateRetrySubscription);
+            return new BatchSubscriber(this, eventFormatter, eventConsumer!, CreateRetrySubscription);
         }
 
         protected virtual IEventSubscription CreateRetrySubscription(IEventSubscriber subscriber)

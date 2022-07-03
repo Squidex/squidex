@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using EventStore.Client;
-using MongoDB.Driver;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
@@ -56,18 +55,14 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<Rebuilder>()
                 .AsSelf();
 
-            services.AddSingletonAs<DefaultStreamNameResolver>()
-                .As<IStreamNameResolver>();
+            services.AddSingletonAs<DefaultEventStreamNames>()
+                .As<IEventStreamNames>();
 
-            services.AddSingletonAs<DefaultEventDataFormatter>()
-                .As<IEventDataFormatter>();
+            services.AddSingletonAs<DefaultEventFormatter>()
+                .As<IEventFormatter>();
 
-            services.AddSingletonAs(c =>
-            {
-                var allEventConsumers = c.GetServices<IEventConsumer>();
-
-                return new EventConsumerFactory(n => allEventConsumers.First(x => x.Name == n));
-            });
+            services.AddSingletonAs<DefaultEventConsumerFactory>()
+                .As<IEventConsumerFactory>();
         }
     }
 }

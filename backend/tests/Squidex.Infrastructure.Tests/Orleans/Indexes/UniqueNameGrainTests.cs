@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using FakeItEasy;
+using Orleans.Core;
 using Xunit;
 
 namespace Squidex.Infrastructure.Orleans.Indexes
@@ -15,7 +17,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
 
         public UniqueNameGrainTests()
         {
-            sut = new UniqueNameGrain<string>();
+            sut = new UniqueNameGrain<string>(A.Fake<IGrainIdentity>());
         }
 
         [Fact]

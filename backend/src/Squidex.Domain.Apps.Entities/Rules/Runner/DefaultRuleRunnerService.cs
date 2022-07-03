@@ -19,18 +19,18 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
     public sealed class DefaultRuleRunnerService : IRuleRunnerService
     {
         private const int MaxSimulatedEvents = 100;
-        private readonly IEventDataFormatter eventDataFormatter;
+        private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
         private readonly IGrainFactory grainFactory;
         private readonly IRuleService ruleService;
 
         public DefaultRuleRunnerService(IGrainFactory grainFactory,
+            IEventFormatter eventFormatter,
             IEventStore eventStore,
-            IEventDataFormatter eventDataFormatter,
             IRuleService ruleService)
         {
             this.grainFactory = grainFactory;
-            this.eventDataFormatter = eventDataFormatter;
+            this.eventFormatter = eventFormatter;
             this.eventStore = eventStore;
             this.ruleService = ruleService;
         }
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
             await foreach (var storedEvent in eventStore.QueryAllReverseAsync($"^([a-zA-Z0-9]+)\\-{appId.Id}", fromNow, MaxSimulatedEvents, ct))
             {
-                var @event = eventDataFormatter.ParseIfKnown(storedEvent);
+                var @event = eventFormatter.ParseIfKnown(storedEvent);
 
                 if (@event?.Payload is AppEvent appEvent)
                 {

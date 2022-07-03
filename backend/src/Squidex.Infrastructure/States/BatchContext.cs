@@ -16,24 +16,24 @@ namespace Squidex.Infrastructure.States
         private static readonly List<Envelope<IEvent>> EmptyStream = new List<Envelope<IEvent>>();
         private readonly Type owner;
         private readonly ISnapshotStore<T> snapshotStore;
+        private readonly IEventFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
-        private readonly IEventDataFormatter eventDataFormatter;
-        private readonly IStreamNameResolver streamNameResolver;
+        private readonly IEventStreamNames eventStreams;
         private readonly Dictionary<DomainId, (long, List<Envelope<IEvent>>)> @events = new Dictionary<DomainId, (long, List<Envelope<IEvent>>)>();
         private Dictionary<DomainId, SnapshotWriteJob<T>>? snapshots;
 
         internal BatchContext(
             Type owner,
-            ISnapshotStore<T> snapshotStore,
+            IEventFormatter eventDataFormatter,
             IEventStore eventStore,
-            IEventDataFormatter eventDataFormatter,
-            IStreamNameResolver streamNameResolver)
+            IEventStreamNames streamNameResolver,
+            ISnapshotStore<T> snapshotStore)
         {
             this.owner = owner;
             this.snapshotStore = snapshotStore;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
-            this.streamNameResolver = streamNameResolver;
+            this.eventStreams = streamNameResolver;
         }
 
         internal void Add(DomainId key, T snapshot, long version)
@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure.States
 
         public async Task LoadAsync(IEnumerable<DomainId> ids)
         {
-            var streamNames = ids.ToDictionary(x => x, x => streamNameResolver.GetStreamName(owner, x.ToString()));
+            var streamNames = ids.ToDictionary(x => x, x => eventStreams.GetStreamName(owner, x.ToString()));
 
             if (streamNames.Count == 0)
             {

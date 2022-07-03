@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Infrastructure.EventSourcing
 {
-    public interface IStreamNameResolver
+    public interface IEventConsumerFactory
     {
-        string GetStreamName(Type aggregateType, string id);
+        IEventConsumer Create(string name);
     }
 }

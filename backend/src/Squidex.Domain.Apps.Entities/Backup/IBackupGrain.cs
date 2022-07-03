@@ -7,7 +7,6 @@
 
 using Orleans;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
@@ -19,6 +18,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         Task ClearAsync();
 
-        Task<J<List<IBackupJob>>> GetStateAsync();
+        Task<List<IBackupJob>> GetStateAsync();
     }
 }

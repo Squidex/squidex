@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => appProvider.GetSchemasAsync(TestApp.Default.Id, default))
                 .Returns(schemas.ToList());
 
-            var services =
+            var serviceProvider =
                 new ServiceCollection()
                     .AddMemoryCache()
                     .AddTransient<GraphQLExecutionContext>()
@@ -148,7 +148,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var schemasHash = A.Fake<ISchemasHash>();
 
-            return new CachingGraphQLResolver(cache, schemasHash, services, Options.Create(new GraphQLOptions()));
+            return new CachingGraphQLResolver(cache, schemasHash, serviceProvider, Options.Create(new GraphQLOptions()));
         }
     }
 }

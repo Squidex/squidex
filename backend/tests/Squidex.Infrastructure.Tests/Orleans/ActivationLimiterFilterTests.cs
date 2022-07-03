@@ -7,6 +7,7 @@
 
 using FakeItEasy;
 using Orleans;
+using Orleans.Core;
 using Orleans.Runtime;
 using Xunit;
 
@@ -24,8 +25,8 @@ namespace Squidex.Infrastructure.Orleans
 
         public sealed class MyGrain : GrainBase
         {
-            public MyGrain(IActivationLimit limit)
-                : base(null, CreateRuntime(limit))
+            public MyGrain(IGrainIdentity identity, IActivationLimit limit)
+                : base(identity, CreateRuntime(limit))
             {
             }
 
@@ -50,10 +51,8 @@ namespace Squidex.Infrastructure.Orleans
         {
             var limit = A.Fake<IActivationLimit>();
 
-            var grain = new MyGrain(limit);
-
             A.CallTo(() => context.Grain)
-                .Returns(grain);
+                .Returns(new MyGrain(A.Fake<IGrainIdentity>(), limit));
 
             await sut.Invoke(context);
 

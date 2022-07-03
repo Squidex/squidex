@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.Logging;
 using Orleans;
+using Orleans.Core;
 using Orleans.Runtime;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -22,14 +23,14 @@ using TaskExtensions = Squidex.Infrastructure.Tasks.TaskExtensions;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
-    public sealed class RuleRunnerGrain : GrainOfString, IRuleRunnerGrain, IRemindable
+    public sealed class RuleRunnerGrain : GrainBase, IRuleRunnerGrain, IRemindable
     {
         private const int MaxErrors = 10;
-        private readonly IGrainState<State> state;
         private readonly IAppProvider appProvider;
-        private readonly ILocalCache localCache;
+        private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
-        private readonly IEventDataFormatter eventDataFormatter;
+        private readonly IGrainState<State> state;
+        private readonly ILocalCache localCache;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly IRuleService ruleService;
         private readonly ILogger<RuleRunnerGrain> log;
@@ -47,27 +48,28 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             public bool RunFromSnapshots { get; set; }
         }
 
-        public RuleRunnerGrain(
-            IGrainState<State> state,
+        public RuleRunnerGrain(IGrainIdentity identity,
             IAppProvider appProvider,
-            ILocalCache localCache,
+            IEventFormatter eventFormatter,
             IEventStore eventStore,
-            IEventDataFormatter eventDataFormatter,
+            IGrainState<State> state,
+            ILocalCache localCache,
             IRuleEventRepository ruleEventRepository,
             IRuleService ruleService,
             ILogger<RuleRunnerGrain> log)
+            : base(identity)
         {
             this.state = state;
             this.appProvider = appProvider;
             this.localCache = localCache;
             this.eventStore = eventStore;
-            this.eventDataFormatter = eventDataFormatter;
+            this.eventFormatter = eventFormatter;
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
             this.log = log;
         }
 
-        protected override Task OnActivateAsync(string key)
+        public override Task OnActivateAsync()
         {
             return EnsureIsRunningAsync(true);
         }
@@ -154,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             {
                 currentReminder = await RegisterOrUpdateReminder("KeepAlive", TimeSpan.Zero, TimeSpan.FromMinutes(2));
 
-                var rule = await appProvider.GetRuleAsync(DomainId.Create(Key), currentState.RuleId!.Value, ct);
+                var rule = await appProvider.GetRuleAsync(Key, currentState.RuleId!.Value, ct);
 
                 if (rule == null)
                 {
@@ -247,7 +249,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             {
                 try
                 {
-                    var @event = eventDataFormatter.ParseIfKnown(storedEvent);
+                    var @event = eventFormatter.ParseIfKnown(storedEvent);
 
                     if (@event != null)
                     {

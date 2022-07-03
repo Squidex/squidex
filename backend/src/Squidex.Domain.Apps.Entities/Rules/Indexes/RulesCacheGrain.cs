@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Orleans.Concurrency;
+using Orleans.Core;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
@@ -13,14 +14,13 @@ using Squidex.Infrastructure.Orleans;
 namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 {
     [Reentrant]
-    public sealed class RulesCacheGrain : GrainOfString, IRulesCacheGrain
+    public sealed class RulesCacheGrain : GrainBase, IRulesCacheGrain
     {
         private readonly IRuleRepository ruleRepository;
         private List<DomainId>? ruleIds;
 
-        private DomainId AppId => DomainId.Create(Key);
-
-        public RulesCacheGrain(IRuleRepository ruleRepository)
+        public RulesCacheGrain(IGrainIdentity grainIdentity, IRuleRepository ruleRepository)
+            : base(grainIdentity)
         {
             this.ruleRepository = ruleRepository;
         }
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
             if (ids == null)
             {
-                ids = await ruleRepository.QueryIdsAsync(AppId);
+                ids = await ruleRepository.QueryIdsAsync(Key);
 
                 ruleIds = ids;
             }

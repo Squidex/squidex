@@ -16,18 +16,18 @@ namespace Squidex.Infrastructure.States
     public class PersistenceEventSourcingTests
     {
         private readonly DomainId key = DomainId.NewGuid();
-        private readonly ISnapshotStore<string> snapshotStore = A.Fake<ISnapshotStore<string>>();
-        private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
+        private readonly IEventFormatter eventFormatter = A.Fake<IEventFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
-        private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
+        private readonly IEventStreamNames eventStreamNames = A.Fake<IEventStreamNames>();
+        private readonly ISnapshotStore<string> snapshotStore = A.Fake<ISnapshotStore<string>>();
         private readonly IStore<string> sut;
 
         public PersistenceEventSourcingTests()
         {
-            A.CallTo(() => streamNameResolver.GetStreamName(None.Type, A<string>._))
+            A.CallTo(() => eventStreamNames.GetStreamName(None.Type, A<string>._))
                 .ReturnsLazily(x => x.GetArgument<string>(1)!);
 
-            sut = new Store<string>(snapshotStore, eventStore, eventDataFormatter, streamNameResolver);
+            sut = new Store<string>(eventFormatter, eventStore, eventStreamNames, snapshotStore);
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => eventStore.QueryAsync(key.ToString(), 0, A<CancellationToken>._))
                 .Returns(new List<StoredEvent> { storedEvent });
 
-            A.CallTo(() => eventDataFormatter.ParseIfKnown(storedEvent))
+            A.CallTo(() => eventFormatter.ParseIfKnown(storedEvent))
                 .Returns(null);
 
             var persistedEvents = Save.Events();
@@ -373,10 +373,10 @@ namespace Squidex.Infrastructure.States
 
                 eventsStored.Add(eventStored);
 
-                A.CallTo(() => eventDataFormatter.Parse(eventStored))
+                A.CallTo(() => eventFormatter.Parse(eventStored))
                     .Returns(new Envelope<IEvent>(@event));
 
-                A.CallTo(() => eventDataFormatter.ParseIfKnown(eventStored))
+                A.CallTo(() => eventFormatter.ParseIfKnown(eventStored))
                     .Returns(new Envelope<IEvent>(@event));
 
                 i++;

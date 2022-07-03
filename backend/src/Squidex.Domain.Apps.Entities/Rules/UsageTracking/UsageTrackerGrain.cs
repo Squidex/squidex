@@ -7,6 +7,7 @@
 
 using Orleans;
 using Orleans.Concurrency;
+using Orleans.Core;
 using Orleans.Runtime;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
@@ -18,7 +19,7 @@ using Squidex.Infrastructure.UsageTracking;
 namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
     [Reentrant]
-    public sealed class UsageTrackerGrain : GrainOfString, IRemindable, IUsageTrackerGrain
+    public sealed class UsageTrackerGrain : GrainBase, IRemindable, IUsageTrackerGrain
     {
         private readonly IGrainState<State> state;
         private readonly IApiUsageTracker usageTracker;
@@ -61,14 +62,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             public Dictionary<DomainId, Target> Targets { get; set; } = new Dictionary<DomainId, Target>();
         }
 
-        public UsageTrackerGrain(IGrainState<State> state, IApiUsageTracker usageTracker)
+        public UsageTrackerGrain(IGrainIdentity identity, IGrainState<State> state, IApiUsageTracker usageTracker)
+            : base(identity)
         {
             this.state = state;
-
             this.usageTracker = usageTracker;
         }
 
-        protected override Task OnActivateAsync(string key)
+        public override Task OnActivateAsync()
         {
             DelayDeactivation(TimeSpan.FromDays(1));
 

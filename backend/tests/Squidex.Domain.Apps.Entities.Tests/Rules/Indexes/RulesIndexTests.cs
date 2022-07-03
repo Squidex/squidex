@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Indexes
@@ -113,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
             var ruleGrain = A.Fake<IRuleGrain>();
 
             A.CallTo(() => ruleGrain.GetStateAsync())
-                .Returns(J.Of<IRuleEntity>(ruleEntity));
+                .Returns(ruleEntity);
 
             var key = DomainId.Combine(appId, ruleId).ToString();
 

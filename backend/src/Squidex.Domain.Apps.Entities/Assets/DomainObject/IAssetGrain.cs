@@ -7,12 +7,11 @@
 
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
     public interface IAssetGrain : IDomainObjectGrain
     {
-        Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Any);
+        Task<IAssetEntity> GetStateAsync(long version = EtagVersion.Any);
     }
 }

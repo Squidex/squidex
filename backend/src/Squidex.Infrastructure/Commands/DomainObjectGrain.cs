@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.DependencyInjection;
+using Orleans.Core;
 using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract class DomainObjectGrain<T, TState> : GrainOfString where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+    public abstract class DomainObjectGrain<T, TState> : GrainBase where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
     {
         private readonly T domainObject;
 
@@ -24,27 +24,15 @@ namespace Squidex.Infrastructure.Commands
             get => domainObject;
         }
 
-        protected DomainObjectGrain(IServiceProvider serviceProvider)
+        protected DomainObjectGrain(IGrainIdentity identity, IDomainObjectFactory factory)
+            : base(identity)
         {
-            Guard.NotNull(serviceProvider);
-
-            domainObject = serviceProvider.GetRequiredService<T>();
+            domainObject = factory.Create<T>(DomainId.Create(identity.PrimaryKeyString));
         }
 
-        protected override Task OnActivateAsync(string key)
+        public Task<CommandResult> ExecuteAsync(IAggregateCommand command)
         {
-            domainObject.Setup(DomainId.Create(key));
-
-            return base.OnActivateAsync(key);
-        }
-
-        public async Task<J<CommandResult>> ExecuteAsync(J<CommandRequest> request)
-        {
-            request.Value.ApplyContext();
-
-            var result = await domainObject.ExecuteAsync(request.Value.Command);
-
-            return result;
+            return domainObject.ExecuteAsync(command);
         }
     }
 }

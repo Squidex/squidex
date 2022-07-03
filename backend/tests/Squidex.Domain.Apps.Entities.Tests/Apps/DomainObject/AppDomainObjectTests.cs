@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -67,15 +68,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 }
             };
 
+            var serviceProvider =
+                new ServiceCollection()
+                    .AddSingleton(initialSettings)
+                    .AddSingleton(appPlansProvider)
+                    .AddSingleton(appPlansBillingManager)
+                    .AddSingleton(userResolver)
+                    .BuildServiceProvider();
+
             var log = A.Fake<ILogger<AppDomainObject>>();
 
-            sut = new AppDomainObject(PersistenceFactory, log,
-                initialSettings,
-                appPlansProvider,
-                appPlansBillingManager,
-                userResolver);
 #pragma warning disable MA0056 // Do not call overridable members in constructor
-            sut.Setup(Id);
+            sut = new AppDomainObject(Id, PersistenceFactory, log, serviceProvider);
 #pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 

@@ -43,20 +43,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return BackupGrain(appId).DeleteAsync(backupId);
         }
 
-        public async Task<IRestoreJob?> GetRestoreAsync(
+        public Task<IRestoreJob> GetRestoreAsync(
             CancellationToken ct = default)
         {
-            var state = await RestoreGrain().GetStateAsync();
-
-            return state.Value;
+            return RestoreGrain().GetStateAsync();
         }
 
-        public async Task<List<IBackupJob>> GetBackupsAsync(DomainId appId,
+        public Task<List<IBackupJob>> GetBackupsAsync(DomainId appId,
             CancellationToken ct = default)
         {
-            var state = await BackupGrain(appId).GetStateAsync();
-
-            return state.Value;
+            return BackupGrain(appId).GetStateAsync();
         }
 
         public async Task<IBackupJob?> GetBackupAsync(DomainId appId, DomainId backupId,
@@ -64,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var state = await BackupGrain(appId).GetStateAsync();
 
-            return state.Value.Find(x => x.Id == backupId);
+            return state.Find(x => x.Id == backupId);
         }
 
         private IRestoreGrain RestoreGrain()

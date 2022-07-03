@@ -7,12 +7,14 @@
 
 using FakeItEasy;
 using NodaTime;
+using Orleans.Core;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Comments
 {
     public class WatchingGrainTests
     {
+        private readonly IGrainIdentity identity = A.Fake<IGrainIdentity>();
         private readonly IClock clock = A.Fake<IClock>();
         private readonly WatchingGrain sut;
         private Instant now = SystemClock.Instance.GetCurrentInstant();
@@ -22,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
             A.CallTo(() => clock.GetCurrentInstant())
                 .ReturnsLazily(() => now);
 
-            sut = new WatchingGrain(clock);
+            sut = new WatchingGrain(identity, clock);
         }
 
         [Fact]

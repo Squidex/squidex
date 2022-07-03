@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Orleans.Concurrency;
+using Orleans.Core;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans.Indexes;
@@ -18,9 +19,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         private readonly ISchemaRepository schemaRepository;
         private Dictionary<string, DomainId>? schemaIds;
 
-        private DomainId AppId => DomainId.Create(Key);
-
-        public SchemasCacheGrain(ISchemaRepository schemaRepository)
+        public SchemasCacheGrain(IGrainIdentity identity, ISchemaRepository schemaRepository)
+            : base(identity)
         {
             this.schemaRepository = schemaRepository;
         }
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             if (ids == null)
             {
-                ids = await schemaRepository.QueryIdsAsync(AppId);
+                ids = await schemaRepository.QueryIdsAsync(Key);
 
                 schemaIds = ids;
             }
