@@ -169,6 +169,8 @@ namespace Squidex.Infrastructure.States
 
             A.CallTo(() => snapshotStore.RemoveAsync(key, A<CancellationToken>._))
                 .MustHaveHappened();
+
+            Assert.Equal(EtagVersion.Empty, persistence.Version);
         }
 
         [Fact]

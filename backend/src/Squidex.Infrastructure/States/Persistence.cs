@@ -74,6 +74,8 @@ namespace Squidex.Infrastructure.States
                 {
                     await snapshotStore.RemoveAsync(ownerKey, ct);
                 }
+
+                versionSnapshot = EtagVersion.Empty;
             }
 
             if (UseEventSourcing)
@@ -82,7 +84,11 @@ namespace Squidex.Infrastructure.States
                 {
                     await eventStore.DeleteStreamAsync(streamName.Value, ct);
                 }
+
+                versionEvents = EtagVersion.Empty;
             }
+
+            UpdateVersion();
         }
 
         public async Task ReadAsync(long expectedVersion = EtagVersion.Any,
