@@ -13,6 +13,7 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Providers.MongoDB.Configuration;
 using Orleans.Providers.MongoDB.Utils;
+using Orleans.Runtime;
 using OrleansDashboard;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Hosting.Configuration;
@@ -40,6 +41,8 @@ namespace Squidex.Config.Orleans
 
                 services.AddScopedAs<ActivationLimit>()
                     .As<IActivationLimit>();
+
+                services.AddScoped(x => x.GetRequiredService<IGrainActivationContext>().GrainIdentity);
             });
 
             builder.ConfigureApplicationParts(parts =>
