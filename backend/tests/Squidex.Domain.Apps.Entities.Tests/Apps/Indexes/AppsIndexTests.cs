@@ -9,7 +9,6 @@
 //using Microsoft.Extensions.Caching.Memory;
 //using Microsoft.Extensions.Logging;
 //using Microsoft.Extensions.Options;
-//using Orleans;
 //using Squidex.Caching;
 //using Squidex.Domain.Apps.Core.Apps;
 //using Squidex.Domain.Apps.Core.TestHelpers;

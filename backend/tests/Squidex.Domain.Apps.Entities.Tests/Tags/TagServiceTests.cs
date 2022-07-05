@@ -147,7 +147,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
-        public async Task Should_add_tags_to_grain()
+        public async Task Should_add_tags()
         {
             await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name1", "name2"), null, ct);
             await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name2", "name3"), null, ct);
@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
-        public async Task Should_remove_tags_from_grain()
+        public async Task Should_remove_tags)
         {
             var result1 = await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name1", "name2"), null, ct);
             var result2 = await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name2", "name3"), null, ct);

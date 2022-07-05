@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using FakeItEasy;
-using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;

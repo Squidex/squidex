@@ -8,7 +8,7 @@
 using FakeItEasy;
 using Xunit;
 
-namespace Squidex.Infrastructure.EventSourcing.Grains
+namespace Squidex.Infrastructure.EventSourcing.Consume
 {
     public class EventConsumerWorkerTests
     {

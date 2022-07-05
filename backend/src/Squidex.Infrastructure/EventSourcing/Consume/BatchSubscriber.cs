@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Tasks;
 #pragma warning disable RECS0082 // Parameter has the same name as a member and hides it
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Infrastructure.EventSourcing.Grains
+namespace Squidex.Infrastructure.EventSourcing.Consume
 {
     internal sealed class BatchSubscriber : IEventSubscriber, IEventSubscription
     {
@@ -91,7 +91,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             handleTask = Run(processor);
         }
 
-        private async Task Run(EventConsumerProcessor grain)
+        private async Task Run(EventConsumerProcessor processor)
         {
             try
             {
@@ -110,7 +110,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                             {
                                 if (ReferenceEquals(error.Sender, sender))
                                 {
-                                    await grain.OnErrorAsync(sender, error.Exception);
+                                    await processor.OnErrorAsync(sender, error.Exception);
                                 }
 
                                 break;
@@ -124,7 +124,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                                     {
                                         var position = itemsBySender.Last().Position;
 
-                                        await grain.OnEventsAsync(sender, itemsBySender.Select(x => x.Event).NotNull().ToList(), position);
+                                        await processor.OnEventsAsync(sender, itemsBySender.Select(x => x.Event).NotNull().ToList(), position);
                                     }
                                 }
 
@@ -143,7 +143,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 if (sender != null)
                 {
-                    await grain.OnErrorAsync(sender, ex);
+                    await processor.OnErrorAsync(sender, ex);
                 }
 
                 throw;

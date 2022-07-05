@@ -12,7 +12,7 @@ using Squidex.Infrastructure.TestHelpers;
 using Squidex.Messaging;
 using Xunit;
 
-namespace Squidex.Infrastructure.EventSourcing.Grains
+namespace Squidex.Infrastructure.EventSourcing.Consume
 {
     public class EventConsumerManagerTests
     {

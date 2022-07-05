@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Infrastructure.EventSourcing.Grains
+namespace Squidex.Infrastructure.EventSourcing.Consume
 {
     public class EventConsumerProcessor
     {

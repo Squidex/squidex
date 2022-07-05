@@ -8,7 +8,6 @@
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Orleans;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
 using Xunit;

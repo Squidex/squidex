@@ -5,11 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
 using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Areas.Frontend;
 using Squidex.Areas.IdentityServer.Config;
-using Squidex.Areas.OrleansDashboard.Middlewares;
 using Squidex.Areas.Portal.Middlewares;
 using Squidex.Config.Authentication;
 using Squidex.Config.Domain;

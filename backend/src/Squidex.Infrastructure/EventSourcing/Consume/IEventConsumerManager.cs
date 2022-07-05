@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.EventSourcing.Grains
+namespace Squidex.Infrastructure.EventSourcing.Consume
 {
     public interface IEventConsumerManager
     {

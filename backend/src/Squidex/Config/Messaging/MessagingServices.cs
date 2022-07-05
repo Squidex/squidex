@@ -12,7 +12,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
-using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Messaging;
 
 namespace Squidex.Config.Messaging

@@ -9,7 +9,7 @@ using EventStore.Client;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Config.Domain

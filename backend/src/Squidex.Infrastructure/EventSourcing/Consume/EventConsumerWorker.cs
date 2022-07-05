@@ -9,7 +9,7 @@ using Squidex.Hosting;
 using Squidex.Infrastructure.Timers;
 using Squidex.Messaging;
 
-namespace Squidex.Infrastructure.EventSourcing.Grains
+namespace Squidex.Infrastructure.EventSourcing.Consume
 {
     public sealed class EventConsumerWorker :
         IMessageHandler<EventConsumerStart>,

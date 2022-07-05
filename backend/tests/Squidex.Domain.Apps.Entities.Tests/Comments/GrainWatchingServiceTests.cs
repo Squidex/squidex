@@ -6,7 +6,6 @@
 //// ==========================================================================
 
 //using FakeItEasy;
-//using Orleans;
 //using Squidex.Infrastructure;
 //using Xunit;
 

@@ -17,9 +17,6 @@ namespace Squidex.Shared
 
         public const string Admin = "squidex.admin.*";
 
-        // Orleans
-        public const string AdminOrleans = "squidex.admin.orleans";
-
         // Admin App Creation
         public const string AdminAppCreate = "squidex.admin.apps.create";
 

@@ -12,7 +12,7 @@ using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
-namespace Squidex.Infrastructure.EventSourcing.Grains
+namespace Squidex.Infrastructure.EventSourcing.Consume
 {
     public class EventConsumerProcessorTests
     {

@@ -164,10 +164,6 @@ namespace Squidex.Web
         [Lazy]
         public bool CanManageEvents => IsAllowed(Permissions.AdminEventsManage);
 
-        // Orleans
-        [Lazy]
-        public bool CanReadOrleans => IsAllowed(Permissions.AdminOrleans);
-
         // Backups
         [Lazy]
         public bool CanRestoreBackup => IsAllowed(Permissions.AdminRestore);

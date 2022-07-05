@@ -7,7 +7,7 @@
 
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
-using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;

@@ -7,7 +7,7 @@
 
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Infrastructure.EventSourcing.Grains
+namespace Squidex.Infrastructure.EventSourcing.Consume
 {
     public sealed class EventConsumerState
     {

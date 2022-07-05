@@ -8,7 +8,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.EventConsumers.Models;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Shared;
 using Squidex.Web;
 

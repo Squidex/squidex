@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         }
 
         [Fact]
-        public async Task Should_invoke_grain_for_comments_command()
+        public async Task Should_invoke_domain_object_for_comments_command()
         {
             var command = CreateCommentsCommand(new CreateComment());
             var context = CrateCommandContext(command);
