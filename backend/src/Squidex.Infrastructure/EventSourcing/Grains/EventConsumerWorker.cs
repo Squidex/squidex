@@ -18,7 +18,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
     {
         private readonly Dictionary<string, EventConsumerProcessor> processors = new Dictionary<string, EventConsumerProcessor>();
 
-        public EventConsumerWorker(IEnumerable<IEventConsumer> eventConsumers, Func<IEventConsumer, EventConsumerProcessor> factory)
+        public EventConsumerWorker(IEnumerable<IEventConsumer> eventConsumers,
+            Func<IEventConsumer, EventConsumerProcessor> factory)
         {
             foreach (var consumer in eventConsumers)
             {

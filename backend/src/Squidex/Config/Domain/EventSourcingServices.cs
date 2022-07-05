@@ -63,6 +63,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<NoopEventNotifier>()
                 .As<IEventNotifier>();
+
+            services.AddSingleton<Func<IEventConsumer, EventConsumerProcessor>>(
+                sb => c => ActivatorUtilities.CreateInstance<EventConsumerProcessor>(sb, c));
         }
     }
 }
