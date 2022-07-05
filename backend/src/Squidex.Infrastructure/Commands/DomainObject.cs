@@ -70,7 +70,8 @@ namespace Squidex.Infrastructure.Commands
             this.log = log;
         }
 
-        public async Task<T> GetSnapshotAsync(long version)
+        public virtual async Task<T> GetSnapshotAsync(long version,
+            CancellationToken ct = default)
         {
             var (result, valid) = snapshots.Get(version);
 
@@ -100,7 +101,7 @@ namespace Squidex.Infrastructure.Commands
                     return newSnapshot != null && !snapshots.ContainsThisAndNewer(newSnapshot.Version);
                 });
 
-                await allEvents.ReadAsync();
+                await allEvents.ReadAsync(ct: ct);
 
                 (result, valid) = snapshots.Get(version);
             }

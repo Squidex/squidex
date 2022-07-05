@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var asset = CreateAsset(DomainId.NewGuid());
 
-            A.CallTo(() => assetLoader.GetAsync(appId.Id, asset.Id, 2))
+            A.CallTo(() => assetLoader.GetAsync(appId.Id, asset.Id, 2, A<CancellationToken>._))
                 .Returns(asset);
 
             var result = await sut.FindAsync(requestContext, asset.Id, 2, ct);
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var asset = CreateAsset(DomainId.NewGuid());
 
-            A.CallTo(() => assetLoader.GetAsync(appId.Id, asset.Id, 2))
+            A.CallTo(() => assetLoader.GetAsync(appId.Id, asset.Id, 2, A<CancellationToken>._))
                 .Returns(Task.FromResult<IAssetEntity?>(null));
 
             var result = await sut.FindAsync(requestContext, asset.Id, 2, ct);

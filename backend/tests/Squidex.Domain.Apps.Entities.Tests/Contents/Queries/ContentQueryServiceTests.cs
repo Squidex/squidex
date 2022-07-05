@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = CreateContent(DomainId.NewGuid());
 
-            A.CallTo(() => contentVersionLoader.GetAsync(appId.Id, content.Id, 13))
+            A.CallTo(() => contentVersionLoader.GetAsync(appId.Id, content.Id, 13, A<CancellationToken>._))
                 .Returns(content);
 
             var result = await sut.FindAsync(requestContext, schemaId.Name, content.Id, 13, ct);

@@ -11,6 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public interface IContentLoader
     {
-        Task<IContentEntity?> GetAsync(DomainId appId, DomainId id, long version = EtagVersion.Any);
+        Task<IContentEntity?> GetAsync(DomainId appId, DomainId id, long version = EtagVersion.Any,
+            CancellationToken ct = default);
     }
 }

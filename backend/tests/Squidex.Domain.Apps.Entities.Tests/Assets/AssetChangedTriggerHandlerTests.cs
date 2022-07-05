@@ -23,6 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class AssetChangedTriggerHandlerTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IAssetLoader assetLoader = A.Fake<IAssetLoader>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
@@ -30,6 +32,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetChangedTriggerHandlerTests()
         {
+            ct = cts.Token;
+
             A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
                 .Returns(true);
 
@@ -76,14 +80,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var ctx = Context();
 
-            A.CallTo(() => assetRepository.StreamAll(ctx.AppId.Id, default))
+            A.CallTo(() => assetRepository.StreamAll(ctx.AppId.Id, ct))
                 .Returns(new List<AssetEntity>
                 {
                     new AssetEntity(),
                     new AssetEntity()
                 }.ToAsyncEnumerable());
 
-            var result = await sut.CreateSnapshotEventsAsync(ctx, default).ToListAsync();
+            var result = await sut.CreateSnapshotEventsAsync(ctx, ct).ToListAsync(ct);
 
             var typed = result.OfType<EnrichedAssetEvent>().ToList();
 
@@ -101,10 +105,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-            A.CallTo(() => assetLoader.GetAsync(ctx.AppId.Id, @event.AssetId, 12))
+            A.CallTo(() => assetLoader.GetAsync(ctx.AppId.Id, @event.AssetId, 12, ct))
                 .Returns(new AssetEntity());
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, ct).ToListAsync(ct);
 
             var enrichedEvent = result.Single() as EnrichedAssetEvent;
 

@@ -1,89 +1,97 @@
-﻿//// ==========================================================================
-////  Squidex Headless CMS
-//// ==========================================================================
-////  Copyright (c) Squidex UG (haftungsbeschraenkt)
-////  All rights reserved. Licensed under the MIT license.
-//// ==========================================================================
+﻿// ==========================================================================
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  All rights reserved. Licensed under the MIT license.
+// ==========================================================================
 
-//using FakeItEasy;
-//using Orleans;
-//using Squidex.Domain.Apps.Entities.Contents.DomainObject;
-//using Squidex.Infrastructure;
-//using Xunit;
+using FakeItEasy;
+using Squidex.Domain.Apps.Entities.Contents.DomainObject;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
+using Xunit;
 
-//namespace Squidex.Domain.Apps.Entities.Contents.Queries
-//{
-//    public class ContentLoaderTests
-//    {
-//        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
-//        private readonly IContentGrain grain = A.Fake<IContentGrain>();
-//        private readonly DomainId appId = DomainId.NewGuid();
-//        private readonly DomainId id = DomainId.NewGuid();
-//        private readonly ContentLoader sut;
+namespace Squidex.Domain.Apps.Entities.Contents.Queries
+{
+    public class ContentLoaderTests
+    {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
+        private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
+        private readonly ContentDomainObject domainObject = A.Fake<ContentDomainObject>();
+        private readonly DomainId appId = DomainId.NewGuid();
+        private readonly DomainId id = DomainId.NewGuid();
+        private readonly ContentLoader sut;
 
-//        public ContentLoaderTests()
-//        {
-//            var key = DomainId.Combine(appId, id).ToString();
+        public ContentLoaderTests()
+        {
+            ct = cts.Token;
 
-//            A.CallTo(() => grainFactory.GetGrain<IContentGrain>(key, null))
-//                .Returns(grain);
+            var key = DomainId.Combine(appId, id);
 
-//            sut = new ContentLoader(grainFactory);
-//        }
+            A.CallTo(() => domainObjectFactory.Create<ContentDomainObject>(key))
+                .Returns(domainObject);
 
-//        [Fact]
-//        public async Task Should_return_null_if_no_state_returned()
-//        {
-//            A.CallTo(() => grain.GetStateAsync(10))
-//                .Returns(Task.FromResult<IContentEntity>(null!));
+            sut = new ContentLoader(domainObjectFactory);
+        }
 
-//            Assert.Null(await sut.GetAsync(appId, id, 10));
-//        }
+        [Fact]
+        public async Task Should_return_null_if_no_state_returned()
+        {
+            var content = (ContentDomainObject.State)null!;
 
-//        [Fact]
-//        public async Task Should_return_null_if_state_empty()
-//        {
-//            var content = new ContentEntity { Version = EtagVersion.Empty };
+            A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+                .Returns(content);
 
-//            A.CallTo(() => grain.GetStateAsync(10))
-//                .Returns(content);
+            Assert.Null(await sut.GetAsync(appId, id, 10, ct));
+        }
 
-//            Assert.Null(await sut.GetAsync(appId, id, 10));
-//        }
+        [Fact]
+        public async Task Should_return_null_if_state_empty()
+        {
+            var content = new ContentDomainObject.State { Version = EtagVersion.Empty };
 
-//        [Fact]
-//        public async Task Should_return_null_if_state_has_other_version()
-//        {
-//            var content = new ContentEntity { Version = 5 };
+            A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+                .Returns(content);
 
-//            A.CallTo(() => grain.GetStateAsync(10))
-//                .Returns(content);
+            Assert.Null(await sut.GetAsync(appId, id, 10, ct));
+        }
 
-//            Assert.Null(await sut.GetAsync(appId, id, 10));
-//        }
+        [Fact]
+        public async Task Should_return_null_if_state_has_other_version()
+        {
+            var content = new ContentDomainObject.State { Version = 5 };
 
-//        [Fact]
-//        public async Task Should_not_return_null_if_state_has_other_version_than_any()
-//        {
-//            var content = new ContentEntity { Version = 5 };
+            A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+                .Returns(content);
 
-//            A.CallTo(() => grain.GetStateAsync(EtagVersion.Any))
-//                .Returns(content);
+            Assert.Null(await sut.GetAsync(appId, id, 10, ct));
+        }
 
-//            await sut.GetAsync(appId, id, EtagVersion.Any);
-//        }
+        [Fact]
+        public async Task Should_not_return_null_if_state_has_other_version_than_any()
+        {
+            var content = new ContentDomainObject.State { Version = 5 };
 
-//        [Fact]
-//        public async Task Should_return_content_from_state()
-//        {
-//            var content = new ContentEntity { Version = 10 };
+            A.CallTo(() => domainObject.GetSnapshotAsync(EtagVersion.Any, ct))
+                .Returns(content);
 
-//            A.CallTo(() => grain.GetStateAsync(10))
-//                .Returns(content);
+            var result = await sut.GetAsync(appId, id, EtagVersion.Any, ct);
 
-//            var result = await sut.GetAsync(appId, id, 10);
+            Assert.Same(content, result);
+        }
 
-//            Assert.Same(content, result);
-//        }
-//    }
-//}
+        [Fact]
+        public async Task Should_return_content_from_state()
+        {
+            var content = new ContentDomainObject.State { Version = 10 };
+
+            A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+                .Returns(content);
+
+            var result = await sut.GetAsync(appId, id, 10, ct);
+
+            Assert.Same(content, result);
+        }
+    }
+}

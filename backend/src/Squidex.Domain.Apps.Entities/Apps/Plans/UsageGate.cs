@@ -33,33 +33,24 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         {
             Guard.NotNull(app);
 
-            var appId = app.Id;
-
-            var isBlocked = false;
-
-            if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && client.ApiCallsLimit > 0)
-            {
-                var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today, clientId, ct);
-
-                isBlocked = usage >= client.ApiCallsLimit;
-            }
-
             var (plan, _) = appPlansProvider.GetPlanForApp(app);
 
-            var limit = plan.MaxApiCalls;
+            var appId = app.Id;
+            var blocking = false;
+            var blockLimit = plan.MaxApiCalls;
 
-            if (limit > 0 || plan.BlockingApiCalls > 0)
+            if (blockLimit > 0 || plan.BlockingApiCalls > 0)
             {
                 var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today, null, ct);
 
-                if (IsOver10Percent(limit, usage) && IsAboutToBeLocked(today, limit, usage) && !HasNotifiedBefore(app.Id))
+                if (IsOver10Percent(blockLimit, usage) && IsAboutToBeLocked(today, blockLimit, usage) && !HasNotifiedBefore(app.Id))
                 {
                     var notification = new UsageTrackingCheck
                     {
                         AppId = appId,
                         AppName = app.Name,
                         Usage = usage,
-                        UsageLimit = limit,
+                        UsageLimit = blockLimit,
                         Users = GetUsers(app)
                     };
 
@@ -68,10 +59,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                     TrackNotified(appId);
                 }
 
-                isBlocked = isBlocked || (plan.BlockingApiCalls > 0 && usage > plan.BlockingApiCalls);
+                blocking = plan.BlockingApiCalls > 0 && usage > plan.BlockingApiCalls;
             }
 
-            return isBlocked;
+            if (!blocking)
+            {
+                if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && client.ApiCallsLimit > 0)
+                {
+                    var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today, clientId, ct);
+
+                    blocking = usage >= client.ApiCallsLimit;
+                }
+            }
+
+            return blocking;
         }
 
         private bool HasNotifiedBefore(DomainId appId)

@@ -24,7 +24,7 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 {
-    public sealed partial class ContentDomainObject : DomainObject<ContentDomainObject.State>
+    public partial class ContentDomainObject : DomainObject<ContentDomainObject.State>
     {
         private readonly IServiceProvider serviceProvider;
 

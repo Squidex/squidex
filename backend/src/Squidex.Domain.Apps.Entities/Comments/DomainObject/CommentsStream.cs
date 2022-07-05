@@ -17,7 +17,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 {
-    public sealed class CommentsStream : IExecutable
+    public class CommentsStream : IExecutable
     {
         private readonly List<Envelope<CommentsEvent>> uncommittedEvents = new List<Envelope<CommentsEvent>>();
         private readonly List<Envelope<CommentsEvent>> events = new List<Envelope<CommentsEvent>>();
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             this.eventStore = eventStore;
         }
 
-        public async Task LoadAsync(
+        public virtual async Task LoadAsync(
             CancellationToken ct)
         {
             streamName = $"comments-{key}";
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             }
         }
 
-        public Task<CommandResult> ExecuteAsync(IAggregateCommand command)
+        public virtual Task<CommandResult> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {
@@ -156,12 +156,12 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             version++;
         }
 
-        public List<Envelope<CommentsEvent>> GetUncommittedEvents()
+        public virtual List<Envelope<CommentsEvent>> GetUncommittedEvents()
         {
             return uncommittedEvents;
         }
 
-        public CommentsResult GetComments(long sinceVersion = EtagVersion.Any)
+        public virtual CommentsResult GetComments(long sinceVersion = EtagVersion.Any)
         {
             return CommentsResult.FromEvents(events, Version, (int)sinceVersion);
         }
