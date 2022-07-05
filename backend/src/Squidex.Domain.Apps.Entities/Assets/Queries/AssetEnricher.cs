@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             {
                 ct.ThrowIfCancellationRequested();
 
-                var tagsById = await CalculateTags(group);
+                var tagsById = await CalculateTagsAsync(group, ct);
 
                 foreach (var asset in group)
                 {
@@ -156,11 +156,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             }
         }
 
-        private async Task<Dictionary<string, string>> CalculateTags(IGrouping<DomainId, IAssetEntity> group)
+        private async Task<Dictionary<string, string>> CalculateTagsAsync(IGrouping<DomainId, IAssetEntity> group,
+            CancellationToken ct)
         {
             var uniqueIds = group.Where(x => x.Tags != null).SelectMany(x => x.Tags).ToHashSet();
 
-            return await tagService.DenormalizeTagsAsync(group.Key, TagGroups.Assets, uniqueIds);
+            return await tagService.DenormalizeTagsAsync(group.Key, TagGroups.Assets, uniqueIds, ct);
         }
     }
 }

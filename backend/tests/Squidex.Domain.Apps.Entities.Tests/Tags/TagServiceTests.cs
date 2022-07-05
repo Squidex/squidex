@@ -184,6 +184,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
             var result1 = await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name1", "name2"), null, ct);
             var result2 = await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name2", "name3"), null, ct);
 
+            // Tags from the first normalization are decreased and removed if count reaches zero.
             await sut.NormalizeTagsAsync(appId, group, null, new HashSet<string>(result1.Values), ct);
 
             var allTags = await sut.GetTagsAsync(appId, group, ct);
@@ -198,9 +199,10 @@ namespace Squidex.Domain.Apps.Entities.Tags
         [Fact]
         public async Task Should_resolve_tag_names()
         {
+            // Get IDs from names.
             var tagIds = await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name1", "name2"), null, ct);
 
-            // Just the inverse operation of the normalization.
+            // Get names from IDs (reverse operation).
             var tagNames = await sut.GetTagIdsAsync(appId, group, HashSet.Of("name1", "name2", "invalid1"), ct);
 
             Assert.Equal(tagIds, tagNames);

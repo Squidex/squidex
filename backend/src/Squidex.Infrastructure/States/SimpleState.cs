@@ -71,6 +71,7 @@ namespace Squidex.Infrastructure.States
                     updater(Value);
 
                     await WriteAsync(ct);
+                    return;
                 }
                 catch (InconsistentStateException) when (i < retries)
                 {
