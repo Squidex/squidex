@@ -7,29 +7,27 @@
 
 namespace Squidex.Infrastructure.States
 {
-    public sealed class UniqueNamesState : IUniqueNamesState
+    public sealed class NameReservationState : SimpleState<NameReservationState.State>
     {
-        private readonly SimpleState<State> state;
-
         public sealed class State
         {
-            public Dictionary<string, (string Name, DomainId Id)> Reservations { get; set; } = new Dictionary<string, (string Name, DomainId Id)>();
+            public List<NameReservation> Reservations { get; set; } = new List<NameReservation>();
 
             public string? Reserve(DomainId id, string name)
             {
                 string? token = null;
 
-                var reservation = Reservations.FirstOrDefault(x => x.Value.Name == name);
+                var reservation = Reservations.Find(x => x.Name == name);
 
-                if (Equals(reservation.Value.Id, id))
+                if (reservation?.Id == id)
                 {
-                    token = reservation.Key;
+                    token = reservation.Token;
                 }
-                else if (reservation.Key == null)
+                else if (reservation == null)
                 {
                     token = RandomHash.Simple();
 
-                    Reservations.Add(token, (name, id));
+                    Reservations.Add(new NameReservation(token, name, id));
                 }
 
                 return token;
@@ -37,19 +35,18 @@ namespace Squidex.Infrastructure.States
 
             public void Remove(string? token)
             {
-                Reservations.Remove(token ?? string.Empty);
+                Reservations.RemoveAll(x => x.Token == token);
             }
         }
 
-        public UniqueNamesState(IPersistenceFactory<State> persistenceFactory)
+        public NameReservationState(IPersistenceFactory<State> persistenceFactory, string id)
+            : base(persistenceFactory, typeof(NameReservationState), id)
         {
-            state = new SimpleState<State>(persistenceFactory, GetType(), "Default");
         }
 
-        public Task LoadAsync(
-            CancellationToken ct = default)
+        public NameReservationState(IPersistenceFactory<State> persistenceFactory, DomainId id)
+            : base(persistenceFactory, typeof(NameReservationState), id)
         {
-            return state.LoadAsync(ct);
         }
 
         public async Task<string?> ReserveAsync(DomainId id, string name,
@@ -57,7 +54,7 @@ namespace Squidex.Infrastructure.States
         {
             try
             {
-                return await state.UpdateAsync(s => s.Reserve(id, name), ct: ct);
+                return await UpdateAsync(s => s.Reserve(id, name), ct: ct);
             }
             catch (InconsistentStateException)
             {
@@ -70,7 +67,7 @@ namespace Squidex.Infrastructure.States
         {
             try
             {
-                await state.UpdateAsync(s => s.Remove(token), ct: ct);
+                await UpdateAsync(s => s.Remove(token), ct: ct);
             }
             catch (InconsistentStateException)
             {

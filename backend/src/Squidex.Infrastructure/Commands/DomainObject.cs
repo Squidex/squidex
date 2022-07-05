@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 
+#pragma warning disable MA0056 // Do not call overridable members in constructor
+
 namespace Squidex.Infrastructure.Commands
 {
     public abstract partial class DomainObject<T> : IExecutable where T : class, IDomainState<T>, new()
@@ -26,12 +28,12 @@ namespace Squidex.Infrastructure.Commands
             get => uniqueId;
         }
 
-        public T Snapshot
+        public virtual T Snapshot
         {
             get => snapshots.Current;
         }
 
-        public long Version
+        public virtual long Version
         {
             get => snapshots.Version;
         }

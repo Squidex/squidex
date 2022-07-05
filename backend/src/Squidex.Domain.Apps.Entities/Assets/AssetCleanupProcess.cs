@@ -11,12 +11,12 @@ using tusdotnet.Interfaces;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetCleanupWorker : IBackgroundProcess
+    public sealed class AssetCleanupProcess : IBackgroundProcess
     {
         private readonly ITusExpirationStore expirationStore;
         private CompletionTimer timer;
 
-        public AssetCleanupWorker(ITusExpirationStore expirationStore)
+        public AssetCleanupProcess(ITusExpirationStore expirationStore)
         {
             this.expirationStore = expirationStore;
         }

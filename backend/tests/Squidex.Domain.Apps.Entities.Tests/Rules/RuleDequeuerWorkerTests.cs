@@ -16,20 +16,20 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public class RuleDequeuerGrainTests
+    public class RuleDequeuerWorkerTests
     {
         private readonly IClock clock = A.Fake<IClock>();
-        private readonly ILogger<RuleDequeuerGrain> log = A.Dummy<ILogger<RuleDequeuerGrain>>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly IRuleService ruleService = A.Fake<IRuleService>();
-        private readonly RuleDequeuerGrain sut;
+        private readonly ILogger<RuleDequeuerWorker> log = A.Dummy<ILogger<RuleDequeuerWorker>>();
+        private readonly RuleDequeuerWorker sut;
 
-        public RuleDequeuerGrainTests()
+        public RuleDequeuerWorkerTests()
         {
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(SystemClock.Instance.GetCurrentInstant().WithoutMs());
 
-            sut = new RuleDequeuerGrain(ruleService, ruleEventRepository, log, clock);
+            sut = new RuleDequeuerWorker(ruleService, ruleEventRepository, log, clock);
         }
 
         [Fact]

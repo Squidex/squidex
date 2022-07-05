@@ -20,7 +20,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
-    public sealed partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
+    public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
     {
         private readonly IServiceProvider serviceProvider;
 

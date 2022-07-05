@@ -23,7 +23,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class BackupProcessor
     {
-        private const int MaxBackups = 10;
         private static readonly Duration UpdateDuration = Duration.FromSeconds(1);
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IBackupArchiveStore backupArchiveStore;
@@ -87,10 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 throw new DomainException(T.Get("backups.alreadyRunning"));
             }
 
-            if (state.Value.Jobs.Count >= MaxBackups)
-            {
-                throw new DomainException(T.Get("backups.maxReached", new { max = MaxBackups }));
-            }
+            state.Value.EnsureCanStart();
 
             var job = new BackupJob
             {

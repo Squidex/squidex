@@ -69,7 +69,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<JintScriptEngine>()
                 .As<IScriptEngine>().As<IScriptDescriptor>();
 
-            services.AddSingletonAs<GrainTagService>()
+            services.AddSingletonAs<TagService>()
                 .As<ITagService>();
 
             services.AddSingletonAs<CounterJintExtension>()

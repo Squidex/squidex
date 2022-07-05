@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_denormalize_tags()
         {
-            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Contains("name1")))
+            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Contains("name1"), default))
                 .Returns(new Dictionary<string, string> { ["name1"] = "id1" });
 
             var query = Q.Empty.WithODataQuery("$filter=tags eq 'name1'");
@@ -167,7 +167,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_not_fail_if_tags_not_found()
         {
-            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Contains("name1")))
+            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Contains("name1"), default))
                 .Returns(new Dictionary<string, string>());
 
             var query = Q.Empty.WithODataQuery("$filter=tags eq 'name1'");
@@ -186,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             Assert.Equal("Filter: fileSize == 123; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
 
-            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, A<string>._, A<HashSet<string>>._))
+            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, A<string>._, A<HashSet<string>>._, default))
                 .MustNotHaveHappened();
         }
     }

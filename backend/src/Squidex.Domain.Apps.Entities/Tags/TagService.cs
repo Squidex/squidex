@@ -11,7 +11,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Tags
 {
-    public sealed class GrainTagService : ITagService
+    public sealed class TagService : ITagService
     {
         private readonly IPersistenceFactory<State> persistenceFactory;
 
@@ -187,81 +187,90 @@ namespace Squidex.Domain.Apps.Entities.Tags
             }
         }
 
-        public GrainTagService(IPersistenceFactory<State> persistenceFactory)
+        public TagService(IPersistenceFactory<State> persistenceFactory)
         {
             this.persistenceFactory = persistenceFactory;
         }
 
-        public async Task RenameTagAsync(DomainId appId, string group, string name, string newName)
+        public async Task RenameTagAsync(DomainId id, string group, string name, string newName,
+            CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(name);
             Guard.NotNullOrEmpty(newName);
 
-            var state = await GetStateAsync(appId, group);
+            var state = await GetStateAsync(id, group, ct);
 
-            await state.UpdateAsync(s => s.Rename(name, newName));
+            await state.UpdateAsync(s => s.Rename(name, newName), ct: ct);
         }
 
-        public async Task RebuildTagsAsync(DomainId appId, string group, TagsExport export)
+        public async Task RebuildTagsAsync(DomainId id, string group, TagsExport export,
+            CancellationToken ct = default)
         {
             Guard.NotNull(export);
 
-            var state = await GetStateAsync(appId, group);
+            var state = await GetStateAsync(id, group, ct);
 
-            await state.UpdateAsync(s => s.Rebuild(export));
+            await state.UpdateAsync(s => s.Rebuild(export), ct: ct);
         }
 
-        public async Task<Dictionary<string, string>> GetTagIdsAsync(DomainId appId, string group, HashSet<string> names)
+        public async Task<Dictionary<string, string>> GetTagIdsAsync(DomainId id, string group, HashSet<string> names,
+            CancellationToken ct = default)
         {
             Guard.NotNull(names);
 
-            var state = await GetStateAsync(appId, group);
+            var state = await GetStateAsync(id, group, ct);
 
-            return await state.UpdateAsync(s => s.GetTagIds(names));
+            return await state.UpdateAsync(s => s.GetTagIds(names), ct: ct);
         }
 
-        public async Task<Dictionary<string, string>> DenormalizeTagsAsync(DomainId appId, string group, HashSet<string> ids)
+        public async Task<Dictionary<string, string>> DenormalizeTagsAsync(DomainId id, string group, HashSet<string> ids,
+            CancellationToken ct = default)
         {
             Guard.NotNull(ids);
 
-            var state = await GetStateAsync(appId, group);
+            var state = await GetStateAsync(id, group, ct);
 
-            return await state.UpdateAsync(s => s.Denormalize(ids));
+            return await state.UpdateAsync(s => s.Denormalize(ids), ct: ct);
         }
 
-        public async Task<Dictionary<string, string>> NormalizeTagsAsync(DomainId appId, string group, HashSet<string>? names, HashSet<string>? ids)
+        public async Task<Dictionary<string, string>> NormalizeTagsAsync(DomainId id, string group, HashSet<string>? names, HashSet<string>? ids,
+            CancellationToken ct = default)
         {
-            var state = await GetStateAsync(appId, group);
+            var state = await GetStateAsync(id, group, ct);
 
-            return await state.UpdateAsync(s => s.Normalize(names, ids));
+            return await state.UpdateAsync(s => s.Normalize(names, ids), ct: ct);
         }
 
-        public async Task<TagsSet> GetTagsAsync(DomainId appId, string group)
+        public async Task<TagsSet> GetTagsAsync(DomainId id, string group,
+            CancellationToken ct = default)
         {
-            var state = await GetStateAsync(appId, group);
+            var state = await GetStateAsync(id, group, ct);
 
             return state.Value.GetTags(state.Version);
         }
 
-        public async Task<TagsExport> GetExportableTagsAsync(DomainId appId, string group)
+        public async Task<TagsExport> GetExportableTagsAsync(DomainId id, string group,
+            CancellationToken ct = default)
         {
-            var state = await GetStateAsync(appId, group);
+            var state = await GetStateAsync(id, group, ct);
 
             return state.Value.GetExportableTags();
         }
 
-        public async Task ClearAsync(DomainId appId, string group)
+        public async Task ClearAsync(DomainId id, string group,
+            CancellationToken ct = default)
         {
-            var state = await GetStateAsync(appId, group);
+            var state = await GetStateAsync(id, group, ct);
 
-            await state.ClearAsync();
+            await state.ClearAsync(ct);
         }
 
-        private async Task<SimpleState<State>> GetStateAsync(DomainId appId, string group)
+        private async Task<SimpleState<State>> GetStateAsync(DomainId id, string group,
+            CancellationToken ct)
         {
-            var state = new SimpleState<State>(persistenceFactory, GetType(), $"{appId}_{group}");
+            var state = new SimpleState<State>(persistenceFactory, GetType(), $"{id}_{group}");
 
-            await state.LoadAsync();
+            await state.LoadAsync(ct);
 
             return state;
         }

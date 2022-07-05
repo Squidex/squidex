@@ -21,10 +21,10 @@ namespace Squidex.Config.Messaging
     {
         public static void AddSquidexMessaging(this IServiceCollection services, IConfiguration config)
         {
-            services.AddSingletonAs<AssetCleanupWorker>()
+            services.AddSingletonAs<AssetCleanupProcess>()
                 .AsSelf();
 
-            services.AddSingletonAs<ContentSchedulerWorker>()
+            services.AddSingletonAs<ContentSchedulerProcess>()
                 .AsSelf();
 
             services.AddSingletonAs<RuleDequeuerWorker>()

@@ -17,8 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         private static readonly Regex MentionRegex = new Regex(@"@(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+\/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+\/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*", RegexOptions.Compiled | RegexOptions.ExplicitCapture, TimeSpan.FromMilliseconds(100));
         private readonly IUserResolver userResolver;
 
-        public CommentsCommandMiddleware(IServiceProvider serviceProvider, IUserResolver userResolver)
-            : base(serviceProvider)
+        public CommentsCommandMiddleware(IDomainObjectFactory domainObjectFactory, IUserResolver userResolver)
+            : base(domainObjectFactory)
         {
             this.userResolver = userResolver;
         }

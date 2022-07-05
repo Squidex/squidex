@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\src\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Entities\Squidex.Domain.Apps.Entities.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Core.Tests\Squidex.Domain.Apps.Core.Tests.csproj" />
+    <ProjectReference Include="..\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FakeItEasy" Version="7.3.1" />

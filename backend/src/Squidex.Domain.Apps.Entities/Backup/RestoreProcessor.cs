@@ -19,7 +19,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -100,10 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Guard.ValidSlug(newAppName);
             }
 
-            if (CurrentJob?.Status == JobStatus.Started)
-            {
-                throw new DomainException(T.Get("backups.restoreRunning"));
-            }
+            CurrentJob.EnsureCanStart();
 
             state.Value.Job = new RestoreJob
             {

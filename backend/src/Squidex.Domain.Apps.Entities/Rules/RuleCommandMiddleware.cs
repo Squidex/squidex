@@ -16,9 +16,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly IRuleEnricher ruleEnricher;
         private readonly IContextProvider contextProvider;
 
-        public RuleCommandMiddleware(IServiceProvider serviceProvider,
+        public RuleCommandMiddleware(IDomainObjectFactory domainObjectFactory,
             IRuleEnricher ruleEnricher, IContextProvider contextProvider)
-            : base(serviceProvider)
+            : base(domainObjectFactory)
         {
             this.ruleEnricher = ruleEnricher;
 

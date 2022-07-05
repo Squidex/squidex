@@ -37,7 +37,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             edmModel = queryModel.ConvertToEdm("Squidex", "Asset");
         }
 
-        public virtual async Task<Q> ParseAsync(Context context, Q q)
+        public virtual async Task<Q> ParseAsync(Context context, Q q,
+            CancellationToken ct = default)
         {
             Guard.NotNull(context);
             Guard.NotNull(q);
@@ -46,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             {
                 var query = ParseClrQuery(q);
 
-                await TransformTagAsync(context, query);
+                await TransformTagAsync(context, query, ct);
 
                 WithSorting(query);
                 WithPaging(query, q);
@@ -114,11 +115,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             }
         }
 
-        private async Task TransformTagAsync(Context context, ClrQuery query)
+        private async Task TransformTagAsync(Context context, ClrQuery query,
+            CancellationToken ct)
         {
             if (query.Filter != null)
             {
-                query.Filter = await FilterTagTransformer.TransformAsync(query.Filter, context.App.Id, tagService);
+                query.Filter = await FilterTagTransformer.TransformAsync(query.Filter, context.App.Id, tagService, ct);
             }
         }
 

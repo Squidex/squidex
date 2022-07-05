@@ -17,19 +17,19 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public class ContentSchedulerGrainTests
+    public class ContentSchedulerProcessTests
     {
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly IClock clock = A.Fake<IClock>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly ContentSchedulerGrain sut;
+        private readonly ContentSchedulerProcess sut;
 
-        public ContentSchedulerGrainTests()
+        public ContentSchedulerProcessTests()
         {
-            var log = A.Fake<ILogger<ContentSchedulerGrain>>();
+            var log = A.Fake<ILogger<ContentSchedulerProcess>>();
 
-            sut = new ContentSchedulerGrain(contentRepository, commandBus, clock, log);
+            sut = new ContentSchedulerProcess(contentRepository, commandBus, clock, log);
         }
 
         [Fact]

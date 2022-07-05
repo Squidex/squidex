@@ -84,9 +84,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", default))
                 .MustHaveHappened();
 
-            A.CallTo(() => appsIndex.RegisterAsync(appId, appName, default))
-                .MustHaveHappened();
-
             A.CallTo(() => rebuilder.InsertManyAsync<AppDomainObject, AppDomainObject.State>(A<IEnumerable<DomainId>>.That.Is(appId), 1, default))
                 .MustHaveHappened();
         }

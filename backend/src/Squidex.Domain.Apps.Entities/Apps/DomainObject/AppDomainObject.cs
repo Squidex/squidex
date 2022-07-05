@@ -24,7 +24,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 {
-    public sealed partial class AppDomainObject : DomainObject<AppDomainObject.State>
+    public partial class AppDomainObject : DomainObject<AppDomainObject.State>
     {
         private readonly IServiceProvider serviceProvider;
 

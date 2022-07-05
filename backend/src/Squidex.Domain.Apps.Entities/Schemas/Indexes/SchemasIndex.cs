@@ -21,13 +21,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
         private readonly ISchemaRepository schemaRepository;
         private readonly IReplicatedCache schemaCache;
-        private readonly IUniqueNamesState uniqueNamesState;
+        private readonly IPersistenceFactory<NameReservationState.State> persistenceFactory;
 
-        public SchemasIndex(ISchemaRepository schemaRepository, IReplicatedCache schemaCache, IUniqueNamesState uniqueNamesState)
+        public SchemasIndex(ISchemaRepository schemaRepository, IReplicatedCache schemaCache, IPersistenceFactory<NameReservationState.State> persistenceFactory)
         {
             this.schemaRepository = schemaRepository;
             this.schemaCache = schemaCache;
-            this.uniqueNamesState = uniqueNamesState;
+            this.persistenceFactory = persistenceFactory;
         }
 
         public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId,
@@ -37,12 +37,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             {
                 var schemas = await schemaRepository.QueryAllAsync(appId, ct);
 
-                foreach (var schema in schemas)
+                foreach (var schema in schemas.Where(IsValid))
                 {
                     await InvalidateItAsync(appId, schema.Id, schema.SchemaDef.Name);
                 }
 
-                return schemas.NotNull().ToList();
+                return schemas.Where(IsValid).NotNull().ToList();
             }
         }
 
@@ -62,6 +62,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                 }
 
                 var schema = await schemaRepository.FindAsync(appId, name, ct);
+
+                if (!IsValid(schema))
+                {
+                    schema = null;
+                }
 
                 if (schema != null)
                 {
@@ -89,6 +94,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                 var schema = await schemaRepository.FindAsync(appId, id, ct);
 
+                if (!IsValid(schema))
+                {
+                    schema = null;
+                }
+
                 if (schema != null)
                 {
                     await CacheItAsync(schema);
@@ -104,14 +114,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             if (command is CreateSchema createSchema)
             {
-                var token = await CheckSchemaAsync(createSchema);
+                var names = await GetNamesAsync(createSchema.AppId.Id, default);
+
+                var token = await CheckSchemaAsync(createSchema, names);
                 try
                 {
                     await next(context);
                 }
                 finally
                 {
-                    await uniqueNamesState.RemoveReservationAsync(token);
+                    await names.RemoveReservationAsync(token);
                 }
             }
             else
@@ -151,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return InvalidateItAsync(update.AppId.Id, update.SchemaId.Id, update.SchemaId.Name);
         }
 
-        private async Task<string> CheckSchemaAsync(CreateSchema command)
+        private async Task<string> CheckSchemaAsync(CreateSchema command, NameReservationState names)
         {
             var existing = await schemaRepository.FindAsync(command.AppId.Id, command.Name);
 
@@ -160,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                 throw new ValidationException(T.Get("schemas.nameAlreadyExists"));
             }
 
-            var token = await uniqueNamesState.ReserveAsync(command.SchemaId, $"SCHEMA_{command.Name}");
+            var token = await names.ReserveAsync(command.SchemaId, command.Name);
 
             if (token == null)
             {
@@ -177,6 +189,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                 GetCacheKey(appId, name));
         }
 
+        private async Task<NameReservationState> GetNamesAsync(DomainId appId,
+            CancellationToken ct)
+        {
+            var state = new NameReservationState(persistenceFactory, $"{appId}_Schemas");
+
+            await state.LoadAsync(ct);
+
+            return state;
+        }
+
         private static string GetCacheKey(DomainId appId, string name)
         {
             return $"{typeof(SchemasIndex)}_Schemas_Name_{appId}_{name}";
@@ -185,6 +207,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         private static string GetCacheKey(DomainId appId, DomainId id)
         {
             return $"{typeof(SchemasIndex)}_Schemas_Id_{appId}_{id}";
+        }
+
+        private static bool IsValid(ISchemaEntity? schema)
+        {
+            return schema != null && schema.Version > EtagVersion.Empty && !schema.IsDeleted;
         }
 
         private Task CacheItAsync(ISchemaEntity schema)

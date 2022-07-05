@@ -182,7 +182,7 @@ namespace Squidex.Config.Domain
             services.AddSingleton(typeof(IPersistenceFactory<>),
                 typeof(Store<>));
 
-            services.AddSingletonAs<UniqueNamesState>()
+            services.AddSingletonAs<NameReservationState>()
                 .As<IUniqueNamesState>();
 
             services.AddSingletonAs<IInitializable>(c =>

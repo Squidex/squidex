@@ -16,19 +16,19 @@ using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentSchedulerWorker : IBackgroundProcess
+    public sealed class ContentSchedulerProcess : IBackgroundProcess
     {
         private readonly IContentRepository contentRepository;
         private readonly ICommandBus commandBus;
         private readonly IClock clock;
-        private readonly ILogger<ContentSchedulerWorker> log;
+        private readonly ILogger<ContentSchedulerProcess> log;
         private CompletionTimer timer;
 
-        public ContentSchedulerWorker(
+        public ContentSchedulerProcess(
             IContentRepository contentRepository,
             ICommandBus commandBus,
             IClock clock,
-            ILogger<ContentSchedulerWorker> log)
+            ILogger<ContentSchedulerProcess> log)
         {
             this.clock = clock;
 

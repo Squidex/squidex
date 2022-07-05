@@ -19,9 +19,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IContextProvider contextProvider;
 
-        public AppCommandMiddleware(IServiceProvider serviceProvider,
+        public AppCommandMiddleware(IDomainObjectFactory domainObjectFactory,
             IAppImageStore appImageStore, IAssetThumbnailGenerator assetThumbnailGenerator, IContextProvider contextProvider)
-            : base(serviceProvider)
+            : base(domainObjectFactory)
         {
             this.appImageStore = appImageStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;

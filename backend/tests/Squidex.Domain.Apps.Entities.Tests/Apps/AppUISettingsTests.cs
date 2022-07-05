@@ -1,97 +1,97 @@
-﻿// ==========================================================================
-//  Squidex Headless CMS
-// ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschraenkt)
-//  All rights reserved. Licensed under the MIT license.
-// ==========================================================================
+﻿//// ==========================================================================
+////  Squidex Headless CMS
+//// ==========================================================================
+////  Copyright (c) Squidex UG (haftungsbeschraenkt)
+////  All rights reserved. Licensed under the MIT license.
+//// ==========================================================================
 
-using FakeItEasy;
-using Orleans;
-using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
-using Xunit;
+//using FakeItEasy;
+//using Orleans;
+//using Squidex.Domain.Apps.Entities.TestHelpers;
+//using Squidex.Infrastructure;
+//using Squidex.Infrastructure.Json.Objects;
+//using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps
-{
-    public class AppUISettingsTests
-    {
-        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
-        private readonly IAppUISettingsGrain grain = A.Fake<IAppUISettingsGrain>();
-        private readonly AppUISettings sut;
+//namespace Squidex.Domain.Apps.Entities.Apps
+//{
+//    public class AppUISettingsTests
+//    {
+//        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
+//        private readonly IAppUISettingsGrain grain = A.Fake<IAppUISettingsGrain>();
+//        private readonly AppUISettings sut;
 
-        public AppUISettingsTests()
-        {
-            A.CallTo(() => grainFactory.GetGrain<IAppUISettingsGrain>(A<string>._, null))
-                .Returns(grain);
+//        public AppUISettingsTests()
+//        {
+//            A.CallTo(() => grainFactory.GetGrain<IAppUISettingsGrain>(A<string>._, null))
+//                .Returns(grain);
 
-            sut = new AppUISettings(grainFactory);
-        }
+//            sut = new AppUISettings(grainFactory);
+//        }
 
-        [Fact]
-        public async Task Should_call_grain_if_retrieving_settings()
-        {
-            var settings = new JsonObject();
+//        [Fact]
+//        public async Task Should_call_grain_if_retrieving_settings()
+//        {
+//            var settings = new JsonObject();
 
-            A.CallTo(() => grain.GetAsync())
-                .Returns(settings);
+//            A.CallTo(() => grain.GetAsync())
+//                .Returns(settings);
 
-            var result = await sut.GetAsync(DomainId.NewGuid(), "user");
+//            var result = await sut.GetAsync(DomainId.NewGuid(), "user");
 
-            Assert.Same(settings, result);
-        }
+//            Assert.Same(settings, result);
+//        }
 
-        [Fact]
-        public async Task Should_call_grain_if_setting_value()
-        {
-            var value = new JsonObject();
+//        [Fact]
+//        public async Task Should_call_grain_if_setting_value()
+//        {
+//            var value = new JsonObject();
 
-            await sut.SetAsync(DomainId.NewGuid(), "user", "the.path", value);
+//            await sut.SetAsync(DomainId.NewGuid(), "user", "the.path", value);
 
-            A.CallTo(() => grain.SetAsync("the.path", value))
-                .MustHaveHappened();
-        }
+//            A.CallTo(() => grain.SetAsync("the.path", value))
+//                .MustHaveHappened();
+//        }
 
-        [Fact]
-        public async Task Should_call_grain_if_replacing_settings()
-        {
-            var value = new JsonObject();
+//        [Fact]
+//        public async Task Should_call_grain_if_replacing_settings()
+//        {
+//            var value = new JsonObject();
 
-            await sut.SetAsync(DomainId.NewGuid(), "user", value);
+//            await sut.SetAsync(DomainId.NewGuid(), "user", value);
 
-            A.CallTo(() => grain.SetAsync(value))
-                .MustHaveHappened();
-        }
+//            A.CallTo(() => grain.SetAsync(value))
+//                .MustHaveHappened();
+//        }
 
-        [Fact]
-        public async Task Should_call_grain_if_removing_value()
-        {
-            await sut.RemoveAsync(DomainId.NewGuid(), "user", "the.path");
+//        [Fact]
+//        public async Task Should_call_grain_if_removing_value()
+//        {
+//            await sut.RemoveAsync(DomainId.NewGuid(), "user", "the.path");
 
-            A.CallTo(() => grain.RemoveAsync("the.path"))
-                .MustHaveHappened();
-        }
+//            A.CallTo(() => grain.RemoveAsync("the.path"))
+//                .MustHaveHappened();
+//        }
 
-        [Fact]
-        public async Task Should_clear_grain_when_app_deleted()
-        {
-            var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
+//        [Fact]
+//        public async Task Should_clear_grain_when_app_deleted()
+//        {
+//            var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
 
-            await ((IDeleter)sut).DeleteAppAsync(app, default);
+//            await ((IDeleter)sut).DeleteAppAsync(app, default);
 
-            A.CallTo(() => grain.ClearAsync())
-                .MustHaveHappened();
-        }
+//            A.CallTo(() => grain.ClearAsync())
+//                .MustHaveHappened();
+//        }
 
-        [Fact]
-        public async Task Should_clear_grain_when_contributor_removed()
-        {
-            var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
+//        [Fact]
+//        public async Task Should_clear_grain_when_contributor_removed()
+//        {
+//            var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
 
-            await ((IDeleter)sut).DeleteContributorAsync(app.Id, "user1", default);
+//            await ((IDeleter)sut).DeleteContributorAsync(app.Id, "user1", default);
 
-            A.CallTo(() => grain.ClearAsync())
-                .MustHaveHappened();
-        }
-    }
-}
+//            A.CallTo(() => grain.ClearAsync())
+//                .MustHaveHappened();
+//        }
+//    }
+//}

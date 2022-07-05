@@ -1,189 +1,189 @@
-﻿// ==========================================================================
-//  Squidex Headless CMS
-// ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschraenkt)
-//  All rights reserved. Licensed under the MIT license.
-// ==========================================================================
+﻿//// ==========================================================================
+////  Squidex Headless CMS
+//// ==========================================================================
+////  Copyright (c) Squidex UG (haftungsbeschraenkt)
+////  All rights reserved. Licensed under the MIT license.
+//// ==========================================================================
 
-using FakeItEasy;
-using FluentAssertions;
-using NodaTime;
-using Orleans.Core;
-using Squidex.Domain.Apps.Core.Comments;
-using Squidex.Domain.Apps.Entities.Comments.Commands;
-using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Domain.Apps.Events.Comments;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.EventSourcing;
-using Xunit;
+//using FakeItEasy;
+//using FluentAssertions;
+//using NodaTime;
+//using Orleans.Core;
+//using Squidex.Domain.Apps.Core.Comments;
+//using Squidex.Domain.Apps.Entities.Comments.Commands;
+//using Squidex.Domain.Apps.Entities.TestHelpers;
+//using Squidex.Domain.Apps.Events.Comments;
+//using Squidex.Infrastructure;
+//using Squidex.Infrastructure.Commands;
+//using Squidex.Infrastructure.EventSourcing;
+//using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
-{
-    public class CommentsGrainTests
-    {
-        private readonly IGrainIdentity identity = A.Fake<IGrainIdentity>();
-        private readonly IEventFormatter eventFormatter = A.Fake<IEventFormatter>();
-        private readonly IEventStore eventStore = A.Fake<IEventStore>();
-        private readonly DomainId commentsId = DomainId.NewGuid();
-        private readonly DomainId commentId = DomainId.NewGuid();
-        private readonly RefToken actor = RefToken.User("me");
-        private readonly CommentsGrain sut;
+//namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
+//{
+//    public class CommentsGrainTests
+//    {
+//        private readonly IGrainIdentity identity = A.Fake<IGrainIdentity>();
+//        private readonly IEventFormatter eventFormatter = A.Fake<IEventFormatter>();
+//        private readonly IEventStore eventStore = A.Fake<IEventStore>();
+//        private readonly DomainId commentsId = DomainId.NewGuid();
+//        private readonly DomainId commentId = DomainId.NewGuid();
+//        private readonly RefToken actor = RefToken.User("me");
+//        private readonly CommentsGrain sut;
 
-        private string Id
-        {
-            get => commentsId.ToString();
-        }
+//        private string Id
+//        {
+//            get => commentsId.ToString();
+//        }
 
-        public IEnumerable<Envelope<IEvent>> LastEvents { get; private set; } = Enumerable.Empty<Envelope<IEvent>>();
+//        public IEnumerable<Envelope<IEvent>> LastEvents { get; private set; } = Enumerable.Empty<Envelope<IEvent>>();
 
-        public CommentsGrainTests()
-        {
-            A.CallTo(() => identity.PrimaryKeyString)
-                .Returns(Id);
+//        public CommentsGrainTests()
+//        {
+//            A.CallTo(() => identity.PrimaryKeyString)
+//                .Returns(Id);
 
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, A<string>._, A<long>._, A<ICollection<EventData>>._, default))
-                .Invokes(x => LastEvents = sut!.GetUncommittedEvents().Select(x => x.To<IEvent>()).ToList());
+//            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, A<string>._, A<long>._, A<ICollection<EventData>>._, default))
+//                .Invokes(x => LastEvents = sut!.GetUncommittedEvents().Select(x => x.To<IEvent>()).ToList());
 
-            sut = new CommentsGrain(identity, eventFormatter, eventStore);
-        }
+//            sut = new CommentsGrain(identity, eventFormatter, eventStore);
+//        }
 
-        [Fact]
-        public async Task Create_should_create_events()
-        {
-            var command = new CreateComment { Text = "text1", Url = new Uri("http://uri") };
+//        [Fact]
+//        public async Task Create_should_create_events()
+//        {
+//            var command = new CreateComment { Text = "text1", Url = new Uri("http://uri") };
 
-            var result = await sut.ExecuteAsync(CreateCommentsCommand(command));
+//            var result = await sut.ExecuteAsync(CreateCommentsCommand(command));
 
-            result.ShouldBeEquivalent(CommandResult.Empty(commentsId, 0, EtagVersion.Empty));
+//            result.ShouldBeEquivalent(CommandResult.Empty(commentsId, 0, EtagVersion.Empty));
 
-            (await sut.GetCommentsAsync(0)).Should().BeEquivalentTo(new CommentsResult
-            {
-                Version = 0
-            });
+//            (await sut.GetCommentsAsync(0)).Should().BeEquivalentTo(new CommentsResult
+//            {
+//                Version = 0
+//            });
 
-            (await sut.GetCommentsAsync(-1)).Should().BeEquivalentTo(new CommentsResult
-            {
-                CreatedComments = new List<Comment>
-                {
-                    new Comment(command.CommentId, GetTime(), command.Actor, "text1", command.Url)
-                },
-                Version = 0
-            });
+//            (await sut.GetCommentsAsync(-1)).Should().BeEquivalentTo(new CommentsResult
+//            {
+//                CreatedComments = new List<Comment>
+//                {
+//                    new Comment(command.CommentId, GetTime(), command.Actor, "text1", command.Url)
+//                },
+//                Version = 0
+//            });
 
-            LastEvents
-                .ShouldHaveSameEvents(
-                    CreateCommentsEvent(new CommentCreated { Text = command.Text, Url = command.Url })
-                );
-        }
+//            LastEvents
+//                .ShouldHaveSameEvents(
+//                    CreateCommentsEvent(new CommentCreated { Text = command.Text, Url = command.Url })
+//                );
+//        }
 
-        [Fact]
-        public async Task Update_should_create_events()
-        {
-            await ExecuteCreateAsync();
+//        [Fact]
+//        public async Task Update_should_create_events()
+//        {
+//            await ExecuteCreateAsync();
 
-            var updateCommand = new UpdateComment { Text = "text2" };
+//            var updateCommand = new UpdateComment { Text = "text2" };
 
-            var result = await sut.ExecuteAsync(CreateCommentsCommand(updateCommand));
+//            var result = await sut.ExecuteAsync(CreateCommentsCommand(updateCommand));
 
-            result.ShouldBeEquivalent(CommandResult.Empty(commentsId, 1, 0));
+//            result.ShouldBeEquivalent(CommandResult.Empty(commentsId, 1, 0));
 
-            (await sut.GetCommentsAsync(-1)).Should().BeEquivalentTo(new CommentsResult
-            {
-                CreatedComments = new List<Comment>
-                {
-                    new Comment(commentId, GetTime(), updateCommand.Actor, "text2")
-                },
-                Version = 1
-            });
+//            (await sut.GetCommentsAsync(-1)).Should().BeEquivalentTo(new CommentsResult
+//            {
+//                CreatedComments = new List<Comment>
+//                {
+//                    new Comment(commentId, GetTime(), updateCommand.Actor, "text2")
+//                },
+//                Version = 1
+//            });
 
-            (await sut.GetCommentsAsync(0)).Should().BeEquivalentTo(new CommentsResult
-            {
-                UpdatedComments = new List<Comment>
-                {
-                    new Comment(commentId, GetTime(), updateCommand.Actor, "text2")
-                },
-                Version = 1
-            });
+//            (await sut.GetCommentsAsync(0)).Should().BeEquivalentTo(new CommentsResult
+//            {
+//                UpdatedComments = new List<Comment>
+//                {
+//                    new Comment(commentId, GetTime(), updateCommand.Actor, "text2")
+//                },
+//                Version = 1
+//            });
 
-            LastEvents
-                .ShouldHaveSameEvents(
-                    CreateCommentsEvent(new CommentUpdated { Text = updateCommand.Text })
-                );
-        }
+//            LastEvents
+//                .ShouldHaveSameEvents(
+//                    CreateCommentsEvent(new CommentUpdated { Text = updateCommand.Text })
+//                );
+//        }
 
-        [Fact]
-        public async Task Delete_should_create_events()
-        {
-            await ExecuteCreateAsync();
-            await ExecuteUpdateAsync();
+//        [Fact]
+//        public async Task Delete_should_create_events()
+//        {
+//            await ExecuteCreateAsync();
+//            await ExecuteUpdateAsync();
 
-            var deleteCommand = new DeleteComment();
+//            var deleteCommand = new DeleteComment();
 
-            var result = await sut.ExecuteAsync(CreateCommentsCommand(deleteCommand));
+//            var result = await sut.ExecuteAsync(CreateCommentsCommand(deleteCommand));
 
-            result.ShouldBeEquivalent(CommandResult.Empty(commentsId, 2, 1));
+//            result.ShouldBeEquivalent(CommandResult.Empty(commentsId, 2, 1));
 
-            (await sut.GetCommentsAsync(-1)).Should().BeEquivalentTo(new CommentsResult
-            {
-                Version = 2
-            });
+//            (await sut.GetCommentsAsync(-1)).Should().BeEquivalentTo(new CommentsResult
+//            {
+//                Version = 2
+//            });
 
-            (await sut.GetCommentsAsync(0)).Should().BeEquivalentTo(new CommentsResult
-            {
-                DeletedComments = new List<DomainId>
-                {
-                    commentId
-                },
-                Version = 2
-            });
+//            (await sut.GetCommentsAsync(0)).Should().BeEquivalentTo(new CommentsResult
+//            {
+//                DeletedComments = new List<DomainId>
+//                {
+//                    commentId
+//                },
+//                Version = 2
+//            });
 
-            (await sut.GetCommentsAsync(1)).Should().BeEquivalentTo(new CommentsResult
-            {
-                DeletedComments = new List<DomainId>
-                {
-                    commentId
-                },
-                Version = 2
-            });
+//            (await sut.GetCommentsAsync(1)).Should().BeEquivalentTo(new CommentsResult
+//            {
+//                DeletedComments = new List<DomainId>
+//                {
+//                    commentId
+//                },
+//                Version = 2
+//            });
 
-            LastEvents
-                .ShouldHaveSameEvents(
-                    CreateCommentsEvent(new CommentDeleted())
-                );
-        }
+//            LastEvents
+//                .ShouldHaveSameEvents(
+//                    CreateCommentsEvent(new CommentDeleted())
+//                );
+//        }
 
-        private Task ExecuteCreateAsync()
-        {
-            return sut.ExecuteAsync(CreateCommentsCommand(new CreateComment { Text = "text1" }));
-        }
+//        private Task ExecuteCreateAsync()
+//        {
+//            return sut.ExecuteAsync(CreateCommentsCommand(new CreateComment { Text = "text1" }));
+//        }
 
-        private Task ExecuteUpdateAsync()
-        {
-            return sut.ExecuteAsync(CreateCommentsCommand(new UpdateComment { Text = "text2" }));
-        }
+//        private Task ExecuteUpdateAsync()
+//        {
+//            return sut.ExecuteAsync(CreateCommentsCommand(new UpdateComment { Text = "text2" }));
+//        }
 
-        private T CreateCommentsEvent<T>(T @event) where T : CommentsEvent
-        {
-            @event.Actor = actor;
-            @event.CommentsId = commentsId;
-            @event.CommentId = commentId;
+//        private T CreateCommentsEvent<T>(T @event) where T : CommentsEvent
+//        {
+//            @event.Actor = actor;
+//            @event.CommentsId = commentsId;
+//            @event.CommentId = commentId;
 
-            return @event;
-        }
+//            return @event;
+//        }
 
-        private T CreateCommentsCommand<T>(T command) where T : CommentsCommand
-        {
-            command.Actor = actor;
-            command.CommentsId = commentsId;
-            command.CommentId = commentId;
+//        private T CreateCommentsCommand<T>(T command) where T : CommentsCommand
+//        {
+//            command.Actor = actor;
+//            command.CommentsId = commentsId;
+//            command.CommentId = commentId;
 
-            return command;
-        }
+//            return command;
+//        }
 
-        private Instant GetTime()
-        {
-            return LastEvents.ElementAt(0).Headers.Timestamp();
-        }
-    }
-}
+//        private Instant GetTime()
+//        {
+//            return LastEvents.ElementAt(0).Headers.Timestamp();
+//        }
+//    }
+//}

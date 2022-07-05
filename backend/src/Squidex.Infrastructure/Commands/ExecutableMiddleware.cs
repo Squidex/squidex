@@ -5,22 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.DependencyInjection;
-
 namespace Squidex.Infrastructure.Commands
 {
     public class ExecutableMiddleware<TCommand, T> : ICommandMiddleware where TCommand : IAggregateCommand where T : IExecutable
     {
-        private readonly Func<DomainId, T> factory;
+        private readonly IDomainObjectFactory domainObjectFactory;
 
-        public ExecutableMiddleware(IServiceProvider serviceProvider)
+        public ExecutableMiddleware(IDomainObjectFactory domainObjectFactory)
         {
-            var objectFactory = ActivatorUtilities.CreateFactory(typeof(T), new[] { typeof(DomainId) });
-
-            factory = id =>
-            {
-                return (T)objectFactory(serviceProvider, new object?[] { id });
-            };
+            this.domainObjectFactory = domainObjectFactory;
         }
 
         public virtual async Task HandleAsync(CommandContext context, NextDelegate next)
@@ -48,7 +41,7 @@ namespace Squidex.Infrastructure.Commands
 
         private Task<CommandResult> ExecuteCommandAsync(TCommand typedCommand)
         {
-            var executable = factory(typedCommand.AggregateId);
+            var executable = domainObjectFactory.Create<T>(typedCommand.AggregateId);
 
             return executable.ExecuteAsync(typedCommand);
         }

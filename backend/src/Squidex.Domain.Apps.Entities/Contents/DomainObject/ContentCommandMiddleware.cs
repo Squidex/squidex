@@ -16,9 +16,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         private readonly IContentEnricher contentEnricher;
         private readonly IContextProvider contextProvider;
 
-        public ContentCommandMiddleware(IServiceProvider serviceProvider,
+        public ContentCommandMiddleware(IDomainObjectFactory domainObjectFactory,
             IContentEnricher contentEnricher, IContextProvider contextProvider)
-            : base(serviceProvider)
+            : base(domainObjectFactory)
         {
             this.contentEnricher = contentEnricher;
             this.contextProvider = contextProvider;

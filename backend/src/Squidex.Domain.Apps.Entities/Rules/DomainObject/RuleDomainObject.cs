@@ -21,7 +21,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 {
-    public sealed partial class RuleDomainObject : DomainObject<RuleDomainObject.State>
+    public partial class RuleDomainObject : DomainObject<RuleDomainObject.State>
     {
         private readonly IServiceProvider serviceProvider;
 

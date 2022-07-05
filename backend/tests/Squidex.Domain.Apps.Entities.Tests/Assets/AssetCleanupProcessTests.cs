@@ -11,26 +11,26 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class AssetCleanupGrainTests
+    public class AssetCleanupProcessTests
     {
         private readonly ITusExpirationStore expirationStore = A.Fake<ITusExpirationStore>();
-        private readonly AssetCleanupGrain sut;
+        private readonly AssetCleanupProcess sut;
 
-        public AssetCleanupGrainTests()
+        public AssetCleanupProcessTests()
         {
-            sut = new AssetCleanupGrain(expirationStore);
+            sut = new AssetCleanupProcess(expirationStore);
         }
 
         [Fact]
-        public async Task Should_do_nothing_on_activate()
+        public async Task Should_stop_when_start_not_called()
         {
-            await sut.ActivateAsync();
+            await sut.StopAsync(default);
         }
 
         [Fact]
         public async Task Should_call_expiration_store_when_reminder_invoked()
         {
-            await sut.ReceiveReminder("Reminder", default);
+            await sut.CleanupAsync(default);
 
             A.CallTo(() => expirationStore.RemoveExpiredFilesAsync(default))
                 .MustHaveHappened();

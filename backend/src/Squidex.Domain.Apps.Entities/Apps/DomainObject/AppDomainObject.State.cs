@@ -18,7 +18,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 {
-    public sealed partial class AppDomainObject
+    public partial class AppDomainObject
     {
         [CollectionName("Apps")]
         public sealed class State : DomainObjectState<State>, IAppEntity

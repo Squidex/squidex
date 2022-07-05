@@ -25,14 +25,14 @@ namespace Squidex.Infrastructure.TestHelpers
             set => state = value;
         }
 
-        public TestState(DomainId id)
-            : this(id, A.Fake<IPersistenceFactory<T>>())
+        public TestState(string id, IPersistenceFactory<T>? persistenceFactory = null)
+            : this(DomainId.Create(id), persistenceFactory)
         {
         }
 
-        public TestState(DomainId id, IPersistenceFactory<T> persistenceFactory)
+        public TestState(DomainId id, IPersistenceFactory<T>? persistenceFactory = null)
         {
-            PersistenceFactory = persistenceFactory;
+            PersistenceFactory = persistenceFactory ?? A.Fake<IPersistenceFactory<T>>();
 
             A.CallTo(() => PersistenceFactory.WithSnapshots(A<Type>._, id, A<HandleSnapshot<T>>._))
                 .Invokes(x =>

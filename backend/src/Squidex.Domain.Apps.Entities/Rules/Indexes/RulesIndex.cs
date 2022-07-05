@@ -24,8 +24,15 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             using (Telemetry.Activities.StartActivity("RulesIndex/GetRulesAsync"))
             {
-                return await ruleRepository.QueryAllAsync(appId, ct);
+                var rules = await ruleRepository.QueryAllAsync(appId, ct);
+
+                return rules.Where(IsValid).ToList();
             }
+        }
+
+        private static bool IsValid(IRuleEntity? rule)
+        {
+            return rule != null && rule.Version > EtagVersion.Empty && !rule.IsDeleted;
         }
     }
 }

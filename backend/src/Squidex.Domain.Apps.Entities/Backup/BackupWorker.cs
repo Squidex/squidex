@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
     public sealed class BackupWorker :
         IMessageHandler<BackupRestore>,
         IMessageHandler<BackupStart>,
-        IMessageHandler<BackupRemove>,
+        IMessageHandler<BackupDelete>,
         IMessageHandler<BackupClear>,
         IInitializable
     {
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             await processor.BackupAsync(message.Actor, ct);
         }
 
-        public async Task HandleAsync(BackupRemove message,
+        public async Task HandleAsync(BackupDelete message,
             CancellationToken ct = default)
         {
             var processor = await GetBackupProcessorAsync(message.AppId);

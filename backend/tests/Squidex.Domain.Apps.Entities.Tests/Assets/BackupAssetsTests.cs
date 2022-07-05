@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateBackupContext();
 
-            A.CallTo(() => tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets))
+            A.CallTo(() => tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets, default))
                 .Returns(tags);
 
             await sut.BackupAsync(context, ct);
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateBackupContext();
 
-            A.CallTo(() => tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets))
+            A.CallTo(() => tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets, default))
                 .Returns(tags);
 
             await sut.BackupAsync(context, ct);
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.RestoreAsync(context, ct);
 
-            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Tags == tags)))
+            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Tags == tags), default))
                 .MustHaveHappened();
         }
 
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.RestoreAsync(context, ct);
 
-            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Alias == alias)))
+            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Alias == alias), default))
                 .MustHaveHappened();
         }
 
@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(A<string>._, ct))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Alias == alias)))
+            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Alias == alias), default))
                 .MustNotHaveHappened();
         }
 

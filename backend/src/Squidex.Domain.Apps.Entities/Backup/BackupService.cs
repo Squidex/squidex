@@ -36,22 +36,30 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return messaging.PublishAsync(new BackupClear(app.Id), ct: ct);
         }
 
-        public Task StartBackupAsync(DomainId appId, RefToken actor,
+        public async Task StartBackupAsync(DomainId appId, RefToken actor,
             CancellationToken ct = default)
         {
-            return messaging.PublishAsync(new BackupStart(appId, actor), ct: ct);
+            var state = await GetStateAsync(appId, ct);
+
+            state.Value.EnsureCanStart();
+
+            await messaging.PublishAsync(new BackupStart(appId, actor), ct: ct);
         }
 
-        public Task StartRestoreAsync(RefToken actor, Uri url, string? newAppName,
+        public async Task StartRestoreAsync(RefToken actor, Uri url, string? newAppName,
             CancellationToken ct = default)
         {
-            return messaging.PublishAsync(new BackupRestore(actor, url, newAppName), ct: ct);
+            await restoreState.LoadAsync(ct);
+
+            restoreState.Value.EnsureCanStart();
+
+            await messaging.PublishAsync(new BackupRestore(actor, url, newAppName), ct: ct);
         }
 
         public Task DeleteBackupAsync(DomainId appId, DomainId backupId,
             CancellationToken ct = default)
         {
-            return messaging.PublishAsync(new BackupRemove(appId, backupId), ct: ct);
+            return messaging.PublishAsync(new BackupDelete(appId, backupId), ct: ct);
         }
 
         public async Task<IRestoreJob> GetRestoreAsync(

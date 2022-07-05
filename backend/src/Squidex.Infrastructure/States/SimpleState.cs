@@ -9,7 +9,7 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    public sealed class SimpleState<T> where T : class, new()
+    public class SimpleState<T> where T : class, new()
     {
         private readonly IPersistence<T> persistence;
 
@@ -61,7 +61,7 @@ namespace Squidex.Infrastructure.States
             return persistence.WriteEventAsync(envelope, ct);
         }
 
-        public async Task UpdateAsync(Action<T> updater, int retries = 5,
+        public async Task UpdateAsync(Action<T> updater, int retries = 20,
             CancellationToken ct = default)
         {
             for (var i = 0; i < retries; i++)

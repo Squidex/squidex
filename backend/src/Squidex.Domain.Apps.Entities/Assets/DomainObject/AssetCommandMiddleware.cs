@@ -22,13 +22,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         private readonly IEnumerable<IAssetMetadataSource> assetMetadataSources;
 
         public AssetCommandMiddleware(
-            IServiceProvider serviceProvider,
+            IDomainObjectFactory domainObjectFactory,
             IAssetEnricher assetEnricher,
             IAssetFileStore assetFileStore,
             IAssetQueryService assetQuery,
             IContextProvider contextProvider,
             IEnumerable<IAssetMetadataSource> assetMetadataSources)
-            : base(serviceProvider)
+            : base(domainObjectFactory)
         {
             this.assetEnricher = assetEnricher;
             this.assetFileStore = assetFileStore;
