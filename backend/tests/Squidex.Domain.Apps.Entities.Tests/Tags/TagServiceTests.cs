@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
-        public async Task Should_remove_tags)
+        public async Task Should_remove_tags()
         {
             var result1 = await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name1", "name2"), null, ct);
             var result2 = await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name2", "name3"), null, ct);
