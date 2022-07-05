@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MassTransit;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.UsageTracking;
+using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
@@ -19,13 +19,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         private readonly MemoryCache memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IApiUsageTracker apiUsageTracker;
-        private readonly IBus bus;
+        private readonly IMessageBus messaging;
 
-        public UsageGate(IAppPlansProvider appPlansProvider, IApiUsageTracker apiUsageTracker, IBus bus)
+        public UsageGate(IAppPlansProvider appPlansProvider, IApiUsageTracker apiUsageTracker, IMessageBus messaging)
         {
             this.appPlansProvider = appPlansProvider;
             this.apiUsageTracker = apiUsageTracker;
-            this.bus = bus;
+            this.messaging = messaging;
         }
 
         public virtual async Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateTime today,
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                         Users = GetUsers(app)
                     };
 
-                    await bus.Publish(notification, ct);
+                    await messaging.PublishAsync(notification, ct: ct);
 
                     TrackNotified(appId);
                 }

@@ -53,6 +53,9 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<Rebuilder>()
                 .AsSelf();
 
+            services.AddSingletonAs<EventConsumerManager>()
+                .As<IEventConsumerManager>();
+
             services.AddSingletonAs<DefaultStreamNameResolver>()
                 .As<IStreamNameResolver>();
 

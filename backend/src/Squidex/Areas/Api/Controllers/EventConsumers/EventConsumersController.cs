@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
-using Orleans;
 using Squidex.Areas.Api.Controllers.EventConsumers.Models;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing.Grains;
@@ -40,27 +39,42 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
 
         [HttpPut]
         [Route("event-consumers/{consumerName}/start/")]
+        [ProducesResponseType(typeof(EventConsumerDto), StatusCodes.Status200OK)]
         [ApiPermission(Permissions.AdminEventsManage)]
-        public async Task StartEventConsumer(string consumerName)
+        public async Task<IActionResult> StartEventConsumer(string consumerName)
         {
-            await eventConsumerManager.StartAsync(consumerName);
+            var eventConsumer = await eventConsumerManager.StartAsync(consumerName, HttpContext.RequestAborted);
+
+            var response = EventConsumerDto.FromDomain(eventConsumer, Resources);
+
+            return Ok(response);
         }
 
         [HttpPut]
         [Route("event-consumers/{consumerName}/stop/")]
+        [ProducesResponseType(typeof(EventConsumerDto), StatusCodes.Status200OK)]
         [ApiPermission(Permissions.AdminEventsManage)]
-        public async Task StopEventConsumer(string consumerName)
+        public async Task<IActionResult> StopEventConsumer(string consumerName)
         {
-            await eventConsumerManager.StopAsync(consumerName);
+            var eventConsumer = await eventConsumerManager.StopAsync(consumerName, HttpContext.RequestAborted);
+
+            var response = EventConsumerDto.FromDomain(eventConsumer, Resources);
+
+            return Ok(response);
         }
 
         [HttpPut]
         [Route("event-consumers/{consumerName}/reset/")]
         [ProducesResponseType(typeof(EventConsumerDto), StatusCodes.Status200OK)]
         [ApiPermission(Permissions.AdminEventsManage)]
-        public async Task ResetEventConsumer(string consumerName)
+        public async Task<IActionResult> ResetEventConsumer(string consumerName)
         {
-            await eventConsumerManager.ResetAsync(consumerName);
+            var eventConsumer = await eventConsumerManager.ResetAsync(consumerName, HttpContext.RequestAborted);
+
+            var response = EventConsumerDto.FromDomain(eventConsumer, Resources);
+
+            return Ok(response);
         }
+
     }
 }

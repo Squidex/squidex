@@ -6,13 +6,15 @@
 // ==========================================================================
 
 using System.Collections.Concurrent;
-using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
+using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
-    public sealed class RuleRunnerWorker : IJobConsumer<RuleRunnerRun>, IConsumer<RuleRunnerCancel>
+    public sealed class RuleRunnerWorker :
+        IMessageHandler<RuleRunnerRun>,
+        IMessageHandler<RuleRunnerCancel>
     {
         private readonly ConcurrentDictionary<DomainId, RuleRunnerProcessor> processors = new ConcurrentDictionary<DomainId, RuleRunnerProcessor>();
         private readonly Func<DomainId, RuleRunnerProcessor> processorFactory;
@@ -27,16 +29,18 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             };
         }
 
-        public async Task Run(JobContext<RuleRunnerRun> context)
+        public async Task HandleAsync(RuleRunnerRun message,
+            CancellationToken ct = default)
         {
-            var runner = await GetProcessorAsync(context.Job.AppId);
+            var runner = await GetProcessorAsync(message.AppId);
 
-            await runner.RunAsync(context.Job.RuleId, context.Job.FromSnapshots, context.RetryAttempt > 0, context.CancellationToken);
+            await runner.RunAsync(message.RuleId, message.FromSnapshots, false, ct);
         }
 
-        public async Task Consume(ConsumeContext<RuleRunnerCancel> context)
+        public async Task HandleAsync(RuleRunnerCancel message,
+            CancellationToken ct = default)
         {
-            var runner = await GetProcessorAsync(context.Message.AppId);
+            var runner = await GetProcessorAsync(message.AppId);
 
             await runner.CancelAsync();
         }

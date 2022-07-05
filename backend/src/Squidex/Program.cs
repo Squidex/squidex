@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Config.Domain;
-using Squidex.Config.Orleans;
 using Squidex.Config.Startup;
 
 namespace Squidex
@@ -44,9 +43,6 @@ namespace Squidex
 
                     // Step 4: Start background processes.
                     services.AddBackgroundProcesses();
-
-                    // Step 5: Run mass transit.
-                    services.AddSquidexMassTransit(context.Configuration);
                 })
                 .ConfigureWebHostDefaults(builder =>
                 {

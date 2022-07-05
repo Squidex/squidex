@@ -12,10 +12,13 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         Task<List<EventConsumerInfo>> GetConsumersAsync(
             CancellationToken ct = default);
 
-        Task ResetAsync(string consumerName);
+        Task<EventConsumerInfo> ResetAsync(string consumerName,
+            CancellationToken ct = default);
 
-        Task StopAsync(string consumerName);
+        Task<EventConsumerInfo> StopAsync(string consumerName,
+            CancellationToken ct = default);
 
-        Task StartAsync(string consumerName);
+        Task<EventConsumerInfo> StartAsync(string consumerName,
+            CancellationToken ct = default);
     }
 }

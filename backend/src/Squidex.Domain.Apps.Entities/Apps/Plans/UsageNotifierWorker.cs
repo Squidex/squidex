@@ -5,17 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MassTransit;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Messaging;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
-    public sealed class UsageNotifierWorker : IConsumer<UsageTrackingCheck>
+    public sealed class UsageNotifierWorker : IMessageHandler<UsageTrackingCheck>
     {
         private static readonly TimeSpan TimeBetweenNotifications = TimeSpan.FromDays(3);
         private readonly SimpleState<State> state;
@@ -39,12 +39,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             state = new SimpleState<State>(persistenceFactory, GetType(), DomainId.Create("Default"));
         }
 
-        public Task Consume(ConsumeContext<UsageTrackingCheck> context)
-        {
-            return NotifyAsync(context.Message);
-        }
-
-        public async Task NotifyAsync(UsageTrackingCheck notification)
+        public async Task HandleAsync(UsageTrackingCheck notification,
+            CancellationToken ct = default)
         {
             if (!notificationSender.IsActive)
             {
@@ -59,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                 {
                     foreach (var userId in notification.Users)
                     {
-                        var user = await userResolver.FindByIdOrEmailAsync(userId);
+                        var user = await userResolver.FindByIdOrEmailAsync(userId, ct);
 
                         if (user != null)
                         {

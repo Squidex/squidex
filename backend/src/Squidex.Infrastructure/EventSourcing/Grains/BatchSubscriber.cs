@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private sealed record ErrorJob(Exception Exception, object? Sender);
 
         public BatchSubscriber(
-            EventConsumerWorker grain,
+            EventConsumerProcessor grain,
             IEventDataFormatter eventDataFormatter,
             IEventConsumer eventConsumer,
             Func<IEventSubscriber, IEventSubscription> factory)
@@ -91,7 +91,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             handleTask = Run(grain);
         }
 
-        private async Task Run(EventConsumerWorker grain)
+        private async Task Run(EventConsumerProcessor grain)
         {
             try
             {

@@ -12,11 +12,16 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed record BackupStart(DomainId AppId, RefToken Actor);
-
-    public sealed record BackupRemove(DomainId AppId, DomainId Id);
-
-    public sealed record BackupClear(DomainId AppId);
-
     public sealed record BackupRestore(RefToken Actor, Uri Url, string? NewAppName = null);
+
+    public sealed record BackupStart(DomainId AppId, RefToken Actor)
+        : BackupMessage(AppId);
+
+    public sealed record BackupRemove(DomainId AppId, DomainId Id)
+        : BackupMessage(AppId);
+
+    public sealed record BackupClear(DomainId AppId)
+        : BackupMessage(AppId);
+
+    public abstract record BackupMessage(DomainId AppId);
 }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MassTransit;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
@@ -14,6 +13,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
+using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
@@ -24,20 +24,20 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         private readonly IPersistenceFactory<RuleRunnerState> persistenceFactory;
         private readonly IEventStore eventStore;
         private readonly IRuleService ruleService;
-        private readonly IBus bus;
+        private readonly IMessageBus messaging;
 
         public DefaultRuleRunnerService(
             IPersistenceFactory<RuleRunnerState> persistenceFactory,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             IRuleService ruleService,
-            IBus bus)
+            IMessageBus messaging)
         {
             this.eventDataFormatter = eventDataFormatter;
             this.persistenceFactory = persistenceFactory;
             this.eventStore = eventStore;
             this.ruleService = ruleService;
-            this.bus = bus;
+            this.messaging = messaging;
         }
 
         public Task<List<SimulatedRuleEvent>> SimulateAsync(IRuleEntity rule,
@@ -115,13 +115,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         public Task CancelAsync(DomainId appId,
             CancellationToken ct = default)
         {
-            return bus.Publish(new RuleRunnerCancel(appId), ct);
+            return messaging.PublishAsync(new RuleRunnerCancel(appId), ct: ct);
         }
 
         public Task RunAsync(DomainId appId, DomainId ruleId, bool fromSnapshots = false,
             CancellationToken ct = default)
         {
-            return bus.Publish(new RuleRunnerRun(appId, ruleId, fromSnapshots), ct);
+            return messaging.PublishAsync(new RuleRunnerRun(appId, ruleId, fromSnapshots), ct: ct);
         }
 
         public async Task<DomainId?> GetRunningRuleIdAsync(DomainId appId,

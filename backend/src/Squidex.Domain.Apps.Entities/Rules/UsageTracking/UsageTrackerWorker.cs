@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MassTransit;
 using Squidex.Domain.Apps.Events;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
@@ -13,14 +12,11 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Timers;
 using Squidex.Infrastructure.UsageTracking;
+using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
-    public sealed class UsageTrackerWorker :
-        IConsumer<UsageTrackingAdd>,
-        IConsumer<UsageTrackingUpdate>,
-        IConsumer<UsageTrackingRemove>,
-        IBackgroundProcess
+    public sealed class UsageTrackerWorker : IMessageHandler<UsageTrackingMessage>, IBackgroundProcess
     {
         private readonly SimpleState<State> state;
         private readonly IApiUsageTracker usageTracker;
@@ -131,25 +127,44 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             }
         }
 
-        public Task Consume(ConsumeContext<UsageTrackingAdd> context)
+        public Task HandleAsync(UsageTrackingMessage message,
+            CancellationToken ct = default)
         {
-            UpdateTarget(context.Message.RuleId, t => t.SetApp(context.Message.AppId).SetLimit(context.Message.Limits).SetNumDays(context.Message.NumDays));
-
-            return state.WriteAsync();
+            switch (message)
+            {
+                case UsageTrackingAdd add:
+                    return HandleAsync(add, ct);
+                case UsageTrackingRemove remove:
+                    return HandleAsync(remove, ct);
+                case UsageTrackingUpdate update:
+                    return HandleAsync(update, ct);
+                default:
+                    return Task.CompletedTask;
+            }
         }
 
-        public Task Consume(ConsumeContext<UsageTrackingUpdate> context)
+        public Task HandleAsync(UsageTrackingAdd message,
+            CancellationToken ct)
         {
-            UpdateTarget(context.Message.RuleId, t => t.SetLimit(context.Message.Limits).SetNumDays(context.Message.NumDays));
+            UpdateTarget(message.RuleId, t => t.SetApp(message.AppId).SetLimit(message.Limits).SetNumDays(message.NumDays));
 
-            return state.WriteAsync();
+            return state.WriteAsync(ct);
         }
 
-        public Task Consume(ConsumeContext<UsageTrackingRemove> context)
+        public Task HandleAsync(UsageTrackingUpdate message,
+            CancellationToken ct)
         {
-            state.Value.Targets.Remove(context.Message.RuleId);
+            UpdateTarget(message.RuleId, t => t.SetLimit(message.Limits).SetNumDays(message.NumDays));
 
-            return state.WriteAsync();
+            return state.WriteAsync(ct);
+        }
+
+        public Task HandleAsync(UsageTrackingRemove message,
+            CancellationToken ct)
+        {
+            state.Value.Targets.Remove(message.RuleId);
+
+            return state.WriteAsync(ct);
         }
 
         private void UpdateTarget(DomainId ruleId, Action<Target> updater)

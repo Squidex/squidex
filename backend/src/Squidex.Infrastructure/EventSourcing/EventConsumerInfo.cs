@@ -7,16 +7,16 @@
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed class EventConsumerInfo
+    public sealed record EventConsumerInfo
     {
-        public bool IsStopped { get; set; }
+        public bool IsStopped { get; init; }
 
-        public int Count { get; set; }
+        public int Count { get; init; }
 
-        public string Name { get; set; }
+        public string Name { get; init; }
 
-        public string Error { get; set; }
+        public string Error { get; init; }
 
-        public string Position { get; set; }
+        public string Position { get; init; }
     }
 }

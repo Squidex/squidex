@@ -11,14 +11,13 @@
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
     public sealed record EventConsumerReset(string EventConsumer)
-    {
-    }
+        : EventConsumerMessage(EventConsumer);
 
     public sealed record EventConsumerStart(string EventConsumer)
-    {
-    }
+        : EventConsumerMessage(EventConsumer);
 
     public sealed record EventConsumerStop(string EventConsumer)
-    {
-    }
+        : EventConsumerMessage(EventConsumer);
+
+    public abstract record EventConsumerMessage(string EventConsumer);
 }

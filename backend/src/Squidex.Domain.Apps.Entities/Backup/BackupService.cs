@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MassTransit;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
+using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
@@ -17,42 +17,41 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         private readonly SimpleState<RestoreJob> restoreState;
         private readonly IPersistenceFactory<BackupState> persistenceFactoryBackup;
-        private readonly IBus bus;
+        private readonly IMessageBus messaging;
 
         public BackupService(
             IPersistenceFactory<RestoreJob> persistenceFactoryRestore,
             IPersistenceFactory<BackupState> persistenceFactoryBackup,
-            IBus bus)
+            IMessageBus messaging)
         {
             this.persistenceFactoryBackup = persistenceFactoryBackup;
+            this.messaging = messaging;
 
             restoreState = new SimpleState<RestoreJob>(persistenceFactoryRestore, GetType(), "Default");
-
-            this.bus = bus;
         }
 
         Task IDeleter.DeleteAppAsync(IAppEntity app,
             CancellationToken ct)
         {
-            return bus.Publish(new BackupClear(app.Id), ct);
+            return messaging.PublishAsync(new BackupClear(app.Id), ct: ct);
         }
 
         public Task StartBackupAsync(DomainId appId, RefToken actor,
             CancellationToken ct = default)
         {
-            return bus.Publish(new BackupStart(appId, actor), ct);
+            return messaging.PublishAsync(new BackupStart(appId, actor), ct: ct);
         }
 
         public Task StartRestoreAsync(RefToken actor, Uri url, string? newAppName,
             CancellationToken ct = default)
         {
-            return bus.Publish(new BackupRestore(actor, url, newAppName), ct);
+            return messaging.PublishAsync(new BackupRestore(actor, url, newAppName), ct: ct);
         }
 
         public Task DeleteBackupAsync(DomainId appId, DomainId backupId,
             CancellationToken ct = default)
         {
-            return bus.Publish(new BackupRemove(appId, backupId), ct);
+            return messaging.PublishAsync(new BackupRemove(appId, backupId), ct: ct);
         }
 
         public async Task<IRestoreJob?> GetRestoreAsync(

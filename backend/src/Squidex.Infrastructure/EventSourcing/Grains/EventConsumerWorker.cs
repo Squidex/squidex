@@ -5,270 +5,64 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Logging;
-using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Squidex.Hosting;
+using Squidex.Messaging;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public sealed class EventConsumerWorker : IAsyncDisposable
+    public sealed class EventConsumerWorker :
+        IMessageHandler<EventConsumerStart>,
+        IMessageHandler<EventConsumerStop>,
+        IMessageHandler<EventConsumerReset>,
+        IInitializable
     {
-        private readonly SimpleState<EventConsumerState> state;
-        private readonly IEventDataFormatter eventDataFormatter;
-        private readonly IEventConsumer? eventConsumer;
-        private readonly IEventStore eventStore;
-        private readonly ILogger<EventConsumerWorker> log;
-        private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
-        private IEventSubscription? currentSubscription;
+        private readonly Dictionary<string, EventConsumerProcessor> processors = new Dictionary<string, EventConsumerProcessor>();
 
-        private EventConsumerState State
+        public EventConsumerWorker(IEnumerable<IEventConsumer> eventConsumers, IServiceProvider serviceProvider)
         {
-            get => state.Value;
-            set => state.Value = value;
+            foreach (var consumer in eventConsumers)
+            {
+                var processor = ActivatorUtilities.CreateInstance<EventConsumerProcessor>(serviceProvider, consumer);
+
+                processors[consumer.Name] = processor;
+            }
         }
 
-        public EventConsumerWorker(
-            IPersistenceFactory<EventConsumerState> persistenceFactory,
-            IEventConsumer eventConsumer,
-            IEventStore eventStore,
-            IEventDataFormatter eventDataFormatter,
-            ILogger<EventConsumerWorker> log)
-        {
-            this.eventStore = eventStore;
-            this.eventDataFormatter = eventDataFormatter;
-            this.eventConsumer = eventConsumer;
-            this.log = log;
-
-            state = new SimpleState<EventConsumerState>(persistenceFactory, GetType(), eventConsumer.Name);
-        }
-
-        public Task InitializeAsync(
+        public async Task InitializeAsync(
             CancellationToken ct)
         {
-            return state.LoadAsync(ct);
-        }
-
-        public ValueTask DisposeAsync()
-        {
-            CompleteAsync().Forget();
-
-            return default;
-        }
-
-        public async Task CompleteAsync()
-        {
-            if (currentSubscription is BatchSubscriber batchSubscriber)
+            foreach (var (_, processor) in processors)
             {
-                try
-                {
-                    await batchSubscriber.CompleteAsync();
-                }
-                catch (Exception ex)
-                {
-                    log.LogCritical(ex, "Failed to complete consumer.");
-                }
+                await processor.InitializeAsync(ct);
             }
         }
 
-        public Task OnEventsAsync(object sender, IReadOnlyList<Envelope<IEvent>> events, string position)
+        public async Task HandleAsync(EventConsumerStart message,
+            CancellationToken ct = default)
         {
-            if (!ReferenceEquals(sender, currentSubscription?.Sender))
+            if (processors.TryGetValue(message.EventConsumer, out var processor))
             {
-                return Task.CompletedTask;
-            }
-
-            return DoAndUpdateStateAsync(async () =>
-            {
-                await DispatchAsync(events);
-
-                State = State.Handled(position, events.Count);
-            }, State.Position);
-        }
-
-        public Task OnErrorAsync(object sender, Exception exception)
-        {
-            if (!ReferenceEquals(sender, currentSubscription?.Sender))
-            {
-                return Task.CompletedTask;
-            }
-
-            return DoAndUpdateStateAsync(() =>
-            {
-                Unsubscribe();
-
-                State = State.Stopped(exception);
-            }, State.Position);
-        }
-
-        public async Task ActivateAsync()
-        {
-            if (State.IsFailed)
-            {
-                await DoAndUpdateStateAsync(() =>
-                {
-                    Subscribe();
-
-                    State = State.Started();
-                }, State.Position);
-            }
-            else if (!State.IsStopped)
-            {
-                Subscribe();
+                await processor.StartAsync();
             }
         }
 
-        public async Task StartAsync()
+        public async Task HandleAsync(EventConsumerStop message,
+            CancellationToken ct = default)
         {
-            if (!State.IsStopped)
+            if (processors.TryGetValue(message.EventConsumer, out var processor))
             {
-                return;
-            }
-
-            await DoAndUpdateStateAsync(() =>
-            {
-                Subscribe();
-
-                State = State.Started();
-            }, State.Position);
-        }
-
-        public async Task StopAsync()
-        {
-            if (State.IsStopped)
-            {
-                return;
-            }
-
-            await DoAndUpdateStateAsync(() =>
-            {
-                Unsubscribe();
-
-                State = State.Stopped();
-            }, State.Position);
-        }
-
-        public async Task ResetAsync()
-        {
-            await DoAndUpdateStateAsync(async () =>
-            {
-                Unsubscribe();
-
-                await ClearAsync();
-
-                State = EventConsumerState.Initial;
-
-                Subscribe();
-            }, State.Position);
-        }
-
-        private async Task DispatchAsync(IReadOnlyList<Envelope<IEvent>> events)
-        {
-            if (events.Count > 0)
-            {
-                await eventConsumer!.On(events);
+                await processor.StopAsync();
             }
         }
 
-        private Task DoAndUpdateStateAsync(Action action, string? position, [CallerMemberName] string? caller = null)
+        public async Task HandleAsync(EventConsumerReset message,
+            CancellationToken ct = default)
         {
-            return DoAndUpdateStateAsync(() =>
+            if (processors.TryGetValue(message.EventConsumer, out var processor))
             {
-                action();
-
-                return Task.CompletedTask;
-            }, position, caller);
-        }
-
-        private async Task DoAndUpdateStateAsync(Func<Task> action, string? position, [CallerMemberName] string? caller = null)
-        {
-            await semaphore.WaitAsync();
-            try
-            {
-                var previousState = State;
-
-                try
-                {
-                    await action();
-                }
-                catch (Exception ex)
-                {
-                    try
-                    {
-                        Unsubscribe();
-                    }
-                    catch (Exception unsubscribeException)
-                    {
-                        ex = new AggregateException(ex, unsubscribeException);
-                    }
-
-                    log.LogCritical(ex, "Failed to update consumer {consumer} at position {position} from {caller}.",
-                        eventConsumer!.Name, position, caller);
-
-                    State = previousState.Stopped(ex);
-                }
-
-                if (State != previousState)
-                {
-                    await state.WriteAsync();
-                }
+                await processor.ResetAsync();
             }
-            finally
-            {
-                semaphore.Release();
-            }
-        }
-
-        private async Task ClearAsync()
-        {
-            if (log.IsEnabled(LogLevel.Debug))
-            {
-                log.LogDebug("Event consumer {consumer} reset started", eventConsumer!.Name);
-            }
-
-            var watch = ValueStopwatch.StartNew();
-            try
-            {
-                await eventConsumer!.ClearAsync();
-            }
-            finally
-            {
-                log.LogDebug("Event consumer {consumer} reset completed after {time}ms.", eventConsumer!.Name, watch.Stop());
-            }
-        }
-
-        private void Unsubscribe()
-        {
-            var subscription = Interlocked.Exchange(ref currentSubscription, null);
-
-            subscription?.Unsubscribe();
-        }
-
-        private void Subscribe()
-        {
-            if (currentSubscription == null)
-            {
-                currentSubscription = CreateSubscription();
-            }
-            else
-            {
-                currentSubscription.WakeUp();
-            }
-        }
-
-        private BatchSubscriber CreateSubscription()
-        {
-            return new BatchSubscriber(this, eventDataFormatter, eventConsumer!, CreateRetrySubscription);
-        }
-
-        private IEventSubscription CreateRetrySubscription(IEventSubscriber subscriber)
-        {
-            return new RetrySubscription(subscriber, CreateSubscription);
-        }
-
-        private IEventSubscription CreateSubscription(IEventSubscriber subscriber)
-        {
-            return eventStore.CreateSubscription(subscriber, eventConsumer!.EventsFilter, State.Position);
         }
     }
 }
