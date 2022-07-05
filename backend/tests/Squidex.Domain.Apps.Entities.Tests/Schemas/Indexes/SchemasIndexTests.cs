@@ -277,20 +277,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         private ISchemaEntity SetupSchema(long version = 0, bool isDeleted = false)
         {
-            var schemaEntity = A.Fake<ISchemaEntity>();
+            var schema = A.Fake<ISchemaEntity>();
 
-            A.CallTo(() => schemaEntity.SchemaDef)
-                .Returns(new Schema(schemaId.Name));
-            A.CallTo(() => schemaEntity.Id)
-                .Returns(schemaId.Id);
-            A.CallTo(() => schemaEntity.AppId)
-                .Returns(appId);
-            A.CallTo(() => schemaEntity.Version)
-                .Returns(version);
-            A.CallTo(() => schemaEntity.IsDeleted)
-                .Returns(isDeleted);
+            A.CallTo(() => schema.SchemaDef).Returns(new Schema(schemaId.Name));
+            A.CallTo(() => schema.Id).Returns(schemaId.Id);
+            A.CallTo(() => schema.AppId).Returns(appId);
+            A.CallTo(() => schema.Version).Returns(version);
+            A.CallTo(() => schema.IsDeleted).Returns(isDeleted);
 
-            return schemaEntity;
+            return schema;
         }
     }
 }

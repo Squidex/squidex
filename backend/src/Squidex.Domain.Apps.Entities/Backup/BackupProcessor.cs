@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Backup.State;
@@ -27,7 +26,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IBackupArchiveStore backupArchiveStore;
         private readonly IBackupHandlerFactory backupHandlerFactory;
-        private readonly IClock clock;
         private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
         private readonly IUserResolver userResolver;
@@ -37,12 +35,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private CancellationTokenSource? currentJobToken;
         private BackupJob? currentJob;
 
+        public IClock Clock { get; set; } = SystemClock.Instance;
+
         public BackupProcessor(
             DomainId appId,
             IBackupArchiveLocation backupArchiveLocation,
             IBackupArchiveStore backupArchiveStore,
             IBackupHandlerFactory backupHandlerFactory,
-            IClock clock,
             IEventFormatter eventFormatter,
             IEventStore eventStore,
             IPersistenceFactory<BackupState> persistenceFactory,
@@ -53,7 +52,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.backupArchiveLocation = backupArchiveLocation;
             this.backupArchiveStore = backupArchiveStore;
             this.backupHandlerFactory = backupHandlerFactory;
-            this.clock = clock;
             this.eventFormatter = eventFormatter;
             this.eventStore = eventStore;
             this.userResolver = userResolver;
@@ -91,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             var job = new BackupJob
             {
                 Id = DomainId.NewGuid(),
-                Started = clock.GetCurrentInstant(),
+                Started = Clock.GetCurrentInstant(),
                 Status = JobStatus.Started
             };
 
@@ -187,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
             finally
             {
-                job.Stopped = clock.GetCurrentInstant();
+                job.Stopped = Clock.GetCurrentInstant();
 
                 await state.WriteAsync();
 
@@ -204,7 +202,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task<Instant> WritePeriodically(Instant lastTimestamp)
         {
-            var now = clock.GetCurrentInstant();
+            var now = Clock.GetCurrentInstant();
 
             if ((now - lastTimestamp) >= UpdateDuration)
             {

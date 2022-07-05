@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Comments;
-using Squidex.Domain.Apps.Entities.Comments.DomainObject;
 
 namespace Squidex.Config.Domain
 {

@@ -23,7 +23,10 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(SystemClock.Instance.GetCurrentInstant().WithoutMs());
 
-            sut = new EnrichWithTimestampCommandMiddleware(clock);
+            sut = new EnrichWithTimestampCommandMiddleware
+            {
+                Clock = clock
+            };
         }
 
         [Fact]

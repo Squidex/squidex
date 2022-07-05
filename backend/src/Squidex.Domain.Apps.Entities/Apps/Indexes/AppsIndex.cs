@@ -24,25 +24,27 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
         private readonly IAppRepository appRepository;
         private readonly IReplicatedCache appCache;
-        private readonly IUniqueNamesState uniqueNamesState;
+        private readonly NameReservationState namesState;
 
-        public AppsIndex(IAppRepository appRepository, IReplicatedCache appCache, IUniqueNamesState uniqueNamesState)
+        public AppsIndex(IAppRepository appRepository, IReplicatedCache appCache,
+            IPersistenceFactory<NameReservationState.State> persistenceFactory)
         {
             this.appRepository = appRepository;
             this.appCache = appCache;
-            this.uniqueNamesState = uniqueNamesState;
+
+            namesState = new NameReservationState(persistenceFactory, "Apps");
         }
 
         public Task InitializeAsync(
             CancellationToken ct)
         {
-            return uniqueNamesState.LoadAsync(ct);
+            return namesState.LoadAsync(ct);
         }
 
         public Task RemoveReservationAsync(string? token,
             CancellationToken ct = default)
         {
-            return uniqueNamesState.RemoveReservationAsync(token, ct);
+            return namesState.RemoveReservationAsync(token, ct);
         }
 
         public async Task<string?> ReserveAsync(DomainId id, string name,
@@ -53,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 return null;
             }
 
-            return await uniqueNamesState.ReserveAsync(id, name, ct);
+            return await namesState.ReserveAsync(id, name, ct);
         }
 
         public async Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions,
@@ -61,19 +63,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             using (Telemetry.Activities.StartActivity("AppsIndex/GetAppsForUserAsync"))
             {
-                var appQueries =
-                    await Task.WhenAll(
-                        appRepository.QueryAllAsync(userId, ct),
-                        appRepository.QueryAllAsync(permissions.ToAppNames(), ct));
+                var apps = await appRepository.QueryAllAsync(userId, permissions.ToAppNames(), ct);
 
-                var apps = appQueries.SelectMany(x => x).NotNull().ToList();
-
-                foreach (var app in apps)
+                foreach (var app in apps.Where(IsValid))
                 {
                     await CacheItAsync(app);
                 }
 
-                return apps;
+                return apps.Where(IsValid).ToList();
             }
         }
 
@@ -91,6 +88,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 }
 
                 var app = await appRepository.FindAsync(name, ct);
+
+                if (!IsValid(app))
+                {
+                    app = null;
+                }
 
                 if (app != null)
                 {
@@ -116,6 +118,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
                 var app = await appRepository.FindAsync(appId, ct);
 
+                if (!IsValid(app))
+                {
+                    app = null;
+                }
+
                 if (app != null)
                 {
                     await CacheItAsync(app);
@@ -138,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 }
                 finally
                 {
-                    await uniqueNamesState.RemoveReservationAsync(token);
+                    await namesState.RemoveReservationAsync(token);
                 }
             }
             else
@@ -198,6 +205,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         private static string GetCacheKey(string name)
         {
             return $"{typeof(AppsIndex)}_Apps_Name_{name}";
+        }
+
+        private static bool IsValid(IAppEntity? app)
+        {
+            return app != null && app.Version > EtagVersion.Empty && !app.IsDeleted;
         }
 
         private Task InvalidateItAsync(DomainId id, string name)

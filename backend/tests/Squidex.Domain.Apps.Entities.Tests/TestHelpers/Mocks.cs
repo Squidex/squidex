@@ -31,17 +31,10 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
             var app = A.Fake<IAppEntity>();
 
-            A.CallTo(() => app.Id)
-                .Returns(appId.Id);
-
-            A.CallTo(() => app.Name)
-                .Returns(appId.Name);
-
-            A.CallTo(() => app.Languages)
-                .Returns(config);
-
-            A.CallTo(() => app.UniqueId)
-                .Returns(appId.Id);
+            A.CallTo(() => app.Id).Returns(appId.Id);
+            A.CallTo(() => app.Name).Returns(appId.Name);
+            A.CallTo(() => app.Languages).Returns(config);
+            A.CallTo(() => app.UniqueId).Returns(appId.Id);
 
             return app;
         }
@@ -50,17 +43,12 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         {
             var schema = A.Fake<ISchemaEntity>();
 
-            A.CallTo(() => schema.Id)
-                .Returns(schemaId.Id);
+            schemaDef ??= new Schema(schemaId.Name);
 
-            A.CallTo(() => schema.AppId)
-                .Returns(appId);
-
-            A.CallTo(() => schema.SchemaDef)
-                .Returns(schemaDef ?? new Schema(schemaId.Name));
-
-            A.CallTo(() => schema.UniqueId)
-                .Returns(DomainId.Combine(appId, schemaId.Id));
+            A.CallTo(() => schema.Id).Returns(schemaId.Id);
+            A.CallTo(() => schema.AppId).Returns(appId);
+            A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
+            A.CallTo(() => schema.UniqueId).Returns(DomainId.Combine(appId, schemaId.Id));
 
             return schema;
         }

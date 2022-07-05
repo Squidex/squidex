@@ -29,7 +29,10 @@ namespace Squidex.Domain.Apps.Entities.Rules
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(SystemClock.Instance.GetCurrentInstant().WithoutMs());
 
-            sut = new RuleDequeuerWorker(ruleService, ruleEventRepository, log, clock);
+            sut = new RuleDequeuerWorker(ruleService, ruleEventRepository, log)
+            {
+                Clock = clock
+            };
         }
 
         [Fact]

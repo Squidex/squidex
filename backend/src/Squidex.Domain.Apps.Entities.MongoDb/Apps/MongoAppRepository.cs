@@ -83,26 +83,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             return result;
         }
 
-        public async Task<List<IAppEntity>> QueryAllAsync(string contributorId,
+        public async Task<List<IAppEntity>> QueryAllAsync(string contributorId, IEnumerable<string> names,
             CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAsync"))
+            using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAllAsync"))
             {
                 var entities =
-                    await Collection.Find(x => x.IndexedUserIds.Contains(contributorId) && !x.IndexedDeleted)
-                        .ToListAsync(ct);
-
-                return entities.Select(x => (IAppEntity)x.Document).ToList();
-            }
-        }
-
-        public async Task<List<IAppEntity>> QueryAllAsync(IEnumerable<string> names,
-            CancellationToken ct = default)
-        {
-            using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAllAsyncByNames"))
-            {
-                var entities =
-                    await Collection.Find(x => names.Contains(x.IndexedName) && !x.IndexedDeleted)
+                    await Collection.Find(x => (x.IndexedUserIds.Contains(contributorId) || names.Contains(x.IndexedName)) && !x.IndexedDeleted)
                         .ToListAsync(ct);
 
                 return entities.Select(x => (IAppEntity)x.Document).ToList();

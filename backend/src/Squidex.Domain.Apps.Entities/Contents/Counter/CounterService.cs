@@ -36,44 +36,40 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
             this.persistenceFactory = persistenceFactory;
         }
 
-        public async Task<long> IncrementAsync(DomainId appId, string name)
-        {
-            var state = await GetStateAsync(appId);
-
-            await state.UpdateAsync(x => x.Increment(name));
-
-            return state.Value.Counters[name];
-        }
-
-        public async Task<long> ResetAsync(DomainId appId, string name, long value)
-        {
-            var state = await GetStateAsync(appId);
-
-            await state.UpdateAsync(x => x.Reset(name, value));
-
-            return state.Value.Counters[name];
-        }
-
-        public async Task ClearAsync(DomainId appId)
-        {
-            var state = await GetStateAsync(appId);
-
-            await state.UpdateAsync(x => x.Counters.Clear());
-        }
-
-        public async Task DeleteAppAsync(IAppEntity app,
+        async Task IDeleter.DeleteAppAsync(IAppEntity app,
             CancellationToken ct)
         {
-            var state = await GetStateAsync(app.Id);
+            var state = await GetStateAsync(app.Id, ct);
 
             await state.ClearAsync(ct);
         }
 
-        private async Task<SimpleState<State>> GetStateAsync(DomainId appId)
+        public async Task<long> IncrementAsync(DomainId appId, string name,
+            CancellationToken ct = default)
+        {
+            var state = await GetStateAsync(appId, ct);
+
+            await state.UpdateAsync(x => x.Increment(name), ct: ct);
+
+            return state.Value.Counters[name];
+        }
+
+        public async Task<long> ResetAsync(DomainId appId, string name, long value,
+            CancellationToken ct = default)
+        {
+            var state = await GetStateAsync(appId, ct);
+
+            await state.UpdateAsync(x => x.Reset(name, value), ct: ct);
+
+            return state.Value.Counters[name];
+        }
+
+        private async Task<SimpleState<State>> GetStateAsync(DomainId appId,
+            CancellationToken ct)
         {
             var state = new SimpleState<State>(persistenceFactory, GetType(), appId);
 
-            await state.LoadAsync();
+            await state.LoadAsync(ct);
 
             return state;
         }

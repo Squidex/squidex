@@ -11,10 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Repositories
 {
     public interface IAppRepository
     {
-        Task<List<IAppEntity>> QueryAllAsync(string contributorId,
-            CancellationToken ct = default);
-
-        Task<List<IAppEntity>> QueryAllAsync(IEnumerable<string> names,
+        Task<List<IAppEntity>> QueryAllAsync(string contributorId, IEnumerable<string> names,
             CancellationToken ct = default);
 
         Task<IAppEntity?> FindAsync(DomainId id,

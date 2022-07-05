@@ -5,17 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.States
+using Squidex.Infrastructure;
+
+namespace Squidex.Domain.Apps.Entities.Comments
 {
-    public interface IUniqueNamesState
+    public interface IWatchingService
     {
-        Task LoadAsync(
-            CancellationToken ct = default);
-
-        Task<string?> ReserveAsync(DomainId id, string name,
-            CancellationToken ct = default);
-
-        Task RemoveReservationAsync(string? token,
+        Task<string[]> GetWatchingUsersAsync(DomainId appId, string? resource, string userId,
             CancellationToken ct = default);
     }
 }

@@ -28,8 +28,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         private readonly RuleOptions ruleOptions;
         private readonly IEventEnricher eventEnricher;
         private readonly IJsonSerializer jsonSerializer;
-        private readonly IClock clock;
         private readonly ILogger<RuleService> log;
+
+        public IClock Clock { get; set; } = SystemClock.Instance;
 
         public RuleService(
             IOptions<RuleOptions> ruleOptions,
@@ -37,21 +38,15 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             IEnumerable<IRuleActionHandler> ruleActionHandlers,
             IEventEnricher eventEnricher,
             IJsonSerializer jsonSerializer,
-            IClock clock,
             ILogger<RuleService> log,
             TypeNameRegistry typeNameRegistry)
         {
             this.typeNameRegistry = typeNameRegistry;
-
+            this.eventEnricher = eventEnricher;
             this.ruleOptions = ruleOptions.Value;
             this.ruleTriggerHandlers = ruleTriggerHandlers.ToDictionary(x => x.TriggerType);
             this.ruleActionHandlers = ruleActionHandlers.ToDictionary(x => x.ActionType);
-            this.eventEnricher = eventEnricher;
-
             this.jsonSerializer = jsonSerializer;
-
-            this.clock = clock;
-
             this.log = log;
         }
 
@@ -94,7 +89,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 yield break;
             }
 
-            var now = clock.GetCurrentInstant();
+            var now = Clock.GetCurrentInstant();
 
             await foreach (var enrichedEvent in triggerHandler.CreateSnapshotEventsAsync(context, ct))
             {
@@ -204,7 +199,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     return;
                 }
 
-                var now = clock.GetCurrentInstant();
+                var now = Clock.GetCurrentInstant();
 
                 var eventTime =
                     @event.Headers.ContainsKey(CommonHeaders.Timestamp) ?

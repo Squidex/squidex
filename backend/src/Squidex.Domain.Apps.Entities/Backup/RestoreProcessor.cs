@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Threading.Tasks.Dataflow;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
@@ -27,7 +26,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IBackupHandlerFactory backupHandlerFactory;
-        private readonly IClock clock;
         private readonly ICommandBus commandBus;
         private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
@@ -38,6 +36,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private RestoreContext runningContext;
         private StreamMapper runningStreamMapper;
 
+        public IClock Clock { get; set; } = SystemClock.Instance;
+
         private RestoreJob CurrentJob
         {
             get => state.Value.Job;
@@ -46,7 +46,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
         public RestoreProcessor(
             IBackupArchiveLocation backupArchiveLocation,
             IBackupHandlerFactory backupHandlerFactory,
-            IClock clock,
             ICommandBus commandBus,
             IEventFormatter eventFormatter,
             IEventStore eventStore,
@@ -57,7 +56,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             this.backupArchiveLocation = backupArchiveLocation;
             this.backupHandlerFactory = backupHandlerFactory;
-            this.clock = clock;
             this.commandBus = commandBus;
             this.eventFormatter = eventFormatter;
             this.eventStore = eventStore;
@@ -106,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Id = DomainId.NewGuid(),
                 NewAppName = newAppName,
                 Actor = actor,
-                Started = clock.GetCurrentInstant(),
+                Started = Clock.GetCurrentInstant(),
                 Status = JobStatus.Started,
                 Url = url
             };
@@ -200,7 +198,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 }
                 finally
                 {
-                    CurrentJob.Stopped = clock.GetCurrentInstant();
+                    CurrentJob.Stopped = Clock.GetCurrentInstant();
 
                     await state.WriteAsync(ct);
 
@@ -407,11 +405,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             if (replace && CurrentJob.Log.Count > 0)
             {
-                CurrentJob.Log[^1] = $"{clock.GetCurrentInstant()}: {message}";
+                CurrentJob.Log[^1] = $"{Clock.GetCurrentInstant()}: {message}";
             }
             else
             {
-                CurrentJob.Log.Add($"{clock.GetCurrentInstant()}: {message}");
+                CurrentJob.Log.Add($"{Clock.GetCurrentInstant()}: {message}");
             }
         }
     }

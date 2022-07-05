@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;

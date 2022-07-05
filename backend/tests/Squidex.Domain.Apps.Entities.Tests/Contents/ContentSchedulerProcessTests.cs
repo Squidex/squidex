@@ -27,9 +27,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ContentSchedulerProcessTests()
         {
-            var log = A.Fake<ILogger<ContentSchedulerProcess>>();
-
-            sut = new ContentSchedulerProcess(contentRepository, commandBus, clock, log);
+            sut = new ContentSchedulerProcess(contentRepository, commandBus, A.Fake<ILogger<ContentSchedulerProcess>>())
+            {
+                Clock = clock
+            };
         }
 
         [Fact]

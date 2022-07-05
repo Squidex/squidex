@@ -41,7 +41,10 @@ namespace Squidex.Web.Pipeline
                 return Task.CompletedTask;
             };
 
-            sut = new UsageMiddleware(appLogStore, usageTracker, clock);
+            sut = new UsageMiddleware(appLogStore, usageTracker)
+            {
+                Clock = clock
+            };
         }
 
         [Fact]

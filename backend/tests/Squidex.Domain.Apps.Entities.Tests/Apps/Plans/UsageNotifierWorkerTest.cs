@@ -32,7 +32,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             A.CallTo(() => notificationSender.IsActive)
                 .Returns(true);
 
-            sut = new UsageNotifierWorker(state.PersistenceFactory, notificationSender, userResolver, clock);
+            sut = new UsageNotifierWorker(state.PersistenceFactory, notificationSender, userResolver)
+            {
+                Clock = clock
+            };
         }
 
         [Fact]

@@ -11,18 +11,13 @@ namespace Squidex.Infrastructure.Commands
 {
     public sealed class EnrichWithTimestampCommandMiddleware : ICommandMiddleware
     {
-        private readonly IClock clock;
-
-        public EnrichWithTimestampCommandMiddleware(IClock clock)
-        {
-            this.clock = clock;
-        }
+        public IClock Clock { get; set; } = SystemClock.Instance;
 
         public Task HandleAsync(CommandContext context, NextDelegate next)
         {
             if (context.Command is ITimestampCommand timestampCommand)
             {
-                timestampCommand.Timestamp = clock.GetCurrentInstant();
+                timestampCommand.Timestamp = Clock.GetCurrentInstant();
             }
 
             return next(context);

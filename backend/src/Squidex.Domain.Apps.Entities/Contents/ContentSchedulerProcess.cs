@@ -20,21 +20,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         private readonly IContentRepository contentRepository;
         private readonly ICommandBus commandBus;
-        private readonly IClock clock;
         private readonly ILogger<ContentSchedulerProcess> log;
         private CompletionTimer timer;
+
+        public IClock Clock { get; set; } = SystemClock.Instance;
 
         public ContentSchedulerProcess(
             IContentRepository contentRepository,
             ICommandBus commandBus,
-            IClock clock,
             ILogger<ContentSchedulerProcess> log)
         {
-            this.clock = clock;
-
             this.commandBus = commandBus;
             this.contentRepository = contentRepository;
-
             this.log = log;
         }
 
@@ -55,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public async Task PublishAsync(
             CancellationToken ct = default)
         {
-            var now = clock.GetCurrentInstant();
+            var now = Clock.GetCurrentInstant();
 
             await foreach (var content in contentRepository.QueryScheduledWithoutDataAsync(now, ct))
             {

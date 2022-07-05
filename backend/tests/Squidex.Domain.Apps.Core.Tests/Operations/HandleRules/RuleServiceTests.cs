@@ -85,7 +85,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             sut = new RuleService(Options.Create(new RuleOptions()),
                 new[] { ruleTriggerHandler },
                 new[] { ruleActionHandler },
-                eventEnricher, TestUtils.DefaultSerializer, clock, log, typeNameRegistry);
+                eventEnricher, TestUtils.DefaultSerializer, log, typeNameRegistry)
+            {
+                Clock = clock
+            };
         }
 
         [Fact]

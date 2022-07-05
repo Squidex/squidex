@@ -137,13 +137,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_writer_user_settings()
+        public async Task Should_write_user_settings()
         {
             var settings = new JsonObject();
 
             var context = CreateBackupContext();
 
-            A.CallTo(() => appUISettings.GetAsync(appId, null))
+            A.CallTo(() => appUISettings.GetAsync(appId, null, ct))
                 .Returns(settings);
 
             await sut.BackupAsync(context, ct);
@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.RestoreAsync(context, ct);
 
-            A.CallTo(() => appUISettings.SetAsync(appId, null, settings))
+            A.CallTo(() => appUISettings.SetAsync(appId, null, settings, ct))
                 .MustHaveHappened();
         }
 

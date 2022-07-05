@@ -27,11 +27,36 @@ namespace Squidex.Areas.Api.Controllers.Comments
     public sealed class CommentsController : ApiController
     {
         private readonly ICommentsLoader commentsLoader;
+        private readonly IWatchingService watchingService;
 
-        public CommentsController(ICommandBus commandBus, ICommentsLoader commentsLoader)
+        public CommentsController(ICommandBus commandBus, ICommentsLoader commentsLoader,
+            IWatchingService watchingService)
             : base(commandBus)
         {
             this.commentsLoader = commentsLoader;
+
+            this.watchingService = watchingService;
+        }
+
+        /// <summary>
+        /// Get all watching users..
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="resource">The path to the resource.</param>
+        /// <returns>
+        /// 200 => Watching users returned.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpGet]
+        [Route("apps/{app}/watching/{*resource}")]
+        [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous]
+        [ApiCosts(0)]
+        public async Task<IActionResult> GetWatchingUsers(string app, string? resource = null)
+        {
+            var result = await watchingService.GetWatchingUsersAsync(App.Id, resource, UserId(), HttpContext.RequestAborted);
+
+            return Ok(result);
         }
 
         /// <summary>

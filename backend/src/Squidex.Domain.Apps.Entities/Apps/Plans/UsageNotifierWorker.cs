@@ -21,7 +21,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         private readonly SimpleState<State> state;
         private readonly INotificationSender notificationSender;
         private readonly IUserResolver userResolver;
-        private readonly IClock clock;
 
         [CollectionName("UsageNotifications")]
         public sealed class State
@@ -29,12 +28,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             public Dictionary<DomainId, DateTime> NotificationsSent { get; } = new Dictionary<DomainId, DateTime>();
         }
 
+        public IClock Clock { get; set; } = SystemClock.Instance;
+
         public UsageNotifierWorker(IPersistenceFactory<State> persistenceFactory,
-            INotificationSender notificationSender, IUserResolver userResolver, IClock clock)
+            INotificationSender notificationSender, IUserResolver userResolver)
         {
             this.notificationSender = notificationSender;
             this.userResolver = userResolver;
-            this.clock = clock;
 
             state = new SimpleState<State>(persistenceFactory, GetType(), DomainId.Create("Default"));
         }
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                 return;
             }
 
-            var now = clock.GetCurrentInstant().ToDateTimeUtc();
+            var now = Clock.GetCurrentInstant().ToDateTimeUtc();
 
             if (!HasBeenSentBefore(notification.AppId, now))
             {

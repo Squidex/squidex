@@ -25,21 +25,18 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly ITargetBlock<IRuleEventEntity> requestBlock;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly IRuleService ruleService;
-        private readonly IClock clock;
         private readonly ILogger<RuleDequeuerWorker> log;
         private CompletionTimer timer;
+
+        public IClock Clock { get; set; } = SystemClock.Instance;
 
         public RuleDequeuerWorker(
             IRuleService ruleService,
             IRuleEventRepository ruleEventRepository,
-            ILogger<RuleDequeuerWorker> log,
-            IClock clock)
+            ILogger<RuleDequeuerWorker> log)
         {
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
-
-            this.clock = clock;
-
             this.log = log;
 
             requestBlock =
@@ -70,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             try
             {
-                var now = clock.GetCurrentInstant();
+                var now = Clock.GetCurrentInstant();
 
                 await ruleEventRepository.QueryPendingAsync(now, requestBlock.SendAsync, ct);
             }
@@ -96,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 var jobDelay = ComputeJobDelay(response.Status, @event, job);
                 var jobResult = ComputeJobResult(response.Status, jobDelay);
 
-                var now = clock.GetCurrentInstant();
+                var now = Clock.GetCurrentInstant();
 
                 var update = new RuleJobUpdate
                 {

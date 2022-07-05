@@ -23,7 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         private readonly IReplicatedCache schemaCache;
         private readonly IPersistenceFactory<NameReservationState.State> persistenceFactory;
 
-        public SchemasIndex(ISchemaRepository schemaRepository, IReplicatedCache schemaCache, IPersistenceFactory<NameReservationState.State> persistenceFactory)
+        public SchemasIndex(ISchemaRepository schemaRepository, IReplicatedCache schemaCache,
+            IPersistenceFactory<NameReservationState.State> persistenceFactory)
         {
             this.schemaRepository = schemaRepository;
             this.schemaCache = schemaCache;
@@ -42,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                     await InvalidateItAsync(appId, schema.Id, schema.SchemaDef.Name);
                 }
 
-                return schemas.Where(IsValid).NotNull().ToList();
+                return schemas.Where(IsValid).ToList();
             }
         }
 
@@ -182,13 +183,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return token;
         }
 
-        private Task InvalidateItAsync(DomainId appId, DomainId id, string name)
-        {
-            return schemaCache.RemoveAsync(
-                GetCacheKey(appId, id),
-                GetCacheKey(appId, name));
-        }
-
         private async Task<NameReservationState> GetNamesAsync(DomainId appId,
             CancellationToken ct)
         {
@@ -212,6 +206,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         private static bool IsValid(ISchemaEntity? schema)
         {
             return schema != null && schema.Version > EtagVersion.Empty && !schema.IsDeleted;
+        }
+
+        private Task InvalidateItAsync(DomainId appId, DomainId id, string name)
+        {
+            return schemaCache.RemoveAsync(
+                GetCacheKey(appId, id),
+                GetCacheKey(appId, name));
         }
 
         private Task CacheItAsync(ISchemaEntity schema)

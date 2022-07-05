@@ -61,6 +61,28 @@ namespace Squidex.Infrastructure.States
             return persistence.WriteEventAsync(envelope, ct);
         }
 
+        public async Task UpdateIfAsync(Func<T, bool> updater, int retries = 20,
+            CancellationToken ct = default)
+        {
+            for (var i = 0; i < retries; i++)
+            {
+                try
+                {
+                    if (!updater(Value))
+                    {
+                        return;
+                    }
+
+                    await WriteAsync(ct);
+                    return;
+                }
+                catch (InconsistentStateException) when (i < retries)
+                {
+                    await LoadAsync(ct);
+                }
+            }
+        }
+
         public async Task UpdateAsync(Action<T> updater, int retries = 20,
             CancellationToken ct = default)
         {

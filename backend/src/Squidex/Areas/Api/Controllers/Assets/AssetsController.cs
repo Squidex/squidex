@@ -72,7 +72,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetTags(string app)
         {
-            var tags = await tagService.GetTagsAsync(AppId, TagGroups.Assets);
+            var tags = await tagService.GetTagsAsync(AppId, TagGroups.Assets, HttpContext.RequestAborted);
 
             Response.Headers[HeaderNames.ETag] = tags.Version.ToString(CultureInfo.InvariantCulture);
 
@@ -96,7 +96,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> PutTag(string app, string name, [FromBody] RenameTagDto request)
         {
-            await tagService.RenameTagAsync(AppId, TagGroups.Assets, Uri.UnescapeDataString(name), request.TagName);
+            await tagService.RenameTagAsync(AppId, TagGroups.Assets, Uri.UnescapeDataString(name), request.TagName, HttpContext.RequestAborted);
 
             return await GetTags(app);
         }
