@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public EventConsumerState Stopped(Exception? ex = null)
         {
-            return new EventConsumerState(Position, Count) { IsStopped = true, Error = ex?.ToString() };
+            return new EventConsumerState(Position, Count) { IsStopped = true, Error = ex?.Message };
         }
 
         public EventConsumerState Started()

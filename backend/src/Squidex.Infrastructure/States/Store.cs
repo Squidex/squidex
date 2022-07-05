@@ -16,6 +16,8 @@ namespace Squidex.Infrastructure.States
         private readonly IEventStreamNames eventStreamNames;
         private readonly ISnapshotStore<T> snapshotStore;
 
+        public ISnapshotStore<T> Snapshots => snapshotStore;
+
         public Store(
             IEventFormatter eventFormatter,
             IEventStore eventStore,

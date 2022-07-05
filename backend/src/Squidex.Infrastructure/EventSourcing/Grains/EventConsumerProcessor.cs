@@ -8,11 +8,10 @@
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public sealed class EventConsumerProcessor : IAsyncDisposable
+    public class EventConsumerProcessor
     {
         private readonly SimpleState<EventConsumerState> state;
         private readonly IEventFormatter eventFormatter;
@@ -22,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
         private IEventSubscription? currentSubscription;
 
-        private EventConsumerState State
+        public EventConsumerState State
         {
             get => state.Value;
             set => state.Value = value;
@@ -43,20 +42,13 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             state = new SimpleState<EventConsumerState>(persistenceFactory, GetType(), eventConsumer.Name);
         }
 
-        public Task InitializeAsync(
+        public virtual Task InitializeAsync(
             CancellationToken ct)
         {
             return state.LoadAsync(ct);
         }
 
-        public ValueTask DisposeAsync()
-        {
-            CompleteAsync().Forget();
-
-            return default;
-        }
-
-        public async Task CompleteAsync()
+        public virtual async Task CompleteAsync()
         {
             if (currentSubscription is BatchSubscriber batchSubscriber)
             {
@@ -71,7 +63,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        public Task OnEventsAsync(object sender, IReadOnlyList<Envelope<IEvent>> events, string position)
+        public virtual Task OnEventsAsync(object sender, IReadOnlyList<Envelope<IEvent>> events, string position)
         {
             if (!ReferenceEquals(sender, currentSubscription?.Sender))
             {
@@ -86,7 +78,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }, State.Position);
         }
 
-        public Task OnErrorAsync(object sender, Exception exception)
+        public virtual Task OnErrorAsync(object sender, Exception exception)
         {
             if (!ReferenceEquals(sender, currentSubscription?.Sender))
             {
@@ -101,7 +93,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }, State.Position);
         }
 
-        public async Task ActivateAsync()
+        public virtual async Task ActivateAsync()
         {
             if (State.IsFailed)
             {
@@ -118,7 +110,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        public async Task StartAsync()
+        public virtual async Task StartAsync()
         {
             if (!State.IsStopped)
             {
@@ -133,7 +125,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }, State.Position);
         }
 
-        public async Task StopAsync()
+        public virtual async Task StopAsync()
         {
             if (State.IsStopped)
             {
@@ -148,7 +140,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }, State.Position);
         }
 
-        public async Task ResetAsync()
+        public virtual async Task ResetAsync()
         {
             await DoAndUpdateStateAsync(async () =>
             {
@@ -261,12 +253,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return new BatchSubscriber(this, eventFormatter, eventConsumer!, CreateRetrySubscription);
         }
 
-        private IEventSubscription CreateRetrySubscription(IEventSubscriber subscriber)
+        protected virtual IEventSubscription CreateRetrySubscription(IEventSubscriber subscriber)
         {
             return new RetrySubscription(subscriber, CreateSubscription);
         }
 
-        private IEventSubscription CreateSubscription(IEventSubscriber subscriber)
+        protected virtual IEventSubscription CreateSubscription(IEventSubscriber subscriber)
         {
             return eventStore.CreateSubscription(subscriber, eventConsumer!.EventsFilter, State.Position);
         }

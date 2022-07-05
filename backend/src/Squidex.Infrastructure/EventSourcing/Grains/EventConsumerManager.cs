@@ -12,14 +12,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 {
     public sealed class EventConsumerManager : IEventConsumerManager
     {
-        private readonly ISnapshotStore<EventConsumerState> snapshotStore;
         private readonly IPersistenceFactory<EventConsumerState> persistence;
         private readonly IMessageBus messaging;
 
-        public EventConsumerManager(ISnapshotStore<EventConsumerState> snapshotStore, IPersistenceFactory<EventConsumerState> persistence,
+        public EventConsumerManager(IPersistenceFactory<EventConsumerState> persistence,
             IMessageBus messaging)
         {
-            this.snapshotStore = snapshotStore;
             this.persistence = persistence;
             this.messaging = messaging;
         }
@@ -27,7 +25,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         public async Task<List<EventConsumerInfo>> GetConsumersAsync(
             CancellationToken ct = default)
         {
-            var snapshots = await snapshotStore.ReadAllAsync(ct).ToListAsync(ct);
+            var snapshots = await persistence.Snapshots.ReadAllAsync(ct).ToListAsync(ct);
 
             return snapshots.Select(x => x.Value.ToInfo(x.Key.ToString())).ToList();
         }

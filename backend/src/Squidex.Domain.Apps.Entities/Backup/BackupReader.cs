@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         }
 
         public async IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(
-            IEventStreamNames eventStreamNames, 
+            IEventStreamNames eventStreamNames,
             IEventFormatter eventFormatter,
             [EnumeratorCancellation] CancellationToken ct = default)
         {
