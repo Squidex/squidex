@@ -42,13 +42,11 @@ namespace Squidex.Infrastructure.Commands
             return Task.FromResult(result.Payload is None ? result : result.Payload);
         }
 
-        private async Task<CommandResult> ExecuteCommandAsync(TCommand typedCommand)
+        private Task<CommandResult> ExecuteCommandAsync(TCommand typedCommand)
         {
             var grain = grainFactory.GetGrain<TGrain>(typedCommand.AggregateId.ToString());
 
-            var result = await grain.ExecuteAsync(CommandRequest.Create(typedCommand));
-
-            return result.Value;
+            return grain.ExecuteAsync(typedCommand);
         }
     }
 }

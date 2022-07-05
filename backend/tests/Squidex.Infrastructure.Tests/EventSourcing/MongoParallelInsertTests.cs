@@ -7,6 +7,7 @@
 
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
+using Orleans.Core;
 using Orleans.Internal;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Orleans;
@@ -22,9 +23,9 @@ namespace Squidex.Infrastructure.EventSourcing
     [Trait("Category", "Dependencies")]
     public sealed class MongoParallelInsertTests : IClassFixture<MongoEventStoreReplicaSetFixture>
     {
-        private readonly IGrainState<EventConsumerState> grainState = A.Fake<IGrainState<EventConsumerState>>();
+        private readonly IGrainState<EventConsumerState> state = A.Fake<IGrainState<EventConsumerState>>();
         private readonly ILogger<EventConsumerGrain> log = A.Fake<ILogger<EventConsumerGrain>>();
-        private readonly IEventDataFormatter eventDataFormatter;
+        private readonly IEventFormatter eventFormatter;
 
         public MongoEventStoreFixture _ { get; }
 
@@ -152,12 +153,13 @@ namespace Squidex.Infrastructure.EventSourcing
             public TaskScheduler Scheduler => scheduler;
 
             public MyEventConsumerGrain(
-                EventConsumerFactory eventConsumerFactory,
+                IGrainIdentity identity,
                 IGrainState<EventConsumerState> state,
+                IEventConsumerFactory eventConsumerFactory,
+                IEventFormatter eventFormatter,
                 IEventStore eventStore,
-                IEventDataFormatter eventDataFormatter,
                 ILogger<EventConsumerGrain> log)
-                : base(eventConsumerFactory, state, eventStore, eventDataFormatter, log)
+                : base(identity, state, eventConsumerFactory, eventFormatter, eventStore, log)
             {
             }
         }
@@ -212,7 +214,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var typeNameRegistry = new TypeNameRegistry().Map(typeof(MyEvent), "My");
 
-            eventDataFormatter = new DefaultEventDataFormatter(typeNameRegistry, TestUtils.DefaultSerializer);
+            eventFormatter = new DefaultEventFormatter(typeNameRegistry, TestUtils.DefaultSerializer);
         }
 
         [Fact]
@@ -220,25 +222,24 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var expectedEvents = 10 * 1000;
 
-            var consumer = new MyEventConsumer(expectedEvents);
-            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+            var eventConsumer = new MyEventConsumer(expectedEvents);
+            var eventConsumerGrain = BuildGrain(eventConsumer);
 
-            await consumerGrain.ActivateAsync(consumer.Name);
-            await consumerGrain.ActivateAsync();
+            await eventConsumerGrain.ActivateAsync();
 
-            Parallel.For(0, 20, x =>
+            await Parallel.ForEachAsync(Enumerable.Range(0, 20), async (_, _) =>
             {
                 for (var i = 0; i < 500; i++)
                 {
                     var commitId = Guid.NewGuid();
 
-                    var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+                    var data = eventFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
 
-                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
+                    await _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data });
                 }
             });
 
-            await AssertConsumerAsync(expectedEvents, consumer);
+            await AssertConsumerAsync(expectedEvents, eventConsumer);
         }
 
         [Fact]
@@ -246,26 +247,25 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var expectedEvents = 10 * 1000;
 
-            var consumer = new MyEventConsumer(expectedEvents);
-            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+            var eventConsumer = new MyEventConsumer(expectedEvents);
+            var eventConsumerGrain = BuildGrain(eventConsumer);
 
-            await consumerGrain.ActivateAsync(consumer.Name);
-            await consumerGrain.ActivateAsync();
+            await eventConsumerGrain.ActivateAsync();
 
-            Parallel.For(0, 10, x =>
+            await Parallel.ForEachAsync(Enumerable.Range(0, 10), async (_, _) =>
             {
                 for (var i = 0; i < 500; i++)
                 {
                     var commitId = Guid.NewGuid();
 
-                    var data1 = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
-                    var data2 = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+                    var data1 = eventFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+                    var data2 = eventFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
 
-                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data1, data2 }).Wait();
+                    await _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data1, data2 });
                 }
             });
 
-            await AssertConsumerAsync(expectedEvents, consumer);
+            await AssertConsumerAsync(expectedEvents, eventConsumer);
         }
 
         [Fact]
@@ -273,25 +273,24 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var expectedEvents = 10 * 1000;
 
-            var consumer = new MyEventConsumer(expectedEvents);
-            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+            var eventConsumer = new MyEventConsumer(expectedEvents);
+            var eventConsumerGrain = BuildGrain(eventConsumer);
 
-            Parallel.For(0, 10, x =>
+            await Parallel.ForEachAsync(Enumerable.Range(0, 10), async (_, _) =>
             {
                 for (var i = 0; i < 1000; i++)
                 {
                     var commitId = Guid.NewGuid();
 
-                    var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+                    var data = eventFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
 
-                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
+                    await _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data });
                 }
             });
 
-            await consumerGrain.ActivateAsync(consumer.Name);
-            await consumerGrain.ActivateAsync();
+            await eventConsumerGrain.ActivateAsync();
 
-            await AssertConsumerAsync(expectedEvents, consumer);
+            await AssertConsumerAsync(expectedEvents, eventConsumer);
         }
 
         [Fact]
@@ -299,37 +298,36 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var expectedEvents = 10 * 1000;
 
-            var consumer = new MyEventConsumer(expectedEvents);
-            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+            var eventConsumer = new MyEventConsumer(expectedEvents);
+            var eventConsumerGrain = BuildGrain(eventConsumer);
 
-            Parallel.For(0, 10, x =>
+            await Parallel.ForEachAsync(Enumerable.Range(0, 10), async (_, _) =>
             {
                 for (var i = 0; i < 500; i++)
                 {
                     var commitId = Guid.NewGuid();
 
-                    var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+                    var data = eventFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
 
-                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
+                    await _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data });
                 }
             });
 
-            await consumerGrain.ActivateAsync(consumer.Name);
-            await consumerGrain.ActivateAsync();
+            await eventConsumerGrain.ActivateAsync();
 
-            Parallel.For(0, 10, x =>
+            await Parallel.ForEachAsync(Enumerable.Range(0, 10), async (_, _) =>
             {
                 for (var i = 0; i < 500; i++)
                 {
                     var commitId = Guid.NewGuid();
 
-                    var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+                    var data = eventFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
 
-                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
+                    await _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data });
                 }
             });
 
-            await AssertConsumerAsync(expectedEvents, consumer);
+            await AssertConsumerAsync(expectedEvents, eventConsumer);
         }
 
         [Fact]
@@ -337,13 +335,12 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var expectedEvents = 10 * 1000;
 
-            var consumer = new MyEventConsumer(expectedEvents);
-            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+            var eventConsumer = new MyEventConsumer(expectedEvents);
+            var eventConsumerGrain = BuildGrain(eventConsumer);
 
-            await consumerGrain.ActivateAsync(consumer.Name);
-            await consumerGrain.ActivateAsync();
+            await eventConsumerGrain.ActivateAsync();
 
-            Parallel.For(0, 10, x =>
+            await Parallel.ForEachAsync(Enumerable.Range(0, 10), async (_, _) =>
             {
                 for (var j = 0; j < 10; j++)
                 {
@@ -351,16 +348,16 @@ namespace Squidex.Infrastructure.EventSourcing
                     {
                         var commitId = Guid.NewGuid();
 
-                        var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+                        var data = eventFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
 
-                        _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
+                        await _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data });
                     }
 
-                    Thread.Sleep(1000);
+                    await Task.Delay(1000);
                 }
             });
 
-            await AssertConsumerAsync(expectedEvents, consumer);
+            await AssertConsumerAsync(expectedEvents, eventConsumer);
         }
 
         [Fact]
@@ -368,50 +365,64 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var expectedEvents = 10 * 1000;
 
-            var consumer = new MyEventConsumer(expectedEvents);
-            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+            var eventConsumer = new MyEventConsumer(expectedEvents);
+            var eventConsumerGrain = BuildGrain(eventConsumer);
 
-            var scheduler = consumerGrain.Scheduler;
+            var scheduler = eventConsumerGrain.Scheduler;
 
-            consumer.EventReceived = count =>
+            eventConsumer.EventReceived = count =>
             {
                 if (count % 1000 == 0)
                 {
                     Task.Factory.StartNew(async () =>
                     {
-                        await consumerGrain.StopAsync();
-                        await consumerGrain.StartAsync();
+                        await eventConsumerGrain.StopAsync();
+                        await eventConsumerGrain.StartAsync();
                     }, default, default, scheduler).Forget();
                 }
 
                 return Task.CompletedTask;
             };
 
-            await consumerGrain.ActivateAsync(consumer.Name);
-            await consumerGrain.ActivateAsync();
+            await eventConsumerGrain.ActivateAsync();
 
-            Parallel.For(0, 10, x =>
+            await Parallel.ForEachAsync(Enumerable.Range(0, 10), async (_, _) =>
             {
                 for (var i = 0; i < 1000; i++)
                 {
                     var commitId = Guid.NewGuid();
 
-                    var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+                    var data = eventFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
 
-                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
+                    await _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data });
                 }
             });
 
-            await AssertConsumerAsync(expectedEvents, consumer);
+            await AssertConsumerAsync(expectedEvents, eventConsumer);
         }
 
-        private static async Task AssertConsumerAsync(int expectedEvents, MyEventConsumer consumer)
+        private MyEventConsumerGrain BuildGrain(IEventConsumer eventConsumer)
         {
-            await consumer.Completed.WithTimeout(TimeSpan.FromSeconds(100));
+            var identity = A.Fake<IGrainIdentity>();
+
+            A.CallTo(() => identity.PrimaryKeyString)
+                .Returns(eventConsumer.Name);
+
+            var eventConsumerFactory = A.Fake<IEventConsumerFactory>();
+
+            A.CallTo(() => eventConsumerFactory.Create(eventConsumer.Name))
+                .Returns(eventConsumer);
+
+            return new MyEventConsumerGrain(identity, state, eventConsumerFactory, eventFormatter, _.EventStore, log);
+        }
+
+        private static async Task AssertConsumerAsync(int expectedEvents, MyEventConsumer eventConsumer)
+        {
+            await eventConsumer.Completed.WithTimeout(TimeSpan.FromSeconds(100));
 
             await Task.Delay(2000);
 
-            Assert.Equal(expectedEvents, consumer.Received);
+            Assert.Equal(expectedEvents, eventConsumer.Received);
         }
     }
 }

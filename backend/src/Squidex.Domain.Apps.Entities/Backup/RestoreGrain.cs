@@ -6,9 +6,9 @@
 // ==========================================================================
 
 using System.Threading.Tasks.Dataflow;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
+using Orleans.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Backup.State;
@@ -25,18 +25,18 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class RestoreGrain : GrainOfString, IRestoreGrain
+    public sealed class RestoreGrain : GrainBase, IRestoreGrain
     {
         private readonly IBackupArchiveLocation backupArchiveLocation;
+        private readonly IBackupHandlerFactory backupHandlers;
         private readonly IClock clock;
         private readonly ICommandBus commandBus;
+        private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
-        private readonly IEventDataFormatter eventDataFormatter;
-        private readonly ILogger<RestoreGrain> log;
-        private readonly IServiceProvider serviceProvider;
-        private readonly IStreamNameResolver streamNameResolver;
-        private readonly IUserResolver userResolver;
+        private readonly IEventStreamNames eventStreams;
         private readonly IGrainState<BackupRestoreState> state;
+        private readonly ILogger<RestoreGrain> log;
+        private readonly IUserResolver userResolver;
         private RestoreContext runningContext;
         private StreamMapper runningStreamMapper;
 
@@ -47,29 +47,31 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public RestoreGrain(
             IBackupArchiveLocation backupArchiveLocation,
+            IBackupHandlerFactory backupHandlers,
             IClock clock,
             ICommandBus commandBus,
-            IEventDataFormatter eventDataFormatter,
+            IEventFormatter eventFormatter,
             IEventStore eventStore,
+            IEventStreamNames eventStreams,
+            IGrainIdentity identity,
             IGrainState<BackupRestoreState> state,
-            IServiceProvider serviceProvider,
-            IStreamNameResolver streamNameResolver,
             IUserResolver userResolver,
             ILogger<RestoreGrain> log)
+            : base(identity)
         {
             this.backupArchiveLocation = backupArchiveLocation;
+            this.backupHandlers = backupHandlers;
             this.clock = clock;
             this.commandBus = commandBus;
-            this.eventDataFormatter = eventDataFormatter;
+            this.eventFormatter = eventFormatter;
             this.eventStore = eventStore;
-            this.serviceProvider = serviceProvider;
+            this.eventStreams = eventStreams;
             this.state = state;
-            this.streamNameResolver = streamNameResolver;
             this.userResolver = userResolver;
             this.log = log;
         }
 
-        protected override Task OnActivateAsync(string key)
+        public override Task OnActivateAsync()
         {
             RecoverAfterRestartAsync().Forget();
 
@@ -127,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task ProcessAsync()
         {
-            var handlers = CreateHandlers();
+            var handlers = backupHandlers.CreateMany();
 
             var ct = default(CancellationToken);
 
@@ -300,7 +302,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     {
                         var offset = runningStreamMapper.GetStreamOffset(stream);
 
-                        commits.Add(EventCommit.Create(stream, offset, @event, eventDataFormatter));
+                        commits.Add(EventCommit.Create(stream, offset, @event, eventFormatter));
                     }
 
                     await eventStore.AppendUnsafeAsync(commits);
@@ -328,7 +330,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             batchBlock.BidirectionalLinkTo(writeBlock);
 
-            await foreach (var job in reader.ReadEventsAsync(streamNameResolver, eventDataFormatter))
+            await foreach (var job in reader.ReadEventsAsync(eventStreams, eventFormatter))
             {
                 var newStream = await HandleEventAsync(reader, handlers, job.Stream, job.Event);
 
@@ -425,14 +427,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        private IEnumerable<IBackupHandler> CreateHandlers()
+        public Task<IRestoreJob> GetStateAsync()
         {
-            return serviceProvider.GetRequiredService<IEnumerable<IBackupHandler>>();
-        }
-
-        public Task<J<IRestoreJob>> GetStateAsync()
-        {
-            return Task.FromResult<J<IRestoreJob>>(CurrentJob);
+            return Task.FromResult<IRestoreJob>(CurrentJob);
         }
     }
 }

@@ -16,39 +16,26 @@ namespace Squidex.Infrastructure.Orleans
 {
     public class JsonExternalSerializerTests
     {
-        public JsonExternalSerializerTests()
-        {
-            J.DefaultSerializer = TestUtils.DefaultSerializer;
-        }
+        private readonly IExternalSerializer serializer = new JsonSerializer(TestUtils.DefaultSerializer);
 
         [Fact]
         public void Should_not_copy_null()
         {
             var source = (string?)null;
 
-            var clone = J<int>.Copy(source, null);
+            var clone = serializer.DeepCopy(source, null);
 
             Assert.Null(clone);
         }
 
         [Fact]
-        public void Should_copy_null_json()
+        public void Should_not_copy_values()
         {
-            var source = new J<List<int>?>(null);
+            var source = new List<int> { 1, 2, 3 };
 
-            var clone = (J<List<int>>)J<object>.Copy(source, null)!;
+            var copy = serializer.DeepCopy(source, null)!;
 
-            Assert.Null(clone.Value);
-        }
-
-        [Fact]
-        public void Should_not_copy_immutable_values()
-        {
-            var source = new List<int> { 1, 2, 3 }.AsJ();
-
-            var copy = (J<List<int>>)J<object>.Copy(source, null)!;
-
-            Assert.Same(source.Value, copy.Value);
+            Assert.Same(source, copy);
         }
 
         [Fact]
@@ -63,19 +50,21 @@ namespace Squidex.Infrastructure.Orleans
             SerializeAndDeserialize(ArrayOfLength(8000), Assert.Equal);
         }
 
-        private static void SerializeAndDeserialize<T>(T value, Action<T, T> equals) where T : class
+        private void SerializeAndDeserialize<T>(T value, Action<T, T> assertEquals) where T : class
         {
             using (var buffer = new MemoryStream())
             {
-                J<object>.Serialize(J.Of(value), CreateWriter(buffer), typeof(T));
+                var jsonWriter = CreateWriter(buffer);
+                var jsonReader = CreateReader(buffer);
+
+                serializer.Serialize(value, jsonWriter, typeof(T));
 
                 buffer.Position = 0;
 
-                var copy = (J<T>)J<object>.Deserialize(typeof(J<T>), CreateReader(buffer))!;
+                var deserialized = (T)serializer.Deserialize(typeof(T), jsonReader)!;
 
-                equals(copy.Value, value);
-
-                Assert.NotSame(value, copy.Value);
+                assertEquals(deserialized, value);
+                Assert.NotSame(value, deserialized);
             }
         }
 
@@ -85,8 +74,10 @@ namespace Squidex.Infrastructure.Orleans
 
             A.CallTo(() => reader.ReadByteArray(A<byte[]>._, A<int>._, A<int>._))
                 .Invokes(new Action<byte[], int, int>((array, offset, length) => buffer.Read(array, offset, length)));
+
             A.CallTo(() => reader.CurrentPosition)
                 .ReturnsLazily(x => (int)buffer.Position);
+
             A.CallTo(() => reader.Length)
                 .ReturnsLazily(x => (int)buffer.Length);
 
@@ -104,6 +95,7 @@ namespace Squidex.Infrastructure.Orleans
 
             A.CallTo(() => writer.Write(A<byte[]>._, A<int>._, A<int>._))
                 .Invokes(new Action<byte[], int, int>(buffer.Write));
+
             A.CallTo(() => writer.CurrentOffset)
                 .ReturnsLazily(x => (int)buffer.Position);
 

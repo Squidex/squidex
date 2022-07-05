@@ -5,12 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Orleans.Core;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Counter
 {
-    public sealed class CounterGrain : GrainOfString, ICounterGrain
+    public sealed class CounterGrain : GrainBase, ICounterGrain
     {
         private readonly IGrainState<State> state;
 
@@ -20,7 +21,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
             public Dictionary<string, long> Counters { get; set; } = new Dictionary<string, long>();
         }
 
-        public CounterGrain(IGrainState<State> state)
+        public CounterGrain(IGrainIdentity identity, IGrainState<State> state)
+            : base(identity)
         {
             this.state = state;
         }

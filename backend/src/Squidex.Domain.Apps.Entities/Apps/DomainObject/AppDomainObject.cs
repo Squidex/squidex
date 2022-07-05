@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -25,22 +26,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 {
     public sealed partial class AppDomainObject : DomainObject<AppDomainObject.State>
     {
-        private readonly InitialSettings initialSettings;
-        private readonly IAppPlansProvider appPlansProvider;
-        private readonly IAppPlanBillingManager appPlansBillingManager;
-        private readonly IUserResolver userResolver;
+        private readonly IServiceProvider serviceProvider;
 
-        public AppDomainObject(IPersistenceFactory<State> persistence, ILogger<AppDomainObject> log,
-            InitialSettings initialSettings,
-            IAppPlansProvider appPlansProvider,
-            IAppPlanBillingManager appPlansBillingManager,
-            IUserResolver userResolver)
-            : base(persistence, log)
+        public AppDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<AppDomainObject> log,
+            IServiceProvider serviceProvider)
+            : base(id, persistence, log)
         {
-            this.userResolver = userResolver;
-            this.appPlansProvider = appPlansProvider;
-            this.appPlansBillingManager = appPlansBillingManager;
-            this.initialSettings = initialSettings;
+            this.serviceProvider = serviceProvider;
         }
 
         protected override bool IsDeleted(State snapshot)
@@ -125,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 case AssignContributor assignContributor:
                     return UpdateReturnAsync(assignContributor, async c =>
                     {
-                        await GuardAppContributors.CanAssign(c, Snapshot, userResolver, GetPlan());
+                        await GuardAppContributors.CanAssign(c, Snapshot, UserResolver(), GetPlan());
 
                         AssignContributor(c, !Snapshot.Contributors.ContainsKey(assignContributor.ContributorId));
 
@@ -265,7 +257,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 case ChangePlan changePlan:
                     return UpdateReturnAsync(changePlan, async c =>
                     {
-                        GuardApp.CanChangePlan(c, Snapshot, appPlansProvider);
+                        GuardApp.CanChangePlan(c, Snapshot, AppPlansProvider());
 
                         if (c.FromCallback)
                         {
@@ -275,9 +267,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         }
                         else
                         {
-                            var result =
-                                await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier,
-                                    Snapshot.NamedId(), c.PlanId, c.Referer);
+                            var result = await AppPlanBillingManager().ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), c.PlanId, c.Referer);
 
                             switch (result)
                             {
@@ -293,7 +283,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 case DeleteApp delete:
                     return UpdateAsync(delete, async c =>
                     {
-                        await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null, null);
+                        await AppPlanBillingManager().ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null, null);
 
                         DeleteApp(c);
                     });
@@ -302,11 +292,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     ThrowHelper.NotSupportedException();
                     return default!;
             }
-        }
-
-        private IAppLimitsPlan GetPlan()
-        {
-            return appPlansProvider.GetPlanForApp(Snapshot).Plan;
         }
 
         private void Create(CreateApp command)
@@ -335,7 +320,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         private void ChangePlan(ChangePlan command)
         {
-            if (string.Equals(appPlansProvider.GetFreePlan()?.Id, command.PlanId, StringComparison.Ordinal))
+            if (string.Equals(GetFreePlan()?.Id, command.PlanId, StringComparison.Ordinal))
             {
                 Raise(command, new AppPlanReset());
             }
@@ -466,7 +451,32 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         private AppSettingsUpdated CreateInitialSettings()
         {
-            return new AppSettingsUpdated { Settings = initialSettings.Settings };
+            return new AppSettingsUpdated { Settings = serviceProvider.GetRequiredService<InitialSettings>().Settings };
+        }
+
+        private IAppPlansProvider AppPlansProvider()
+        {
+            return serviceProvider.GetRequiredService<IAppPlansProvider>();
+        }
+
+        private IAppPlanBillingManager AppPlanBillingManager()
+        {
+            return serviceProvider.GetRequiredService<IAppPlanBillingManager>();
+        }
+
+        private IUserResolver UserResolver()
+        {
+            return serviceProvider.GetRequiredService<IUserResolver>();
+        }
+
+        private IAppLimitsPlan GetFreePlan()
+        {
+            return AppPlansProvider().GetFreePlan();
+        }
+
+        private IAppLimitsPlan GetPlan()
+        {
+            return AppPlansProvider().GetPlanForApp(Snapshot).Plan;
         }
     }
 }

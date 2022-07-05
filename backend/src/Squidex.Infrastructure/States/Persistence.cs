@@ -14,13 +14,13 @@ namespace Squidex.Infrastructure.States
     internal sealed class Persistence<T> : IPersistence<T>
     {
         private readonly DomainId ownerKey;
-        private readonly ISnapshotStore<T> snapshotStore;
-        private readonly IEventStore eventStore;
-        private readonly IEventDataFormatter eventDataFormatter;
-        private readonly PersistenceMode persistenceMode;
-        private readonly HandleSnapshot<T>? applyState;
         private readonly HandleEvent? applyEvent;
+        private readonly HandleSnapshot<T>? applyState;
+        private readonly IEventFormatter eventFormatter;
+        private readonly IEventStore eventStore;
+        private readonly ISnapshotStore<T> snapshotStore;
         private readonly Lazy<string> streamName;
+        private readonly PersistenceMode persistenceMode;
         private long versionSnapshot = EtagVersion.Empty;
         private long versionEvents = EtagVersion.Empty;
         private long version = EtagVersion.Empty;
@@ -46,23 +46,23 @@ namespace Squidex.Infrastructure.States
         }
 
         public Persistence(DomainId ownerKey, Type ownerType,
-            ISnapshotStore<T> snapshotStore,
-            IEventStore eventStore,
-            IEventDataFormatter eventDataFormatter,
-            IStreamNameResolver streamNameResolver,
             PersistenceMode persistenceMode,
+            IEventFormatter eventFormatter,
+            IEventStore eventStore,
+            IEventStreamNames eventStreams,
+            ISnapshotStore<T> snapshotStore,
             HandleSnapshot<T>? applyState,
             HandleEvent? applyEvent)
         {
-            this.ownerKey = ownerKey;
-            this.applyState = applyState;
             this.applyEvent = applyEvent;
+            this.applyState = applyState;
+            this.eventFormatter = eventFormatter;
             this.eventStore = eventStore;
-            this.eventDataFormatter = eventDataFormatter;
+            this.ownerKey = ownerKey;
             this.persistenceMode = persistenceMode;
             this.snapshotStore = snapshotStore;
 
-            streamName = new Lazy<string>(() => streamNameResolver.GetStreamName(ownerType, ownerKey.ToString()!));
+            streamName = new Lazy<string>(() => eventStreams.GetStreamName(ownerType, ownerKey.ToString()!));
         }
 
         public async Task DeleteAsync(
@@ -74,6 +74,8 @@ namespace Squidex.Infrastructure.States
                 {
                     await snapshotStore.RemoveAsync(ownerKey, ct);
                 }
+
+                versionSnapshot = EtagVersion.Empty;
             }
 
             if (UseEventSourcing)
@@ -82,7 +84,11 @@ namespace Squidex.Infrastructure.States
                 {
                     await eventStore.DeleteStreamAsync(streamName.Value, ct);
                 }
+
+                versionEvents = EtagVersion.Empty;
             }
+
+            UpdateVersion();
         }
 
         public async Task ReadAsync(long expectedVersion = EtagVersion.Any,
@@ -153,7 +159,7 @@ namespace Squidex.Infrastructure.States
 
                 if (!isStopped)
                 {
-                    var parsedEvent = eventDataFormatter.ParseIfKnown(@event);
+                    var parsedEvent = eventFormatter.ParseIfKnown(@event);
 
                     if (applyEvent != null && parsedEvent != null)
                     {
@@ -210,7 +216,7 @@ namespace Squidex.Infrastructure.States
             }
 
             var eventCommitId = Guid.NewGuid();
-            var eventData = events.Select(x => eventDataFormatter.ToEventData(x, eventCommitId, true)).ToArray();
+            var eventData = events.Select(x => eventFormatter.ToEventData(x, eventCommitId, true)).ToArray();
 
             try
             {

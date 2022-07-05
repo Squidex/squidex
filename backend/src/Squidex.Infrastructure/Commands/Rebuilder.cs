@@ -13,28 +13,18 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
-#pragma warning disable RECS0108 // Warns about static fields in generic types
-
 namespace Squidex.Infrastructure.Commands
 {
     public class Rebuilder
     {
+        private readonly IDomainObjectFactory domainObjectFactory;
         private readonly ILocalCache localCache;
         private readonly IEventStore eventStore;
         private readonly IServiceProvider serviceProvider;
         private readonly ILogger<Rebuilder> log;
 
-        private static class Factory<T, TState> where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
-        {
-            private static readonly ObjectFactory ObjectFactory = ActivatorUtilities.CreateFactory(typeof(T), new[] { typeof(IPersistenceFactory<TState>) });
-
-            public static T Create(IServiceProvider serviceProvider, IPersistenceFactory<TState> persistenceFactory)
-            {
-                return (T)ObjectFactory(serviceProvider, new object[] { persistenceFactory });
-            }
-        }
-
         public Rebuilder(
+            IDomainObjectFactory domainObjectFactory,
             ILocalCache localCache,
             IEventStore eventStore,
             IServiceProvider serviceProvider,
@@ -42,6 +32,7 @@ namespace Squidex.Infrastructure.Commands
         {
             this.eventStore = eventStore;
             this.serviceProvider = serviceProvider;
+            this.domainObjectFactory = domainObjectFactory;
             this.localCache = localCache;
             this.log = log;
         }
@@ -107,9 +98,7 @@ namespace Squidex.Infrastructure.Commands
                             {
                                 try
                                 {
-                                    var domainObject = Factory<T, TState>.Create(serviceProvider, context);
-
-                                    domainObject.Setup(id);
+                                    var domainObject = domainObjectFactory.Create<T, TState>(id, context);
 
                                     await domainObject.RebuildStateAsync();
                                 }

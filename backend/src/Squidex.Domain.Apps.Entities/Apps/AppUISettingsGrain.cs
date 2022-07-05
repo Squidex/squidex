@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Orleans.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
@@ -12,7 +13,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class AppUISettingsGrain : GrainOfString, IAppUISettingsGrain
+    public sealed class AppUISettingsGrain : GrainBase, IAppUISettingsGrain
     {
         private readonly IGrainState<State> state;
 
@@ -22,14 +23,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
             public JsonObject Settings { get; set; } = new JsonObject();
         }
 
-        public AppUISettingsGrain(IGrainState<State> state)
+        public AppUISettingsGrain(IGrainIdentity identity, IGrainState<State> state)
+            : base(identity)
         {
             this.state = state;
         }
 
-        public Task<J<JsonObject>> GetAsync()
+        public Task<JsonObject> GetAsync()
         {
-            return Task.FromResult(state.Value.Settings.AsJ());
+            return Task.FromResult(state.Value.Settings);
         }
 
         public Task ClearAsync()
@@ -39,14 +41,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return state.ClearAsync();
         }
 
-        public Task SetAsync(J<JsonObject> settings)
+        public Task SetAsync(JsonObject settings)
         {
             state.Value.Settings = settings;
 
             return state.WriteAsync();
         }
 
-        public Task SetAsync(string path, J<JsonValue> value)
+        public Task SetAsync(string path, JsonValue value)
         {
             var container = GetContainer(path, true, out var key);
 
@@ -56,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 return Task.CompletedTask;
             }
 
-            container[key] = value.Value;
+            container[key] = value;
 
             return state.WriteAsync();
         }

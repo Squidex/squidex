@@ -6,12 +6,11 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 {
     public interface ISchemaGrain : IDomainObjectGrain
     {
-        Task<J<ISchemaEntity>> GetStateAsync();
+        Task<ISchemaEntity> GetStateAsync();
     }
 }

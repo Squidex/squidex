@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Entities.Search;
 
 namespace Squidex.Config.Domain
@@ -16,9 +15,6 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexSchemas(this IServiceCollection services)
         {
-            services.AddTransientAs<SchemaDomainObject>()
-                .AsSelf();
-
             services.AddTransientAs<SchemasSearchSource>()
                 .As<ISearchSource>();
 

@@ -17,17 +17,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private static readonly MemoryStream DummyStream = new MemoryStream(Encoding.UTF8.GetBytes("dummy"));
         private readonly IAssetFileStore assetFileStore;
+        private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
-        private readonly IEventDataFormatter eventDataFormatter;
 
         public RebuildFiles(
             IAssetFileStore assetFileStore,
-            IEventStore eventStore,
-            IEventDataFormatter eventDataFormatter)
+            IEventFormatter eventFormatter,
+            IEventStore eventStore)
         {
             this.assetFileStore = assetFileStore;
             this.eventStore = eventStore;
-            this.eventDataFormatter = eventDataFormatter;
+            this.eventFormatter = eventFormatter;
         }
 
         public async Task RepairAsync(
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             await foreach (var storedEvent in eventStore.QueryAllAsync("^asset\\-", ct: ct))
             {
-                var @event = eventDataFormatter.ParseIfKnown(storedEvent);
+                var @event = eventFormatter.ParseIfKnown(storedEvent);
 
                 if (@event != null)
                 {

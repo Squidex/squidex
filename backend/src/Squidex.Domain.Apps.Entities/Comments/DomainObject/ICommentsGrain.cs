@@ -9,13 +9,12 @@ using Orleans;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 {
     public interface ICommentsGrain : IGrainWithStringKey
     {
-        Task<J<CommandResult>> ExecuteAsync(J<CommentsCommand> command);
+        Task<CommandResult> ExecuteAsync(CommentsCommand command);
 
         Task<CommentsResult> GetCommentsAsync(long sinceVersion = EtagVersion.Any);
     }

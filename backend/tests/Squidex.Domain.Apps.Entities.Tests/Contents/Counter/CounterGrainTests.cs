@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Orleans.Core;
 using Squidex.Infrastructure.Orleans;
 using Xunit;
 
@@ -13,12 +14,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
 {
     public class CounterGrainTests
     {
-        private readonly IGrainState<CounterGrain.State> grainState = A.Fake<IGrainState<CounterGrain.State>>();
+        private readonly IGrainIdentity identity = A.Fake<IGrainIdentity>();
+        private readonly IGrainState<CounterGrain.State> state = A.Fake<IGrainState<CounterGrain.State>>();
         private readonly CounterGrain sut;
 
         public CounterGrainTests()
         {
-            sut = new CounterGrain(grainState);
+            sut = new CounterGrain(identity, state);
         }
 
         [Fact]
@@ -30,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
             Assert.Equal(1, await sut.IncrementAsync("Counter2"));
             Assert.Equal(2, await sut.IncrementAsync("Counter2"));
 
-            A.CallTo(() => grainState.WriteAsync())
+            A.CallTo(() => state.WriteAsync())
                 .MustHaveHappened(4, Times.Exactly);
         }
 
@@ -44,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
 
             Assert.Equal(2, await sut.IncrementAsync("Counter1"));
 
-            A.CallTo(() => grainState.WriteAsync())
+            A.CallTo(() => state.WriteAsync())
                 .MustHaveHappened(4, Times.Exactly);
         }
     }

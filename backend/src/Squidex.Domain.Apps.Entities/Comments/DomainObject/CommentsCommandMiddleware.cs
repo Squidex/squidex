@@ -9,7 +9,6 @@ using System.Text.RegularExpressions;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
@@ -36,17 +35,15 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                     await MentionUsersAsync(createComment);
                 }
 
-                await ExecuteCommandAsync(context, commentsCommand);
+                await ExecuteCommandAsync(commentsCommand);
             }
 
             await next(context);
         }
 
-        private async Task ExecuteCommandAsync(CommandContext context, CommentsCommand commentsCommand)
+        private Task ExecuteCommandAsync(CommentsCommand commentsCommand)
         {
-            var result = await GetGrain(commentsCommand).ExecuteAsync(commentsCommand.AsJ());
-
-            context.Complete(result.Value);
+            return GetGrain(commentsCommand).ExecuteAsync(commentsCommand);
         }
 
         private ICommentsGrain GetGrain(CommentsCommand commentsCommand)

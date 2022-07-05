@@ -5,7 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Orleans;
+using Orleans.Configuration;
+using Orleans.Hosting;
 using Orleans.TestingHost;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.TestHelpers;
@@ -18,20 +22,16 @@ namespace Squidex.Infrastructure.Orleans
     {
         public interface ICommandGrain : IGrainWithStringKey
         {
-            public Task<J<CommandResult>> ExecuteAsync(J<CommandRequest> request);
+            public Task<CommandResult> ExecuteAsync(IAggregateCommand command);
         }
 
         public class CommandGrain : Grain, ICommandGrain
         {
-            public Task<J<CommandResult>> ExecuteAsync(J<CommandRequest> request)
+            public Task<CommandResult> ExecuteAsync(IAggregateCommand command)
             {
-                request.Value.ApplyContext();
+                var result = new CommandResult(command.AggregateId, 0, 0, ((TestCommand)command).Value);
 
-                var command = (TestCommand)request.Value.Command;
-
-                var result = new CommandResult(command.AggregateId, 0, 0, command.Value);
-
-                return Task.FromResult(result.AsJ());
+                return Task.FromResult(result);
             }
         }
 
@@ -44,9 +44,33 @@ namespace Squidex.Infrastructure.Orleans
             public string Value { get; set; }
         }
 
-        public JsonExternalSerializationTests()
+        public sealed class Configurator : ISiloConfigurator, IClientBuilderConfigurator
         {
-            J.DefaultSerializer = TestUtils.DefaultSerializer;
+            public void Configure(ISiloBuilder siloBuilder)
+            {
+                siloBuilder.ConfigureServices(services =>
+                {
+                    services.AddSingleton(TestUtils.DefaultSerializer);
+                });
+
+                siloBuilder.Configure<SerializationProviderOptions>(options =>
+                {
+                    options.SerializationProviders.Add(typeof(JsonSerializer));
+                });
+            }
+
+            public void Configure(IConfiguration configuration, IClientBuilder clientBuilder)
+            {
+                clientBuilder.ConfigureServices(services =>
+                {
+                    services.AddSingleton(TestUtils.DefaultSerializer);
+                });
+
+                clientBuilder.Configure<SerializationProviderOptions>(options =>
+                {
+                    options.SerializationProviders.Add(typeof(JsonSerializer));
+                });
+            }
         }
 
         [Fact]
@@ -54,6 +78,8 @@ namespace Squidex.Infrastructure.Orleans
         {
             var cluster =
                 new TestClusterBuilder(1)
+                    .AddSiloBuilderConfigurator<Configurator>()
+                    .AddClientBuilderConfigurator<Configurator>()
                     .Build();
 
             await cluster.DeployAsync();
@@ -64,14 +90,12 @@ namespace Squidex.Infrastructure.Orleans
                 {
                     var id = DomainId.NewGuid().ToString();
 
-                    var grain = cluster.GrainFactory.GetGrain<ICommandGrain>(id);
+                    var commandGrain = cluster.GrainFactory.GetGrain<ICommandGrain>(id);
+                    var commandTest = new TestCommand { Value = id };
 
-                    var result = await grain.ExecuteAsync(CommandRequest.Create(new TestCommand
-                    {
-                        Value = id
-                    }));
+                    var result = await commandGrain.ExecuteAsync(commandTest);
 
-                    Assert.Equal(id, result.Value.Payload);
+                    Assert.Equal(id, result.Payload);
                 }
             }
             finally

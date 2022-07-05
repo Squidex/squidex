@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         Task<bool> HasFileAsync(string name,
             CancellationToken ct = default);
 
-        IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter,
+        IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(IEventStreamNames eventStreams, IEventFormatter eventFormatter,
             CancellationToken ct = default);
     }
 }

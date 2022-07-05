@@ -227,7 +227,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private async Task<IAppEntity?> GetAppCoreAsync(DomainId id, bool allowArchived = false)
         {
-            var app = (await grainFactory.GetGrain<IAppGrain>(id.ToString()).GetStateAsync()).Value;
+            var app = await grainFactory.GetGrain<IAppGrain>(id.ToString()).GetStateAsync();
 
             if (app.Version <= EtagVersion.Empty || (app.IsDeleted && !allowArchived))
             {

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Orleans.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
@@ -15,20 +16,21 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
     {
         private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
 
-        public AssetDomainObjectGrain(IServiceProvider serviceProvider, IActivationLimit limit)
-            : base(serviceProvider)
+        public AssetDomainObjectGrain(IGrainIdentity identity, IDomainObjectFactory factory,
+            IActivationLimit limit)
+            : base(identity, factory)
         {
             limit?.SetLimit(5000, Lifetime);
         }
 
-        protected override Task OnActivateAsync(string key)
+        public override Task OnActivateAsync()
         {
             TryDelayDeactivation(Lifetime);
 
-            return base.OnActivateAsync(key);
+            return base.OnActivateAsync();
         }
 
-        public async Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Any)
+        public async Task<IAssetEntity> GetStateAsync(long version = EtagVersion.Any)
         {
             await DomainObject.EnsureLoadedAsync();
 

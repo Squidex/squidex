@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Orleans.Concurrency;
+using Orleans.Core;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans.Indexes;
@@ -18,7 +19,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         private readonly IAppRepository appRepository;
         private readonly Dictionary<string, DomainId> appIds = new Dictionary<string, DomainId>();
 
-        public AppsCacheGrain(IAppRepository appRepository)
+        public AppsCacheGrain(IGrainIdentity identity, IAppRepository appRepository)
+            : base(identity)
         {
             this.appRepository = appRepository;
         }

@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 .Returns(grain);
 
             A.CallTo(() => grain.GetStateAsync())
-                .Returns(state.AsJ());
+                .Returns(state);
 
             var result = await sut.GetRestoreAsync();
 
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 .Returns(grain);
 
             A.CallTo(() => grain.GetStateAsync())
-                .Returns(state.AsJ());
+                .Returns(state);
 
             var result = await sut.GetBackupsAsync(appId);
 
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 .Returns(grain);
 
             A.CallTo(() => grain.GetStateAsync())
-                .Returns(state.AsJ());
+                .Returns(state);
 
             var result1 = await sut.GetBackupAsync(appId, backupId);
             var result2 = await sut.GetBackupAsync(appId, DomainId.NewGuid());

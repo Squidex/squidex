@@ -358,7 +358,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             var appGrain = A.Fake<IAppGrain>();
 
             A.CallTo(() => appGrain.GetStateAsync())
-                .Returns(J.Of(app));
+                .Returns(app);
 
             A.CallTo(() => grainFactory.GetGrain<IAppGrain>(appId.Id.ToString(), null))
                 .Returns(appGrain);

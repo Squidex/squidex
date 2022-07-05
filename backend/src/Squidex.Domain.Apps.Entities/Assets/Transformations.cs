@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public static async Task<string?> GetBlurHashAsync(this AssetRef asset, BlurOptions options,
             IAssetFileStore assetFileStore,
-            IAssetThumbnailGenerator thumbnailGenerator,
+            IAssetThumbnailGenerator assetThumbnails,
             CancellationToken ct = default)
         {
             using (var stream = DefaultPools.MemoryStream.GetStream())
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 stream.Position = 0;
 
-                return await thumbnailGenerator.ComputeBlurHashAsync(stream, asset.MimeType, options, ct);
+                return await assetThumbnails.ComputeBlurHashAsync(stream, asset.MimeType, options, ct);
             }
         }
     }

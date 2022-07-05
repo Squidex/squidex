@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.Orleans
             }
             finally
             {
-                await Task.WhenAny(Task.Delay(2000), cluster.StopAllSilosAsync());
+                await Task.WhenAny(Task.Delay(2000), cluster.DisposeAsync().AsTask());
             }
         }
     }

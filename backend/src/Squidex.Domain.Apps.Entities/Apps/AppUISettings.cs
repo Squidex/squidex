@@ -8,7 +8,6 @@
 using Orleans;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
@@ -38,11 +37,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        public async Task<JsonObject> GetAsync(DomainId appId, string? userId)
+        public Task<JsonObject> GetAsync(DomainId appId, string? userId)
         {
-            var result = await GetGrain(appId, userId).GetAsync();
-
-            return result.Value;
+            return GetGrain(appId, userId).GetAsync();
         }
 
         public Task RemoveAsync(DomainId appId, string? userId, string path)
@@ -52,12 +49,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public Task SetAsync(DomainId appId, string? userId, string path, JsonValue value)
         {
-            return GetGrain(appId, userId).SetAsync(path, value.AsJ());
+            return GetGrain(appId, userId).SetAsync(path, value);
         }
 
         public Task SetAsync(DomainId appId, string? userId, JsonObject settings)
         {
-            return GetGrain(appId, userId).SetAsync(settings.AsJ());
+            return GetGrain(appId, userId).SetAsync(settings);
         }
 
         public Task ClearAsync(DomainId appId, string? userId)

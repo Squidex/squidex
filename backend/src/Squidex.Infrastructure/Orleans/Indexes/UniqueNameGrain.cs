@@ -5,11 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Orleans.Core;
+
 namespace Squidex.Infrastructure.Orleans.Indexes
 {
-    public class UniqueNameGrain<T> : GrainOfString, IUniqueNameGrain<T>
+    public class UniqueNameGrain<T> : GrainBase, IUniqueNameGrain<T>
     {
         private readonly Dictionary<string, (string Name, T Id)> reservations = new Dictionary<string, (string Name, T Id)>();
+
+        public UniqueNameGrain(IGrainIdentity identity)
+            : base(identity)
+        {
+        }
 
         public virtual Task<string?> ReserveAsync(T id, string name)
         {

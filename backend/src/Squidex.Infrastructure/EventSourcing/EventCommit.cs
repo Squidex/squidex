@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return new EventCommit(id, streamName, offset, new List<EventData> { @event });
         }
 
-        public static EventCommit Create(string streamName, long offset, Envelope<IEvent> envelope, IEventDataFormatter eventDataFormatter)
+        public static EventCommit Create(string streamName, long offset, Envelope<IEvent> envelope, IEventFormatter eventDataFormatter)
         {
             var id = Guid.NewGuid();
 

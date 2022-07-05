@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Orleans.Core;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards;
 using Squidex.Domain.Apps.Events.Comments;
@@ -18,12 +19,12 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 {
-    public sealed class CommentsGrain : GrainOfString, ICommentsGrain
+    public sealed class CommentsGrain : GrainBase, ICommentsGrain
     {
         private readonly List<Envelope<CommentsEvent>> uncommittedEvents = new List<Envelope<CommentsEvent>>();
         private readonly List<Envelope<CommentsEvent>> events = new List<Envelope<CommentsEvent>>();
+        private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
-        private readonly IEventDataFormatter eventDataFormatter;
         private long version = EtagVersion.Empty;
         private string streamName;
 
@@ -32,21 +33,24 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             get => version;
         }
 
-        public CommentsGrain(IEventStore eventStore, IEventDataFormatter eventDataFormatter)
+        public CommentsGrain(IGrainIdentity identity,
+            IEventFormatter eventFormatter,
+            IEventStore eventStore)
+            : base(identity)
         {
+            this.eventFormatter = eventFormatter;
             this.eventStore = eventStore;
-            this.eventDataFormatter = eventDataFormatter;
         }
 
-        protected override async Task OnActivateAsync(string key)
+        public override async Task OnActivateAsync()
         {
-            streamName = $"comments-{key}";
+            streamName = $"comments-{Key}";
 
             var storedEvents = await eventStore.QueryReverseAsync(streamName, 100);
 
             foreach (var @event in storedEvents)
             {
-                var parsedEvent = eventDataFormatter.Parse(@event);
+                var parsedEvent = eventFormatter.Parse(@event);
 
                 version = @event.EventStreamNumber;
 
@@ -54,14 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             }
         }
 
-        public async Task<J<CommandResult>> ExecuteAsync(J<CommentsCommand> command)
-        {
-            var result = await ExecuteAsync(command.Value);
-
-            return result.AsJ();
-        }
-
-        private Task<CommandResult> ExecuteAsync(CommentsCommand command)
+        public Task<CommandResult> ExecuteAsync(CommentsCommand command)
         {
             switch (command)
             {
@@ -76,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 case UpdateComment updateComment:
                     return Upsert(updateComment, c =>
                     {
-                        GuardComments.CanUpdate(c, Key, events);
+                        GuardComments.CanUpdate(c, Key.ToString(), events);
 
                         Update(c);
                     });
@@ -84,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 case DeleteComment deleteComment:
                     return Upsert(deleteComment, c =>
                     {
-                        GuardComments.CanDelete(c, Key, events);
+                        GuardComments.CanDelete(c, Key.ToString(), events);
 
                         Delete(c);
                     });
@@ -102,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
             {
-                throw new DomainObjectVersionException(Key, Version, command.ExpectedVersion);
+                throw new DomainObjectVersionException(Key.ToString(), Version, command.ExpectedVersion);
             }
 
             var previousVersion = version;
@@ -115,14 +112,14 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 {
                     var commitId = Guid.NewGuid();
 
-                    var eventData = uncommittedEvents.Select(x => eventDataFormatter.ToEventData(x, commitId)).ToList();
+                    var eventData = uncommittedEvents.Select(x => eventFormatter.ToEventData(x, commitId)).ToList();
 
                     await eventStore.AppendAsync(commitId, streamName, previousVersion, eventData);
                 }
 
                 events.AddRange(uncommittedEvents);
 
-                return CommandResult.Empty(DomainId.Create(Key), Version, previousVersion);
+                return CommandResult.Empty(Key, Version, previousVersion);
             }
             catch
             {

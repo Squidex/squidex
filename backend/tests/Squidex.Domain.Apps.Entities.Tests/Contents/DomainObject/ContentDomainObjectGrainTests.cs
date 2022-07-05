@@ -6,6 +6,9 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Orleans.Core;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
 using Xunit;
 
@@ -20,12 +23,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         [Fact]
         public void Should_set_limit()
         {
-            var serviceProvider = A.Fake<IServiceProvider>();
+            var id = DomainId.NewGuid();
 
-            A.CallTo(() => serviceProvider.GetService(typeof(ContentDomainObject)))
+            var identity = A.Fake<IGrainIdentity>();
+
+            A.CallTo(() => identity.PrimaryKeyString)
+                .Returns(id.ToString());
+
+            var factory = A.Fake<IDomainObjectFactory>();
+
+            A.CallTo(() => factory.Create<ContentDomainObject>(id))
                 .Returns(A.Dummy<ContentDomainObject>());
 
-            new ContentDomainObjectGrain(serviceProvider, limit);
+            new ContentDomainObjectGrain(identity, factory, limit);
 
             A.CallTo(() => limit.SetLimit(5000, TimeSpan.FromMinutes(5)))
                 .MustHaveHappened();

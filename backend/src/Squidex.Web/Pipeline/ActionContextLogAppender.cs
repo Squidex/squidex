@@ -8,35 +8,34 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
 using Squidex.Log;
 
 namespace Squidex.Web.Pipeline
 {
     public sealed class ActionContextLogAppender : ILogAppender
     {
-        private readonly IServiceProvider services;
+        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IActionContextAccessor actionContextAccessor;
 
-        public ActionContextLogAppender(IServiceProvider services)
+        public ActionContextLogAppender(IHttpContextAccessor httpContextAccessor, IActionContextAccessor actionContextAccessor)
         {
-            this.services = services;
+            this.httpContextAccessor = httpContextAccessor;
+            this.actionContextAccessor = actionContextAccessor;
         }
 
         public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception? exception)
         {
-            var httpContextAccessor = services.GetService<IHttpContextAccessor>();
+            var httpContext = httpContextAccessor.HttpContext;
 
-            if (string.IsNullOrEmpty(httpContextAccessor?.HttpContext?.Request?.Method))
+            if (string.IsNullOrEmpty(httpContext?.Request?.Method))
             {
                 return;
             }
 
-            var actionContext = services.GetRequiredService<IActionContextAccessor>()?.ActionContext;
+            var actionContext = actionContextAccessor.ActionContext;
 
             try
             {
-                var httpContext = httpContextAccessor.HttpContext;
-
                 if (string.IsNullOrEmpty(httpContext?.Request?.Method))
                 {
                     return;

@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
@@ -313,7 +312,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             var schemaGrain = A.Fake<ISchemaGrain>();
 
             A.CallTo(() => schemaGrain.GetStateAsync())
-                .Returns(J.Of(schemaEntity));
+                .Returns(schemaEntity);
 
             var key = DomainId.Combine(appId, schemaId.Id).ToString();
 

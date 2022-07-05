@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public BatchSubscriber(
             EventConsumerGrain grain,
-            IEventDataFormatter eventDataFormatter,
+            IEventFormatter eventDataFormatter,
             IEventConsumer eventConsumer,
             Func<IEventSubscriber, IEventSubscription> factory)
         {

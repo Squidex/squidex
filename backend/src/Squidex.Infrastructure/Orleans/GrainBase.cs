@@ -14,13 +14,14 @@ namespace Squidex.Infrastructure.Orleans
 {
     public abstract class GrainBase : Grain
     {
-        protected GrainBase()
-        {
-        }
+        public DomainId Key { get; private set; }
 
-        protected GrainBase(IGrainIdentity? identity, IGrainRuntime? runtime)
+        protected GrainBase(IGrainIdentity identity, IGrainRuntime? runtime = null)
             : base(identity, runtime)
         {
+            Guard.NotNull(identity);
+
+            Key = DomainId.Create(identity.PrimaryKeyString);
         }
 
         public void ReportIAmAlive()

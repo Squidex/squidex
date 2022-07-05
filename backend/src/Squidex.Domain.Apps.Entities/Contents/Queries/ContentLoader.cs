@@ -29,14 +29,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 var contentGrain = grainFactory.GetGrain<IContentGrain>(key);
                 var contentState = await contentGrain.GetStateAsync(version);
 
-                var content = contentState.Value;
-
-                if (content == null || content.Version <= EtagVersion.Empty || (version > EtagVersion.Any && content.Version != version))
+                if (contentState == null || contentState.Version <= EtagVersion.Empty || (version > EtagVersion.Any && contentState.Version != version))
                 {
                     return null;
                 }
 
-                return content;
+                return contentState;
             }
         }
     }

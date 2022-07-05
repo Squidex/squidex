@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using NodaTime;
+using Orleans.Core;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
@@ -15,10 +16,10 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
-    public sealed class UsageNotifierGrain : GrainOfString, IUsageNotifierGrain
+    public sealed class UsageNotifierGrain : GrainBase, IUsageNotifierGrain
     {
         private static readonly TimeSpan TimeBetweenNotifications = TimeSpan.FromDays(3);
-        private readonly IGrainState<State> state;
+        private readonly IGrainState<State> grainState;
         private readonly INotificationSender notificationSender;
         private readonly IUserResolver userResolver;
         private readonly IClock clock;
@@ -29,9 +30,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             public Dictionary<DomainId, DateTime> NotificationsSent { get; } = new Dictionary<DomainId, DateTime>();
         }
 
-        public UsageNotifierGrain(IGrainState<State> state, INotificationSender notificationSender, IUserResolver userResolver, IClock clock)
+        public UsageNotifierGrain(IGrainIdentity identity,
+            IGrainState<State> grainState, INotificationSender notificationSender, IUserResolver userResolver, IClock clock)
+            : base(identity)
         {
-            this.state = state;
+            this.grainState = grainState;
             this.notificationSender = notificationSender;
             this.userResolver = userResolver;
             this.clock = clock;
@@ -70,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         private bool HasBeenSentBefore(DomainId appId, DateTime now)
         {
-            if (state.Value.NotificationsSent.TryGetValue(appId, out var lastSent))
+            if (grainState.Value.NotificationsSent.TryGetValue(appId, out var lastSent))
             {
                 var elapsed = now - lastSent;
 
@@ -82,9 +85,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         private Task TrackNotifiedAsync(DomainId appId, DateTime now)
         {
-            state.Value.NotificationsSent[appId] = now;
+            grainState.Value.NotificationsSent[appId] = now;
 
-            return state.WriteAsync();
+            return grainState.WriteAsync();
         }
     }
 }

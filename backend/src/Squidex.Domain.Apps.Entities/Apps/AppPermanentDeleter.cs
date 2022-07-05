@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 var app = await appGrain.GetStateAsync();
 
                 // If the app does not exist, the version is lower than zero.
-                if (app.Value.Version < 0)
+                if (app.Version < 0)
                 {
                     return;
                 }
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 {
                     using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
                     {
-                        await deleter.DeleteAppAsync(app.Value, default);
+                        await deleter.DeleteAppAsync(app, default);
                     }
                 }
             }

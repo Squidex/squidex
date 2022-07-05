@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         private async Task<IRuleEntity?> GetRuleCoreAsync(DomainId id)
         {
-            var rule = (await grainFactory.GetGrain<IRuleGrain>(id.ToString()).GetStateAsync()).Value;
+            var rule = await grainFactory.GetGrain<IRuleGrain>(id.ToString()).GetStateAsync();
 
             if (rule.Version <= EtagVersion.Empty || rule.IsDeleted)
             {

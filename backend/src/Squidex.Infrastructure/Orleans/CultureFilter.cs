@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.Orleans
             return context.Invoke();
         }
 
-        public Task Invoke(IIncomingGrainCallContext context)
+        public async Task Invoke(IIncomingGrainCallContext context)
         {
             if (RequestContext.Get("Culture") is string culture)
             {
@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.Orleans
                 CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(cultureUI);
             }
 
-            return context.Invoke();
+            await context.Invoke();
         }
     }
 }

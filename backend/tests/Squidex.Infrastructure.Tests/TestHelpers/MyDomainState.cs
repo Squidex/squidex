@@ -41,6 +41,15 @@ namespace Squidex.Infrastructure.TestHelpers
         }
     }
 
+    public sealed class ValueChanged : IEvent
+    {
+        public long Value { get; set; }
+    }
+
+    public sealed class Deleted : IEvent
+    {
+    }
+
     public sealed class MultipleByTwiceEvent : IEvent, IMigratedStateEvent<MyDomainState>
     {
         public IEvent Migrate(MyDomainState state)
@@ -50,14 +59,5 @@ namespace Squidex.Infrastructure.TestHelpers
                 Value = state.Value * 2
             };
         }
-    }
-
-    public sealed class ValueChanged : IEvent
-    {
-        public long Value { get; set; }
-    }
-
-    public sealed class Deleted : IEvent
-    {
     }
 }

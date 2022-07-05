@@ -5,19 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Orleans.Core;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 {
     public sealed class RuleDomainObjectGrain : DomainObjectGrain<RuleDomainObject, RuleDomainObject.State>, IRuleGrain
     {
-        public RuleDomainObjectGrain(IServiceProvider serviceProvider)
-            : base(serviceProvider)
+        public RuleDomainObjectGrain(IGrainIdentity identity, IDomainObjectFactory factory)
+            : base(identity, factory)
         {
         }
 
-        public async Task<J<IRuleEntity>> GetStateAsync()
+        public async Task<IRuleEntity> GetStateAsync()
         {
             await DomainObject.EnsureLoadedAsync();
 

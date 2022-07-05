@@ -28,9 +28,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
     {
         private readonly IServiceProvider serviceProvider;
 
-        public ContentDomainObject(IPersistenceFactory<State> persistence, ILogger<ContentDomainObject> log,
+        public ContentDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<ContentDomainObject> log,
             IServiceProvider serviceProvider)
-            : base(persistence, log)
+            : base(id, persistence, log)
         {
             this.serviceProvider = serviceProvider;
 

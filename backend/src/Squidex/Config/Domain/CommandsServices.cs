@@ -117,6 +117,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<UsageTrackerCommandMiddleware>()
                 .As<ICommandMiddleware>();
+
+            services.AddSingletonAs<DefaultDomainObjectFactory>()
+                .As<IDomainObjectFactory>();
         }
     }
 }

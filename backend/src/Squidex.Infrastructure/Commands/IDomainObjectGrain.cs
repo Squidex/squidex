@@ -6,12 +6,11 @@
 // ==========================================================================
 
 using Orleans;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Infrastructure.Commands
 {
     public interface IDomainObjectGrain : IGrainWithStringKey
     {
-        Task<J<CommandResult>> ExecuteAsync(J<CommandRequest> request);
+        Task<CommandResult> ExecuteAsync(IAggregateCommand command);
     }
 }

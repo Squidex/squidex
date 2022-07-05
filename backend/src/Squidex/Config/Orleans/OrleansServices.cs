@@ -13,11 +13,11 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Providers.MongoDB.Configuration;
 using Orleans.Providers.MongoDB.Utils;
+using Orleans.Runtime;
 using OrleansDashboard;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Hosting.Configuration;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Web;
 
@@ -42,16 +42,18 @@ namespace Squidex.Config.Orleans
                 services.AddScopedAs<ActivationLimit>()
                     .As<IActivationLimit>();
 
-                services.AddInitializer<IJsonSerializer>("Serializer (Orleans)", serializer =>
-                {
-                    J.DefaultSerializer = serializer;
-                }, -1);
+                services.AddScoped(x => x.GetRequiredService<IGrainActivationContext>().GrainIdentity);
             });
 
             builder.ConfigureApplicationParts(parts =>
             {
                 parts.AddApplicationPart(SquidexEntities.Assembly);
                 parts.AddApplicationPart(SquidexInfrastructure.Assembly);
+            });
+
+            builder.Configure<SerializationProviderOptions>(options =>
+            {
+                options.SerializationProviders.Add(typeof(JsonSerializer));
             });
 
             builder.Configure<SchedulingOptions>(options =>
@@ -75,10 +77,12 @@ namespace Squidex.Config.Orleans
                 options.HostSelf = false;
             });
 
-            builder.AddOutgoingGrainCallFilter<ActivityPropagationOutgoingGrainCallFilter>();
+            builder.AddOutgoingGrainCallFilter<ActivityPropagationFilter>();
+            builder.AddOutgoingGrainCallFilter<CultureFilter>();
             builder.AddIncomingGrainCallFilter<ExceptionWrapperFilter>();
-            builder.AddIncomingGrainCallFilter<ActivityPropagationIncomingGrainCallFilter>();
+            builder.AddIncomingGrainCallFilter<ActivityPropagationFilter>();
             builder.AddIncomingGrainCallFilter<ActivationLimiterFilter>();
+            builder.AddIncomingGrainCallFilter<CultureFilter>();
             builder.AddIncomingGrainCallFilter<LocalCacheFilter>();
             builder.AddIncomingGrainCallFilter<LoggingFilter>();
             builder.AddIncomingGrainCallFilter<StateFilter>();

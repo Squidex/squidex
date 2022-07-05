@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         Task StartRestoreAsync(RefToken actor, Uri url, string? newAppName);
 
-        Task<IRestoreJob?> GetRestoreAsync(
+        Task<IRestoreJob> GetRestoreAsync(
             CancellationToken ct = default);
 
         Task<List<IBackupJob>> GetBackupsAsync(DomainId appId,

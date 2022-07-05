@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Xunit;
 
@@ -122,11 +121,6 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             }
 
             return command;
-        }
-
-        protected static J<IAggregateCommand> J(IAggregateCommand command)
-        {
-            return command.AsJ();
         }
 
         protected TEvent CreateEvent<TEvent>(TEvent @event, bool fromClient = false) where TEvent : SquidexEvent

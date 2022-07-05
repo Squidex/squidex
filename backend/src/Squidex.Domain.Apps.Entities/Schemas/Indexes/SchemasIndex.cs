@@ -205,7 +205,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         private async Task<ISchemaEntity?> GetSchemaCoreAsync(DomainId id, bool allowDeleted = false)
         {
-            var schema = (await grainFactory.GetGrain<ISchemaGrain>(id.ToString()).GetStateAsync()).Value;
+            var schema = await grainFactory.GetGrain<ISchemaGrain>(id.ToString()).GetStateAsync();
 
             if (schema.Version <= EtagVersion.Empty || (schema.IsDeleted && !allowDeleted))
             {
