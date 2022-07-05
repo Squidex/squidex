@@ -5,12 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Infrastructure.EventSourcing
 {
-    public interface IBatchContext<T> : IAsyncDisposable, IPersistenceFactory<T>
+    public interface IEventFormatter
     {
-        Task CommitAsync();
+        Envelope<IEvent> Parse(StoredEvent storedEvent);
 
-        Task LoadAsync(IEnumerable<DomainId> ids);
+        Envelope<IEvent>? ParseIfKnown(StoredEvent storedEvent);
+
+        EventData ToEventData(Envelope<IEvent> envelope, Guid commitId, bool migrate = true);
     }
 }

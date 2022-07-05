@@ -11,21 +11,21 @@ namespace Squidex.Infrastructure.States
 {
     public sealed class Store<T> : IStore<T>
     {
-        private readonly IStreamNameResolver streamNameResolver;
-        private readonly ISnapshotStore<T> snapshotStore;
+        private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
-        private readonly IEventDataFormatter eventDataFormatter;
+        private readonly IEventStreamNames eventStreamNames;
+        private readonly ISnapshotStore<T> snapshotStore;
 
         public Store(
-            ISnapshotStore<T> snapshotStore,
+            IEventFormatter eventFormatter,
             IEventStore eventStore,
-            IEventDataFormatter eventDataFormatter,
-            IStreamNameResolver streamNameResolver)
+            IEventStreamNames eventStreamNames,
+            ISnapshotStore<T> snapshotStore)
         {
-            this.snapshotStore = snapshotStore;
+            this.eventFormatter = eventFormatter;
             this.eventStore = eventStore;
-            this.eventDataFormatter = eventDataFormatter;
-            this.streamNameResolver = streamNameResolver;
+            this.eventStreamNames = eventStreamNames;
+            this.snapshotStore = snapshotStore;
         }
 
         public Task ClearSnapshotsAsync()
@@ -36,10 +36,10 @@ namespace Squidex.Infrastructure.States
         public IBatchContext<T> WithBatchContext(Type owner)
         {
             return new BatchContext<T>(owner,
-                snapshotStore,
+                eventFormatter,
                 eventStore,
-                eventDataFormatter,
-                streamNameResolver);
+                eventStreamNames,
+                snapshotStore);
         }
 
         public IPersistence<T> WithEventSourcing(Type owner, DomainId key, HandleEvent? applyEvent)
@@ -62,11 +62,11 @@ namespace Squidex.Infrastructure.States
             Guard.NotNull(key);
 
             return new Persistence<T>(key, owner,
-                snapshotStore,
-                eventStore,
-                eventDataFormatter,
-                streamNameResolver,
                 mode,
+                eventFormatter,
+                eventStore,
+                eventStreamNames,
+                snapshotStore,
                 applySnapshot,
                 applyEvent);
         }

@@ -20,20 +20,20 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
     public sealed class DefaultRuleRunnerService : IRuleRunnerService
     {
         private const int MaxSimulatedEvents = 100;
-        private readonly IEventDataFormatter eventDataFormatter;
         private readonly IPersistenceFactory<RuleRunnerState> persistenceFactory;
+        private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
         private readonly IRuleService ruleService;
         private readonly IMessageBus messaging;
 
         public DefaultRuleRunnerService(
             IPersistenceFactory<RuleRunnerState> persistenceFactory,
+            IEventFormatter eventFormatter,
             IEventStore eventStore,
-            IEventDataFormatter eventDataFormatter,
             IRuleService ruleService,
             IMessageBus messaging)
         {
-            this.eventDataFormatter = eventDataFormatter;
+            this.eventFormatter = eventFormatter;
             this.persistenceFactory = persistenceFactory;
             this.eventStore = eventStore;
             this.ruleService = ruleService;
@@ -66,12 +66,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
             await foreach (var storedEvent in eventStore.QueryAllReverseAsync($"^([a-zA-Z0-9]+)\\-{appId.Id}", fromNow, MaxSimulatedEvents, ct))
             {
-                var @event = eventDataFormatter.ParseIfKnown(storedEvent);
+                var @event = eventFormatter.ParseIfKnown(storedEvent);
 
                 if (@event?.Payload is AppEvent appEvent)
                 {
                     // Also create jobs for rules with failing conditions because we want to show them in th table.
-                    await foreach (var result in ruleService.CreateJobsAsync(@event, context, ct))
+                    await foreach (var result in ruleService.CreateJobsAsync(@event, context, ct).WithCancellation(ct))
                     {
                         var eventName = result.Job?.EventName;
 

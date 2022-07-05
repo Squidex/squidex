@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -39,9 +40,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         {
             var log = A.Fake<ILogger<RuleDomainObject>>();
 
-            sut = new RuleDomainObject(PersistenceFactory, log, appProvider, ruleEnqueuer);
+            var serviceProvider =
+                new ServiceCollection()
+                    .AddSingleton(appProvider)
+                    .AddSingleton(ruleEnqueuer)
+                    .BuildServiceProvider();
+
 #pragma warning disable MA0056 // Do not call overridable members in constructor
-            sut.Setup(Id);
+            sut = new RuleDomainObject(Id, PersistenceFactory, log, serviceProvider);
 #pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 

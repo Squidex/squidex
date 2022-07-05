@@ -8,6 +8,7 @@
 using FakeItEasy;
 using FluentAssertions;
 using NodaTime;
+using Orleans.Core;
 using Squidex.Domain.Apps.Core.Comments;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -21,8 +22,9 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 {
     public class CommentsGrainTests
     {
+        private readonly IGrainIdentity identity = A.Fake<IGrainIdentity>();
+        private readonly IEventFormatter eventFormatter = A.Fake<IEventFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
-        private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly DomainId commentsId = DomainId.NewGuid();
         private readonly DomainId commentId = DomainId.NewGuid();
         private readonly RefToken actor = RefToken.User("me");
@@ -37,11 +39,13 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         public CommentsGrainTests()
         {
+            A.CallTo(() => identity.PrimaryKeyString)
+                .Returns(Id);
+
             A.CallTo(() => eventStore.AppendAsync(A<Guid>._, A<string>._, A<long>._, A<ICollection<EventData>>._, default))
                 .Invokes(x => LastEvents = sut!.GetUncommittedEvents().Select(x => x.To<IEvent>()).ToList());
 
-            sut = new CommentsGrain(eventStore, eventDataFormatter);
-            sut.ActivateAsync(Id).Wait();
+            sut = new CommentsGrain(identity, eventFormatter, eventStore);
         }
 
         [Fact]
@@ -51,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var result = await sut.ExecuteAsync(CreateCommentsCommand(command));
 
-            result.Value.ShouldBeEquivalent(CommandResult.Empty(commentsId, 0, EtagVersion.Empty));
+            result.ShouldBeEquivalent(CommandResult.Empty(commentsId, 0, EtagVersion.Empty));
 
             (await sut.GetCommentsAsync(0)).Should().BeEquivalentTo(new CommentsResult
             {
@@ -82,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var result = await sut.ExecuteAsync(CreateCommentsCommand(updateCommand));
 
-            result.Value.ShouldBeEquivalent(CommandResult.Empty(commentsId, 1, 0));
+            result.ShouldBeEquivalent(CommandResult.Empty(commentsId, 1, 0));
 
             (await sut.GetCommentsAsync(-1)).Should().BeEquivalentTo(new CommentsResult
             {
@@ -118,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var result = await sut.ExecuteAsync(CreateCommentsCommand(deleteCommand));
 
-            result.Value.ShouldBeEquivalent(CommandResult.Empty(commentsId, 2, 1));
+            result.ShouldBeEquivalent(CommandResult.Empty(commentsId, 2, 1));
 
             (await sut.GetCommentsAsync(-1)).Should().BeEquivalentTo(new CommentsResult
             {

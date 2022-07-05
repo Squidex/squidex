@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
@@ -94,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var grain = A.Fake<IContentGrain>();
 
-            A.CallTo(() => grain.ExecuteAsync(A<J<CommandRequest>>._))
+            A.CallTo(() => grain.ExecuteAsync(A<IAggregateCommand>._))
                 .Returns(new CommandResult(command.AggregateId, 1, 0, result));
 
             A.CallTo(() => grainFactory.GetGrain<IContentGrain>(command.AggregateId.ToString(), null))

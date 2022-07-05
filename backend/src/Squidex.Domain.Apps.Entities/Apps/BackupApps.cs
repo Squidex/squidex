@@ -37,9 +37,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             IAppUISettings appUISettings)
         {
             this.appsIndex = appsIndex;
-            this.rebuilder = rebuilder;
             this.appImageStore = appImageStore;
             this.appUISettings = appUISettings;
+            this.rebuilder = rebuilder;
         }
 
         public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context,

@@ -32,8 +32,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private sealed record ErrorJob(Exception Exception, object? Sender);
 
         public BatchSubscriber(
-            EventConsumerProcessor grain,
-            IEventDataFormatter eventDataFormatter,
+            EventConsumerProcessor processor,
+            IEventFormatter eventFormatter,
             IEventConsumer eventConsumer,
             Func<IEventSubscriber, IEventSubscription> factory)
         {
@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                         if (eventConsumer.Handles(storedEvent))
                         {
-                            @event = eventDataFormatter.ParseIfKnown(storedEvent);
+                            @event = eventFormatter.ParseIfKnown(storedEvent);
                         }
 
                         await batchQueue.Writer.WriteAsync(new BatchItem(@event, storedEvent.EventPosition, sender), completed.Token);
@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }).ContinueWith(x => batchQueue.Writer.TryComplete(x.Exception));
 #pragma warning restore MA0040 // Flow the cancellation token
 
-            handleTask = Run(grain);
+            handleTask = Run(processor);
         }
 
         private async Task Run(EventConsumerProcessor grain)

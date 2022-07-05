@@ -7,10 +7,8 @@
 
 namespace Squidex.Infrastructure.States
 {
-    public interface IBatchContext<T> : IAsyncDisposable, IPersistenceFactory<T>
+    public interface IEventStreamNames
     {
-        Task CommitAsync();
-
-        Task LoadAsync(IEnumerable<DomainId> ids);
+        string GetStreamName(Type aggregateType, string id);
     }
 }

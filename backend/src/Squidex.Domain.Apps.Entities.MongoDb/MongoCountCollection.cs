@@ -7,7 +7,6 @@
 
 using MongoDB.Driver;
 using NodaTime;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Tasks;
 

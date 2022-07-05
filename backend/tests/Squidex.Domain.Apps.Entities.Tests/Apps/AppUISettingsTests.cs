@@ -10,7 +10,6 @@ using Orleans;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps
@@ -35,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var settings = new JsonObject();
 
             A.CallTo(() => grain.GetAsync())
-                .Returns(settings.AsJ());
+                .Returns(settings);
 
             var result = await sut.GetAsync(DomainId.NewGuid(), "user");
 
@@ -49,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.SetAsync(DomainId.NewGuid(), "user", "the.path", value);
 
-            A.CallTo(() => grain.SetAsync("the.path", A<J<JsonValue>>.That.Matches(x => x.Value == value)))
+            A.CallTo(() => grain.SetAsync("the.path", value))
                 .MustHaveHappened();
         }
 
@@ -60,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.SetAsync(DomainId.NewGuid(), "user", value);
 
-            A.CallTo(() => grain.SetAsync(A<J<JsonObject>>.That.Matches(x => x.Value == value)))
+            A.CallTo(() => grain.SetAsync(value))
                 .MustHaveHappened();
         }
 

@@ -11,12 +11,12 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed class DefaultEventDataFormatter : IEventDataFormatter
+    public sealed class DefaultEventFormatter : IEventFormatter
     {
         private readonly IJsonSerializer serializer;
         private readonly TypeNameRegistry typeNameRegistry;
 
-        public DefaultEventDataFormatter(TypeNameRegistry typeNameRegistry, IJsonSerializer serializer)
+        public DefaultEventFormatter(TypeNameRegistry typeNameRegistry, IJsonSerializer serializer)
         {
             this.typeNameRegistry = typeNameRegistry;
 

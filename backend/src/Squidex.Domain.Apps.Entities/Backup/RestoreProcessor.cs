@@ -27,14 +27,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
     public sealed class RestoreProcessor
     {
         private readonly IBackupArchiveLocation backupArchiveLocation;
+        private readonly IBackupHandlerFactory backupHandlerFactory;
         private readonly IClock clock;
         private readonly ICommandBus commandBus;
+        private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
-        private readonly IEventDataFormatter eventDataFormatter;
-        private readonly ILogger<RestoreProcessor> log;
-        private readonly IServiceProvider serviceProvider;
-        private readonly IStreamNameResolver streamNameResolver;
+        private readonly IEventStreamNames eventStreamNames;
         private readonly IUserResolver userResolver;
+        private readonly ILogger<RestoreProcessor> log;
         private readonly SimpleState<BackupRestoreState> state;
         private RestoreContext runningContext;
         private StreamMapper runningStreamMapper;
@@ -46,23 +46,23 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public RestoreProcessor(
             IBackupArchiveLocation backupArchiveLocation,
+            IBackupHandlerFactory backupHandlerFactory,
             IClock clock,
             ICommandBus commandBus,
-            IEventDataFormatter eventDataFormatter,
+            IEventFormatter eventFormatter,
             IEventStore eventStore,
+            IEventStreamNames eventStreamNames,
             IPersistenceFactory<BackupRestoreState> persistenceFactory,
-            IServiceProvider serviceProvider,
-            IStreamNameResolver streamNameResolver,
             IUserResolver userResolver,
             ILogger<RestoreProcessor> log)
         {
             this.backupArchiveLocation = backupArchiveLocation;
+            this.backupHandlerFactory = backupHandlerFactory;
             this.clock = clock;
             this.commandBus = commandBus;
-            this.eventDataFormatter = eventDataFormatter;
+            this.eventFormatter = eventFormatter;
             this.eventStore = eventStore;
-            this.serviceProvider = serviceProvider;
-            this.streamNameResolver = streamNameResolver;
+            this.eventStreamNames = eventStreamNames;
             this.userResolver = userResolver;
             this.log = log;
 
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private async Task ProcessAsync(
             CancellationToken ct)
         {
-            var handlers = CreateHandlers();
+            var handlers = backupHandlerFactory.CreateMany();
 
             using (Telemetry.Activities.StartActivity("RestoreBackup"))
             {
@@ -294,7 +294,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     {
                         var offset = runningStreamMapper.GetStreamOffset(stream);
 
-                        commits.Add(EventCommit.Create(stream, offset, @event, eventDataFormatter));
+                        commits.Add(EventCommit.Create(stream, offset, @event, eventFormatter));
                     }
 
                     await eventStore.AppendUnsafeAsync(commits);
@@ -322,7 +322,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             batchBlock.BidirectionalLinkTo(writeBlock);
 
-            await foreach (var job in reader.ReadEventsAsync(streamNameResolver, eventDataFormatter))
+            await foreach (var job in reader.ReadEventsAsync(eventStreamNames, eventFormatter))
             {
                 var newStream = await HandleEventAsync(reader, handlers, job.Stream, job.Event);
 
@@ -417,11 +417,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 CurrentJob.Log.Add($"{clock.GetCurrentInstant()}: {message}");
             }
-        }
-
-        private IEnumerable<IBackupHandler> CreateHandlers()
-        {
-            return serviceProvider.GetRequiredService<IEnumerable<IBackupHandler>>();
         }
     }
 }

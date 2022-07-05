@@ -7,7 +7,6 @@
 
 using FluentAssertions;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers
 {
@@ -38,11 +37,6 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         public static void ShouldBeEquivalent<T>(this T lhs, T rhs)
         {
             lhs.Should().BeEquivalentTo(rhs, o => o.IncludingProperties());
-        }
-
-        public static void ShouldBeEquivalent<T>(this J<T> lhs, T rhs)
-        {
-            lhs.Value.Should().BeEquivalentTo(rhs, o => o.IncludingProperties());
         }
     }
 }

@@ -5,14 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.EventSourcing
+using Squidex.Infrastructure.States;
+
+namespace Squidex.Infrastructure.Commands
 {
-    public interface IEventDataFormatter
+    public interface IDomainObjectFactory
     {
-        Envelope<IEvent> Parse(StoredEvent storedEvent);
+        T Create<T>(DomainId id);
 
-        Envelope<IEvent>? ParseIfKnown(StoredEvent storedEvent);
-
-        EventData ToEventData(Envelope<IEvent> envelope, Guid commitId, bool migrate = true);
+        T Create<T, TState>(DomainId id, IPersistenceFactory<TState> factory);
     }
 }

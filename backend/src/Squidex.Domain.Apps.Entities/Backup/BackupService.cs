@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return messaging.PublishAsync(new BackupRemove(appId, backupId), ct: ct);
         }
 
-        public async Task<IRestoreJob?> GetRestoreAsync(
+        public async Task<IRestoreJob> GetRestoreAsync(
             CancellationToken ct = default)
         {
             await restoreState.LoadAsync(ct);

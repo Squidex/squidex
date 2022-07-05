@@ -41,7 +41,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public BackupContents(Rebuilder rebuilder, IUrlGenerator urlGenerator)
         {
             this.rebuilder = rebuilder;
-
             this.urlGenerator = urlGenerator;
         }
 

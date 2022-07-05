@@ -75,6 +75,5 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
 
             return Ok(response);
         }
-
     }
 }

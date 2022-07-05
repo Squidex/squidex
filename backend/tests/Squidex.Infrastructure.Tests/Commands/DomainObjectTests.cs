@@ -17,12 +17,28 @@ namespace Squidex.Infrastructure.Commands
     {
         private readonly IPersistenceFactory<MyDomainState> persistenceFactory = A.Fake<IPersistenceFactory<MyDomainState>>();
         private readonly IPersistence<MyDomainState> persistence = A.Fake<IPersistence<MyDomainState>>();
+        private readonly IPersistence<MyDomainState> persistenceEvents = A.Fake<IPersistence<MyDomainState>>();
         private readonly DomainId id = DomainId.NewGuid();
         private readonly MyDomainObject sut;
+        private HandleEvent? handleEvent;
 
         public DomainObjectTests()
         {
-            sut = new MyDomainObject(persistenceFactory);
+            A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
+                .Invokes(args =>
+                {
+                    handleEvent = args.GetArgument<HandleEvent>(2)!;
+                })
+                .Returns(persistenceEvents);
+
+            A.CallTo(() => persistenceFactory.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>._, A<HandleEvent>._))
+                .Invokes(args =>
+                {
+                    handleEvent = args.GetArgument<HandleEvent>(3)!;
+                })
+                .Returns(persistence);
+
+            sut = new MyDomainObject(id, persistenceFactory);
         }
 
         [Fact]
@@ -83,7 +99,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_create_old_event()
+        public async Task Should_migrate_old_event_with_state()
         {
             SetupCreated(new ValueChanged { Value = 10 }, new MultipleByTwiceEvent());
 
@@ -514,8 +530,6 @@ namespace Squidex.Infrastructure.Commands
 
         private void SetupCreated(params IEvent[] @events)
         {
-            var handleEvent = new HandleEvent(_ => true);
-
             var version = -1;
 
             A.CallTo(() => persistence.ReadAsync(-2, default))
@@ -525,27 +539,16 @@ namespace Squidex.Infrastructure.Commands
 
                     foreach (var @event in events)
                     {
-                        handleEvent(Envelope.Create(@event));
+                        handleEvent?.Invoke(Envelope.Create(@event));
                     }
                 });
 
-            A.CallTo(() => persistenceFactory.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>._, A<HandleEvent>._))
-                .Invokes(args =>
-                {
-                    handleEvent = args.GetArgument<HandleEvent>(3)!;
-                })
-                .Returns(persistence);
-
             A.CallTo(() => persistence.Version)
                 .ReturnsLazily(() => version);
-
-            sut.Setup(id);
         }
 
         private void SetupLoaded()
         {
-            var handleEvent = new HandleEvent(_ => true);
-
             var @events = new List<Envelope<IEvent>>();
 
             A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, default))
@@ -554,21 +557,12 @@ namespace Squidex.Infrastructure.Commands
                     @events.AddRange(args.GetArgument<IReadOnlyList<Envelope<IEvent>>>(0)!);
                 });
 
-            var eventsPersistence = A.Fake<IPersistence<MyDomainState>>();
-
-            A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
-                .Invokes(args =>
-                {
-                    handleEvent = args.GetArgument<HandleEvent>(2)!;
-                })
-                .Returns(eventsPersistence);
-
-            A.CallTo(() => eventsPersistence.ReadAsync(EtagVersion.Any, default))
+            A.CallTo(() => persistenceEvents.ReadAsync(EtagVersion.Any, default))
                 .Invokes(_ =>
                 {
                     foreach (var @event in events)
                     {
-                        handleEvent(@event);
+                        handleEvent?.Invoke(@event);
                     }
                 });
         }
@@ -580,8 +574,6 @@ namespace Squidex.Infrastructure.Commands
 
             A.CallTo(() => persistence.Version)
                 .Returns(-1);
-
-            sut.Setup(id);
         }
     }
 }

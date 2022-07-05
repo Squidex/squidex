@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Shared.Users;
 using Xunit;
 
@@ -47,8 +46,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             A.CallTo(() => grainFactory.GetGrain<ICommentsGrain>(commentsId.ToString(), null))
                 .Returns(grain);
 
-            A.CallTo(() => grain.ExecuteAsync(A<J<CommentsCommand>>.That.Matches(x => x.Value == command)))
-                .Returns(CommandResult.Empty(commentsId, 0, 0).AsJ());
+            A.CallTo(() => grain.ExecuteAsync(command))
+                .Returns(CommandResult.Empty(commentsId, 0, 0));
 
             var isNextCalled = false;
 

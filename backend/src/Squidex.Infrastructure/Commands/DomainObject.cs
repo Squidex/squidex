@@ -15,10 +15,10 @@ namespace Squidex.Infrastructure.Commands
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private readonly SnapshotList<T> snapshots = new SnapshotList<T>();
-        private readonly DomainId uniqueId;
-        private readonly IPersistenceFactory<T> factory;
         private readonly ILogger log;
-        private IPersistence<T>? persistence;
+        private readonly IPersistenceFactory<T> factory;
+        private readonly IPersistence<T> persistence;
+        private readonly DomainId uniqueId;
         private bool isLoaded;
 
         public DomainId UniqueId
@@ -50,7 +50,6 @@ namespace Squidex.Infrastructure.Commands
 
             this.uniqueId = uniqueId;
             this.factory = factory;
-            this.log = log;
 
             persistence = factory.WithSnapshotsAndEventSourcing(GetType(), UniqueId,
                 new HandleSnapshot<T>((snapshot, version) =>
@@ -60,10 +59,13 @@ namespace Squidex.Infrastructure.Commands
                 }),
                 @event =>
                 {
+                    // Some migrations needs the current state.
                     @event = @event.Migrate(Snapshot);
 
                     return ApplyEvent(@event, true, Snapshot, Version, true).Success;
                 });
+
+            this.log = log;
         }
 
         public async Task<T> GetSnapshotAsync(long version)
@@ -81,6 +83,7 @@ namespace Squidex.Infrastructure.Commands
 
                 var allEvents = factory.WithEventSourcing(GetType(), UniqueId, @event =>
                 {
+                    // Some migrations needs the current state.
                     @event = @event.Migrate(snapshot);
 
                     var (newSnapshot, isChanged) = ApplyEvent(@event, true, snapshot, snapshot.Version, false);
@@ -103,27 +106,24 @@ namespace Squidex.Infrastructure.Commands
             return result ?? new T { Version = EtagVersion.Empty };
         }
 
-        public virtual async Task EnsureLoadedAsync(bool silent = false)
+        public virtual async Task EnsureLoadedAsync()
         {
             if (isLoaded)
             {
                 return;
             }
 
-            if (silent)
+            await persistence.ReadAsync();
+
+            if (persistence.IsSnapshotStale)
             {
-                await ReadAsync();
-            }
-            else
-            {
-                var watch = ValueStopwatch.StartNew();
                 try
                 {
-                    await ReadAsync();
+                    await persistence.WriteSnapshotAsync(Snapshot);
                 }
-                finally
+                catch (Exception ex)
                 {
-                    log.LogInformation("Activated domain object of type {type} with ID {id} in {time}.", GetType(), UniqueId, watch.Stop());
+                    log.LogError(ex, "Failed to repair snapshot for domain object of type {type} with ID {id}.", GetType(), UniqueId);
                 }
             }
 
@@ -174,12 +174,11 @@ namespace Squidex.Infrastructure.Commands
                     var deletedId = DomainId.Combine(UniqueId, DomainId.Create("deleted"));
                     var deletedStream = factory.WithEventSourcing(GetType(), deletedId, null);
 
+                    // Write to the deleted stream first so we never loose this information.
                     await deletedStream.WriteEventsAsync(events);
 
-                    if (persistence != null)
-                    {
-                        await persistence.DeleteAsync();
-                    }
+                    // Cleanup the secondary stream first.
+                    await persistence.DeleteAsync();
 
                     snapshots.Clear();
                 }
@@ -218,7 +217,7 @@ namespace Squidex.Infrastructure.Commands
                 }
                 catch (InconsistentStateException)
                 {
-                    await EnsureLoadedAsync(true);
+                    await EnsureLoadedAsync();
 
                     if (wasDeleted)
                     {
@@ -327,48 +326,27 @@ namespace Squidex.Infrastructure.Commands
             return (newSnapshot, isChanged);
         }
 
-        private async Task ReadAsync()
-        {
-            if (persistence != null)
-            {
-                await persistence.ReadAsync();
-
-                if (persistence.IsSnapshotStale)
-                {
-                    try
-                    {
-                        await persistence.WriteSnapshotAsync(Snapshot);
-                    }
-                    catch (Exception ex)
-                    {
-                        log.LogError(ex, "Failed to repair snapshot for domain object of type {type} with ID {id}.", GetType(), UniqueId);
-                    }
-                }
-            }
-        }
-
         private async Task WriteAsync(Envelope<IEvent>[] newEvents)
         {
-            if (newEvents.Length > 0 && persistence != null)
+            if (newEvents.Length == 0)
             {
-                await persistence.WriteEventsAsync(newEvents);
-                await persistence.WriteSnapshotAsync(Snapshot);
+                return;
             }
+
+            await persistence.WriteEventsAsync(newEvents);
+            await persistence.WriteSnapshotAsync(Snapshot);
         }
 
         public async Task RebuildStateAsync()
         {
-            await EnsureLoadedAsync(true);
+            await EnsureLoadedAsync();
 
             if (Version <= EtagVersion.Empty)
             {
                 throw new DomainObjectNotFoundException(UniqueId.ToString());
             }
 
-            if (persistence != null)
-            {
-                await persistence.WriteSnapshotAsync(Snapshot);
-            }
+            await persistence.WriteSnapshotAsync(Snapshot);
         }
 
         protected virtual T Apply(T snapshot, Envelope<IEvent> @event)

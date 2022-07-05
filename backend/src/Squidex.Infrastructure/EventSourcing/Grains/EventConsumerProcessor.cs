@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
     public sealed class EventConsumerProcessor : IAsyncDisposable
     {
         private readonly SimpleState<EventConsumerState> state;
-        private readonly IEventDataFormatter eventDataFormatter;
+        private readonly IEventFormatter eventFormatter;
         private readonly IEventConsumer? eventConsumer;
         private readonly IEventStore eventStore;
         private readonly ILogger<EventConsumerProcessor> log;
@@ -31,12 +31,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         public EventConsumerProcessor(
             IPersistenceFactory<EventConsumerState> persistenceFactory,
             IEventConsumer eventConsumer,
+            IEventFormatter eventFormatter,
             IEventStore eventStore,
-            IEventDataFormatter eventDataFormatter,
             ILogger<EventConsumerProcessor> log)
         {
             this.eventStore = eventStore;
-            this.eventDataFormatter = eventDataFormatter;
+            this.eventFormatter = eventFormatter;
             this.eventConsumer = eventConsumer;
             this.log = log;
 
@@ -258,7 +258,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private BatchSubscriber CreateSubscription()
         {
-            return new BatchSubscriber(this, eventDataFormatter, eventConsumer!, CreateRetrySubscription);
+            return new BatchSubscriber(this, eventFormatter, eventConsumer!, CreateRetrySubscription);
         }
 
         private IEventSubscription CreateRetrySubscription(IEventSubscriber subscriber)

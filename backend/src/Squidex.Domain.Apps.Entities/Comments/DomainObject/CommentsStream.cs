@@ -22,8 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         private readonly List<Envelope<CommentsEvent>> uncommittedEvents = new List<Envelope<CommentsEvent>>();
         private readonly List<Envelope<CommentsEvent>> events = new List<Envelope<CommentsEvent>>();
         private readonly DomainId key;
+        private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
-        private readonly IEventDataFormatter eventDataFormatter;
         private long version = EtagVersion.Empty;
         private string streamName;
 
@@ -34,12 +34,12 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         public CommentsStream(
             DomainId key,
-            IEventStore eventStore,
-            IEventDataFormatter eventDataFormatter)
+            IEventFormatter eventFormatter,
+            IEventStore eventStore)
         {
             this.key = key;
+            this.eventFormatter = eventFormatter;
             this.eventStore = eventStore;
-            this.eventDataFormatter = eventDataFormatter;
         }
 
         public async Task LoadAsync(
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             foreach (var @event in storedEvents)
             {
-                var parsedEvent = eventDataFormatter.Parse(@event);
+                var parsedEvent = eventFormatter.Parse(@event);
 
                 version = @event.EventStreamNumber;
 
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 {
                     var commitId = Guid.NewGuid();
 
-                    var eventData = uncommittedEvents.Select(x => eventDataFormatter.ToEventData(x, commitId)).ToList();
+                    var eventData = uncommittedEvents.Select(x => eventFormatter.ToEventData(x, commitId)).ToList();
 
                     await eventStore.AppendAsync(commitId, streamName, previousVersion, eventData);
                 }

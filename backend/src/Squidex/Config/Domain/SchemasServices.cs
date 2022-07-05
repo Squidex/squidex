@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Entities.Search;
 
 namespace Squidex.Config.Domain

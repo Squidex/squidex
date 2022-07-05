@@ -7,6 +7,7 @@
 
 using FakeItEasy;
 using FluentAssertions;
+using Orleans.Core;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
@@ -18,17 +19,20 @@ namespace Squidex.Domain.Apps.Entities.Tags
 {
     public class TagGrainTests
     {
-        private readonly IGrainState<TagGrain.State> grainState = A.Fake<IGrainState<TagGrain.State>>();
+        private readonly IGrainIdentity identity = A.Fake<IGrainIdentity>();
+        private readonly IGrainState<TagGrain.State> state = A.Fake<IGrainState<TagGrain.State>>();
         private readonly string id = DomainId.NewGuid().ToString();
         private readonly TagGrain sut;
 
         public TagGrainTests()
         {
-            A.CallTo(() => grainState.ClearAsync())
-                .Invokes(() => grainState.Value = new TagGrain.State());
+            A.CallTo(() => identity.PrimaryKeyString)
+                .Returns(id);
 
-            sut = new TagGrain(grainState);
-            sut.ActivateAsync(id).Wait();
+            A.CallTo(() => state.ClearAsync())
+                .Invokes(() => state.Value = new TagGrain.State());
+
+            sut = new TagGrain(identity, state);
         }
 
         [Fact]
@@ -42,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             Assert.Empty(allTags);
 
-            A.CallTo(() => grainState.ClearAsync())
+            A.CallTo(() => state.ClearAsync())
                 .MustHaveHappened();
         }
 

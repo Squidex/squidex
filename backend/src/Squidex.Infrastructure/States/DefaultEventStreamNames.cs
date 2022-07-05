@@ -9,7 +9,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.States
 {
-    public sealed class DefaultStreamNameResolver : IStreamNameResolver
+    public sealed class DefaultEventStreamNames : IEventStreamNames
     {
         private static readonly string[] Suffixes = { "Grain", "DomainObject", "State" };
 

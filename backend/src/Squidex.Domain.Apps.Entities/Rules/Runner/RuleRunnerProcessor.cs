@@ -19,25 +19,25 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
     public sealed class RuleRunnerProcessor
     {
         private const int MaxErrors = 10;
-        private readonly SimpleState<RuleRunnerState> state;
-        private readonly DomainId appId;
         private readonly IAppProvider appProvider;
-        private readonly ILocalCache localCache;
+        private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
-        private readonly IEventDataFormatter eventDataFormatter;
+        private readonly ILocalCache localCache;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly IRuleService ruleService;
         private readonly ILogger<RuleRunnerProcessor> log;
+        private readonly SimpleState<RuleRunnerState> state;
+        private readonly DomainId appId;
         private CancellationTokenSource? currentJobToken;
         private bool isStopping;
 
         public RuleRunnerProcessor(
             DomainId appId,
-            IPersistenceFactory<RuleRunnerState> persistenceFactory,
             IAppProvider appProvider,
-            ILocalCache localCache,
+            IEventFormatter eventFormatter,
             IEventStore eventStore,
-            IEventDataFormatter eventDataFormatter,
+            ILocalCache localCache,
+            IPersistenceFactory<RuleRunnerState> persistenceFactory,
             IRuleEventRepository ruleEventRepository,
             IRuleService ruleService,
             ILogger<RuleRunnerProcessor> log)
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             this.appProvider = appProvider;
             this.localCache = localCache;
             this.eventStore = eventStore;
-            this.eventDataFormatter = eventDataFormatter;
+            this.eventFormatter = eventFormatter;
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
             this.log = log;
@@ -218,7 +218,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             {
                 try
                 {
-                    var @event = eventDataFormatter.ParseIfKnown(storedEvent);
+                    var @event = eventFormatter.ParseIfKnown(storedEvent);
 
                     if (@event != null)
                     {

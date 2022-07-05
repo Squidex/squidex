@@ -97,11 +97,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return attachmentEntry;
         }
 
-        public async IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter,
+        public async IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(
+            IEventStreamNames eventStreamNames, 
+            IEventFormatter eventFormatter,
             [EnumeratorCancellation] CancellationToken ct = default)
         {
-            Guard.NotNull(formatter);
-            Guard.NotNull(streamNameResolver);
+            Guard.NotNull(eventFormatter);
+            Guard.NotNull(eventStreamNames);
 
             while (!ct.IsCancellationRequested)
             {
@@ -117,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     var storedEvent = serializer.Deserialize<CompatibleStoredEvent>(stream).ToStoredEvent();
 
                     var eventStream = storedEvent.StreamName;
-                    var eventEnvelope = formatter.Parse(storedEvent);
+                    var eventEnvelope = eventFormatter.Parse(storedEvent);
 
                     yield return (eventStream, eventEnvelope);
                 }

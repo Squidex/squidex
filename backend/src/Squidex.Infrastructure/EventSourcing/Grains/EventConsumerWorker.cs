@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.DependencyInjection;
 using Squidex.Hosting;
 using Squidex.Messaging;
 
@@ -19,13 +18,11 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
     {
         private readonly Dictionary<string, EventConsumerProcessor> processors = new Dictionary<string, EventConsumerProcessor>();
 
-        public EventConsumerWorker(IEnumerable<IEventConsumer> eventConsumers, IServiceProvider serviceProvider)
+        public EventConsumerWorker(IEnumerable<IEventConsumer> eventConsumers, Func<IEventConsumer, EventConsumerProcessor> factory)
         {
             foreach (var consumer in eventConsumers)
             {
-                var processor = ActivatorUtilities.CreateInstance<EventConsumerProcessor>(serviceProvider, consumer);
-
-                processors[consumer.Name] = processor;
+                processors[consumer.Name] = factory(consumer);
             }
         }
 

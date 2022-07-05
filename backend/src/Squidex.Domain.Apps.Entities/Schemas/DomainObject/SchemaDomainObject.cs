@@ -405,5 +405,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
         {
             return NamedId.Of(Snapshot.SchemaFieldsTotal + 1, command.Name);
         }
+
+        public Task<ISchemaEntity> GetStateAsync()
+        {
+            return Task.FromResult<ISchemaEntity>(Snapshot);
+        }
     }
 }

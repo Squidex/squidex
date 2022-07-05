@@ -25,38 +25,38 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         private const int MaxBackups = 10;
         private static readonly Duration UpdateDuration = Duration.FromSeconds(1);
-        private readonly SimpleState<BackupState> state;
-        private readonly DomainId appId;
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IBackupArchiveStore backupArchiveStore;
+        private readonly IBackupHandlerFactory backupHandlerFactory;
         private readonly IClock clock;
-        private readonly IServiceProvider serviceProvider;
-        private readonly IEventDataFormatter eventDataFormatter;
+        private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
-        private readonly ILogger<BackupProcessor> log;
         private readonly IUserResolver userResolver;
+        private readonly ILogger<BackupProcessor> log;
+        private readonly SimpleState<BackupState> state;
+        private readonly DomainId appId;
         private CancellationTokenSource? currentJobToken;
         private BackupJob? currentJob;
 
         public BackupProcessor(
             DomainId appId,
-            IPersistenceFactory<BackupState> persistenceFactory,
             IBackupArchiveLocation backupArchiveLocation,
             IBackupArchiveStore backupArchiveStore,
+            IBackupHandlerFactory backupHandlerFactory,
             IClock clock,
-            IEventDataFormatter eventDataFormatter,
+            IEventFormatter eventFormatter,
             IEventStore eventStore,
-            IServiceProvider serviceProvider,
+            IPersistenceFactory<BackupState> persistenceFactory,
             IUserResolver userResolver,
             ILogger<BackupProcessor> log)
         {
             this.appId = appId;
             this.backupArchiveLocation = backupArchiveLocation;
             this.backupArchiveStore = backupArchiveStore;
+            this.backupHandlerFactory = backupHandlerFactory;
             this.clock = clock;
-            this.eventDataFormatter = eventDataFormatter;
+            this.eventFormatter = eventFormatter;
             this.eventStore = eventStore;
-            this.serviceProvider = serviceProvider;
             this.userResolver = userResolver;
             this.log = log;
 
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private async Task ProcessAsync(BackupJob job, RefToken actor,
             CancellationToken ct)
         {
-            var handlers = CreateHandlers();
+            var handlers = backupHandlerFactory.CreateMany();
 
             var lastTimestamp = job.Started;
 
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                         await foreach (var storedEvent in eventStore.QueryAllAsync(GetFilter(), ct: ct))
                         {
-                            var @event = eventDataFormatter.Parse(storedEvent);
+                            var @event = eventFormatter.Parse(storedEvent);
 
                             if (@event.Payload is SquidexEvent squidexEvent && squidexEvent.Actor != null)
                             {
@@ -260,11 +260,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
             state.Value.Jobs.Remove(job);
 
             await state.WriteAsync();
-        }
-
-        private IEnumerable<IBackupHandler> CreateHandlers()
-        {
-            return serviceProvider.GetRequiredService<IEnumerable<IBackupHandler>>();
         }
     }
 }

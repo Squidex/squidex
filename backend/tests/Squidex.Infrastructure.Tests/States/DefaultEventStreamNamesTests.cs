@@ -9,9 +9,9 @@ using Xunit;
 
 namespace Squidex.Infrastructure.States
 {
-    public class DefaultStreamNameResolverTests
+    public class DefaultEventStreamNamesTests
     {
-        private readonly DefaultStreamNameResolver sut = new DefaultStreamNameResolver();
+        private readonly DefaultEventStreamNames sut = new DefaultEventStreamNames();
 
         private sealed class MyUser
         {

@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public interface IStreamNameResolver
+    public interface IBackupHandlerFactory
     {
-        string GetStreamName(Type aggregateType, string id);
+        IEnumerable<IBackupHandler> CreateMany();
     }
 }
