@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly IAssetMetadataSource assetMetadataSource1 = A.Fake<IAssetMetadataSource>();
         private readonly IAssetMetadataSource assetMetadataSource2 = A.Fake<IAssetMetadataSource>();
-        private readonly IJsonSerializer jsonSerializer = A.Fake<IJsonSerializer>();
+        private readonly IJsonSerializer serializer = A.Fake<IJsonSerializer>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly Context requestContext;
         private readonly AssetEnricher sut;
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             requestContext = Context.Anonymous(Mocks.App(appId));
 
-            sut = new AssetEnricher(tagService, assetMetadataSources, requestCache, urlGenerator, jsonSerializer);
+            sut = new AssetEnricher(tagService, assetMetadataSources, requestCache, urlGenerator, serializer);
         }
 
         [Fact]

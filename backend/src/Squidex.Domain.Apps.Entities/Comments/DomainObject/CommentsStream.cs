@@ -17,7 +17,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 {
-    public class CommentsStream : IExecutable
+    public class CommentsStream : IAggregate
     {
         private readonly List<Envelope<CommentsEvent>> uncommittedEvents = new List<Envelope<CommentsEvent>>();
         private readonly List<Envelope<CommentsEvent>> events = new List<Envelope<CommentsEvent>>();

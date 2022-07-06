@@ -15,10 +15,10 @@ namespace Squidex.Infrastructure.States
     {
         private static readonly List<Envelope<IEvent>> EmptyStream = new List<Envelope<IEvent>>();
         private readonly Type owner;
-        private readonly ISnapshotStore<T> snapshotStore;
         private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
         private readonly IEventStreamNames eventStreamNames;
+        private readonly ISnapshotStore<T> snapshotStore;
         private readonly Dictionary<DomainId, (long, List<Envelope<IEvent>>)> @events = new Dictionary<DomainId, (long, List<Envelope<IEvent>>)>();
         private Dictionary<DomainId, SnapshotWriteJob<T>>? snapshots;
 
@@ -32,10 +32,10 @@ namespace Squidex.Infrastructure.States
             ISnapshotStore<T> snapshotStore)
         {
             this.owner = owner;
-            this.snapshotStore = snapshotStore;
-            this.eventStore = eventStore;
             this.eventFormatter = eventFormatter;
+            this.eventStore = eventStore;
             this.eventStreamNames = eventStreamNames;
+            this.snapshotStore = snapshotStore;
         }
 
         internal void Add(DomainId key, T snapshot, long version)

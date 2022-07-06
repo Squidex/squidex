@@ -18,21 +18,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
         private readonly CancellationToken ct;
         private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
+        private readonly IDomainObjectCache domainObjectCache = A.Fake<IDomainObjectCache>();
         private readonly ContentDomainObject domainObject = A.Fake<ContentDomainObject>();
         private readonly DomainId appId = DomainId.NewGuid();
         private readonly DomainId id = DomainId.NewGuid();
+        private readonly DomainId unqiueId;
         private readonly ContentLoader sut;
 
         public ContentLoaderTests()
         {
             ct = cts.Token;
 
-            var key = DomainId.Combine(appId, id);
+            unqiueId = DomainId.Combine(appId, id);
 
-            A.CallTo(() => domainObjectFactory.Create<ContentDomainObject>(key))
+            A.CallTo(() => domainObjectFactory.Create<ContentDomainObject>(unqiueId))
                 .Returns(domainObject);
 
-            sut = new ContentLoader(domainObjectFactory);
+            sut = new ContentLoader(domainObjectFactory, domainObjectCache);
         }
 
         [Fact]
@@ -92,6 +94,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var result = await sut.GetAsync(appId, id, 10, ct);
 
             Assert.Same(content, result);
+        }
+
+        [Fact]
+        public async Task Should_return_content_from_cache()
+        {
+            var content = new ContentDomainObject.State { Version = 10 };
+
+            A.CallTo(() => domainObjectCache.GetAsync<ContentDomainObject.State>(DomainId.Combine(appId, id), 10, ct))
+                .Returns(content);
+
+            var result = await sut.GetAsync(appId, id, 10, ct);
+
+            Assert.Same(content, result);
+
+            A.CallTo(() => domainObjectFactory.Create<ContentDomainObject>(unqiueId))
+                .MustHaveHappened();
         }
     }
 }

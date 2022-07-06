@@ -13,12 +13,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 {
     public sealed class CalculateTokens : IContentEnricherStep
     {
-        private readonly IJsonSerializer jsonSerializer;
+        private readonly IJsonSerializer serializer;
         private readonly IUrlGenerator urlGenerator;
 
-        public CalculateTokens(IUrlGenerator urlGenerator, IJsonSerializer jsonSerializer)
+        public CalculateTokens(IUrlGenerator urlGenerator, IJsonSerializer serializer)
         {
-            this.jsonSerializer = jsonSerializer;
+            this.serializer = serializer;
             this.urlGenerator = urlGenerator;
         }
 
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                     u = url
                 };
 
-                var json = jsonSerializer.Serialize(token);
+                var json = serializer.Serialize(token);
 
                 content.EditToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
             }

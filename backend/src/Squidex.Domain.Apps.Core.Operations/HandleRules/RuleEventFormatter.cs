@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         private const string GlobalFallback = "null";
         private static readonly Regex RegexPatternOld = new Regex(@"^(?<FullPath>(?<Type>[^_]*)_(?<Path>[^\s]*))", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
         private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<FullPath>(?<Type>[\w]+)_(?<Path>[\w\.\-]+))[\s]*(\|[\s]*(?<Transform>[^\?}]+))?(\?[\s]*(?<Fallback>[^\}\s]+))?[\s]*\}", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-        private readonly IJsonSerializer jsonSerializer;
+        private readonly IJsonSerializer serializer;
         private readonly IEnumerable<IRuleEventFormatter> formatters;
         private readonly ITemplateEngine templateEngine;
         private readonly IScriptEngine scriptEngine;
@@ -69,9 +69,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
         }
 
-        public RuleEventFormatter(IJsonSerializer jsonSerializer, IEnumerable<IRuleEventFormatter> formatters, ITemplateEngine templateEngine, IScriptEngine scriptEngine)
+        public RuleEventFormatter(IJsonSerializer serializer, IEnumerable<IRuleEventFormatter> formatters, ITemplateEngine templateEngine, IScriptEngine scriptEngine)
         {
-            this.jsonSerializer = jsonSerializer;
+            this.serializer = serializer;
             this.formatters = formatters;
             this.templateEngine = templateEngine;
             this.scriptEngine = scriptEngine;
@@ -81,14 +81,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             var payload = @event;
 
-            return jsonSerializer.Serialize(payload);
+            return serializer.Serialize(payload);
         }
 
         public virtual string ToEnvelope(EnrichedEvent @event)
         {
             var payload = new { type = @event.Name, payload = @event, timestamp = @event.Timestamp };
 
-            return jsonSerializer.Serialize(payload);
+            return serializer.Serialize(payload);
         }
 
         public async ValueTask<string?> FormatAsync(string text, EnrichedEvent @event)

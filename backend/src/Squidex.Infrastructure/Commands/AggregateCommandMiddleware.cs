@@ -7,11 +7,12 @@
 
 namespace Squidex.Infrastructure.Commands
 {
-    public class ExecutableMiddleware<TCommand, T> : ICommandMiddleware where TCommand : IAggregateCommand where T : IExecutable
+    public class AggregateCommandMiddleware<TCommand, TTarget> : ICommandMiddleware
+        where TCommand : IAggregateCommand where TTarget : IAggregate
     {
         private readonly IDomainObjectFactory domainObjectFactory;
 
-        public ExecutableMiddleware(IDomainObjectFactory domainObjectFactory)
+        public AggregateCommandMiddleware(IDomainObjectFactory domainObjectFactory)
         {
             this.domainObjectFactory = domainObjectFactory;
         }
@@ -39,11 +40,16 @@ namespace Squidex.Infrastructure.Commands
             return Task.FromResult(result.Payload is None ? result : result.Payload);
         }
 
-        private Task<CommandResult> ExecuteCommandAsync(TCommand typedCommand)
+        protected virtual Task<CommandResult> ExecuteCommandAsync(TCommand command)
         {
-            var executable = domainObjectFactory.Create<T>(typedCommand.AggregateId);
+            var executable = domainObjectFactory.Create<TTarget>(command.AggregateId);
 
-            return executable.ExecuteAsync(typedCommand);
+            return ExecuteCommandAsync(executable, command);
+        }
+
+        protected virtual Task<CommandResult> ExecuteCommandAsync(TTarget executable, TCommand command)
+        {
+            return executable.ExecuteAsync(command);
         }
     }
 }

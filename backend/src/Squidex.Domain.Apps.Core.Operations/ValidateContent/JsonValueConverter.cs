@@ -22,19 +22,19 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         private static readonly JsonValueConverter Instance = new JsonValueConverter();
 
-        public record struct Args(JsonValue Value, IJsonSerializer JsonSerializer, ResolvedComponents Components);
+        public record struct Args(JsonValue Value, IJsonSerializer Serializer, ResolvedComponents Components);
 
         private JsonValueConverter()
         {
         }
 
-        public static (object? Result, JsonError? Error) ConvertValue(IField field, JsonValue value, IJsonSerializer jsonSerializer,
+        public static (object? Result, JsonError? Error) ConvertValue(IField field, JsonValue value, IJsonSerializer serializer,
             ResolvedComponents components)
         {
             Guard.NotNull(field);
             Guard.NotNull(value);
 
-            var args = new Args(value, jsonSerializer, components);
+            var args = new Args(value, serializer, components);
 
             return field.Accept(Instance, args);
         }

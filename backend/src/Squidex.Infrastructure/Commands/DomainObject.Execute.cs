@@ -9,24 +9,27 @@ namespace Squidex.Infrastructure.Commands
 {
     public partial class DomainObject<T>
     {
-        protected Task<CommandResult> CreateReturnAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler) where TCommand : ICommand
+        protected Task<CommandResult> CreateReturnAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler,
+            CancellationToken ct = default) where TCommand : ICommand
         {
             EnsureCanCreate(command);
 
-            return UpsertCoreAsync(command, handler, true);
+            return UpsertCoreAsync(command, handler, true, ct);
         }
 
-        protected Task<CommandResult> CreateReturn<TCommand>(TCommand command, Func<TCommand, object?> handler) where TCommand : ICommand
+        protected Task<CommandResult> CreateReturn<TCommand>(TCommand command, Func<TCommand, object?> handler,
+            CancellationToken ct = default) where TCommand : ICommand
         {
             return CreateReturnAsync(command, x =>
             {
                 var result = handler(x);
 
                 return Task.FromResult(result);
-            });
+            }, ct);
         }
 
-        protected Task<CommandResult> CreateAsync<TCommand>(TCommand command, Func<TCommand, Task> handler) where TCommand : ICommand
+        protected Task<CommandResult> CreateAsync<TCommand>(TCommand command, Func<TCommand, Task> handler,
+            CancellationToken ct = default) where TCommand : ICommand
         {
             EnsureCanCreate(command);
 
@@ -35,37 +38,41 @@ namespace Squidex.Infrastructure.Commands
                 await handler(x);
 
                 return None.Value;
-            }, true);
+            }, true, ct);
         }
 
-        protected Task<CommandResult> Create<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : ICommand
+        protected Task<CommandResult> Create<TCommand>(TCommand command, Action<TCommand> handler,
+            CancellationToken ct = default) where TCommand : ICommand
         {
             return CreateAsync(command, x =>
             {
                 handler(x);
 
                 return Task.FromResult<object?>(None.Value);
-            });
+            }, ct);
         }
 
-        protected async Task<CommandResult> UpdateReturnAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler) where TCommand : ICommand
+        protected async Task<CommandResult> UpdateReturnAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler,
+            CancellationToken ct = default) where TCommand : ICommand
         {
             await EnsureCanUpdateAsync(command);
 
-            return await UpsertCoreAsync(command, handler);
+            return await UpsertCoreAsync(command, handler, false, ct);
         }
 
-        protected Task<CommandResult> UpdateReturn<TCommand>(TCommand command, Func<TCommand, object?> handler) where TCommand : ICommand
+        protected Task<CommandResult> UpdateReturn<TCommand>(TCommand command, Func<TCommand, object?> handler,
+            CancellationToken ct = default) where TCommand : ICommand
         {
             return UpdateReturnAsync(command, x =>
             {
                 var result = handler(x);
 
                 return Task.FromResult(result);
-            });
+            }, ct);
         }
 
-        protected async Task<CommandResult> UpdateAsync<TCommand>(TCommand command, Func<TCommand, Task> handler) where TCommand : ICommand
+        protected async Task<CommandResult> UpdateAsync<TCommand>(TCommand command, Func<TCommand, Task> handler,
+            CancellationToken ct = default) where TCommand : ICommand
         {
             await EnsureCanUpdateAsync(command);
 
@@ -74,37 +81,41 @@ namespace Squidex.Infrastructure.Commands
                 await handler(x);
 
                 return None.Value;
-            }, true);
+            }, true, ct);
         }
 
-        protected async Task<CommandResult> Update<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : ICommand
+        protected async Task<CommandResult> Update<TCommand>(TCommand command, Action<TCommand> handler,
+            CancellationToken ct = default) where TCommand : ICommand
         {
             return await UpdateAsync(command, x =>
             {
                 handler(x);
 
                 return Task.FromResult<object?>(None.Value);
-            });
+            }, ct);
         }
 
-        protected async Task<CommandResult> UpsertReturnAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler) where TCommand : ICommand
+        protected async Task<CommandResult> UpsertReturnAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler,
+            CancellationToken ct = default) where TCommand : ICommand
         {
             await EnsureCanUpsertAsync(command);
 
-            return await UpsertCoreAsync(command, handler, true);
+            return await UpsertCoreAsync(command, handler, true, ct);
         }
 
-        protected async Task<CommandResult> UpsertReturn<TCommand>(TCommand command, Func<TCommand, object?> handler) where TCommand : ICommand
+        protected async Task<CommandResult> UpsertReturn<TCommand>(TCommand command, Func<TCommand, object?> handler,
+            CancellationToken ct = default) where TCommand : ICommand
         {
             return await UpsertReturnAsync(command, x =>
             {
                 var result = handler(x);
 
                 return Task.FromResult(result);
-            });
+            }, ct);
         }
 
-        protected async Task<CommandResult> UpsertAsync<TCommand>(TCommand command, Func<TCommand, Task> handler) where TCommand : ICommand
+        protected async Task<CommandResult> UpsertAsync<TCommand>(TCommand command, Func<TCommand, Task> handler,
+            CancellationToken ct = default) where TCommand : ICommand
         {
             await EnsureCanUpsertAsync(command);
 
@@ -113,10 +124,11 @@ namespace Squidex.Infrastructure.Commands
                 await handler(x);
 
                 return None.Value;
-            }, true);
+            }, true, ct);
         }
 
-        protected async Task<CommandResult> Upsert<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : ICommand
+        protected async Task<CommandResult> Upsert<TCommand>(TCommand command, Action<TCommand> handler,
+            CancellationToken ct = default) where TCommand : ICommand
         {
             Guard.NotNull(handler);
 
@@ -125,10 +137,11 @@ namespace Squidex.Infrastructure.Commands
                 handler(x);
 
                 return Task.FromResult<object?>(None.Value);
-            });
+            }, ct);
         }
 
-        protected async Task<CommandResult> DeletePermanentAsync<TCommand>(TCommand command, Func<TCommand, Task> handler) where TCommand : ICommand
+        protected async Task<CommandResult> DeletePermanentAsync<TCommand>(TCommand command, Func<TCommand, Task> handler,
+            CancellationToken ct = default) where TCommand : ICommand
         {
             Guard.NotNull(handler);
 
@@ -139,10 +152,11 @@ namespace Squidex.Infrastructure.Commands
                 await handler(x);
 
                 return None.Value;
-            });
+            }, ct);
         }
 
-        protected async Task<CommandResult> DeletePermanent<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : ICommand
+        protected async Task<CommandResult> DeletePermanent<TCommand>(TCommand command, Action<TCommand> handler,
+            CancellationToken ct = default) where TCommand : ICommand
         {
             Guard.NotNull(handler);
 
@@ -151,7 +165,7 @@ namespace Squidex.Infrastructure.Commands
                 handler(x);
 
                 return Task.FromResult<object?>(None.Value);
-            });
+            }, ct);
         }
 
         private void EnsureCanCreate<TCommand>(TCommand command) where TCommand : ICommand

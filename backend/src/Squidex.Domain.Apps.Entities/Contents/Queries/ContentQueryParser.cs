@@ -29,15 +29,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     {
         private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
         private readonly IMemoryCache cache;
-        private readonly IJsonSerializer jsonSerializer;
+        private readonly IJsonSerializer serializer;
         private readonly IAppProvider appprovider;
         private readonly ITextIndex textIndex;
         private readonly ContentOptions options;
 
         public ContentQueryParser(IAppProvider appprovider, ITextIndex textIndex, IOptions<ContentOptions> options,
-            IMemoryCache cache, IJsonSerializer jsonSerializer)
+            IMemoryCache cache, IJsonSerializer serializer)
         {
-            this.jsonSerializer = jsonSerializer;
+            this.serializer = serializer;
             this.appprovider = appprovider;
             this.textIndex = textIndex;
             this.cache = cache;
@@ -186,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var queryModel = BuildQueryModel(context, schema, components);
 
-            return queryModel.Parse(json, jsonSerializer);
+            return queryModel.Parse(json, serializer);
         }
 
         private ClrQuery ParseOData(Context context, ISchemaEntity? schema, string odata,

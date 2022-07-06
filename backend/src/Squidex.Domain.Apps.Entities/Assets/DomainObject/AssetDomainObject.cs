@@ -29,8 +29,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             : base(id, persistence, log)
         {
             this.serviceProvider = serviceProvider;
-
-            Capacity = 2;
         }
 
         protected override bool IsDeleted(State snapshot)

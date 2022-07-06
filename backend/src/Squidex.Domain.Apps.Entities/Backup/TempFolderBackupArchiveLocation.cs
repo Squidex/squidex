@@ -14,11 +14,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
     [ExcludeFromCodeCoverage]
     public sealed class TempFolderBackupArchiveLocation : IBackupArchiveLocation
     {
-        private readonly IJsonSerializer jsonSerializer;
+        private readonly IJsonSerializer serializer;
 
-        public TempFolderBackupArchiveLocation(IJsonSerializer jsonSerializer)
+        public TempFolderBackupArchiveLocation(IJsonSerializer serializer)
         {
-            this.jsonSerializer = jsonSerializer;
+            this.serializer = serializer;
         }
 
         public async Task<IBackupReader> OpenReaderAsync(Uri url, DomainId id)
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             try
             {
-                return new BackupReader(jsonSerializer, stream);
+                return new BackupReader(serializer, stream);
             }
             catch (IOException)
             {
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public Task<IBackupWriter> OpenWriterAsync(Stream stream)
         {
-            var writer = new BackupWriter(jsonSerializer, stream, true);
+            var writer = new BackupWriter(serializer, stream, true);
 
             return Task.FromResult<IBackupWriter>(writer);
         }

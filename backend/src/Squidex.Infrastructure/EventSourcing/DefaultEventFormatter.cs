@@ -19,7 +19,6 @@ namespace Squidex.Infrastructure.EventSourcing
         public DefaultEventFormatter(TypeNameRegistry typeNameRegistry, IJsonSerializer serializer)
         {
             this.typeNameRegistry = typeNameRegistry;
-
             this.serializer = serializer;
         }
 

@@ -8,7 +8,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { AdministrationAreaComponent, ClusterPageComponent, EventConsumerComponent, EventConsumersPageComponent, EventConsumersService, EventConsumersState, RestorePageComponent, UserComponent, UserMustExistGuard, UserPageComponent, UsersPageComponent, UsersService, UsersState } from './declarations';
+import { AdministrationAreaComponent, EventConsumerComponent, EventConsumersPageComponent, EventConsumersService, EventConsumersState, RestorePageComponent, UserComponent, UserMustExistGuard, UserPageComponent, UsersPageComponent, UsersService, UsersState } from './declarations';
 
 const routes: Routes = [
     {
@@ -21,10 +21,6 @@ const routes: Routes = [
                     {
                         path: 'event-consumers',
                         component: EventConsumersPageComponent,
-                    },
-                    {
-                        path: 'cluster',
-                        component: ClusterPageComponent,
                     },
                     {
                         path: 'restore',
@@ -59,7 +55,6 @@ const routes: Routes = [
     ],
     declarations: [
         AdministrationAreaComponent,
-        ClusterPageComponent,
         EventConsumerComponent,
         EventConsumersPageComponent,
         RestorePageComponent,

@@ -36,9 +36,6 @@ interface Snapshot {
     // Indicates if the user can restore backups.
     canRestore?: boolean;
 
-    // Indicates if the user can see the orleans dashboard.
-    canUseOrleans?: boolean;
-
     // Indicates if the user can use at least one admin resource.
     canUserAdminResource?: boolean;
 }
@@ -63,11 +60,8 @@ export class UIState extends State<Snapshot> {
     public canRestore =
         this.project(x => x.canRestore === true);
 
-    public canUseOrleans =
-        this.project(x => x.canUseOrleans === true);
-
     public canUserAdminResource =
-        this.project(x => x.canRestore === true || x.canReadUsers === true || x.canReadEvents === true || x.canUseOrleans);
+        this.project(x => x.canRestore === true || x.canReadUsers === true || x.canReadEvents === true);
 
     public get<T>(path: string, defaultValue: T) {
         return this.settings.pipe(map(x => getValue(x, path, defaultValue)),
@@ -144,7 +138,6 @@ export class UIState extends State<Snapshot> {
                     canReadEvents: hasAnyLink(payload, 'admin/events'),
                     canReadUsers: hasAnyLink(payload, 'admin/users'),
                     canRestore: hasAnyLink(payload, 'admin/restore'),
-                    canUseOrleans: hasAnyLink(payload, 'admin/orleans'),
                 }, 'Loading Resources Done');
             });
     }

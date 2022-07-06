@@ -5,14 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
+using MongoDB.Bson.Serialization.Attributes;
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Caching
 {
-    public interface IDomainState<out T>
+    public sealed class MongoCacheEntry
     {
-        long Version { get; set; }
+        [BsonId]
+        public string Key { get; set; }
 
-        T Apply(Envelope<IEvent> @event);
+        [BsonElement]
+        public DateTime Expires { get; set; }
+
+        [BsonElement]
+        public byte[] Value { get; set; }
     }
 }

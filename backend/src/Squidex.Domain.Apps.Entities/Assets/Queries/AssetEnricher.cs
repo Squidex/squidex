@@ -21,16 +21,16 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         private readonly IEnumerable<IAssetMetadataSource> assetMetadataSources;
         private readonly IRequestCache requestCache;
         private readonly IUrlGenerator urlGenerator;
-        private readonly IJsonSerializer jsonSerializer;
+        private readonly IJsonSerializer serializer;
 
         public AssetEnricher(ITagService tagService, IEnumerable<IAssetMetadataSource> assetMetadataSources, IRequestCache requestCache,
-            IUrlGenerator urlGenerator, IJsonSerializer jsonSerializer)
+            IUrlGenerator urlGenerator, IJsonSerializer serializer)
         {
             this.tagService = tagService;
             this.assetMetadataSources = assetMetadataSources;
             this.requestCache = requestCache;
             this.urlGenerator = urlGenerator;
-            this.jsonSerializer = jsonSerializer;
+            this.serializer = serializer;
         }
 
         public async Task<IEnrichedAssetEntity> EnrichAsync(IAssetEntity asset, Context context,
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                     u = url
                 };
 
-                var json = jsonSerializer.Serialize(token);
+                var json = serializer.Serialize(token);
 
                 asset.EditToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
             }

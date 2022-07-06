@@ -24,13 +24,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     {
         private readonly QueryModel queryModel = AssetQueryModel.Build();
         private readonly IEdmModel edmModel;
-        private readonly IJsonSerializer jsonSerializer;
+        private readonly IJsonSerializer serializer;
         private readonly ITagService tagService;
         private readonly AssetOptions options;
 
-        public AssetQueryParser(IJsonSerializer jsonSerializer, ITagService tagService, IOptions<AssetOptions> options)
+        public AssetQueryParser(IJsonSerializer serializer, ITagService tagService, IOptions<AssetOptions> options)
         {
-            this.jsonSerializer = jsonSerializer;
+            this.serializer = serializer;
             this.tagService = tagService;
             this.options = options.Value;
 
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         private ClrQuery ParseJson(string json)
         {
-            return queryModel.Parse(json, jsonSerializer);
+            return queryModel.Parse(json, serializer);
         }
 
         private ClrQuery ParseOData(string odata)

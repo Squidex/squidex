@@ -18,8 +18,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 {
     public sealed class MongoSchemaRepository : MongoSnapshotStoreBase<SchemaDomainObject.State, MongoSchemaEntity>, ISchemaRepository, IDeleter
     {
-        public MongoSchemaRepository(IMongoDatabase database, JsonSerializer jsonSerializer)
-            : base(database, jsonSerializer)
+        public MongoSchemaRepository(IMongoDatabase database, JsonSerializer serializer)
+            : base(database, serializer)
         {
         }
 

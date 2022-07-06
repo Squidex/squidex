@@ -7,8 +7,12 @@
 
 namespace Squidex.Infrastructure.Commands
 {
-    public interface IExecutable
+    public interface IDomainObjectCache
     {
-        Task<CommandResult> ExecuteAsync(IAggregateCommand command);
+        Task<T> GetAsync<T>(DomainId id, long version,
+            CancellationToken ct = default);
+
+        Task SetAsync<T>(DomainId id, long version, T snapshot,
+            CancellationToken ct = default);
     }
 }

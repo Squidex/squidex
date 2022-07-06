@@ -12,8 +12,8 @@ namespace Squidex.Infrastructure.States
 {
     public sealed class MongoSnapshotStore<T> : MongoSnapshotStoreBase<T, MongoState<T>>
     {
-        public MongoSnapshotStore(IMongoDatabase database, JsonSerializer jsonSerializer)
-            : base(database, jsonSerializer)
+        public MongoSnapshotStore(IMongoDatabase database, JsonSerializer serializer)
+            : base(database, serializer)
         {
         }
     }

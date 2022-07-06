@@ -14,28 +14,51 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     public sealed class ContentLoader : IContentLoader
     {
         private readonly IDomainObjectFactory domainObjectFactory;
+        private readonly IDomainObjectCache domainObjectCache;
 
-        public ContentLoader(IDomainObjectFactory domainObjectFactory)
+        public ContentLoader(IDomainObjectFactory domainObjectFactory, IDomainObjectCache domainObjectCache)
         {
             this.domainObjectFactory = domainObjectFactory;
+            this.domainObjectCache = domainObjectCache;
         }
 
         public async Task<IContentEntity?> GetAsync(DomainId appId, DomainId id, long version = EtagVersion.Any,
             CancellationToken ct = default)
         {
+            var uniqueId = DomainId.Combine(appId, id);
+
+            var content = await GetCachedAsync(uniqueId, version, ct);
+
+            if (content == null)
+            {
+                content = await GetAsync(uniqueId, version, ct);
+            }
+
+            if (content == null || content.Version <= EtagVersion.Empty || (version > EtagVersion.Any && content.Version != version))
+            {
+                return null;
+            }
+
+            return content;
+        }
+
+        private async Task<ContentDomainObject.State?> GetCachedAsync(DomainId uniqueId, long version,
+            CancellationToken ct)
+        {
+            using (Telemetry.Activities.StartActivity("ContentLoader/GetCachedAsync"))
+            {
+                return await domainObjectCache.GetAsync<ContentDomainObject.State>(uniqueId, version, ct);
+            }
+        }
+
+        private async Task<ContentDomainObject.State> GetAsync(DomainId uniqueId, long version,
+            CancellationToken ct)
+        {
             using (Telemetry.Activities.StartActivity("ContentLoader/GetAsync"))
             {
-                var key = DomainId.Combine(appId, id);
+                var contentObject = domainObjectFactory.Create<ContentDomainObject>(uniqueId);
 
-                var contentObject = domainObjectFactory.Create<ContentDomainObject>(key);
-                var contentState = await contentObject.GetSnapshotAsync(version, ct);
-
-                if (contentState == null || contentState.Version <= EtagVersion.Empty || (version > EtagVersion.Any && contentState.Version != version))
-                {
-                    return null;
-                }
-
-                return contentState;
+                return await contentObject.GetSnapshotAsync(version, ct);
             }
         }
     }

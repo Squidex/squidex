@@ -21,12 +21,6 @@ namespace Squidex.Infrastructure.TestHelpers
 
         public bool RecreateEvent { get; set; }
 
-        public int VersionsToKeep
-        {
-            get => Capacity;
-            set => Capacity = value;
-        }
-
         public MyDomainObject(DomainId id, IPersistenceFactory<MyDomainState> factory)
            : base(id, factory, A.Dummy<ILogger>())
         {

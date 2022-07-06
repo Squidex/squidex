@@ -18,8 +18,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
 {
     public sealed class MongoAppRepository : MongoSnapshotStoreBase<AppDomainObject.State, MongoAppEntity>, IAppRepository, IDeleter
     {
-        public MongoAppRepository(IMongoDatabase database, JsonSerializer jsonSerializer)
-            : base(database, jsonSerializer)
+        public MongoAppRepository(IMongoDatabase database, JsonSerializer serializer)
+            : base(database, serializer)
         {
         }
 

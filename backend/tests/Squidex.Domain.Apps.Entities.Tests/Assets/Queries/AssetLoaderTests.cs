@@ -18,21 +18,23 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
         private readonly CancellationToken ct;
         private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
+        private readonly IDomainObjectCache domainObjectCache = A.Fake<IDomainObjectCache>();
         private readonly AssetDomainObject domainObject = A.Fake<AssetDomainObject>();
         private readonly DomainId appId = DomainId.NewGuid();
         private readonly DomainId id = DomainId.NewGuid();
+        private readonly DomainId uniqueId;
         private readonly AssetLoader sut;
 
         public AssetLoaderTests()
         {
             ct = cts.Token;
 
-            var key = DomainId.Combine(appId, id);
+            uniqueId = DomainId.Combine(appId, id);
 
-            A.CallTo(() => domainObjectFactory.Create<AssetDomainObject>(key))
+            A.CallTo(() => domainObjectFactory.Create<AssetDomainObject>(uniqueId))
                 .Returns(domainObject);
 
-            sut = new AssetLoader(domainObjectFactory);
+            sut = new AssetLoader(domainObjectFactory, domainObjectCache);
         }
 
         [Fact]
@@ -92,6 +94,22 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             var result = await sut.GetAsync(appId, id, 10, ct);
 
             Assert.Same(asset, result);
+        }
+
+        [Fact]
+        public async Task Should_return_content_from_cache()
+        {
+            var content = new AssetDomainObject.State { Version = 10 };
+
+            A.CallTo(() => domainObjectCache.GetAsync<AssetDomainObject.State>(DomainId.Combine(appId, id), 10, ct))
+                .Returns(content);
+
+            var result = await sut.GetAsync(appId, id, 10, ct);
+
+            Assert.Same(content, result);
+
+            A.CallTo(() => domainObjectFactory.Create<AssetDomainObject>(uniqueId))
+                .MustHaveHappened();
         }
     }
 }

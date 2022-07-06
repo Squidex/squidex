@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Caching.Distributed;
 using Migrations.Migrations.MongoDb;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Extensions.DiagnosticSources;
@@ -38,6 +39,7 @@ using Squidex.Domain.Users.InMemory;
 using Squidex.Domain.Users.MongoDb;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
@@ -97,6 +99,9 @@ namespace Squidex.Config.Domain
 
                     services.AddTransientAs<AddAppIdToEventStream>()
                         .As<IMigration>();
+
+                    services.AddSingletonAs<MongoDistributedCache>()
+                        .As<IDistributedCache>();
 
                     services.AddHealthChecks()
                         .AddCheck<MongoHealthCheck>("MongoDB", tags: new[] { "node" });

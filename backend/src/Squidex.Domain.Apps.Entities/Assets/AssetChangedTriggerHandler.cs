@@ -74,7 +74,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var asset = await assetLoader.GetAsync(
                 assetEvent.AppId.Id,
                 assetEvent.AssetId,
-                @event.Headers.EventStreamNumber());
+                @event.Headers.EventStreamNumber(),
+                ct);
 
             if (asset != null)
             {

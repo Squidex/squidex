@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
-    public sealed class AssetCommandMiddleware : ExecutableMiddleware<AssetCommand, AssetDomainObject>
+    public sealed class AssetCommandMiddleware : CachingDomainObjectMiddleware<AssetCommand, AssetDomainObject, AssetDomainObject.State>
     {
         private readonly IAssetFileStore assetFileStore;
         private readonly IAssetEnricher assetEnricher;
@@ -23,12 +23,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         public AssetCommandMiddleware(
             IDomainObjectFactory domainObjectFactory,
+            IDomainObjectCache domainObjectCache,
             IAssetEnricher assetEnricher,
             IAssetFileStore assetFileStore,
             IAssetQueryService assetQuery,
             IContextProvider contextProvider,
             IEnumerable<IAssetMetadataSource> assetMetadataSources)
-            : base(domainObjectFactory)
+            : base(domainObjectFactory, domainObjectCache)
         {
             this.assetEnricher = assetEnricher;
             this.assetFileStore = assetFileStore;

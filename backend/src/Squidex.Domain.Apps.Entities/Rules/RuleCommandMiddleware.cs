@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public sealed class RuleCommandMiddleware : ExecutableMiddleware<RuleCommand, RuleDomainObject>
+    public sealed class RuleCommandMiddleware : AggregateCommandMiddleware<RuleCommand, RuleDomainObject>
     {
         private readonly IRuleEnricher ruleEnricher;
         private readonly IContextProvider contextProvider;

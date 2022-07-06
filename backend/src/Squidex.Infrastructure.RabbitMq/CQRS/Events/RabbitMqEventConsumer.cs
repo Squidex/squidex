@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class RabbitMqEventConsumer : DisposableObjectBase, IInitializable, IEventConsumer
     {
-        private readonly IJsonSerializer jsonSerializer;
+        private readonly IJsonSerializer serializer;
         private readonly string eventPublisherName;
         private readonly string exchange;
         private readonly string eventsFilter;
@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             get => eventsFilter;
         }
 
-        public RabbitMqEventConsumer(IJsonSerializer jsonSerializer, string eventPublisherName, string uri, string exchange, string eventsFilter)
+        public RabbitMqEventConsumer(IJsonSerializer serializer, string eventPublisherName, string uri, string exchange, string eventsFilter)
         {
             connectionFactory = new ConnectionFactory { Uri = new Uri(uri, UriKind.Absolute) };
             connection = new Lazy<IConnection>(connectionFactory.CreateConnection);
@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             this.exchange = exchange;
             this.eventsFilter = eventsFilter;
             this.eventPublisherName = eventPublisherName;
-            this.jsonSerializer = jsonSerializer;
+            this.serializer = serializer;
         }
 
         protected override void DisposeObject(bool disposing)
@@ -86,7 +86,7 @@ namespace Squidex.Infrastructure.CQRS.Events
                 return Task.CompletedTask;
             }
 
-            var jsonString = jsonSerializer.Serialize(@event);
+            var jsonString = serializer.Serialize(@event);
             var jsonBytes = Encoding.UTF8.GetBytes(jsonString);
 
             channel.Value.BasicPublish(exchange, string.Empty, null, jsonBytes);

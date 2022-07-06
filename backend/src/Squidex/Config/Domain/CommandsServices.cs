@@ -106,10 +106,10 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<CommentsCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<ExecutableMiddleware<AssetFolderCommand, AssetFolderDomainObject>>()
+            services.AddSingletonAs<AggregateCommandMiddleware<AssetFolderCommand, AssetFolderDomainObject>>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<ExecutableMiddleware<SchemaCommand, SchemaDomainObject>>()
+            services.AddSingletonAs<AggregateCommandMiddleware<SchemaCommand, SchemaDomainObject>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<SingletonCommandMiddleware>()
@@ -120,6 +120,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<DefaultDomainObjectFactory>()
                 .As<IDomainObjectFactory>();
+
+            services.AddSingletonAs<DefaultDomainObjectCache>()
+                .As<IDomainObjectCache>();
         }
     }
 }

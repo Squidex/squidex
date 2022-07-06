@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         private readonly TypeNameRegistry typeNameRegistry;
         private readonly RuleOptions ruleOptions;
         private readonly IEventEnricher eventEnricher;
-        private readonly IJsonSerializer jsonSerializer;
+        private readonly IJsonSerializer serializer;
         private readonly ILogger<RuleService> log;
 
         public IClock Clock { get; set; } = SystemClock.Instance;
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             IEnumerable<IRuleTriggerHandler> ruleTriggerHandlers,
             IEnumerable<IRuleActionHandler> ruleActionHandlers,
             IEventEnricher eventEnricher,
-            IJsonSerializer jsonSerializer,
+            IJsonSerializer serializer,
             ILogger<RuleService> log,
             TypeNameRegistry typeNameRegistry)
         {
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.ruleOptions = ruleOptions.Value;
             this.ruleTriggerHandlers = ruleTriggerHandlers.ToDictionary(x => x.TriggerType);
             this.ruleActionHandlers = ruleActionHandlers.ToDictionary(x => x.ActionType);
-            this.jsonSerializer = jsonSerializer;
+            this.serializer = serializer;
             this.log = log;
         }
 
@@ -316,7 +316,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             {
                 var (description, data) = await actionHandler.CreateJobAsync(enrichedEvent, context.Rule.Action);
 
-                var json = jsonSerializer.Serialize(data);
+                var json = serializer.Serialize(data);
 
                 job.ActionData = json;
                 job.ActionName = actionName;
@@ -362,7 +362,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 var actionType = typeNameRegistry.GetType(actionName);
                 var actionHandler = ruleActionHandlers[actionType];
 
-                var deserialized = jsonSerializer.Deserialize<object>(job, actionHandler.DataType);
+                var deserialized = serializer.Deserialize<object>(job, actionHandler.DataType);
 
                 using (var cts = new CancellationTokenSource(GetTimeoutInMs()))
                 {

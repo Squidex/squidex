@@ -11,14 +11,17 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 {
-    public sealed class ContentCommandMiddleware : ExecutableMiddleware<ContentCommand, ContentDomainObject>
+    public sealed class ContentCommandMiddleware : CachingDomainObjectMiddleware<ContentCommand, ContentDomainObject, ContentDomainObject.State>
     {
         private readonly IContentEnricher contentEnricher;
         private readonly IContextProvider contextProvider;
 
-        public ContentCommandMiddleware(IDomainObjectFactory domainObjectFactory,
-            IContentEnricher contentEnricher, IContextProvider contextProvider)
-            : base(domainObjectFactory)
+        public ContentCommandMiddleware(
+            IDomainObjectFactory domainObjectFactory,
+            IDomainObjectCache domainObjectCache,
+            IContentEnricher contentEnricher,
+            IContextProvider contextProvider)
+            : base(domainObjectFactory, domainObjectCache)
         {
             this.contentEnricher = contentEnricher;
             this.contextProvider = contextProvider;

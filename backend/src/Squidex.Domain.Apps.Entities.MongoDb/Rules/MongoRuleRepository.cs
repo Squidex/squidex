@@ -18,8 +18,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 {
     public sealed class MongoRuleRepository : MongoSnapshotStoreBase<RuleDomainObject.State, MongoRuleEntity>, IRuleRepository, IDeleter
     {
-        public MongoRuleRepository(IMongoDatabase database, JsonSerializer jsonSerializer)
-            : base(database, jsonSerializer)
+        public MongoRuleRepository(IMongoDatabase database, JsonSerializer serializer)
+            : base(database, serializer)
         {
         }
 
