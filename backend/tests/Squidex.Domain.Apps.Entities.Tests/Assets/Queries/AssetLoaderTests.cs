@@ -31,6 +31,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             uniqueId = DomainId.Combine(appId, id);
 
+            A.CallTo(() => domainObjectCache.GetAsync<AssetDomainObject.State>(A<DomainId>._, A<long>._, ct))
+                .Returns(Task.FromResult<AssetDomainObject.State>(null!));
+
             A.CallTo(() => domainObjectFactory.Create<AssetDomainObject>(uniqueId))
                 .Returns(domainObject);
 
@@ -109,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             Assert.Same(content, result);
 
             A.CallTo(() => domainObjectFactory.Create<AssetDomainObject>(uniqueId))
-                .MustHaveHappened();
+                .MustNotHaveHappened();
         }
     }
 }

@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public bool Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            var result = GeoJsonValue.TryParse(args.Value, args.JsonSerializer, out _);
+            var result = GeoJsonValue.TryParse(args.Value, args.Serializer, out _);
 
             return result == GeoJsonParseResult.Success;
         }

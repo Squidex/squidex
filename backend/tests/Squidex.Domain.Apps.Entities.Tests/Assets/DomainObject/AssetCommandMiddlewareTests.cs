@@ -17,6 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
     public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.State>
     {
+        private readonly IDomainObjectCache domainObjectCache = A.Fake<IDomainObjectCache>();
         private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
         private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
         private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
@@ -51,6 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             sut = new AssetCommandMiddleware(
                 domainObjectFactory,
+                domainObjectCache,
                 assetEnricher,
                 assetFileStore,
                 assetQuery,

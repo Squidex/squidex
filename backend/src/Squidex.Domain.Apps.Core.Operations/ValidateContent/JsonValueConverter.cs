@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public (object? Result, JsonError? Error) Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            var result = GeoJsonValue.TryParse(args.Value, args.JsonSerializer, out var value);
+            var result = GeoJsonValue.TryParse(args.Value, args.Serializer, out var value);
 
             switch (result)
             {

@@ -17,6 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 {
     public sealed class ContentCommandMiddlewareTests : HandlerTestBase<ContentDomainObject.State>
     {
+        private readonly IDomainObjectCache domainObjectCache = A.Fake<IDomainObjectCache>();
         private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
         private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
@@ -40,7 +41,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);
 
-            sut = new ContentCommandMiddleware(domainObjectFactory, contentEnricher, contextProvider);
+            sut = new ContentCommandMiddleware(
+                domainObjectFactory,
+                domainObjectCache,
+                contentEnricher,
+                contextProvider);
         }
 
         [Fact]
