@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private async Task<object> PublishAsync(AssetFolderCommand command)
         {
-            var result = await sut.ExecuteAsync(CreateAssetFolderCommand(command));
+            var result = await sut.ExecuteAsync(CreateAssetFolderCommand(command), default);
 
             return result.Payload;
         }

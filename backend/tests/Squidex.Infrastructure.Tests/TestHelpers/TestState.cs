@@ -6,33 +6,50 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.TestHelpers
 {
     public sealed class TestState<T> where T : class, new()
     {
+        private readonly List<Envelope<IEvent>> events = new List<Envelope<IEvent>>();
         private HandleSnapshot<T>? handleSnapshot;
-        private T state = new T();
+        private HandleEvent? handleEvent;
 
         public IPersistenceFactory<T> PersistenceFactory { get; private set; }
 
         public IPersistence<T> Persistence { get; } = A.Fake<IPersistence<T>>();
 
-        public T Value
-        {
-            get => state;
-            set => state = value;
-        }
+        public long Version { get; set; } = EtagVersion.Empty;
+
+        public T Snapshot { get; set; } = new T();
 
         public TestState(string id, IPersistenceFactory<T>? persistenceFactory = null)
             : this(DomainId.Create(id), persistenceFactory)
         {
         }
 
+        public void AddEvent(Envelope<IEvent> @event)
+        {
+            events.Add(@event);
+        }
+
+        public void AddEvent(IEvent @event)
+        {
+            events.Add(Envelope.Create(@event));
+        }
+
         public TestState(DomainId id, IPersistenceFactory<T>? persistenceFactory = null)
         {
             PersistenceFactory = persistenceFactory ?? A.Fake<IPersistenceFactory<T>>();
+
+            A.CallTo(() => PersistenceFactory.WithEventSourcing(A<Type>._, id, A<HandleEvent>._))
+                .Invokes(x =>
+                {
+                    handleEvent = x.GetArgument<HandleEvent>(2);
+                })
+                .Returns(Persistence);
 
             A.CallTo(() => PersistenceFactory.WithSnapshots(A<Type>._, id, A<HandleSnapshot<T>>._))
                 .Invokes(x =>
@@ -45,25 +62,40 @@ namespace Squidex.Infrastructure.TestHelpers
                 .Invokes(x =>
                 {
                     handleSnapshot = x.GetArgument<HandleSnapshot<T>>(2);
+                    handleEvent = x.GetArgument<HandleEvent>(3);
                 })
                 .Returns(Persistence);
+
+            A.CallTo(() => Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, A<CancellationToken>._))
+                .Invokes(x =>
+                {
+                    events.AddRange(x.GetArgument<IReadOnlyList<Envelope<IEvent>>>(0)!);
+                });
 
             A.CallTo(() => Persistence.WriteSnapshotAsync(A<T>._, A<CancellationToken>._))
                 .Invokes(x =>
                 {
-                    state = x.GetArgument<T>(0)!;
+                    Snapshot = x.GetArgument<T>(0)!;
                 });
 
             A.CallTo(() => Persistence.ReadAsync(A<long>._, A<CancellationToken>._))
                 .Invokes(x =>
                 {
-                    handleSnapshot?.Invoke(state, 0);
+                    handleSnapshot?.Invoke(Snapshot, Version);
+
+                    if (handleEvent != null)
+                    {
+                        foreach (var @event in events)
+                        {
+                            handleEvent(@event);
+                        }
+                    }
                 });
 
             A.CallTo(() => Persistence.DeleteAsync(A<CancellationToken>._))
                 .Invokes(x =>
                 {
-                    state = new T();
+                    Snapshot = new T();
                 });
         }
     }

@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         [Fact]
         public async Task Should_throw_exception_when_restore_already_running()
         {
-            stateRestore.Value = new RestoreJob
+            stateRestore.Snapshot = new RestoreJob
             {
                 Status = JobStatus.Started
             };
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             for (var i = 0; i < 10; i++)
             {
-                stateBackup.Value.Jobs.Add(new BackupJob());
+                stateBackup.Snapshot.Jobs.Add(new BackupJob());
             }
 
             await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartBackupAsync(appId, actor));
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             for (var i = 0; i < 2; i++)
             {
-                stateBackup.Value.Jobs.Add(new BackupJob { Status = JobStatus.Started });
+                stateBackup.Snapshot.Jobs.Add(new BackupJob { Status = JobStatus.Started });
             }
 
             await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartBackupAsync(appId, actor));
@@ -114,14 +114,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
         [Fact]
         public async Task Should_get_restore_state_from_store()
         {
-            stateRestore.Value = new RestoreJob
+            stateRestore.Snapshot = new RestoreJob
             {
                 Stopped = SystemClock.Instance.GetCurrentInstant()
             };
 
             var result = await sut.GetRestoreAsync();
 
-            result.Should().BeEquivalentTo(stateRestore.Value);
+            result.Should().BeEquivalentTo(stateRestore.Snapshot);
         }
 
         [Fact]
@@ -134,11 +134,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Stopped = SystemClock.Instance.GetCurrentInstant()
             };
 
-            stateBackup.Value.Jobs.Add(job);
+            stateBackup.Snapshot.Jobs.Add(job);
 
             var result = await sut.GetBackupsAsync(appId);
 
-            result.Should().BeEquivalentTo(stateBackup.Value.Jobs);
+            result.Should().BeEquivalentTo(stateBackup.Snapshot.Jobs);
         }
 
         [Fact]
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Stopped = SystemClock.Instance.GetCurrentInstant()
             };
 
-            stateBackup.Value.Jobs.Add(job);
+            stateBackup.Snapshot.Jobs.Add(job);
 
             var result = await sut.GetBackupAsync(appId, backupId);
 

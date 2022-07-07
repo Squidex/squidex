@@ -58,12 +58,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 Equals(assetCommand.AssetId, Snapshot.Id);
         }
 
-        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+            CancellationToken ct)
         {
             switch (command)
             {
                 case UpsertAsset upsert:
-                    return UpsertReturnAsync(upsert, async c =>
+                    return UpsertReturnAsync(upsert, async (c, ct) =>
                     {
                         var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -82,14 +83,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         }
 
                         return Snapshot;
-                    });
+                    }, ct);
 
-                case CreateAsset c:
-                    return CreateReturnAsync(c, async create =>
+                case CreateAsset create:
+                    return CreateReturnAsync(create, async (c, ct) =>
                     {
                         var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                        await CreateCore(create, operation);
+                        await CreateCore(c, operation);
 
                         if (Is.Change(Snapshot.ParentId, c.ParentId))
                         {
@@ -97,53 +98,54 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         }
 
                         return Snapshot;
-                    });
+                    }, ct);
 
-                case AnnotateAsset c:
-                    return UpdateReturnAsync(c, async c =>
+                case AnnotateAsset annotate:
+                    return UpdateReturnAsync(annotate, async (c, ct) =>
                     {
                         var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await AnnotateCore(c, operation);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateAsset update:
-                    return UpdateReturnAsync(update, async c =>
+                    return UpdateReturnAsync(update, async (c, ct) =>
                     {
                         var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await UpdateCore(c, operation);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case MoveAsset move:
-                    return UpdateReturnAsync(move, async c =>
+                    return UpdateReturnAsync(move, async (c, ct) =>
                     {
                         var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await MoveCore(c, operation);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case DeleteAsset delete when delete.Permanent:
-                    return DeletePermanentAsync(delete, async c =>
+                    return DeletePermanentAsync(delete, async (c, ct) =>
                     {
                         var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await DeleteCore(c, operation);
-                    });
+                    }, ct);
 
                 case DeleteAsset delete:
-                    return UpdateAsync(delete, async c =>
+                    return UpdateAsync(delete, async (c, ct) =>
                     {
                         var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await DeleteCore(c, operation);
-                    });
+                    }, ct);
+
                 default:
                     ThrowHelper.NotSupportedException();
                     return default!;

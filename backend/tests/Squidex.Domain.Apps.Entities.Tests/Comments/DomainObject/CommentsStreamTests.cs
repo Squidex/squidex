@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         {
             var command = new CreateComment { Text = "text1", Url = new Uri("http://uri") };
 
-            var result = await sut.ExecuteAsync(CreateCommentsCommand(command));
+            var result = await sut.ExecuteAsync(CreateCommentsCommand(command), default);
 
             result.ShouldBeEquivalent(CommandResult.Empty(commentsId, 0, EtagVersion.Empty));
 
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var updateCommand = new UpdateComment { Text = "text2" };
 
-            var result = await sut.ExecuteAsync(CreateCommentsCommand(updateCommand));
+            var result = await sut.ExecuteAsync(CreateCommentsCommand(updateCommand), default);
 
             result.ShouldBeEquivalent(CommandResult.Empty(commentsId, 1, 0));
 
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var deleteCommand = new DeleteComment();
 
-            var result = await sut.ExecuteAsync(CreateCommentsCommand(deleteCommand));
+            var result = await sut.ExecuteAsync(CreateCommentsCommand(deleteCommand), default);
 
             result.ShouldBeEquivalent(CommandResult.Empty(commentsId, 2, 1));
 
@@ -145,12 +145,12 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         private Task ExecuteCreateAsync()
         {
-            return sut.ExecuteAsync(CreateCommentsCommand(new CreateComment { Text = "text1" }));
+            return sut.ExecuteAsync(CreateCommentsCommand(new CreateComment { Text = "text1" }), default);
         }
 
         private Task ExecuteUpdateAsync()
         {
-            return sut.ExecuteAsync(CreateCommentsCommand(new UpdateComment { Text = "text2" }));
+            return sut.ExecuteAsync(CreateCommentsCommand(new UpdateComment { Text = "text2" }), default);
         }
 
         private T CreateCommentsEvent<T>(T @event) where T : CommentsEvent

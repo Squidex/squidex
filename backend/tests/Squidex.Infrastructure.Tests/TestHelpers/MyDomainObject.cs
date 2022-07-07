@@ -61,7 +61,8 @@ namespace Squidex.Infrastructure.TestHelpers
             return snapshot.IsDeleted;
         }
 
-        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+            CancellationToken ct)
         {
             switch (command)
             {
@@ -69,13 +70,13 @@ namespace Squidex.Infrastructure.TestHelpers
                     return Upsert(c, createAuto =>
                     {
                         RaiseEvent(new ValueChanged { Value = createAuto.Value });
-                    });
+                    }, ct);
 
                 case CreateAuto c:
                     return Create(c, createAuto =>
                     {
                         RaiseEvent(new ValueChanged { Value = createAuto.Value });
-                    });
+                    }, ct);
 
                 case CreateCustom c:
                     return CreateReturn(c, createCustom =>
@@ -83,13 +84,13 @@ namespace Squidex.Infrastructure.TestHelpers
                         RaiseEvent(new ValueChanged { Value = createCustom.Value });
 
                         return "CREATED";
-                    });
+                    }, ct);
 
                 case UpdateAuto c:
                     return Update(c, updateAuto =>
                     {
                         RaiseEvent(new ValueChanged { Value = updateAuto.Value });
-                    });
+                    }, ct);
 
                 case UpdateCustom c:
                     return UpdateReturn(c, updateCustom =>
@@ -97,17 +98,20 @@ namespace Squidex.Infrastructure.TestHelpers
                         RaiseEvent(new ValueChanged { Value = updateCustom.Value });
 
                         return "UPDATED";
-                    });
+                    }, ct);
+
                 case Delete c:
                     return Update(c, delete =>
                     {
                         RaiseEvent(new Deleted());
-                    });
+                    }, ct);
+
                 case DeletePermanent c:
                     return DeletePermanent(c, delete =>
                     {
                         RaiseEvent(new Deleted());
-                    });
+                    }, ct);
+
                 default:
                     throw new NotSupportedException();
             }

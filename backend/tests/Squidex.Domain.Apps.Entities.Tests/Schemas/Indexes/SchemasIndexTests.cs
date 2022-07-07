@@ -177,12 +177,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             await sut.HandleAsync(context, x =>
             {
-                madeReservation = state.Value.Reservations.FirstOrDefault();
+                madeReservation = state.Snapshot.Reservations.FirstOrDefault();
 
                 return Task.CompletedTask;
             });
 
-            Assert.Empty(state.Value.Reservations);
+            Assert.Empty(state.Snapshot.Reservations);
 
             Assert.Equal(schemaId.Id, madeReservation?.Id);
             Assert.Equal(schemaId.Name, madeReservation?.Name);
@@ -204,12 +204,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             await Assert.ThrowsAnyAsync<Exception>(() => sut.HandleAsync(context, x =>
             {
-                madeReservation = state.Value.Reservations.FirstOrDefault();
+                madeReservation = state.Snapshot.Reservations.FirstOrDefault();
 
                 throw new InvalidOperationException();
             }));
 
-            Assert.Empty(state.Value.Reservations);
+            Assert.Empty(state.Snapshot.Reservations);
 
             Assert.Equal(schemaId.Id, madeReservation?.Id);
             Assert.Equal(schemaId.Name, madeReservation?.Name);
@@ -218,7 +218,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_not_create_schema_if_name_is_reserved()
         {
-            state.Value.Reservations.Add(new NameReservation(RandomHash.Simple(), schemaId.Name, DomainId.NewGuid()));
+            state.Snapshot.Reservations.Add(new NameReservation(RandomHash.Simple(), schemaId.Name, DomainId.NewGuid()));
 
             A.CallTo(() => schemaRepository.FindAsync(appId.Id, schemaId.Name, ct))
                 .Returns(Task.FromResult<ISchemaEntity?>(null));

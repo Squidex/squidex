@@ -9,6 +9,7 @@ namespace Squidex.Infrastructure.Commands
 {
     public interface IAggregate
     {
-        Task<CommandResult> ExecuteAsync(IAggregateCommand command);
+        Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+            CancellationToken ct);
     }
 }

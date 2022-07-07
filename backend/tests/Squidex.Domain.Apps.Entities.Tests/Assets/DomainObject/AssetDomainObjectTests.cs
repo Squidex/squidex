@@ -483,7 +483,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private async Task<object> PublishAsync(AssetCommand command)
         {
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await sut.ExecuteAsync(CreateAssetCommand(command), default);
 
             return result.Payload;
         }

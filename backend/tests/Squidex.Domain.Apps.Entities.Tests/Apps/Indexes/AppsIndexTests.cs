@@ -191,12 +191,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.HandleAsync(context, x =>
             {
-                madeReservation = state.Value.Reservations.FirstOrDefault();
+                madeReservation = state.Snapshot.Reservations.FirstOrDefault();
 
                 return Task.CompletedTask;
             });
 
-            Assert.Empty(state.Value.Reservations);
+            Assert.Empty(state.Snapshot.Reservations);
 
             Assert.Equal(appId.Id, madeReservation?.Id);
             Assert.Equal(appId.Name, madeReservation?.Name);
@@ -218,12 +218,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await Assert.ThrowsAnyAsync<Exception>(() => sut.HandleAsync(context, x =>
             {
-                madeReservation = state.Value.Reservations.FirstOrDefault();
+                madeReservation = state.Snapshot.Reservations.FirstOrDefault();
 
                 throw new InvalidOperationException();
             }));
 
-            Assert.Empty(state.Value.Reservations);
+            Assert.Empty(state.Snapshot.Reservations);
 
             Assert.Equal(appId.Id, madeReservation?.Id);
             Assert.Equal(appId.Name, madeReservation?.Name);
@@ -232,7 +232,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_not_create_app_if_name_is_reserved()
         {
-            state.Value.Reservations.Add(new NameReservation(RandomHash.Simple(), appId.Name, DomainId.NewGuid()));
+            state.Snapshot.Reservations.Add(new NameReservation(RandomHash.Simple(), appId.Name, DomainId.NewGuid()));
 
             A.CallTo(() => appRepository.FindAsync(appId.Name, ct))
                 .Returns(Task.FromResult<IAppEntity?>(null));

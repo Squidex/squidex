@@ -50,7 +50,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return command is AppUpdateCommand update && Equals(update?.AppId?.Id, Snapshot.Id);
         }
 
-        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+            CancellationToken ct)
         {
             switch (command)
             {
@@ -62,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         Create(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateApp update:
                     return UpdateReturn(update, c =>
@@ -72,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         Update(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateAppSettings updateSettings:
                     return UpdateReturn(updateSettings, c =>
@@ -82,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         UpdateSettings(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UploadAppImage uploadImage:
                     return UpdateReturn(uploadImage, c =>
@@ -92,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         UploadImage(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case RemoveAppImage removeImage:
                     return UpdateReturn(removeImage, c =>
@@ -102,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         RemoveImage(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case ConfigureAssetScripts configureAssetScripts:
                     return UpdateReturn(configureAssetScripts, c =>
@@ -112,17 +113,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         ConfigureAssetScripts(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case AssignContributor assignContributor:
-                    return UpdateReturnAsync(assignContributor, async c =>
+                    return UpdateReturnAsync(assignContributor, async (c, ct) =>
                     {
                         await GuardAppContributors.CanAssign(c, Snapshot, UserResolver(), GetPlan());
 
                         AssignContributor(c, !Snapshot.Contributors.ContainsKey(assignContributor.ContributorId));
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case RemoveContributor removeContributor:
                     return UpdateReturn(removeContributor, c =>
@@ -132,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         RemoveContributor(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case AttachClient attachClient:
                     return UpdateReturn(attachClient, c =>
@@ -142,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         AttachClient(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateClient updateClient:
                     return UpdateReturn(updateClient, c =>
@@ -152,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         UpdateClient(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case RevokeClient revokeClient:
                     return UpdateReturn(revokeClient, c =>
@@ -162,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         RevokeClient(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case AddWorkflow addWorkflow:
                     return UpdateReturn(addWorkflow, c =>
@@ -172,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         AddWorkflow(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateWorkflow updateWorkflow:
                     return UpdateReturn(updateWorkflow, c =>
@@ -182,7 +183,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         UpdateWorkflow(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case DeleteWorkflow deleteWorkflow:
                     return UpdateReturn(deleteWorkflow, c =>
@@ -192,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         DeleteWorkflow(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case AddLanguage addLanguage:
                     return UpdateReturn(addLanguage, c =>
@@ -202,7 +203,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         AddLanguage(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case RemoveLanguage removeLanguage:
                     return UpdateReturn(removeLanguage, c =>
@@ -212,7 +213,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         RemoveLanguage(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateLanguage updateLanguage:
                     return UpdateReturn(updateLanguage, c =>
@@ -222,7 +223,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         UpdateLanguage(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case AddRole addRole:
                     return UpdateReturn(addRole, c =>
@@ -232,7 +233,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         AddRole(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case DeleteRole deleteRole:
                     return UpdateReturn(deleteRole, c =>
@@ -242,7 +243,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         DeleteRole(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateRole updateRole:
                     return UpdateReturn(updateRole, c =>
@@ -252,10 +253,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         UpdateRole(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case ChangePlan changePlan:
-                    return UpdateReturnAsync(changePlan, async c =>
+                    return UpdateReturnAsync(changePlan, async (c, ct) =>
                     {
                         GuardApp.CanChangePlan(c, Snapshot, AppPlansProvider());
 
@@ -278,15 +279,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
                             return result;
                         }
-                    });
+                    }, ct);
 
                 case DeleteApp delete:
-                    return UpdateAsync(delete, async c =>
+                    return UpdateAsync(delete, async (c, ct) =>
                     {
                         await AppPlanBillingManager().ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null, null);
 
                         DeleteApp(c);
-                    });
+                    }, ct);
 
                 default:
                     ThrowHelper.NotSupportedException();

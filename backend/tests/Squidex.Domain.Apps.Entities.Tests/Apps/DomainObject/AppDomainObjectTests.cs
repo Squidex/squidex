@@ -707,7 +707,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         private async Task<object> PublishAsync(AppCommand command)
         {
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await sut.ExecuteAsync(CreateCommand(command), default);
 
             return result.Payload;
         }

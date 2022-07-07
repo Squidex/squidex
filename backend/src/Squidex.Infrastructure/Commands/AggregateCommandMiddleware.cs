@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected virtual Task<CommandResult> ExecuteCommandAsync(TTarget executable, TCommand command)
         {
-            return executable.ExecuteAsync(command);
+            return executable.ExecuteAsync(command, default);
         }
     }
 }

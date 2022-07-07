@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         {
             var testState = new TestState<EventConsumerState>(DomainId.Create(consumerName), persistenceFactory)
             {
-                Value = new EventConsumerState
+                Snapshot = new EventConsumerState
                 {
                     Position = "42"
                 }
@@ -83,7 +83,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         {
             var testState = new TestState<EventConsumerState>(DomainId.Create(consumerName), persistenceFactory)
             {
-                Value = new EventConsumerState
+                Snapshot = new EventConsumerState
                 {
                     Position = "42"
                 }
@@ -102,7 +102,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         {
             var testState = new TestState<EventConsumerState>(DomainId.Create(consumerName), persistenceFactory)
             {
-                Value = new EventConsumerState
+                Snapshot = new EventConsumerState
                 {
                     Position = "42"
                 }

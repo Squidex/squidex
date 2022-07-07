@@ -167,7 +167,7 @@ namespace Squidex.Infrastructure.Commands
             uncomittedEvents.Clear();
         }
 
-        private async Task<CommandResult> DeleteCoreAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler,
+        private async Task<CommandResult> DeleteCoreAsync<TCommand>(TCommand command, Func<TCommand, CancellationToken, Task<object?>> handler,
             CancellationToken ct = default) where TCommand : ICommand
         {
             Guard.NotNull(handler);
@@ -176,7 +176,7 @@ namespace Squidex.Infrastructure.Commands
             var previousVersion = Version;
             try
             {
-                var result = (await handler(command)) ?? None.Value;
+                var result = (await handler(command, ct)) ?? None.Value;
 
                 if (uncomittedEvents.Count > 0)
                 {
@@ -208,7 +208,7 @@ namespace Squidex.Infrastructure.Commands
             }
         }
 
-        private async Task<CommandResult> UpsertCoreAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler, bool isCreation,
+        private async Task<CommandResult> UpsertCoreAsync<TCommand>(TCommand command, Func<TCommand, CancellationToken, Task<object?>> handler, bool isCreation,
             CancellationToken ct) where TCommand : ICommand
         {
             Guard.NotNull(handler);
@@ -217,7 +217,7 @@ namespace Squidex.Infrastructure.Commands
             var previousVersion = Version;
             try
             {
-                var result = (await handler(command)) ?? None.Value;
+                var result = (await handler(command, ct)) ?? None.Value;
 
                 var events = uncomittedEvents.ToArray();
                 try
@@ -228,7 +228,7 @@ namespace Squidex.Infrastructure.Commands
                 {
                     await EnsureLoadedAsync(ct);
 
-                    if (IsDeleted(Snapshot))
+                    if (IsDeleted(previousSnapshot))
                     {
                         if (CanRecreate() && isCreation)
                         {
@@ -358,6 +358,7 @@ namespace Squidex.Infrastructure.Commands
             return snapshot.Apply(@event);
         }
 
-        public abstract Task<CommandResult> ExecuteAsync(IAggregateCommand command);
+        public abstract Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+            CancellationToken ct);
     }
 }

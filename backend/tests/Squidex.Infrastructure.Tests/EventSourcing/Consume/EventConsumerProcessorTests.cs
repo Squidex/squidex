@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         {
             state = new TestState<EventConsumerState>(DomainId.Create(consumerName))
             {
-                Value = new EventConsumerState
+                Snapshot = new EventConsumerState
                 {
                     Position = initialPosition
                 }
@@ -112,7 +112,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         [Fact]
         public async Task Should_not_subscribe_to_event_store_if_stopped_in_db()
         {
-            state.Value = state.Value.Stopped();
+            state.Snapshot = state.Snapshot.Stopped();
 
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();
@@ -142,7 +142,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         [Fact]
         public async Task Should_subscribe_to_event_store_if_failed()
         {
-            state.Value = state.Value.Stopped(new InvalidOperationException());
+            state.Snapshot = state.Snapshot.Stopped(new InvalidOperationException());
 
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();
@@ -211,7 +211,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             A.CallTo(() => eventSubscription.Unsubscribe())
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, state.Value.Position))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, state.Snapshot.Position))
                 .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, null))

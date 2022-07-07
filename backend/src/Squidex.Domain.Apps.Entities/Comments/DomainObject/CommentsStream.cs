@@ -59,7 +59,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             }
         }
 
-        public virtual Task<CommandResult> ExecuteAsync(IAggregateCommand command)
+        public virtual Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+            CancellationToken ct)
         {
             switch (command)
             {
@@ -69,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                         GuardComments.CanCreate(c);
 
                         Create(c);
-                    });
+                    }, ct);
 
                 case UpdateComment updateComment:
                     return Upsert(updateComment, c =>
@@ -77,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                         GuardComments.CanUpdate(c, key.ToString(), events);
 
                         Update(c);
-                    });
+                    }, ct);
 
                 case DeleteComment deleteComment:
                     return Upsert(deleteComment, c =>
@@ -85,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                         GuardComments.CanDelete(c, key.ToString(), events);
 
                         Delete(c);
-                    });
+                    }, ct);
 
                 default:
                     ThrowHelper.NotSupportedException();
@@ -93,7 +94,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             }
         }
 
-        private async Task<CommandResult> Upsert<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : CommentsCommand
+        private async Task<CommandResult> Upsert<TCommand>(TCommand command, Action<TCommand> handler,
+            CancellationToken ct) where TCommand : CommentsCommand
         {
             Guard.NotNull(command);
             Guard.NotNull(handler);
@@ -115,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
                     var eventData = uncommittedEvents.Select(x => eventFormatter.ToEventData(x, commitId)).ToList();
 
-                    await eventStore.AppendAsync(commitId, streamName, previousVersion, eventData);
+                    await eventStore.AppendAsync(commitId, streamName, previousVersion, eventData, ct);
                 }
 
                 events.AddRange(uncommittedEvents);

@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var domainObject = A.Fake<CommentsStream>();
 
-            A.CallTo(() => domainObject.ExecuteAsync(command))
+            A.CallTo(() => domainObject.ExecuteAsync(command, A<CancellationToken>._))
                 .Returns(CommandResult.Empty(commentsId, 0, 0));
 
             A.CallTo(() => domainObjectFactory.Create<CommentsStream>(commentsId))

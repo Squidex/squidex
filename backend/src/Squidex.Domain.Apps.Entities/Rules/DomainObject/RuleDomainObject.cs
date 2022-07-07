@@ -49,29 +49,30 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                 ruleCommand.RuleId.Equals(Snapshot.Id);
         }
 
-        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+            CancellationToken ct)
         {
             switch (command)
             {
                 case CreateRule createRule:
-                    return CreateReturnAsync(createRule, async c =>
+                    return CreateReturnAsync(createRule, async (c, ct) =>
                     {
                         await GuardRule.CanCreate(c, AppProvider());
 
                         Create(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateRule updateRule:
-                    return UpdateReturnAsync(updateRule, async c =>
+                    return UpdateReturnAsync(updateRule, async (c, ct) =>
                     {
                         await GuardRule.CanUpdate(c, Snapshot, AppProvider());
 
                         Update(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case EnableRule enable:
                     return UpdateReturn(enable, c =>
@@ -79,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                         Enable(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case DisableRule disable:
                     return UpdateReturn(disable, c =>
@@ -87,21 +88,21 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                         Disable(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case DeleteRule delete:
                     return Update(delete, c =>
                     {
                         Delete(c);
-                    });
+                    }, ct);
 
                 case TriggerRule triggerRule:
-                    return UpdateReturnAsync(triggerRule, async c =>
+                    return UpdateReturnAsync(triggerRule, async (c, ct) =>
                     {
                         await Trigger(triggerRule);
 
                         return true;
-                    });
+                    }, ct);
 
                 default:
                     ThrowHelper.NotSupportedException();

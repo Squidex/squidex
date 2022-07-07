@@ -87,12 +87,12 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected async Task<object> PublishIdempotentAsync<T>(DomainObject<T> domainObject, IAggregateCommand command) where T : class, IDomainState<T>, new()
         {
-            var result = await domainObject.ExecuteAsync(command);
+            var result = await domainObject.ExecuteAsync(command, default);
 
             var previousSnapshot = domainObject.Snapshot;
             var previousVersion = domainObject.Snapshot.Version;
 
-            await domainObject.ExecuteAsync(command);
+            await domainObject.ExecuteAsync(command, default);
 
             Assert.Same(previousSnapshot, domainObject.Snapshot);
             Assert.Equal(previousVersion, domainObject.Snapshot.Version);

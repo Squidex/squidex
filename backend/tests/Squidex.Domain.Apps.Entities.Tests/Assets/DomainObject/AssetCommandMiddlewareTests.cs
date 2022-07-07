@@ -249,7 +249,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             var domainObject = A.Fake<AssetDomainObject>();
 
-            A.CallTo(() => domainObject.ExecuteAsync(A<IAggregateCommand>._))
+            A.CallTo(() => domainObject.ExecuteAsync(A<IAggregateCommand>._, A<CancellationToken>._))
                 .Returns(new CommandResult(command.AggregateId, 1, 0, result));
 
             A.CallTo(() => domainObjectFactory.Create<AssetDomainObject>(command.AggregateId))
