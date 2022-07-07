@@ -7,8 +7,8 @@
 
 namespace Squidex.Infrastructure.Commands
 {
-    public class CachingDomainObjectMiddleware<TCommand, TTarget, TState> : AggregateCommandMiddleware<TCommand, TTarget>
-        where TCommand : IAggregateCommand where TTarget : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+    public class CachingDomainObjectMiddleware<TCommand, T, TState> : AggregateCommandMiddleware<TCommand, T>
+        where TCommand : IAggregateCommand where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
     {
         private readonly IDomainObjectCache domainObjectCache;
 
@@ -18,18 +18,20 @@ namespace Squidex.Infrastructure.Commands
             this.domainObjectCache = domainObjectCache;
         }
 
-        protected override async Task<CommandResult> ExecuteCommandAsync(TTarget executable, TCommand command)
+        protected override async Task<CommandResult> ExecuteCommandAsync(T executable, TCommand command,
+            CancellationToken ct)
         {
             var oldSnapshot = executable.Snapshot;
 
-            var result = await base.ExecuteCommandAsync(executable, command);
+            var result = await base.ExecuteCommandAsync(executable, command, ct);
 
             var newSnapshot = executable.Snapshot;
 
             if (newSnapshot.Version != oldSnapshot.Version)
             {
-                await domainObjectCache.SetAsync(executable.UniqueId, oldSnapshot.Version, oldSnapshot);
-                await domainObjectCache.SetAsync(executable.UniqueId, newSnapshot.Version, newSnapshot);
+                // If we are so far it is not worth to cancel the flow anymore.
+                await domainObjectCache.SetAsync(executable.UniqueId, oldSnapshot.Version, oldSnapshot, default);
+                await domainObjectCache.SetAsync(executable.UniqueId, newSnapshot.Version, newSnapshot, default);
             }
 
             return result;

@@ -132,25 +132,27 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
             var command = context.Command;
 
             if (command is CreateApp createApp)
             {
-                var token = await CheckAppAsync(createApp);
+                var token = await CheckAppAsync(createApp, ct);
                 try
                 {
-                    await next(context);
+                    await next(context, ct);
                 }
                 finally
                 {
-                    await namesState.RemoveReservationAsync(token);
+                    // Always remove the reservation and therefore do not pass over cancellation token.
+                    await namesState.RemoveReservationAsync(token, default);
                 }
             }
             else
             {
-                await next(context);
+                await next(context, ct);
             }
 
             if (context.IsCompleted)
@@ -170,9 +172,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        private async Task<string?> CheckAppAsync(CreateApp command)
+        private async Task<string?> CheckAppAsync(CreateApp command,
+            CancellationToken ct)
         {
-            var token = await ReserveAsync(command.AppId, command.Name);
+            var token = await ReserveAsync(command.AppId, command.Name, ct);
 
             if (token == null)
             {

@@ -12,7 +12,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class FileTypeAssetMetadataSource : IAssetMetadataSource
     {
-        public Task EnhanceAsync(UploadAssetCommand command)
+        public Task EnhanceAsync(UploadAssetCommand command,
+            CancellationToken ct)
         {
             if (command.Tags != null)
             {

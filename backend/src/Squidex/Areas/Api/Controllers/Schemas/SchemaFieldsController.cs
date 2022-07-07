@@ -546,7 +546,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
         private async Task<SchemaDto> InvokeCommandAsync(ICommand command)
         {
-            var context = await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             var result = context.Result<ISchemaEntity>();
             var response = SchemaDto.FromDomain(result, Resources);

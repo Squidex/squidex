@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
             Assert.False(isBlocked);
 
-            A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, ct))
+            A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -160,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             await sut.IsBlockedAsync(appEntity, clientId, today, ct);
             await sut.IsBlockedAsync(appEntity, clientId, today, ct);
 
-            A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, ct))
+            A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
     }

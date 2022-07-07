@@ -29,9 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         private readonly IContextProvider contextProvider;
         private readonly ILogger<ContentsBulkUpdateCommandMiddleware> log;
 
-        private sealed record BulkTaskCommand(BulkTask Task, DomainId Id, ICommand Command)
-        {
-        }
+        private sealed record BulkTaskCommand(BulkTask Task, DomainId Id, ICommand Command,
+            CancellationToken CancellationToken);
 
         private sealed record BulkTask(
             ICommandBus Bus,
@@ -39,10 +38,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             int JobIndex,
             BulkUpdateJob CommandJob,
             BulkUpdateContents Command,
-            ConcurrentBag<BulkUpdateResultItem> Results
-        )
-        {
-        }
+            ConcurrentBag<BulkUpdateResultItem> Results,
+            CancellationToken CancellationToken);
 
         public ContentsBulkUpdateCommandMiddleware(
             IContentQueryService contentQuery,
@@ -55,7 +52,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             this.log = log;
         }
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
             if (context.Command is BulkUpdateContents bulkUpdates)
             {
@@ -112,7 +110,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             i,
                             bulkUpdates.Jobs[i],
                             bulkUpdates,
-                            results);
+                            results,
+                            ct);
 
                         if (!await createCommandsBlock.SendAsync(task))
                         {
@@ -133,17 +132,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             }
             else
             {
-                await next(context);
+                await next(context, ct);
             }
         }
 
         private async Task ExecuteCommandAsync(BulkTaskCommand bulkCommand)
         {
-            var (task, id, command) = bulkCommand;
+            var (task, id, command, ct) = bulkCommand;
 
             try
             {
-                await task.Bus.PublishAsync(command);
+                await task.Bus.PublishAsync(command, ct);
 
                 task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex));
             }
@@ -178,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                         command.ContentId = id;
 
-                        commands.Add(new BulkTaskCommand(task, id, command));
+                        commands.Add(new BulkTaskCommand(task, id, command, task.CancellationToken));
                     }
                     catch (Exception ex)
                     {
@@ -273,7 +272,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!string.IsNullOrWhiteSpace(task.CommandJob.Schema))
             {
-                var schema = await contentQuery.GetSchemaOrThrowAsync(contextProvider.Context, task.Schema);
+                var schema = await contentQuery.GetSchemaOrThrowAsync(contextProvider.Context, task.Schema, task.CancellationToken);
 
                 command.SchemaId = schema.NamedId();
             }
@@ -299,7 +298,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             {
                 task.CommandJob.Query.Take = task.CommandJob.ExpectedCount;
 
-                var existing = await contentQuery.QueryAsync(contextProvider.Context, task.Schema, Q.Empty.WithJsonQuery(task.CommandJob.Query));
+                var existing = await contentQuery.QueryAsync(contextProvider.Context, task.Schema, Q.Empty.WithJsonQuery(task.CommandJob.Query), task.CancellationToken);
 
                 if (existing.Total > task.CommandJob.ExpectedCount)
                 {

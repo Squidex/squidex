@@ -21,22 +21,23 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             this.messaging = messaging;
         }
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
             switch (context.Command)
             {
                 case DeleteRule deleteRule:
-                    await messaging.PublishAsync(new UsageTrackingRemove(deleteRule.RuleId));
+                    await messaging.PublishAsync(new UsageTrackingRemove(deleteRule.RuleId), ct: default);
                     break;
                 case CreateRule createRule when createRule.Trigger is UsageTrigger usage:
-                    await messaging.PublishAsync(new UsageTrackingAdd(createRule.RuleId, createRule.AppId, usage.Limit, usage.NumDays));
+                    await messaging.PublishAsync(new UsageTrackingAdd(createRule.RuleId, createRule.AppId, usage.Limit, usage.NumDays), ct: default);
                     break;
                 case UpdateRule ruleUpdated when ruleUpdated.Trigger is UsageTrigger usage:
-                    await messaging.PublishAsync(new UsageTrackingUpdate(ruleUpdated.RuleId, usage.Limit, usage.NumDays));
+                    await messaging.PublishAsync(new UsageTrackingUpdate(ruleUpdated.RuleId, usage.Limit, usage.NumDays), ct: default);
                     break;
             }
 
-            await next(context);
+            await next(context, ct);
         }
     }
 }

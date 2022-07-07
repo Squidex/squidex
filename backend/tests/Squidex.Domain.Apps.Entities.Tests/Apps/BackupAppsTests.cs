@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             await sut.CleanupRestoreErrorAsync(appId);
 
-            A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", ct))
+            A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 

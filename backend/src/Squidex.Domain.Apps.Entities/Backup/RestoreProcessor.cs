@@ -216,14 +216,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 try
                 {
-                    await commandBus.PublishAsync(new AssignContributor
+                    var command = new AssignContributor
                     {
                         Actor = actor,
                         AppId = CurrentJob.AppId,
                         ContributorId = actor.Identifier,
                         Restoring = true,
                         Role = Role.Owner
-                    });
+                    };
+
+                    await commandBus.PublishAsync(command, default);
 
                     Log("Assigned current user.");
                 }

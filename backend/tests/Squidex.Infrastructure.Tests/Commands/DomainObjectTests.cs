@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.EnsureLoadedAsync(ct);
 
-            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>._, ct))
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>._, default))
                 .MustHaveHappened();
         }
 
@@ -61,7 +61,7 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.EnsureLoadedAsync(ct);
 
-            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>._, ct))
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -70,13 +70,13 @@ namespace Squidex.Infrastructure.Commands
         {
             var result = await sut.ExecuteAsync(new CreateAuto { Value = 4 }, ct);
 
-            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 4), ct))
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 4), default))
                 .MustHaveHappened();
 
             A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1), ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => state.Persistence.ReadAsync(A<long>._, ct))
+            A.CallTo(() => state.Persistence.ReadAsync(A<long>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             Assert.Equal(CommandResult.Empty(id, 0, EtagVersion.Empty), result);
@@ -226,13 +226,13 @@ namespace Squidex.Infrastructure.Commands
 
             var result = await sut.ExecuteAsync(new UpdateAuto { Value = 8, ExpectedVersion = 0 }, ct);
 
-            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 8), ct))
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 8), default))
                 .MustHaveHappened();
 
             A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1), ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => state.Persistence.ReadAsync(A<long>._, ct))
+            A.CallTo(() => state.Persistence.ReadAsync(A<long>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             Assert.Equal(CommandResult.Empty(id, 1, 0), result);
@@ -250,7 +250,7 @@ namespace Squidex.Infrastructure.Commands
 
             var result = await sut.ExecuteAsync(new UpdateAuto { Value = 8, ExpectedVersion = 0 }, ct);
 
-            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 8), ct))
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 8), default))
                 .MustHaveHappened();
 
             A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1), ct))
@@ -272,7 +272,7 @@ namespace Squidex.Infrastructure.Commands
         {
             await sut.ExecuteAsync(new CreateAuto(), ct);
 
-            A.CallTo(() => state.Persistence.ReadAsync(A<long>._, ct))
+            A.CallTo(() => state.Persistence.ReadAsync(A<long>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -301,7 +301,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 4), ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, ct))
+            A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -392,7 +392,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_reset_state_if_writing_snapshot_for_create_failed()
         {
-            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>._, ct))
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>._, default))
                 .Throws(new InvalidOperationException());
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(new CreateAuto(), ct));
@@ -406,7 +406,7 @@ namespace Squidex.Infrastructure.Commands
         {
             SetupCreated(4);
 
-            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>._, ct))
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>._, default))
                 .Throws(new InvalidOperationException());
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(new UpdateAuto(), ct));
@@ -436,7 +436,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, ct))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => deleteStream.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, ct))
+            A.CallTo(() => deleteStream.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 

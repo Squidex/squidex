@@ -111,7 +111,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         {
             var command = request.ToCreateCommand(commentsId);
 
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             var response = CommentDto.FromDomain(command);
 
@@ -138,7 +138,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         {
             var command = request.ToUpdateComment(commentsId, commentId);
 
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -161,7 +161,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         {
             var command = new DeleteComment { CommentsId = commentsId, CommentId = commentId };
 
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             return NoContent();
         }

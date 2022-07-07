@@ -27,13 +27,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             this.contextProvider = contextProvider;
         }
 
-        protected override async Task<object> EnrichResultAsync(CommandContext context, CommandResult result)
+        protected override async Task<object> EnrichResultAsync(CommandContext context, CommandResult result,
+            CancellationToken ct)
         {
-            var payload = await base.EnrichResultAsync(context, result);
+            var payload = await base.EnrichResultAsync(context, result, ct);
 
             if (payload is IContentEntity content && payload is not IEnrichedContentEntity)
             {
-                payload = await contentEnricher.EnrichAsync(content, true, contextProvider.Context, default);
+                payload = await contentEnricher.EnrichAsync(content, true, contextProvider.Context, ct);
             }
 
             return payload;

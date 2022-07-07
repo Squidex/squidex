@@ -12,6 +12,7 @@ namespace Squidex.Infrastructure.States
     public class SimpleState<T> where T : class, new()
     {
         private readonly IPersistence<T> persistence;
+        private bool isLoaded;
 
         public T Value { get; set; } = new T();
 
@@ -35,10 +36,12 @@ namespace Squidex.Infrastructure.States
             });
         }
 
-        public Task LoadAsync(
+        public async Task LoadAsync(
             CancellationToken ct = default)
         {
-            return persistence.ReadAsync(ct: ct);
+            await persistence.ReadAsync(ct: ct);
+
+            isLoaded = true;
         }
 
         public Task ClearAsync(
@@ -64,6 +67,8 @@ namespace Squidex.Infrastructure.States
         public async Task UpdateIfAsync(Func<T, bool> updater, int retries = 20,
             CancellationToken ct = default)
         {
+            await EnsureLoadedAsync(ct);
+
             for (var i = 0; i < retries; i++)
             {
                 try
@@ -86,6 +91,8 @@ namespace Squidex.Infrastructure.States
         public async Task UpdateAsync(Action<T> updater, int retries = 20,
             CancellationToken ct = default)
         {
+            await EnsureLoadedAsync(ct);
+
             for (var i = 0; i < retries; i++)
             {
                 try
@@ -105,6 +112,8 @@ namespace Squidex.Infrastructure.States
         public async Task<TResult> UpdateAsync<TResult>(Func<T, TResult> updater, int retries = 5,
             CancellationToken ct = default)
         {
+            await EnsureLoadedAsync(ct);
+
             for (var i = 0; i < retries; i++)
             {
                 try
@@ -112,7 +121,6 @@ namespace Squidex.Infrastructure.States
                     var result = updater(Value);
 
                     await WriteAsync(ct);
-
                     return result;
                 }
                 catch (InconsistentStateException) when (i < retries)
@@ -122,6 +130,17 @@ namespace Squidex.Infrastructure.States
             }
 
             return default!;
+        }
+
+        private async Task EnsureLoadedAsync(
+            CancellationToken ct)
+        {
+            if (isLoaded)
+            {
+                return;
+            }
+
+            await LoadAsync(ct);
         }
     }
 }

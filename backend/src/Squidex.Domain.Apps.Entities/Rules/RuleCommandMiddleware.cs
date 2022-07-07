@@ -21,17 +21,17 @@ namespace Squidex.Domain.Apps.Entities.Rules
             : base(domainObjectFactory)
         {
             this.ruleEnricher = ruleEnricher;
-
             this.contextProvider = contextProvider;
         }
 
-        protected override async Task<object> EnrichResultAsync(CommandContext context, CommandResult result)
+        protected override async Task<object> EnrichResultAsync(CommandContext context, CommandResult result,
+            CancellationToken ct)
         {
-            var payload = await base.EnrichResultAsync(context, result);
+            var payload = await base.EnrichResultAsync(context, result, ct);
 
             if (payload is IRuleEntity rule && payload is not IEnrichedRuleEntity)
             {
-                payload = await ruleEnricher.EnrichAsync(rule, contextProvider.Context, default);
+                payload = await ruleEnricher.EnrichAsync(rule, contextProvider.Context, ct);
             }
 
             return payload;

@@ -186,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             Assert.Equal("Filter: fileSize == 123; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
 
-            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, A<string>._, A<HashSet<string>>._, default))
+            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, A<string>._, A<HashSet<string>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
     }

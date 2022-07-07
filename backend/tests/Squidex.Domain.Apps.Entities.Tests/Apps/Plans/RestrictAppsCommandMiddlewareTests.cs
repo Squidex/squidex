@@ -20,6 +20,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
     public sealed class RestrictAppsCommandMiddlewareTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly RestrictAppsOptions options = new RestrictAppsOptions();
@@ -27,6 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public RestrictAppsCommandMiddlewareTests()
         {
+            ct = cts.Token;
+
             sut = new RestrictAppsCommandMiddleware(Options.Create(options), userResolver);
         }
 
@@ -52,17 +56,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             A.CallTo(() => user.Claims)
                 .Returns(Enumerable.Repeat(new Claim(SquidexClaimTypes.TotalApps, "5"), 1).ToList());
 
-            A.CallTo(() => userResolver.FindByIdAsync(userId, default))
+            A.CallTo(() => userResolver.FindByIdAsync(userId, ct))
                 .Returns(user);
 
             var isNextCalled = false;
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(commandContext, x =>
+            await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(commandContext, (c, ct) =>
             {
                 isNextCalled = true;
 
                 return Task.CompletedTask;
-            }));
+            }, ct));
 
             Assert.False(isNextCalled);
         }
@@ -89,15 +93,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             A.CallTo(() => user.Claims)
                 .Returns(Enumerable.Repeat(new Claim(SquidexClaimTypes.TotalApps, "5"), 1).ToList());
 
-            A.CallTo(() => userResolver.FindByIdAsync(userId, default))
+            A.CallTo(() => userResolver.FindByIdAsync(userId, ct))
                 .Returns(user);
 
-            await sut.HandleAsync(commandContext, x =>
+            await sut.HandleAsync(commandContext, (c, ct) =>
             {
-                x.Complete(true);
+                c.Complete(true);
 
                 return Task.CompletedTask;
-            });
+            }, ct);
 
             A.CallTo(() => userResolver.SetClaimAsync(userId, SquidexClaimTypes.TotalApps, "6", true, default))
                 .MustHaveHappened();
@@ -115,12 +119,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
             options.MaximumNumberOfApps = 10;
 
-            await sut.HandleAsync(commandContext, x =>
+            await sut.HandleAsync(commandContext, (c, ct) =>
             {
-                x.Complete(true);
+                c.Complete(true);
 
                 return Task.CompletedTask;
-            });
+            }, ct);
 
             A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -138,12 +142,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
             options.MaximumNumberOfApps = 0;
 
-            await sut.HandleAsync(commandContext, x =>
+            await sut.HandleAsync(commandContext, (c, ct) =>
             {
-                x.Complete(true);
+                c.Complete(true);
 
                 return Task.CompletedTask;
-            });
+            }, ct);
 
             A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -161,12 +165,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
             options.MaximumNumberOfApps = 10;
 
-            await sut.HandleAsync(commandContext, x =>
+            await sut.HandleAsync(commandContext, (c, ct) =>
             {
-                x.Complete(true);
+                c.Complete(true);
 
                 return Task.CompletedTask;
-            });
+            }, ct);
 
             A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();

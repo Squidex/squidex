@@ -200,7 +200,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteApp(string app)
         {
-            await CommandBus.PublishAsync(new DeleteApp());
+            var command = new DeleteApp();
+
+            await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -219,7 +221,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private async Task<T> InvokeCommandAsync<T>(ICommand command, Func<IAppEntity, T> converter)
         {
-            var context = await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             var result = context.Result<IAppEntity>();
             var response = converter(result);

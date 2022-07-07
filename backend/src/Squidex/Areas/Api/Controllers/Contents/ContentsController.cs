@@ -236,7 +236,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var command = new ValidateContent { ContentId = id };
 
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -387,7 +387,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var command = request.ToCommand();
 
-            var context = await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             var result = context.Result<BulkUpdateResult>();
             var response = result.Select(x => BulkResultDto.FromDomain(x, HttpContext)).ToArray();
@@ -418,7 +418,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var command = request.ToCommand();
 
-            var context = await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             var result = context.Result<BulkUpdateResult>();
             var response = result.Select(x => BulkResultDto.FromDomain(x, HttpContext)).ToArray();
@@ -647,14 +647,14 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var command = request.ToCommand(id);
 
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             return NoContent();
         }
 
         private async Task<ContentDto> InvokeCommandAsync(ICommand command)
         {
-            var context = await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             var result = context.Result<IEnrichedContentEntity>();
             var response = ContentDto.FromDomain(result, Resources);

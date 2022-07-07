@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         StatusJobId = job.Id
                     };
 
-                    await commandBus.PublishAsync(command);
+                    await commandBus.PublishAsync(command, default);
                 }
             }
             catch (DomainObjectNotFoundException)

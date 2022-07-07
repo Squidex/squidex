@@ -109,27 +109,29 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
             var command = context.Command;
 
             if (command is CreateSchema createSchema)
             {
-                var names = await GetNamesAsync(createSchema.AppId.Id, default);
+                var names = await GetNamesAsync(createSchema.AppId.Id, ct);
 
-                var token = await CheckSchemaAsync(createSchema, names);
+                var token = await CheckSchemaAsync(createSchema, names, ct);
                 try
                 {
-                    await next(context);
+                    await next(context, ct);
                 }
                 finally
                 {
-                    await names.RemoveReservationAsync(token);
+                    // Always remove the reservation and therefore do not pass over cancellation token.
+                    await names.RemoveReservationAsync(token, default);
                 }
             }
             else
             {
-                await next(context);
+                await next(context, ct);
             }
 
             if (context.IsCompleted)
@@ -164,16 +166,17 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return InvalidateItAsync(update.AppId.Id, update.SchemaId.Id, update.SchemaId.Name);
         }
 
-        private async Task<string> CheckSchemaAsync(CreateSchema command, NameReservationState names)
+        private async Task<string> CheckSchemaAsync(CreateSchema command, NameReservationState names,
+            CancellationToken ct)
         {
-            var existing = await schemaRepository.FindAsync(command.AppId.Id, command.Name);
+            var existing = await schemaRepository.FindAsync(command.AppId.Id, command.Name, ct);
 
             if (existing != null && !existing.IsDeleted)
             {
                 throw new ValidationException(T.Get("schemas.nameAlreadyExists"));
             }
 
-            var token = await names.ReserveAsync(command.SchemaId, command.Name);
+            var token = await names.ReserveAsync(command.SchemaId, command.Name, ct);
 
             if (token == null)
             {

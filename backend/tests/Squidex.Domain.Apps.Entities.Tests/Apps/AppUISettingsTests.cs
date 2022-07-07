@@ -189,7 +189,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             await sut.RemoveAsync(appId, userId, "root.nested", ct);
 
-            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, ct))
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -198,7 +198,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             await sut.RemoveAsync(appId, userId, "root", ct);
 
-            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, ct))
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
     }

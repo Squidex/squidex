@@ -178,7 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_take_and_remove_reservation_if_created()
         {
-            A.CallTo(() => appRepository.FindAsync(appId.Name, default))
+            A.CallTo(() => appRepository.FindAsync(appId.Name, ct))
                 .Returns(Task.FromResult<IAppEntity?>(null));
 
             var command = Create(appId.Name);
@@ -189,12 +189,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             NameReservation? madeReservation = null;
 
-            await sut.HandleAsync(context, x =>
+            await sut.HandleAsync(context, (c, ct) =>
             {
                 madeReservation = state.Snapshot.Reservations.FirstOrDefault();
 
                 return Task.CompletedTask;
-            });
+            }, ct);
 
             Assert.Empty(state.Snapshot.Reservations);
 
@@ -205,7 +205,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_clear_reservation_if_app_creation_failed()
         {
-            A.CallTo(() => appRepository.FindAsync(appId.Name, default))
+            A.CallTo(() => appRepository.FindAsync(appId.Name, ct))
                 .Returns(Task.FromResult<IAppEntity?>(null));
 
             var command = Create(appId.Name);
@@ -216,12 +216,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             NameReservation? madeReservation = null;
 
-            await Assert.ThrowsAnyAsync<Exception>(() => sut.HandleAsync(context, x =>
+            await Assert.ThrowsAnyAsync<Exception>(() => sut.HandleAsync(context, (c, ct) =>
             {
                 madeReservation = state.Snapshot.Reservations.FirstOrDefault();
 
                 throw new InvalidOperationException();
-            }));
+            }, ct));
 
             Assert.Empty(state.Snapshot.Reservations);
 
@@ -243,10 +243,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 new CommandContext(command, commandBus)
                     .Complete();
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
-
-            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<NameReservationState.State>._, A<CancellationToken>._))
-                .MustNotHaveHappened();
+            await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context, ct));
         }
 
         [Fact]
@@ -261,7 +258,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 new CommandContext(command, commandBus)
                     .Complete();
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+            await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context, ct));
 
             A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<NameReservationState.State>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -278,7 +275,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 new CommandContext(command, commandBus)
                     .Complete(app);
 
-            await sut.HandleAsync(context);
+            await sut.HandleAsync(context, ct);
 
             A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<NameReservationState.State>._, A<CancellationToken>._))
                 .MustNotHaveHappened();

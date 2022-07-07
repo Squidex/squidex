@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Tags, ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Alias!, ct))
+            A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Alias!, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -143,13 +143,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.RestoreAsync(context, ct);
 
-            A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, ct))
+            A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(A<string>._, ct))
+            A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Alias == alias), default))
+            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Alias == alias), A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -277,7 +277,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.RestoreEventAsync(AppEvent(@event), context, ct);
 
-            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, assetId, version, null, assetStream, true, ct))
+            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, assetId, version, null, assetStream, true, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 

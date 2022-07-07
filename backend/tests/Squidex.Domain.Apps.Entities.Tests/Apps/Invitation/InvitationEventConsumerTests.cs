@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
         private void MustNotResolveUser()
         {
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, default))
+            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 

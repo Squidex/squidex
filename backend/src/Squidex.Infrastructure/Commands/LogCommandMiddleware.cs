@@ -18,7 +18,8 @@ namespace Squidex.Infrastructure.Commands
             this.log = log;
         }
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
             var type = context.Command.GetType();
 
@@ -32,7 +33,7 @@ namespace Squidex.Infrastructure.Commands
                 var watch = ValueStopwatch.StartNew();
                 try
                 {
-                    await next(context);
+                    await next(context, ct);
 
                     log.LogInformation("Command {command} with ID {id} succeeded.", type, context.ContextId);
                 }

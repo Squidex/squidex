@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             A.CallTo(() => inner.SetAsync(A<List<TextContentState>>.That.Matches(x => x.Count == 1 && x[0].IsDeleted), ct))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>._, ct))
+            A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
     }

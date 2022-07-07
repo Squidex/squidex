@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -53,7 +53,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
         {
             CheckPermissions(userId);
 
-            var result = await commentsLoader.GetCommentsAsync(userId, version);
+            var result = await commentsLoader.GetCommentsAsync(userId, version, HttpContext.RequestAborted);
 
             var response = Deferred.Response(() =>
             {
@@ -88,7 +88,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
                 CommentId = commentId
             };
 
-            await CommandBus.PublishAsync(commmand);
+            await CommandBus.PublishAsync(commmand, HttpContext.RequestAborted);
 
             return NoContent();
         }

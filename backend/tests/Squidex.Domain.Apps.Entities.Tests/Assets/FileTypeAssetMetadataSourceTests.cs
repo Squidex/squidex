@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = new CreateAsset();
 
-            await sut.EnhanceAsync(command);
+            await sut.EnhanceAsync(command, default);
 
             Assert.Empty(command.Tags);
         }
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 File = new NoopAssetFile("File.DOCX")
             };
 
-            await sut.EnhanceAsync(command);
+            await sut.EnhanceAsync(command, default);
 
             Assert.Contains("type/docx", command.Tags);
         }
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 File = new NoopAssetFile("File")
             };
 
-            await sut.EnhanceAsync(command);
+            await sut.EnhanceAsync(command, default);
 
             Assert.Contains("type/blob", command.Tags);
         }

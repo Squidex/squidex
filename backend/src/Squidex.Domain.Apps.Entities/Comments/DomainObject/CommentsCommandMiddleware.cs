@@ -23,7 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             this.userResolver = userResolver;
         }
 
-        public override async Task HandleAsync(CommandContext context, NextDelegate next)
+        public override async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
             if (context.Command is CommentsCommand commentsCommand)
             {
@@ -33,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 }
             }
 
-            await base.HandleAsync(context, next);
+            await base.HandleAsync(context, next, ct);
         }
 
         private static bool IsMention(CreateComment createComment)

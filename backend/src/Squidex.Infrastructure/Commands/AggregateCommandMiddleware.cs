@@ -7,8 +7,8 @@
 
 namespace Squidex.Infrastructure.Commands
 {
-    public class AggregateCommandMiddleware<TCommand, TTarget> : ICommandMiddleware
-        where TCommand : IAggregateCommand where TTarget : IAggregate
+    public class AggregateCommandMiddleware<TCommand, T1> : ICommandMiddleware
+        where TCommand : IAggregateCommand where T1 : IAggregate
     {
         private readonly IDomainObjectFactory domainObjectFactory;
 
@@ -17,39 +17,44 @@ namespace Squidex.Infrastructure.Commands
             this.domainObjectFactory = domainObjectFactory;
         }
 
-        public virtual async Task HandleAsync(CommandContext context, NextDelegate next)
+        public virtual async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
-            await ExecuteCommandAsync(context);
+            await ExecuteCommandAsync(context, ct);
 
-            await next(context);
+            await next(context, ct);
         }
 
-        protected async Task ExecuteCommandAsync(CommandContext context)
+        protected async Task ExecuteCommandAsync(CommandContext context,
+            CancellationToken ct)
         {
             if (context.Command is TCommand typedCommand)
             {
-                var commandResult = await ExecuteCommandAsync(typedCommand);
-                var commandPayload = await EnrichResultAsync(context, commandResult);
+                var commandResult = await ExecuteCommandAsync(typedCommand, ct);
+                var commandPayload = await EnrichResultAsync(context, commandResult, ct);
 
                 context.Complete(commandPayload);
             }
         }
 
-        protected virtual Task<object> EnrichResultAsync(CommandContext context, CommandResult result)
+        protected virtual Task<object> EnrichResultAsync(CommandContext context, CommandResult result,
+            CancellationToken ct)
         {
             return Task.FromResult(result.Payload is None ? result : result.Payload);
         }
 
-        protected virtual Task<CommandResult> ExecuteCommandAsync(TCommand command)
+        protected virtual Task<CommandResult> ExecuteCommandAsync(TCommand command,
+            CancellationToken ct)
         {
-            var executable = domainObjectFactory.Create<TTarget>(command.AggregateId);
+            var executable = domainObjectFactory.Create<T1>(command.AggregateId);
 
-            return ExecuteCommandAsync(executable, command);
+            return ExecuteCommandAsync(executable, command, ct);
         }
 
-        protected virtual Task<CommandResult> ExecuteCommandAsync(TTarget executable, TCommand command)
+        protected virtual Task<CommandResult> ExecuteCommandAsync(T1 executable, TCommand command,
+            CancellationToken ct)
         {
-            return executable.ExecuteAsync(command, default);
+            return executable.ExecuteAsync(command, ct);
         }
     }
 }

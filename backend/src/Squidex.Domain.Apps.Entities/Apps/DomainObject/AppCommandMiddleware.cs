@@ -28,33 +28,36 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             this.contextProvider = contextProvider;
         }
 
-        public override async Task HandleAsync(CommandContext context, NextDelegate next)
+        public override async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
             if (context.Command is UploadAppImage uploadImage)
             {
-                await UploadAsync(uploadImage);
+                await UploadAsync(uploadImage, ct);
             }
 
-            await base.HandleAsync(context, next);
+            await base.HandleAsync(context, next, ct);
         }
 
-        protected override Task<object> EnrichResultAsync(CommandContext context, CommandResult result)
+        protected override Task<object> EnrichResultAsync(CommandContext context, CommandResult result,
+            CancellationToken ct)
         {
             if (result.Payload is IAppEntity app)
             {
                 contextProvider.Context.App = app;
             }
 
-            return base.EnrichResultAsync(context, result);
+            return base.EnrichResultAsync(context, result, ct);
         }
 
-        private async Task UploadAsync(UploadAppImage uploadImage)
+        private async Task UploadAsync(UploadAppImage uploadImage,
+            CancellationToken ct)
         {
             var file = uploadImage.File;
 
             await using (var uploadStream = file.OpenRead())
             {
-                var image = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream, file.MimeType);
+                var image = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream, file.MimeType, ct);
 
                 if (image == null)
                 {
@@ -64,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             await using (var uploadStream = file.OpenRead())
             {
-                await appImageStore.UploadAsync(uploadImage.AppId.Id, uploadStream);
+                await appImageStore.UploadAsync(uploadImage.AppId.Id, uploadStream, ct);
             }
         }
     }

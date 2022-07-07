@@ -335,8 +335,10 @@ namespace Squidex.Infrastructure.Commands
         {
             if (newEvents.Length > 0)
             {
+                // Writing the events is the first step, so we can cancel it if requested by the user, but if events are written,
+                // we should also write the snapshots to keep both collection / database as consitent as possible.
                 await persistence.WriteEventsAsync(newEvents, ct);
-                await persistence.WriteSnapshotAsync(Snapshot, ct);
+                await persistence.WriteSnapshotAsync(Snapshot, default);
             }
         }
 

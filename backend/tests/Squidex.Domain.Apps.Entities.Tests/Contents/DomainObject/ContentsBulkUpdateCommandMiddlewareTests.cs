@@ -24,6 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 {
     public class ContentsBulkUpdateCommandMiddlewareTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
@@ -34,6 +36,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         public ContentsBulkUpdateCommandMiddlewareTests()
         {
+            ct = cts.Token;
+
             var log = A.Fake<ILogger<ContentsBulkUpdateCommandMiddleware>>();
 
             sut = new ContentsBulkUpdateCommandMiddleware(contentQuery, contextProvider, log);
@@ -73,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result);
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == null && x.Exception is DomainObjectNotFoundException);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -89,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         x.ShouldSkipCleanup() &&
                         x.ShouldSkipContentEnrichment() &&
                         x.ShouldSkipTotal()),
-                    schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), A<CancellationToken>._))
+                    schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), ct))
                 .Returns(ResultList.CreateFrom(2, CreateContent(id), CreateContent(id)));
 
             var command = BulkCommand(BulkUpdateContentType.ChangeStatus, query);
@@ -99,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result);
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == null && x.Exception is DomainException);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -115,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         x.ShouldSkipCleanup() &&
                         x.ShouldSkipContentEnrichment() &&
                         x.ShouldSkipTotal()),
-                    schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), A<CancellationToken>._))
+                    schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), ct))
                 .Returns(ResultList.CreateFrom(1, CreateContent(id)));
 
             var command = BulkCommand(BulkUpdateContentType.Upsert, query: query, data: data);
@@ -126,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
-                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id)))
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), ct))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -145,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         x.ShouldSkipCleanup() &&
                         x.ShouldSkipContentEnrichment() &&
                         x.ShouldSkipTotal()),
-                    schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), A<CancellationToken>._))
+                    schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), ct))
                 .Returns(ResultList.CreateFrom(2,
                     CreateContent(id1),
                     CreateContent(id2)));
@@ -161,11 +165,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id2 && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
-                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id1)))
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id1), ct))
                 .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => commandBus.PublishAsync(
-                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id2)))
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id2), ct))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -184,7 +188,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
-                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default)))
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default), ct))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -203,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
-                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default)))
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default), ct))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -222,7 +226,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
-                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id)))
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), ct))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -241,7 +245,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
-                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id)))
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), ct))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -260,7 +264,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
-                    A<CreateContent>.That.Matches(x => x.ContentId == id && x.Data == data)))
+                    A<CreateContent>.That.Matches(x => x.ContentId == id && x.Data == data), ct))
                 .MustHaveHappened();
         }
 
@@ -278,7 +282,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result);
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -297,7 +301,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
-                    A<UpdateContent>.That.Matches(x => x.ContentId == id && x.Data == data)))
+                    A<UpdateContent>.That.Matches(x => x.ContentId == id && x.Data == data), ct))
                 .MustHaveHappened();
         }
 
@@ -315,7 +319,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result);
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -334,7 +338,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
-                    A<PatchContent>.That.Matches(x => x.ContentId == id && x.Data == data)))
+                    A<PatchContent>.That.Matches(x => x.ContentId == id && x.Data == data), ct))
                 .MustHaveHappened();
         }
 
@@ -352,7 +356,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result);
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -370,7 +374,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result);
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == null)))
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == null), ct))
                 .MustHaveHappened();
         }
 
@@ -388,7 +393,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result);
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == time)))
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == time), ct))
                 .MustHaveHappened();
         }
 
@@ -406,7 +412,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result);
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -425,7 +431,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
-                    A<ValidateContent>.That.Matches(x => x.ContentId == id)))
+                    A<ValidateContent>.That.Matches(x => x.ContentId == id), ct))
                 .MustHaveHappened();
         }
 
@@ -443,7 +449,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result);
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -462,7 +468,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
-                    A<DeleteContent>.That.Matches(x => x.ContentId == id)))
+                    A<DeleteContent>.That.Matches(x => x.ContentId == id), ct))
                 .MustHaveHappened();
         }
 
@@ -480,7 +486,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result);
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -488,7 +494,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             var context = new CommandContext(command, commandBus);
 
-            await sut.HandleAsync(context);
+            await sut.HandleAsync(context, ct);
 
             return (context.PlainResult as BulkUpdateResult)!;
         }

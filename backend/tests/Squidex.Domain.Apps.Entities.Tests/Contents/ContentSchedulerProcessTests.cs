@@ -61,17 +61,19 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await sut.PublishAsync();
 
             A.CallTo(() => commandBus.PublishAsync(
-                A<ChangeContentStatus>.That.Matches(x =>
+                    A<ChangeContentStatus>.That.Matches(x =>
                        x.ContentId == content1.Id &&
                        x.Status == content1.ScheduleJob.Status &&
-                       x.StatusJobId == content1.ScheduleJob.Id)))
+                       x.StatusJobId == content1.ScheduleJob.Id),
+                    default))
                 .MustHaveHappened();
 
             A.CallTo(() => commandBus.PublishAsync(
-                A<ChangeContentStatus>.That.Matches(x =>
+                    A<ChangeContentStatus>.That.Matches(x =>
                        x.ContentId == content2.Id &&
                        x.Status == content2.ScheduleJob.Status &&
-                       x.StatusJobId == content2.ScheduleJob.Id)))
+                       x.StatusJobId == content2.ScheduleJob.Id),
+                    default))
                 .MustHaveHappened();
         }
 
@@ -95,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await sut.PublishAsync();
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -117,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentRepository.QueryScheduledWithoutDataAsync(now, default))
                 .Returns(new[] { content1 }.ToAsyncEnumerable());
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, default))
                 .Throws(new DomainObjectNotFoundException(content1.Id.ToString()));
 
             await sut.PublishAsync();

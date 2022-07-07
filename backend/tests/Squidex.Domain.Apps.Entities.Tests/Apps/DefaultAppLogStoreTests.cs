@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await ((IDeleter)sut).DeleteAppAsync(app, ct);
 
-            A.CallTo(() => requestLogStore.DeleteAsync($"^[a-z]-{app.Id}", ct))
+            A.CallTo(() => requestLogStore.DeleteAsync($"^[a-z]-{app.Id}", A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.LogAsync(appId, default, ct);
 
-            A.CallTo(() => requestLogStore.LogAsync(A<Request>._, ct))
+            A.CallTo(() => requestLogStore.LogAsync(A<Request>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 

@@ -29,9 +29,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new CommandContext(command, commandBus)
                     .Complete();
 
-            await sut.HandleAsync(context);
+            await sut.HandleAsync(context, default);
 
-            A.CallTo(() => commandBus.PublishAsync(A<CreateContent>.That.Matches(x => x.Status == Status.Published)))
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<CreateContent>.That.Matches(x => x.Status == Status.Published), default))
                 .MustHaveHappened();
         }
 
@@ -44,9 +45,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new CommandContext(command, commandBus)
                     .Complete();
 
-            await sut.HandleAsync(context);
+            await sut.HandleAsync(context, default);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -58,9 +59,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var context =
                 new CommandContext(command, commandBus);
 
-            await sut.HandleAsync(context);
+            await sut.HandleAsync(context, default);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
     }

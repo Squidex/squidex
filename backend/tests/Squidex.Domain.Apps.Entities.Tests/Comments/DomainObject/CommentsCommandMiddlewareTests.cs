@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 {
     public class CommentsCommandMiddlewareTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
@@ -28,6 +30,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         public CommentsCommandMiddlewareTests()
         {
+            ct = cts.Token;
+
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, default))
                 .Returns(Task.FromResult<IUser?>(null));
 
@@ -42,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var domainObject = A.Fake<CommentsStream>();
 
-            A.CallTo(() => domainObject.ExecuteAsync(command, A<CancellationToken>._))
+            A.CallTo(() => domainObject.ExecuteAsync(command, ct))
                 .Returns(CommandResult.Empty(commentsId, 0, 0));
 
             A.CallTo(() => domainObjectFactory.Create<CommentsStream>(commentsId))
@@ -50,12 +54,12 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var isNextCalled = false;
 
-            await sut.HandleAsync(context, c =>
+            await sut.HandleAsync(context, (c, ct) =>
             {
                 isNextCalled = true;
 
                 return Task.CompletedTask;
-            });
+            }, ct);
 
             Assert.True(isNextCalled);
         }
@@ -74,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var context = CrateCommandContext(command);
 
-            await sut.HandleAsync(context);
+            await sut.HandleAsync(context, ct);
 
             Assert.Equal(command.Mentions, new[] { "id1", "id2" });
         }
@@ -93,9 +97,9 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var context = CrateCommandContext(command);
 
-            await sut.HandleAsync(context);
+            await sut.HandleAsync(context, ct);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -110,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var context = CrateCommandContext(command);
 
-            await sut.HandleAsync(context);
+            await sut.HandleAsync(context, ct);
 
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -127,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var context = CrateCommandContext(command);
 
-            await sut.HandleAsync(context);
+            await sut.HandleAsync(context, ct);
 
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
