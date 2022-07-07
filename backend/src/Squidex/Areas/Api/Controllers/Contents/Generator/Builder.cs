@@ -60,7 +60,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 return BuildResult(contentSchema);
             });
 
-            var path = $"api/content/{AppName}";
+            var path = $"/api/content/{AppName}";
 
             var builder = new OperationsBuilder
             {
@@ -108,7 +108,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 return BuildResult(contentSchema);
             });
 
-            var path = $"api/content/{AppName}/{schema.Name}";
+            var path = $"/api/content/{AppName}/{schema.Name}";
 
             var builder = new OperationsBuilder
             {
