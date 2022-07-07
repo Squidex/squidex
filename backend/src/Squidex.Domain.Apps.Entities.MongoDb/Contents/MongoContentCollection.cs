@@ -230,7 +230,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public Task InsertManyAsync(IReadOnlyList<MongoContentEntity> snapshots,
             CancellationToken ct = default)
         {
-            return Collection.InsertManyAsync(snapshots, InsertUnordered, ct);
+            return !snapshots.Any()
+                ? Task.CompletedTask
+                : Collection.InsertManyAsync(snapshots, InsertUnordered, ct);
         }
     }
 }
