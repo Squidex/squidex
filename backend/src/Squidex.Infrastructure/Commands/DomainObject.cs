@@ -213,8 +213,6 @@ namespace Squidex.Infrastructure.Commands
         {
             Guard.NotNull(handler);
 
-            var wasDeleted = IsDeleted(Snapshot);
-
             var previousSnapshot = Snapshot;
             var previousVersion = Version;
             try
@@ -230,7 +228,7 @@ namespace Squidex.Infrastructure.Commands
                 {
                     await EnsureLoadedAsync(ct);
 
-                    if (wasDeleted)
+                    if (IsDeleted(Snapshot))
                     {
                         if (CanRecreate() && isCreation)
                         {
