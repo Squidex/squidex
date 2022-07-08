@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public partial class MongoContentRepository : IContentRepository, IInitializable
     {
-        private readonly MongoContentCollection collectionAll;
+        private readonly MongoContentCollection collectionFrontend;
         private readonly MongoContentCollection collectionPublished;
         private readonly IAppProvider appProvider;
 
@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider)
         {
-            collectionAll =
+            collectionFrontend =
                 new MongoContentCollection("States_Contents_All3", database, appProvider,
                     ReadPreference.Primary);
 
@@ -46,20 +46,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task InitializeAsync(
             CancellationToken ct)
         {
-            await collectionAll.InitializeAsync(ct);
+            await collectionFrontend.InitializeAsync(ct);
             await collectionPublished.InitializeAsync(ct);
         }
 
         public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
             CancellationToken ct = default)
         {
-            return collectionAll.StreamAll(appId, schemaIds, ct);
+            return collectionFrontend.StreamAll(appId, schemaIds, ct);
         }
 
         public IAsyncEnumerable<IContentEntity> QueryScheduledWithoutDataAsync(Instant now,
             CancellationToken ct = default)
         {
-            return collectionAll.QueryScheduledWithoutDataAsync(now, ct);
+            return collectionFrontend.QueryScheduledWithoutDataAsync(now, ct);
         }
 
         public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q, SearchScope scope,
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.QueryAsync(app, schemas, q, ct);
+                return collectionFrontend.QueryAsync(app, schemas, q, ct);
             }
             else
             {
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.QueryAsync(app, schema, q, ct);
+                return collectionFrontend.QueryAsync(app, schema, q, ct);
             }
             else
             {
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.FindContentAsync(schema, id, ct);
+                return collectionFrontend.FindContentAsync(schema, id, ct);
             }
             else
             {
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.QueryIdsAsync(appId, ids, ct);
+                return collectionFrontend.QueryIdsAsync(appId, ids, ct);
             }
             else
             {
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.HasReferrersAsync(appId, contentId, ct);
+                return collectionFrontend.HasReferrersAsync(appId, contentId, ct);
             }
             else
             {
@@ -130,18 +130,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public Task ResetScheduledAsync(DomainId documentId,
             CancellationToken ct = default)
         {
-            return collectionAll.ResetScheduledAsync(documentId, ct);
+            return collectionFrontend.ResetScheduledAsync(documentId, ct);
         }
 
         public Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
             CancellationToken ct = default)
         {
-            return collectionAll.QueryIdsAsync(appId, schemaId, filterNode, ct);
+            return collectionFrontend.QueryIdsAsync(appId, schemaId, filterNode, ct);
         }
 
         public IEnumerable<IMongoCollection<MongoContentEntity>> GetInternalCollections()
         {
-            yield return collectionAll.GetInternalCollection();
+            yield return collectionFrontend.GetInternalCollection();
             yield return collectionPublished.GetInternalCollection();
         }
     }

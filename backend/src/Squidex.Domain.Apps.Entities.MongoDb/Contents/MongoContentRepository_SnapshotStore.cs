@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         IAsyncEnumerable<SnapshotResult<ContentDomainObject.State>> ISnapshotStore<ContentDomainObject.State>.ReadAllAsync(
             CancellationToken ct)
         {
-            return collectionAll.StreamAll(ct)
+            return collectionFrontend.StreamAll(ct)
                 .Select(x => new SnapshotResult<ContentDomainObject.State>(x.DocumentId, x.ToState(), x.Version, true));
         }
 
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             using (Telemetry.Activities.StartActivity("MongoContentRepository/ReadAsync"))
             {
                 var existing =
-                    await collectionAll.FindAsync(key, ct);
+                    await collectionFrontend.FindAsync(key, ct);
 
                 if (existing?.IsSnapshot == true)
                 {
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/DeleteAppAsync"))
             {
-                await collectionAll.DeleteAppAsync(app.Id, ct);
+                await collectionFrontend.DeleteAppAsync(app.Id, ct);
                 await collectionPublished.DeleteAppAsync(app.Id, ct);
             }
         }
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/ClearAsync"))
             {
-                await collectionAll.ClearAsync(ct);
+                await collectionFrontend.ClearAsync(ct);
                 await collectionPublished.ClearAsync(ct);
             }
         }
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/RemoveAsync"))
             {
-                await collectionAll.RemoveAsync(key, ct);
+                await collectionFrontend.RemoveAsync(key, ct);
                 await collectionPublished.RemoveAsync(key, ct);
             }
         }
@@ -82,8 +82,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 }
 
                 await Task.WhenAll(
-                    UpsertDraftContentAsync(job, ct),
-                    UpsertOrDeletePublishedAsync(job, ct));
+                    UpsertFrontendAsync(job, ct),
+                    UpsertPublishedAsync(job, ct));
             }
         }
 
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteManyAsync"))
             {
                 var entitiesPublished = new List<MongoContentEntity>();
-                var entitiesAll = new List<MongoContentEntity>();
+                var entitiesFrontend = new List<MongoContentEntity>();
 
                 foreach (var job in jobs.Where(IsValid))
                 {
@@ -102,16 +102,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                         entitiesPublished.Add(await MongoContentEntity.CreatePublishedAsync(job, appProvider));
                     }
 
-                    entitiesAll.Add(await MongoContentEntity.CreateDraftAsync(job, appProvider));
+                    entitiesFrontend.Add(await MongoContentEntity.CreateDraftAsync(job, appProvider));
                 }
 
                 await Task.WhenAll(
-                    collectionPublished.InsertManyAsync(entitiesPublished, ct),
-                    collectionAll.InsertManyAsync(entitiesAll, ct));
+                    collectionFrontend.InsertManyAsync(entitiesFrontend, ct),
+                    collectionPublished.InsertManyAsync(entitiesPublished, ct));
             }
         }
 
-        private async Task UpsertOrDeletePublishedAsync(SnapshotWriteJob<ContentDomainObject.State> job,
+        private async Task UpsertPublishedAsync(SnapshotWriteJob<ContentDomainObject.State> job,
             CancellationToken ct = default)
         {
             if (ShouldWritePublished(job.Value))
@@ -132,12 +132,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return collectionPublished.RemoveAsync(documentId, ct);
         }
 
-        private async Task UpsertDraftContentAsync(SnapshotWriteJob<ContentDomainObject.State> job,
+        private async Task UpsertFrontendAsync(SnapshotWriteJob<ContentDomainObject.State> job,
             CancellationToken ct = default)
         {
             var entity = await MongoContentEntity.CreateDraftAsync(job, appProvider);
 
-            await collectionAll.UpsertVersionedAsync(entity.DocumentId, job.OldVersion, entity, ct);
+            await collectionFrontend.UpsertVersionedAsync(entity.DocumentId, job.OldVersion, entity, ct);
         }
 
         private async Task UpsertPublishedContentAsync(SnapshotWriteJob<ContentDomainObject.State> job,
