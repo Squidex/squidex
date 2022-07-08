@@ -100,7 +100,7 @@ namespace Squidex.Infrastructure.Commands
                                 {
                                     var domainObject = domainObjectFactory.Create<T, TState>(id, context);
 
-                                    await domainObject.RebuildStateAsync();
+                                    await domainObject.RebuildStateAsync(ct);
                                 }
                                 catch (DomainObjectNotFoundException)
                                 {
