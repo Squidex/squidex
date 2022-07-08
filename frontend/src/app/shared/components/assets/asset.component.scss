@@ -111,6 +111,8 @@ $list-height: 2.25rem;
 
         img {
             background-image: $asset-background;
+            object-fit: contain;
+            object-position: inherit;
         }
     }
 

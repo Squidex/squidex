@@ -4,7 +4,7 @@
     <form [formGroup]="addClientForm.form" (ngSubmit)="addClient()">
         <div class="row gx-2">
             <div class="col">
-                <sqx-control-errors for="name"></sqx-control-errors>
+                <sqx-control-errors for="id"></sqx-control-errors>
 
                 <input type="text" class="form-control" formControlName="id" maxlength="40" placeholder="{{ 'clients.clientNamePlaceholder' | sqxTranslate }}" autocomplete="off" sqxTransformInput="LowerCase">
             </div>
