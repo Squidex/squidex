@@ -787,7 +787,7 @@
   "schemas.schemaHintsHint": "为文档和用户界面描述这个Schemas。",
   "schemas.schemaLabelHint": "文档和用户界面的显示名称。",
   "schemas.schemaNameHint": "您只能使用字母、数字和破折号，并且不能超过 40 个字符。",
-  "schemas.schemaNameValidationMessage": "名称只能包含字母、数字、破折号和空格。",
+  "schemas.schemaNameValidationMessage": "名称只能包含字母、数字和破折号。",
   "schemas.schemaTagsHint": "用于注释自动化流程Schemas的标签。",
   "schemas.searchPlaceholder": "搜索Schemas...",
   "schemas.showFieldFailed": "显示字段失败。请重新加载。",
