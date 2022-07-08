@@ -371,6 +371,106 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_update_content_in_parallel()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a new item.
+                content = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, ContentCreateOptions.AsPublish);
+
+
+                var numErrors = 0;
+                var numSuccess = 0;
+
+                // STEP 3: Make parallel updates.
+                await Parallel.ForEachAsync(Enumerable.Range(0, 20), async (i, ct) =>
+                {
+                    try
+                    {
+                        await _.Contents.UpdateAsync(content.Id, new TestEntityData { Number = i });
+
+                        Interlocked.Increment(ref numErrors);
+                    }
+                    catch (SquidexException ex) when (ex.StatusCode == 412)
+                    {
+                        Interlocked.Increment(ref numSuccess);
+                        return;
+                    }
+                });
+
+                // At least some errors and success should have happened.
+                Assert.True(numErrors > 0);
+                Assert.True(numSuccess > 0);
+
+
+                // STEP 3: Make an normal update to ensure nothing is corrupt.
+                await _.Contents.UpdateAsync(content.Id, new TestEntityData { Number = 2 });
+
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal(2, content.Data.Number);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_upsert_content_in_parallel()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a new item.
+                content = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, ContentCreateOptions.AsPublish);
+
+
+                var numErrors = 0;
+                var numSuccess = 0;
+
+                // STEP 3: Make parallel upserts.
+                await Parallel.ForEachAsync(Enumerable.Range(0, 20), async (i, ct) =>
+                {
+                    try
+                    {
+                        await _.Contents.UpsertAsync(content.Id, new TestEntityData { Number = i });
+
+                        Interlocked.Increment(ref numErrors);
+                    }
+                    catch (SquidexException ex) when (ex.StatusCode == 409)
+                    {
+                        Interlocked.Increment(ref numSuccess);
+                        return;
+                    }
+                });
+
+                // At least some errors and success should have happened.
+                Assert.True(numErrors > 0);
+                Assert.True(numSuccess > 0);
+
+
+                // STEP 3: Make an normal update to ensure nothing is corrupt.
+                await _.Contents.UpdateAsync(content.Id, new TestEntityData { Number = 2 });
+
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal(2, content.Data.Number);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
         public async Task Should_update_content_to_null()
         {
             TestEntity content = null;
@@ -648,10 +748,9 @@ namespace TestSuite.ApiTests
 
 
             // STEP 4: Retrieve all deleted items and check if found.
-            var deleted = await _.Contents.GetAsync(new ContentQuery
-            {
-                Filter = "isDeleted eq true"
-            }, QueryContext.Default.Unpublished(true));
+            var q = new ContentQuery { Filter = "isDeleted eq true" };
+
+            var deleted = await _.Contents.GetAsync(q, QueryContext.Default.Unpublished(true));
 
             Assert.Equal(!permanent, deleted.Items.Any(x => x.Id == content_1.Id));
         }
@@ -680,7 +779,9 @@ namespace TestSuite.ApiTests
 
 
             // STEP 4: Check if we can find it again with a query.
-            var contents_4 = await _.Contents.GetAsync(new ContentQuery { Filter = $"id eq '{content_1.Id}'" });
+            var q = new ContentQuery { Filter = $"id eq '{content_1.Id}'" };
+
+            var contents_4 = await _.Contents.GetAsync(q);
 
             Assert.NotNull(contents_4.Items.Find(x => x.Id == content_1.Id));
         }
@@ -707,7 +808,9 @@ namespace TestSuite.ApiTests
 
 
             // STEP 4: Check if we can find it again with a query.
-            var contents_4 = await _.Contents.GetAsync(new ContentQuery { Filter = $"id eq '{content_1.Id}'" });
+            var q = new ContentQuery { Filter = $"id eq '{content_1.Id}'" };
+
+            var contents_4 = await _.Contents.GetAsync(q);
 
             Assert.NotNull(contents_4.Items.Find(x => x.Id == content_1.Id));
         }

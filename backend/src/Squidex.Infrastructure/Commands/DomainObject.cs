@@ -224,33 +224,36 @@ namespace Squidex.Infrastructure.Commands
                 {
                     await WriteAsync(events, ct);
                 }
-                catch (InconsistentStateException)
+                catch (InconsistentStateException ex)
                 {
+                    // Start from the previous, unchanged snapshot.
+                    snapshot = previousSnapshot;
+
+                    // Create commands do not load the domain object for performance reasons, therefore we ensure it is loaded.
                     await EnsureLoadedAsync(ct);
 
-                    if (IsDeleted(previousSnapshot))
+                    var isDeleted = IsDeleted(Snapshot);
+
+                    if (isDeleted && isCreation && CanRecreate())
                     {
-                        if (CanRecreate() && isCreation)
+                        foreach (var @event in uncomittedEvents)
                         {
-                            snapshot = previousSnapshot;
-
-                            foreach (var @event in uncomittedEvents)
-                            {
-                                ApplyEvent(@event, Snapshot, Version, false, true);
-                            }
-
-                            await WriteAsync(events, ct);
+                            ApplyEvent(@event, Snapshot, Version, false, true);
                         }
-                        else
-                        {
-                            throw new DomainObjectDeletedException(uniqueId.ToString());
-                        }
+
+                        await WriteAsync(events, ct);
+                    }
+                    else if (isDeleted)
+                    {
+                        throw new DomainObjectDeletedException(uniqueId.ToString());
+                    }
+                    else if (isCreation)
+                    {
+                        throw new DomainObjectConflictException(uniqueId.ToString());
                     }
                     else
                     {
-                        snapshot = previousSnapshot;
-
-                        throw new DomainObjectConflictException(uniqueId.ToString());
+                        throw new DomainObjectVersionException(uniqueId.ToString(), ex.VersionCurrent, ex.VersionExpected, ex);
                     }
                 }
 

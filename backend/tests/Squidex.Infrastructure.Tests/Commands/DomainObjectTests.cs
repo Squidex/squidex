@@ -136,6 +136,33 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
+        public async Task Should_throw_exception_if_writing_causes_inconsistent_state_exception()
+        {
+            sut.Recreate = false;
+
+            SetupCreated(2);
+
+            A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, ct))
+                .Throws(new InconsistentStateException(2, -1)).Once();
+
+            await Assert.ThrowsAsync<DomainObjectVersionException>(() => sut.ExecuteAsync(new UpdateAuto(), ct));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_writing_causes_inconsistent_state_exception_and_deleted()
+        {
+            sut.Recreate = false;
+
+            SetupCreated(2);
+            SetupDeleted();
+
+            A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, ct))
+                .Throws(new InconsistentStateException(2, -1)).Once();
+
+            await Assert.ThrowsAsync<DomainObjectDeletedException>(() => sut.ExecuteAsync(new UpdateAuto(), ct));
+        }
+
+        [Fact]
         public async Task Should_recreate_with_create_command_if_deleted_before()
         {
             sut.Recreate = true;
@@ -164,7 +191,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_exception_if_recreation_with_create_command_not_allowed()
+        public async Task Should_throw_exception_if_recreation_with_create_command_is_not_allowed()
         {
             sut.Recreate = false;
 
@@ -174,7 +201,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, ct))
                 .Throws(new InconsistentStateException(2, -1)).Once();
 
-            await Assert.ThrowsAsync<DomainObjectConflictException>(() => sut.ExecuteAsync(new CreateAuto { Value = 4 }, ct));
+            await Assert.ThrowsAsync<DomainObjectConflictException>(() => sut.ExecuteAsync(new CreateAuto(), ct));
         }
 
         [Fact]
@@ -206,7 +233,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_exception_if_recreation_with_upsert_command_not_allowed()
+        public async Task Should_throw_exception_if_recreation_with_upsert_command_is_not_allowed()
         {
             sut.Recreate = false;
 
@@ -216,7 +243,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, ct))
                 .Throws(new InconsistentStateException(2, -1)).Once();
 
-            await Assert.ThrowsAsync<DomainObjectDeletedException>(() => sut.ExecuteAsync(new Upsert { Value = 4 }, ct));
+            await Assert.ThrowsAsync<DomainObjectDeletedException>(() => sut.ExecuteAsync(new Upsert(), ct));
         }
 
         [Fact]

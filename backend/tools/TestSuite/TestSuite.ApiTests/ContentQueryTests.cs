@@ -43,10 +43,9 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_query_by_ids()
         {
-            var items = await _.Contents.GetAsync(new ContentQuery
-            {
-                OrderBy = "data/number/iv asc"
-            });
+            var q = new ContentQuery { OrderBy = "data/number/iv asc" };
+
+            var items = await _.Contents.GetAsync(q);
 
             var itemsById = await _.Contents.GetAsync(new HashSet<string>(items.Items.Take(3).Select(x => x.Id)));
 
@@ -63,10 +62,9 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_all_with_odata()
         {
-            var items = await _.Contents.GetAsync(new ContentQuery
-            {
-                OrderBy = "data/number/iv asc"
-            });
+            var q = new ContentQuery { OrderBy = "data/number/iv asc" };
+
+            var items = await _.Contents.GetAsync(q);
 
             AssertItems(items, 10, new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
         }
@@ -74,7 +72,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_all_with_json()
         {
-            var items = await _.Contents.GetAsync(new ContentQuery
+            var q = new ContentQuery
             {
                 JsonQuery = new
                 {
@@ -86,7 +84,9 @@ namespace TestSuite.ApiTests
                         }
                     }
                 }
-            });
+            };
+
+            var items = await _.Contents.GetAsync(q);
 
             AssertItems(items, 10, new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
         }
@@ -94,10 +94,9 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_items_by_skip_with_odata()
         {
-            var items = await _.Contents.GetAsync(new ContentQuery
-            {
-                Skip = 5, OrderBy = "data/number/iv asc"
-            });
+            var q = new ContentQuery { OrderBy = "data/number/iv asc", Skip = 5 };
+
+            var items = await _.Contents.GetAsync(q);
 
             AssertItems(items, 10, new[] { 6, 7, 8, 9, 10 });
         }
@@ -105,7 +104,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_items_by_skip_with_json()
         {
-            var items = await _.Contents.GetAsync(new ContentQuery
+            var q = new ContentQuery
             {
                 JsonQuery = new
                 {
@@ -118,7 +117,9 @@ namespace TestSuite.ApiTests
                     },
                     skip = 5
                 }
-            });
+            };
+
+            var items = await _.Contents.GetAsync(q);
 
             AssertItems(items, 10, new[] { 6, 7, 8, 9, 10 });
         }
@@ -126,10 +127,9 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_items_by_skip_and_top_with_odata()
         {
-            var items = await _.Contents.GetAsync(new ContentQuery
-            {
-                Skip = 2, Top = 5, OrderBy = "data/number/iv asc"
-            });
+            var q = new ContentQuery { Skip = 2, Top = 5, OrderBy = "data/number/iv asc" };
+
+            var items = await _.Contents.GetAsync(q);
 
             AssertItems(items, 10, new[] { 3, 4, 5, 6, 7 });
         }
@@ -137,10 +137,11 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_items_by_skip_and_top_with_json()
         {
-            var items = await _.Contents.GetAsync(new ContentQuery
+            var q = new ContentQuery
             {
                 JsonQuery = new
                 {
+                    skip = 2,
                     sort = new[]
                     {
                         new
@@ -148,9 +149,11 @@ namespace TestSuite.ApiTests
                             path = "data.number.iv", order = "ascending"
                         }
                     },
-                    skip = 2, top = 5
+                    top = 5
                 }
-            });
+            };
+
+            var items = await _.Contents.GetAsync(q);
 
             AssertItems(items, 10, new[] { 3, 4, 5, 6, 7 });
         }
@@ -158,10 +161,9 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_items_by_filter_with_odata()
         {
-            var items = await _.Contents.GetAsync(new ContentQuery
-            {
-                Filter = "data/number/iv gt 3 and data/number/iv lt 7", OrderBy = "data/number/iv asc"
-            });
+            var q = new ContentQuery { Filter = "data/number/iv gt 3 and data/number/iv lt 7", OrderBy = "data/number/iv asc" };
+
+            var items = await _.Contents.GetAsync(q);
 
             AssertItems(items, 3, new[] { 4, 5, 6 });
         }
@@ -169,7 +171,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_items_by_filter_with_json()
         {
-            var items = await _.Contents.GetAsync(new ContentQuery
+            var q = new ContentQuery
             {
                 JsonQuery = new
                 {
@@ -199,7 +201,9 @@ namespace TestSuite.ApiTests
                         }
                     }
                 }
-            });
+            };
+
+            var items = await _.Contents.GetAsync(q);
 
             AssertItems(items, 3, new[] { 4, 5, 6 });
         }
@@ -207,7 +211,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_items_by_json_filter_with_json()
         {
-            var items = await _.Contents.GetAsync(new ContentQuery
+            var q = new ContentQuery
             {
                 JsonQuery = new
                 {
@@ -237,7 +241,9 @@ namespace TestSuite.ApiTests
                         }
                     }
                 }
-            });
+            };
+
+            var items = await _.Contents.GetAsync(q);
 
             AssertItems(items, 3, new[] { 4, 5, 6 });
         }
@@ -245,15 +251,14 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_items_by_full_text_with_odata()
         {
+            var q = new ContentQuery { Search = "1" };
+
             // Query multiple times to wait for async text indexer.
             for (var i = 0; i < 10; i++)
             {
                 await Task.Delay(500);
 
-                var items = await _.Contents.GetAsync(new ContentQuery
-                {
-                    Search = "1"
-                });
+                var items = await _.Contents.GetAsync(q);
 
                 if (items.Items.Any())
                 {
@@ -268,18 +273,20 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_items_by_full_text_with_json()
         {
+            var q = new ContentQuery
+            {
+                JsonQuery = new
+                {
+                    fullText = "2"
+                }
+            };
+
             // Query multiple times to wait for async text indexer.
             for (var i = 0; i < 10; i++)
             {
                 await Task.Delay(500);
 
-                var items = await _.Contents.GetAsync(new ContentQuery
-                {
-                    JsonQuery = new
-                    {
-                        fullText = "2"
-                    }
-                });
+                var items = await _.Contents.GetAsync(q);
 
                 if (items.Items.Any())
                 {
@@ -294,15 +301,14 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_items_by_near_location_with_odata()
         {
+            var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(3 3)') lt 1000" };
+
             // Query multiple times to wait for async text indexer.
             for (var i = 0; i < 10; i++)
             {
                 await Task.Delay(500);
 
-                var items = await _.Contents.GetAsync(new ContentQuery
-                {
-                    Filter = "geo.distance(data/geo/iv, geography'POINT(3 3)') lt 1000"
-                });
+                var items = await _.Contents.GetAsync(q);
 
                 if (items.Items.Any())
                 {
@@ -317,28 +323,30 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_items_by_near_location_with_json()
         {
+            var q = new ContentQuery
+            {
+                JsonQuery = new
+                {
+                    filter = new
+                    {
+                        path = "data.geo.iv",
+                        op = "lt",
+                        value = new
+                        {
+                            longitude = 3,
+                            latitude = 3,
+                            distance = 1000
+                        }
+                    }
+                }
+            };
+
             // Query multiple times to wait for async text indexer.
             for (var i = 0; i < 10; i++)
             {
                 await Task.Delay(500);
 
-                var items = await _.Contents.GetAsync(new ContentQuery
-                {
-                    JsonQuery = new
-                    {
-                        filter = new
-                        {
-                            path = "data.geo.iv",
-                            op = "lt",
-                            value = new
-                            {
-                                longitude = 3,
-                                latitude = 3,
-                                distance = 1000
-                            }
-                        }
-                    }
-                });
+                var items = await _.Contents.GetAsync(q);
 
                 if (items.Items.Any())
                 {
@@ -353,15 +361,14 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_items_by_near_geoson_location_with_odata()
         {
+            var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(4 4)') lt 1000" };
+
             // Query multiple times to wait for async text indexer.
             for (var i = 0; i < 10; i++)
             {
                 await Task.Delay(500);
 
-                var items = await _.Contents.GetAsync(new ContentQuery
-                {
-                    Filter = "geo.distance(data/geo/iv, geography'POINT(4 4)') lt 1000"
-                });
+                var items = await _.Contents.GetAsync(q);
 
                 if (items.Items.Any())
                 {
@@ -376,28 +383,30 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_items_by_near_geoson_location_with_json()
         {
+            var q = new ContentQuery
+            {
+                JsonQuery = new
+                {
+                    filter = new
+                    {
+                        path = "data.geo.iv",
+                        op = "lt",
+                        value = new
+                        {
+                            longitude = 4,
+                            latitude = 4,
+                            distance = 1000
+                        }
+                    }
+                }
+            };
+
             // Query multiple times to wait for async text indexer.
             for (var i = 0; i < 10; i++)
             {
                 await Task.Delay(500);
 
-                var items = await _.Contents.GetAsync(new ContentQuery
-                {
-                    JsonQuery = new
-                    {
-                        filter = new
-                        {
-                            path = "data.geo.iv",
-                            op = "lt",
-                            value = new
-                            {
-                                longitude = 4,
-                                latitude = 4,
-                                distance = 1000
-                            }
-                        }
-                    }
-                });
+                var items = await _.Contents.GetAsync(q);
 
                 if (items.Items.Any())
                 {

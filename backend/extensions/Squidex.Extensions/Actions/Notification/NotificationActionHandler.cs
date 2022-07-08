@@ -84,7 +84,7 @@ namespace Squidex.Extensions.Actions.Notification
             command.AppId = NoApp;
             command.FromRule = true;
 
-            await commandBus.PublishAsync(command);
+            await commandBus.PublishAsync(command, ct);
 
             return Result.Success($"Notified: {job.Text}");
         }

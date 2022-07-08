@@ -19,10 +19,15 @@ namespace Squidex.Infrastructure.Commands
 
             foreach (var middleware in middlewares.Reverse())
             {
-                next = (c, ct) => middleware.HandleAsync(c, next, ct);
+                next = Create(next, middleware);
             }
 
             pipeline = next;
+        }
+
+        private static NextDelegate Create(NextDelegate next, ICommandMiddleware middleware)
+        {
+            return (c, ct) => middleware.HandleAsync(c, next, ct);
         }
 
         public async Task<CommandContext> PublishAsync(ICommand command,

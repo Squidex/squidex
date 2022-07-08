@@ -81,7 +81,7 @@ namespace Squidex.Infrastructure.Commands
                 await handler(c, ct);
 
                 return None.Value;
-            }, true, ct);
+            }, false, ct);
         }
 
         protected async Task<CommandResult> Update<TCommand>(TCommand command, Action<TCommand> handler,

@@ -17,13 +17,14 @@ namespace Squidex.Infrastructure.TestHelpers
 
         public static T SerializeAndDeserializeBinary<T>(this T source)
         {
-            var stream = new MemoryStream();
+            using (var stream = new MemoryStream())
+            {
+                Formatter.Serialize(stream, source!);
 
-            Formatter.Serialize(stream, source!);
+                stream.Position = 0;
 
-            stream.Position = 0;
-
-            return (T)Formatter.Deserialize(stream);
+                return (T)Formatter.Deserialize(stream);
+            }
         }
     }
 }
