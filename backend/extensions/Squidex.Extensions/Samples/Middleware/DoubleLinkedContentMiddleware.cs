@@ -23,9 +23,10 @@ namespace Squidex.Extensions.Samples.Middleware
             this.contentLoader = contentLoader;
         }
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
-            await next(context);
+            await next(context, ct);
 
             if (context.Command is UpdateContent update && context.IsCompleted && update.SchemaId.Name == "source")
             {
@@ -36,7 +37,8 @@ namespace Squidex.Extensions.Samples.Middleware
                     await contentLoader.GetAsync(
                         content.AppId.Id,
                         content.Id,
-                        content.Version - 1);
+                        content.Version - 1,
+                        ct);
 
                 // The data might have been changed within the domain object. Therefore we do not use the data fro mthe command.
                 var oldReferenceId = GetReference(contentPrevious?.Data);
@@ -50,7 +52,7 @@ namespace Squidex.Extensions.Samples.Middleware
 
                 if (oldReferenceId != null)
                 {
-                    var oldReferenced = await contentLoader.GetAsync(content.AppId.Id, DomainId.Create(oldReferenceId));
+                    var oldReferenced = await contentLoader.GetAsync(content.AppId.Id, DomainId.Create(oldReferenceId), ct: ct);
 
                     if (oldReferenced != null)
                     {
@@ -59,13 +61,13 @@ namespace Squidex.Extensions.Samples.Middleware
                         // Remove the reference from the old referenced content.
                         data.Remove("referencing");
 
-                        await UpdateReferencing(context, oldReferenced, data);
+                        await UpdateReferencing(context, oldReferenced, data, ct);
                     }
                 }
 
                 if (newReferenceId != null)
                 {
-                    var newReferenced = await contentLoader.GetAsync(content.AppId.Id, DomainId.Create(newReferenceId));
+                    var newReferenced = await contentLoader.GetAsync(content.AppId.Id, DomainId.Create(newReferenceId), ct: ct);
 
                     if (newReferenced != null)
                     {
@@ -77,14 +79,16 @@ namespace Squidex.Extensions.Samples.Middleware
                             ["iv"] = JsonValue.Array(content.Id)
                         };
 
-                        await UpdateReferencing(context, newReferenced, data);
+                        await UpdateReferencing(context, newReferenced, data, ct);
                     }
                 }
             }
         }
 
-        private static async Task UpdateReferencing(CommandContext context, IContentEntity reference, ContentData data)
+        private static async Task UpdateReferencing(CommandContext context, IContentEntity reference, ContentData data,
+            CancellationToken ct)
         {
+            // Also set the expected version, otherwise it will be overriden with the version from the request.
             await context.CommandBus.PublishAsync(new UpdateContent
             {
                 AppId = reference.AppId,
@@ -93,9 +97,8 @@ namespace Squidex.Extensions.Samples.Middleware
                 DoNotScript = true,
                 DoNotValidate = true,
                 Data = data,
-                // Also set the expected version, otherwise it will be overriden with the version from the request.
                 ExpectedVersion = reference.Version
-            });
+            }, ct);
         }
 
         private static string GetReference(ContentData data)
