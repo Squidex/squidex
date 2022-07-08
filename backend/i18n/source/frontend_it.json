@@ -771,7 +771,7 @@
   "schemas.schemaHintsHint": "Descrivi questo schema per la documentazione e le interfacce utente.",
   "schemas.schemaLabelHint": "Nome da visualizzare per la documentazione e le interfacce utente.",
   "schemas.schemaNameHint": "Puoi utilizzare solo lettere, numeri e trattini e un numero massimo di 40 caratteri.",
-  "schemas.schemaNameValidationMessage": "Il nome può contenere solo lettere, numeri, trattini e spazi.",
+  "schemas.schemaNameValidationMessage": "Il nome può contenere solo lettere, numeri e trattini.",
   "schemas.schemaTagsHint": "Tag per descrivere il tuo schema per i processi automatici.",
   "schemas.searchPlaceholder": "Cerca negli schemi...",
   "schemas.showFieldFailed": "Non è stato possibile mostrare il campo. Per favore ricarica.",

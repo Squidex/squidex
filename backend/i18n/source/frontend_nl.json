@@ -893,7 +893,7 @@
   "schemas.schemaHintsHint": "Beschrijf dit schema voor documentatie en gebruikersinterfaces.",
   "schemas.schemaLabelHint": "Weergavenaam voor documentatie en gebruikersinterfaces.",
   "schemas.schemaNameHint": "Je mag alleen letters, cijfers en streepjes gebruiken en niet meer dan 40 tekens.",
-  "schemas.schemaNameValidationMessage": "Naam mag alleen letters, cijfers, streepjes en spaties bevatten.",
+  "schemas.schemaNameValidationMessage": "Naam mag alleen letters, cijfers en streepjes bevatten.",
   "schemas.schemaTagsHint": "Tags om uw schema voor automatiseringsprocessen te annoteren.",
   "schemas.searchPlaceholder": "Zoek schema's ...",
   "schemas.showFieldFailed": "Kan veld niet weergeven. Laad opnieuw.",
