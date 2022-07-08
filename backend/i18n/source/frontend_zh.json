@@ -146,7 +146,7 @@
   "clients.allowAnonymousHint": "允许在没有访问令牌的情况下访问通过此客户端角色配置的所有资源的 API。不要给多个客户端匿名访问。",
   "clients.apiCallsLimit": "最大 API 调用数",
   "clients.apiCallsLimitHint": "限制此客户端每月可以进行的 API 调用次数，以保护您的 API 队伍为其他更重要的客户端提供服务。",
-  "clients.clientIdValidationMessage": "名称只能包含字母、数字、破折号和空格。",
+  "clients.clientIdValidationMessage": "名称只能包含字母、数字和破折号。",
   "clients.clientNamePlaceholder": "输入客户端名称",
   "clients.connect": "连接",
   "clients.connectWizard.cli": "连接 Squidex CLI",

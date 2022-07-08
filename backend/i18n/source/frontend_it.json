@@ -136,7 +136,7 @@
   "clients.allowAnonymousHint": "Consenti l'accesso alle API senza token di accesso a tutte le risorse che sono configurate per il ruolo di questo client. È possibile avere un solo client impostato con accesso anonimo.",
   "clients.apiCallsLimit": "Numero Max di chiamate alle API",
   "clients.apiCallsLimitHint": "Limita il numero di chiamate al mese effettuabili dal client alle API calls per riservare ai client più importanti il numero di chiamate API disponili.",
-  "clients.clientIdValidationMessage": "Il nome deve contenere solo lettere, numeri, trattini e spaziNa.",
+  "clients.clientIdValidationMessage": "Il nome può contenere solo lettere, numeri e trattini.",
   "clients.clientNamePlaceholder": "Inserisci il nome del client",
   "clients.connect": "Connettere",
   "clients.connectWizard.cli": "Connettere con la Squidex CLI",

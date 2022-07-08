@@ -158,7 +158,7 @@
   "clients.allowAnonymousHint": "Sta toegang tot de API toe zonder toegangstoken voor alle bronnen die zijn geconfigureerd via de rol van deze client. Geef niet meer dan één client anonieme toegang.",
   "clients.apiCallsLimit": "Max. API aanroepen",
   "clients.apiCallsLimitHint": "Beperk het aantal API aanroepen dat deze client per maand kan doen om uw API quota te beschermen voor andere clients die belangrijker zijn.",
-  "clients.clientIdValidationMessage": "Naam mag alleen letters, cijfers, streepjes en spaties bevatten.",
+  "clients.clientIdValidationMessage": "Naam mag alleen letters, cijfers en streepjes bevatten.",
   "clients.clientNamePlaceholder": "Voer de naam van de klant in",
   "clients.connect": "Verbinden",
   "clients.connectWizard.cli": "Maak verbinding met Squidex CLI",
