@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         }
 
         public async Task HandleAsync(UsageTrackingCheck notification,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             if (!notificationSender.IsActive)
             {

@@ -70,7 +70,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }, cts.Token);
         }
 
-        public void Unsubscribe()
+        public void Dispose()
         {
             subscription?.Dispose();
 

@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         [Fact]
         public async Task Shoud_start_correct_processor()
         {
-            await sut.HandleAsync(new EventConsumerStart(consumer1.Name));
+            await sut.HandleAsync(new EventConsumerStart(consumer1.Name), default);
 
             A.CallTo(() => processor1.StartAsync())
                 .MustHaveHappened();
@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         [Fact]
         public async Task Shoud_stop_correct_processor()
         {
-            await sut.HandleAsync(new EventConsumerStart(consumer1.Name));
+            await sut.HandleAsync(new EventConsumerStart(consumer1.Name), default);
 
             A.CallTo(() => processor1.StartAsync())
                 .MustHaveHappened();
@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         [Fact]
         public async Task Shoud_reset_correct_processor()
         {
-            await sut.HandleAsync(new EventConsumerReset(consumer1.Name));
+            await sut.HandleAsync(new EventConsumerReset(consumer1.Name), default);
 
             A.CallTo(() => processor1.ResetAsync())
                 .MustHaveHappened();

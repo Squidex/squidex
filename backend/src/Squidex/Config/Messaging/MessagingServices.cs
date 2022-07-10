@@ -16,6 +16,7 @@ using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Messaging;
 using Squidex.Messaging.Implementation;
+using Squidex.Messaging.Implementation.Scheduler;
 
 namespace Squidex.Config.Messaging
 {
@@ -66,22 +67,22 @@ namespace Squidex.Config.Messaging
 
             services.AddMessaging("default", worker, options =>
             {
-                options.NumWorkers = 1;
+                options.Scheduler = InlineScheduler.Instance;
             });
 
             services.AddMessaging("backup.start", worker, options =>
             {
-                options.NumWorkers = 4;
+                options.Scheduler = new ParallelScheduler(4);
             });
 
             services.AddMessaging("backup.restore", worker, options =>
             {
-                options.NumWorkers = 1;
+                options.Scheduler = InlineScheduler.Instance;
             });
 
             services.AddMessaging("rules.run", worker, options =>
             {
-                options.NumWorkers = 4;
+                options.Scheduler = new ParallelScheduler(4);
             });
         }
     }

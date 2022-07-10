@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                 Users = new[] { "1", "2" }
             };
 
-            await sut.HandleAsync(message);
+            await sut.HandleAsync(message, default);
 
             A.CallTo(() => notificationSender.SendUsageAsync(A<IUser>._, "my-app", 1000, 3000))
                 .MustNotHaveHappened();
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                 Users = new[] { "1", "2", "3" }
             };
 
-            await sut.HandleAsync(message);
+            await sut.HandleAsync(message, default);
 
             A.CallTo(() => notificationSender.SendUsageAsync(user1!, "my-app", 1000, 3000))
                 .MustHaveHappened();
@@ -98,8 +98,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                 Users = new[] { "1" }
             };
 
-            await sut.HandleAsync(message);
-            await sut.HandleAsync(message);
+            await sut.HandleAsync(message, default);
+            await sut.HandleAsync(message, default);
 
             A.CallTo(() => notificationSender.SendUsageAsync(user!, "my-app", 1000, 3000))
                 .MustHaveHappenedOnceExactly();
@@ -118,11 +118,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                 Users = new[] { "1" }
             };
 
-            await sut.HandleAsync(message);
+            await sut.HandleAsync(message, default);
 
             time = time.Plus(Duration.FromDays(3));
 
-            await sut.HandleAsync(message);
+            await sut.HandleAsync(message, default);
 
             A.CallTo(() => notificationSender.SendUsageAsync(user!, "my-app", 1000, 3000))
                 .MustHaveHappenedTwiceExactly();
@@ -146,11 +146,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                 Users = new[] { "1" }
             };
 
-            await sut.HandleAsync(message);
+            await sut.HandleAsync(message, default);
 
             time = time.Plus(Duration.FromHours(hours));
 
-            await sut.HandleAsync(message);
+            await sut.HandleAsync(message, default);
 
             A.CallTo(() => notificationSender.SendUsageAsync(user!, "my-app", 1000, 3000))
                 .MustHaveHappenedOnceExactly();

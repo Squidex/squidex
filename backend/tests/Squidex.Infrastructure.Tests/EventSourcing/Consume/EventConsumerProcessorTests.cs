@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
     {
         public sealed class MyEventConsumerProcessor : EventConsumerProcessor
         {
-            private IEventSubscriber? currentSubscriber;
+            public IEventSubscriber? Subscriber { get; set; }
 
             public MyEventConsumerProcessor(
                 IPersistenceFactory<EventConsumerState> persistenceFactory,
@@ -30,16 +30,6 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             {
             }
 
-            public Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
-            {
-                return currentSubscriber!.OnEventAsync(subscription, storedEvent);
-            }
-
-            public Task OnErrorAsync(IEventSubscription subscription, Exception exception)
-            {
-                return currentSubscriber!.OnErrorAsync(subscription, exception);
-            }
-
             protected override IEventSubscription CreateRetrySubscription(IEventSubscriber subscriber)
             {
                 return CreateSubscription(subscriber);
@@ -47,7 +37,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
             protected override IEventSubscription CreateSubscription(IEventSubscriber subscriber)
             {
-                currentSubscriber = subscriber;
+                Subscriber = subscriber;
 
                 return base.CreateSubscription(subscriber);
             }
@@ -80,9 +70,6 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
             A.CallTo(() => eventConsumer.Name)
                 .Returns(consumerName);
-
-            A.CallTo(() => eventSubscription.Sender)
-                .Returns(eventSubscription);
 
             A.CallTo(() => eventConsumer.Handles(A<StoredEvent>._))
                 .Returns(true);
@@ -185,7 +172,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<EventConsumerState>._, A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventSubscription.Unsubscribe())
+            A.CallTo(() => eventSubscription.Dispose())
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -208,7 +195,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             A.CallTo(() => eventConsumer.ClearAsync())
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventSubscription.Unsubscribe())
+            A.CallTo(() => eventSubscription.Dispose())
                 .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, state.Snapshot.Position))
@@ -336,7 +323,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();
 
-            await OnEventAsync(A.Fake<IEventSubscription>(), storedEvent);
+            await sut.OnEventsAsync(A.Fake<IEventSubscription>(), new[] { envelope }.ToList(), storedEvent.EventPosition);
             await sut.CompleteAsync();
 
             AssertGrainState(isStopped: false, position: initialPosition);
@@ -361,7 +348,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<EventConsumerState>._, A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventSubscription.Unsubscribe())
+            A.CallTo(() => eventSubscription.Dispose())
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -373,7 +360,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();
 
-            await OnErrorAsync(A.Fake<IEventSubscription>(), ex);
+            await sut.OnErrorAsync(A.Fake<IEventSubscription>(), ex);
             await sut.CompleteAsync();
 
             AssertGrainState(isStopped: false, position: initialPosition);
@@ -414,7 +401,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<EventConsumerState>._, A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventSubscription.Unsubscribe())
+            A.CallTo(() => eventSubscription.Dispose())
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -440,7 +427,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<EventConsumerState>._, A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventSubscription.Unsubscribe())
+            A.CallTo(() => eventSubscription.Dispose())
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -466,7 +453,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<EventConsumerState>._, A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventSubscription.Unsubscribe())
+            A.CallTo(() => eventSubscription.Dispose())
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -496,7 +483,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<EventConsumerState>._, A<CancellationToken>._))
                 .MustHaveHappened(2, Times.Exactly);
 
-            A.CallTo(() => eventSubscription.Unsubscribe())
+            A.CallTo(() => eventSubscription.Dispose())
                 .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
@@ -520,14 +507,14 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             AssertGrainState(isStopped: true, position: storedEvent.EventPosition, error: ex.Message, 1);
         }
 
-        private Task OnErrorAsync(IEventSubscription subscription, Exception exception)
+        private ValueTask OnErrorAsync(IEventSubscription subscription, Exception exception)
         {
-            return sut.OnErrorAsync(subscription, exception);
+            return sut.Subscriber?.OnErrorAsync(subscription, exception) ?? default;
         }
 
-        private Task OnEventAsync(IEventSubscription subscription, StoredEvent ev)
+        private ValueTask OnEventAsync(IEventSubscription subscription, StoredEvent @event)
         {
-            return sut.OnEventAsync(subscription, ev);
+            return sut.Subscriber?.OnEventAsync(subscription, @event) ?? default;
         }
 
         private void AssertGrainState(bool isStopped = false, string? position = null, string? error = null, int count = 0)

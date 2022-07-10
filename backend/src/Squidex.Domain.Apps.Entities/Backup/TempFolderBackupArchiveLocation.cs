@@ -21,7 +21,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.serializer = serializer;
         }
 
-        public async Task<IBackupReader> OpenReaderAsync(Uri url, DomainId id)
+        public async Task<IBackupReader> OpenReaderAsync(Uri url, DomainId id,
+            CancellationToken ct)
         {
             Stream stream;
 
@@ -40,12 +41,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     {
                         client.Timeout = TimeSpan.FromHours(1);
 
-                        response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                        response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);
                         response.EnsureSuccessStatusCode();
 
-                        await using (var sourceStream = await response.Content.ReadAsStreamAsync())
+                        await using (var sourceStream = await response.Content.ReadAsStreamAsync(ct))
                         {
-                            await sourceStream.CopyToAsync(stream);
+                            await sourceStream.CopyToAsync(stream, ct);
                         }
                     }
                 }
@@ -94,7 +95,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return fileStream;
         }
 
-        public Task<IBackupWriter> OpenWriterAsync(Stream stream)
+        public Task<IBackupWriter> OpenWriterAsync(Stream stream,
+            CancellationToken ct)
         {
             var writer = new BackupWriter(serializer, stream, true);
 

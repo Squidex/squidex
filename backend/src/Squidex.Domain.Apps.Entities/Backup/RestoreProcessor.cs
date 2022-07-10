@@ -18,6 +18,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -32,16 +33,70 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IEventStreamNames eventStreamNames;
         private readonly IUserResolver userResolver;
         private readonly ILogger<RestoreProcessor> log;
+        private readonly ReentrantScheduler scheduler = new ReentrantScheduler(1);
         private readonly SimpleState<BackupRestoreState> state;
-        private RestoreContext runningContext;
-        private StreamMapper runningStreamMapper;
+        private Run? currentRun;
+
+        // Use a run to store all state that is necessary for a single run.
+        private sealed class Run : IDisposable
+        {
+            private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
+            private readonly CancellationTokenSource cancellationLinked;
+            private readonly IClock clock;
+
+            public IEnumerable<IBackupHandler> Handlers { get; init; }
+
+            public IBackupReader Reader { get; set; }
+
+            public RestoreJob Job { get; init; }
+
+            public RestoreContext Context { get; set; }
+
+            public StreamMapper StreamMapper { get; set; }
+
+            public CancellationToken CancellationToken => cancellationLinked.Token;
+
+            public Run(IClock clock, CancellationToken ct)
+            {
+                cancellationLinked = CancellationTokenSource.CreateLinkedTokenSource(ct, cancellationSource.Token);
+
+                this.clock = clock;
+            }
+
+            public void Log(string message, bool replace = false)
+            {
+                if (replace && Job.Log.Count > 0)
+                {
+                    Job.Log[^1] = $"{clock.GetCurrentInstant()}: {message}";
+                }
+                else
+                {
+                    Job.Log.Add($"{clock.GetCurrentInstant()}: {message}");
+                }
+            }
+
+            public void Dispose()
+            {
+                Reader?.Dispose();
+
+                cancellationSource.Dispose();
+                cancellationLinked.Dispose();
+            }
+
+            public void Cancel()
+            {
+                try
+                {
+                    cancellationSource.Cancel();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Cancellation token might have been disposed, if the run is completed.
+                }
+            }
+        }
 
         public IClock Clock { get; set; } = SystemClock.Instance;
-
-        private RestoreJob CurrentJob
-        {
-            get => state.Value.Job;
-        }
 
         public RestoreProcessor(
             IBackupArchiveLocation backupArchiveLocation,
@@ -71,22 +126,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             await state.LoadAsync(ct);
 
-            await RecoverAfterRestartAsync();
-        }
-
-        private async Task RecoverAfterRestartAsync()
-        {
-            if (CurrentJob?.Status == JobStatus.Started)
+            if (state.Value.Job?.Status == JobStatus.Started)
             {
-                Log("Failed due application restart");
+                state.Value.Job.Status = JobStatus.Failed;
 
-                CurrentJob.Status = JobStatus.Failed;
-
-                await state.WriteAsync();
+                await state.WriteAsync(ct);
             }
         }
 
-        public async Task RestoreAsync(Uri url, RefToken actor, string? newAppName,
+        public Task RestoreAsync(Uri url, RefToken actor, string? newAppName,
             CancellationToken ct)
         {
             Guard.NotNull(url);
@@ -97,184 +145,193 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Guard.ValidSlug(newAppName);
             }
 
-            CurrentJob.EnsureCanStart();
-
-            state.Value.Job = new RestoreJob
+            return scheduler.ScheduleAsync(async ct =>
             {
-                Id = DomainId.NewGuid(),
-                NewAppName = newAppName,
-                Actor = actor,
-                Started = Clock.GetCurrentInstant(),
-                Status = JobStatus.Started,
-                Url = url
-            };
+                if (currentRun != null)
+                {
+                    throw new DomainException(T.Get("backups.restoreRunning"));
+                }
 
-            await state.WriteAsync(ct);
+                state.Value.Job?.EnsureCanStart();
 
-            await ProcessAsync(ct);
+                // Set the current run first to indicate that we are running a rule at the moment.
+                var run = currentRun = new Run(Clock, ct)
+                {
+                    Job = new RestoreJob
+                    {
+                        Id = DomainId.NewGuid(),
+                        NewAppName = newAppName,
+                        Actor = actor,
+                        Started = Clock.GetCurrentInstant(),
+                        Status = JobStatus.Started,
+                        Url = url
+                    },
+                    Handlers = backupHandlerFactory.CreateMany()
+                };
+
+                state.Value.Job = run.Job;
+                try
+                {
+                    await state.WriteAsync(run.CancellationToken);
+
+                    await ProcessAsync(run, run.CancellationToken);
+                }
+                finally
+                {
+                    // Unset the run to indicate that we are done.
+                    currentRun.Dispose();
+                    currentRun = null;
+                }
+            }, ct);
         }
 
-        private async Task ProcessAsync(
+        private async Task ProcessAsync(Run run,
             CancellationToken ct)
         {
-            var handlers = backupHandlerFactory.CreateMany();
-
             using (Telemetry.Activities.StartActivity("RestoreBackup"))
             {
                 try
                 {
-                    Log("Started. The restore process has the following steps:");
-                    Log("  * Download backup");
-                    Log("  * Restore events and attachments.");
-                    Log("  * Restore all objects like app, schemas and contents");
-                    Log("  * Complete the restore operation for all objects");
+                    run.Log("Started. The restore process has the following steps:");
+                    run.Log("  * Download backup");
+                    run.Log("  * Restore events and attachments.");
+                    run.Log("  * Restore all objects like app, schemas and contents");
+                    run.Log("  * Complete the restore operation for all objects");
 
-                    log.LogInformation("Backup with job id {backupId} with from URL '{url}' started.",
-                        CurrentJob.Id,
-                        CurrentJob.Url);
+                    log.LogInformation("Backup with job id {backupId} with from URL '{url}' started.", run.Job.Id, run.Job.Url);
 
-                    using (var reader = await DownloadAsync())
+                    run.Reader = await DownloadAsync(run, ct);
+
+                    await run.Reader.CheckCompatibilityAsync();
+
+                    using (Telemetry.Activities.StartActivity("ReadEvents"))
                     {
-                        await reader.CheckCompatibilityAsync();
-
-                        using (Telemetry.Activities.StartActivity("ReadEvents"))
-                        {
-                            await ReadEventsAsync(reader, handlers);
-                        }
-
-                        foreach (var handler in handlers)
-                        {
-                            using (Telemetry.Activities.StartActivity($"{handler.GetType().Name}/RestoreAsync"))
-                            {
-                                await handler.RestoreAsync(runningContext, ct);
-                            }
-
-                            Log($"Restored {handler.Name}");
-                        }
-
-                        foreach (var handler in handlers)
-                        {
-                            using (Telemetry.Activities.StartActivity($"{handler.GetType().Name}/CompleteRestoreAsync"))
-                            {
-                                await handler.CompleteRestoreAsync(runningContext, CurrentJob.NewAppName!);
-                            }
-
-                            Log($"Completed {handler.Name}");
-                        }
+                        await ReadEventsAsync(run, ct); 
                     }
 
-                    await AssignContributorAsync();
+                    foreach (var handler in run.Handlers)
+                    {
+                        using (Telemetry.Activities.StartActivity($"{handler.GetType().Name}/RestoreAsync"))
+                        {
+                            await handler.RestoreAsync(run.Context, ct);
+                        }
 
-                    CurrentJob.Status = JobStatus.Completed;
+                        run.Log($"Restored {handler.Name}");
+                    }
 
-                    Log("Completed, Yeah!");
+                    foreach (var handler in run.Handlers)
+                    {
+                        using (Telemetry.Activities.StartActivity($"{handler.GetType().Name}/CompleteRestoreAsync"))
+                        {
+                            await handler.CompleteRestoreAsync(run.Context, run.Job.NewAppName!);
+                        }
 
-                    log.LogInformation("Backup with job id {backupId} from URL '{url}' completed.",
-                        CurrentJob.Id,
-                        CurrentJob.Url);
+                        run.Log($"Completed {handler.Name}");
+                    }
+
+                    await AssignContributorAsync(run);
+
+                    run.Job.Status = JobStatus.Completed;
+                    run.Log("Completed, Yeah!");
+
+                    log.LogInformation("Backup with job id {backupId} from URL '{url}' completed.", run.Job.Id, run.Job.Url);
                 }
                 catch (Exception ex)
                 {
                     switch (ex)
                     {
                         case BackupRestoreException backupException:
-                            Log(backupException.Message);
+                            run.Log(backupException.Message);
                             break;
                         case FileNotFoundException fileNotFoundException:
-                            Log(fileNotFoundException.Message);
+                            run.Log(fileNotFoundException.Message);
                             break;
                         default:
-                            Log("Failed with internal error");
+                            run.Log("Failed with internal error");
                             break;
                     }
 
-                    await CleanupAsync(handlers);
+                    await CleanupAsync(run);
 
-                    CurrentJob.Status = JobStatus.Failed;
+                    run.Job.Status = JobStatus.Failed;
 
-                    log.LogError(ex, "Backup with job id {backupId} from URL '{url}' failed.",
-                        CurrentJob.Id,
-                        CurrentJob.Url);
+                    log.LogError(ex, "Backup with job id {backupId} from URL '{url}' failed.", run.Job.Id, run.Job.Url);
                 }
                 finally
                 {
-                    CurrentJob.Stopped = Clock.GetCurrentInstant();
+                    run.Job.Stopped = Clock.GetCurrentInstant();
 
                     await state.WriteAsync(ct);
-
-                    runningStreamMapper = null!;
-                    runningContext = null!;
                 }
             }
         }
 
-        private async Task AssignContributorAsync()
+        private async Task AssignContributorAsync(Run run)
         {
-            var actor = CurrentJob.Actor;
+            if (run.Job.Actor?.IsUser != true)
+            {
+                run.Log("Current user not assigned because restore was triggered by client.");
+                return;
+            }
 
-            if (actor?.IsUser == true)
+            try
+            {
+                var command = new AssignContributor
+                {
+                    Actor = run.Job.Actor,
+                    AppId = run.Job.AppId,
+                    ContributorId = run.Job.Actor.Identifier,
+                    Restoring = true,
+                    Role = Role.Owner
+                };
+
+                await commandBus.PublishAsync(command, default);
+
+                run.Log("Assigned current user.");
+            }
+            catch (DomainException ex)
+            {
+                run.Log($"Failed to assign contributor: {ex.Message}");
+            }
+        }
+
+        private async Task CleanupAsync(Run run)
+        {
+            if (run.Job.AppId == null)
+            {
+                return;
+            }
+
+            foreach (var handler in run.Handlers)
             {
                 try
                 {
-                    var command = new AssignContributor
-                    {
-                        Actor = actor,
-                        AppId = CurrentJob.AppId,
-                        ContributorId = actor.Identifier,
-                        Restoring = true,
-                        Role = Role.Owner
-                    };
-
-                    await commandBus.PublishAsync(command, default);
-
-                    Log("Assigned current user.");
+                    await handler.CleanupRestoreErrorAsync(run.Job.AppId.Id);
                 }
-                catch (DomainException ex)
+                catch (Exception ex)
                 {
-                    Log($"Failed to assign contributor: {ex.Message}");
-                }
-            }
-            else
-            {
-                Log("Current user not assigned because restore was triggered by client.");
-            }
-        }
-
-        private async Task CleanupAsync(IEnumerable<IBackupHandler> handlers)
-        {
-            if (CurrentJob.AppId != null)
-            {
-                var appId = CurrentJob.AppId.Id;
-
-                foreach (var handler in handlers)
-                {
-                    try
-                    {
-                        await handler.CleanupRestoreErrorAsync(appId);
-                    }
-                    catch (Exception ex)
-                    {
-                        log.LogError(ex, "Failed to clean up restore.");
-                    }
+                    log.LogError(ex, "Failed to clean up restore.");
                 }
             }
         }
 
-        private async Task<IBackupReader> DownloadAsync()
+        private async Task<IBackupReader> DownloadAsync(Run run,
+            CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("Download"))
             {
-                Log("Downloading Backup");
+                run.Log("Downloading Backup");
 
-                var reader = await backupArchiveLocation.OpenReaderAsync(CurrentJob.Url, CurrentJob.Id);
+                var reader = await backupArchiveLocation.OpenReaderAsync(run.Job.Url, run.Job.Id, ct);
 
-                Log("Downloaded Backup");
+                run.Log("Downloaded Backup");
 
                 return reader;
             }
         }
 
-        private async Task ReadEventsAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers)
+        private async Task ReadEventsAsync(Run run,
+            CancellationToken ct)
         {
             const int BatchSize = 100;
 
@@ -288,16 +345,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     foreach (var (stream, @event) in batch)
                     {
-                        var offset = runningStreamMapper.GetStreamOffset(stream);
+                        var offset = run.StreamMapper.GetStreamOffset(stream);
 
                         commits.Add(EventCommit.Create(stream, offset, @event, eventFormatter));
                     }
 
-                    await eventStore.AppendUnsafeAsync(commits);
+                    await eventStore.AppendUnsafeAsync(commits, ct);
 
                     handled += commits.Count;
 
-                    Log($"Reading {reader.ReadEvents}/{handled} events and {reader.ReadAttachments} attachments completed.", true);
+                    run.Log($"Reading {run.Reader.ReadEvents}/{handled} events and {run.Reader.ReadAttachments} attachments completed.", true);
                 }
                 catch (OperationCanceledException ex)
                 {
@@ -318,9 +375,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             batchBlock.BidirectionalLinkTo(writeBlock);
 
-            await foreach (var job in reader.ReadEventsAsync(eventStreamNames, eventFormatter))
+            await foreach (var job in run.Reader.ReadEventsAsync(eventStreamNames, eventFormatter, ct))
             {
-                var newStream = await HandleEventAsync(reader, handlers, job.Stream, job.Event);
+                var newStream = await HandleEventAsync(run, job.Stream, job.Event, ct);
 
                 if (newStream != null)
                 {
@@ -336,30 +393,32 @@ namespace Squidex.Domain.Apps.Entities.Backup
             await writeBlock.Completion;
         }
 
-        private async Task<string?> HandleEventAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers, string stream, Envelope<IEvent> @event,
+        private async Task<string?> HandleEventAsync(Run run, string stream, Envelope<IEvent> @event,
             CancellationToken ct = default)
         {
             if (@event.Payload is AppCreated appCreated)
             {
                 var previousAppId = appCreated.AppId.Id;
 
-                if (!string.IsNullOrWhiteSpace(CurrentJob.NewAppName))
+                if (!string.IsNullOrWhiteSpace(run.Job.NewAppName))
                 {
-                    appCreated.Name = CurrentJob.NewAppName;
+                    appCreated.Name = run.Job.NewAppName;
 
-                    CurrentJob.AppId = NamedId.Of(DomainId.NewGuid(), CurrentJob.NewAppName);
+                    run.Job.AppId = NamedId.Of(DomainId.NewGuid(), run.Job.NewAppName);
                 }
                 else
                 {
-                    CurrentJob.AppId = NamedId.Of(DomainId.NewGuid(), appCreated.Name);
+                    run.Job.AppId = NamedId.Of(DomainId.NewGuid(), appCreated.Name);
                 }
 
-                await CreateContextAsync(reader, previousAppId);
+                await CreateContextAsync(run, previousAppId, ct);
+
+                run.StreamMapper = new StreamMapper(run.Context);
             }
 
             if (@event.Payload is SquidexEvent squidexEvent && squidexEvent.Actor != null)
             {
-                if (runningContext.UserMapping.TryMap(squidexEvent.Actor, out var newUser))
+                if (run.Context.UserMapping.TryMap(squidexEvent.Actor, out var newUser))
                 {
                     squidexEvent.Actor = newUser;
                 }
@@ -367,17 +426,17 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             if (@event.Payload is AppEvent appEvent)
             {
-                appEvent.AppId = CurrentJob.AppId;
+                appEvent.AppId = run.Job.AppId;
             }
 
-            var (newStream, id) = runningStreamMapper.Map(stream);
+            var (newStream, id) = run.StreamMapper.Map(stream);
 
             @event.SetAggregateId(id);
             @event.SetRestored();
 
-            foreach (var handler in handlers)
+            foreach (var handler in run.Handlers)
             {
-                if (!await handler.RestoreEventAsync(@event, runningContext, ct))
+                if (!await handler.RestoreEventAsync(@event, run.Context, ct))
                 {
                     return null;
                 }
@@ -386,33 +445,21 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return newStream;
         }
 
-        private async Task CreateContextAsync(IBackupReader reader, DomainId previousAppId)
+        private async Task CreateContextAsync(Run run, DomainId previousAppId,
+            CancellationToken ct)
         {
-            var userMapping = new UserMapping(CurrentJob.Actor);
+            var userMapping = new UserMapping(run.Job.Actor);
 
             using (Telemetry.Activities.StartActivity("CreateUsers"))
             {
-                Log("Creating Users");
+                run.Log("Creating Users");
 
-                await userMapping.RestoreAsync(reader, userResolver);
+                await userMapping.RestoreAsync(run.Reader, userResolver, ct);
 
-                Log("Created Users");
+                run.Log("Created Users");
             }
 
-            runningContext = new RestoreContext(CurrentJob.AppId.Id, userMapping, reader, previousAppId);
-            runningStreamMapper = new StreamMapper(runningContext);
-        }
-
-        private void Log(string message, bool replace = false)
-        {
-            if (replace && CurrentJob.Log.Count > 0)
-            {
-                CurrentJob.Log[^1] = $"{Clock.GetCurrentInstant()}: {message}";
-            }
-            else
-            {
-                CurrentJob.Log.Add($"{Clock.GetCurrentInstant()}: {message}");
-            }
+            run.Context = new RestoreContext(run.Job.AppId.Id, userMapping, run.Reader, previousAppId);
         }
     }
 }

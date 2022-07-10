@@ -8,6 +8,7 @@
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Consume
 {
@@ -18,7 +19,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         private readonly IEventConsumer? eventConsumer;
         private readonly IEventStore eventStore;
         private readonly ILogger<EventConsumerProcessor> log;
-        private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
+        private readonly AsyncLock asyncLock = new AsyncLock();
         private IEventSubscription? currentSubscription;
 
         public EventConsumerState State
@@ -63,77 +64,77 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             }
         }
 
-        public virtual Task OnEventsAsync(object sender, IReadOnlyList<Envelope<IEvent>> events, string position)
+        public virtual Task OnEventsAsync(IEventSubscription subscription, IReadOnlyList<Envelope<IEvent>> events, string position)
         {
-            if (!ReferenceEquals(sender, currentSubscription?.Sender))
+            return UpdateAsync(async () =>
             {
-                return Task.CompletedTask;
-            }
+                if (!ReferenceEquals(subscription, currentSubscription))
+                {
+                    return;
+                }
 
-            return DoAndUpdateStateAsync(async () =>
-            {
                 await DispatchAsync(events);
 
                 State = State.Handled(position, events.Count);
             }, State.Position);
         }
 
-        public virtual Task OnErrorAsync(object sender, Exception exception)
+        public virtual Task OnErrorAsync(IEventSubscription subscription, Exception exception)
         {
-            if (!ReferenceEquals(sender, currentSubscription?.Sender))
+            return UpdateAsync(() =>
             {
-                return Task.CompletedTask;
-            }
+                if (!ReferenceEquals(subscription, currentSubscription))
+                {
+                    return;
+                }
 
-            return DoAndUpdateStateAsync(() =>
-            {
                 Unsubscribe();
 
                 State = State.Stopped(exception);
             }, State.Position);
         }
 
-        public virtual async Task ActivateAsync()
+        public virtual Task ActivateAsync()
         {
-            if (State.IsFailed)
+            return UpdateAsync(() =>
             {
-                await DoAndUpdateStateAsync(() =>
+                if (State.IsFailed)
                 {
                     Subscribe();
 
                     State = State.Started();
-                }, State.Position);
-            }
-            else if (!State.IsStopped)
-            {
-                Subscribe();
-            }
+                }
+                else if (!State.IsStopped)
+                {
+                    Subscribe();
+                }
+            }, State.Position);
         }
 
-        public virtual async Task StartAsync()
+        public virtual Task StartAsync()
         {
-            if (!State.IsStopped)
+            return UpdateAsync(() =>
             {
-                return;
-            }
+                if (!State.IsStopped)
+                {
+                    return;
+                }
 
-            await DoAndUpdateStateAsync(() =>
-            {
                 Subscribe();
 
                 State = State.Started();
             }, State.Position);
         }
 
-        public virtual async Task StopAsync()
+        public virtual Task StopAsync()
         {
-            if (State.IsStopped)
+            return UpdateAsync(() =>
             {
-                return;
-            }
+                if (State.IsStopped)
+                {
+                    return;
+                }
 
-            await DoAndUpdateStateAsync(() =>
-            {
                 Unsubscribe();
 
                 State = State.Stopped();
@@ -142,7 +143,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
         public virtual async Task ResetAsync()
         {
-            await DoAndUpdateStateAsync(async () =>
+            await UpdateAsync(async () =>
             {
                 Unsubscribe();
 
@@ -162,9 +163,9 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             }
         }
 
-        private Task DoAndUpdateStateAsync(Action action, string? position, [CallerMemberName] string? caller = null)
+        private Task UpdateAsync(Action action, string? position, [CallerMemberName] string? caller = null)
         {
-            return DoAndUpdateStateAsync(() =>
+            return UpdateAsync(() =>
             {
                 action();
 
@@ -172,10 +173,9 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             }, position, caller);
         }
 
-        private async Task DoAndUpdateStateAsync(Func<Task> action, string? position, [CallerMemberName] string? caller = null)
+        private async Task UpdateAsync(Func<Task> action, string? position, [CallerMemberName] string? caller = null)
         {
-            await semaphore.WaitAsync();
-            try
+            using (await asyncLock.EnterAsync())
             {
                 var previousState = State;
 
@@ -205,10 +205,6 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
                     await state.WriteAsync();
                 }
             }
-            finally
-            {
-                semaphore.Release();
-            }
         }
 
         private async Task ClearAsync()
@@ -231,9 +227,11 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
         private void Unsubscribe()
         {
-            var subscription = Interlocked.Exchange(ref currentSubscription, null);
-
-            subscription?.Unsubscribe();
+            if (currentSubscription != null)
+            {
+                currentSubscription.Dispose();
+                currentSubscription = null;
+            }
         }
 
         private void Subscribe()
@@ -248,7 +246,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             }
         }
 
-        private BatchSubscriber CreateSubscription()
+        private IEventSubscription CreateSubscription()
         {
             return new BatchSubscriber(this, eventFormatter, eventConsumer!, CreateRetrySubscription);
         }

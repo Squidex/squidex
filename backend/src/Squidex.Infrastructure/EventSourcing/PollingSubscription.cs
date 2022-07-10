@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.EventSourcing
             timer.SkipCurrentDelay();
         }
 
-        public void Unsubscribe()
+        public void Dispose()
         {
             timer.StopAsync().Forget();
         }

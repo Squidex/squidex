@@ -5,21 +5,24 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.States;
 using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
     public sealed class RuleRunnerWorker :
+        IBackgroundProcess,
         IMessageHandler<RuleRunnerRun>,
         IMessageHandler<RuleRunnerCancel>
     {
-        private readonly ConcurrentDictionary<DomainId, RuleRunnerProcessor> processors = new ConcurrentDictionary<DomainId, RuleRunnerProcessor>();
+        private readonly Dictionary<DomainId, Task<RuleRunnerProcessor>> processors = new Dictionary<DomainId, Task<RuleRunnerProcessor>>();
         private readonly Func<DomainId, RuleRunnerProcessor> processorFactory;
+        private readonly ISnapshotStore<RuleRunnerJob> snapshotStore;
 
-        public RuleRunnerWorker(IServiceProvider serviceProvider)
+        public RuleRunnerWorker(IServiceProvider serviceProvider, ISnapshotStore<RuleRunnerJob> snapshotStore)
         {
             var objectFactory = ActivatorUtilities.CreateFactory(typeof(RuleRunnerProcessor), new[] { typeof(DomainId) });
 
@@ -27,31 +30,50 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             {
                 return (RuleRunnerProcessor)objectFactory(serviceProvider, new object[] { key });
             };
+
+            this.snapshotStore = snapshotStore;
+        }
+
+        public async Task StartAsync(
+            CancellationToken ct)
+        {
+            await foreach (var snapshot in snapshotStore.ReadAllAsync(ct))
+            {
+                await GetProcessorAsync(snapshot.Key, ct);
+            }
         }
 
         public async Task HandleAsync(RuleRunnerRun message,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
-            var runner = await GetProcessorAsync(message.AppId);
+            var processor = await GetProcessorAsync(message.AppId, ct);
 
-            await runner.RunAsync(message.RuleId, message.FromSnapshots, false, ct);
+            await processor.RunAsync(message.RuleId, message.FromSnapshots, ct);
         }
 
         public async Task HandleAsync(RuleRunnerCancel message,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
-            var runner = await GetProcessorAsync(message.AppId);
+            var processor = await GetProcessorAsync(message.AppId, ct);
 
-            await runner.CancelAsync();
+            await processor.CancelAsync();
         }
 
-        private async Task<RuleRunnerProcessor> GetProcessorAsync(DomainId appId)
+        private Task<RuleRunnerProcessor> GetProcessorAsync(DomainId appId,
+            CancellationToken ct)
         {
-            var runner = processors.GetOrAdd(appId, processorFactory);
+            // Use a normal dictionary to avoid double creations.
+            lock (processors)
+            {
+                return processors.GetOrAdd(appId, async key =>
+                {
+                    var processor = processorFactory(key);
 
-            await runner.LoadAsync(default);
+                    await processor.LoadAsync(ct);
 
-            return runner;
+                    return processor;
+                });
+            }
         }
     }
 }

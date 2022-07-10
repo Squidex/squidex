@@ -12,7 +12,9 @@ using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
+using TaskHelper = Squidex.Infrastructure.Tasks.TaskExtensions;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
@@ -27,9 +29,45 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         private readonly IRuleService ruleService;
         private readonly ILogger<RuleRunnerProcessor> log;
         private readonly SimpleState<RuleRunnerState> state;
+        private readonly ReentrantScheduler scheduler = new ReentrantScheduler(1);
         private readonly DomainId appId;
-        private CancellationTokenSource? currentJobToken;
-        private bool isStopping;
+        private Run? currentRun;
+
+        // Use a run to store all state that is necessary for a single run.
+        private sealed class Run : IDisposable
+        {
+            private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
+            private readonly CancellationTokenSource cancellationLinked;
+
+            public RuleRunnerState Job { get; init; }
+
+            public RuleContext Context { get; set; }
+
+            public CancellationToken CancellationToken => cancellationLinked.Token;
+
+            public Run(CancellationToken ct)
+            {
+                cancellationLinked = CancellationTokenSource.CreateLinkedTokenSource(ct, cancellationSource.Token);
+            }
+
+            public void Dispose()
+            {
+                cancellationSource.Dispose();
+                cancellationLinked.Dispose();
+            }
+
+            public void Cancel()
+            {
+                try
+                {
+                    cancellationSource.Cancel();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Cancellation token might have been disposed, if the run is completed.
+                }
+            }
+        }
 
         public RuleRunnerProcessor(
             DomainId appId,
@@ -54,94 +92,93 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             state = new SimpleState<RuleRunnerState>(persistenceFactory, GetType(), appId);
         }
 
-        public Task LoadAsync(
+        public async Task LoadAsync(
             CancellationToken ct = default)
         {
-            return state.LoadAsync(ct);
-        }
+            await state.LoadAsync(ct);
 
-        public Task ReleaseAsync()
-        {
-            isStopping = true;
-
-            currentJobToken?.Cancel();
-
-            return Task.CompletedTask;
+            if (!state.Value.RunFromSnapshots)
+            {
+                TaskHelper.Forget(RunAsync(state.Value.RuleId, false, default));
+            }
+            else
+            {
+                await state.ClearAsync(ct);
+            }
         }
 
         public Task CancelAsync()
         {
-            try
+            // Ensure that only one thread is accessing the current state at a time.
+            return scheduler.Schedule(() =>
             {
-                currentJobToken?.Cancel();
-            }
-            catch (ObjectDisposedException)
-            {
-                return Task.CompletedTask;
-            }
-
-            return Task.CompletedTask;
+                currentRun?.Cancel();
+            });
         }
 
-        public async Task RunAsync(DomainId ruleId, bool fromSnapshots, bool isRetry,
+        public Task RunAsync(DomainId ruleId, bool fromSnapshots,
             CancellationToken ct)
         {
-            if (currentJobToken != null)
+            return scheduler.ScheduleAsync(async ct =>
             {
-                throw new DomainException(T.Get("rules.ruleAlreadyRunning"));
-            }
-
-            state.Value = new RuleRunnerState
-            {
-                RuleId = ruleId,
-                RunFromSnapshots = fromSnapshots
-            };
-
-            await state.WriteAsync(ct);
-
-            await EnsureIsRunningAsync(isRetry, ct);
-        }
-
-        private async Task EnsureIsRunningAsync(bool isRetry,
-            CancellationToken ct)
-        {
-            var job = state.Value;
-
-            if (job.RuleId != null && currentJobToken == null)
-            {
-                if (state.Value.RunFromSnapshots && isRetry)
+                // There is no continuation token for snapshots, therefore we cannot continue with the run.
+                if (currentRun?.Job.RunFromSnapshots == true)
                 {
-                    state.Value = new RuleRunnerState();
-
-                    await state.WriteAsync(ct);
+                    throw new DomainException(T.Get("rules.ruleAlreadyRunning"));
                 }
-                else
-                {
-                    currentJobToken = new CancellationTokenSource();
 
-                    using (var linked = CancellationTokenSource.CreateLinkedTokenSource(currentJobToken.Token, ct))
+                var previousJob = state.Value;
+
+                // If we have not removed the state, we have not completed the previous run and can therefore just continue.
+                var position =
+                    previousJob.RuleId == ruleId && !previousJob.RunFromSnapshots ?
+                    previousJob.Position :
+                    null;
+
+                // Set the current run first to indicate that we are running a rule at the moment.
+                var run = currentRun = new Run(ct)
+                {
+                    Job = new RuleRunnerState
                     {
-                        await ProcessAsync(state.Value, ct);
+                        RuleId = ruleId,
+                        RunId = DomainId.NewGuid(),
+                        RunFromSnapshots = fromSnapshots,
+                        Position = position
                     }
+                };
+
+                state.Value = run.Job;
+                try
+                {
+                    await state.WriteAsync(run.CancellationToken);
+
+                    await ProcessAsync(run, run.CancellationToken);
                 }
-            }
+                finally
+                {
+                    // Unset the run to indicate that we are done.
+                    currentRun.Dispose();
+                    currentRun = null;
+                }
+            }, ct);
         }
 
-        private async Task ProcessAsync(RuleRunnerState currentState,
+        private async Task ProcessAsync(Run run,
             CancellationToken ct)
         {
             try
             {
-                var rule = await appProvider.GetRuleAsync(appId, currentState.RuleId!.Value, ct);
+                var rule = await appProvider.GetRuleAsync(appId, run.Job.RuleId, ct);
 
+                // The rule might have been deleted in the meantime.
                 if (rule == null)
                 {
-                    throw new DomainObjectNotFoundException(currentState.RuleId.ToString()!);
+                    throw new DomainObjectNotFoundException(run.Job.RuleId.ToString()!);
                 }
 
                 using (localCache.StartContext())
                 {
-                    var context = new RuleContext
+                    run.Context = new RuleContext
                     {
                         AppId = rule.AppId,
                         Rule = rule.RuleDef,
@@ -149,13 +186,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                         IncludeStale = true
                     };
 
-                    if (currentState.RunFromSnapshots && ruleService.CanCreateSnapshotEvents(context))
+                    if (run.Job.RunFromSnapshots && ruleService.CanCreateSnapshotEvents(run.Context))
                     {
-                        await EnqueueFromSnapshotsAsync(context, ct);
+                        await EnqueueFromSnapshotsAsync(run, ct);
                     }
                     else
                     {
-                        await EnqueueFromEventsAsync(currentState, context, ct);
+                        await EnqueueFromEventsAsync(run, ct);
                     }
                 }
             }
@@ -165,29 +202,22 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Failed to run rule with ID {ruleId}.", currentState.RuleId);
+                log.LogError(ex, "Failed to run rule with ID {ruleId}.", run.Job.RuleId);
             }
             finally
             {
-                if (!isStopping)
-                {
-                    currentState.RuleId = null;
-                    currentState.Position = null;
-
-                    await state.WriteAsync(ct);
-
-                    currentJobToken?.Dispose();
-                    currentJobToken = null;
-                }
+                // Remove the state to indicate that the run has been completed.
+                await state.ClearAsync(default);
             }
         }
 
-        private async Task EnqueueFromSnapshotsAsync(RuleContext context,
+        private async Task EnqueueFromSnapshotsAsync(Run run,
             CancellationToken ct)
         {
+            // We collect errors and allow a few erors before we throw an exception.
             var errors = 0;
 
-            await foreach (var job in ruleService.CreateSnapshotJobsAsync(context, ct))
+            await foreach (var job in ruleService.CreateSnapshotJobsAsync(run.Context, ct))
             {
                 if (job.Job != null && job.SkipReason == SkipReason.None)
                 {
@@ -202,19 +232,21 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                         throw job.EnrichmentError;
                     }
 
-                    log.LogWarning(job.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", context.RuleId);
+                    log.LogWarning(job.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", run.Context.RuleId);
                 }
             }
         }
 
-        private async Task EnqueueFromEventsAsync(RuleRunnerState currentState, RuleContext context,
+        private async Task EnqueueFromEventsAsync(Run run,
             CancellationToken ct)
         {
+            // We collect errors and allow a few erors before we throw an exception.
             var errors = 0;
 
+            // Use a prefix query so that the storage can use an index for the query.
             var filter = $"^([a-z]+)\\-{appId}";
 
-            await foreach (var storedEvent in eventStore.QueryAllAsync(filter, currentState.Position, ct: ct))
+            await foreach (var storedEvent in eventStore.QueryAllAsync(filter, run.Job.Position, ct: ct))
             {
                 try
                 {
@@ -222,7 +254,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
                     if (@event != null)
                     {
-                        var jobs = ruleService.CreateJobsAsync(@event, context, ct);
+                        var jobs = ruleService.CreateJobsAsync(@event, run.Context, ct);
 
                         await foreach (var job in jobs.WithCancellation(ct))
                         {
@@ -242,11 +274,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                         throw;
                     }
 
-                    log.LogWarning(ex, "Failed to run rule with ID {ruleId}, continue with next job.", context.RuleId);
+                    log.LogWarning(ex, "Failed to run rule with ID {ruleId}, continue with next job.", run.Context.RuleId);
                 }
                 finally
                 {
-                    currentState.Position = storedEvent.EventPosition;
+                    run.Job.Position = storedEvent.EventPosition;
                 }
 
                 await state.WriteAsync(ct);

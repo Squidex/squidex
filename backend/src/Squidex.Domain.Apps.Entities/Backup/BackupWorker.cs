@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         IMessageHandler<BackupClear>,
         IInitializable
     {
-        private readonly ConcurrentDictionary<DomainId, BackupProcessor> backupProcessors = new ConcurrentDictionary<DomainId, BackupProcessor>();
+        private readonly Dictionary<DomainId, Task<BackupProcessor>> backupProcessors = new Dictionary<DomainId, Task<BackupProcessor>>();
         private readonly Func<DomainId, BackupProcessor> backupFactory;
         private readonly RestoreProcessor restoreProcessor;
 
@@ -43,13 +43,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
         }
 
         public Task HandleAsync(BackupRestore message,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             return restoreProcessor.RestoreAsync(message.Url, message.Actor, message.NewAppName, ct);
         }
 
         public async Task HandleAsync(BackupStart message,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             var processor = await GetBackupProcessorAsync(message.AppId);
 
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         }
 
         public async Task HandleAsync(BackupDelete message,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             var processor = await GetBackupProcessorAsync(message.AppId);
 
@@ -65,20 +65,26 @@ namespace Squidex.Domain.Apps.Entities.Backup
         }
 
         public async Task HandleAsync(BackupClear message,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             var processor = await GetBackupProcessorAsync(message.AppId);
 
             await processor.ClearAsync();
         }
 
-        private async Task<BackupProcessor> GetBackupProcessorAsync(DomainId appId)
+        private Task<BackupProcessor> GetBackupProcessorAsync(DomainId appId)
         {
-            var processor = backupProcessors.GetOrAdd(appId, backupFactory);
+            lock (backupProcessors)
+            {
+                return backupProcessors.GetOrAdd(appId, async key =>
+                {
+                    var processor = backupFactory(key);
 
-            await processor.LoadAsync(default);
+                    await processor.LoadAsync(default);
 
-            return processor;
+                    return processor;
+                });
+            }
         }
     }
 }

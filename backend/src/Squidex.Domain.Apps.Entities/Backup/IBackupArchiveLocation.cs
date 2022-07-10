@@ -13,8 +13,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         Stream OpenStream(DomainId backupId);
 
-        Task<IBackupWriter> OpenWriterAsync(Stream stream);
+        Task<IBackupWriter> OpenWriterAsync(Stream stream,
+            CancellationToken ct);
 
-        Task<IBackupReader> OpenReaderAsync(Uri url, DomainId id);
+        Task<IBackupReader> OpenReaderAsync(Uri url, DomainId id,
+            CancellationToken ct);
     }
 }

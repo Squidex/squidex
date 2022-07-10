@@ -92,7 +92,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             await Task.Delay(200);
 
-            sut.Unsubscribe();
+            sut.Dispose();
         }
     }
 }

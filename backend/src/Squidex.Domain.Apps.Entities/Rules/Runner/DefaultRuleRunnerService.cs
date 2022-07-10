@@ -20,14 +20,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
     public sealed class DefaultRuleRunnerService : IRuleRunnerService
     {
         private const int MaxSimulatedEvents = 100;
-        private readonly IPersistenceFactory<RuleRunnerState> persistenceFactory;
+        private readonly IPersistenceFactory<RuleRunnerJob> persistenceFactory;
         private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
         private readonly IRuleService ruleService;
         private readonly IMessageBus messaging;
 
         public DefaultRuleRunnerService(
-            IPersistenceFactory<RuleRunnerState> persistenceFactory,
+            IPersistenceFactory<RuleRunnerJob> persistenceFactory,
             IEventFormatter eventFormatter,
             IEventStore eventStore,
             IRuleService ruleService,
@@ -132,10 +132,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             return state.Value.RuleId;
         }
 
-        private async Task<SimpleState<RuleRunnerState>> GetStateAsync(DomainId appId,
+        private async Task<SimpleState<RuleRunnerJob>> GetStateAsync(DomainId appId,
             CancellationToken ct)
         {
-            var state = new SimpleState<RuleRunnerState>(persistenceFactory, GetType(), appId);
+            var state = new SimpleState<RuleRunnerJob>(persistenceFactory, GetType(), appId);
 
             await state.LoadAsync(ct);
 

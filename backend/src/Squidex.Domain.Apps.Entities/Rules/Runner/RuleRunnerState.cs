@@ -11,9 +11,11 @@ using Squidex.Infrastructure.States;
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
     [CollectionName("Rules_Runner")]
-    public sealed class RuleRunnerState
+    public sealed class RuleRunnerJob
     {
-        public DomainId? RuleId { get; set; }
+        public DomainId RuleId { get; set; }
+
+        public DomainId RunId { get; set; }
 
         public string? Position { get; set; }
 

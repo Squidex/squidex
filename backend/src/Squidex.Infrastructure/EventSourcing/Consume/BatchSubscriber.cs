@@ -21,15 +21,10 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         private readonly Task handleTask;
         private readonly CancellationTokenSource completed = new CancellationTokenSource();
 
-        public object? Sender
-        {
-            get => eventSubscription.Sender!;
-        }
-
-        private sealed record EventSource(StoredEvent StoredEvent, object Sender);
-        private sealed record BatchItem(Envelope<IEvent>? Event, string Position, object Sender);
+        private sealed record EventSource(StoredEvent StoredEvent);
+        private sealed record BatchItem(Envelope<IEvent>? Event, string Position);
         private sealed record BatchJob(BatchItem[] Items);
-        private sealed record ErrorJob(Exception Exception, object? Sender);
+        private sealed record ErrorJob(Exception Exception);
 
         public BatchSubscriber(
             EventConsumerProcessor processor,
@@ -67,8 +62,9 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
             Task.Run(async () =>
             {
-                await foreach (var (storedEvent, sender) in parseQueue.Reader.ReadAllAsync(completed.Token))
+                await foreach (var source in parseQueue.Reader.ReadAllAsync(completed.Token))
                 {
+                    var storedEvent = source.StoredEvent;
                     try
                     {
                         Envelope<IEvent>? @event = null;
@@ -78,11 +74,11 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
                             @event = eventFormatter.ParseIfKnown(storedEvent);
                         }
 
-                        await batchQueue.Writer.WriteAsync(new BatchItem(@event, storedEvent.EventPosition, sender), completed.Token);
+                        await batchQueue.Writer.WriteAsync(new BatchItem(@event, storedEvent.EventPosition), completed.Token);
                     }
                     catch (Exception ex)
                     {
-                        await taskQueue.Writer.WriteAsync(new ErrorJob(ex, sender), completed.Token);
+                        await taskQueue.Writer.WriteAsync(new ErrorJob(ex), completed.Token);
                     }
                 }
             }).ContinueWith(x => batchQueue.Writer.TryComplete(x.Exception));
@@ -97,37 +93,20 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             {
                 await foreach (var task in taskQueue.Reader.ReadAllAsync(completed.Token))
                 {
-                    var sender = eventSubscription?.Sender;
-
-                    if (sender == null)
-                    {
-                        continue;
-                    }
-
                     switch (task)
                     {
                         case ErrorJob error when error.Exception is not OperationCanceledException:
                             {
-                                if (ReferenceEquals(error.Sender, sender))
-                                {
-                                    await processor.OnErrorAsync(sender, error.Exception);
-                                }
-
+                                await processor.OnErrorAsync(this, error.Exception);
                                 break;
                             }
 
                         case BatchJob batch:
                             {
-                                foreach (var itemsBySender in batch.Items.GroupBy(x => x.Sender))
-                                {
-                                    if (ReferenceEquals(itemsBySender.Key, sender))
-                                    {
-                                        var position = itemsBySender.Last().Position;
+                                var eventsPosition = batch.Items[^1].Position;
+                                var eventsCollection = batch.Items.Select(x => x.Event).NotNull().ToList();
 
-                                        await processor.OnEventsAsync(sender, itemsBySender.Select(x => x.Event).NotNull().ToList(), position);
-                                    }
-                                }
-
+                                await processor.OnEventsAsync(this, eventsCollection, eventsPosition);
                                 break;
                             }
                     }
@@ -139,14 +118,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             }
             catch (Exception ex)
             {
-                var sender = eventSubscription?.Sender;
-
-                if (sender != null)
-                {
-                    await processor.OnErrorAsync(sender, ex);
-                }
-
-                throw;
+                await processor.OnErrorAsync(this, ex);
             }
         }
 
@@ -157,32 +129,26 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             return handleTask;
         }
 
-        void IEventSubscription.Unsubscribe()
+        public void Dispose()
         {
             completed.Cancel();
 
-            eventSubscription.Unsubscribe();
+            eventSubscription.Dispose();
         }
 
-        void IEventSubscription.WakeUp()
+        public void WakeUp()
         {
             eventSubscription.WakeUp();
         }
 
-        async Task IEventSubscriber.OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
+        ValueTask IEventSubscriber.OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
         {
-            if (subscription.Sender != null)
-            {
-                await parseQueue.Writer.WriteAsync(new EventSource(storedEvent, subscription.Sender), completed.Token);
-            }
+            return parseQueue.Writer.WriteAsync(new EventSource(storedEvent), completed.Token);
         }
 
-        async Task IEventSubscriber.OnErrorAsync(IEventSubscription subscription, Exception exception)
+        ValueTask IEventSubscriber.OnErrorAsync(IEventSubscription subscription, Exception exception)
         {
-            if (subscription.Sender != null && exception is not OperationCanceledException)
-            {
-                await taskQueue.Writer.WriteAsync(new ErrorJob(exception, subscription.Sender), completed.Token);
-            }
+            return taskQueue.Writer.WriteAsync(new ErrorJob(exception), completed.Token);
         }
     }
 }

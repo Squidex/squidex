@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         }
 
         public async Task HandleAsync(EventConsumerStart message,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             if (processors.TryGetValue(message.Name, out var processor))
             {
@@ -63,7 +63,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         }
 
         public async Task HandleAsync(EventConsumerStop message,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             if (processors.TryGetValue(message.Name, out var processor))
             {
@@ -72,7 +72,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         }
 
         public async Task HandleAsync(EventConsumerReset message,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             if (processors.TryGetValue(message.Name, out var processor))
             {

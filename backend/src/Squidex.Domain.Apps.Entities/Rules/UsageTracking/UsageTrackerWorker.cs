@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         }
 
         public Task HandleAsync(UsageTrackingMessage message,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             switch (message)
             {

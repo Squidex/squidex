@@ -22,18 +22,22 @@ namespace Squidex.Infrastructure.EventSourcing
 
             public string LastPosition { get; set; }
 
-            public Task OnErrorAsync(IEventSubscription subscription, Exception exception)
+            public void Dispose()
+            {
+            }
+
+            public ValueTask OnErrorAsync(IEventSubscription subscription, Exception exception)
             {
                 throw exception;
             }
 
-            public Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
+            public ValueTask OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
             {
                 LastPosition = storedEvent.EventPosition;
 
                 Events.Add(storedEvent);
 
-                return Task.CompletedTask;
+                return default;
             }
         }
 
@@ -483,7 +487,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
             finally
             {
-                subscription?.Unsubscribe();
+                subscription?.Dispose();
             }
         }
 
