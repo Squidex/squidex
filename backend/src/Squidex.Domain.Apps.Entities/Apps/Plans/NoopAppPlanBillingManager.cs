@@ -16,12 +16,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             get => false;
         }
 
-        public Task<IChangePlanResult> ChangePlanAsync(string userId, NamedId<DomainId> appId, string? planId, string? referer)
+        public Task<IChangePlanResult> ChangePlanAsync(string userId, NamedId<DomainId> appId, string? planId, string? referer,
+            CancellationToken ct = default)
         {
             return Task.FromResult<IChangePlanResult>(new PlanChangedResult());
         }
 
-        public Task<string> GetPortalLinkAsync(string userId)
+        public Task<string> GetPortalLinkAsync(string userId,
+            CancellationToken ct = default)
         {
             return Task.FromResult(string.Empty);
         }

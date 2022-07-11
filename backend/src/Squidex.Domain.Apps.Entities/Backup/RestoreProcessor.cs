@@ -206,7 +206,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     using (Telemetry.Activities.StartActivity("ReadEvents"))
                     {
-                        await ReadEventsAsync(run, ct); 
+                        await ReadEventsAsync(run, ct);
                     }
 
                     foreach (var handler in run.Handlers)
