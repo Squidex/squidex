@@ -143,6 +143,13 @@ jobs:
           string: "${{ env.GITHUB_REF_SLUG }}"
           split-by: "."
 
+      - name: Check Tag
+        id: normal-version
+        run: |
+          if [[ ${{ env.GITHUB_REF_SLUG }} =~ ^[0-9]+\.[0-9]+$ ]]; then
+              echo ::set-output name=match::true
+          fi
+
       - name: Get Image From Cache
         uses: actions/cache@v2
         with:
@@ -167,7 +174,7 @@ jobs:
       - name: Push Latest
         run: |
           docker push squidex/squidex:latest
-        if: $${{ !contains(env.GITHUB_REF_SLUG, '-rc') && !contains('env.GITHUB_REF_SLUG', '-beta') }}
+        if: steps.normal-version.outputs.match == 'true'
 
   release:
     needs: publish
