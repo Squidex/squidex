@@ -304,7 +304,7 @@ namespace TestSuite.ApiTests
             var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(3 3)') lt 1000" };
 
             // Query multiple times to wait for async text indexer.
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 20; i++)
             {
                 await Task.Delay(500);
 
@@ -342,7 +342,7 @@ namespace TestSuite.ApiTests
             };
 
             // Query multiple times to wait for async text indexer.
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 20; i++)
             {
                 await Task.Delay(500);
 
