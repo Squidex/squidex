@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         {
             var appId = DomainId.NewGuid();
 
-            A.CallTo(() => counterService.ResetAsync(appId, "my", 4, default))
+            A.CallTo(() => counterService.ResetAsync(appId, "my", 4, A<CancellationToken>._))
                 .Returns(3);
 
             const string script = @"
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         {
             var appId = DomainId.NewGuid();
 
-            A.CallTo(() => counterService.IncrementAsync(appId, "my", default))
+            A.CallTo(() => counterService.IncrementAsync(appId, "my", A<CancellationToken>._))
                 .Returns(3);
 
             const string script = @"
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         {
             var appId = DomainId.NewGuid();
 
-            A.CallTo(() => counterService.IncrementAsync(appId, "my", default))
+            A.CallTo(() => counterService.IncrementAsync(appId, "my", A<CancellationToken>._))
                 .Returns(3);
 
             const string script = @"

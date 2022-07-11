@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateBackupContext();
 
-            A.CallTo(() => tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets, default))
+            A.CallTo(() => tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets, ct))
                 .Returns(tags);
 
             await sut.BackupAsync(context, ct);
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateBackupContext();
 
-            A.CallTo(() => tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets, default))
+            A.CallTo(() => tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets, ct))
                 .Returns(tags);
 
             await sut.BackupAsync(context, ct);
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.RestoreAsync(context, ct);
 
-            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Tags == tags), default))
+            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Tags == tags), ct))
                 .MustHaveHappened();
         }
 
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.RestoreAsync(context, ct);
 
-            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Alias == alias), default))
+            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Alias == alias), ct))
                 .MustHaveHappened();
         }
 
