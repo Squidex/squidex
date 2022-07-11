@@ -11,7 +11,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Repositories
 {
     public interface ISchemaRepository
     {
-        Task<Dictionary<string, DomainId>> QueryIdsAsync(DomainId appId,
+        Task<List<ISchemaEntity>> QueryAllAsync(DomainId appId,
+            CancellationToken ct = default);
+
+        Task<ISchemaEntity?> FindAsync(DomainId appId, DomainId id,
+            CancellationToken ct = default);
+
+        Task<ISchemaEntity?> FindAsync(DomainId appId, string name,
             CancellationToken ct = default);
     }
 }

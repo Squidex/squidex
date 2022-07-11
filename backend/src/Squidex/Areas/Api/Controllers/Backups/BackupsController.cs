@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -67,9 +66,9 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ProducesResponseType(typeof(List<BackupJobDto>), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppBackupsCreate)]
         [ApiCosts(0)]
-        public IActionResult PostBackup(string app)
+        public async Task<IActionResult> PostBackup(string app)
         {
-            backupService.StartBackupAsync(App.Id, User.Token()!).Forget();
+            await backupService.StartBackupAsync(App.Id, User.Token()!, HttpContext.RequestAborted);
 
             return NoContent();
         }

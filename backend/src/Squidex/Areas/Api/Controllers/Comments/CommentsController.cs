@@ -54,7 +54,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [ApiCosts(0)]
         public async Task<IActionResult> GetWatchingUsers(string app, string? resource = null)
         {
-            var result = await watchingService.GetWatchingUsersAsync(App.Id, resource ?? "all", UserId());
+            var result = await watchingService.GetWatchingUsersAsync(App.Id, resource, UserId(), HttpContext.RequestAborted);
 
             return Ok(result);
         }
@@ -79,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [ApiCosts(0)]
         public async Task<IActionResult> GetComments(string app, DomainId commentsId, [FromQuery] long version = EtagVersion.Any)
         {
-            var result = await commentsLoader.GetCommentsAsync(commentsId, version);
+            var result = await commentsLoader.GetCommentsAsync(commentsId, version, HttpContext.RequestAborted);
 
             var response = Deferred.Response(() =>
             {
@@ -111,7 +111,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         {
             var command = request.ToCreateCommand(commentsId);
 
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             var response = CommentDto.FromDomain(command);
 
@@ -138,7 +138,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         {
             var command = request.ToUpdateComment(commentsId, commentId);
 
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -161,7 +161,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         {
             var command = new DeleteComment { CommentsId = commentsId, CommentId = commentId };
 
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             return NoContent();
         }

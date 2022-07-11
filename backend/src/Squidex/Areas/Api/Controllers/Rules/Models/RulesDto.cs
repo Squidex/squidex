@@ -29,10 +29,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         public static async Task<RulesDto> FromRulesAsync(IEnumerable<IEnrichedRuleEntity> items, IRuleRunnerService ruleRunnerService, Resources resources)
         {
             var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(resources.Context.App.Id);
+            var runningAvailable = runningRuleId != default;
 
             var result = new RulesDto
             {
-                Items = items.Select(x => RuleDto.FromDomain(x, runningRuleId == null, ruleRunnerService, resources)).ToArray()
+                Items = items.Select(x => RuleDto.FromDomain(x, runningAvailable, ruleRunnerService, resources)).ToArray()
             };
 
             result.RunningRuleId = runningRuleId;

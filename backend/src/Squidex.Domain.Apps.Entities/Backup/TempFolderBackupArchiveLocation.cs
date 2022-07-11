@@ -14,14 +14,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
     [ExcludeFromCodeCoverage]
     public sealed class TempFolderBackupArchiveLocation : IBackupArchiveLocation
     {
-        private readonly IJsonSerializer jsonSerializer;
+        private readonly IJsonSerializer serializer;
 
-        public TempFolderBackupArchiveLocation(IJsonSerializer jsonSerializer)
+        public TempFolderBackupArchiveLocation(IJsonSerializer serializer)
         {
-            this.jsonSerializer = jsonSerializer;
+            this.serializer = serializer;
         }
 
-        public async Task<IBackupReader> OpenReaderAsync(Uri url, DomainId id)
+        public async Task<IBackupReader> OpenReaderAsync(Uri url, DomainId id,
+            CancellationToken ct)
         {
             Stream stream;
 
@@ -40,12 +41,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     {
                         client.Timeout = TimeSpan.FromHours(1);
 
-                        response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                        response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);
                         response.EnsureSuccessStatusCode();
 
-                        await using (var sourceStream = await response.Content.ReadAsStreamAsync())
+                        await using (var sourceStream = await response.Content.ReadAsStreamAsync(ct))
                         {
-                            await sourceStream.CopyToAsync(stream);
+                            await sourceStream.CopyToAsync(stream, ct);
                         }
                     }
                 }
@@ -63,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             try
             {
-                return new BackupReader(jsonSerializer, stream);
+                return new BackupReader(serializer, stream);
             }
             catch (IOException)
             {
@@ -94,9 +95,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return fileStream;
         }
 
-        public Task<IBackupWriter> OpenWriterAsync(Stream stream)
+        public Task<IBackupWriter> OpenWriterAsync(Stream stream,
+            CancellationToken ct)
         {
-            var writer = new BackupWriter(jsonSerializer, stream, true);
+            var writer = new BackupWriter(serializer, stream, true);
 
             return Task.FromResult<IBackupWriter>(writer);
         }

@@ -18,7 +18,8 @@ namespace Squidex.Infrastructure.Commands
         {
             public ICommand LastCommand { get; private set; }
 
-            public Task HandleAsync(CommandContext context, NextDelegate next)
+            public Task HandleAsync(CommandContext context, NextDelegate next,
+                CancellationToken ct)
             {
                 LastCommand = context.Command;
 
@@ -32,7 +33,8 @@ namespace Squidex.Infrastructure.Commands
         {
             public ICommand LastCommand { get; private set; }
 
-            public Task HandleAsync(CommandContext context, NextDelegate next)
+            public Task HandleAsync(CommandContext context, NextDelegate next,
+                CancellationToken ct)
             {
                 LastCommand = context.Command;
 
@@ -44,7 +46,8 @@ namespace Squidex.Infrastructure.Commands
         {
             public ICommand LastCommand { get; private set; }
 
-            public Task HandleAsync(CommandContext context, NextDelegate next)
+            public Task HandleAsync(CommandContext context, NextDelegate next,
+                CancellationToken ct)
             {
                 LastCommand = context.Command;
 
@@ -56,9 +59,10 @@ namespace Squidex.Infrastructure.Commands
         public async Task Should_not_set_handled_if_no_handler_registered()
         {
             var sut = new InMemoryCommandBus(Array.Empty<ICommandMiddleware>());
-            var ctx = await sut.PublishAsync(command);
 
-            Assert.False(ctx.IsCompleted);
+            var context = await sut.PublishAsync(command, default);
+
+            Assert.False(context.IsCompleted);
         }
 
         [Fact]
@@ -67,10 +71,11 @@ namespace Squidex.Infrastructure.Commands
             var handler = new NonHandledHandler();
 
             var sut = new InMemoryCommandBus(new ICommandMiddleware[] { handler });
-            var ctx = await sut.PublishAsync(command);
+
+            var context = await sut.PublishAsync(command, default);
 
             Assert.Equal(command, handler.LastCommand);
-            Assert.False(ctx.IsCompleted);
+            Assert.False(context.IsCompleted);
         }
 
         [Fact]
@@ -79,10 +84,11 @@ namespace Squidex.Infrastructure.Commands
             var handler = new HandledHandler();
 
             var sut = new InMemoryCommandBus(new ICommandMiddleware[] { handler });
-            var ctx = await sut.PublishAsync(command);
+
+            var context = await sut.PublishAsync(command, default);
 
             Assert.Equal(command, handler.LastCommand);
-            Assert.True(ctx.IsCompleted);
+            Assert.True(context.IsCompleted);
         }
 
         [Fact]
@@ -92,7 +98,7 @@ namespace Squidex.Infrastructure.Commands
 
             var sut = new InMemoryCommandBus(new ICommandMiddleware[] { handler });
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.PublishAsync(command));
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.PublishAsync(command, default));
 
             Assert.Equal(command, handler.LastCommand);
         }

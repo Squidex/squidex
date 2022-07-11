@@ -68,10 +68,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => step2.EnrichAsync(requestContext, ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, ct))
+            A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => step2.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, ct))
+            A.CallTo(() => step2.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 

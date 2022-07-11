@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
-            A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>._, A<HashSet<string>>._))
+            A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>._, A<HashSet<string>>._, default))
                 .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x) ?? new Dictionary<string, string>()));
 
             var log = A.Fake<ILogger<AssetDomainObject>>();
@@ -483,7 +483,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private async Task<object> PublishAsync(AssetCommand command)
         {
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+            var result = await sut.ExecuteAsync(CreateAssetCommand(command), default);
 
             return result.Payload;
         }

@@ -17,15 +17,16 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     {
         private static readonly FilterTagTransformer Instance = new FilterTagTransformer();
 
-        public record struct Args(DomainId AppId, ITagService TagService);
+        public record struct Args(DomainId AppId, ITagService TagService, CancellationToken CancellationToken);
 
         private FilterTagTransformer()
         {
         }
 
-        public static ValueTask<FilterNode<ClrValue>?> TransformAsync(FilterNode<ClrValue> nodeIn, DomainId appId, ITagService tagService)
+        public static ValueTask<FilterNode<ClrValue>?> TransformAsync(FilterNode<ClrValue> nodeIn, DomainId appId, ITagService tagService,
+            CancellationToken ct)
         {
-            var args = new Args(appId, tagService);
+            var args = new Args(appId, tagService, ct);
 
             return nodeIn.Accept(Instance, args);
         }
@@ -34,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             if (string.Equals(nodeIn.Path[0], nameof(IAssetEntity.Tags), StringComparison.OrdinalIgnoreCase) && nodeIn.Value.Value is string stringValue)
             {
-                var tagNames = await args.TagService.GetTagIdsAsync(args.AppId, TagGroups.Assets, HashSet.Of(stringValue));
+                var tagNames = await args.TagService.GetTagIdsAsync(args.AppId, TagGroups.Assets, HashSet.Of(stringValue), args.CancellationToken);
 
                 if (tagNames.TryGetValue(stringValue, out var normalized))
                 {

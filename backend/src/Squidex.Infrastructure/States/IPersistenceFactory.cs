@@ -17,6 +17,8 @@ namespace Squidex.Infrastructure.States
 
     public interface IPersistenceFactory<T>
     {
+        ISnapshotStore<T> Snapshots { get; }
+
         IPersistence<T> WithEventSourcing(Type owner, DomainId id, HandleEvent? applyEvent);
 
         IPersistence<T> WithSnapshots(Type owner, DomainId id, HandleSnapshot<T>? applySnapshot);

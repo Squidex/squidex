@@ -36,11 +36,6 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
                 result.AddGetLink("admin/users", resources.Url<UserManagementController>(x => nameof(x.GetUsers)));
             }
 
-            if (resources.CanReadOrleans)
-            {
-                result.AddGetLink("admin/orleans", "/orleans");
-            }
-
             result.AddGetLink("languages", resources.Url<LanguagesController>(x => nameof(x.GetLanguages)));
 
             return result;

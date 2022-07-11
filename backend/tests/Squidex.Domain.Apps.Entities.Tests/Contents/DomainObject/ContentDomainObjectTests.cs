@@ -1028,7 +1028,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task<object> PublishAsync(ContentCommand command)
         {
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await sut.ExecuteAsync(CreateContentCommand(command), default);
 
             return result.Payload;
         }

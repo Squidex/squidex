@@ -50,7 +50,7 @@ namespace Squidex.Web.Pipeline
                     {
                         var (_, clientId) = context.HttpContext.User.GetClient();
 
-                        var isBlocked = await usageGate.IsBlockedAsync(app, clientId, DateTime.Today);
+                        var isBlocked = await usageGate.IsBlockedAsync(app, clientId, DateTime.Today, context.HttpContext.RequestAborted);
 
                         if (isBlocked)
                         {

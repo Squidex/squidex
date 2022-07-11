@@ -17,9 +17,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class SingletonCommandMiddleware : ICommandMiddleware
     {
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
-            await next(context);
+            await next(context, ct);
 
             if (context.IsCompleted && context.Command is CreateSchema { Type: SchemaType.Singleton } createSchema)
             {
@@ -40,7 +41,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 SimpleMapper.Map(createSchema, content);
 
-                await context.CommandBus.PublishAsync(content);
+                // Always create the corresponding content and therefore do not pass over cancellation token.
+                await context.CommandBus.PublishAsync(content, default);
             }
         }
     }

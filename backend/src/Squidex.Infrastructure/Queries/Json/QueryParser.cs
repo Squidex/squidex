@@ -14,14 +14,14 @@ namespace Squidex.Infrastructure.Queries.Json
 {
     public static class QueryParser
     {
-        public static ClrQuery Parse(this QueryModel model, string json, IJsonSerializer jsonSerializer)
+        public static ClrQuery Parse(this QueryModel model, string json, IJsonSerializer serializer)
         {
             if (string.IsNullOrWhiteSpace(json))
             {
                 return new ClrQuery();
             }
 
-            var query = ParseFromJson(json, jsonSerializer);
+            var query = ParseFromJson(json, serializer);
 
             return Convert(model, query);
         }
@@ -76,11 +76,11 @@ namespace Squidex.Infrastructure.Queries.Json
             }
         }
 
-        public static Query<JsonValue> ParseFromJson(string json, IJsonSerializer jsonSerializer)
+        public static Query<JsonValue> ParseFromJson(string json, IJsonSerializer serializer)
         {
             try
             {
-                return jsonSerializer.Deserialize<Query<JsonValue>>(json);
+                return serializer.Deserialize<Query<JsonValue>>(json);
             }
             catch (JsonException ex)
             {

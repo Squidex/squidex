@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using FakeItEasy;
-using Orleans;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -18,12 +17,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
     public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.State>
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
+        private readonly IDomainObjectCache domainObjectCache = A.Fake<IDomainObjectCache>();
+        private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
         private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
         private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
         private readonly IAssetMetadataSource assetMetadataSource = A.Fake<IAssetMetadataSource>();
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
-        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly DomainId assetId = DomainId.NewGuid();
         private readonly AssetFile file = new NoopAssetFile();
         private readonly Context requestContext;
@@ -40,6 +42,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         public AssetCommandMiddlewareTests()
         {
+            ct = cts.Token;
+
             file = new NoopAssetFile();
 
             requestContext = Context.Anonymous(Mocks.App(AppNamedId));
@@ -47,10 +51,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);
 
-            A.CallTo(() => assetQuery.FindByHashAsync(A<Context>._, A<string>._, A<string>._, A<long>._, A<CancellationToken>._))
+            A.CallTo(() => assetQuery.FindByHashAsync(A<Context>._, A<string>._, A<string>._, A<long>._, ct))
                 .Returns(Task.FromResult<IEnrichedAssetEntity?>(null));
 
-            sut = new AssetCommandMiddleware(grainFactory,
+            sut = new AssetCommandMiddleware(
+                domainObjectFactory,
+                domainObjectCache,
                 assetEnricher,
                 assetFileStore,
                 assetQuery,
@@ -86,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             var enriched = new AssetEntity();
 
-            A.CallTo(() => assetEnricher.EnrichAsync(result, requestContext, A<CancellationToken>._))
+            A.CallTo(() => assetEnricher.EnrichAsync(result, requestContext, ct))
                 .Returns(enriched);
 
             var context =
@@ -213,11 +219,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private void AssertAssetHasBeenUploaded(long fileVersion)
         {
-            A.CallTo(() => assetFileStore.UploadAsync(A<string>._, A<HasherStream>._, default))
+            A.CallTo(() => assetFileStore.UploadAsync(A<string>._, A<HasherStream>._, ct))
                 .MustHaveHappened();
-            A.CallTo(() => assetFileStore.CopyAsync(A<string>._, AppId, assetId, fileVersion, null, default))
+
+            A.CallTo(() => assetFileStore.CopyAsync(A<string>._, AppId, assetId, fileVersion, null, ct))
                 .MustHaveHappened();
-            A.CallTo(() => assetFileStore.DeleteAsync(A<string>._, default))
+
+            A.CallTo(() => assetFileStore.DeleteAsync(A<string>._, ct))
                 .MustHaveHappened();
         }
 
@@ -229,13 +237,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 FileSize = fileSize
             };
 
-            A.CallTo(() => assetQuery.FindByHashAsync(requestContext, A<string>._, fileName, fileSize, A<CancellationToken>._))
+            A.CallTo(() => assetQuery.FindByHashAsync(requestContext, A<string>._, fileName, fileSize, ct))
                 .Returns(duplicate);
         }
 
         private void AssertMetadataEnriched()
         {
-            A.CallTo(() => assetMetadataSource.EnhanceAsync(A<UploadAssetCommand>._))
+            A.CallTo(() => assetMetadataSource.EnhanceAsync(A<UploadAssetCommand>._, ct))
                 .MustHaveHappened();
         }
 
@@ -245,15 +253,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             CreateCommand(command);
 
-            var grain = A.Fake<IAssetGrain>();
+            var domainObject = A.Fake<AssetDomainObject>();
 
-            A.CallTo(() => grain.ExecuteAsync(A<IAggregateCommand>._))
+            A.CallTo(() => domainObject.ExecuteAsync(A<IAggregateCommand>._, ct))
                 .Returns(new CommandResult(command.AggregateId, 1, 0, result));
 
-            A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(command.AggregateId.ToString(), null))
-                .Returns(grain);
+            A.CallTo(() => domainObjectFactory.Create<AssetDomainObject>(command.AggregateId))
+                .Returns(domainObject);
 
-            return HandleAsync(sut, command);
+            return HandleAsync(sut, command, ct);
         }
 
         private IAssetEntity CreateAsset(long fileVersion = 0)

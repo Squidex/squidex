@@ -6,11 +6,9 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
-using Orleans;
 using Squidex.Areas.Api.Controllers.EventConsumers.Models;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.EventSourcing.Grains;
-using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -18,12 +16,12 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
 {
     public sealed class EventConsumersController : ApiController
     {
-        private readonly IGrainFactory grainFactory;
+        private readonly IEventConsumerManager eventConsumerManager;
 
-        public EventConsumersController(ICommandBus commandBus, IGrainFactory grainFactory)
+        public EventConsumersController(ICommandBus commandBus, IEventConsumerManager eventConsumerManager)
             : base(commandBus)
         {
-            this.grainFactory = grainFactory;
+            this.eventConsumerManager = eventConsumerManager;
         }
 
         [HttpGet]
@@ -32,9 +30,9 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [ApiPermission(Permissions.AdminEventsRead)]
         public async Task<IActionResult> GetEventConsumers()
         {
-            var eventConsumers = await GetGrain().GetConsumersAsync();
+            var eventConsumers = await eventConsumerManager.GetConsumersAsync(HttpContext.RequestAborted);
 
-            var response = EventConsumersDto.FromDomain(eventConsumers.Value, Resources);
+            var response = EventConsumersDto.FromDomain(eventConsumers, Resources);
 
             return Ok(response);
         }
@@ -45,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [ApiPermission(Permissions.AdminEventsManage)]
         public async Task<IActionResult> StartEventConsumer(string consumerName)
         {
-            var eventConsumer = await GetGrain().StartAsync(consumerName);
+            var eventConsumer = await eventConsumerManager.StartAsync(consumerName, HttpContext.RequestAborted);
 
             var response = EventConsumerDto.FromDomain(eventConsumer, Resources);
 
@@ -58,7 +56,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [ApiPermission(Permissions.AdminEventsManage)]
         public async Task<IActionResult> StopEventConsumer(string consumerName)
         {
-            var eventConsumer = await GetGrain().StopAsync(consumerName);
+            var eventConsumer = await eventConsumerManager.StopAsync(consumerName, HttpContext.RequestAborted);
 
             var response = EventConsumerDto.FromDomain(eventConsumer, Resources);
 
@@ -71,16 +69,11 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [ApiPermission(Permissions.AdminEventsManage)]
         public async Task<IActionResult> ResetEventConsumer(string consumerName)
         {
-            var eventConsumer = await GetGrain().ResetAsync(consumerName);
+            var eventConsumer = await eventConsumerManager.ResetAsync(consumerName, HttpContext.RequestAborted);
 
             var response = EventConsumerDto.FromDomain(eventConsumer, Resources);
 
             return Ok(response);
-        }
-
-        private IEventConsumerManagerGrain GetGrain()
-        {
-            return grainFactory.GetGrain<IEventConsumerManagerGrain>(SingleGrain.Id);
         }
     }
 }

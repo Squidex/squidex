@@ -27,17 +27,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             this.userResolver = userResolver;
         }
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
             if (usageOptions.MaximumNumberOfApps <= 0 || context.Command is not CreateApp createApp || createApp.Actor.IsClient)
             {
-                await next(context);
+                await next(context, ct);
                 return;
             }
 
             var totalApps = 0;
 
-            var user = await userResolver.FindByIdAsync(createApp.Actor.Identifier);
+            var user = await userResolver.FindByIdAsync(createApp.Actor.Identifier, ct);
 
             if (user != null)
             {
@@ -49,14 +50,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                 }
             }
 
-            await next(context);
+            await next(context, ct);
 
             if (context.IsCompleted && user != null)
             {
                 var newApps = totalApps + 1;
                 var newAppsValue = newApps.ToString(CultureInfo.InvariantCulture);
 
-                await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.TotalApps, newAppsValue, true);
+                // Always update the user and therefore do nto pass cancellation token.
+                await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.TotalApps, newAppsValue, true, default);
             }
         }
     }

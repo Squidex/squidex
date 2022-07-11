@@ -80,7 +80,7 @@ namespace Squidex.Config.Domain
                 .As<ICommandMiddleware>().As<IAppsIndex>();
 
             services.AddSingletonAs<RulesIndex>()
-                .As<ICommandMiddleware>().As<IRulesIndex>();
+                .As<IRulesIndex>();
 
             services.AddSingletonAs<SchemasIndex>()
                 .As<ICommandMiddleware>().As<ISchemasIndex>();
@@ -106,10 +106,10 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<CommentsCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<GrainCommandMiddleware<AssetFolderCommand, IAssetFolderGrain>>()
+            services.AddSingletonAs<AggregateCommandMiddleware<AssetFolderCommand, AssetFolderDomainObject>>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<GrainCommandMiddleware<SchemaCommand, ISchemaGrain>>()
+            services.AddSingletonAs<AggregateCommandMiddleware<SchemaCommand, SchemaDomainObject>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<SingletonCommandMiddleware>()
@@ -120,6 +120,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<DefaultDomainObjectFactory>()
                 .As<IDomainObjectFactory>();
+
+            services.AddSingletonAs<DefaultDomainObjectCache>()
+                .As<IDomainObjectCache>();
         }
     }
 }

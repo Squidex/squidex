@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 
             await operation.MustMoveToValidFolder(parentId);
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, default))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 
             await operation.MustMoveToValidFolder(parentId);
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, default))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 

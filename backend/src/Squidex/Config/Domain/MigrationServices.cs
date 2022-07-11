@@ -62,12 +62,6 @@ namespace Squidex.Config.Domain
 
             services.AddTransientAs<RebuildAssetFolders>()
                 .As<IMigration>();
-
-            services.AddTransientAs<StartEventConsumers>()
-                .As<IMigration>();
-
-            services.AddTransientAs<StopEventConsumers>()
-                .As<IMigration>();
         }
     }
 }

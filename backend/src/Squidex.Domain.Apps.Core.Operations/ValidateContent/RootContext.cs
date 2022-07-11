@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         private readonly ConcurrentBag<ValidationError> errors = new ConcurrentBag<ValidationError>();
         private readonly Scheduler scheduler = new Scheduler();
 
-        public IJsonSerializer JsonSerializer { get; }
+        public IJsonSerializer Serializer { get; }
 
         public DomainId ContentId { get; }
 
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         }
 
         public RootContext(
-            IJsonSerializer jsonSerializer,
+            IJsonSerializer serializer,
             NamedId<DomainId> appId,
             NamedId<DomainId> schemaId,
             Schema schema,
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             AppId = appId;
             Components = components;
             ContentId = contentId;
-            JsonSerializer = jsonSerializer;
+            Serializer = serializer;
             Schema = schema;
             SchemaId = schemaId;
         }

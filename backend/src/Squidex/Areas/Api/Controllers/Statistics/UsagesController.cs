@@ -81,8 +81,8 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         /// Get api calls in date range.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="fromDate">The from date.</param>
-        /// <param name="toDate">The to date.</param>
+        /// <param name="dateFrom">The from date.</param>
+        /// <param name="dateTo">The to date.</param>
         /// <returns>
         /// 200 => API call returned.
         /// 404 => App not found.
@@ -93,14 +93,14 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [ProducesResponseType(typeof(CallsUsageDtoDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppUsage)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetUsages(string app, DateTime fromDate, DateTime toDate)
+        public async Task<IActionResult> GetUsages(string app, DateTime dateFrom, DateTime dateTo)
         {
-            if (fromDate > toDate && (toDate - fromDate).TotalDays > 100)
+            if (dateFrom > dateTo && (dateTo - dateFrom).TotalDays > 100)
             {
                 return BadRequest();
             }
 
-            var (summary, details) = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date, HttpContext.RequestAborted);
+            var (summary, details) = await usageTracker.QueryAsync(AppId.ToString(), dateFrom.Date, dateTo.Date, HttpContext.RequestAborted);
 
             var (plan, _) = appPlansProvider.GetPlanForApp(App);
 

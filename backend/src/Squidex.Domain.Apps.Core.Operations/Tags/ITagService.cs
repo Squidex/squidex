@@ -11,20 +11,28 @@ namespace Squidex.Domain.Apps.Core.Tags
 {
     public interface ITagService
     {
-        Task<Dictionary<string, string>> GetTagIdsAsync(DomainId appId, string group, HashSet<string> names);
+        Task<Dictionary<string, string>> GetTagIdsAsync(DomainId id, string group, HashSet<string> names,
+            CancellationToken ct = default);
 
-        Task<Dictionary<string, string>> NormalizeTagsAsync(DomainId appId, string group, HashSet<string>? names, HashSet<string>? ids);
+        Task<Dictionary<string, string>> NormalizeTagsAsync(DomainId id, string group, HashSet<string>? names, HashSet<string>? ids,
+            CancellationToken ct = default);
 
-        Task<Dictionary<string, string>> DenormalizeTagsAsync(DomainId appId, string group, HashSet<string> ids);
+        Task<Dictionary<string, string>> DenormalizeTagsAsync(DomainId id, string group, HashSet<string> ids,
+            CancellationToken ct = default);
 
-        Task<TagsSet> GetTagsAsync(DomainId appId, string group);
+        Task<TagsSet> GetTagsAsync(DomainId id, string group,
+            CancellationToken ct = default);
 
-        Task<TagsExport> GetExportableTagsAsync(DomainId appId, string group);
+        Task<TagsExport> GetExportableTagsAsync(DomainId id, string group,
+            CancellationToken ct = default);
 
-        Task RenameTagAsync(DomainId appId, string group, string name, string newName);
+        Task RenameTagAsync(DomainId id, string group, string name, string newName,
+            CancellationToken ct = default);
 
-        Task RebuildTagsAsync(DomainId appId, string group, TagsExport export);
+        Task RebuildTagsAsync(DomainId id, string group, TagsExport export,
+            CancellationToken ct = default);
 
-        Task ClearAsync(DomainId appId, string group);
+        Task ClearAsync(DomainId id, string group,
+            CancellationToken ct = default);
     }
 }

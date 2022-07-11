@@ -11,9 +11,12 @@ namespace Squidex.Infrastructure.Commands
 {
     public static class CommandExtensions
     {
-        public static Task HandleAsync(this ICommandMiddleware commandMiddleware, CommandContext context)
+        private static readonly NextDelegate End = (c, ct) => Task.CompletedTask;
+
+        public static Task HandleAsync(this ICommandMiddleware commandMiddleware, CommandContext context,
+            CancellationToken ct)
         {
-            return commandMiddleware.HandleAsync(context, x => Task.CompletedTask);
+            return commandMiddleware.HandleAsync(context, End, ct);
         }
 
         public static Envelope<IEvent> Migrate<T>(this Envelope<IEvent> @event, T snapshot)

@@ -22,11 +22,12 @@ namespace Squidex.Web.CommandMiddlewares
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public Task HandleAsync(CommandContext context, NextDelegate next)
+        public Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
             if (httpContextAccessor.HttpContext == null)
             {
-                return next(context);
+                return next(context, ct);
             }
 
             if (context.Command is ISchemaCommand schemaCommand && schemaCommand.SchemaId == null)
@@ -36,7 +37,7 @@ namespace Squidex.Web.CommandMiddlewares
                 schemaCommand.SchemaId = schemaId;
             }
 
-            return next(context);
+            return next(context, ct);
         }
 
         private NamedId<DomainId> GetSchemaId()

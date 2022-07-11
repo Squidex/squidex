@@ -22,11 +22,12 @@ namespace Squidex.Web.CommandMiddlewares
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public Task HandleAsync(CommandContext context, NextDelegate next)
+        public Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
             if (httpContextAccessor.HttpContext == null)
             {
-                return next(context);
+                return next(context, ct);
             }
 
             if (context.Command is SquidexCommand squidexCommand)
@@ -43,7 +44,7 @@ namespace Squidex.Web.CommandMiddlewares
                 squidexCommand.User ??= httpContextAccessor.HttpContext.User;
             }
 
-            return next(context);
+            return next(context, ct);
         }
     }
 }

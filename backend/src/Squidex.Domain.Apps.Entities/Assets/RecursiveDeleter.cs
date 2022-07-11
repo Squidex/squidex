@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         command.Actor = folderDeleted.Actor;
 
-                        await commandBus.PublishAsync(command);
+                        await commandBus.PublishAsync(command, default);
                     }
                     catch (Exception ex)
                     {

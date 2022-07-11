@@ -85,7 +85,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             sut = new RuleService(Options.Create(new RuleOptions()),
                 new[] { ruleTriggerHandler },
                 new[] { ruleActionHandler },
-                eventEnricher, TestUtils.DefaultSerializer, clock, log, typeNameRegistry);
+                eventEnricher, TestUtils.DefaultSerializer, log, typeNameRegistry)
+            {
+                Clock = clock
+            };
         }
 
         [Fact]
@@ -448,7 +451,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.Trigger(A<Envelope<AppEvent>>._, A<RuleContext>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => ruleTriggerHandler.CreateEnrichedEventsAsync(A<Envelope<AppEvent>>._, A<RuleContext>._, default))
+            A.CallTo(() => ruleTriggerHandler.CreateEnrichedEventsAsync(A<Envelope<AppEvent>>._, A<RuleContext>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 

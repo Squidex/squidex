@@ -9,7 +9,7 @@ using EventStore.Client;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Config.Domain
@@ -49,11 +49,11 @@ namespace Squidex.Config.Domain
                 }
             });
 
-            services.AddSingletonAs<OrleansEventNotifier>()
-                .As<IEventNotifier>();
-
             services.AddTransientAs<Rebuilder>()
                 .AsSelf();
+
+            services.AddSingletonAs<EventConsumerManager>()
+                .As<IEventConsumerManager>();
 
             services.AddSingletonAs<DefaultEventStreamNames>()
                 .As<IEventStreamNames>();
@@ -61,8 +61,11 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<DefaultEventFormatter>()
                 .As<IEventFormatter>();
 
-            services.AddSingletonAs<DefaultEventConsumerFactory>()
-                .As<IEventConsumerFactory>();
+            services.AddSingletonAs<NoopEventNotifier>()
+                .As<IEventNotifier>();
+
+            services.AddSingleton<Func<IEventConsumer, EventConsumerProcessor>>(
+                sb => c => ActivatorUtilities.CreateInstance<EventConsumerProcessor>(sb, c));
         }
     }
 }

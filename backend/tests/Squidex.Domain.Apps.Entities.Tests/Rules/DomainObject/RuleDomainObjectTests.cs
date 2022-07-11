@@ -290,7 +290,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
         private async Task<object?> PublishAsync(RuleCommand command)
         {
-            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
+            var result = await sut.ExecuteAsync(CreateRuleCommand(command), default);
 
             return result.Payload;
         }

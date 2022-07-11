@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.States
             PersistenceMode persistenceMode,
             IEventFormatter eventFormatter,
             IEventStore eventStore,
-            IEventStreamNames eventStreams,
+            IEventStreamNames eventStreamNames,
             ISnapshotStore<T> snapshotStore,
             HandleSnapshot<T>? applyState,
             HandleEvent? applyEvent)
@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure.States
             this.persistenceMode = persistenceMode;
             this.snapshotStore = snapshotStore;
 
-            streamName = new Lazy<string>(() => eventStreams.GetStreamName(ownerType, ownerKey.ToString()!));
+            streamName = new Lazy<string>(() => eventStreamNames.GetStreamName(ownerType, ownerKey.ToString()!));
         }
 
         public async Task DeleteAsync(

@@ -31,21 +31,18 @@ namespace Squidex.Domain.Apps.Entities.History
         private readonly IUrlGenerator urlGenerator;
         private readonly IUserResolver userResolver;
         private readonly ILogger<NotifoService> log;
-        private readonly IClock clock;
         private readonly INotifoClient? client;
+
+        public IClock Clock { get; set; } = SystemClock.Instance;
 
         public NotifoService(IOptions<NotifoOptions> options,
             IUrlGenerator urlGenerator,
             IUserResolver userResolver,
-            ILogger<NotifoService> log,
-            IClock clock)
+            ILogger<NotifoService> log)
         {
             this.options = options.Value;
-
             this.urlGenerator = urlGenerator;
             this.userResolver = userResolver;
-            this.clock = clock;
-
             this.log = log;
 
             if (options.Value.IsConfigured())
@@ -155,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
             try
             {
-                var now = clock.GetCurrentInstant();
+                var now = Clock.GetCurrentInstant();
 
                 var maxAge = now - MaxAge;
 

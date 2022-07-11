@@ -6,18 +6,22 @@
 // ==========================================================================
 
 using FakeItEasy;
-using Orleans;
+using FluentAssertions;
+using NodaTime;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.TestHelpers;
+using Squidex.Messaging;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
     public class BackupServiceTests
     {
-        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
+        private readonly TestState<BackupState> stateBackup;
+        private readonly TestState<RestoreJob> stateRestore;
+        private readonly IMessageBus messaging = A.Fake<IMessageBus>();
         private readonly DomainId appId = DomainId.NewGuid();
         private readonly DomainId backupId = DomainId.NewGuid();
         private readonly RefToken actor = RefToken.User("me");
@@ -25,130 +29,133 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public BackupServiceTests()
         {
-            sut = new BackupService(grainFactory);
+            stateRestore = new TestState<RestoreJob>("Default");
+            stateBackup = new TestState<BackupState>(appId);
+
+            sut = new BackupService(
+                stateRestore.PersistenceFactory,
+                stateBackup.PersistenceFactory, messaging);
         }
 
         [Fact]
-        public async Task Should_call_grain_if_restoring_backup()
+        public async Task Should_send_message_to_restore_backup()
         {
-            var grain = A.Fake<IRestoreGrain>();
-
-            A.CallTo(() => grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id, null))
-                .Returns(grain);
-
-            var initiator = RefToken.User("me");
-
             var restoreUrl = new Uri("http://squidex.io");
             var restoreAppName = "New App";
 
-            await sut.StartRestoreAsync(initiator, restoreUrl, restoreAppName);
+            await sut.StartRestoreAsync(actor, restoreUrl, restoreAppName);
 
-            A.CallTo(() => grain.RestoreAsync(restoreUrl, initiator, restoreAppName))
+            A.CallTo(() => messaging.PublishAsync(new BackupRestore(actor, restoreUrl, restoreAppName), null, default))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_call_grain_to_get_restore_status()
+        public async Task Should_send_message_to_start_backup()
         {
-            IRestoreJob state = new RestoreJob();
+            await sut.StartBackupAsync(appId, actor);
 
-            var grain = A.Fake<IRestoreGrain>();
+            A.CallTo(() => messaging.PublishAsync(new BackupStart(appId, actor), null, default))
+                .MustHaveHappened();
+        }
 
-            A.CallTo(() => grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id, null))
-                .Returns(grain);
+        [Fact]
+        public async Task Should_send_message_to_delete_backup()
+        {
+            await sut.DeleteBackupAsync(appId, backupId);
 
-            A.CallTo(() => grain.GetStateAsync())
-                .Returns(state);
+            A.CallTo(() => messaging.PublishAsync(new BackupDelete(appId, backupId), null, default))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_send_message_to_clear_backups()
+        {
+            await ((IDeleter)sut).DeleteAppAsync(Mocks.App(NamedId.Of(appId, "my-app")), default);
+
+            A.CallTo(() => messaging.PublishAsync(new BackupClear(appId), null, default))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_when_restore_already_running()
+        {
+            stateRestore.Snapshot = new RestoreJob
+            {
+                Status = JobStatus.Started
+            };
+
+            var restoreUrl = new Uri("http://squidex.io");
+
+            await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartRestoreAsync(actor, restoreUrl, null));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_when_backup_has_too_many_jobs()
+        {
+            for (var i = 0; i < 10; i++)
+            {
+                stateBackup.Snapshot.Jobs.Add(new BackupJob());
+            }
+
+            await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartBackupAsync(appId, actor));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_when_backup_has_one_running_job()
+        {
+            for (var i = 0; i < 2; i++)
+            {
+                stateBackup.Snapshot.Jobs.Add(new BackupJob { Status = JobStatus.Started });
+            }
+
+            await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartBackupAsync(appId, actor));
+        }
+
+        [Fact]
+        public async Task Should_get_restore_state_from_store()
+        {
+            stateRestore.Snapshot = new RestoreJob
+            {
+                Stopped = SystemClock.Instance.GetCurrentInstant()
+            };
 
             var result = await sut.GetRestoreAsync();
 
-            Assert.Same(state, result);
+            result.Should().BeEquivalentTo(stateRestore.Snapshot);
         }
 
         [Fact]
-        public async Task Should_call_grain_to_start_backup()
+        public async Task Should_get_backups_state_from_store()
         {
-            var grain = A.Fake<IBackupGrain>();
-
-            A.CallTo(() => grainFactory.GetGrain<IBackupGrain>(appId.ToString(), null))
-                .Returns(grain);
-
-            await sut.StartBackupAsync(appId, actor);
-
-            A.CallTo(() => grain.BackupAsync(actor))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_call_grain_to_get_backups()
-        {
-            var state = new List<IBackupJob>
+            var job = new BackupJob
             {
-                new BackupJob { Id = backupId }
+                Id = backupId,
+                Started = SystemClock.Instance.GetCurrentInstant(),
+                Stopped = SystemClock.Instance.GetCurrentInstant()
             };
 
-            var grain = A.Fake<IBackupGrain>();
-
-            A.CallTo(() => grainFactory.GetGrain<IBackupGrain>(appId.ToString(), null))
-                .Returns(grain);
-
-            A.CallTo(() => grain.GetStateAsync())
-                .Returns(state);
+            stateBackup.Snapshot.Jobs.Add(job);
 
             var result = await sut.GetBackupsAsync(appId);
 
-            Assert.Same(state, result);
+            result.Should().BeEquivalentTo(stateBackup.Snapshot.Jobs);
         }
 
         [Fact]
-        public async Task Should_call_grain_to_get_backup()
+        public async Task Should_get_backup_state_from_store()
         {
-            var state = new List<IBackupJob>
+            var job = new BackupJob
             {
-                new BackupJob { Id = backupId }
+                Id = backupId,
+                Started = SystemClock.Instance.GetCurrentInstant(),
+                Stopped = SystemClock.Instance.GetCurrentInstant()
             };
 
-            var grain = A.Fake<IBackupGrain>();
+            stateBackup.Snapshot.Jobs.Add(job);
 
-            A.CallTo(() => grainFactory.GetGrain<IBackupGrain>(appId.ToString(), null))
-                .Returns(grain);
+            var result = await sut.GetBackupAsync(appId, backupId);
 
-            A.CallTo(() => grain.GetStateAsync())
-                .Returns(state);
-
-            var result1 = await sut.GetBackupAsync(appId, backupId);
-            var result2 = await sut.GetBackupAsync(appId, DomainId.NewGuid());
-
-            Assert.Same(state[0], result1);
-            Assert.Null(result2);
-        }
-
-        [Fact]
-        public async Task Should_call_grain_to_delete_backup()
-        {
-            var grain = A.Fake<IBackupGrain>();
-
-            A.CallTo(() => grainFactory.GetGrain<IBackupGrain>(appId.ToString(), null))
-                .Returns(grain);
-
-            await sut.DeleteBackupAsync(appId, backupId);
-
-            A.CallTo(() => grain.DeleteAsync(backupId))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_call_grain_to_clear_backups()
-        {
-            var grain = A.Fake<IBackupGrain>();
-
-            A.CallTo(() => grainFactory.GetGrain<IBackupGrain>(appId.ToString(), null))
-                .Returns(grain);
-
-            await ((IDeleter)sut).DeleteAppAsync(Mocks.App(NamedId.Of(appId, "my-app")), default);
-
-            A.CallTo(() => grain.ClearAsync())
-                .MustHaveHappened();
+            result.Should().BeEquivalentTo(job);
         }
     }
 }

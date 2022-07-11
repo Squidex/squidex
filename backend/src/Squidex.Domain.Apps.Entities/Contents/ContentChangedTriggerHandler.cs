@@ -83,7 +83,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 await contentLoader.GetAsync(
                     contentEvent.AppId.Id,
                     contentEvent.ContentId,
-                    @event.Headers.EventStreamNumber());
+                    @event.Headers.EventStreamNumber(),
+                    ct);
 
             if (content != null)
             {
@@ -117,7 +118,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 await contentLoader.GetAsync(
                                     content.AppId.Id,
                                     content.Id,
-                                    content.Version - 1);
+                                    content.Version - 1,
+                                    ct);
 
                             if (previousContent != null)
                             {

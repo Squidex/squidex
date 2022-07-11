@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public async Task BackupAsync(BackupContext context,
             CancellationToken ct)
         {
-            var json = await appUISettings.GetAsync(context.AppId, null);
+            var json = await appUISettings.GetAsync(context.AppId, null, ct);
 
             await context.Writer.WriteJsonAsync(SettingsFile, json, ct);
         }
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var json = await context.Reader.ReadJsonAsync<JsonObject>(SettingsFile, ct);
 
-            await appUISettings.SetAsync(context.AppId, null, json);
+            await appUISettings.SetAsync(context.AppId, null, json, ct);
         }
 
         private async Task ReserveAppAsync(DomainId appId, string appName,
@@ -139,7 +139,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             await rebuilder.InsertManyAsync<AppDomainObject, AppDomainObject.State>(Enumerable.Repeat(context.AppId, 1), 1, default);
 
-            await appsIndex.RegisterAsync(context.AppId, appName);
             await appsIndex.RemoveReservationAsync(appReservation);
         }
 

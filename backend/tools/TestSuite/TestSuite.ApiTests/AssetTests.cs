@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Net;
 using Squidex.Assets;
 using Squidex.ClientLibrary.Management;
 using Xunit;
@@ -362,7 +363,7 @@ namespace TestSuite.ApiTests
                 });
 
                 // Should return 403 when not authenticated.
-                Assert.Contains("403", ex.Message, StringComparison.Ordinal);
+                Assert.Equal(HttpStatusCode.Forbidden, ex.StatusCode);
             }
 
 
@@ -375,7 +376,7 @@ namespace TestSuite.ApiTests
                 });
 
                 // Should return 403 when not authenticated.
-                Assert.Contains("403", ex.Message, StringComparison.Ordinal);
+                Assert.Equal(HttpStatusCode.Forbidden, ex.StatusCode);
             }
         }
 

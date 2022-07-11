@@ -11,6 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 {
     public interface ICommentsLoader
     {
-        Task<CommentsResult> GetCommentsAsync(DomainId id, long version = EtagVersion.Any);
+        Task<CommentsResult> GetCommentsAsync(DomainId id, long version = EtagVersion.Any,
+            CancellationToken ct = default);
     }
 }

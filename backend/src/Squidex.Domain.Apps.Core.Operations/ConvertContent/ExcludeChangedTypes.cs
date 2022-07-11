@@ -15,11 +15,11 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 {
     public sealed class ExcludeChangedTypes : IContentFieldConverter, IContentValueConverter
     {
-        private readonly IJsonSerializer jsonSerializer;
+        private readonly IJsonSerializer serializer;
 
-        public ExcludeChangedTypes(IJsonSerializer jsonSerializer)
+        public ExcludeChangedTypes(IJsonSerializer serializer)
         {
-            this.jsonSerializer = jsonSerializer;
+            this.serializer = serializer;
         }
 
         public ContentFieldData? ConvertField(IRootField field, ContentFieldData source)
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             try
             {
-                return !JsonValueValidator.IsValid(field, source, jsonSerializer);
+                return !JsonValueValidator.IsValid(field, source, serializer);
             }
             catch
             {

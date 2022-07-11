@@ -6,24 +6,24 @@
 // ==========================================================================
 
 using FakeItEasy;
-using Orleans;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.UsageTracking;
+using Squidex.Messaging;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
     public class UsageGateTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IAppEntity appEntity;
         private readonly IAppLimitsPlan appPlan = A.Fake<IAppLimitsPlan>();
         private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
         private readonly IApiUsageTracker usageTracker = A.Fake<IApiUsageTracker>();
-        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
-        private readonly IUsageNotifierGrain usageNotifierGrain = A.Fake<IUsageNotifierGrain>();
+        private readonly IMessageBus messaging = A.Fake<IMessageBus>();
         private readonly string clientId = Guid.NewGuid().ToString();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly UsageGate sut;
@@ -36,8 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         {
             appEntity = Mocks.App(appId);
 
-            A.CallTo(() => grainFactory.GetGrain<IUsageNotifierGrain>(SingleGrain.Id, null))
-                .Returns(usageNotifierGrain);
+            ct = cts.Token;
 
             A.CallTo(() => appPlansProvider.GetPlan(null))
                 .Returns(appPlan);
@@ -51,10 +50,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             A.CallTo(() => appPlan.BlockingApiCalls)
                 .ReturnsLazily(x => apiCallsBlocking);
 
-            A.CallTo(() => usageTracker.GetMonthCallsAsync(appId.Id.ToString(), today, A<string>._, default))
+            A.CallTo(() => usageTracker.GetMonthCallsAsync(appId.Id.ToString(), today, A<string>._, ct))
                 .ReturnsLazily(x => Task.FromResult(apiCallsCurrent));
 
-            sut = new UsageGate(appPlansProvider, usageTracker, grainFactory);
+            sut = new UsageGate(appPlansProvider, usageTracker, messaging);
         }
 
         [Fact]
@@ -67,11 +66,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             apiCallsBlocking = 1600;
             apiCallsMax = 1600;
 
-            var isBlocked = await sut.IsBlockedAsync(appEntity, clientId, today);
+            var isBlocked = await sut.IsBlockedAsync(appEntity, clientId, today, ct);
 
             Assert.True(isBlocked);
 
-            A.CallTo(() => usageNotifierGrain.NotifyAsync(A<UsageNotification>.Ignored))
+            A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, ct))
                 .MustHaveHappened();
         }
 
@@ -82,11 +81,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             apiCallsBlocking = 600;
             apiCallsMax = 600;
 
-            var isBlocked = await sut.IsBlockedAsync(appEntity, clientId, today);
+            var isBlocked = await sut.IsBlockedAsync(appEntity, clientId, today, ct);
 
             Assert.True(isBlocked);
 
-            A.CallTo(() => usageNotifierGrain.NotifyAsync(A<UsageNotification>.Ignored))
+            A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, ct))
                 .MustHaveHappened();
         }
 
@@ -97,11 +96,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             apiCallsBlocking = 1600;
             apiCallsMax = 1600;
 
-            var isBlocked = await sut.IsBlockedAsync(appEntity, clientId, today);
+            var isBlocked = await sut.IsBlockedAsync(appEntity, clientId, today, ct);
 
             Assert.False(isBlocked);
 
-            A.CallTo(() => usageNotifierGrain.NotifyAsync(A<UsageNotification>.Ignored))
+            A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -112,11 +111,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             apiCallsBlocking = 5000;
             apiCallsMax = 3000;
 
-            var isBlocked = await sut.IsBlockedAsync(appEntity, clientId, today);
+            var isBlocked = await sut.IsBlockedAsync(appEntity, clientId, today, ct);
 
             Assert.False(isBlocked);
 
-            A.CallTo(() => usageNotifierGrain.NotifyAsync(A<UsageNotification>.Ignored))
+            A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, ct))
                 .MustHaveHappened();
         }
 
@@ -127,11 +126,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             apiCallsBlocking = 5000;
             apiCallsMax = 0;
 
-            var isBlocked = await sut.IsBlockedAsync(appEntity, clientId, today);
+            var isBlocked = await sut.IsBlockedAsync(appEntity, clientId, today, ct);
 
             Assert.False(isBlocked);
 
-            A.CallTo(() => usageNotifierGrain.NotifyAsync(A<UsageNotification>.Ignored))
+            A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, ct))
                 .MustHaveHappened();
         }
 
@@ -142,10 +141,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             apiCallsBlocking = 5000;
             apiCallsMax = 3000;
 
-            await sut.IsBlockedAsync(appEntity, clientId, today);
-            await sut.IsBlockedAsync(appEntity, clientId, today);
+            await sut.IsBlockedAsync(appEntity, clientId, today, ct);
+            await sut.IsBlockedAsync(appEntity, clientId, today, ct);
 
-            A.CallTo(() => usageNotifierGrain.NotifyAsync(A<UsageNotification>.Ignored))
+            A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, ct))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -158,10 +157,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             apiCallsBlocking = 5000;
             apiCallsMax = 3000;
 
-            await sut.IsBlockedAsync(appEntity, clientId, today);
-            await sut.IsBlockedAsync(appEntity, clientId, today);
+            await sut.IsBlockedAsync(appEntity, clientId, today, ct);
+            await sut.IsBlockedAsync(appEntity, clientId, today, ct);
 
-            A.CallTo(() => usageNotifierGrain.NotifyAsync(A<UsageNotification>.Ignored))
+            A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
     }

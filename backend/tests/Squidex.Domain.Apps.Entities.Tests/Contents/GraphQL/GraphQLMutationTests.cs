@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             content = TestContent.Create(contentId, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id, null);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>.Ignored))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>.Ignored, A<CancellationToken>._))
                 .Returns(commandContext);
         }
 
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             AssertResult(expected, result);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -101,11 +101,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             AssertResult(expected, result);
 
             A.CallTo(() => commandBus.PublishAsync(
-                A<CreateContent>.That.Matches(x =>
-                    x.ExpectedVersion == EtagVersion.Any &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
-                    x.Status == Status.Published &&
-                    x.Data.Equals(content.Data))))
+                    A<CreateContent>.That.Matches(x =>
+                        x.ExpectedVersion == EtagVersion.Any &&
+                        x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                        x.Status == Status.Published &&
+                        x.Data.Equals(content.Data)),
+                    A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -134,12 +135,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             AssertResult(expected, result);
 
             A.CallTo(() => commandBus.PublishAsync(
-                A<CreateContent>.That.Matches(x =>
-                    x.ExpectedVersion == EtagVersion.Any &&
-                    x.ContentId == DomainId.Create("123") &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
-                    x.Status == Status.Published &&
-                    x.Data.Equals(content.Data))))
+                    A<CreateContent>.That.Matches(x =>
+                        x.ExpectedVersion == EtagVersion.Any &&
+                        x.ContentId == DomainId.Create("123") &&
+                        x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                        x.Status == Status.Published &&
+                        x.Data.Equals(content.Data)),
+                    A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -168,11 +170,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             AssertResult(expected, result);
 
             A.CallTo(() => commandBus.PublishAsync(
-                A<CreateContent>.That.Matches(x =>
-                    x.ExpectedVersion == EtagVersion.Any &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
-                    x.Status == Status.Published &&
-                    x.Data.Equals(content.Data))))
+                    A<CreateContent>.That.Matches(x =>
+                        x.ExpectedVersion == EtagVersion.Any &&
+                        x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                        x.Status == Status.Published &&
+                        x.Data.Equals(content.Data)),
+                    A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -214,7 +217,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             AssertResult(expected, result);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -243,11 +246,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             AssertResult(expected, result);
 
             A.CallTo(() => commandBus.PublishAsync(
-                A<UpdateContent>.That.Matches(x =>
-                    x.ContentId == content.Id &&
-                    x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
-                    x.Data.Equals(content.Data))))
+                    A<UpdateContent>.That.Matches(x =>
+                        x.ContentId == content.Id &&
+                        x.ExpectedVersion == 10 &&
+                        x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                        x.Data.Equals(content.Data)),
+                    A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -276,11 +280,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             AssertResult(expected, result);
 
             A.CallTo(() => commandBus.PublishAsync(
-                A<UpdateContent>.That.Matches(x =>
-                    x.ContentId == content.Id &&
-                    x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
-                    x.Data.Equals(content.Data))))
+                    A<UpdateContent>.That.Matches(x =>
+                        x.ContentId == content.Id &&
+                        x.ExpectedVersion == 10 &&
+                        x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                        x.Data.Equals(content.Data)),
+                    A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -322,7 +327,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             AssertResult(expected, result);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -351,12 +356,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             AssertResult(expected, result);
 
             A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x =>
-                    x.ContentId == content.Id &&
-                    x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
-                    x.Status == Status.Published &&
-                    x.Data.Equals(content.Data))))
+                    A<UpsertContent>.That.Matches(x =>
+                        x.ContentId == content.Id &&
+                        x.ExpectedVersion == 10 &&
+                        x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                        x.Status == Status.Published &&
+                        x.Data.Equals(content.Data)),
+                    A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -385,12 +391,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             AssertResult(expected, result);
 
             A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x =>
-                    x.ContentId == content.Id &&
-                    x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
-                    x.Status == Status.Published &&
-                    x.Data.Equals(content.Data))))
+                    A<UpsertContent>.That.Matches(x =>
+                        x.ContentId == content.Id &&
+                        x.ExpectedVersion == 10 &&
+                        x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                        x.Status == Status.Published &&
+                        x.Data.Equals(content.Data)),
+                    A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -432,7 +439,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             AssertResult(expected, result);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -461,11 +468,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             AssertResult(expected, result);
 
             A.CallTo(() => commandBus.PublishAsync(
-                A<PatchContent>.That.Matches(x =>
-                    x.ContentId == content.Id &&
-                    x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
-                    x.Data.Equals(content.Data))))
+                    A<PatchContent>.That.Matches(x =>
+                        x.ContentId == content.Id &&
+                        x.ExpectedVersion == 10 &&
+                        x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                        x.Data.Equals(content.Data)),
+                    A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -494,11 +502,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             AssertResult(expected, result);
 
             A.CallTo(() => commandBus.PublishAsync(
-                A<PatchContent>.That.Matches(x =>
-                    x.ContentId == content.Id &&
-                    x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
-                    x.Data.Equals(content.Data))))
+                    A<PatchContent>.That.Matches(x =>
+                        x.ContentId == content.Id &&
+                        x.ExpectedVersion == 10 &&
+                        x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                        x.Data.Equals(content.Data)),
+                    A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -540,7 +549,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             AssertResult(expected, result);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -571,12 +580,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             AssertResult(expected, result);
 
             A.CallTo(() => commandBus.PublishAsync(
-                A<ChangeContentStatus>.That.Matches(x =>
-                    x.ContentId == contentId &&
-                    x.DueTime == dueTime &&
-                    x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
-                    x.Status == Status.Published)))
+                    A<ChangeContentStatus>.That.Matches(x =>
+                        x.ContentId == contentId &&
+                        x.DueTime == dueTime &&
+                        x.ExpectedVersion == 10 &&
+                        x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                        x.Status == Status.Published),
+                    A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -605,12 +615,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             AssertResult(expected, result);
 
             A.CallTo(() => commandBus.PublishAsync(
-                A<ChangeContentStatus>.That.Matches(x =>
-                    x.ContentId == contentId &&
-                    x.DueTime == null &&
-                    x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
-                    x.Status == Status.Published)))
+                    A<ChangeContentStatus>.That.Matches(x =>
+                        x.ContentId == contentId &&
+                        x.DueTime == null &&
+                        x.ExpectedVersion == 10 &&
+                        x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                        x.Status == Status.Published),
+                    A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -639,12 +650,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             AssertResult(expected, result);
 
             A.CallTo(() => commandBus.PublishAsync(
-                A<ChangeContentStatus>.That.Matches(x =>
-                    x.ContentId == contentId &&
-                    x.DueTime == null &&
-                    x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
-                    x.Status == Status.Published)))
+                    A<ChangeContentStatus>.That.Matches(x =>
+                        x.ContentId == contentId &&
+                        x.DueTime == null &&
+                        x.ExpectedVersion == 10 &&
+                        x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                        x.Status == Status.Published),
+                    A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -686,7 +698,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             AssertResult(expected, result);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -718,10 +730,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             AssertResult(expected, result);
 
             A.CallTo(() => commandBus.PublishAsync(
-                A<DeleteContent>.That.Matches(x =>
-                    x.ContentId == contentId &&
-                    x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId))))
+                    A<DeleteContent>.That.Matches(x =>
+                        x.ContentId == contentId &&
+                        x.ExpectedVersion == 10 &&
+                        x.SchemaId.Equals(TestSchemas.DefaultId)),
+                    A<CancellationToken>._))
                 .MustHaveHappened();
         }
 

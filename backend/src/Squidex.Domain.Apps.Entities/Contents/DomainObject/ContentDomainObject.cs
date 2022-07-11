@@ -24,7 +24,7 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 {
-    public sealed partial class ContentDomainObject : DomainObject<ContentDomainObject.State>
+    public partial class ContentDomainObject : DomainObject<ContentDomainObject.State>
     {
         private readonly IServiceProvider serviceProvider;
 
@@ -33,8 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             : base(id, persistence, log)
         {
             this.serviceProvider = serviceProvider;
-
-            Capacity = 5;
         }
 
         protected override bool IsDeleted(State snapshot)
@@ -65,12 +63,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 Equals(contentCommand.ContentId, Snapshot.Id);
         }
 
-        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+            CancellationToken ct)
         {
             switch (command)
             {
                 case UpsertContent upsertContent:
-                    return UpsertReturnAsync(upsertContent, async c =>
+                    return UpsertReturnAsync(upsertContent, async (c, ct) =>
                     {
                         var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -93,10 +92,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         }
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case CreateContent createContent:
-                    return CreateReturnAsync(createContent, async c =>
+                    return CreateReturnAsync(createContent, async (c, ct) =>
                     {
                         var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -112,70 +111,70 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         }
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case ValidateContent validate:
-                    return UpdateReturnAsync(validate, async c =>
+                    return UpdateReturnAsync(validate, async (c, ct) =>
                     {
                         var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await ValidateCore(operation);
 
                         return true;
-                    });
+                    }, ct);
 
                 case CreateContentDraft createDraft:
-                    return UpdateReturnAsync(createDraft, async c =>
+                    return UpdateReturnAsync(createDraft, async (c, ct) =>
                     {
                         var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await CreateDraftCore(c, operation);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case DeleteContentDraft deleteDraft:
-                    return UpdateReturnAsync(deleteDraft, async c =>
+                    return UpdateReturnAsync(deleteDraft, async (c, ct) =>
                     {
                         var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         DeleteDraftCore(c, operation);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case PatchContent patchContent:
-                    return UpdateReturnAsync(patchContent, async c =>
+                    return UpdateReturnAsync(patchContent, async (c, ct) =>
                     {
                         var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await PatchCore(c, operation);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateContent updateContent:
-                    return UpdateReturnAsync(updateContent, async c =>
+                    return UpdateReturnAsync(updateContent, async (c, ct) =>
                     {
                         var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await UpdateCore(c, operation);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case CancelContentSchedule cancelContentSchedule:
-                    return UpdateReturnAsync(cancelContentSchedule, async c =>
+                    return UpdateReturnAsync(cancelContentSchedule, async (c, ct) =>
                     {
                         var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         CancelChangeCore(c, operation);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case ChangeContentStatus changeContentStatus:
-                    return UpdateReturnAsync(changeContentStatus, async c =>
+                    return UpdateReturnAsync(changeContentStatus, async (c, ct) =>
                     {
                         try
                         {
@@ -203,23 +202,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         }
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case DeleteContent deleteContent when deleteContent.Permanent:
-                    return DeletePermanentAsync(deleteContent, async c =>
+                    return DeletePermanentAsync(deleteContent, async (c, ct) =>
                     {
                         var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await DeleteCore(c, operation);
-                    });
+                    }, ct);
 
                 case DeleteContent deleteContent:
-                    return UpdateAsync(deleteContent, async c =>
+                    return UpdateAsync(deleteContent, async (c, ct) =>
                     {
                         var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
                         await DeleteCore(c, operation);
-                    });
+                    }, ct);
 
                 default:
                     ThrowHelper.NotSupportedException();

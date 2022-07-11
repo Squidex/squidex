@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
 using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Areas.Frontend;
 using Squidex.Areas.IdentityServer.Config;
-using Squidex.Areas.OrleansDashboard.Middlewares;
 using Squidex.Areas.Portal.Middlewares;
 using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
+using Squidex.Config.Messaging;
 using Squidex.Config.Web;
 using Squidex.Pipeline.Plugins;
 using Squidex.Web;
@@ -59,6 +58,7 @@ namespace Squidex
             services.AddSquidexImageResizing(config);
             services.AddSquidexInfrastructure(config);
             services.AddSquidexLocalization();
+            services.AddSquidexMessaging(config);
             services.AddSquidexMigration(config);
             services.AddSquidexNotifications(config);
             services.AddSquidexOpenApiSettings();
@@ -114,12 +114,6 @@ namespace Squidex
             {
                 builder.UseMiddleware<PortalDashboardAuthenticationMiddleware>();
                 builder.UseMiddleware<PortalRedirectMiddleware>();
-            });
-
-            app.Map(Constants.PrefixOrleans, builder =>
-            {
-                builder.UseMiddleware<OrleansDashboardAuthenticationMiddleware>();
-                builder.UseOrleansDashboard();
             });
 
             app.UseEndpoints(endpoints =>

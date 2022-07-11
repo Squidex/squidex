@@ -7,6 +7,7 @@
 
 using NodaTime;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Backup.State
 {
@@ -31,5 +32,13 @@ namespace Squidex.Domain.Apps.Entities.Backup.State
         public JobStatus Status { get; set; }
 
         public string? NewAppName { get; set; }
+
+        public void EnsureCanStart()
+        {
+            if (Status == JobStatus.Started)
+            {
+                throw new DomainException(T.Get("backups.restoreRunning"));
+            }
+        }
     }
 }

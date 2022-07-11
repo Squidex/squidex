@@ -325,7 +325,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteSchema(string app, string schema)
         {
-            await CommandBus.PublishAsync(new DeleteSchema());
+            var command = new DeleteSchema();
+
+            await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -393,7 +395,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
         private async Task<SchemaDto> InvokeCommandAsync(ICommand command)
         {
-            var context = await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             var result = context.Result<ISchemaEntity>();
             var response = SchemaDto.FromDomain(result, Resources);

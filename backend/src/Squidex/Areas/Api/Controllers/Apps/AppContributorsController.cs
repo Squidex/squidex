@@ -135,7 +135,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private async Task<ContributorsDto> InvokeCommandAsync(ICommand command)
         {
-            var context = await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             if (context.PlainResult is InvitedResult invited)
             {

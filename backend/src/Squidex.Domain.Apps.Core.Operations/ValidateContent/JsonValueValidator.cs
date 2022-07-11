@@ -20,18 +20,18 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         private static readonly JsonValueValidator Instance = new JsonValueValidator();
 
-        public record struct Args(JsonValue Value, IJsonSerializer JsonSerializer);
+        public record struct Args(JsonValue Value, IJsonSerializer Serializer);
 
         private JsonValueValidator()
         {
         }
 
-        public static bool IsValid(IField field, JsonValue value, IJsonSerializer jsonSerializer)
+        public static bool IsValid(IField field, JsonValue value, IJsonSerializer serializer)
         {
             Guard.NotNull(field);
             Guard.NotNull(value);
 
-            var args = new Args(value, jsonSerializer);
+            var args = new Args(value, serializer);
 
             return field.Accept(Instance, args);
         }
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public bool Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            var result = GeoJsonValue.TryParse(args.Value, args.JsonSerializer, out _);
+            var result = GeoJsonValue.TryParse(args.Value, args.Serializer, out _);
 
             return result == GeoJsonParseResult.Success;
         }

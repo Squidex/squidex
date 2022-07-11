@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -19,14 +19,15 @@ namespace Squidex.Infrastructure.Commands
             this.options = options.Value;
         }
 
-        public Task HandleAsync(CommandContext context, NextDelegate next)
+        public Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
             if (options.IsReadonly)
             {
                 throw new DomainException(T.Get("common.readonlyMode"));
             }
 
-            return next(context);
+            return next(context, ct);
         }
     }
 }

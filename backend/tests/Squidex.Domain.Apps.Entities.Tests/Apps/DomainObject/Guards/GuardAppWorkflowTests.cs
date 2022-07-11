@@ -215,8 +215,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             var app = A.Fake<IAppEntity>();
 
-            A.CallTo(() => app.Workflows)
-                .Returns(workflows);
+            A.CallTo(() => app.Workflows).Returns(workflows);
 
             return app;
         }

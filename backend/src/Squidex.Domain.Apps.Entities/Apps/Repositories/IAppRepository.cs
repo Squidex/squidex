@@ -11,10 +11,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Repositories
 {
     public interface IAppRepository
     {
-        Task<Dictionary<string, DomainId>> QueryIdsAsync(string contributorId,
+        Task<List<IAppEntity>> QueryAllAsync(string contributorId, IEnumerable<string> names,
             CancellationToken ct = default);
 
-        Task<Dictionary<string, DomainId>> QueryIdsAsync(IEnumerable<string> names,
+        Task<IAppEntity?> FindAsync(DomainId id,
+            CancellationToken ct = default);
+
+        Task<IAppEntity?> FindAsync(string name,
             CancellationToken ct = default);
     }
 }

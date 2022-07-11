@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Null(enrichedEvent.User);
 
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, default))
+            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 

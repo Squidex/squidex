@@ -8,18 +8,18 @@
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 {
     public sealed class MongoSchemaRepository : MongoSnapshotStoreBase<SchemaDomainObject.State, MongoSchemaEntity>, ISchemaRepository, IDeleter
     {
-        public MongoSchemaRepository(IMongoDatabase database, JsonSerializer jsonSerializer)
-            : base(database, jsonSerializer)
+        public MongoSchemaRepository(IMongoDatabase database, JsonSerializer serializer)
+            : base(database, serializer)
         {
         }
 
@@ -41,33 +41,42 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
             return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, app.Id), ct);
         }
 
-        public async Task<Dictionary<string, DomainId>> QueryIdsAsync(DomainId appId,
-            CancellationToken ct = default)
+        public async Task<List<ISchemaEntity>> QueryAllAsync(DomainId appId, CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartActivity("MongoSchemaRepository/QueryAsync"))
+            using (Telemetry.Activities.StartActivity("MongoSchemaRepository/QueryAllAsync"))
             {
-                var find = Collection.Find(x => x.IndexedAppId == appId && !x.IndexedDeleted);
+                var entities =
+                    await Collection.Find(x => x.IndexedAppId == appId && !x.IndexedDeleted)
+                        .ToListAsync(ct);
 
-                return await QueryAsync(find, ct);
+                return entities.Select(x => (ISchemaEntity)x.Document).ToList();
             }
         }
 
-        private static async Task<Dictionary<string, DomainId>> QueryAsync(IFindFluent<MongoSchemaEntity, MongoSchemaEntity> find,
-            CancellationToken ct)
+        public async Task<ISchemaEntity?> FindAsync(DomainId appId, DomainId id,
+            CancellationToken ct = default)
         {
-            var entities = await find.SortBy(x => x.IndexedCreated).Only(x => x.IndexedId, x => x.IndexedName).ToListAsync(ct);
-
-            var result = new Dictionary<string, DomainId>();
-
-            foreach (var entity in entities)
+            using (Telemetry.Activities.StartActivity("MongoSchemaRepository/FindAsync"))
             {
-                var indexedId = DomainId.Create(entity["_si"].AsString);
-                var indexedName = entity["_sn"].AsString;
+                var entity =
+                    await Collection.Find(x => x.IndexedAppId == appId && x.IndexedId == id && !x.IndexedDeleted)
+                        .FirstOrDefaultAsync(ct);
 
-                result[indexedName] = indexedId;
+                return entity?.Document;
             }
+        }
 
-            return result;
+        public async Task<ISchemaEntity?> FindAsync(DomainId appId, string name,
+            CancellationToken ct = default)
+        {
+            using (Telemetry.Activities.StartActivity("MongoSchemaRepository/FindAsyncByName"))
+            {
+                var entity =
+                    await Collection.Find(x => x.IndexedAppId == appId && x.IndexedName == name && !x.IndexedDeleted)
+                        .FirstOrDefaultAsync(ct);
+
+                return entity?.Document;
+            }
         }
     }
 }

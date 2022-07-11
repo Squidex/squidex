@@ -298,7 +298,7 @@ namespace Squidex.Web.Pipeline
 
         private static IAppEntity CreateApp(string name, string? appUser = null, string? appClient = null, long? apiCallsLimit = null, bool? allowAnonymous = null)
         {
-            var appEntity = A.Fake<IAppEntity>();
+            var app = A.Fake<IAppEntity>();
 
             var contributors = AppContributors.Empty;
 
@@ -314,19 +314,12 @@ namespace Squidex.Web.Pipeline
                 clients = clients.Add(appClient, "secret").Update(appClient, apiCallsLimit: apiCallsLimit, allowAnonymous: allowAnonymous);
             }
 
-            A.CallTo(() => appEntity.Contributors)
-                .Returns(contributors);
+            A.CallTo(() => app.Contributors).Returns(contributors);
+            A.CallTo(() => app.Clients).Returns(clients);
+            A.CallTo(() => app.Name).Returns(name);
+            A.CallTo(() => app.Roles).Returns(Roles.Empty);
 
-            A.CallTo(() => appEntity.Clients)
-                .Returns(clients);
-
-            A.CallTo(() => appEntity.Name)
-                .Returns(name);
-
-            A.CallTo(() => appEntity.Roles)
-                .Returns(Roles.Empty);
-
-            return appEntity;
+            return app;
         }
     }
 }

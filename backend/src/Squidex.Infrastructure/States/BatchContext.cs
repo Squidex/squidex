@@ -15,25 +15,27 @@ namespace Squidex.Infrastructure.States
     {
         private static readonly List<Envelope<IEvent>> EmptyStream = new List<Envelope<IEvent>>();
         private readonly Type owner;
-        private readonly ISnapshotStore<T> snapshotStore;
-        private readonly IEventFormatter eventDataFormatter;
+        private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
-        private readonly IEventStreamNames eventStreams;
+        private readonly IEventStreamNames eventStreamNames;
+        private readonly ISnapshotStore<T> snapshotStore;
         private readonly Dictionary<DomainId, (long, List<Envelope<IEvent>>)> @events = new Dictionary<DomainId, (long, List<Envelope<IEvent>>)>();
         private Dictionary<DomainId, SnapshotWriteJob<T>>? snapshots;
 
+        public ISnapshotStore<T> Snapshots => snapshotStore;
+
         internal BatchContext(
             Type owner,
-            IEventFormatter eventDataFormatter,
+            IEventFormatter eventFormatter,
             IEventStore eventStore,
-            IEventStreamNames streamNameResolver,
+            IEventStreamNames eventStreamNames,
             ISnapshotStore<T> snapshotStore)
         {
             this.owner = owner;
-            this.snapshotStore = snapshotStore;
+            this.eventFormatter = eventFormatter;
             this.eventStore = eventStore;
-            this.eventDataFormatter = eventDataFormatter;
-            this.eventStreams = streamNameResolver;
+            this.eventStreamNames = eventStreamNames;
+            this.snapshotStore = snapshotStore;
         }
 
         internal void Add(DomainId key, T snapshot, long version)
@@ -48,7 +50,7 @@ namespace Squidex.Infrastructure.States
 
         public async Task LoadAsync(IEnumerable<DomainId> ids)
         {
-            var streamNames = ids.ToDictionary(x => x, x => eventStreams.GetStreamName(owner, x.ToString()));
+            var streamNames = ids.ToDictionary(x => x, x => eventStreamNames.GetStreamName(owner, x.ToString()));
 
             if (streamNames.Count == 0)
             {
@@ -61,7 +63,7 @@ namespace Squidex.Infrastructure.States
             {
                 if (streams.TryGetValue(streamName, out var data))
                 {
-                    var stream = data.Select(eventDataFormatter.ParseIfKnown).NotNull().ToList();
+                    var stream = data.Select(eventFormatter.ParseIfKnown).NotNull().ToList();
 
                     events[id] = (data.Count - 1, stream);
                 }

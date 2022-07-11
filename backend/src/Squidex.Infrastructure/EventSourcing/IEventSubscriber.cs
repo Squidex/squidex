@@ -9,8 +9,8 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public interface IEventSubscriber
     {
-        Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent);
+        ValueTask OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent);
 
-        Task OnErrorAsync(IEventSubscription subscription, Exception exception);
+        ValueTask OnErrorAsync(IEventSubscription subscription, Exception exception);
     }
 }

@@ -76,7 +76,7 @@ namespace Squidex.Extensions.Actions.CreateContent
 
             command.FromRule = true;
 
-            await commandBus.PublishAsync(command);
+            await commandBus.PublishAsync(command, ct);
 
             return Result.Success($"Created to: {job.SchemaId.Name}");
         }

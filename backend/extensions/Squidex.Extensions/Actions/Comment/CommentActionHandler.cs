@@ -64,7 +64,7 @@ namespace Squidex.Extensions.Actions.Comment
 
             command.FromRule = true;
 
-            await commandBus.PublishAsync(command);
+            await commandBus.PublishAsync(command, ct);
 
             return Result.Success($"Commented: {job.Text}");
         }

@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var command = new CreateAsset { File = svg };
 
-            await sut.EnhanceAsync(command);
+            await sut.EnhanceAsync(command, default);
 
             Assert.Contains("image", command.Tags);
         }
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var command = new CreateAsset { File = svg };
 
-            await sut.EnhanceAsync(command);
+            await sut.EnhanceAsync(command, default);
 
             Assert.Contains("image", command.Tags);
         }
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var command = new CreateAsset { File = svg };
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.EnhanceAsync(command));
+            await Assert.ThrowsAsync<ValidationException>(() => sut.EnhanceAsync(command, default));
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var command = new CreateAsset { File = svg };
 
-            await sut.EnhanceAsync(command);
+            await sut.EnhanceAsync(command, default);
         }
     }
 }

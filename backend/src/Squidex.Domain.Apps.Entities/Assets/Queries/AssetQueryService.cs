@@ -178,7 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             using (Telemetry.Activities.StartActivity("AssetQueryService/QueryAsync"))
             {
-                q = await queryParser.ParseAsync(context, q);
+                q = await queryParser.ParseAsync(context, q, ct);
 
                 var assets = await QueryCoreAsync(context, parentId, q, ct);
 

@@ -6,11 +6,11 @@
 // ==========================================================================
 
 using FakeItEasy;
-using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Xunit;
@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public class AppPermanentDeleterTests
     {
-        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
+        private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
         private readonly IDeleter deleter1 = A.Fake<IDeleter>();
         private readonly IDeleter deleter2 = A.Fake<IDeleter>();
         private readonly TypeNameRegistry typeNameRegistry;
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     .Map(typeof(AppContributorRemoved))
                     .Map(typeof(AppDeleted));
 
-            sut = new AppPermanentDeleter(new[] { deleter1, deleter2 }, grainFactory, typeNameRegistry);
+            sut = new AppPermanentDeleter(new[] { deleter1, deleter2 }, domainObjectFactory, typeNameRegistry);
         }
 
         [Fact]
@@ -111,15 +111,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_call_deleters_when_app_deleted()
         {
-            var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
+            var app = new AppDomainObject.State { Id = DomainId.NewGuid(), Name = "my-app" };
 
-            var grain = A.Fake<IAppGrain>();
+            var domainObject = A.Fake<AppDomainObject>();
 
-            A.CallTo(() => grain.GetStateAsync())
+            A.CallTo(() => domainObject.Snapshot)
                 .Returns(app);
 
-            A.CallTo(() => grainFactory.GetGrain<IAppGrain>(app.Id.ToString(), null))
-                .Returns(grain);
+            A.CallTo(() => domainObjectFactory.Create<AppDomainObject>(app.Id))
+                .Returns(domainObject);
 
             await sut.On(Envelope.Create(new AppDeleted
             {

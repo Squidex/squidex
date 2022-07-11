@@ -28,9 +28,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var sut = new AlwaysCreateClientCommandMiddleware();
 
-            await sut.HandleAsync(context);
+            await sut.HandleAsync(context, default);
 
-            A.CallTo(() => commandBus.PublishAsync(A<AttachClient>.That.Matches(x => x.Id == "default")))
+            A.CallTo(() => commandBus.PublishAsync(A<AttachClient>.That.Matches(x => x.Id == "default"), default))
                 .MustHaveHappened();
         }
     }

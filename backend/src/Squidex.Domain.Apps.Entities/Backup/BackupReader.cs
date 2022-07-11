@@ -97,11 +97,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return attachmentEntry;
         }
 
-        public async IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(IEventStreamNames eventStreams, IEventFormatter eventFormatter,
+        public async IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(
+            IEventStreamNames eventStreamNames,
+            IEventFormatter eventFormatter,
             [EnumeratorCancellation] CancellationToken ct = default)
         {
             Guard.NotNull(eventFormatter);
-            Guard.NotNull(eventStreams);
+            Guard.NotNull(eventStreamNames);
 
             while (!ct.IsCancellationRequested)
             {

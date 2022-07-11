@@ -5,20 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure.Tasks;
+
 namespace Squidex.Infrastructure.EventSourcing
 {
     public sealed class RetrySubscription : IEventSubscription, IEventSubscriber
     {
         private readonly RetryWindow retryWindow = new RetryWindow(TimeSpan.FromMinutes(5), 5);
+        private readonly AsyncLock lockObject = new AsyncLock();
         private readonly IEventSubscriber eventSubscriber;
         private readonly Func<IEventSubscriber, IEventSubscription> eventSubscriptionFactory;
-        private readonly object lockObject = new object();
         private CancellationTokenSource timerCancellation = new CancellationTokenSource();
         private IEventSubscription? currentSubscription;
 
         public int ReconnectWaitMs { get; set; } = 5000;
-
-        public object? Sender => currentSubscription?.Sender;
 
         public RetrySubscription(IEventSubscriber eventSubscriber, Func<IEventSubscriber, IEventSubscription> eventSubscriptionFactory)
         {
@@ -31,38 +31,40 @@ namespace Squidex.Infrastructure.EventSourcing
             Subscribe();
         }
 
-        private void Subscribe()
+        public void Dispose()
         {
-            if (currentSubscription == null)
+            using (lockObject.Enter())
             {
-                lock (lockObject)
-                {
-                    if (currentSubscription == null)
-                    {
-                        currentSubscription = eventSubscriptionFactory(this);
-                    }
-                }
+                Unsubscribe();
             }
+
+            lockObject.Dispose();
         }
 
-        public void Unsubscribe()
+        private void Subscribe()
         {
             if (currentSubscription != null)
             {
-                lock (lockObject)
-                {
-                    if (currentSubscription != null)
-                    {
-                        timerCancellation.Cancel();
-                        timerCancellation.Dispose();
-
-                        currentSubscription.Unsubscribe();
-                        currentSubscription = null;
-
-                        timerCancellation = new CancellationTokenSource();
-                    }
-                }
+                return;
             }
+
+            currentSubscription = eventSubscriptionFactory(this);
+        }
+
+        private void Unsubscribe()
+        {
+            if (currentSubscription == null)
+            {
+                return;
+            }
+
+            timerCancellation.Cancel();
+            timerCancellation.Dispose();
+
+            currentSubscription.Dispose();
+            currentSubscription = null;
+
+            timerCancellation = new CancellationTokenSource();
         }
 
         public void WakeUp()
@@ -70,29 +72,54 @@ namespace Squidex.Infrastructure.EventSourcing
             currentSubscription?.WakeUp();
         }
 
-        public async Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
+        async ValueTask IEventSubscriber.OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
         {
-            await eventSubscriber.OnEventAsync(subscription, storedEvent);
+            using (await lockObject.EnterAsync(default))
+            {
+                if (!ReferenceEquals(subscription, currentSubscription))
+                {
+                    return;
+                }
+
+                await eventSubscriber.OnEventAsync(this, storedEvent);
+            }
         }
 
-        public async Task OnErrorAsync(IEventSubscription subscription, Exception exception)
+        async ValueTask IEventSubscriber.OnErrorAsync(IEventSubscription subscription, Exception exception)
         {
             if (exception is OperationCanceledException)
             {
                 return;
             }
 
-            if (retryWindow.CanRetryAfterFailure())
+            using (await lockObject.EnterAsync(default))
             {
+                if (!ReferenceEquals(subscription, currentSubscription))
+                {
+                    return;
+                }
+
                 Unsubscribe();
 
-                await Task.Delay(ReconnectWaitMs, timerCancellation.Token);
-
-                Subscribe();
+                if (!retryWindow.CanRetryAfterFailure())
+                {
+                    await eventSubscriber.OnErrorAsync(this, exception);
+                    return;
+                }
             }
-            else
+
+            try
             {
-                await eventSubscriber.OnErrorAsync(subscription, exception);
+                await Task.Delay(ReconnectWaitMs, timerCancellation.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
+            using (await lockObject.EnterAsync(default))
+            {
+                Subscribe();
             }
         }
     }

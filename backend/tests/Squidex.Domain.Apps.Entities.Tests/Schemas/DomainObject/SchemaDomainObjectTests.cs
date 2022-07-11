@@ -785,7 +785,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
         private async Task<object> PublishAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
         {
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await sut.ExecuteAsync(CreateCommand(command), default);
 
             return result.Payload;
         }

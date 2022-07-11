@@ -9,16 +9,19 @@ using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 
+#pragma warning disable MA0056 // Do not call overridable members in constructor
+#pragma warning disable RECS0082 // Parameter has the same name as a member and hides it
+
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract partial class DomainObject<T> where T : class, IDomainState<T>, new()
+    public abstract partial class DomainObject<T> : IAggregate where T : class, IDomainState<T>, new()
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
-        private readonly SnapshotList<T> snapshots = new SnapshotList<T>();
         private readonly ILogger log;
-        private readonly IPersistenceFactory<T> factory;
+        private readonly IPersistenceFactory<T> persistenceFactory;
         private readonly IPersistence<T> persistence;
         private readonly DomainId uniqueId;
+        private T snapshot = new T { Version = EtagVersion.Empty };
         private bool isLoaded;
 
         public DomainId UniqueId
@@ -26,100 +29,107 @@ namespace Squidex.Infrastructure.Commands
             get => uniqueId;
         }
 
-        public T Snapshot
+        public virtual T Snapshot
         {
-            get => snapshots.Current;
+            get => snapshot;
         }
 
-        public long Version
+        public virtual long Version
         {
-            get => snapshots.Version;
+            get => snapshot.Version;
         }
 
-        protected int Capacity
-        {
-            get => snapshots.Capacity;
-            set => snapshots.Capacity = value;
-        }
-
-        protected DomainObject(DomainId uniqueId, IPersistenceFactory<T> factory,
+        protected DomainObject(DomainId uniqueId, IPersistenceFactory<T> persistenceFactory,
             ILogger log)
         {
-            Guard.NotNull(factory);
+            Guard.NotNull(persistenceFactory);
             Guard.NotNull(log);
 
             this.uniqueId = uniqueId;
-            this.factory = factory;
 
-            persistence = factory.WithSnapshotsAndEventSourcing(GetType(), UniqueId,
-                new HandleSnapshot<T>((snapshot, version) =>
+            this.persistenceFactory = persistenceFactory;
+
+            persistence = persistenceFactory.WithSnapshotsAndEventSourcing(GetType(), UniqueId,
+                new HandleSnapshot<T>((newSnapshot, version) =>
                 {
-                    snapshot.Version = version;
-                    snapshots.Add(snapshot, version, true);
+                    newSnapshot.Version = version;
+
+                    snapshot = newSnapshot;
                 }),
                 @event =>
                 {
-                    // Some migrations needs the current state.
-                    @event = @event.Migrate(Snapshot);
+                    var (newSnapshot, changed) = ApplyEvent(@event, Snapshot, Version, false, true);
 
-                    return ApplyEvent(@event, true, Snapshot, Version, true).Success;
+                    if (changed && newSnapshot != null)
+                    {
+                        snapshot = newSnapshot;
+                    }
+
+                    return true;
                 });
 
             this.log = log;
         }
 
-        public async Task<T> GetSnapshotAsync(long version)
+        public virtual async Task<T> GetSnapshotAsync(long version,
+            CancellationToken ct = default)
         {
-            var (result, valid) = snapshots.Get(version);
-
-            if (result == null && valid)
+            if (version <= EtagVersion.Any)
             {
-                var snapshot = new T
-                {
-                    Version = EtagVersion.Empty
-                };
-
-                snapshots.Add(snapshot, snapshot.Version, false);
-
-                var allEvents = factory.WithEventSourcing(GetType(), UniqueId, @event =>
-                {
-                    // Some migrations needs the current state.
-                    @event = @event.Migrate(snapshot);
-
-                    var (newSnapshot, isChanged) = ApplyEvent(@event, true, snapshot, snapshot.Version, false);
-
-                    // Can only be null in case of errors or inconsistent streams.
-                    if (newSnapshot != null)
-                    {
-                        snapshot = newSnapshot;
-                    }
-
-                    // If all snapshorts from this one here are valid we can stop.
-                    return newSnapshot != null && !snapshots.ContainsThisAndNewer(newSnapshot.Version);
-                });
-
-                await allEvents.ReadAsync();
-
-                (result, valid) = snapshots.Get(version);
+                await EnsureLoadedAsync(ct);
+                return Snapshot;
             }
 
-            return result ?? new T { Version = EtagVersion.Empty };
+            var result = new T
+            {
+                Version = EtagVersion.Empty
+            };
+
+            if (version == result.Version)
+            {
+                return result;
+            }
+
+            var allEvents = persistenceFactory.WithEventSourcing(GetType(), UniqueId, @event =>
+            {
+                var (newSnapshot, _) = ApplyEvent(@event, result, result.Version, false, false);
+
+                // Can only be null in case of errors or inconsistent streams.
+                if (newSnapshot != null && newSnapshot.Version <= version)
+                {
+                    result = newSnapshot;
+                }
+
+                return result.Version <= version;
+            });
+
+            await allEvents.ReadAsync(ct: ct);
+
+            if (result.Version != version)
+            {
+                result = new T { Version = EtagVersion.Empty };
+            }
+
+            return result;
         }
 
-        public virtual async Task EnsureLoadedAsync()
+        public virtual async Task EnsureLoadedAsync(
+            CancellationToken ct = default)
         {
             if (isLoaded)
             {
                 return;
             }
 
-            await persistence.ReadAsync();
+            await persistence.ReadAsync(ct: ct);
 
             if (persistence.IsSnapshotStale)
             {
                 try
                 {
+#pragma warning disable MA0040 // Flow the cancellation token
                     await persistence.WriteSnapshotAsync(Snapshot);
+#pragma warning restore MA0040 // Flow the cancellation token
                 }
                 catch (Exception ex)
                 {
@@ -141,7 +151,7 @@ namespace Squidex.Infrastructure.Commands
 
             @event.SetAggregateId(uniqueId);
 
-            if (ApplyEvent(@event, false, Snapshot, Version, true).Success)
+            if (ApplyEvent(@event, Snapshot, Version, false, true).Success)
             {
                 uncomittedEvents.Add(@event);
             }
@@ -157,7 +167,8 @@ namespace Squidex.Infrastructure.Commands
             uncomittedEvents.Clear();
         }
 
-        private async Task<CommandResult> DeleteCoreAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler) where TCommand : ICommand
+        private async Task<CommandResult> DeleteCoreAsync<TCommand>(TCommand command, Func<TCommand, CancellationToken, Task<object?>> handler,
+            CancellationToken ct = default) where TCommand : ICommand
         {
             Guard.NotNull(handler);
 
@@ -165,30 +176,30 @@ namespace Squidex.Infrastructure.Commands
             var previousVersion = Version;
             try
             {
-                var result = (await handler(command)) ?? None.Value;
+                var result = (await handler(command, ct)) ?? None.Value;
 
-                var events = uncomittedEvents.ToArray();
-
-                if (events != null)
+                if (uncomittedEvents.Count > 0)
                 {
                     var deletedId = DomainId.Combine(UniqueId, DomainId.Create("deleted"));
-                    var deletedStream = factory.WithEventSourcing(GetType(), deletedId, null);
+                    var deletedStream = persistenceFactory.WithEventSourcing(GetType(), deletedId, null);
 
                     // Write to the deleted stream first so we never loose this information.
-                    await deletedStream.WriteEventsAsync(events);
-
-                    // Cleanup the secondary stream first.
-                    await persistence.DeleteAsync();
-
-                    snapshots.Clear();
+                    await deletedStream.WriteEventsAsync(uncomittedEvents, ct);
                 }
+
+                // Cleanup the primary stream second.
+                await persistence.DeleteAsync(ct);
+
+                snapshot = new T
+                {
+                    Version = EtagVersion.Empty
+                };
 
                 return new CommandResult(UniqueId, Version, previousVersion, result);
             }
             catch
             {
-                RestorePreviousSnapshot(previousSnapshot, previousVersion);
-
+                snapshot = previousSnapshot;
                 throw;
             }
             finally
@@ -197,51 +208,52 @@ namespace Squidex.Infrastructure.Commands
             }
         }
 
-        private async Task<CommandResult> UpsertCoreAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler, bool isCreation = false) where TCommand : ICommand
+        private async Task<CommandResult> UpsertCoreAsync<TCommand>(TCommand command, Func<TCommand, CancellationToken, Task<object?>> handler, bool isCreation,
+            CancellationToken ct) where TCommand : ICommand
         {
             Guard.NotNull(handler);
-
-            var wasDeleted = IsDeleted(Snapshot);
 
             var previousSnapshot = Snapshot;
             var previousVersion = Version;
             try
             {
-                var result = (await handler(command)) ?? None.Value;
+                var result = (await handler(command, ct)) ?? None.Value;
 
                 var events = uncomittedEvents.ToArray();
-
                 try
                 {
-                    await WriteAsync(events);
+                    await WriteAsync(events, ct);
                 }
-                catch (InconsistentStateException)
+                catch (InconsistentStateException ex)
                 {
-                    await EnsureLoadedAsync();
+                    // Start from the previous, unchanged snapshot.
+                    snapshot = previousSnapshot;
 
-                    if (wasDeleted)
+                    // Create commands do not load the domain object for performance reasons, therefore we ensure it is loaded.
+                    await EnsureLoadedAsync(ct);
+
+                    var isDeleted = IsDeleted(Snapshot);
+
+                    if (isDeleted && isCreation && CanRecreate())
                     {
-                        if (CanRecreate() && isCreation)
+                        foreach (var @event in uncomittedEvents)
                         {
-                            snapshots.ResetTo(new T(), previousVersion);
-
-                            foreach (var @event in uncomittedEvents)
-                            {
-                                ApplyEvent(@event, false, Snapshot, Version, true);
-                            }
-
-                            await WriteAsync(events);
+                            ApplyEvent(@event, Snapshot, Version, false, true);
                         }
-                        else
-                        {
-                            throw new DomainObjectDeletedException(uniqueId.ToString());
-                        }
+
+                        await WriteAsync(events, ct);
+                    }
+                    else if (isDeleted)
+                    {
+                        throw new DomainObjectDeletedException(uniqueId.ToString());
+                    }
+                    else if (isCreation)
+                    {
+                        throw new DomainObjectConflictException(uniqueId.ToString());
                     }
                     else
                     {
-                        RestorePreviousSnapshot(previousSnapshot, previousVersion);
-
-                        throw new DomainObjectConflictException(uniqueId.ToString());
+                        throw new DomainObjectVersionException(uniqueId.ToString(), ex.VersionCurrent, ex.VersionExpected, ex);
                     }
                 }
 
@@ -251,8 +263,7 @@ namespace Squidex.Infrastructure.Commands
             }
             catch
             {
-                RestorePreviousSnapshot(previousSnapshot, previousVersion);
-
+                snapshot = previousSnapshot;
                 throw;
             }
             finally
@@ -286,12 +297,7 @@ namespace Squidex.Infrastructure.Commands
             return false;
         }
 
-        private void RestorePreviousSnapshot(T previousSnapshot, long previousVersion)
-        {
-            snapshots.ResetTo(previousSnapshot, previousVersion);
-        }
-
-        private (T?, bool Success) ApplyEvent(Envelope<IEvent> @event, bool isLoading, T snapshot, long version, bool clean)
+        private (T?, bool Success) ApplyEvent(Envelope<IEvent> @event, T snapshot, long version, bool loading, bool update)
         {
             if (IsDeleted(snapshot))
             {
@@ -306,47 +312,50 @@ namespace Squidex.Infrastructure.Commands
                 };
             }
 
+            @event = @event.Migrate(snapshot);
+
             var newVersion = version + 1;
             var newSnapshot = Apply(snapshot, @event);
 
-            if (ReferenceEquals(snapshot, newSnapshot) && isLoading)
-            {
-                newSnapshot = snapshot.Copy();
-            }
+            var isChanged = loading || !ReferenceEquals(snapshot, newSnapshot);
 
-            var isChanged = !ReferenceEquals(snapshot, newSnapshot);
-
+            // If we are loading events at the moment, we will always update the version.
             if (isChanged)
             {
                 newSnapshot.Version = newVersion;
+            }
 
-                snapshots.Add(newSnapshot, newVersion, clean);
+            if (update)
+            {
+                this.snapshot = newSnapshot;
             }
 
             return (newSnapshot, isChanged);
         }
 
-        private async Task WriteAsync(Envelope<IEvent>[] newEvents)
+        private async Task WriteAsync(Envelope<IEvent>[] newEvents,
+            CancellationToken ct)
         {
-            if (newEvents.Length == 0)
+            if (newEvents.Length > 0)
             {
-                return;
+                // Writing the events is the first step, so we can cancel it if requested by the user, but if events are written,
+                // we should also write the snapshots to keep both collection / database as consitent as possible.
+                await persistence.WriteEventsAsync(newEvents, ct);
+                await persistence.WriteSnapshotAsync(Snapshot, default);
             }
-
-            await persistence.WriteEventsAsync(newEvents);
-            await persistence.WriteSnapshotAsync(Snapshot);
         }
 
-        public async Task RebuildStateAsync()
+        public async Task RebuildStateAsync(
+            CancellationToken ct = default)
         {
-            await EnsureLoadedAsync();
+            await EnsureLoadedAsync(ct);
 
             if (Version <= EtagVersion.Empty)
             {
                 throw new DomainObjectNotFoundException(UniqueId.ToString());
             }
 
-            await persistence.WriteSnapshotAsync(Snapshot);
+            await persistence.WriteSnapshotAsync(Snapshot, ct);
         }
 
         protected virtual T Apply(T snapshot, Envelope<IEvent> @event)
@@ -354,6 +363,7 @@ namespace Squidex.Infrastructure.Commands
             return snapshot.Apply(@event);
         }
 
-        public abstract Task<CommandResult> ExecuteAsync(IAggregateCommand command);
+        public abstract Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+            CancellationToken ct);
     }
 }

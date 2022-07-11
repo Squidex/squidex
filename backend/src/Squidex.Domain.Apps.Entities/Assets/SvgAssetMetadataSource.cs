@@ -16,7 +16,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private const int FileSizeLimit = 2 * 1024 * 1024; // 2MB
 
-        public async Task EnhanceAsync(UploadAssetCommand command)
+        public async Task EnhanceAsync(UploadAssetCommand command,
+            CancellationToken ct)
         {
             var isSvg =
                 command.File.MimeType == "image/svg+xml" ||

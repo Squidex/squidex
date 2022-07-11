@@ -68,7 +68,6 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
                 AddGetLink("download", resources.Url<BackupContentController>(x => nameof(x.GetBackupContentV2), values));
             }
 
-
             return this;
         }
     }

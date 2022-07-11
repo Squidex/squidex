@@ -22,19 +22,19 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         private static readonly JsonValueConverter Instance = new JsonValueConverter();
 
-        public record struct Args(JsonValue Value, IJsonSerializer JsonSerializer, ResolvedComponents Components);
+        public record struct Args(JsonValue Value, IJsonSerializer Serializer, ResolvedComponents Components);
 
         private JsonValueConverter()
         {
         }
 
-        public static (object? Result, JsonError? Error) ConvertValue(IField field, JsonValue value, IJsonSerializer jsonSerializer,
+        public static (object? Result, JsonError? Error) ConvertValue(IField field, JsonValue value, IJsonSerializer serializer,
             ResolvedComponents components)
         {
             Guard.NotNull(field);
             Guard.NotNull(value);
 
-            var args = new Args(value, jsonSerializer, components);
+            var args = new Args(value, serializer, components);
 
             return field.Accept(Instance, args);
         }
@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public (object? Result, JsonError? Error) Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            var result = GeoJsonValue.TryParse(args.Value, args.JsonSerializer, out var value);
+            var result = GeoJsonValue.TryParse(args.Value, args.Serializer, out var value);
 
             switch (result)
             {

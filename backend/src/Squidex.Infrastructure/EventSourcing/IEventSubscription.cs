@@ -7,14 +7,8 @@
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public interface IEventSubscription
+    public interface IEventSubscription : IDisposable
     {
-        object? Sender => this;
-
-        void Unsubscribe()
-        {
-        }
-
         void WakeUp()
         {
         }

@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities
             Assert.Single(components);
             Assert.Same(schema.SchemaDef, components[schemaId.Id]);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false, default))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 

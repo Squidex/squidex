@@ -26,27 +26,26 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         private readonly IContextProvider contextProvider;
         private readonly ILogger<AssetsBulkUpdateCommandMiddleware> log;
 
-        private sealed record BulkTaskCommand(BulkTask Task, DomainId Id, ICommand Command)
-        {
-        }
+        private sealed record BulkTaskCommand(BulkTask Task, DomainId Id, ICommand Command,
+            CancellationToken CancellationToken);
 
         private sealed record BulkTask(
             ICommandBus Bus,
             int JobIndex,
             BulkUpdateJob CommandJob,
             BulkUpdateAssets Command,
-            ConcurrentBag<BulkUpdateResultItem> Results
-        )
-        {
-        }
+            ConcurrentBag<BulkUpdateResultItem> Results,
+            CancellationToken CancellationToken);
 
         public AssetsBulkUpdateCommandMiddleware(IContextProvider contextProvider, ILogger<AssetsBulkUpdateCommandMiddleware> log)
         {
             this.contextProvider = contextProvider;
+
             this.log = log;
         }
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
             if (context.Command is BulkUpdateAssets bulkUpdates)
             {
@@ -103,7 +102,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                             i,
                             bulkUpdates.Jobs[i],
                             bulkUpdates,
-                            results);
+                            results,
+                            ct);
 
                         if (!await createCommandsBlock.SendAsync(task))
                         {
@@ -124,16 +124,16 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             }
             else
             {
-                await next(context);
+                await next(context, ct);
             }
         }
 
         private async Task ExecuteCommandAsync(BulkTaskCommand bulkCommand)
         {
-            var (task, id, command) = bulkCommand;
+            var (task, id, command, ct) = bulkCommand;
             try
             {
-                await task.Bus.PublishAsync(command);
+                await task.Bus.PublishAsync(command, ct);
 
                 task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex));
             }
@@ -157,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                 command.AssetId = id;
 
-                return new BulkTaskCommand(task, id, command);
+                return new BulkTaskCommand(task, id, command, task.CancellationToken);
             }
             catch (Exception ex)
             {

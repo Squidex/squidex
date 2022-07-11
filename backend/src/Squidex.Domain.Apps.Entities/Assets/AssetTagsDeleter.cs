@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public Task DeleteAppAsync(IAppEntity app,
             CancellationToken ct)
         {
-            return tagService.ClearAsync(app.Id, TagGroups.Assets);
+            return tagService.ClearAsync(app.Id, TagGroups.Assets, ct);
         }
     }
 }

@@ -23,7 +23,10 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(SystemClock.Instance.GetCurrentInstant().WithoutMs());
 
-            sut = new EnrichWithTimestampCommandMiddleware(clock);
+            sut = new EnrichWithTimestampCommandMiddleware
+            {
+                Clock = clock
+            };
         }
 
         [Fact]
@@ -31,7 +34,7 @@ namespace Squidex.Infrastructure.Commands
         {
             var command = new MyCommand();
 
-            await sut.HandleAsync(new CommandContext(command, commandBus));
+            await sut.HandleAsync(new CommandContext(command, commandBus), default);
 
             Assert.Equal(clock.GetCurrentInstant(), command.Timestamp);
         }
@@ -39,7 +42,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_do_nothing_for_normal_command()
         {
-            await sut.HandleAsync(new CommandContext(A.Dummy<ICommand>(), commandBus));
+            await sut.HandleAsync(new CommandContext(A.Dummy<ICommand>(), commandBus), default);
 
             A.CallTo(() => clock.GetCurrentInstant())
                 .MustNotHaveHappened();

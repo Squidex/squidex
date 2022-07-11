@@ -152,7 +152,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return result;
         }
 
-        public void Unsubscribe()
+        public void Dispose()
         {
             stopToken.Cancel();
         }

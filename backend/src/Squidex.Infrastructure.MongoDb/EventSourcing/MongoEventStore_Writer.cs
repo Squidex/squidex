@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 var commit = BuildCommit(commitId, streamName, expectedVersion >= -1 ? expectedVersion : currentVersion, events);
 
-                for (var attempt = 0; attempt < MaxWriteAttempts; attempt++)
+                for (var attempt = 1; attempt <= MaxWriteAttempts; attempt++)
                 {
                     try
                     {
@@ -88,11 +88,7 @@ namespace Squidex.Infrastructure.EventSourcing
                                 throw new WrongEventVersionException(currentVersion, expectedVersion);
                             }
 
-                            if (attempt < MaxWriteAttempts)
-                            {
-                                expectedVersion = currentVersion;
-                            }
-                            else
+                            if (attempt >= MaxWriteAttempts)
                             {
                                 throw new TimeoutException("Could not acquire a free slot for the commit within the provided time.");
                             }

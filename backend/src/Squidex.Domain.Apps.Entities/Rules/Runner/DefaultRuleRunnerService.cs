@@ -6,33 +6,38 @@
 // ==========================================================================
 
 using NodaTime;
-using Orleans;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.States;
+using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
     public sealed class DefaultRuleRunnerService : IRuleRunnerService
     {
         private const int MaxSimulatedEvents = 100;
+        private readonly IPersistenceFactory<RuleRunnerState> persistenceFactory;
         private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
-        private readonly IGrainFactory grainFactory;
         private readonly IRuleService ruleService;
+        private readonly IMessageBus messaging;
 
-        public DefaultRuleRunnerService(IGrainFactory grainFactory,
+        public DefaultRuleRunnerService(
+            IPersistenceFactory<RuleRunnerState> persistenceFactory,
             IEventFormatter eventFormatter,
             IEventStore eventStore,
-            IRuleService ruleService)
+            IRuleService ruleService,
+            IMessageBus messaging)
         {
-            this.grainFactory = grainFactory;
             this.eventFormatter = eventFormatter;
+            this.persistenceFactory = persistenceFactory;
             this.eventStore = eventStore;
             this.ruleService = ruleService;
+            this.messaging = messaging;
         }
 
         public Task<List<SimulatedRuleEvent>> SimulateAsync(IRuleEntity rule,
@@ -66,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                 if (@event?.Payload is AppEvent appEvent)
                 {
                     // Also create jobs for rules with failing conditions because we want to show them in th table.
-                    await foreach (var result in ruleService.CreateJobsAsync(@event, context, ct))
+                    await foreach (var result in ruleService.CreateJobsAsync(@event, context, ct).WithCancellation(ct))
                     {
                         var eventName = result.Job?.EventName;
 
@@ -110,25 +115,31 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         public Task CancelAsync(DomainId appId,
             CancellationToken ct = default)
         {
-            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
-
-            return grain.CancelAsync();
-        }
-
-        public Task<DomainId?> GetRunningRuleIdAsync(DomainId appId,
-            CancellationToken ct = default)
-        {
-            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
-
-            return grain.GetRunningRuleIdAsync();
+            return messaging.PublishAsync(new RuleRunnerCancel(appId), ct: ct);
         }
 
         public Task RunAsync(DomainId appId, DomainId ruleId, bool fromSnapshots = false,
             CancellationToken ct = default)
         {
-            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
+            return messaging.PublishAsync(new RuleRunnerRun(appId, ruleId, fromSnapshots), ct: ct);
+        }
 
-            return grain.RunAsync(ruleId, fromSnapshots);
+        public async Task<DomainId?> GetRunningRuleIdAsync(DomainId appId,
+            CancellationToken ct = default)
+        {
+            var state = await GetStateAsync(appId, ct);
+
+            return state.Value.RuleId;
+        }
+
+        private async Task<SimpleState<RuleRunnerState>> GetStateAsync(DomainId appId,
+            CancellationToken ct)
+        {
+            var state = new SimpleState<RuleRunnerState>(persistenceFactory, GetType(), appId);
+
+            await state.LoadAsync(ct);
+
+            return state;
         }
 
         private static RuleContext GetContext(IRuleEntity rule)

@@ -84,9 +84,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", default))
                 .MustHaveHappened();
 
-            A.CallTo(() => appsIndex.RegisterAsync(appId, appName, default))
-                .MustHaveHappened();
-
             A.CallTo(() => rebuilder.InsertManyAsync<AppDomainObject, AppDomainObject.State>(A<IEnumerable<DomainId>>.That.Is(appId), 1, default))
                 .MustHaveHappened();
         }
@@ -135,18 +132,18 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             await sut.CleanupRestoreErrorAsync(appId);
 
-            A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", ct))
+            A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task Should_writer_user_settings()
+        public async Task Should_write_user_settings()
         {
             var settings = new JsonObject();
 
             var context = CreateBackupContext();
 
-            A.CallTo(() => appUISettings.GetAsync(appId, null))
+            A.CallTo(() => appUISettings.GetAsync(appId, null, ct))
                 .Returns(settings);
 
             await sut.BackupAsync(context, ct);
@@ -167,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.RestoreAsync(context, ct);
 
-            A.CallTo(() => appUISettings.SetAsync(appId, null, settings))
+            A.CallTo(() => appUISettings.SetAsync(appId, null, settings, ct))
                 .MustHaveHappened();
         }
 

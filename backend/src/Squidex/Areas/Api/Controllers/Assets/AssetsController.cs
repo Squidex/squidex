@@ -72,7 +72,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetTags(string app)
         {
-            var tags = await tagService.GetTagsAsync(AppId, TagGroups.Assets);
+            var tags = await tagService.GetTagsAsync(AppId, TagGroups.Assets, HttpContext.RequestAborted);
 
             Response.Headers[HeaderNames.ETag] = tags.Version.ToString(CultureInfo.InvariantCulture);
 
@@ -96,7 +96,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> PutTag(string app, string name, [FromBody] RenameTagDto request)
         {
-            await tagService.RenameTagAsync(AppId, TagGroups.Assets, Uri.UnescapeDataString(name), request.TagName);
+            await tagService.RenameTagAsync(AppId, TagGroups.Assets, Uri.UnescapeDataString(name), request.TagName, HttpContext.RequestAborted);
 
             return await GetTags(app);
         }
@@ -277,7 +277,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var command = request.ToCommand();
 
-            var context = await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             var result = context.Result<BulkUpdateResult>();
             var response = result.Select(x => BulkResultDto.FromDomain(x, HttpContext)).ToArray();
@@ -415,7 +415,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var command = request.ToCommand(id);
 
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -448,7 +448,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
         private async Task<AssetDto> InvokeCommandAsync(ICommand command)
         {
-            var context = await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             if (context.PlainResult is AssetDuplicate created)
             {

@@ -11,6 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 {
     public interface IWatchingService
     {
-        Task<string[]> GetWatchingUsersAsync(DomainId appId, string resource, string userId);
+        Task<string[]> GetWatchingUsersAsync(DomainId appId, string? resource, string userId,
+            CancellationToken ct = default);
     }
 }
