@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     await backupArchiveStore.DeleteAsync(backup.Id, default);
                 }
 
-                await state.ClearAsync();
+                await state.ClearAsync(default);
             });
         }
 
@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     currentRun.Dispose();
                     currentRun = null;
                 }
-            });
+            }, ct);
         }
 
         private async Task ProcessAsync(Run run,
@@ -183,7 +183,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         {
                             var @event = eventFormatter.Parse(storedEvent);
 
-                            if (@event.Payload is SquidexEvent squidexEvent && squidexEvent.Actor != null)
+                            if (@event.Payload is SquidexEvent { Actor: { } } squidexEvent)
                             {
                                 backupUsers.Backup(squidexEvent.Actor);
                             }
@@ -241,7 +241,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 run.Job.Stopped = Clock.GetCurrentInstant();
 
-                await state.WriteAsync();
+                await state.WriteAsync(default);
             }
         }
 

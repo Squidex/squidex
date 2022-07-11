@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public bool IsCompleted
         {
-            get => tcs.Task.Status == TaskStatus.RanToCompletion || tcs.Task.Status == TaskStatus.Faulted;
+            get => tcs.Task.Status is TaskStatus.RanToCompletion or TaskStatus.Faulted;
         }
 
         internal ScriptExecutionContext(Engine engine, CancellationToken cancellationToken)

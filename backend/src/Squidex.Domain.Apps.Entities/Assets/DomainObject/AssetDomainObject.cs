@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         return Snapshot;
                     }, ct);
 
-                case DeleteAsset delete when delete.Permanent:
+                case DeleteAsset { Permanent: true } delete:
                     return DeletePermanentAsync(delete, async (c, ct) =>
                     {
                         var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);

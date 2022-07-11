@@ -268,7 +268,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         }
                         else
                         {
-                            var result = await AppPlanBillingManager().ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), c.PlanId, c.Referer);
+                            var result = await AppPlanBillingManager().ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), c.PlanId, c.Referer, default);
 
                             switch (result)
                             {
@@ -284,7 +284,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 case DeleteApp delete:
                     return UpdateAsync(delete, async (c, ct) =>
                     {
-                        await AppPlanBillingManager().ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null, null);
+                        await AppPlanBillingManager().ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null, null, ct);
 
                         DeleteApp(c);
                     }, ct);

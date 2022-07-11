@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure.Commands
             {
                 using (var stream = DefaultPools.MemoryStream.GetStream())
                 {
-                    serializer.Serialize<T>(snapshot, stream, true);
+                    serializer.Serialize(snapshot, stream, true);
 
                     await distributedCache.SetAsync(cacheKey, stream.ToArray(), CacheOptions, ct);
                 }

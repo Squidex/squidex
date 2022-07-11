@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             {
                 try
                 {
-                    if (q.Ids != null && q.Ids.Count > 0)
+                    if (q.Ids is { Count: > 0 })
                     {
                         var filter = BuildFilter(appId, q.Ids.ToHashSet());
 

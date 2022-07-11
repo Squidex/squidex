@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure.UsageTracking
                         .Ascending(x => x.Key)
                         .Ascending(x => x.Category)
                         .Ascending(x => x.Date)),
-                cancellationToken: ct = default);
+                cancellationToken: ct);
         }
 
         public Task DeleteAsync(string key,

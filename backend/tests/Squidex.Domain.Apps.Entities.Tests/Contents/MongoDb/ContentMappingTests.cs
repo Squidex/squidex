@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                 LastModifiedBy = user,
                 ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Published, user, time),
                 SchemaId = NamedId.Of(DomainId.NewGuid(), "my-schema"),
-                Version = 42,
+                Version = 42
             };
 
             return state;
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                 NewVersion = new ContentVersion(Status.Published, newData),
                 ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Published, user, time),
                 SchemaId = NamedId.Of(DomainId.NewGuid(), "my-schema"),
-                Version = 42,
+                Version = 42
             };
 
             return state;

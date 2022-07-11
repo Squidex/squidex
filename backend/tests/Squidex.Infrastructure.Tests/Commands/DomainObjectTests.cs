@@ -504,7 +504,7 @@ namespace Squidex.Infrastructure.Commands
             state.AddEvent(new ValueChanged { Value = value });
         }
 
-        private void SetupCreated(params IEvent[] @events)
+        private void SetupCreated(params IEvent[] events)
         {
             events.Foreach(@event => state.AddEvent(@event));
         }

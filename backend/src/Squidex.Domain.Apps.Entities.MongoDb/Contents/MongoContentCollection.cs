@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryAsync"))
             {
-                if (q.Ids != null && q.Ids.Count > 0)
+                if (q.Ids is { Count: > 0 })
                 {
                     return await queryByIds.QueryAsync(app.Id, schemas, q, ct);
                 }
@@ -148,7 +148,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryAsync"))
             {
-                if (q.Ids != null && q.Ids.Count > 0)
+                if (q.Ids is { Count: > 0 })
                 {
                     return await queryByIds.QueryAsync(app.Id, new List<ISchemaEntity> { schema }, q, ct);
                 }

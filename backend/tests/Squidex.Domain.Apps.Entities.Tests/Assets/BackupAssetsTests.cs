@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 Alias = new Dictionary<string, string>
                 {
-                    ["tag1"] = "new-name",
+                    ["tag1"] = "new-name"
                 },
                 Tags = new Dictionary<string, Tag>()
             };

@@ -23,11 +23,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public async Task EnhanceAsync(UploadAssetCommand command,
             CancellationToken ct)
         {
-            if (command.Type == AssetType.Unknown || command.Type == AssetType.Image)
+            if (command.Type is not AssetType.Unknown or AssetType.Image)
             {
                 var mimeType = command.File.MimeType;
 
-                ImageInfo? imageInfo = null;
+                ImageInfo? imageInfo;
 
                 await using (var uploadStream = command.File.OpenRead())
                 {

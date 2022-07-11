@@ -17,7 +17,7 @@ namespace Squidex.Web.CommandMiddlewares
         public Task HandleAsync(CommandContext context, NextDelegate next,
             CancellationToken ct)
         {
-            if (context.Command is ContentCommand contentCommand && contentCommand is not CreateContent)
+            if (context.Command is ContentCommand contentCommand and not CreateContent)
             {
                 if (contentCommand.ContentId.ToString().Equals(SingletonId, StringComparison.Ordinal))
                 {

@@ -251,7 +251,7 @@ namespace Squidex.Infrastructure.Queries
         {
             private static bool ValidOperator(string op)
             {
-                return op == "lt" || op == "exists";
+                return op is "lt" or "exists";
             }
 
             public static IEnumerable<object[]> ValidTests()
@@ -387,7 +387,7 @@ namespace Squidex.Infrastructure.Queries
         {
             private static bool ValidOperator(string op)
             {
-                return op == "eq" || op == "ne" || op == "exists";
+                return op is "eq" or "ne" or "exists";
             }
 
             public static IEnumerable<object[]> ValidTests()
@@ -467,7 +467,7 @@ namespace Squidex.Infrastructure.Queries
         {
             private static bool ValidOperator(string op)
             {
-                return op == "eq" || op == "ne" || op == "empty" || op == "exists";
+                return op is "eq" or "ne" or "empty" or "exists";
             }
 
             public static IEnumerable<object[]> ValidTests()

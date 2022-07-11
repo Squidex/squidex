@@ -25,7 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IAppImageStore appImageStore;
         private readonly IAppsIndex appsIndex;
         private readonly IAppUISettings appUISettings;
-        private readonly HashSet<string> contributors = new HashSet<string>();
         private string? appReservation;
 
         public string Name { get; } = "Apps";
@@ -91,7 +90,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         }
 
                         contributorAssigned.ContributorId = user.Identifier;
-                        contributors.Add(contributorAssigned.ContributorId);
                         break;
                     }
 
@@ -103,7 +101,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         }
 
                         contributorRemoved.ContributorId = user.Identifier;
-                        contributors.Remove(contributorRemoved.ContributorId);
                         break;
                     }
             }

@@ -121,27 +121,27 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             Guard.ValidNumber(value);
 
-            this.Value = value;
+            Value = value;
         }
 
         public JsonValue(bool value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         public JsonValue(string? value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         public JsonValue(JsonArray? value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         public JsonValue(JsonObject? value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         public static JsonValue Create<T>(IReadOnlyDictionary<string, T>? values)

@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             results,
                             ct);
 
-                        if (!await createCommandsBlock.SendAsync(task))
+                        if (!await createCommandsBlock.SendAsync(task, ct))
                         {
                             break;
                         }
@@ -313,7 +313,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 return existing.Select(x => x.Id).ToArray();
             }
 
-            if (task.CommandJob.Type == BulkUpdateContentType.Create || task.CommandJob.Type == BulkUpdateContentType.Upsert)
+            if (task.CommandJob.Type is BulkUpdateContentType.Create or BulkUpdateContentType.Upsert)
             {
                 return new[] { DomainId.NewGuid() };
             }

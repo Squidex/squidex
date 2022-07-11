@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Hosting;
 using Squidex.Infrastructure;

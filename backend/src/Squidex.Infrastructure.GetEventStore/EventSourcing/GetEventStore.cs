@@ -83,7 +83,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var stream = QueryReverseAsync(streamName, StreamPosition.End, take, ct);
 
-            await foreach (var storedEvent in stream.IgnoreNotFound(ct).TakeWhile(x => x.Data.Headers.Timestamp() >= timestamp))
+            await foreach (var storedEvent in stream.IgnoreNotFound(ct).TakeWhile(x => x.Data.Headers.Timestamp() >= timestamp).WithCancellation(ct))
             {
                 yield return storedEvent;
             }

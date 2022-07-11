@@ -11,7 +11,7 @@ using OpenTelemetry.Trace;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.APM.Datadog
+namespace Squidex.Extensions.APM.Otlp
 {
     public sealed class OtlpPlugin : IPlugin
     {

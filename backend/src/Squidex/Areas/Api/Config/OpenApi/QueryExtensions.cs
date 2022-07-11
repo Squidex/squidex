@@ -25,7 +25,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 Type = JsonObjectType.Number
             };
 
-            void AddQuery(OpenApiParameter parameter)
+            void AddParameterQuery(OpenApiParameter parameter)
             {
                 if (operation.Parameters.Any(x => x.Name == parameter.Name && x.Kind == OpenApiParameterKind.Query))
                 {
@@ -39,7 +39,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
             if (supportSearch)
             {
-                AddQuery(new OpenApiParameter
+                AddParameterQuery(new OpenApiParameter
                 {
                     Schema = stringSchema,
                     Name = "$search",
@@ -47,42 +47,42 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 });
             }
 
-            AddQuery(new OpenApiParameter
+            AddParameterQuery(new OpenApiParameter
             {
                 Schema = numberSchema,
                 Name = "$top",
                 Description = FieldDescriptions.QueryTop
             });
 
-            AddQuery(new OpenApiParameter
+            AddParameterQuery(new OpenApiParameter
             {
                 Schema = numberSchema,
                 Name = "$skip",
                 Description = FieldDescriptions.QuerySkip
             });
 
-            AddQuery(new OpenApiParameter
+            AddParameterQuery(new OpenApiParameter
             {
                 Schema = stringSchema,
                 Name = "$orderby",
                 Description = FieldDescriptions.QueryOrderBy
             });
 
-            AddQuery(new OpenApiParameter
+            AddParameterQuery(new OpenApiParameter
             {
                 Schema = stringSchema,
                 Name = "$filter",
                 Description = FieldDescriptions.QueryFilter
             });
 
-            AddQuery(new OpenApiParameter
+            AddParameterQuery(new OpenApiParameter
             {
                 Schema = stringSchema,
                 Name = "q",
                 Description = FieldDescriptions.QueryQ
             });
 
-            AddQuery(new OpenApiParameter
+            AddParameterQuery(new OpenApiParameter
             {
                 Schema = stringSchema,
                 Name = "ids",

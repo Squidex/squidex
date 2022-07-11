@@ -242,7 +242,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 FileName = fileName,
                 FileSize = fileSize,
                 MimeType = fileType!,
-                Version = version,
+                Version = version
             };
         }
     }

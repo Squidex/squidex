@@ -9,7 +9,5 @@
 
 namespace Squidex.Infrastructure.UsageTracking
 {
-    public sealed record StoredUsage(string? Category, DateTime Date, Counters Counters)
-    {
-    }
+    public sealed record StoredUsage(string? Category, DateTime Date, Counters Counters);
 }

@@ -45,7 +45,7 @@ namespace Squidex.Config.Authentication
                     pictureUrl = url.GetString();
                 }
 
-                if (pictureUrl != null && pictureUrl.EndsWith("?sz=50", System.StringComparison.Ordinal))
+                if (pictureUrl != null && pictureUrl.EndsWith("?sz=50", StringComparison.Ordinal))
                 {
                     pictureUrl = pictureUrl[..^6];
                 }

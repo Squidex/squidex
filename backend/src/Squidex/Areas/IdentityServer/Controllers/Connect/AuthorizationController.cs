@@ -22,7 +22,7 @@ using Squidex.Shared.Users;
 using Squidex.Web;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace Notifo.Areas.Account.Controllers
+namespace Notifo.Areas.Account.Controllers.Connect
 {
     public class AuthorizationController : IdentityServerController
     {

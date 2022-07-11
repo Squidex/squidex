@@ -156,9 +156,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private void WithPaging(ClrQuery query, Q q)
         {
-            if (query.Take <= 0 || query.Take == long.MaxValue)
+            if (query.Take is <= 0 or long.MaxValue)
             {
-                if (q.Ids != null && q.Ids.Count > 0)
+                if (q.Ids is { Count: > 0 })
                 {
                     query.Take = q.Ids.Count;
                 }

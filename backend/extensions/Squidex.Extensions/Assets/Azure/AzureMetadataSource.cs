@@ -73,7 +73,7 @@ namespace Squidex.Extensions.Assets.Azure
                             }
                         }
 
-                        var description = result.Description?.Captions?.OrderByDescending(x => x.Confidence)?.FirstOrDefault()?.Text;
+                        var description = result.Description?.Captions.MaxBy(x => x.Confidence)?.Text;
 
                         if (description != null)
                         {

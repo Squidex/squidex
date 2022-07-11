@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var payload = await base.EnrichResultAsync(context, result, ct);
 
-            if (payload is IRuleEntity rule && payload is not IEnrichedRuleEntity)
+            if (payload is IRuleEntity rule and not IEnrichedRuleEntity)
             {
                 payload = await ruleEnricher.EnrichAsync(rule, contextProvider.Context, ct);
             }

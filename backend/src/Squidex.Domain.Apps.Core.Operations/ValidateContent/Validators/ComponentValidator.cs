@@ -25,10 +25,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             {
                 var validator = validatorFactory(component.Schema);
 
-                if (validator != null)
-                {
-                    validator.Validate(component.Data, context);
-                }
+                validator?.Validate(component.Data, context);
             }
         }
     }

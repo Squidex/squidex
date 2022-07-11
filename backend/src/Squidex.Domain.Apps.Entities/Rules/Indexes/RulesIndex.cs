@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         private static bool IsValid(IRuleEntity? rule)
         {
-            return rule != null && rule.Version > EtagVersion.Empty && !rule.IsDeleted;
+            return rule is { Version: > EtagVersion.Empty, IsDeleted: false };
         }
     }
 }

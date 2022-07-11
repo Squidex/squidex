@@ -36,7 +36,7 @@ namespace Squidex.Extensions.Text.Azure
 
                 if (indexOfDot > 0)
                 {
-                    var language = analyzer[0..indexOfDot];
+                    var language = analyzer[..indexOfDot];
 
                     var isValidLanguage =
                         language.Length == 2 ||
@@ -78,11 +78,11 @@ namespace Squidex.Extensions.Text.Azure
             {
                 new SimpleField("docId", SearchFieldDataType.String)
                 {
-                    IsKey = true,
+                    IsKey = true
                 },
                 new SimpleField("appId", SearchFieldDataType.String)
                 {
-                    IsFilterable = true,
+                    IsFilterable = true
                 },
                 new SimpleField("appName", SearchFieldDataType.String)
                 {

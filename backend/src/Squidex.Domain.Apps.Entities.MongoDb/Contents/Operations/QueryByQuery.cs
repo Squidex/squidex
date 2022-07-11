@@ -216,12 +216,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         private static bool IsSatisfiedByIndex(ClrQuery query)
         {
-            return query.Sort != null &&
-                query.Sort.Count == 2 &&
-                query.Sort[0].Path.ToString() == "mt" &&
-                query.Sort[0].Order == SortOrder.Descending &&
-                query.Sort[1].Path.ToString() == "id" &&
-                query.Sort[1].Order == SortOrder.Ascending;
+            return query.Sort is { Count: 2 } && query.Sort[0].Path.ToString() == "mt" && query.Sort[0].Order == SortOrder.Descending && query.Sort[1].Path.ToString() == "id" && query.Sort[1].Order == SortOrder.Ascending;
         }
 
         private static FilterDefinition<MongoContentEntity> BuildFilter(DomainId appId, DomainId schemaId, FilterNode<ClrValue>? filter)

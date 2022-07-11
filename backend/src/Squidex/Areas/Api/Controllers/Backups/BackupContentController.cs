@@ -77,7 +77,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         {
             var backup = await backupservice.GetBackupAsync(appId, id, HttpContext.RequestAborted);
 
-            if (backup == null || backup.Status != JobStatus.Completed)
+            if (backup is not { Status: JobStatus.Completed })
             {
                 return NotFound();
             }

@@ -7,24 +7,19 @@
 
 using System.Collections.Immutable;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
-    public sealed record ValidationContext
+    public sealed record ValidationContext(RootContext Root)
     {
-        public ImmutableQueue<string> Path { get; private set; } = ImmutableQueue<string>.Empty;
+        public ImmutableQueue<string> Path { get; init; } = ImmutableQueue<string>.Empty;
 
         public bool IsOptional { get; init; }
-
-        public RootContext Root { get; }
 
         public ValidationMode Mode { get; init; }
 
         public ValidationAction Action { get; init; }
-
-        public ValidationContext(RootContext rootContext)
-        {
-            Root = rootContext;
-        }
 
         public void AddError(IEnumerable<string> path, string message)
         {

@@ -76,7 +76,7 @@ namespace Squidex.Config.Domain
                 {
                     Settings = new AppSettings
                     {
-                        Patterns = ReadonlyList.ToReadonlyList(patterns)
+                        Patterns = patterns.ToReadonlyList()
                     }
                 };
             });

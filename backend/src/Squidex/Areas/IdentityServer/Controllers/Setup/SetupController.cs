@@ -126,7 +126,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
 
             if (url.EndsWith(Constants.PrefixIdentityServer, StringComparison.Ordinal))
             {
-                url = url[0..^Constants.PrefixIdentityServer.Length];
+                url = url[..^Constants.PrefixIdentityServer.Length];
             }
 
             return url.TrimEnd('/');

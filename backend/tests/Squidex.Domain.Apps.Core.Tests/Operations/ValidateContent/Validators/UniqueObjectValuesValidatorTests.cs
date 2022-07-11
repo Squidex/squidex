@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
                     .Add("myNumber", 1),
                 new JsonObject()
                     .Add("myString", "1")
-                    .Add("myNumber", 1),
+                    .Add("myNumber", 1)
             },
             errors);
 

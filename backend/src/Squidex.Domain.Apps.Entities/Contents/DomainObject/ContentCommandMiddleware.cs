@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             var payload = await base.EnrichResultAsync(context, result, ct);
 
-            if (payload is IContentEntity content && payload is not IEnrichedContentEntity)
+            if (payload is IContentEntity content and not IEnrichedContentEntity)
             {
                 payload = await contentEnricher.EnrichAsync(content, true, contextProvider.Context, ct);
             }

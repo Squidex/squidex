@@ -25,9 +25,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         public override bool Read()
         {
-            if (bsonReader.State == BsonReaderState.Initial ||
-                bsonReader.State == BsonReaderState.ScopeDocument ||
-                bsonReader.State == BsonReaderState.Type)
+            if (bsonReader.State is BsonReaderState.Initial or BsonReaderState.ScopeDocument or BsonReaderState.Type)
             {
                 bsonReader.ReadBsonType();
             }

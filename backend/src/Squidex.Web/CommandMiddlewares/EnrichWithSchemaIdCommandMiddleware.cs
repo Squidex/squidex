@@ -30,7 +30,7 @@ namespace Squidex.Web.CommandMiddlewares
                 return next(context, ct);
             }
 
-            if (context.Command is ISchemaCommand schemaCommand && schemaCommand.SchemaId == null)
+            if (context.Command is ISchemaCommand { SchemaId: null } schemaCommand)
             {
                 var schemaId = GetSchemaId();
 

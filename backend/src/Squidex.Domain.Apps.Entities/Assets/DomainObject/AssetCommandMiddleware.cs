@@ -159,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             await using (var uploadStream = command.File.OpenRead())
             {
-                using (var hashStream = new HasherStream(uploadStream, HashAlgorithmName.SHA256))
+                await using (var hashStream = new HasherStream(uploadStream, HashAlgorithmName.SHA256))
                 {
                     await assetFileStore.UploadAsync(tempFile, hashStream, ct);
 

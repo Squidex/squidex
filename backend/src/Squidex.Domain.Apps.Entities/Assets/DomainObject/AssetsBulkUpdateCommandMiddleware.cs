@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                             results,
                             ct);
 
-                        if (!await createCommandsBlock.SendAsync(task))
+                        if (!await createCommandsBlock.SendAsync(task, ct))
                         {
                             break;
                         }

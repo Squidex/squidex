@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         {
             context.Schedule(async (scheduler, ct) =>
             {
-                var result = await counterService.IncrementAsync(appId, name);
+                var result = await counterService.IncrementAsync(appId, name, ct);
 
                 if (callback != null)
                 {
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         {
             context.Schedule(async (scheduler, ct) =>
             {
-                var result = await counterService.ResetAsync(appId, name, value);
+                var result = await counterService.ResetAsync(appId, name, value, ct);
 
                 if (callback != null)
                 {

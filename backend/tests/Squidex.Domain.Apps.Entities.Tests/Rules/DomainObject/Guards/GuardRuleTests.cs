@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
                 {
                     Url = validUrl
                 },
-                Trigger = null!,
+                Trigger = null!
             });
 
             await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, appProvider),
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
                 {
                     Schemas = ReadonlyList.Empty<ContentChangedTriggerSchemaV2>()
                 },
-                Action = null!,
+                Action = null!
             });
 
             await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, appProvider),

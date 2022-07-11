@@ -9,7 +9,5 @@
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed record AssetDuplicate(IEnrichedAssetEntity Asset)
-    {
-    }
+    public sealed record AssetDuplicate(IEnrichedAssetEntity Asset);
 }

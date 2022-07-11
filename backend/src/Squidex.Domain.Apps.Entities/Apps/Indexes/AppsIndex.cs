@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private static bool IsValid(IAppEntity? app)
         {
-            return app != null && app.Version > EtagVersion.Empty && !app.IsDeleted;
+            return app is { Version: > EtagVersion.Empty, IsDeleted: false };
         }
 
         private Task InvalidateItAsync(DomainId id, string name)

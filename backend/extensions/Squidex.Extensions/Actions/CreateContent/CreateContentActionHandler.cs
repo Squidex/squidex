@@ -78,7 +78,7 @@ namespace Squidex.Extensions.Actions.CreateContent
 
             await commandBus.PublishAsync(command, ct);
 
-            return Result.Success($"Created to: {job.SchemaId.Name}");
+            return Result.Success($"Created to: {command.SchemaId.Name}");
         }
     }
 }

@@ -29,10 +29,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
                 case DeleteRule deleteRule:
                     await messaging.PublishAsync(new UsageTrackingRemove(deleteRule.RuleId), ct: default);
                     break;
-                case CreateRule createRule when createRule.Trigger is UsageTrigger usage:
+                case CreateRule { Trigger: UsageTrigger usage } createRule:
                     await messaging.PublishAsync(new UsageTrackingAdd(createRule.RuleId, createRule.AppId, usage.Limit, usage.NumDays), ct: default);
                     break;
-                case UpdateRule ruleUpdated when ruleUpdated.Trigger is UsageTrigger usage:
+                case UpdateRule { Trigger: UsageTrigger usage } ruleUpdated:
                     await messaging.PublishAsync(new UsageTrackingUpdate(ruleUpdated.RuleId, usage.Limit, usage.NumDays), ct: default);
                     break;
             }

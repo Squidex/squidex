@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 asset = await GetAsync(uniqueId, version, ct);
             }
 
-            if (asset == null || asset.Version <= EtagVersion.Empty || (version > EtagVersion.Any && asset.Version != version))
+            if (asset is not { Version: > EtagVersion.Empty } || (version > EtagVersion.Any && asset.Version != version))
             {
                 return null;
             }

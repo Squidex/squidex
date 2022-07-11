@@ -33,13 +33,13 @@ namespace Migrations.OldEvents
         {
             var newSettings = new AppSettings
             {
-                Patterns = ReadonlyList.ToReadonlyList(new List<Pattern>(state.Settings.Patterns.Where(x => x.Name != Name || x.Regex != Pattern))
+                Patterns = new List<Pattern>(state.Settings.Patterns.Where(x => x.Name != Name || x.Regex != Pattern))
                 {
                     new Pattern(Name, Pattern)
                     {
                         Message = Message
                     }
-                }),
+                }.ToReadonlyList(),
                 Editors = state.Settings.Editors
             };
 

@@ -17,10 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly List<string> forAppWithoutSchemas = new List<string>();
         private readonly IAppProvider appProvider;
 
-        static RolePermissionsProvider()
-        {
-        }
-
         public RolePermissionsProvider(IAppProvider appProvider)
         {
             this.appProvider = appProvider;

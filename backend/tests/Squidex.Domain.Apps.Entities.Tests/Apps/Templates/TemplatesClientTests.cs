@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             var templates = await sut.GetTemplatesAsync();
 
             Assert.NotEmpty(templates);
-            Assert.Contains(templates, x => x.IsStarter == true);
+            Assert.Contains(templates, x => x.IsStarter);
         }
 
         [Fact]

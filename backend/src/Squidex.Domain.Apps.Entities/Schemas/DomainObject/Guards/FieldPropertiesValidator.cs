@@ -157,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                     nameof(properties.Editor));
             }
 
-            if ((properties.Editor == NumberFieldEditor.Radio || properties.Editor == NumberFieldEditor.Dropdown) && properties.AllowedValues?.Any() != true)
+            if (properties.Editor is NumberFieldEditor.Radio or NumberFieldEditor.Dropdown && properties.AllowedValues?.Any() != true)
             {
                 yield return new ValidationError(T.Get("schemas.stringEditorsNeedAllowedValuesError"),
                     nameof(properties.AllowedValues));
@@ -215,7 +215,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                     nameof(properties.ContentType));
             }
 
-            if ((properties.Editor == StringFieldEditor.Radio || properties.Editor == StringFieldEditor.Dropdown) && properties.AllowedValues?.Any() != true)
+            if (properties.Editor is StringFieldEditor.Radio or StringFieldEditor.Dropdown && properties.AllowedValues?.Any() != true)
             {
                 yield return new ValidationError(T.Get("schemas.stringEditorsNeedAllowedValuesError"),
                     nameof(properties.AllowedValues));
@@ -264,7 +264,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                     nameof(properties.Editor));
             }
 
-            if ((properties.Editor == TagsFieldEditor.Checkboxes || properties.Editor == TagsFieldEditor.Dropdown) && properties.AllowedValues?.Any() != true)
+            if (properties.Editor is TagsFieldEditor.Checkboxes or TagsFieldEditor.Dropdown && properties.AllowedValues?.Any() != true)
             {
                 yield return new ValidationError(T.Get("schemas.tags.editorNeedsAllowedValues"),
                     nameof(properties.AllowedValues));

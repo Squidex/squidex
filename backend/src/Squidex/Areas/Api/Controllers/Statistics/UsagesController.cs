@@ -70,6 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         {
             var token = dataProtector.Protect(App.Id.ToString());
 
+            // Generate an URL with a encrypted token to provide a normal GET link without authorization infos.
             var url = urlGenerator.BuildUrl($"/api/apps/log/{token}/");
 
             var response = new LogDownloadDto { DownloadUrl = url };
@@ -81,8 +82,8 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         /// Get api calls in date range.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="dateFrom">The from date.</param>
-        /// <param name="dateTo">The to date.</param>
+        /// <param name="fromDate">The from date.</param>
+        /// <param name="toDate">The to date.</param>
         /// <returns>
         /// 200 => API call returned.
         /// 404 => App not found.
@@ -93,15 +94,17 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [ProducesResponseType(typeof(CallsUsageDtoDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppUsage)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetUsages(string app, DateTime dateFrom, DateTime dateTo)
+        public async Task<IActionResult> GetUsages(string app, DateTime fromDate, DateTime toDate)
         {
-            if (dateFrom > dateTo && (dateTo - dateFrom).TotalDays > 100)
+            // We can only query 100 logs for up to 100 days.
+            if (fromDate > toDate && (toDate - fromDate).TotalDays > 100)
             {
                 return BadRequest();
             }
 
-            var (summary, details) = await usageTracker.QueryAsync(AppId.ToString(), dateFrom.Date, dateTo.Date, HttpContext.RequestAborted);
+            var (summary, details) = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date, HttpContext.RequestAborted);
 
+            // Use the current app plan to show the limits to the user.
             var (plan, _) = appPlansProvider.GetPlanForApp(App);
 
             var response = CallsUsageDtoDto.FromDomain(plan, summary, details);
@@ -126,6 +129,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         {
             var size = await assetStatsRepository.GetTotalSizeAsync(AppId);
 
+            // Use the current app plan to show the limits to the user.
             var (plan, _) = appPlansProvider.GetPlanForApp(App);
 
             var response = new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize };
@@ -168,6 +172,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult GetLogFile(string token)
         {
+            // Decrypt the token that has previously been generated.
             var appId = DomainId.Create(dataProtector.Unprotect(token));
 
             var fileDate = DateTime.UtcNow.Date;

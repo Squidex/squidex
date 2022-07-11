@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
                 Tags = new HashSet<string> { "image" },
                 TotalSize = 1024 * 2,
                 Type = AssetType.Image,
-                Version = 42,
+                Version = 42
             };
 
             var snapshotJob = new SnapshotWriteJob<AssetDomainObject.State>(source.UniqueId, source, source.Version);
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
                 LastModified = time,
                 LastModifiedBy = user,
                 ParentId = DomainId.NewGuid(),
-                Version = 42,
+                Version = 42
             };
 
             var snapshotJob = new SnapshotWriteJob<AssetFolderDomainObject.State>(source.UniqueId, source, source.Version);

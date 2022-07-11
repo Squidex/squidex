@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         protected override bool CanAcceptCreation(ICommand command)
         {
-            return command is CreateContent || command is UpsertContent;
+            return command is CreateContent or UpsertContent;
         }
 
         protected override bool CanRecreate()
@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         return Snapshot;
                     }, ct);
 
-                case DeleteContent deleteContent when deleteContent.Permanent:
+                case DeleteContent { Permanent: true } deleteContent:
                     return DeletePermanentAsync(deleteContent, async (c, ct) =>
                     {
                         var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);

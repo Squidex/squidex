@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.Migrations
                     UpsertFind,
                     ct);
 
-            return entity == null || !entity.IsLocked;
+            return entity is not { IsLocked: true };
         }
 
         public Task CompleteAsync(int newVersion,

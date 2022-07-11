@@ -127,9 +127,7 @@ namespace Squidex.Infrastructure.Commands
             {
                 try
                 {
-#pragma warning disable MA0040 // Flow the cancellation token
-                    await persistence.WriteSnapshotAsync(Snapshot);
-#pragma warning restore MA0040 // Flow the cancellation token
+                    await persistence.WriteSnapshotAsync(Snapshot, default);
                 }
                 catch (Exception ex)
                 {

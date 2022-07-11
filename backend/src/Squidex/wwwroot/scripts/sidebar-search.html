@@ -69,9 +69,7 @@
             var search = instantsearch({ indexName: 'test', searchClient });
 
             document.addEventListener('click', event => {
-                if (event.target.matches('.button-click')) {
-                    var id = event.target.getAttribute('data-object-id');
-
+                if (event.target.matches('.button-click')) {  
                     // We cannot directly navigate to in the iframe because it would only change the URL of the iframe.
                     plugin.navigate(`/app/${context.appName}/content/${context.schemaName}`);
                     // plugin.navigate(`/app/${context.appName}/content/${context.schemaName}/${id}`);

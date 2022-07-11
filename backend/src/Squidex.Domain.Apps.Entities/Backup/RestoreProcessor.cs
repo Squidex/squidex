@@ -381,7 +381,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 if (newStream != null)
                 {
-                    if (!await batchBlock.SendAsync((newStream, job.Event)))
+                    if (!await batchBlock.SendAsync((newStream, job.Event), ct))
                     {
                         break;
                     }
@@ -416,7 +416,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 run.StreamMapper = new StreamMapper(run.Context);
             }
 
-            if (@event.Payload is SquidexEvent squidexEvent && squidexEvent.Actor != null)
+            if (@event.Payload is SquidexEvent { Actor: { } } squidexEvent)
             {
                 if (run.Context.UserMapping.TryMap(squidexEvent.Actor, out var newUser))
                 {

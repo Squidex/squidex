@@ -240,7 +240,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
         private IEnumerable<PublishDto> CreateRequests(Envelope<AppEvent> appEvent, HistoryEvent? historyEvent)
         {
-            if (appEvent.Payload is CommentCreated comment && comment.Mentions?.Length > 0)
+            if (appEvent.Payload is CommentCreated { Mentions.Length: > 0 } comment)
             {
                 foreach (var userId in comment.Mentions)
                 {
@@ -267,7 +267,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
             publishRequest.Properties["SquidexApp"] = payload.AppId.Name;
 
-            if (payload is ContentEvent @event && payload is not ContentDeleted)
+            if (payload is ContentEvent @event and not ContentDeleted)
             {
                 var url = urlGenerator.ContentUI(@event.AppId, @event.SchemaId, @event.ContentId);
 

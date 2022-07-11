@@ -41,8 +41,7 @@ namespace Squidex.Infrastructure.MongoDb
                 case BsonType.Binary:
                     var binary = context.Reader.ReadBinaryData();
 
-                    if (binary.SubType == BsonBinarySubType.UuidLegacy ||
-                        binary.SubType == BsonBinarySubType.UuidStandard)
+                    if (binary.SubType is BsonBinarySubType.UuidLegacy or BsonBinarySubType.UuidStandard)
                     {
                         return DomainId.Create(binary.ToGuid());
                     }

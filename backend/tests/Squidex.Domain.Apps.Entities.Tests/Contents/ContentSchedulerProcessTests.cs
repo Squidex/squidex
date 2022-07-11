@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 AppId = appId,
                 Id = DomainId.NewGuid(),
-                ScheduleJob = null,
+                ScheduleJob = null
             };
 
             A.CallTo(() => clock.GetCurrentInstant())

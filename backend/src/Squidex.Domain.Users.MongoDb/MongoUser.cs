@@ -54,7 +54,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         internal void AddClaims(IEnumerable<Claim> claims)
         {
-            claims.Foreach(x => AddClaim(x));
+            claims.Foreach(AddClaim);
         }
 
         internal void AddToken(string provider, string name, string value)
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         internal void RemoveClaims(IEnumerable<Claim> claims)
         {
-            claims.Foreach(x => RemoveClaim(x));
+            claims.Foreach(RemoveClaim);
         }
 
         internal void ReplaceClaim(Claim existingClaim, Claim newClaim)

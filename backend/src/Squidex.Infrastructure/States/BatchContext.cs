@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.States
         private readonly IEventStore eventStore;
         private readonly IEventStreamNames eventStreamNames;
         private readonly ISnapshotStore<T> snapshotStore;
-        private readonly Dictionary<DomainId, (long, List<Envelope<IEvent>>)> @events = new Dictionary<DomainId, (long, List<Envelope<IEvent>>)>();
+        private readonly Dictionary<DomainId, (long, List<Envelope<IEvent>>)> events = new Dictionary<DomainId, (long, List<Envelope<IEvent>>)>();
         private Dictionary<DomainId, SnapshotWriteJob<T>>? snapshots;
 
         public ISnapshotStore<T> Snapshots => snapshotStore;

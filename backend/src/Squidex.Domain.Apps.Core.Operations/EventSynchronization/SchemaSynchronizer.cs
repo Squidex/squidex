@@ -175,7 +175,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                             new FieldEnabled { FieldId = id };
                     }
 
-                    if ((sourceField == null || sourceField is IArrayField) && targetField is IArrayField targetArrayField)
+                    if (sourceField is null or IArrayField && targetField is IArrayField targetArrayField)
                     {
                         var fields = (sourceField as IArrayField)?.FieldCollection ?? FieldCollection<NestedField>.Empty;
 

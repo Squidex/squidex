@@ -9,7 +9,5 @@
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed record Editor(string Name, string Url)
-    {
-    }
+    public sealed record Editor(string Name, string Url);
 }

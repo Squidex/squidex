@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.Collections
         private static class Empties<T>
         {
 #pragma warning disable SA1401 // Fields should be private
-            public static ReadonlyList<T> Instance = new ReadonlyList<T>();
+            public static readonly ReadonlyList<T> Instance = new ReadonlyList<T>();
 #pragma warning restore SA1401 // Fields should be private
         }
 

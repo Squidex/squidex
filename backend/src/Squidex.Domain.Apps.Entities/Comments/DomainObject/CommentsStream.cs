@@ -27,10 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         private long version = EtagVersion.Empty;
         private string streamName;
 
-        private long Version
-        {
-            get => version;
-        }
+        private long Version => version;
 
         public CommentsStream(
             DomainId key,

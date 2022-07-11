@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.TestHelpers
         private HandleSnapshot<T>? handleSnapshot;
         private HandleEvent? handleEvent;
 
-        public IPersistenceFactory<T> PersistenceFactory { get; private set; }
+        public IPersistenceFactory<T> PersistenceFactory { get; }
 
         public IPersistence<T> Persistence { get; } = A.Fake<IPersistence<T>>();
 

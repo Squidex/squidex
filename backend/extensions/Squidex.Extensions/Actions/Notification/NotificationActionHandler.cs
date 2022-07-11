@@ -74,19 +74,19 @@ namespace Squidex.Extensions.Actions.Notification
         protected override async Task<Result> ExecuteJobAsync(CreateComment job,
             CancellationToken ct = default)
         {
-            if (job.CommentsId == default)
+            var command = job;
+
+            if (command.CommentsId == default)
             {
                 return Result.Ignored();
             }
-
-            var command = job;
 
             command.AppId = NoApp;
             command.FromRule = true;
 
             await commandBus.PublishAsync(command, ct);
 
-            return Result.Success($"Notified: {job.Text}");
+            return Result.Success($"Notified: {command.Text}");
         }
     }
 }

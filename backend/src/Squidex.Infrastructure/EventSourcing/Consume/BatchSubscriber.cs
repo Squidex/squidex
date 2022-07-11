@@ -95,7 +95,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
                 {
                     switch (task)
                     {
-                        case ErrorJob error when error.Exception is not OperationCanceledException:
+                        case ErrorJob { Exception: not OperationCanceledException } error:
                             {
                                 await processor.OnErrorAsync(this, error.Exception);
                                 break;

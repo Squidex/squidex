@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 if (version > EtagVersion.Empty)
                 {
-                    content = await contentLoader.GetAsync(context.App.Id, id, version);
+                    content = await contentLoader.GetAsync(context.App.Id, id, version, ct);
                 }
                 else
                 {
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 var contents = await QueryCoreAsync(context, q, schema, ct);
 
-                if (q.Ids != null && q.Ids.Count > 0)
+                if (q.Ids is { Count: > 0 })
                 {
                     contents = contents.SortSet(x => x.Id, q.Ids);
                 }
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 var contents = await QueryCoreAsync(context, q, schemas, ct);
 
-                if (q.Ids != null && q.Ids.Count > 0)
+                if (q.Ids is { Count: > 0 })
                 {
                     contents = contents.SortSet(x => x.Id, q.Ids);
                 }

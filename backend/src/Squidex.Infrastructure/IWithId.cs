@@ -7,7 +7,7 @@
 
 namespace Squidex.Infrastructure
 {
-    public interface IWithId<T>
+    public interface IWithId<out T>
     {
         T Id { get; }
     }

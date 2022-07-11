@@ -32,8 +32,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
 
         public override FilterNode<ClrValue> Visit(CompareFilter<ClrValue> nodeIn, Args args)
         {
-            var result = nodeIn;
-
             var (path, _, value) = nodeIn;
 
             var clrValue = value.Value;
@@ -77,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
                 }
             }
 
-            return result with { Path = path, Value = value };
+            return nodeIn with { Path = path, Value = value };
         }
     }
 }

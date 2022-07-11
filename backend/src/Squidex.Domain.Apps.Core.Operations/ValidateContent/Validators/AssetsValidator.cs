@@ -130,9 +130,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 context.AddError(path, T.Get("contents.validation.maximumSize", new { size = asset.FileSize.ToReadableSize(), max }));
             }
 
-            if (properties.AllowedExtensions != null &&
-                properties.AllowedExtensions.Count > 0 &&
-               !properties.AllowedExtensions.Any(x => asset.FileName.EndsWith("." + x, StringComparison.OrdinalIgnoreCase)))
+            if (properties.AllowedExtensions is { Count: > 0 } && !properties.AllowedExtensions.Any(x => asset.FileName.EndsWith("." + x, StringComparison.OrdinalIgnoreCase)))
             {
                 context.AddError(path, T.Get("contents.validation.extension"));
             }

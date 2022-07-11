@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var existing = await schemaRepository.FindAsync(command.AppId.Id, command.Name, ct);
 
-            if (existing != null && !existing.IsDeleted)
+            if (existing is { IsDeleted: false })
             {
                 throw new ValidationException(T.Get("schemas.nameAlreadyExists"));
             }
@@ -208,7 +208,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         private static bool IsValid(ISchemaEntity? schema)
         {
-            return schema != null && schema.Version > EtagVersion.Empty && !schema.IsDeleted;
+            return schema is { Version: > EtagVersion.Empty, IsDeleted: false };
         }
 
         private Task InvalidateItAsync(DomainId appId, DomainId id, string name)

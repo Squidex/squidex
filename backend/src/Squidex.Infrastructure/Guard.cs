@@ -193,7 +193,7 @@ namespace Squidex.Infrastructure
         {
             NotNull(target, parameterName);
 
-            if (target != null && target.Count == 0)
+            if (target is { Count: 0 })
             {
                 ThrowHelper.ArgumentException("Collection does not contain an item.", parameterName);
                 return default!;
