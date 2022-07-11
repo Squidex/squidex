@@ -158,11 +158,16 @@ jobs:
           docker tag squidex-tmp squidex/squidex:${{ env.GITHUB_REF_SLUG }}
           docker tag squidex-tmp squidex/squidex:${{ steps.version.outputs._0 }}
 
-      - name: Push Tags
+      - name: Push Version
         run: |
           docker push squidex/squidex:latest
           docker push squidex/squidex:${{ env.GITHUB_REF_SLUG }}
           docker push squidex/squidex:${{ steps.version.outputs._0 }}
+
+      - name: Push Latest
+        run: |
+          docker push squidex/squidex:latest
+        if: $${{ !contains(env.GITHUB_REF_SLUG, '-rc') && !contains('env.GITHUB_REF_SLUG', '-beta') }}
 
   release:
     needs: publish
