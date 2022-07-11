@@ -27,6 +27,11 @@ namespace Squidex.Infrastructure
 
         public static string FileType(this string fileName)
         {
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                return "blob";
+            }
+
             try
             {
                 var fileInfo = new FileInfo(fileName);

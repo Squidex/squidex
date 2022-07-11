@@ -299,7 +299,7 @@ namespace TestSuite.ApiTests
                     return _.Contents.CreateAsync(new TestEntityData { Number = 1 }, options);
                 });
 
-                Assert.Contains("\"statusCode\":409", ex.Message, StringComparison.Ordinal);
+                Assert.Equal(409, ex.StatusCode);
             }
             finally
             {
