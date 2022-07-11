@@ -20,9 +20,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
     {
         private readonly Dictionary<DomainId, Task<RuleRunnerProcessor>> processors = new Dictionary<DomainId, Task<RuleRunnerProcessor>>();
         private readonly Func<DomainId, RuleRunnerProcessor> processorFactory;
-        private readonly ISnapshotStore<RuleRunnerJob> snapshotStore;
+        private readonly ISnapshotStore<RuleRunnerState> snapshotStore;
 
-        public RuleRunnerWorker(IServiceProvider serviceProvider, ISnapshotStore<RuleRunnerJob> snapshotStore)
+        public RuleRunnerWorker(IServiceProvider serviceProvider, ISnapshotStore<RuleRunnerState> snapshotStore)
         {
             var objectFactory = ActivatorUtilities.CreateFactory(typeof(RuleRunnerProcessor), new[] { typeof(DomainId) });
 
