@@ -49,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [AllowAnonymous]
         public Task<IActionResult> GetBackupContent(string app, DomainId id)
         {
-            return BackBackupAsync(AppId, app, id);
+            return GetBackupAsync(AppId, app, id);
         }
 
         /// <summary>
@@ -70,10 +70,10 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [AllowAnonymous]
         public Task<IActionResult> GetBackupContentV2(DomainId id, [FromQuery] DomainId appId = default, [FromQuery] string app = "")
         {
-            return BackBackupAsync(appId, app, id);
+            return GetBackupAsync(appId, app, id);
         }
 
-        private async Task<IActionResult> BackBackupAsync(DomainId appId, string app, DomainId id)
+        private async Task<IActionResult> GetBackupAsync(DomainId appId, string app, DomainId id)
         {
             var backup = await backupservice.GetBackupAsync(appId, id, HttpContext.RequestAborted);
 
