@@ -250,10 +250,13 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         }
 
         [Fact]
-        public async Task Should_invoke_and_update_position_if_event_received_batched()
+        public async Task Should_invoke_and_update_position_if_events_received_batched()
         {
             A.CallTo(() => eventConsumer.BatchSize)
-                .Returns(100);
+                .Returns(5);
+
+            A.CallTo(() => eventConsumer.BatchDelay)
+                .Returns(int.MaxValue);
 
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();

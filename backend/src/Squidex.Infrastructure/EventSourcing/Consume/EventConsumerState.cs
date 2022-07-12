@@ -7,19 +7,13 @@
 
 using Squidex.Infrastructure.Reflection;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Infrastructure.EventSourcing.Consume
 {
-    public sealed class EventConsumerState
+    public sealed record EventConsumerState(string? Position, int Count, bool IsStopped = false, string? Error = null)
     {
-        public static readonly EventConsumerState Initial = new EventConsumerState();
-
-        public bool IsStopped { get; init; }
-
-        public string? Error { get; init; }
-
-        public string? Position { get; init; }
-
-        public int Count { get; init; }
+        public static readonly EventConsumerState Initial = new EventConsumerState(null, 0);
 
         public bool IsPaused
         {
@@ -32,14 +26,8 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         }
 
         public EventConsumerState()
+            : this(null, 0)
         {
-        }
-
-        public EventConsumerState(string? position, int count)
-        {
-            Position = position;
-
-            Count = count;
         }
 
         public EventConsumerState Handled(string position, int offset = 1)
@@ -49,7 +37,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
         public EventConsumerState Stopped(Exception? ex = null)
         {
-            return new EventConsumerState(Position, Count) { IsStopped = true, Error = ex?.Message };
+            return new EventConsumerState(Position, Count, true, ex?.Message);
         }
 
         public EventConsumerState Started()
@@ -59,7 +47,10 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
         public EventConsumerInfo ToInfo(string name)
         {
-            return SimpleMapper.Map(this, new EventConsumerInfo { Name = name });
+            return SimpleMapper.Map(this, new EventConsumerInfo
+            {
+                Name = name
+            });
         }
     }
 }

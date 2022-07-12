@@ -175,6 +175,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
         private async Task UpdateAsync(Func<Task> action, string? position, [CallerMemberName] string? caller = null)
         {
+            // We do not want to deal with concurrency in this class, therefore we just use a lock.
             using (await asyncLock.EnterAsync())
             {
                 var previousState = State;
@@ -200,7 +201,8 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
                     State = previousState.Stopped(ex);
                 }
 
-                if (State != previousState)
+                // The state is a record, therefore we can check for value equality.
+                if (!Equals(previousState, State))
                 {
                     await state.WriteAsync();
                 }
