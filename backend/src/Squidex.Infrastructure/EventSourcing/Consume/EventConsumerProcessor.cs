@@ -12,11 +12,11 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Consume
 {
-    public class EventConsumerProcessor
+    public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
     {
         private readonly SimpleState<EventConsumerState> state;
         private readonly IEventFormatter eventFormatter;
-        private readonly IEventConsumer? eventConsumer;
+        private readonly IEventConsumer eventConsumer;
         private readonly IEventStore eventStore;
         private readonly ILogger<EventConsumerProcessor> log;
         private readonly AsyncLock asyncLock = new AsyncLock();
@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
         public virtual async Task CompleteAsync()
         {
-            if (currentSubscription is BatchSubscriber batchSubscriber)
+            if (currentSubscription is BatchSubscription batchSubscriber)
             {
                 try
                 {
@@ -64,24 +64,24 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             }
         }
 
-        public virtual Task OnEventsAsync(IEventSubscription subscription, IReadOnlyList<Envelope<IEvent>> events, string position)
+        public virtual async ValueTask OnNextAsync(IEventSubscription subscription, ParsedEvents @event)
         {
-            return UpdateAsync(async () =>
+            await UpdateAsync(async () =>
             {
                 if (!ReferenceEquals(subscription, currentSubscription))
                 {
                     return;
                 }
 
-                await DispatchAsync(events);
+                await DispatchAsync(@event.Events);
 
-                State = State.Handled(position, events.Count);
+                State = State.Handled(@event.Position, @event.Events.Count);
             }, State.Position);
         }
 
-        public virtual Task OnErrorAsync(IEventSubscription subscription, Exception exception)
+        public virtual async ValueTask OnErrorAsync(IEventSubscription subscription, Exception exception)
         {
-            return UpdateAsync(() =>
+            await UpdateAsync(() =>
             {
                 if (!ReferenceEquals(subscription, currentSubscription))
                 {
@@ -238,7 +238,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         {
             if (currentSubscription == null)
             {
-                currentSubscription = CreateSubscription();
+                currentSubscription = CreateRetrySubscription(this);
             }
             else
             {
@@ -246,17 +246,18 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             }
         }
 
-        private IEventSubscription CreateSubscription()
+        protected IEventSubscription CreatePipeline(IEventSubscriber<ParsedEvents> subscriber)
         {
-            return new BatchSubscriber(this, eventFormatter, eventConsumer!, CreateRetrySubscription);
+            return new BatchSubscription(eventConsumer, subscriber,
+                x => new ParseSubscription(eventConsumer, eventFormatter, x, CreateSubscription));
         }
 
-        protected virtual IEventSubscription CreateRetrySubscription(IEventSubscriber subscriber)
+        protected virtual IEventSubscription CreateRetrySubscription(IEventSubscriber<ParsedEvents> subscriber)
         {
-            return new RetrySubscription(subscriber, CreateSubscription);
+            return new RetrySubscription<ParsedEvents>(subscriber, CreatePipeline);
         }
 
-        protected virtual IEventSubscription CreateSubscription(IEventSubscriber subscriber)
+        protected virtual IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> subscriber)
         {
             return eventStore.CreateSubscription(subscriber, eventConsumer!.EventsFilter, State.Position);
         }

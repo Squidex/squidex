@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -9,8 +9,8 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public interface IEventSubscription : IDisposable
     {
-        void WakeUp()
-        {
-        }
+        void WakeUp();
+
+        ValueTask CompleteAsync();
     }
 }

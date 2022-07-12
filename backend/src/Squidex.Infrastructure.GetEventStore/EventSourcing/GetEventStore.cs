@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
+        public IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> subscriber, string? streamFilter = null, string? position = null)
         {
             Guard.NotNull(streamFilter);
 

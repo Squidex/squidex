@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
     {
         public sealed class MyEventConsumerProcessor : EventConsumerProcessor
         {
-            public IEventSubscriber? Subscriber { get; set; }
+            public IEventSubscriber<StoredEvent>? Subscriber { get; set; }
 
             public MyEventConsumerProcessor(
                 IPersistenceFactory<EventConsumerState> persistenceFactory,
@@ -30,12 +30,12 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             {
             }
 
-            protected override IEventSubscription CreateRetrySubscription(IEventSubscriber subscriber)
+            protected override IEventSubscription CreateRetrySubscription(IEventSubscriber<ParsedEvents> subscriber)
             {
-                return CreateSubscription(subscriber);
+                return CreatePipeline(subscriber);
             }
 
-            protected override IEventSubscription CreateSubscription(IEventSubscriber subscriber)
+            protected override IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> subscriber)
             {
                 Subscriber = subscriber;
 
@@ -65,7 +65,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
                 }
             };
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
                 .Returns(eventSubscription);
 
             A.CallTo(() => eventConsumer.Name)
@@ -108,7 +108,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
             AssertGrainState(isStopped: true, position: initialPosition);
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
                 .MustNotHaveHappened();
         }
 
@@ -122,7 +122,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
             AssertGrainState(isStopped: false, position: initialPosition);
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -138,7 +138,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
             AssertGrainState(isStopped: false, position: initialPosition);
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -152,7 +152,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
             AssertGrainState(isStopped: false, position: initialPosition);
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -198,10 +198,10 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             A.CallTo(() => eventSubscription.Dispose())
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, state.Snapshot.Position))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, state.Snapshot.Position))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, null))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, null))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -211,7 +211,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();
 
-            await OnEventAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
             await sut.CompleteAsync();
 
             AssertGrainState(isStopped: false, position: storedEvent.EventPosition, count: 1);
@@ -232,11 +232,11 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();
 
-            await OnEventAsync(eventSubscription, storedEvent);
-            await OnEventAsync(eventSubscription, storedEvent);
-            await OnEventAsync(eventSubscription, storedEvent);
-            await OnEventAsync(eventSubscription, storedEvent);
-            await OnEventAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
 
             await sut.CompleteAsync();
 
@@ -258,11 +258,11 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();
 
-            await OnEventAsync(eventSubscription, storedEvent);
-            await OnEventAsync(eventSubscription, storedEvent);
-            await OnEventAsync(eventSubscription, storedEvent);
-            await OnEventAsync(eventSubscription, storedEvent);
-            await OnEventAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
 
             await sut.CompleteAsync();
 
@@ -284,7 +284,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();
 
-            await OnEventAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
             await sut.CompleteAsync();
 
             AssertGrainState(isStopped: false, position: storedEvent.EventPosition);
@@ -305,7 +305,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();
 
-            await OnEventAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
             await sut.CompleteAsync();
 
             AssertGrainState(isStopped: false, position: storedEvent.EventPosition);
@@ -323,7 +323,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();
 
-            await sut.OnEventsAsync(A.Fake<IEventSubscription>(), new[] { envelope }.ToList(), storedEvent.EventPosition);
+            await sut.OnNextAsync(A.Fake<IEventSubscription>(), new ParsedEvents(new[] { envelope }.ToList(), storedEvent.EventPosition));
             await sut.CompleteAsync();
 
             AssertGrainState(isStopped: false, position: initialPosition);
@@ -416,7 +416,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();
 
-            await OnEventAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
             await sut.CompleteAsync();
 
             AssertGrainState(isStopped: true, position: initialPosition, error: ex.Message);
@@ -442,7 +442,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();
 
-            await OnEventAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
             await sut.CompleteAsync();
 
             AssertGrainState(isStopped: true, position: initialPosition, error: ex.Message);
@@ -468,7 +468,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();
 
-            await OnEventAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
             await sut.CompleteAsync();
 
             await sut.StopAsync();
@@ -486,7 +486,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             A.CallTo(() => eventSubscription.Dispose())
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
                 .MustHaveHappened(2, Times.Exactly);
         }
 
@@ -501,7 +501,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();
 
-            await OnEventAsync(eventSubscription, storedEvent);
+            await OnNextAsync(eventSubscription, storedEvent);
             await sut.CompleteAsync();
 
             AssertGrainState(isStopped: true, position: storedEvent.EventPosition, error: ex.Message, 1);
@@ -512,9 +512,9 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             return sut.Subscriber?.OnErrorAsync(subscription, exception) ?? default;
         }
 
-        private ValueTask OnEventAsync(IEventSubscription subscription, StoredEvent @event)
+        private ValueTask OnNextAsync(IEventSubscription subscription, StoredEvent @event)
         {
-            return sut.Subscriber?.OnEventAsync(subscription, @event) ?? default;
+            return sut.Subscriber?.OnNextAsync(subscription, @event) ?? default;
         }
 
         private void AssertGrainState(bool isStopped = false, string? position = null, string? error = null, int count = 0)

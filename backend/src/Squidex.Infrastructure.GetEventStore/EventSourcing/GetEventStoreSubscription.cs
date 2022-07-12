@@ -7,6 +7,7 @@
 
 using EventStore.Client;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -16,7 +17,7 @@ namespace Squidex.Infrastructure.EventSourcing
         private StreamSubscription subscription;
 
         public GetEventStoreSubscription(
-            IEventSubscriber subscriber,
+            IEventSubscriber<StoredEvent> eventSubscriber,
             EventStoreClient client,
             EventStoreProjectionClient projectionClient,
             IJsonSerializer serializer,
@@ -35,7 +36,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 {
                     var storedEvent = Formatter.Read(@event, prefix, serializer);
 
-                    await subscriber.OnEventAsync(this, storedEvent);
+                    await eventSubscriber.OnNextAsync(this, storedEvent);
                 }
 
                 void OnError(StreamSubscription subscription, SubscriptionDroppedReason reason, Exception? ex)
@@ -45,7 +46,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     {
                         ex ??= new InvalidOperationException($"Subscription closed with reason {reason}.");
 
-                        subscriber.OnErrorAsync(this, ex);
+                        eventSubscriber.OnErrorAsync(this, ex).AsTask().Forget();
                     }
                 }
 
@@ -75,6 +76,15 @@ namespace Squidex.Infrastructure.EventSourcing
             subscription?.Dispose();
 
             cts.Cancel();
+        }
+
+        public ValueTask CompleteAsync()
+        {
+            return default;
+        }
+
+        public void WakeUp()
+        {
         }
     }
 }

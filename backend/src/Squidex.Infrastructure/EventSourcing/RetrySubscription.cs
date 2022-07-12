@@ -9,24 +9,25 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed class RetrySubscription : IEventSubscription, IEventSubscriber
+    public sealed class RetrySubscription<T> : IEventSubscription, IEventSubscriber<T>
     {
         private readonly RetryWindow retryWindow = new RetryWindow(TimeSpan.FromMinutes(5), 5);
         private readonly AsyncLock lockObject = new AsyncLock();
-        private readonly IEventSubscriber eventSubscriber;
-        private readonly Func<IEventSubscriber, IEventSubscription> eventSubscriptionFactory;
+        private readonly IEventSubscriber<T> eventSubscriber;
+        private readonly EventSubscriptionSource<T> eventSource;
         private CancellationTokenSource timerCancellation = new CancellationTokenSource();
         private IEventSubscription? currentSubscription;
 
         public int ReconnectWaitMs { get; set; } = 5000;
 
-        public RetrySubscription(IEventSubscriber eventSubscriber, Func<IEventSubscriber, IEventSubscription> eventSubscriptionFactory)
+        public RetrySubscription(IEventSubscriber<T> eventSubscriber,
+            EventSubscriptionSource<T> eventSource)
         {
             Guard.NotNull(eventSubscriber);
-            Guard.NotNull(eventSubscriptionFactory);
+            Guard.NotNull(eventSource);
 
             this.eventSubscriber = eventSubscriber;
-            this.eventSubscriptionFactory = eventSubscriptionFactory;
+            this.eventSource = eventSource;
 
             Subscribe();
         }
@@ -48,7 +49,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 return;
             }
 
-            currentSubscription = eventSubscriptionFactory(this);
+            currentSubscription = eventSource(this);
         }
 
         private void Unsubscribe()
@@ -72,7 +73,12 @@ namespace Squidex.Infrastructure.EventSourcing
             currentSubscription?.WakeUp();
         }
 
-        async ValueTask IEventSubscriber.OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
+        public ValueTask CompleteAsync()
+        {
+            return currentSubscription?.CompleteAsync() ?? default;
+        }
+
+        async ValueTask IEventSubscriber<T>.OnNextAsync(IEventSubscription subscription, T @event)
         {
             using (await lockObject.EnterAsync(default))
             {
@@ -81,11 +87,11 @@ namespace Squidex.Infrastructure.EventSourcing
                     return;
                 }
 
-                await eventSubscriber.OnEventAsync(this, storedEvent);
+                await eventSubscriber.OnNextAsync(this, @event);
             }
         }
 
-        async ValueTask IEventSubscriber.OnErrorAsync(IEventSubscription subscription, Exception exception)
+        async ValueTask IEventSubscriber<T>.OnErrorAsync(IEventSubscription subscription, Exception exception)
         {
             if (exception is OperationCanceledException)
             {

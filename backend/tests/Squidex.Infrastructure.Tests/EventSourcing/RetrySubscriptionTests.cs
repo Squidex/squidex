@@ -13,17 +13,17 @@ namespace Squidex.Infrastructure.EventSourcing
     public class RetrySubscriptionTests
     {
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
-        private readonly IEventSubscriber eventSubscriber = A.Fake<IEventSubscriber>();
+        private readonly IEventSubscriber<StoredEvent> eventSubscriber = A.Fake<IEventSubscriber<StoredEvent>>();
         private readonly IEventSubscription eventSubscription = A.Fake<IEventSubscription>();
-        private readonly IEventSubscriber sutSubscriber;
-        private readonly RetrySubscription sut;
+        private readonly IEventSubscriber<StoredEvent> sutSubscriber;
+        private readonly RetrySubscription<StoredEvent> sut;
 
         public RetrySubscriptionTests()
         {
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
                 .Returns(eventSubscription);
 
-            sut = new RetrySubscription(eventSubscriber, s => eventStore.CreateSubscription(s)) { ReconnectWaitMs = 50 };
+            sut = new RetrySubscription<StoredEvent>(eventSubscriber, s => eventStore.CreateSubscription(s)) { ReconnectWaitMs = 50 };
 
             sutSubscriber = sut;
         }
@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.EventSourcing
             A.CallTo(() => eventSubscription.Dispose())
                 .MustHaveHappened(2, Times.Exactly);
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
                 .MustHaveHappened(2, Times.Exactly);
 
             A.CallTo(() => eventSubscriber.OnErrorAsync(eventSubscription, A<Exception>._))
@@ -92,11 +92,11 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var @event = new StoredEvent("Stream", "1", 2, new EventData("Type", new EnvelopeHeaders(), "Payload"));
 
-            await OnEventAsync(eventSubscription, @event);
+            await OnNextAsync(eventSubscription, @event);
 
             sut.Dispose();
 
-            A.CallTo(() => eventSubscriber.OnEventAsync(sut, @event))
+            A.CallTo(() => eventSubscriber.OnNextAsync(sut, @event))
                 .MustHaveHappened();
         }
 
@@ -105,11 +105,11 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var @event = new StoredEvent("Stream", "1", 2, new EventData("Type", new EnvelopeHeaders(), "Payload"));
 
-            await OnEventAsync(A.Fake<IEventSubscription>(), @event);
+            await OnNextAsync(A.Fake<IEventSubscription>(), @event);
 
             sut.Dispose();
 
-            A.CallTo(() => eventSubscriber.OnEventAsync(A<IEventSubscription>._, A<StoredEvent>._))
+            A.CallTo(() => eventSubscriber.OnNextAsync(A<IEventSubscription>._, A<StoredEvent>._))
                 .MustNotHaveHappened();
         }
 
@@ -118,9 +118,9 @@ namespace Squidex.Infrastructure.EventSourcing
             return sutSubscriber.OnErrorAsync(subscriber, ex);
         }
 
-        private ValueTask OnEventAsync(IEventSubscription subscriber, StoredEvent ev)
+        private ValueTask OnNextAsync(IEventSubscription subscriber, StoredEvent ev)
         {
-            return sutSubscriber.OnEventAsync(subscriber, ev);
+            return sutSubscriber.OnNextAsync(subscriber, ev);
         }
     }
 }
