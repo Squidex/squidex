@@ -24,10 +24,7 @@ namespace Squidex.Areas.Api.Controllers.Translations.Models
 
         public static TranslationDto FromDomain(TranslationResult translation)
         {
-            return SimpleMapper.Map(translation, new TranslationDto
-            {
-                Result = translation.Code
-            });
+            return SimpleMapper.Map(translation, new TranslationDto { Result = translation.Code });
         }
     }
 }
