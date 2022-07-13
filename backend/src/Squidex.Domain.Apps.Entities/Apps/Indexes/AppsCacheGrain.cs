@@ -76,6 +76,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
                         result.Add(id);
                     }
+                    else if (appIds.TryGetValue(name, out var cachedId) && cachedId != DomainId.Empty)
+                    {
+                        result.Add(cachedId);
+                    }
                     else
                     {
                         appIds[name] = default;

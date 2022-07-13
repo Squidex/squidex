@@ -17,7 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
     public sealed class RulesCacheGrain : GrainBase, IRulesCacheGrain
     {
         private readonly IRuleRepository ruleRepository;
-        private List<DomainId>? ruleIds;
+        private readonly HashSet<DomainId> ruleIds = new HashSet<DomainId>();
+        private bool isLoaded;
 
         public RulesCacheGrain(IGrainIdentity grainIdentity, IRuleRepository ruleRepository)
             : base(grainIdentity)
@@ -25,32 +26,40 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
             this.ruleRepository = ruleRepository;
         }
 
+        public override Task OnActivateAsync()
+        {
+            return GetRuleIdsAsync();
+        }
+
         public async Task<IReadOnlyCollection<DomainId>> GetRuleIdsAsync()
         {
-            var ids = ruleIds;
-
-            if (ids == null)
+            if (!isLoaded)
             {
-                ids = await ruleRepository.QueryIdsAsync(Key);
+                var loaded = await ruleRepository.QueryIdsAsync(Key);
 
-                ruleIds = ids;
+                foreach (var id in loaded)
+                {
+                    ruleIds.Add(id);
+                }
+
+                isLoaded = true;
             }
 
-            return ids;
+            return ruleIds;
         }
 
         public Task AddAsync(DomainId id)
         {
-            ruleIds?.Add(id);
+            ruleIds.Add(id);
 
             return Task.CompletedTask;
         }
 
-        public Task RemoveAsync(DomainId id)
+        public async Task RemoveAsync(DomainId id)
         {
-            ruleIds?.Remove(id);
+            await GetRuleIdsAsync();
 
-            return Task.CompletedTask;
+            ruleIds.Remove(id);
         }
     }
 }

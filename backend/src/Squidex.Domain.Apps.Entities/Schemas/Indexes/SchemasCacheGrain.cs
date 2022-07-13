@@ -17,12 +17,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
     public sealed class SchemasCacheGrain : UniqueNameGrain<DomainId>, ISchemasCacheGrain
     {
         private readonly ISchemaRepository schemaRepository;
-        private Dictionary<string, DomainId>? schemaIds;
+        private readonly Dictionary<string, DomainId> schemaIds = new Dictionary<string, DomainId>();
+        private bool isLoaded;
 
         public SchemasCacheGrain(IGrainIdentity identity, ISchemaRepository schemaRepository)
             : base(identity)
         {
             this.schemaRepository = schemaRepository;
+        }
+
+        public override Task OnActivateAsync()
+        {
+            return GetIdsAsync();
         }
 
         public override async Task<string?> ReserveAsync(DomainId id, string name)
@@ -61,41 +67,38 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         private async Task<Dictionary<string, DomainId>> GetIdsAsync()
         {
-            var ids = schemaIds;
-
-            if (ids == null)
+            if (!isLoaded)
             {
-                ids = await schemaRepository.QueryIdsAsync(Key);
+                var loaded = await schemaRepository.QueryIdsAsync(Key);
 
-                schemaIds = ids;
+                foreach (var (name, id) in loaded)
+                {
+                    schemaIds[name] = id;
+                }
+
+                isLoaded = true;
             }
 
-            return ids;
+            return schemaIds;
         }
 
         public Task AddAsync(DomainId id, string name)
         {
-            if (schemaIds != null)
-            {
-                schemaIds[name] = id;
-            }
+            schemaIds[name] = id;
 
             return Task.CompletedTask;
         }
 
-        public Task RemoveAsync(DomainId id)
+        public async Task RemoveAsync(DomainId id)
         {
-            if (schemaIds != null)
+            await GetIdsAsync();
+
+            var name = schemaIds.FirstOrDefault(x => x.Value == id).Key;
+
+            if (name != null)
             {
-                var name = schemaIds.FirstOrDefault(x => x.Value == id).Key;
-
-                if (name != null)
-                {
-                    schemaIds.Remove(name);
-                }
+                schemaIds.Remove(name);
             }
-
-            return Task.CompletedTask;
         }
     }
 }
