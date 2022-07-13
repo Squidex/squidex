@@ -154,12 +154,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
             AddSelfLink(resources.Url<SchemasController>(x => nameof(x.GetSchema), values));
 
-            if (resources.CanReadContent(Name))
+            if (resources.CanReadContent(Name) && Type == SchemaType.Default)
             {
                 AddGetLink("contents", resources.Url<ContentsController>(x => nameof(x.GetContents), values));
             }
 
-            if (resources.CanCreateContent(Name))
+            if (resources.CanCreateContent(Name) && Type == SchemaType.Default)
             {
                 AddPostLink("contents/create", resources.Url<ContentsController>(x => nameof(x.PostContent), values));
                 AddPostLink("contents/create/publish", resources.Url<ContentsController>(x => nameof(x.PostContent), values) + "?publish=true");

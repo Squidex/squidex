@@ -22,6 +22,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<TempFolderBackupArchiveLocation>()
                 .As<IBackupArchiveLocation>();
 
+            services.AddSingletonAs<DefaultBackupHandlerFactory>()
+                .As<IBackupHandlerFactory>();
+
             services.AddSingletonAs<DefaultBackupArchiveStore>()
                 .As<IBackupArchiveStore>();
 
