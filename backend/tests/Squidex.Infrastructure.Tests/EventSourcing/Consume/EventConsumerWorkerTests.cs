@@ -32,15 +32,15 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         }
 
         [Fact]
-        public async Task Should_release_without_initialize()
+        public async Task Should_stop_without_start()
         {
-            await sut.ReleaseAsync(default);
+            await sut.StopAsync(default);
         }
 
         [Fact]
         public async Task Should_initialize_all_processors_on_initialize()
         {
-            await sut.InitializeAsync(default);
+            await sut.StartAsync(default);
 
             A.CallTo(() => processor1.InitializeAsync(default))
                 .MustHaveHappenedOnceExactly();
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         [Fact]
         public async Task Should_activate_all_processors_on_initialize()
         {
-            await sut.InitializeAsync(default);
+            await sut.StartAsync(default);
 
             A.CallTo(() => processor1.ActivateAsync())
                 .MustHaveHappened();

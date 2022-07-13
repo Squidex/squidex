@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         IMessageHandler<EventConsumerStart>,
         IMessageHandler<EventConsumerStop>,
         IMessageHandler<EventConsumerReset>,
-        IInitializable
+        IBackgroundProcess
     {
         private readonly Dictionary<string, EventConsumerProcessor> processors = new Dictionary<string, EventConsumerProcessor>();
         private CompletionTimer? timer;
@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             }
         }
 
-        public async Task InitializeAsync(
+        public async Task StartAsync(
             CancellationToken ct)
         {
             foreach (var (_, processor) in processors)
@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             });
         }
 
-        public Task ReleaseAsync(
+        public Task StopAsync(
             CancellationToken ct)
         {
             return timer?.StopAsync() ?? Task.CompletedTask;

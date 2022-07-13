@@ -15,10 +15,29 @@ namespace Squidex.Infrastructure.EventSourcing
         private readonly AsyncLock lockObject = new AsyncLock();
         private readonly IEventSubscriber<T> eventSubscriber;
         private readonly EventSubscriptionSource<T> eventSource;
-        private CancellationTokenSource timerCancellation = new CancellationTokenSource();
-        private IEventSubscription? currentSubscription;
+        private SubscriptionHolder? currentSubscription;
 
         public int ReconnectWaitMs { get; set; } = 5000;
+
+        // Holds all information for a current subscription. Therefore we only have to maintain one reference.
+        private sealed class SubscriptionHolder : IDisposable
+        {
+            public CancellationTokenSource Cancellation { get; } = new CancellationTokenSource();
+
+            public IEventSubscription Subscription { get; }
+
+            public SubscriptionHolder(IEventSubscription subscription)
+            {
+                Subscription = subscription;
+            }
+
+            public void Dispose()
+            {
+                Cancellation.Cancel();
+
+                Subscription.Dispose();
+            }
+        }
 
         public RetrySubscription(IEventSubscriber<T> eventSubscriber,
             EventSubscriptionSource<T> eventSource)
@@ -49,7 +68,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 return;
             }
 
-            currentSubscription = eventSource(this);
+            currentSubscription = new SubscriptionHolder(eventSource(this));
         }
 
         private void Unsubscribe()
@@ -59,30 +78,26 @@ namespace Squidex.Infrastructure.EventSourcing
                 return;
             }
 
-            timerCancellation.Cancel();
-            timerCancellation.Dispose();
-
             currentSubscription.Dispose();
             currentSubscription = null;
-
-            timerCancellation = new CancellationTokenSource();
         }
 
         public void WakeUp()
         {
-            currentSubscription?.WakeUp();
+            currentSubscription?.Subscription.WakeUp();
         }
 
         public ValueTask CompleteAsync()
         {
-            return currentSubscription?.CompleteAsync() ?? default;
+            return currentSubscription?.Subscription.CompleteAsync() ?? default;
         }
 
         async ValueTask IEventSubscriber<T>.OnNextAsync(IEventSubscription subscription, T @event)
         {
+            // It is not entirely sure, if the lock is needed, but it seems to work so far.
             using (await lockObject.EnterAsync(default))
             {
-                if (!ReferenceEquals(subscription, currentSubscription))
+                if (!ReferenceEquals(subscription, currentSubscription?.Subscription))
                 {
                     return;
                 }
@@ -100,11 +115,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
             using (await lockObject.EnterAsync(default))
             {
-                if (!ReferenceEquals(subscription, currentSubscription))
+                if (!ReferenceEquals(subscription, currentSubscription?.Subscription))
                 {
                     return;
                 }
 
+                // Unsubscribing is not an atomar operation, therefore the lock.
                 Unsubscribe();
 
                 if (!retryWindow.CanRetryAfterFailure())
@@ -116,7 +132,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             try
             {
-                await Task.Delay(ReconnectWaitMs, timerCancellation.Token);
+                await Task.Delay(ReconnectWaitMs, currentSubscription?.Cancellation?.Token ?? default);
             }
             catch (OperationCanceledException)
             {
@@ -125,6 +141,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             using (await lockObject.EnterAsync(default))
             {
+                // Subscribing is not an atomar operation, therefore the lock.
                 Subscribe();
             }
         }

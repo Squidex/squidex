@@ -15,19 +15,19 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class BackupService : IBackupService, IDeleter
     {
-        private readonly SimpleState<RestoreJob> restoreState;
+        private readonly SimpleState<BackupRestoreState> restoreState;
         private readonly IPersistenceFactory<BackupState> persistenceFactoryBackup;
         private readonly IMessageBus messaging;
 
         public BackupService(
-            IPersistenceFactory<RestoreJob> persistenceFactoryRestore,
+            IPersistenceFactory<BackupRestoreState> persistenceFactoryRestore,
             IPersistenceFactory<BackupState> persistenceFactoryBackup,
             IMessageBus messaging)
         {
             this.persistenceFactoryBackup = persistenceFactoryBackup;
             this.messaging = messaging;
 
-            restoreState = new SimpleState<RestoreJob>(persistenceFactoryRestore, GetType(), "Default");
+            restoreState = new SimpleState<BackupRestoreState>(persistenceFactoryRestore, GetType(), "Default");
         }
 
         Task IDeleter.DeleteAppAsync(IAppEntity app,
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             await restoreState.LoadAsync(ct);
 
-            restoreState.Value.EnsureCanStart();
+            restoreState.Value.Job?.EnsureCanStart();
 
             await messaging.PublishAsync(new BackupRestore(actor, url, newAppName), ct: ct);
         }
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             await restoreState.LoadAsync(ct);
 
-            return restoreState.Value;
+            return restoreState.Value.Job ?? new RestoreJob();
         }
 
         public async Task<List<IBackupJob>> GetBackupsAsync(DomainId appId,

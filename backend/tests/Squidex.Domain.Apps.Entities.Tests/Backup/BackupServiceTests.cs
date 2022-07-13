@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
     public class BackupServiceTests
     {
         private readonly TestState<BackupState> stateBackup;
-        private readonly TestState<RestoreJob> stateRestore;
+        private readonly TestState<BackupRestoreState> stateRestore;
         private readonly IMessageBus messaging = A.Fake<IMessageBus>();
         private readonly DomainId appId = DomainId.NewGuid();
         private readonly DomainId backupId = DomainId.NewGuid();
@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public BackupServiceTests()
         {
-            stateRestore = new TestState<RestoreJob>("Default");
+            stateRestore = new TestState<BackupRestoreState>("Default");
             stateBackup = new TestState<BackupState>(appId);
 
             sut = new BackupService(
@@ -79,9 +79,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
         [Fact]
         public async Task Should_throw_exception_when_restore_already_running()
         {
-            stateRestore.Snapshot = new RestoreJob
+            stateRestore.Snapshot = new BackupRestoreState
             {
-                Status = JobStatus.Started
+                Job = new RestoreJob
+                {
+                    Status = JobStatus.Started
+                }
             };
 
             var restoreUrl = new Uri("http://squidex.io");
@@ -114,14 +117,17 @@ namespace Squidex.Domain.Apps.Entities.Backup
         [Fact]
         public async Task Should_get_restore_state_from_store()
         {
-            stateRestore.Snapshot = new RestoreJob
+            stateRestore.Snapshot = new BackupRestoreState
             {
-                Stopped = SystemClock.Instance.GetCurrentInstant()
+                Job = new RestoreJob
+                {
+                    Stopped = SystemClock.Instance.GetCurrentInstant()
+                }
             };
 
             var result = await sut.GetRestoreAsync();
 
-            result.Should().BeEquivalentTo(stateRestore.Snapshot);
+            result.Should().BeEquivalentTo(stateRestore.Snapshot.Job);
         }
 
         [Fact]
