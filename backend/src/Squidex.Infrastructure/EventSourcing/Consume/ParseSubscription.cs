@@ -22,8 +22,6 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             IEventSubscriber<ParsedEvent> eventSubscriber,
             EventSubscriptionSource<StoredEvent> eventSource)
         {
-            eventSubscription = eventSource(this);
-
             deserializeQueue = Channel.CreateBounded<object>(new BoundedChannelOptions(2)
             {
                 AllowSynchronousContinuations = true,
@@ -89,6 +87,9 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
                     }
                 }
             }).ContinueWith(x => deserializeQueue.Writer.TryComplete(x.Exception));
+
+            // Run last to subscribe after everything is configured.
+            eventSubscription = eventSource(this);
         }
 
         public void Dispose()

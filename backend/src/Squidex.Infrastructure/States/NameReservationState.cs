@@ -9,6 +9,7 @@ namespace Squidex.Infrastructure.States
 {
     public sealed class NameReservationState : SimpleState<NameReservationState.State>
     {
+        [CollectionName("Names")]
         public sealed class State
         {
             public List<NameReservation> Reservations { get; set; } = new List<NameReservation>();

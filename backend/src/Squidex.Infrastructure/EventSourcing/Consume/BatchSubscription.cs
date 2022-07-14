@@ -23,8 +23,6 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             IEventSubscriber<ParsedEvents> eventSubscriber,
             EventSubscriptionSource<ParsedEvent> eventSource)
         {
-            eventSubscription = eventSource(this);
-
             var batchSize = Math.Max(1, eventConsumer.BatchSize);
             var batchDelay = Math.Max(100, eventConsumer.BatchDelay);
 
@@ -44,6 +42,9 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             batchQueue.Batch<ParsedEvent>(taskQueue, batchSize, batchDelay, completed.Token);
 
             handleTask = Run(eventSubscriber);
+
+            // Run last to subscribe after everything is configured.
+            eventSubscription = eventSource(this);
         }
 
         private async Task Run(IEventSubscriber<ParsedEvents> eventSink)

@@ -51,11 +51,12 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
         public virtual async Task CompleteAsync()
         {
-            if (currentSubscription is BatchSubscription batchSubscriber)
+            // This is only needed for tests to wait for all asynchronous tasks inside the subscriptions.
+            if (currentSubscription != null)
             {
                 try
                 {
-                    await batchSubscriber.CompleteAsync();
+                    await currentSubscription.CompleteAsync();
                 }
                 catch (Exception ex)
                 {
@@ -250,12 +251,14 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
         protected IEventSubscription CreatePipeline(IEventSubscriber<ParsedEvents> subscriber)
         {
+            // Create a pipline of subscription inside a retry.
             return new BatchSubscription(eventConsumer, subscriber,
                 x => new ParseSubscription(eventConsumer, eventFormatter, x, CreateSubscription));
         }
 
         protected virtual IEventSubscription CreateRetrySubscription(IEventSubscriber<ParsedEvents> subscriber)
         {
+            // It is very important to have the retry subscription as outer subscription, because we also need to cancel the batching in case of errors.
             return new RetrySubscription<ParsedEvents>(subscriber, CreatePipeline);
         }
 
