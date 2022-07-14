@@ -22,6 +22,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             }
         }
 
+        public static void MustNotCreateComponent(this ContentOperation operation)
+        {
+            if (operation.SchemaDef.Type == SchemaType.Component)
+            {
+                throw new DomainException(T.Get("contents.componentNotCreatable"));
+            }
+        }
+
         public static void MustNotCreateSingleton(this ContentOperation operation)
         {
             if (operation.SchemaDef.Type == SchemaType.Singleton && operation.CommandId != operation.Schema.Id)

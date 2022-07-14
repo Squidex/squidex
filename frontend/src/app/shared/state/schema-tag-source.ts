@@ -16,7 +16,12 @@ class SchemaConverter implements TagConverter {
 
     constructor(
         private readonly schemas: ReadonlyArray<SchemaDto>,
+        normalOnly: boolean,
     ) {
+        if (normalOnly) {
+            schemas = schemas.filter(x => x.type === 'Default');
+        }
+
         this.suggestions = schemas.map(x => new TagValue(x.id, x.name, x.id));
     }
 
@@ -45,7 +50,11 @@ class SchemaConverter implements TagConverter {
 export class SchemaTagSource {
     public converter =
         this.schemasState.schemas.pipe(
-            map(x => new SchemaConverter(x)));
+            map(x => new SchemaConverter(x, false)));
+
+    public normalConverter =
+        this.schemasState.schemas.pipe(
+            map(x => new SchemaConverter(x, true)));
 
     constructor(
         readonly schemasState: SchemasState,

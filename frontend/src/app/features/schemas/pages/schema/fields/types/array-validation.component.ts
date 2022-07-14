@@ -7,7 +7,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ArrayFieldPropertiesDto, FieldDto, SchemaTagSource } from '@app/shared';
+import { ArrayFieldPropertiesDto, FieldDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-array-validation[field][fieldForm][properties]',
@@ -23,9 +23,4 @@ export class ArrayValidationComponent {
 
     @Input()
     public properties!: ArrayFieldPropertiesDto;
-
-    constructor(
-        public readonly schemasSource: SchemaTagSource,
-    ) {
-    }
 }

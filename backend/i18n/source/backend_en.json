@@ -142,6 +142,7 @@
   "contents.singletonNotChangeable": "Singleton content cannot be updated.",
   "contents.singletonNotCreatable": "Singleton content cannot be created.",
   "contents.singletonNotDeletable": "Singleton content cannot be deleted.",
+  "contents.componentNotCreatable": "Component content cannot be created.",
   "contents.statusNotValid": "Status is not defined in the workflow.",
   "contents.statusTransitionNotAllowed": "Cannot change status from {oldStatus} to {newStatus}.",
   "contents.validation.aspectRatio": "Must have aspect ratio {width}:{height}.",

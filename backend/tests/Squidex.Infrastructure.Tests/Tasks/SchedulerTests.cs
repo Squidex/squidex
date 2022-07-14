@@ -26,6 +26,21 @@ namespace Squidex.Infrastructure.Tasks
         }
 
         [Fact]
+        public async Task Should_schedule_lot_of_tasks_with_limited_concurrency()
+        {
+            var limited = new Scheduler(1);
+
+            for (var i = 1; i <= 10; i++)
+            {
+                Schedule(i, limited);
+            }
+
+            await limited.CompleteAsync();
+
+            Assert.Equal(Enumerable.Range(1, 10).ToArray(), results.OrderBy(x => x).ToArray());
+        }
+
+        [Fact]
         public async Task Should_schedule_multiple_tasks()
         {
             Schedule(1);
@@ -77,6 +92,16 @@ namespace Squidex.Infrastructure.Tasks
         private void Schedule(int value)
         {
             sut.Schedule(async _ =>
+            {
+                await Task.Delay(1);
+
+                results.Add(value);
+            });
+        }
+
+        private void Schedule(int value, Scheduler target)
+        {
+            target.Schedule(async _ =>
             {
                 await Task.Delay(1);
 

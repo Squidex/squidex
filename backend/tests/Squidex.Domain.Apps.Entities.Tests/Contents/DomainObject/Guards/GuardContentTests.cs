@@ -34,6 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         private readonly ISchemaEntity normalUnpublishedSchema;
         private readonly ISchemaEntity singletonSchema;
         private readonly ISchemaEntity singletonUnpublishedSchema;
+        private readonly ISchemaEntity componentSchema;
         private readonly RefToken actor = RefToken.User("123");
 
         public GuardContentTests()
@@ -49,6 +50,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             singletonSchema =
                 Mocks.Schema(appId, schemaId, new Schema(schemaId.Name, type: SchemaType.Singleton).Publish());
+
+            componentSchema =
+                Mocks.Schema(appId, schemaId, new Schema(schemaId.Name, type: SchemaType.Component).Publish());
         }
 
         [Fact]
@@ -89,6 +93,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             var operation = Operation(CreateContent(Status.Draft), singletonSchema);
 
             Assert.Throws<DomainException>(() => operation.MustNotCreateSingleton());
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_creating_component_content()
+        {
+            var operation = Operation(CreateContent(Status.Draft), componentSchema);
+
+            Assert.Throws<DomainException>(() => operation.MustNotCreateComponent());
         }
 
         [Fact]

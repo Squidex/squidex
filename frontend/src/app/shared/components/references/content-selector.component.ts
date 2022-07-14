@@ -81,7 +81,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
         this.schemas = this.schemasState.snapshot.schemas.filter(x => x.canReadContents);
 
         if (this.schemaIds && this.schemaIds.length > 0) {
-            this.schemas = this.schemas.filter(x => x.canReadContents && this.schemaIds!.includes(x.id));
+            this.schemas = this.schemas.filter(x => x.type === 'Default' && x.canReadContents && this.schemaIds!.includes(x.id));
         }
 
         this.selectSchema(this.schemas[0]);
