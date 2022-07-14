@@ -15,6 +15,9 @@ namespace Squidex.Config.Domain
         {
             services.AddSingletonAs<CommentsLoader>()
                 .As<ICommentsLoader>();
+
+            services.AddSingletonAs<WatchingService>()
+                .As<IWatchingService>();
         }
     }
 }
