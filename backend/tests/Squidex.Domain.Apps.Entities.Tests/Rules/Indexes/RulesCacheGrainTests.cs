@@ -99,5 +99,51 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
             A.CallTo(() => ruleRepository.QueryIdsAsync(appId, default))
                 .MustHaveHappenedOnceExactly();
         }
+
+        [Fact]
+        public async Task Should_remove_id_from_not_loaded_result()
+        {
+            var ids = new List<DomainId>
+            {
+                DomainId.NewGuid(),
+                DomainId.NewGuid()
+            };
+
+            var newId = DomainId.NewGuid();
+
+            A.CallTo(() => ruleRepository.QueryIdsAsync(appId, default))
+                .Returns(ids);
+
+            await sut.RemoveAsync(ids.ElementAt(0));
+
+            var result = await sut.GetRuleIdsAsync();
+
+            Assert.Equal(ids.Skip(1), result);
+
+            A.CallTo(() => ruleRepository.QueryIdsAsync(appId, default))
+                .MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task Should_merge_found_value_with_added_id()
+        {
+            var foundId = DomainId.NewGuid();
+
+            async Task<List<DomainId>> GetIds()
+            {
+                await sut.AddAsync(foundId);
+
+                return new List<DomainId>();
+            }
+
+            A.CallTo(() => ruleRepository.QueryIdsAsync(appId, default))
+                .ReturnsLazily(() => GetIds());
+
+            var result1 = await sut.GetRuleIdsAsync();
+            var result2 = await sut.GetRuleIdsAsync();
+
+            Assert.Equal(foundId, result1.Single());
+            Assert.Equal(foundId, result2.Single());
+        }
     }
 }

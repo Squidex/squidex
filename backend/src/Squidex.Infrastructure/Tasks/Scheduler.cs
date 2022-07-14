@@ -113,6 +113,8 @@ namespace Squidex.Infrastructure.Tasks
             }
             finally
             {
+                semaphore.Release();
+
                 if (Interlocked.Decrement(ref pendingTasks) <= 1)
                 {
                     tcs.TrySetResult(true);

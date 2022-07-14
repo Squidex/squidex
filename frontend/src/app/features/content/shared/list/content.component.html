@@ -43,7 +43,7 @@
                 
                 <div class="dropdown-divider"></div>
     
-                <a class="dropdown-item dropdown-item-delete"
+                <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDelete"
                     (sqxConfirmClick)="delete.emit()"
                     confirmTitle="i18n:contents.deleteConfirmTitle"
                     confirmText="i18n:contents.deleteConfirmText"

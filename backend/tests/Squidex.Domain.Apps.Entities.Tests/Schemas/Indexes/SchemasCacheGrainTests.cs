@@ -112,10 +112,56 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             var result = await sut.GetSchemaIdsAsync();
 
-            Assert.Equal(ids.Values.Take(1), result);
+            Assert.Equal(ids.Values.Skip(1), result);
 
             A.CallTo(() => schemaRepository.QueryIdsAsync(appId, default))
                 .MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task Should_remove_id_from_not_loaded_result()
+        {
+            var ids = new Dictionary<string, DomainId>
+            {
+                ["name1"] = DomainId.NewGuid(),
+                ["name2"] = DomainId.NewGuid()
+            };
+
+            var newId = DomainId.NewGuid();
+
+            A.CallTo(() => schemaRepository.QueryIdsAsync(appId, default))
+                .Returns(ids);
+
+            await sut.RemoveAsync(ids.ElementAt(0).Value);
+
+            var result = await sut.GetSchemaIdsAsync();
+
+            Assert.Equal(ids.Values.Skip(1), result);
+
+            A.CallTo(() => schemaRepository.QueryIdsAsync(appId, default))
+                .MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task Should_merge_found_value_with_added_id()
+        {
+            var foundId = DomainId.NewGuid();
+
+            async Task<Dictionary<string, DomainId>> GetIds()
+            {
+                await sut.AddAsync(foundId, "name1");
+
+                return new Dictionary<string, DomainId>();
+            }
+
+            A.CallTo(() => schemaRepository.QueryIdsAsync(appId, default))
+                .ReturnsLazily(() => GetIds());
+
+            var result1 = await sut.GetSchemaIdsAsync();
+            var result2 = await sut.GetSchemaIdsAsync();
+
+            Assert.Equal(foundId, result1.Single());
+            Assert.Equal(foundId, result2.Single());
         }
     }
 }

@@ -56,7 +56,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
         this.schemas = this.schemasState.snapshot.schemas.filter(x => x.canContentsCreate);
 
         if (this.schemaIds && this.schemaIds.length > 0) {
-            this.schemas = this.schemas.filter(x => this.schemaIds!.indexOf(x.id) >= 0);
+            this.schemas = this.schemas.filter(x => x.type === 'Default' && this.schemaIds!.indexOf(x.id) >= 0);
         }
 
         const selectedSchema = this.schemas.find(x => x.name === this.schemaName) || this.schemas[0];

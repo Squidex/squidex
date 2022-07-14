@@ -149,5 +149,27 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             A.CallTo(() => appRepository.QueryIdsAsync(A<IEnumerable<string>>.That.Is("name1", "name2"), default))
                 .MustHaveHappenedOnceExactly();
         }
+
+        [Fact]
+        public async Task Should_merge_found_value_with_added_id()
+        {
+            var foundId = DomainId.NewGuid();
+
+            async Task<Dictionary<string, DomainId>> GetIds()
+            {
+                await sut.AddAsync(foundId, "name1");
+
+                return new Dictionary<string, DomainId>();
+            }
+
+            A.CallTo(() => appRepository.QueryIdsAsync(A<IEnumerable<string>>._, A<CancellationToken>._))
+                .ReturnsLazily(() => GetIds());
+
+            var result1 = await sut.GetAppIdsAsync(new[] { "name1" });
+            var result2 = await sut.GetAppIdsAsync(new[] { "name1" });
+
+            Assert.Equal(foundId, result1.Single());
+            Assert.Equal(foundId, result2.Single());
+        }
     }
 }
