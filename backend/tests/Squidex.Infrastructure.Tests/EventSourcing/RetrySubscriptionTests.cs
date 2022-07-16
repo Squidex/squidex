@@ -24,7 +24,6 @@ namespace Squidex.Infrastructure.EventSourcing
                 .Returns(eventSubscription);
 
             sut = new RetrySubscription<StoredEvent>(eventSubscriber, s => eventStore.CreateSubscription(s)) { ReconnectWaitMs = 50 };
-
             sutSubscriber = sut;
         }
 
@@ -40,7 +39,9 @@ namespace Squidex.Infrastructure.EventSourcing
         [Fact]
         public async Task Should_reopen_subscription_once_if_exception_is_retrieved()
         {
-            await OnErrorAsync(eventSubscription, new InvalidOperationException());
+            var ex = new InvalidOperationException();
+
+            await OnErrorAsync(eventSubscription, ex, times: 1);
 
             await Task.Delay(1000);
 
@@ -61,12 +62,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var ex = new InvalidOperationException();
 
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
+            await OnErrorAsync(eventSubscription, ex, times: 6);
 
             sut.Dispose();
 
@@ -75,11 +71,24 @@ namespace Squidex.Infrastructure.EventSourcing
         }
 
         [Fact]
+        public async Task Should_ignore_operation_cancelled_error_from_inner_subscription_if_failed_often()
+        {
+            var ex = new OperationCanceledException();
+
+            await OnErrorAsync(eventSubscription, ex, times: 6);
+
+            sut.Dispose();
+
+            A.CallTo(() => eventSubscriber.OnErrorAsync(sut, ex))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_not_forward_error_if_exception_is_raised_after_unsubscribe()
         {
             var ex = new InvalidOperationException();
 
-            await OnErrorAsync(eventSubscription, ex);
+            await OnErrorAsync(eventSubscription, ex, times: 1);
 
             sut.Dispose();
 
@@ -113,9 +122,38 @@ namespace Squidex.Infrastructure.EventSourcing
                 .MustNotHaveHappened();
         }
 
-        private ValueTask OnErrorAsync(IEventSubscription subscriber, Exception ex)
+        [Fact]
+        public async Task Should_be_able_to_unsubscribe_within_exception_handler()
         {
-            return sutSubscriber.OnErrorAsync(subscriber, ex);
+            var ex = new InvalidOperationException();
+
+            A.CallTo(() => eventSubscriber.OnErrorAsync(A<IEventSubscription>._, A<Exception>._))
+                .Invokes(() => sut.Dispose());
+
+            await OnErrorAsync(eventSubscription, ex, times: 6);
+
+            Assert.False(sut.IsSubscribed);
+        }
+
+        [Fact]
+        public async Task Should_be_able_to_unsubscribe_within_event_handler()
+        {
+            var @event = new StoredEvent("Stream", "1", 2, new EventData("Type", new EnvelopeHeaders(), "Payload"));
+
+            A.CallTo(() => eventSubscriber.OnNextAsync(A<IEventSubscription>._, A<StoredEvent>._))
+                .Invokes(() => sut.Dispose());
+
+            await OnNextAsync(eventSubscription, @event);
+
+            Assert.False(sut.IsSubscribed);
+        }
+
+        private async ValueTask OnErrorAsync(IEventSubscription subscriber, Exception ex, int times)
+        {
+            for (var i = 0; i < times; i++)
+            {
+                await sutSubscriber.OnErrorAsync(subscriber, ex);
+            }
         }
 
         private ValueTask OnNextAsync(IEventSubscription subscriber, StoredEvent ev)

@@ -79,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [ApiCosts(0)]
         public async Task<IActionResult> GetComments(string app, DomainId commentsId, [FromQuery] long version = EtagVersion.Any)
         {
-            var result = await commentsLoader.GetCommentsAsync(commentsId, version, HttpContext.RequestAborted);
+            var result = await commentsLoader.GetCommentsAsync(Id(commentsId), version, HttpContext.RequestAborted);
 
             var response = Deferred.Response(() =>
             {
@@ -159,11 +159,20 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteComment(string app, DomainId commentsId, DomainId commentId)
         {
-            var command = new DeleteComment { CommentsId = commentsId, CommentId = commentId };
+            var command = new DeleteComment
+            {
+                CommentsId = commentsId,
+                CommentId = commentId
+            };
 
             await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             return NoContent();
+        }
+
+        private DomainId Id(DomainId commentsId)
+        {
+            return DomainId.Combine(App.Id, commentsId);
         }
 
         private string UserId()

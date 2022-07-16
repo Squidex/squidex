@@ -5,12 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Infrastructure.Commands
 {
-    public sealed class RuleOptions
+    public sealed class DomainObjectCacheOptions
     {
-        public int ExecutionTimeoutInSeconds { get; set; } = 3;
-
-        public TimeSpan RuleCacheDuration { get; set; } = TimeSpan.FromSeconds(10);
+        public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
     }
 }

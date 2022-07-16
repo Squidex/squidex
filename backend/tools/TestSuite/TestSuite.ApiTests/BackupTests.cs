@@ -7,6 +7,7 @@
 
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
+using TestSuite.Model;
 using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
@@ -17,6 +18,9 @@ namespace TestSuite.ApiTests
     [Trait("Category", "NotAutomated")]
     public class BackupTests : IClassFixture<ClientFixture>
     {
+        private readonly string appName = Guid.NewGuid().ToString();
+        private readonly string schemaName = $"schema-{Guid.NewGuid()}";
+
         public ClientFixture _ { get; }
 
         public BackupTests(ClientFixture fixture)
@@ -27,9 +31,6 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_backup_and_restore_app()
         {
-            var timeout = TimeSpan.FromMinutes(2);
-
-            var appName = Guid.NewGuid().ToString();
             var appNameRestore = $"{appName}-restore";
 
             // STEP 1: Create app
@@ -38,68 +39,57 @@ namespace TestSuite.ApiTests
             await _.Apps.PostAppAsync(createRequest);
 
 
-            // STEP 2: Create backup
-            await _.Backups.PostBackupAsync(appName);
+            // STEP 2: Prepare app.
+            await PrepareAppAsync(appName);
 
-            BackupJobDto backup = null;
 
-            try
-            {
-                using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
-                {
-                    while (true)
-                    {
-                        cts.Token.ThrowIfCancellationRequested();
+            // STEP 3: Create backup
+            await _.Backups.PostBackupAsync(appNameRestore);
 
-                        await Task.Delay(1000);
+            var backup = await _.Backups.WaitForBackupAsync(appName, TimeSpan.FromMinutes(2));
 
-                        var backups = await _.Backups.GetBackupsAsync(appName);
-
-                        if (backups.Items.Count > 0)
-                        {
-                            backup = backups.Items.FirstOrDefault();
-
-                            break;
-                        }
-                    }
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Assert.True(false, $"Could not retrieve backup within {timeout}.");
-            }
+            Assert.Equal(JobStatus.Completed, backup?.Status);
 
 
             // STEP 3: Restore backup
-            var uri = new Uri($"{_.ServerUrl}{backup._links["download"].Href}");
+            var uri = new Uri(new Uri(_.ServerUrl, UriKind.Absolute), backup._links["download"].Href);
 
-            var restoreRequest = new RestoreRequestDto { Url = uri, Name = appNameRestore };
+            var restore = await _.Backups.WaitForRestoreAsync(uri, TimeSpan.FromMinutes(2));
 
-            await _.Backups.PostRestoreJobAsync(restoreRequest);
+            Assert.Equal(JobStatus.Completed, restore?.Status);
+        }
 
-            try
+        private async Task PrepareAppAsync(string appName)
+        {
+            // Create a test schema.
+            await TestEntity.CreateSchemaAsync(_.Schemas, appName, schemaName);
+
+            var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(appName, schemaName);
+
+            await contents.CreateAsync(new TestEntityData { Number = 1 });
+
+
+            // Upload a test asset
+            var fileInfo = new FileInfo("Assets/logo-squared.png");
+
+            await using (var stream = fileInfo.OpenRead())
             {
-                using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
-                {
-                    while (true)
-                    {
-                        cts.Token.ThrowIfCancellationRequested();
+                var upload = new FileParameter(stream, fileInfo.Name, "image/png");
 
-                        await Task.Delay(1000);
-
-                        var job = await _.Backups.GetRestoreJobAsync();
-
-                        if (job != null && job.Url == uri && job.Status == JobStatus.Completed)
-                        {
-                            break;
-                        }
-                    }
-                }
+                await _.Assets.PostAssetAsync(appName, file: upload);
             }
-            catch (OperationCanceledException)
-            {
-                Assert.True(false, $"Could not retrieve restored app within {timeout}.");
-            }
+
+
+            // Create a workflow
+            var workflow = new AddWorkflowDto { Name = appName };
+
+            await _.Apps.PostWorkflowAsync(appName, workflow);
+
+
+            // Create a language
+            var language = new AddLanguageDto { Language = "de" };
+
+            await _.Apps.PostLanguageAsync(appName, language);
         }
     }
 }

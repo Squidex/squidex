@@ -27,7 +27,7 @@ using Squidex.Web;
 namespace Squidex.Areas.Api.Controllers.Rules
 {
     /// <summary>
-    /// Manages and retrieves information about schemas.
+    /// Manages and retrieves information about rules.
     /// </summary>
     [ApiExplorerSettings(GroupName = nameof(Rules))]
     public sealed class RulesController : ApiController

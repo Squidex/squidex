@@ -127,10 +127,12 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
                 // Forward the exception from one task only.
                 await deserializeQueue.Writer.WriteAsync(exception, completed.Token);
             }
+            catch (OperationCanceledException)
+            {
+                // These exception are acceptable and happens when an exception has been thrown before.
+            }
             catch (ChannelClosedException)
             {
-                // This exception is acceptable and happens when an exception has been thrown before.
-                return;
             }
         }
 
@@ -140,10 +142,12 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             {
                 await deserializeQueue.Writer.WriteAsync(@event, completed.Token);
             }
+            catch (OperationCanceledException)
+            {
+                // These exception are acceptable and happens when an exception has been thrown before.
+            }
             catch (ChannelClosedException)
             {
-                // This exception is acceptable and happens when an exception has been thrown before.
-                return;
             }
         }
     }

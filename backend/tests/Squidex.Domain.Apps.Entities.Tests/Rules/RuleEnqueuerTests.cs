@@ -39,12 +39,13 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public RuleEnqueuerTests()
         {
-            sut = new RuleEnqueuer(
+            var options = Options.Create(new RuleOptions());
+
+            sut = new RuleEnqueuer(cache, localCache,
                 appProvider,
-                cache,
-                localCache,
                 ruleEventRepository,
-                ruleService);
+                ruleService,
+                options);
         }
 
         [Fact]

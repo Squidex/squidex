@@ -17,7 +17,6 @@ namespace Squidex.Extensions.Actions.Notification
     public sealed class NotificationActionHandler : RuleActionHandler<NotificationAction, CreateComment>
     {
         private const string Description = "Send a Notification";
-        private static readonly NamedId<DomainId> NoApp = NamedId.Of(DomainId.Empty, "none");
         private readonly ICommandBus commandBus;
         private readonly IUserResolver userResolver;
 
@@ -49,9 +48,11 @@ namespace Squidex.Extensions.Actions.Notification
 
                 var ruleJob = new CreateComment
                 {
+                    AppId = CommentsCommand.NoApp,
                     Actor = actor,
                     CommentId = DomainId.NewGuid(),
                     CommentsId = DomainId.Create(user.Id),
+                    FromRule = true,
                     Text = await FormatAsync(action.Text, @event)
                 };
 
@@ -80,9 +81,6 @@ namespace Squidex.Extensions.Actions.Notification
             {
                 return Result.Ignored();
             }
-
-            command.AppId = NoApp;
-            command.FromRule = true;
 
             await commandBus.PublishAsync(command, ct);
 

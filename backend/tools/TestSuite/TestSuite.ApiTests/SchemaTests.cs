@@ -17,6 +17,8 @@ namespace TestSuite.ApiTests
 {
     public class SchemaTests : IClassFixture<CreatedAppFixture>
     {
+        private readonly string schemaName = $"schema-{Guid.NewGuid()}";
+
         public CreatedAppFixture _ { get; }
 
         public SchemaTests(CreatedAppFixture fixture)
@@ -27,8 +29,6 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_create_schema()
         {
-            var schemaName = $"schema-{Guid.NewGuid()}";
-
             // STEP 1: Create schema
             var createRequest = new CreateSchemaDto { Name = schemaName };
 
@@ -48,8 +48,6 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_not_allow_creation_if_name_used()
         {
-            var schemaName = $"schema-{Guid.NewGuid()}";
-
             // STEP 1: Create schema
             var createRequest = new CreateSchemaDto { Name = schemaName };
 
@@ -68,8 +66,6 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_create_singleton_schema()
         {
-            var schemaName = $"schema-{Guid.NewGuid()}";
-
             // STEP 1: Create schema
             var createRequest = new CreateSchemaDto
             {
@@ -102,8 +98,6 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_create_schema_with_checkboxes()
         {
-            var schemaName = $"schema-{Guid.NewGuid()}";
-
             // STEP 1: Create schema
             var createRequest = new CreateSchemaDto
             {
@@ -141,8 +135,6 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_delete_Schema()
         {
-            var schemaName = $"schema-{Guid.NewGuid()}";
-
             // STEP 1: Create schema
             var createRequest = new CreateSchemaDto { Name = schemaName };
 
@@ -164,8 +156,6 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_recreate_after_deleted()
         {
-            var schemaName = $"schema-{Guid.NewGuid()}";
-
             // STEP 1: Create schema
             var createRequest = new CreateSchemaDto { Name = schemaName };
 

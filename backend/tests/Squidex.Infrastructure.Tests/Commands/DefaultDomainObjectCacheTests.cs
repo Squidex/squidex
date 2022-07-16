@@ -8,6 +8,7 @@
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Json;
 using Xunit;
 
@@ -27,7 +28,9 @@ namespace Squidex.Infrastructure.Commands
         {
             ct = cts.Token;
 
-            sut = new DefaultDomainObjectCache(cache, serializer, distributedCache);
+            var options = Options.Create(new DomainObjectCacheOptions());
+
+            sut = new DefaultDomainObjectCache(cache, serializer, distributedCache, options);
         }
 
         [Fact]

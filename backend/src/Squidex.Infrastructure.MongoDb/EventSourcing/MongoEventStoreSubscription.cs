@@ -163,7 +163,7 @@ namespace Squidex.Infrastructure.EventSourcing
         }
 
         public void WakeUp()
-        { 
+        {
         }
     }
 }

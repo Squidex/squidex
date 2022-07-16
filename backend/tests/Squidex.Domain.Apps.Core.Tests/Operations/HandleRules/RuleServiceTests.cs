@@ -243,6 +243,29 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
+        public async Task Should_create_jobs_from_snapshots_if_rule_disabled_but_included()
+        {
+            var context = Rule(disable: true, includeSkipped: true);
+
+            A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
+                .Returns(true);
+
+            A.CallTo(() => ruleTriggerHandler.Trigger(A<EnrichedEvent>._, context))
+                .Returns(true);
+
+            A.CallTo(() => ruleTriggerHandler.CreateSnapshotEventsAsync(context, default))
+                .Returns(new List<EnrichedEvent>
+                {
+                    new EnrichedContentEvent { AppId = appId },
+                    new EnrichedContentEvent { AppId = appId }
+                }.ToAsyncEnumerable());
+
+            var jobs = await sut.CreateSnapshotJobsAsync(context).ToListAsync();
+
+            Assert.Equal(2, jobs.Count(x => x.Job != null && x.EnrichmentError == null));
+        }
+
+        [Fact]
         public async Task Should_create_jobs_from_snapshots()
         {
             var context = Rule();
