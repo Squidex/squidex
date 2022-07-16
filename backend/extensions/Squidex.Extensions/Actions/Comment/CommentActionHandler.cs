@@ -30,7 +30,7 @@ namespace Squidex.Extensions.Actions.Comment
             {
                 var ruleJob = new CreateComment
                 {
-                    AppId = contentEvent.AppId
+                    CommentsId = DomainId.Combine(contentEvent.AppId.Id, contentEvent.Id)
                 };
 
                 ruleJob.Text = await FormatAsync(action.Text, @event);
@@ -43,8 +43,6 @@ namespace Squidex.Extensions.Actions.Comment
                 {
                     ruleJob.Actor = contentEvent.Actor;
                 }
-
-                ruleJob.CommentsId = contentEvent.Id;
 
                 return (Description, ruleJob);
             }

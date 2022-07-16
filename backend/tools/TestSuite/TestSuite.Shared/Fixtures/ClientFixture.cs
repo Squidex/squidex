@@ -17,6 +17,8 @@ namespace TestSuite.Fixtures
 
         public IBackupsClient Backups => Squidex.Backups;
 
+        public ICommentsClient Comments => Squidex.Comments;
+
         public ILanguagesClient Languages => Squidex.Languages;
 
         public IPingClient Ping => Squidex.Ping;

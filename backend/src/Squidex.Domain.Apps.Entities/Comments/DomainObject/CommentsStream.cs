@@ -13,8 +13,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
-#pragma warning disable MA0022 // Return Task.FromResult instead of returning null
-
 namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 {
     public class CommentsStream : IAggregate
@@ -24,8 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         private readonly DomainId key;
         private readonly IEventFormatter eventFormatter;
         private readonly IEventStore eventStore;
+        private readonly string streamName;
         private long version = EtagVersion.Empty;
-        private string streamName;
 
         private long Version => version;
 
@@ -37,13 +35,13 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             this.key = key;
             this.eventFormatter = eventFormatter;
             this.eventStore = eventStore;
+
+            streamName = $"comments-{key}";
         }
 
         public virtual async Task LoadAsync(
             CancellationToken ct)
         {
-            streamName = $"comments-{key}";
-
             var storedEvents = await eventStore.QueryReverseAsync(streamName, 100, ct);
 
             foreach (var @event in storedEvents)
@@ -56,13 +54,15 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             }
         }
 
-        public virtual Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+        public virtual async Task<CommandResult> ExecuteAsync(IAggregateCommand command,
             CancellationToken ct)
         {
+            await LoadAsync(ct);
+
             switch (command)
             {
                 case CreateComment createComment:
-                    return Upsert(createComment, c =>
+                    return await Upsert(createComment, c =>
                     {
                         GuardComments.CanCreate(c);
 
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                     }, ct);
 
                 case UpdateComment updateComment:
-                    return Upsert(updateComment, c =>
+                    return await Upsert(updateComment, c =>
                     {
                         GuardComments.CanUpdate(c, key.ToString(), events);
 
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                     }, ct);
 
                 case DeleteComment deleteComment:
-                    return Upsert(deleteComment, c =>
+                    return await Upsert(deleteComment, c =>
                     {
                         GuardComments.CanDelete(c, key.ToString(), events);
 
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
                 default:
                     ThrowHelper.NotSupportedException();
-                    return default!;
+                    return null!;
             }
         }
 

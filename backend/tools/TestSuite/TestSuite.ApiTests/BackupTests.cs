@@ -18,6 +18,9 @@ namespace TestSuite.ApiTests
     [Trait("Category", "NotAutomated")]
     public class BackupTests : IClassFixture<ClientFixture>
     {
+        private readonly string appName = Guid.NewGuid().ToString();
+        private readonly string schemaName = $"schema-{Guid.NewGuid()}";
+
         public ClientFixture _ { get; }
 
         public BackupTests(ClientFixture fixture)
@@ -28,95 +31,36 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_backup_and_restore_app()
         {
-            var timeout = TimeSpan.FromMinutes(2);
-
-            var appNameSource = Guid.NewGuid().ToString();
-            var appNameRestore = $"{appNameSource}-restore";
+            var appNameRestore = $"{appName}-restore";
 
             // STEP 1: Create app
-            var createRequest = new CreateAppDto { Name = appNameSource };
+            var createRequest = new CreateAppDto { Name = appName };
 
             await _.Apps.PostAppAsync(createRequest);
 
 
             // STEP 2: Prepare app.
-            await PrepareAppAsync(appNameSource);
+            await PrepareAppAsync(appName);
 
 
             // STEP 3: Create backup
-            await _.Backups.PostBackupAsync(appNameSource);
+            await _.Backups.PostBackupAsync(appNameRestore);
 
-            BackupJobDto backup = null;
-            try
-            {
-                using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
-                {
-                    while (true)
-                    {
-                        cts.Token.ThrowIfCancellationRequested();
+            var backup = await _.Backups.WaitForBackupAsync(appName, TimeSpan.FromMinutes(2));
 
-                        await Task.Delay(1000);
-
-                        var foundBackup = (await _.Backups.GetBackupsAsync(appNameSource)).Items.FirstOrDefault();
-
-                        if (foundBackup?.Status == JobStatus.Completed)
-                        {
-                            backup = foundBackup;
-                            break;
-                        }
-                        else if (foundBackup?.Status == JobStatus.Failed)
-                        {
-                            throw new InvalidOperationException("Backup operation failed.");
-                        }
-                    }
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Assert.True(false, $"Could not retrieve backup within {timeout}.");
-            }
+            Assert.Equal(JobStatus.Completed, backup?.Status);
 
 
             // STEP 3: Restore backup
             var uri = new Uri(new Uri(_.ServerUrl, UriKind.Absolute), backup._links["download"].Href);
 
-            var restoreRequest = new RestoreRequestDto { Url = uri, Name = appNameRestore };
+            var restore = await _.Backups.WaitForRestoreAsync(uri, TimeSpan.FromMinutes(2));
 
-            await _.Backups.PostRestoreJobAsync(restoreRequest);
-
-            try
-            {
-                using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
-                {
-                    while (true)
-                    {
-                        cts.Token.ThrowIfCancellationRequested();
-
-                        await Task.Delay(1000);
-
-                        var foundRestore = await _.Backups.GetRestoreJobAsync();
-
-                        if (foundRestore?.Url == uri && foundRestore.Status == JobStatus.Completed)
-                        {
-                            break;
-                        }
-                        else if (foundRestore?.Url == uri && foundRestore.Status == JobStatus.Failed)
-                        {
-                            throw new InvalidOperationException("Restore operation failed.");
-                        }
-                    }
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Assert.True(false, $"Could not retrieve restored app within {timeout}.");
-            }
+            Assert.Equal(JobStatus.Completed, restore?.Status);
         }
 
         private async Task PrepareAppAsync(string appName)
         {
-            var schemaName = $"schema-{Guid.NewGuid()}";
-
             // Create a test schema.
             await TestEntity.CreateSchemaAsync(_.Schemas, appName, schemaName);
 

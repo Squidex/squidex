@@ -17,6 +17,7 @@ namespace TestSuite
     {
         private readonly Lazy<IAppsClient> apps;
         private readonly Lazy<IAssetsClient> assets;
+        private readonly Lazy<ICommentsClient> comments;
         private readonly Lazy<IBackupsClient> backups;
         private readonly Lazy<ILanguagesClient> languages;
         private readonly Lazy<IPingClient> ping;
@@ -39,6 +40,11 @@ namespace TestSuite
         public IBackupsClient Backups
         {
             get => backups.Value;
+        }
+
+        public ICommentsClient Comments
+        {
+            get => comments.Value;
         }
 
         public ILanguagesClient Languages
@@ -99,6 +105,11 @@ namespace TestSuite
                 return ClientManager.CreateBackupsClient();
             });
 
+            comments = new Lazy<ICommentsClient>(() =>
+            {
+                return ClientManager.CreateCommentsClient();
+            });
+
             languages = new Lazy<ILanguagesClient>(() =>
             {
                 return ClientManager.CreateLanguagesClient();
@@ -134,22 +145,27 @@ namespace TestSuite
                 Console.WriteLine("Waiting {0} seconds to access server", waitSeconds);
 
                 var pingClient = ClientManager.CreatePingClient();
-
-                using (var cts = new CancellationTokenSource(waitSeconds * 1000))
+                try
                 {
-                    while (!cts.IsCancellationRequested)
+                    using (var cts = new CancellationTokenSource(waitSeconds * 1000))
                     {
-                        try
+                        while (!cts.IsCancellationRequested)
                         {
-                            await pingClient.GetPingAsync(cts.Token);
-
-                            break;
-                        }
-                        catch
-                        {
-                            await Task.Delay(100);
+                            try
+                            {
+                                await pingClient.GetPingAsync(cts.Token);
+                                break;
+                            }
+                            catch
+                            {
+                                await Task.Delay(100, cts.Token);
+                            }
                         }
                     }
+                }
+                catch (OperationCanceledException)
+                {
+                    throw new InvalidOperationException("Cannot connect to test system.");
                 }
 
                 Console.WriteLine("Connected to server.");

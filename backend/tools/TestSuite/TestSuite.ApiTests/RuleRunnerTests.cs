@@ -78,6 +78,50 @@ namespace TestSuite.ApiTests
             Assert.Single(eventsRule.Items);
         }
 
+        [Fact]
+        public async Task Should_run_rule_manually()
+        {
+            // STEP 0: Create app.
+            await CreateAppAsync();
+
+
+            // STEP 1: Start webhook session
+            var (url, sessionId) = await webhookCatcher.CreateSessionAsync();
+
+
+            // STEP 2: Create rule
+            var createRule = new CreateRuleDto
+            {
+                Action = new WebhookRuleActionDto
+                {
+                    Method = WebhookMethod.POST,
+                    Payload = null,
+                    PayloadType = null,
+                    Url = new Uri(url)
+                },
+                Trigger = new ManualRuleTriggerDto()
+            };
+
+            var rule = await _.Rules.PostRuleAsync(appName, createRule);
+
+
+            // STEP 3: Trigger rule
+            await _.Rules.TriggerRuleAsync(appName, rule.Id);
+
+            // Get requests.
+            var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromSeconds(30));
+
+            Assert.Contains(requests, x => x.Method == "POST");
+
+
+            // STEP 4: Get events
+            var eventsAll = await _.Rules.GetEventsAsync(appName, rule.Id);
+            var eventsRule = await _.Rules.GetEventsAsync(appName);
+
+            Assert.Single(eventsAll.Items);
+            Assert.Single(eventsRule.Items);
+        }
+
         [Theory]
         [InlineData(true)]
         [InlineData(false)]

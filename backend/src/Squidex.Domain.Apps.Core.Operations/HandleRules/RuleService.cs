@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             var rule = context.Rule;
 
-            if (!rule.IsEnabled)
+            if (!rule.IsEnabled && !context.IncludeSkipped)
             {
                 yield break;
             }

@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Tasks
 
         public LimitedConcurrencyLevelTaskScheduler(int maxDegreeOfParallelism)
         {
-            Guard.GreaterEquals(maxDegreeOfParallelism, 1, nameof(maxDegreeOfParallelism));
+            Guard.GreaterEquals(maxDegreeOfParallelism, 1);
 
             this.maxDegreeOfParallelism = maxDegreeOfParallelism;
         }

@@ -18,6 +18,8 @@ namespace TestSuite.ApiTests
 {
     public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
     {
+        private readonly string schemaName = $"schema-{Guid.NewGuid()}";
+
         public CreatedAppFixture _ { get; }
 
         public ContentScriptingTests(CreatedAppFixture fixture)
@@ -28,8 +30,6 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_create_content_with_scripting()
         {
-            var schemaName = $"schema-{Guid.NewGuid()}";
-
             var scripts = new SchemaScriptsDto
             {
                 Create = @$"
@@ -52,8 +52,6 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_query_content_with_scripting()
         {
-            var schemaName = $"schema-{Guid.NewGuid()}";
-
             var scripts = new SchemaScriptsDto
             {
                 Query = @$"
@@ -76,8 +74,6 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_query_content_with_scripting_and_pre_query()
         {
-            var schemaName = $"schema-{Guid.NewGuid()}";
-
             var scripts = new SchemaScriptsDto
             {
                 QueryPre = @$"
@@ -102,8 +98,6 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_create_bulk_content_with_scripting()
         {
-            var schemaName = $"schema-{Guid.NewGuid()}";
-
             // STEP 1: Create a schema.
             var scripts = new SchemaScriptsDto
             {
@@ -152,8 +146,6 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_create_bulk_content_with_scripting_but_disabled()
         {
-            var schemaName = $"schema-{Guid.NewGuid()}";
-
             // STEP 1: Create a schema.
             var scripts = new SchemaScriptsDto
             {
