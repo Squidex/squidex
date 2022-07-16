@@ -91,8 +91,10 @@ namespace TestSuite.Fixtures
         {
             var requests = Array.Empty<WebhookRequest>();
 
-            using (var cts = new CancellationTokenSource(timeout))
+            try
             {
+                using var cts = new CancellationTokenSource(timeout);
+
                 while (!cts.IsCancellationRequested)
                 {
                     requests = await GetRequestsAsync(sessionId, cts.Token);
@@ -104,6 +106,9 @@ namespace TestSuite.Fixtures
 
                     await Task.Delay(50, cts.Token);
                 }
+            }
+            catch (OperationCanceledException)
+            {
             }
 
             return requests;
