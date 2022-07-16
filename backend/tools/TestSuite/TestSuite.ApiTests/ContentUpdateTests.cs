@@ -390,11 +390,11 @@ namespace TestSuite.ApiTests
                     {
                         await _.Contents.UpdateAsync(content.Id, new TestEntityData { Number = i });
 
-                        Interlocked.Increment(ref numErrors);
-                    }
-                    catch (SquidexException ex) when (ex.StatusCode == 412)
-                    {
                         Interlocked.Increment(ref numSuccess);
+                    }
+                    catch (SquidexException ex) when (ex.StatusCode is 409 or 412)
+                    {
+                        Interlocked.Increment(ref numErrors);
                         return;
                     }
                 });
@@ -440,11 +440,11 @@ namespace TestSuite.ApiTests
                     {
                         await _.Contents.UpsertAsync(content.Id, new TestEntityData { Number = i });
 
-                        Interlocked.Increment(ref numErrors);
-                    }
-                    catch (SquidexException ex) when (ex.StatusCode == 409)
-                    {
                         Interlocked.Increment(ref numSuccess);
+                    }
+                    catch (SquidexException ex) when (ex.StatusCode is 409 or 412) 
+                    {
+                        Interlocked.Increment(ref numErrors);
                         return;
                     }
                 });
