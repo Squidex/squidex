@@ -111,6 +111,7 @@ jobs:
           environment: |
             CONFIG__WAIT=60
             CONFIG__SERVER__URL=http://localhost:8080
+            WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher
           default_network: host
           options: --name test1
           volumes: ${{ github.workspace }}:/src
@@ -123,6 +124,7 @@ jobs:
           environment: |
             CONFIG__WAIT=60
             CONFIG__SERVER__URL=http://localhost:8081/squidex
+            WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher
           default_network: host
           options: --name test2
           volumes: ${{ github.workspace }}:/src

@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.ObjectPool;
 
@@ -14,20 +15,22 @@ namespace Squidex.Infrastructure.Commands
 {
     public sealed class DefaultDomainObjectCache : IDomainObjectCache
     {
-        private static readonly DistributedCacheEntryOptions CacheOptions = new DistributedCacheEntryOptions
-        {
-            SlidingExpiration = TimeSpan.FromMinutes(10)
-        };
-
+        private readonly DistributedCacheEntryOptions cacheOptions;
         private readonly IMemoryCache cache;
         private readonly IJsonSerializer serializer;
         private readonly IDistributedCache distributedCache;
 
-        public DefaultDomainObjectCache(IMemoryCache cache, IJsonSerializer serializer, IDistributedCache distributedCache)
+        public DefaultDomainObjectCache(IMemoryCache cache, IJsonSerializer serializer, IDistributedCache distributedCache,
+            IOptions<DomainObjectCacheOptions> options)
         {
             this.cache = cache;
             this.serializer = serializer;
             this.distributedCache = distributedCache;
+
+            cacheOptions = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = options.Value.CacheDuration
+            };
         }
 
         public async Task<T> GetAsync<T>(DomainId id, long version,
@@ -67,7 +70,7 @@ namespace Squidex.Infrastructure.Commands
         {
             var cacheKey = CacheKey(id, version);
 
-            cache.Set(cacheKey, snapshot, CacheOptions.SlidingExpiration!.Value);
+            cache.Set(cacheKey, snapshot, cacheOptions.AbsoluteExpirationRelativeToNow!.Value);
 
             try
             {
@@ -75,7 +78,7 @@ namespace Squidex.Infrastructure.Commands
                 {
                     serializer.Serialize(snapshot, stream, true);
 
-                    await distributedCache.SetAsync(cacheKey, stream.ToArray(), CacheOptions, ct);
+                    await distributedCache.SetAsync(cacheKey, stream.ToArray(), cacheOptions, ct);
                 }
             }
             catch

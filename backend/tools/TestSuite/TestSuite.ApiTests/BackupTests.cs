@@ -7,6 +7,7 @@
 
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
+using TestSuite.Model;
 using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
@@ -29,20 +30,23 @@ namespace TestSuite.ApiTests
         {
             var timeout = TimeSpan.FromMinutes(2);
 
-            var appName = Guid.NewGuid().ToString();
-            var appNameRestore = $"{appName}-restore";
+            var appNameSource = Guid.NewGuid().ToString();
+            var appNameRestore = $"{appNameSource}-restore";
 
             // STEP 1: Create app
-            var createRequest = new CreateAppDto { Name = appName };
+            var createRequest = new CreateAppDto { Name = appNameSource };
 
             await _.Apps.PostAppAsync(createRequest);
 
 
-            // STEP 2: Create backup
-            await _.Backups.PostBackupAsync(appName);
+            // STEP 2: Prepare app.
+            await PrepareAppAsync(appNameSource);
+
+
+            // STEP 3: Create backup
+            await _.Backups.PostBackupAsync(appNameSource);
 
             BackupJobDto backup = null;
-
             try
             {
                 using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
@@ -53,13 +57,16 @@ namespace TestSuite.ApiTests
 
                         await Task.Delay(1000);
 
-                        var backups = await _.Backups.GetBackupsAsync(appName);
+                        var foundBackup = (await _.Backups.GetBackupsAsync(appNameSource)).Items.FirstOrDefault();
 
-                        if (backups.Items.Count > 0)
+                        if (foundBackup?.Status == JobStatus.Completed)
                         {
-                            backup = backups.Items.FirstOrDefault();
-
+                            backup = foundBackup;
                             break;
+                        }
+                        else if (foundBackup?.Status == JobStatus.Failed)
+                        {
+                            throw new InvalidOperationException("Backup operation failed.");
                         }
                     }
                 }
@@ -71,7 +78,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Restore backup
-            var uri = new Uri($"{_.ServerUrl}{backup._links["download"].Href}");
+            var uri = new Uri(new Uri(_.ServerUrl, UriKind.Absolute), backup._links["download"].Href);
 
             var restoreRequest = new RestoreRequestDto { Url = uri, Name = appNameRestore };
 
@@ -87,11 +94,15 @@ namespace TestSuite.ApiTests
 
                         await Task.Delay(1000);
 
-                        var job = await _.Backups.GetRestoreJobAsync();
+                        var foundRestore = await _.Backups.GetRestoreJobAsync();
 
-                        if (job != null && job.Url == uri && job.Status == JobStatus.Completed)
+                        if (foundRestore?.Url == uri && foundRestore.Status == JobStatus.Completed)
                         {
                             break;
+                        }
+                        else if (foundRestore?.Url == uri && foundRestore.Status == JobStatus.Failed)
+                        {
+                            throw new InvalidOperationException("Restore operation failed.");
                         }
                     }
                 }
@@ -100,6 +111,41 @@ namespace TestSuite.ApiTests
             {
                 Assert.True(false, $"Could not retrieve restored app within {timeout}.");
             }
+        }
+
+        private async Task PrepareAppAsync(string appName)
+        {
+            var schemaName = $"schema-{Guid.NewGuid()}";
+
+            // Create a test schema.
+            await TestEntity.CreateSchemaAsync(_.Schemas, appName, schemaName);
+
+            var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(appName, schemaName);
+
+            await contents.CreateAsync(new TestEntityData { Number = 1 });
+
+
+            // Upload a test asset
+            var fileInfo = new FileInfo("Assets/logo-squared.png");
+
+            await using (var stream = fileInfo.OpenRead())
+            {
+                var upload = new FileParameter(stream, fileInfo.Name, "image/png");
+
+                await _.Assets.PostAssetAsync(appName, file: upload);
+            }
+
+
+            // Create a workflow
+            var workflow = new AddWorkflowDto { Name = appName };
+
+            await _.Apps.PostWorkflowAsync(appName, workflow);
+
+
+            // Create a language
+            var language = new AddLanguageDto { Language = "de" };
+
+            await _.Apps.PostLanguageAsync(appName, language);
         }
     }
 }

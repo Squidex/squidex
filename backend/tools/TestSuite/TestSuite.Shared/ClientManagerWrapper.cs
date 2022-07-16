@@ -68,10 +68,10 @@ namespace TestSuite
 
         public ClientManagerWrapper()
         {
-            var appName = TestHelpers.GetValue("config:app:name", "integration-tests");
-            var clientId = TestHelpers.GetValue("config:client:id", "root");
-            var clientSecret = TestHelpers.GetValue("config:client:secret", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=");
-            var serverUrl = TestHelpers.GetValue("config:server:url", "https://localhost:5001");
+            var appName = TestHelpers.GetAndPrintValue("config:app:name", "integration-tests");
+            var clientId = TestHelpers.GetAndPrintValue("config:client:id", "root");
+            var clientSecret = TestHelpers.GetAndPrintValue("config:client:secret", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=");
+            var serverUrl = TestHelpers.GetAndPrintValue("config:server:url", "https://localhost:5001");
 
             ClientManager = new SquidexClientManager(new SquidexOptions
             {

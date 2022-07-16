@@ -25,7 +25,7 @@ namespace TestSuite.Utils
                 .Build();
         }
 
-        public static string GetValue(string name, string fallback)
+        public static string GetAndPrintValue(string name, string fallback)
         {
             var value = Configuration[name];
 

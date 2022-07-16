@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         {
             await state.LoadAsync(ct);
 
-            if (!state.Value.RunFromSnapshots)
+            if (!state.Value.RunFromSnapshots && state.Value.RuleId != default)
             {
                 TaskHelper.Forget(RunAsync(state.Value.RuleId, false, default));
             }
@@ -178,12 +178,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
                 using (localCache.StartContext())
                 {
+                    // Also run disabled rules, because we want to enable rules to be only used with manual trigger.
                     run.Context = new RuleContext
                     {
                         AppId = rule.AppId,
                         Rule = rule.RuleDef,
                         RuleId = rule.Id,
-                        IncludeStale = true
+                        IncludeStale = true,
+                        IncludeSkipped = true
                     };
 
                     if (run.Job.RunFromSnapshots && ruleService.CanCreateSnapshotEvents(run.Context))
@@ -219,7 +221,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
             await foreach (var job in ruleService.CreateSnapshotJobsAsync(run.Context, ct))
             {
-                if (job.Job != null && job.SkipReason == SkipReason.None)
+                if (job.Job != null && job.SkipReason is SkipReason.None or SkipReason.Disabled)
                 {
                     await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError, ct);
                 }
@@ -258,7 +260,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
                         await foreach (var job in jobs.WithCancellation(ct))
                         {
-                            if (job.Job != null && job.SkipReason == SkipReason.None)
+                            if (job.Job != null && job.SkipReason is SkipReason.None or SkipReason.Disabled)
                             {
                                 await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError, ct);
                             }

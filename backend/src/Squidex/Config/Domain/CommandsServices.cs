@@ -37,6 +37,9 @@ namespace Squidex.Config.Domain
             services.Configure<RestrictAppsOptions>(config,
                 "usage");
 
+            services.Configure<DomainObjectCacheOptions>(config,
+                "caching:domainObjects");
+
             services.AddSingletonAs<InMemoryCommandBus>()
                 .As<ICommandBus>();
 

@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         {
             var context = GetContext(rule);
 
-            return context.Rule.IsEnabled && context.Rule.Trigger is not ManualTrigger;
+            return context.Rule.Trigger is not ManualTrigger;
         }
 
         public bool CanRunFromSnapshots(IRuleEntity rule)
