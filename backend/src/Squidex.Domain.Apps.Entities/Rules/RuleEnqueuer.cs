@@ -60,6 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await foreach (var job in jobs)
             {
+                // We do not want to handle disabled rules in the normal flow.
                 if (job.Job != null && job.SkipReason == SkipReason.None)
                 {
                     await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError);
@@ -92,6 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var cacheKey = $"{typeof(RuleEnqueuer)}_Rules_{appId}";
 
+            // Cache the rules for performance reasons for a short period of time (usually 10 sec).
             return cache.GetOrCreateAsync(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = cacheDuration;

@@ -109,7 +109,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [ApiCosts(0)]
         public async Task<IActionResult> PostComment(string app, DomainId commentsId, [FromBody] UpsertCommentDto request)
         {
-            var command = request.ToCreateCommand(Id(commentsId));
+            var command = request.ToCreateCommand(commentsId);
 
             await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
@@ -136,7 +136,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [ApiCosts(0)]
         public async Task<IActionResult> PutComment(string app, DomainId commentsId, DomainId commentId, [FromBody] UpsertCommentDto request)
         {
-            var command = request.ToUpdateComment(Id(commentsId), commentId);
+            var command = request.ToUpdateComment(commentsId, commentId);
 
             await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
@@ -161,7 +161,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         {
             var command = new DeleteComment
             {
-                CommentsId = Id(commentsId),
+                CommentsId = commentsId,
                 CommentId = commentId
             };
 

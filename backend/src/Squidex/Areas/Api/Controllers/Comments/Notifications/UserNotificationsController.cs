@@ -82,6 +82,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
 
             var commmand = new DeleteComment
             {
+                AppId = CommentsCommand.NoApp,
                 CommentsId = userId,
                 CommentId = commentId
             };

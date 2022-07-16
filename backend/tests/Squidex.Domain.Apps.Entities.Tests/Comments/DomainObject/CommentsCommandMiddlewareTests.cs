@@ -153,7 +153,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         private T CreateCommentsCommand<T>(T command) where T : CommentsCommand
         {
             command.Actor = actor;
-            command.CommentsId = DomainId.Combine(appId.Id, commentsId);
+            command.AppId = appId;
+            command.CommentsId = commentsId;
             command.CommentId = commentId;
 
             return command;

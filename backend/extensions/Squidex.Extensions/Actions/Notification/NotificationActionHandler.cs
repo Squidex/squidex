@@ -48,9 +48,11 @@ namespace Squidex.Extensions.Actions.Notification
 
                 var ruleJob = new CreateComment
                 {
+                    AppId = CommentsCommand.NoApp,
                     Actor = actor,
                     CommentId = DomainId.NewGuid(),
                     CommentsId = DomainId.Create(user.Id),
+                    FromRule = true,
                     Text = await FormatAsync(action.Text, @event)
                 };
 
@@ -79,8 +81,6 @@ namespace Squidex.Extensions.Actions.Notification
             {
                 return Result.Ignored();
             }
-
-            command.FromRule = true;
 
             await commandBus.PublishAsync(command, ct);
 
