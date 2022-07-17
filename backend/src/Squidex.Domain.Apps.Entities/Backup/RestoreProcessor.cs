@@ -276,6 +276,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             try
             {
+                // Add the current user to the app, so that the admin can see it and verify integrity.
                 var command = new AssignContributor
                 {
                     Actor = run.Job.Actor,

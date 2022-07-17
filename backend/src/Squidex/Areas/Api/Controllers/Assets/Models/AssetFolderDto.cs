@@ -49,14 +49,17 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
             if (resources.CanUpdateAsset)
             {
-                AddPutLink("update", resources.Url<AssetFoldersController>(x => nameof(x.PutAssetFolder), values));
+                AddPutLink("update",
+                    resources.Url<AssetFoldersController>(x => nameof(x.PutAssetFolder), values));
 
-                AddPutLink("move", resources.Url<AssetFoldersController>(x => nameof(x.PutAssetFolderParent), values));
+                AddPutLink("move",
+                    resources.Url<AssetFoldersController>(x => nameof(x.PutAssetFolderParent), values));
             }
 
             if (resources.CanUpdateAsset)
             {
-                AddDeleteLink("delete", resources.Url<AssetFoldersController>(x => nameof(x.DeleteAssetFolder), values));
+                AddDeleteLink("delete",
+                    resources.Url<AssetFoldersController>(x => nameof(x.DeleteAssetFolder), values));
             }
 
             return this;

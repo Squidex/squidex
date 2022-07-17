@@ -43,16 +43,22 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Create backup
-            await _.Backups.PostBackupAsync(appNameRestore);
+            await _.Backups.PostBackupAsync(appName);
 
             var backup = await _.Backups.WaitForBackupAsync(appName, TimeSpan.FromMinutes(2));
 
             Assert.Equal(JobStatus.Completed, backup?.Status);
 
 
-            // STEP 3: Restore backup
-            var uri = new Uri(new Uri(_.ServerUrl, UriKind.Absolute), backup._links["download"].Href);
+            // STEP 4: Restore backup
+            var uri = new Uri(_.ClientManager.GenerateUrl(backup._links["download"].Href));
 
+            var restoreRequest = new RestoreRequestDto { Url = uri, Name = appNameRestore };
+
+            await _.Backups.PostRestoreJobAsync(restoreRequest);
+
+
+            // STEP 5: Wait for the backup.
             var restore = await _.Backups.WaitForRestoreAsync(uri, TimeSpan.FromMinutes(2));
 
             Assert.Equal(JobStatus.Completed, restore?.Status);

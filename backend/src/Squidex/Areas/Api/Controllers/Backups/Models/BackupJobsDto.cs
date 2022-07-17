@@ -37,7 +37,8 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
 
             if (resources.CanCreateBackup)
             {
-                AddPostLink("create", resources.Url<BackupsController>(x => nameof(x.PostBackup), values));
+                AddPostLink("create",
+                    resources.Url<BackupsController>(x => nameof(x.PostBackup), values));
             }
 
             return this;

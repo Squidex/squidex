@@ -66,13 +66,15 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             if (resources.CanCreateContent(values.schema))
             {
-                AddPostLink("create", resources.Url<ContentsController>(x => nameof(x.PostContent), values));
+                AddPostLink("create",
+                    resources.Url<ContentsController>(x => nameof(x.PostContent), values));
 
                 if (resources.CanChangeStatus(values.schema) && await workflow.CanPublishInitialAsync(schema, resources.Context.User))
                 {
                     var publishValues = new { values.app, values.schema, publish = true };
 
-                    AddPostLink("create/publish", resources.Url<ContentsController>(x => nameof(x.PostContent), publishValues));
+                    AddPostLink("create/publish",
+                        resources.Url<ContentsController>(x => nameof(x.PostContent), publishValues));
                 }
             }
         }

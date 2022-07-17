@@ -12,7 +12,6 @@ using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
-#pragma warning disable SA1133 // Do not combine attributes
 
 namespace TestSuite.ApiTests
 {
@@ -477,7 +476,7 @@ namespace TestSuite.ApiTests
             // STEP 4: Delete folder.
             await _.Assets.DeleteAssetFolderAsync(_.AppName, folder_1.Id);
 
-            Assert.True(await _.Assets.WaitForDeletionAsync(_.AppName, folder_1.Id, TimeSpan.FromSeconds(10)));
+            Assert.True(await _.Assets.WaitForDeletionAsync(_.AppName, asset_1.Id, TimeSpan.FromSeconds(30)));
         }
 
         [Theory]

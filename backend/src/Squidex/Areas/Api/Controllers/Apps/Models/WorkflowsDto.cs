@@ -52,7 +52,8 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (resources.CanCreateWorkflow)
             {
-                AddPostLink("create", resources.Url<AppWorkflowsController>(x => nameof(x.PostWorkflow), values));
+                AddPostLink("create",
+                    resources.Url<AppWorkflowsController>(x => nameof(x.PostWorkflow), values));
             }
 
             return this;
