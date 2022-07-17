@@ -15,7 +15,6 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
-    [Trait("Category", "NotAutomated")]
     public class BackupTests : IClassFixture<ClientFixture>
     {
         private readonly string appName = Guid.NewGuid().ToString();
