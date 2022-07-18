@@ -95,10 +95,7 @@ namespace TestSuite.ApiTests
 
         private async Task<ClientDto> CreateAsync()
         {
-            var createRequest = new CreateClientDto
-            {
-                Id = id
-            };
+            var createRequest = new CreateClientDto { Id = id };
 
             var clients = await _.Apps.PostClientAsync(appName, createRequest);
             var client = clients.Items.Find(x => x.Id == id);
@@ -108,10 +105,7 @@ namespace TestSuite.ApiTests
 
         private async Task CreateAppAsync()
         {
-            var createRequest = new CreateAppDto
-            {
-                Name = appName
-            };
+            var createRequest = new CreateAppDto { Name = appName };
 
             await _.Apps.PostAppAsync(createRequest);
         }
