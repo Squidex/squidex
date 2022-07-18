@@ -92,6 +92,7 @@ jobs:
         with:
           image: squidex/build
           environment: |
+            CONFIG__BACKUPURL=http://localhost:5000
             CONFIG__WAIT=60
             CONFIG__SERVER__URL=http://localhost:8080
             WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher
@@ -105,6 +106,7 @@ jobs:
         with:
           image: squidex/build
           environment: |
+            CONFIG__BACKUPURL=http://localhost:5000
             CONFIG__WAIT=60
             CONFIG__SERVER__URL=http://localhost:8081/squidex
             WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher

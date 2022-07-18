@@ -8,6 +8,7 @@
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using TestSuite.Model;
+using TestSuite.Utils;
 using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
@@ -30,6 +31,9 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_backup_and_restore_app()
         {
+            // Load the backup from another URL, because the public URL is might not be accessible for the server.
+            var backupUrl = TestHelpers.GetAndPrintValue("config:backupUrl", _.ServerUrl);
+
             var appNameRestore = $"{appName}-restore";
 
             // STEP 1: Create app
@@ -51,7 +55,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 4: Restore backup
-            var uri = new Uri(_.ClientManager.GenerateUrl(backup._links["download"].Href));
+            var uri = new Uri(new Uri(backupUrl), backup._links["download"].Href);
 
             var restoreRequest = new RestoreRequestDto { Url = uri, Name = appNameRestore };
 

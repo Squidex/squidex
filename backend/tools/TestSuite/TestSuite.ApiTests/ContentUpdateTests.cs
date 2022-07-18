@@ -442,7 +442,7 @@ namespace TestSuite.ApiTests
 
                         Interlocked.Increment(ref numSuccess);
                     }
-                    catch (SquidexException ex) when (ex.StatusCode is 409 or 412) 
+                    catch (SquidexException ex) when (ex.StatusCode is 409 or 412)
                     {
                         Interlocked.Increment(ref numErrors);
                         return;
