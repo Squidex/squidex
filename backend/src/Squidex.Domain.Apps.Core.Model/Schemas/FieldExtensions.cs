@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public static bool IsComponentLike<T>(this T field) where T : IField
         {
-            return field.RawProperties is ComponentFieldProperties || field.RawProperties is ComponentsFieldProperties;
+            return field.RawProperties is ComponentFieldProperties or ComponentsFieldProperties;
         }
 
         public static bool IsUI<T>(this T field) where T : IField

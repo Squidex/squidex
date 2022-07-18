@@ -10,7 +10,6 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Counter;
-using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Contents.Text;
@@ -18,7 +17,6 @@ using Squidex.Domain.Apps.Entities.Contents.Validation;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Config.Domain
 {
@@ -38,11 +36,8 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ContentQueryParser>()
                 .AsSelf();
 
-            services.AddTransientAs<ContentDomainObject>()
-                .AsSelf();
-
-            services.AddTransientAs<CounterDeleter>()
-                .As<IDeleter>();
+            services.AddTransientAs<CounterService>()
+                .As<ICounterService>().As<IDeleter>();
 
             services.AddTransientAs<ContentCache>()
                 .As<IContentCache>();
@@ -102,9 +97,6 @@ namespace Squidex.Config.Domain
                 .As<ISearchSource>();
 
             services.AddSingletonAs<TemplatesClient>()
-                .AsSelf();
-
-            services.AddSingletonAs<GrainBootstrap<IContentSchedulerGrain>>()
                 .AsSelf();
         }
     }

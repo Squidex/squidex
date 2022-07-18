@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 return false;
             }
 
-            static bool CanHaveReference(JsonValue value)
+            static bool CanValueHaveReference(JsonValue value)
             {
                 if (value.Value is JsonArray)
                 {
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 {
                     foreach (var (_, nested) in o)
                     {
-                        if (CanHaveReference(nested))
+                        if (CanValueHaveReference(nested))
                         {
                             return true;
                         }
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 {
                     foreach (var (_, value) in field)
                     {
-                        if (CanHaveReference(value))
+                        if (CanValueHaveReference(value))
                         {
                             return true;
                         }

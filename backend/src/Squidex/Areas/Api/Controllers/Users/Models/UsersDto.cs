@@ -41,7 +41,8 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
 
             if (context.CanCreateUser)
             {
-                AddPostLink("create", context.Url<UserManagementController>(c => nameof(c.PostUser)));
+                AddPostLink("create",
+                    context.Url<UserManagementController>(c => nameof(c.PostUser)));
             }
 
             return this;

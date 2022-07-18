@@ -5,12 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public interface IEventSubscriber
-    {
-        Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent);
+    public delegate IEventSubscription EventSubscriptionSource<T>(IEventSubscriber<T> target);
 
-        Task OnErrorAsync(IEventSubscription subscription, Exception exception);
+    public interface IEventSubscriber<T>
+    {
+        ValueTask OnNextAsync(IEventSubscription subscription, T @event);
+
+        ValueTask OnErrorAsync(IEventSubscription subscription, Exception exception);
     }
 }

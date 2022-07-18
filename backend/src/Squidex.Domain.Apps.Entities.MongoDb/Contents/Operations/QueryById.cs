@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal sealed class QueryById : OperationCollectionBase
+    internal sealed class QueryById : OperationBase
     {
         public async Task<IContentEntity?> QueryAsync(ISchemaEntity schema, DomainId id,
             CancellationToken ct)

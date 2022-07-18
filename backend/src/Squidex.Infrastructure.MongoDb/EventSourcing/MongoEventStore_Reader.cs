@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         private static readonly List<StoredEvent> EmptyEvents = new List<StoredEvent>();
 
-        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
+        public IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> subscriber, string? streamFilter = null, string? position = null)
         {
             Guard.NotNull(subscriber);
 

@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     public sealed class TextIndexingProcess : IEventConsumer
     {
         private const string NotFound = "<404>";
-        private readonly IJsonSerializer jsonSerializer;
+        private readonly IJsonSerializer serializer;
         private readonly ITextIndex textIndex;
         private readonly ITextIndexerState textIndexerState;
 
@@ -49,15 +49,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private sealed class Updates
         {
             private readonly Dictionary<DomainId, TextContentState> states;
-            private readonly IJsonSerializer jsonSerializer;
+            private readonly IJsonSerializer serializer;
             private readonly Dictionary<DomainId, TextContentState> updates = new Dictionary<DomainId, TextContentState>();
             private readonly Dictionary<string, IndexCommand> commands = new Dictionary<string, IndexCommand>();
 
-            public Updates(Dictionary<DomainId, TextContentState> states, IJsonSerializer jsonSerializer)
+            public Updates(Dictionary<DomainId, TextContentState> states, IJsonSerializer serializer)
             {
                 this.states = states;
-
-                this.jsonSerializer = jsonSerializer;
+                this.serializer = serializer;
             }
 
             public async Task WriteAsync(ITextIndex textIndex, ITextIndexerState textIndexerState)
@@ -126,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     {
                         ContentId = @event.ContentId,
                         DocId = state.DocIdCurrent,
-                        GeoObjects = data.ToGeo(jsonSerializer),
+                        GeoObjects = data.ToGeo(serializer),
                         ServeAll = true,
                         ServePublished = false,
                         Texts = data.ToTexts(),
@@ -183,7 +182,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                             {
                                 ContentId = @event.ContentId,
                                 DocId = state.DocIdNew,
-                                GeoObjects = data.ToGeo(jsonSerializer),
+                                GeoObjects = data.ToGeo(serializer),
                                 ServeAll = true,
                                 ServePublished = false,
                                 Texts = data.ToTexts()
@@ -206,7 +205,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                             {
                                 ContentId = @event.ContentId,
                                 DocId = state.DocIdCurrent,
-                                GeoObjects = data.ToGeo(jsonSerializer),
+                                GeoObjects = data.ToGeo(serializer),
                                 ServeAll = true,
                                 ServePublished = isPublished,
                                 Texts = data.ToTexts()
@@ -329,11 +328,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         }
 
         public TextIndexingProcess(
-            IJsonSerializer jsonSerializer,
+            IJsonSerializer serializer,
             ITextIndex textIndex,
             ITextIndexerState textIndexerState)
         {
-            this.jsonSerializer = jsonSerializer;
+            this.serializer = serializer;
             this.textIndex = textIndex;
             this.textIndexerState = textIndexerState;
         }
@@ -348,7 +347,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var states = await QueryStatesAsync(events);
 
-            var updates = new Updates(states, jsonSerializer);
+            var updates = new Updates(states, serializer);
 
             foreach (var @event in events)
             {

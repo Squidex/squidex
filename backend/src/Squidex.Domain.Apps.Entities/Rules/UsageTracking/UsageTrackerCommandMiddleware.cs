@@ -5,57 +5,39 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
+using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
     public sealed class UsageTrackerCommandMiddleware : ICommandMiddleware
     {
-        private readonly IGrainFactory grainFactory;
+        private readonly IMessageBus messaging;
 
-        public UsageTrackerCommandMiddleware(IGrainFactory grainFactory)
+        public UsageTrackerCommandMiddleware(IMessageBus messaging)
         {
-            this.grainFactory = grainFactory;
+            this.messaging = messaging;
         }
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
             switch (context.Command)
             {
                 case DeleteRule deleteRule:
-                    await GetGrain().RemoveTargetAsync(deleteRule.RuleId);
+                    await messaging.PublishAsync(new UsageTrackingRemove(deleteRule.RuleId), ct: default);
                     break;
-                case CreateRule createRule:
-                    {
-                        if (createRule.Trigger is UsageTrigger usage)
-                        {
-                            await GetGrain().AddTargetAsync(createRule.RuleId, createRule.AppId, usage.Limit, usage.NumDays);
-                        }
-
-                        break;
-                    }
-
-                case UpdateRule ruleUpdated:
-                    {
-                        if (ruleUpdated.Trigger is UsageTrigger usage)
-                        {
-                            await GetGrain().UpdateTargetAsync(ruleUpdated.RuleId, usage.Limit, usage.NumDays);
-                        }
-
-                        break;
-                    }
+                case CreateRule { Trigger: UsageTrigger usage } createRule:
+                    await messaging.PublishAsync(new UsageTrackingAdd(createRule.RuleId, createRule.AppId, usage.Limit, usage.NumDays), ct: default);
+                    break;
+                case UpdateRule { Trigger: UsageTrigger usage } ruleUpdated:
+                    await messaging.PublishAsync(new UsageTrackingUpdate(ruleUpdated.RuleId, usage.Limit, usage.NumDays), ct: default);
+                    break;
             }
 
-            await next(context);
-        }
-
-        private IUsageTrackerGrain GetGrain()
-        {
-            return grainFactory.GetGrain<IUsageTrackerGrain>(SingleGrain.Id);
+            await next(context, ct);
         }
     }
 }

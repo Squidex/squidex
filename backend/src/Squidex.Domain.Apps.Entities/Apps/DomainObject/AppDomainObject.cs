@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -23,24 +24,15 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 {
-    public sealed partial class AppDomainObject : DomainObject<AppDomainObject.State>
+    public partial class AppDomainObject : DomainObject<AppDomainObject.State>
     {
-        private readonly InitialSettings initialSettings;
-        private readonly IAppPlansProvider appPlansProvider;
-        private readonly IAppPlanBillingManager appPlansBillingManager;
-        private readonly IUserResolver userResolver;
+        private readonly IServiceProvider serviceProvider;
 
-        public AppDomainObject(IPersistenceFactory<State> persistence, ILogger<AppDomainObject> log,
-            InitialSettings initialSettings,
-            IAppPlansProvider appPlansProvider,
-            IAppPlanBillingManager appPlansBillingManager,
-            IUserResolver userResolver)
-            : base(persistence, log)
+        public AppDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<AppDomainObject> log,
+            IServiceProvider serviceProvider)
+            : base(id, persistence, log)
         {
-            this.userResolver = userResolver;
-            this.appPlansProvider = appPlansProvider;
-            this.appPlansBillingManager = appPlansBillingManager;
-            this.initialSettings = initialSettings;
+            this.serviceProvider = serviceProvider;
         }
 
         protected override bool IsDeleted(State snapshot)
@@ -58,7 +50,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return command is AppUpdateCommand update && Equals(update?.AppId?.Id, Snapshot.Id);
         }
 
-        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+            CancellationToken ct)
         {
             switch (command)
             {
@@ -70,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         Create(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateApp update:
                     return UpdateReturn(update, c =>
@@ -80,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         Update(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateAppSettings updateSettings:
                     return UpdateReturn(updateSettings, c =>
@@ -90,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         UpdateSettings(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UploadAppImage uploadImage:
                     return UpdateReturn(uploadImage, c =>
@@ -100,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         UploadImage(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case RemoveAppImage removeImage:
                     return UpdateReturn(removeImage, c =>
@@ -110,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         RemoveImage(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case ConfigureAssetScripts configureAssetScripts:
                     return UpdateReturn(configureAssetScripts, c =>
@@ -120,17 +113,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         ConfigureAssetScripts(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case AssignContributor assignContributor:
-                    return UpdateReturnAsync(assignContributor, async c =>
+                    return UpdateReturnAsync(assignContributor, async (c, ct) =>
                     {
-                        await GuardAppContributors.CanAssign(c, Snapshot, userResolver, GetPlan());
+                        await GuardAppContributors.CanAssign(c, Snapshot, UserResolver(), GetPlan());
 
                         AssignContributor(c, !Snapshot.Contributors.ContainsKey(assignContributor.ContributorId));
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case RemoveContributor removeContributor:
                     return UpdateReturn(removeContributor, c =>
@@ -140,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         RemoveContributor(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case AttachClient attachClient:
                     return UpdateReturn(attachClient, c =>
@@ -150,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         AttachClient(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateClient updateClient:
                     return UpdateReturn(updateClient, c =>
@@ -160,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         UpdateClient(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case RevokeClient revokeClient:
                     return UpdateReturn(revokeClient, c =>
@@ -170,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         RevokeClient(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case AddWorkflow addWorkflow:
                     return UpdateReturn(addWorkflow, c =>
@@ -180,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         AddWorkflow(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateWorkflow updateWorkflow:
                     return UpdateReturn(updateWorkflow, c =>
@@ -190,7 +183,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         UpdateWorkflow(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case DeleteWorkflow deleteWorkflow:
                     return UpdateReturn(deleteWorkflow, c =>
@@ -200,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         DeleteWorkflow(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case AddLanguage addLanguage:
                     return UpdateReturn(addLanguage, c =>
@@ -210,7 +203,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         AddLanguage(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case RemoveLanguage removeLanguage:
                     return UpdateReturn(removeLanguage, c =>
@@ -220,7 +213,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         RemoveLanguage(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateLanguage updateLanguage:
                     return UpdateReturn(updateLanguage, c =>
@@ -230,7 +223,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         UpdateLanguage(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case AddRole addRole:
                     return UpdateReturn(addRole, c =>
@@ -240,7 +233,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         AddRole(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case DeleteRole deleteRole:
                     return UpdateReturn(deleteRole, c =>
@@ -250,7 +243,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         DeleteRole(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateRole updateRole:
                     return UpdateReturn(updateRole, c =>
@@ -260,12 +253,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         UpdateRole(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case ChangePlan changePlan:
-                    return UpdateReturnAsync(changePlan, async c =>
+                    return UpdateReturnAsync(changePlan, async (c, ct) =>
                     {
-                        GuardApp.CanChangePlan(c, Snapshot, appPlansProvider);
+                        GuardApp.CanChangePlan(c, Snapshot, AppPlansProvider());
 
                         if (c.FromCallback)
                         {
@@ -275,9 +268,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         }
                         else
                         {
-                            var result =
-                                await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier,
-                                    Snapshot.NamedId(), c.PlanId, c.Referer);
+                            var result = await AppPlanBillingManager().ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), c.PlanId, c.Referer, default);
 
                             switch (result)
                             {
@@ -288,25 +279,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
                             return result;
                         }
-                    });
+                    }, ct);
 
                 case DeleteApp delete:
-                    return UpdateAsync(delete, async c =>
+                    return UpdateAsync(delete, async (c, ct) =>
                     {
-                        await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null, null);
+                        await AppPlanBillingManager().ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null, null, ct);
 
                         DeleteApp(c);
-                    });
+                    }, ct);
 
                 default:
                     ThrowHelper.NotSupportedException();
                     return default!;
             }
-        }
-
-        private IAppLimitsPlan GetPlan()
-        {
-            return appPlansProvider.GetPlanForApp(Snapshot).Plan;
         }
 
         private void Create(CreateApp command)
@@ -335,7 +321,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         private void ChangePlan(ChangePlan command)
         {
-            if (string.Equals(appPlansProvider.GetFreePlan()?.Id, command.PlanId, StringComparison.Ordinal))
+            if (string.Equals(GetFreePlan()?.Id, command.PlanId, StringComparison.Ordinal))
             {
                 Raise(command, new AppPlanReset());
             }
@@ -466,7 +452,32 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         private AppSettingsUpdated CreateInitialSettings()
         {
-            return new AppSettingsUpdated { Settings = initialSettings.Settings };
+            return new AppSettingsUpdated { Settings = serviceProvider.GetRequiredService<InitialSettings>().Settings };
+        }
+
+        private IAppPlansProvider AppPlansProvider()
+        {
+            return serviceProvider.GetRequiredService<IAppPlansProvider>();
+        }
+
+        private IAppPlanBillingManager AppPlanBillingManager()
+        {
+            return serviceProvider.GetRequiredService<IAppPlanBillingManager>();
+        }
+
+        private IUserResolver UserResolver()
+        {
+            return serviceProvider.GetRequiredService<IUserResolver>();
+        }
+
+        private IAppLimitsPlan GetFreePlan()
+        {
+            return AppPlansProvider().GetFreePlan();
+        }
+
+        private IAppLimitsPlan GetPlan()
+        {
+            return AppPlansProvider().GetPlanForApp(Snapshot).Plan;
         }
     }
 }

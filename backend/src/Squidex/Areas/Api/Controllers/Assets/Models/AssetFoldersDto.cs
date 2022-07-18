@@ -52,7 +52,8 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
             if (resources.CanUpdateAsset)
             {
-                AddPostLink("create", resources.Url<AssetFoldersController>(x => nameof(x.PostAssetFolder), values));
+                AddPostLink("create",
+                    resources.Url<AssetFoldersController>(x => nameof(x.PostAssetFolder), values));
             }
 
             return this;

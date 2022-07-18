@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    public sealed class QueryAsStream : OperationCollectionBase
+    public sealed class QueryAsStream : OperationBase
     {
         public override IEnumerable<CreateIndexModel<MongoContentEntity>> CreateIndexes()
         {
@@ -23,10 +23,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 .Ascending(x => x.IndexedSchemaId));
         }
 
-        public async IAsyncEnumerable<IContentEntity> StreamAll(IAppEntity app, HashSet<DomainId>? schemaIds,
+        public async IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
             [EnumeratorCancellation] CancellationToken ct)
         {
-            var filter = CreateFilter(app.Id, schemaIds);
+            var filter = CreateFilter(appId, schemaIds);
 
             using (var cursor = await Collection.Find(filter).ToCursorAsync(ct))
             {

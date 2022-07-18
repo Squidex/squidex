@@ -26,13 +26,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly QueryById queryBdId;
         private readonly QueryByIds queryByIds;
         private readonly QueryByQuery queryByQuery;
+        private readonly QueryInDedicatedCollection? queryInDedicatedCollection;
         private readonly QueryReferences queryReferences;
         private readonly QueryReferrers queryReferrers;
         private readonly QueryScheduled queryScheduled;
         private readonly ReadPreference readPreference;
         private readonly string name;
 
-        public MongoContentCollection(string name, IMongoDatabase database, ReadPreference readPreference)
+        public MongoContentCollection(string name, IMongoDatabase database, ReadPreference readPreference,
+            bool dedicatedCollections)
             : base(database)
         {
             this.name = name;
@@ -44,6 +46,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             queryReferences = new QueryReferences(queryByIds);
             queryReferrers = new QueryReferrers();
             queryScheduled = new QueryScheduled();
+
+            if (dedicatedCollections)
+            {
+                queryInDedicatedCollection = new QueryInDedicatedCollection(database.Client, name);
+            }
 
             this.readPreference = readPreference;
         }
@@ -69,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         protected override Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection,
             CancellationToken ct)
         {
-            var operations = new OperationCollectionBase[]
+            var operations = new OperationBase[]
             {
                 queryAsStream,
                 queryBdId,
@@ -94,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return Collection.UpdateOneAsync(x => x.DocumentId == documentId, Update.Unset(x => x.ScheduleJob).Unset(x => x.ScheduledAt), cancellationToken: ct);
         }
 
-        public IAsyncEnumerable<IContentEntity> StreamAll(IAppEntity app, HashSet<DomainId>? schemaIds,
+        public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
             CancellationToken ct)
         {
             return queryAsStream.StreamAll(appId, schemaIds, ct);
@@ -122,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             {
                 try
                 {
-                    if (q.Ids != null && q.Ids.Count > 0 && schemas.Count > 0)
+                    if (q.Ids is { Count: > 0 } && schemas.Count > 0)
                     {
                         return await queryByIds.QueryAsync(app, schemas, q, ct);
                     }
@@ -162,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             {
                 try
                 {
-                    if (q.Ids != null && q.Ids.Count > 0)
+                    if (q.Ids is { Count: > 0 })
                     {
                         return await queryByIds.QueryAsync(app, new List<ISchemaEntity> { schema }, q, ct);
                     }
@@ -174,6 +181,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                     if (q.Referencing == default)
                     {
+                        if (queryInDedicatedCollection != null)
+                        {
+                            return await queryInDedicatedCollection.QueryAsync(schema, q, ct);
+                        }
+
                         return await queryByQuery.QueryAsync(schema, q, ct);
                     }
 
@@ -199,21 +211,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(IAppEntity app, HashSet<DomainId> ids,
+        public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryIdsAsync"))
             {
-                return await queryByIds.QueryIdsAsync(app, ids, ct);
+                return await queryByIds.QueryIdsAsync(appId, ids, ct);
             }
         }
 
-        public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(IAppEntity app, ISchemaEntity schema, FilterNode<ClrValue> filterNode,
+        public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryIdsAsync"))
             {
-                return await queryByQuery.QueryIdsAsync(app, schema, filterNode, ct);
+                return await queryByQuery.QueryIdsAsync(appId, schemaId, filterNode, ct);
             }
         }
 
@@ -253,6 +265,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public Task InsertManyAsync(IReadOnlyList<MongoContentEntity> snapshots,
             CancellationToken ct = default)
         {
+            if (snapshots.Count == 0)
+            {
+                return Task.CompletedTask;
+            }
+
             return Collection.InsertManyAsync(snapshots, InsertUnordered, ct);
         }
     }

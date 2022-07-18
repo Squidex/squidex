@@ -159,14 +159,16 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteAssetFolder(string app, DomainId id)
         {
-            await CommandBus.PublishAsync(new DeleteAssetFolder { AssetFolderId = id });
+            var command = new DeleteAssetFolder { AssetFolderId = id };
+
+            await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             return NoContent();
         }
 
         private async Task<AssetFolderDto> InvokeCommandAsync(ICommand command)
         {
-            var context = await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             return AssetFolderDto.FromDomain(context.Result<IAssetFolderEntity>(), Resources);
         }

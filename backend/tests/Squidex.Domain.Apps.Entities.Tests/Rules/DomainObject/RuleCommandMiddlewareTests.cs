@@ -6,19 +6,17 @@
 // ==========================================================================
 
 using FakeItEasy;
-using Orleans;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 {
     public sealed class RuleCommandMiddlewareTests : HandlerTestBase<RuleDomainObject.State>
     {
-        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
+        private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
         private readonly IRuleEnricher ruleEnricher = A.Fake<IRuleEnricher>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly DomainId ruleId = DomainId.NewGuid();
@@ -41,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);
 
-            sut = new RuleCommandMiddleware(grainFactory, ruleEnricher, contextProvider);
+            sut = new RuleCommandMiddleware(domainObjectFactory, ruleEnricher, contextProvider);
         }
 
         [Fact]
@@ -91,13 +89,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
             CreateCommand(command);
 
-            var grain = A.Fake<IRuleGrain>();
+            var domainObject = A.Fake<RuleDomainObject>();
 
-            A.CallTo(() => grain.ExecuteAsync(A<J<CommandRequest>>._))
+            A.CallTo(() => domainObject.ExecuteAsync(A<IAggregateCommand>._, A<CancellationToken>._))
                 .Returns(new CommandResult(command.AggregateId, 1, 0, result));
 
-            A.CallTo(() => grainFactory.GetGrain<IRuleGrain>(command.AggregateId.ToString(), null))
-                .Returns(grain);
+            A.CallTo(() => domainObjectFactory.Create<RuleDomainObject>(command.AggregateId))
+                .Returns(domainObject);
 
             return HandleAsync(sut, command);
         }

@@ -81,12 +81,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 if (resources.CanUpdateRole)
                 {
-                    AddPutLink("update", resources.Url<AppRolesController>(x => nameof(x.PutRole), values));
+                    AddPutLink("update",
+                        resources.Url<AppRolesController>(x => nameof(x.PutRole), values));
                 }
 
                 if (resources.CanDeleteRole && NumClients == 0 && NumContributors == 0)
                 {
-                    AddDeleteLink("delete", resources.Url<AppRolesController>(x => nameof(x.DeleteRole), values));
+                    AddDeleteLink("delete",
+                        resources.Url<AppRolesController>(x => nameof(x.DeleteRole), values));
                 }
             }
 

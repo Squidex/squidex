@@ -119,10 +119,10 @@ namespace Squidex.Infrastructure.Migrations
             A.CallTo(() => migrator_2_3.UpdateAsync(ct))
                 .MustHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(1, ct))
+            A.CallTo(() => status.CompleteAsync(1, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(2, ct))
+            A.CallTo(() => status.CompleteAsync(2, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             A.CallTo(() => status.CompleteAsync(3, ct))
@@ -219,7 +219,7 @@ namespace Squidex.Infrastructure.Migrations
             A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Critical && x.GetArgument<Exception>(3) == ex)
                 .MustHaveHappened();
 
-            A.CallTo(() => migrator_1_2.UpdateAsync(ct))
+            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 

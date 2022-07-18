@@ -16,6 +16,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class ImageAssetMetadataSourceTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly MemoryStream stream = new MemoryStream();
         private readonly AssetFile file;
@@ -23,6 +25,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public ImageAssetMetadataSourceTests()
         {
+            ct = cts.Token;
+
             file = new DelegateAssetFile("MyImage.png", "image/png", 1024, () => stream);
 
             sut = new ImageAssetMetadataSource(assetThumbnailGenerator);
@@ -33,9 +37,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = new CreateAsset { File = file, Type = AssetType.Image };
 
-            await sut.EnhanceAsync(command);
+            await sut.EnhanceAsync(command, ct);
 
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, default))
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, ct))
                 .MustHaveHappened();
         }
 
@@ -44,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = new CreateAsset { File = file };
 
-            await sut.EnhanceAsync(command);
+            await sut.EnhanceAsync(command, ct);
 
             Assert.Empty(command.Tags);
         }
@@ -54,16 +58,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = new CreateAsset { File = file };
 
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, default))
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, ct))
                 .Returns(new ImageInfo(800, 600, ImageOrientation.None, ImageFormat.PNG));
 
-            await sut.EnhanceAsync(command);
+            await sut.EnhanceAsync(command, ct);
 
             Assert.Equal(800, command.Metadata.GetPixelWidth());
             Assert.Equal(600, command.Metadata.GetPixelHeight());
             Assert.Equal(AssetType.Image, command.Type);
 
-            A.CallTo(() => assetThumbnailGenerator.FixOrientationAsync(stream, file.MimeType, A<Stream>._, default))
+            A.CallTo(() => assetThumbnailGenerator.FixOrientationAsync(stream, file.MimeType, A<Stream>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -72,19 +76,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = new CreateAsset { File = file };
 
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, default))
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, ct))
                 .Returns(new ImageInfo(800, 600, ImageOrientation.None, ImageFormat.PNG));
 
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, default))
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, ct))
                 .Returns(new ImageInfo(600, 800, ImageOrientation.BottomRight, ImageFormat.PNG)).Once();
 
-            await sut.EnhanceAsync(command);
+            await sut.EnhanceAsync(command, ct);
 
             Assert.Equal(800, command.Metadata.GetPixelWidth());
             Assert.Equal(600, command.Metadata.GetPixelHeight());
             Assert.Equal(AssetType.Image, command.Type);
 
-            A.CallTo(() => assetThumbnailGenerator.FixOrientationAsync(stream, file.MimeType, A<Stream>._, default))
+            A.CallTo(() => assetThumbnailGenerator.FixOrientationAsync(stream, file.MimeType, A<Stream>._, ct))
                 .MustHaveHappened();
         }
 
@@ -96,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             command.Metadata.SetPixelWidth(100);
             command.Metadata.SetPixelWidth(100);
 
-            await sut.EnhanceAsync(command);
+            await sut.EnhanceAsync(command, ct);
 
             Assert.Contains("image", command.Tags);
             Assert.Contains("image/small", command.Tags);
@@ -110,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             command.Metadata.SetPixelWidth(800);
             command.Metadata.SetPixelWidth(600);
 
-            await sut.EnhanceAsync(command);
+            await sut.EnhanceAsync(command, ct);
 
             Assert.Contains("image", command.Tags);
             Assert.Contains("image/medium", command.Tags);
@@ -124,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             command.Metadata.SetPixelWidth(1200);
             command.Metadata.SetPixelWidth(1400);
 
-            await sut.EnhanceAsync(command);
+            await sut.EnhanceAsync(command, ct);
 
             Assert.Contains("image", command.Tags);
             Assert.Contains("image/large", command.Tags);

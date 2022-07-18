@@ -189,39 +189,46 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
             if (resources.CanUpdateAsset)
             {
-                AddPutLink("update", resources.Url<AssetsController>(x => nameof(x.PutAsset), values));
+                AddPutLink("update",
+                    resources.Url<AssetsController>(x => nameof(x.PutAsset), values));
             }
 
             if (resources.CanUpdateAsset)
             {
-                AddPutLink("move", resources.Url<AssetsController>(x => nameof(x.PutAssetParent), values));
+                AddPutLink("move",
+                    resources.Url<AssetsController>(x => nameof(x.PutAssetParent), values));
             }
 
             if (resources.CanUploadAsset)
             {
-                AddPutLink("upload", resources.Url<AssetsController>(x => nameof(x.PutAssetContent), values));
+                AddPutLink("upload",
+                    resources.Url<AssetsController>(x => nameof(x.PutAssetContent), values));
             }
 
             if (resources.CanDeleteAsset)
             {
-                AddDeleteLink("delete", resources.Url<AssetsController>(x => nameof(x.DeleteAsset), values));
+                AddDeleteLink("delete",
+                    resources.Url<AssetsController>(x => nameof(x.DeleteAsset), values));
             }
 
             if (!string.IsNullOrWhiteSpace(Slug))
             {
                 var idValues = new { app, idOrSlug = Id, more = Slug };
 
-                AddGetLink("content", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), idValues));
+                AddGetLink("content",
+                    resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), idValues));
 
                 var slugValues = new { app, idOrSlug = Slug };
 
-                AddGetLink("content/slug", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), slugValues));
+                AddGetLink("content/slug",
+                    resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), slugValues));
             }
             else
             {
                 var idValues = new { app, idOrSlug = Id };
 
-                AddGetLink("content", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), idValues));
+                AddGetLink("content",
+                    resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), idValues));
             }
 
             return this;

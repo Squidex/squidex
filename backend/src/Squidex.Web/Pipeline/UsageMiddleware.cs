@@ -19,14 +19,13 @@ namespace Squidex.Web.Pipeline
     {
         private readonly IAppLogStore usageLog;
         private readonly IApiUsageTracker usageTracker;
-        private readonly IClock clock;
 
-        public UsageMiddleware(IAppLogStore usageLog, IApiUsageTracker usageTracker, IClock clock)
+        public IClock Clock { get; set; } = SystemClock.Instance;
+
+        public UsageMiddleware(IAppLogStore usageLog, IApiUsageTracker usageTracker )
         {
             this.usageLog = usageLog;
             this.usageTracker = usageTracker;
-
-            this.clock = clock;
         }
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -64,7 +63,7 @@ namespace Squidex.Web.Pipeline
                         request.ElapsedMs = watch.Stop();
                         request.RequestMethod = context.Request.Method;
                         request.RequestPath = context.Request.Path;
-                        request.Timestamp = clock.GetCurrentInstant();
+                        request.Timestamp = Clock.GetCurrentInstant();
                         request.StatusCode = context.Response.StatusCode;
                         request.UserId = context.User.OpenIdSubject();
                         request.UserClientId = clientId;

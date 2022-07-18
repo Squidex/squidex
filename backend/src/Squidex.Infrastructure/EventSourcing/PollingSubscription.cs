@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public PollingSubscription(
             IEventStore eventStore,
-            IEventSubscriber eventSubscriber,
+            IEventSubscriber<StoredEvent> eventSubscriber,
             string? streamFilter,
             string? position)
         {
@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 {
                     await foreach (var storedEvent in eventStore.QueryAllAsync(streamFilter, position, ct: ct))
                     {
-                        await eventSubscriber.OnEventAsync(this, storedEvent);
+                        await eventSubscriber.OnNextAsync(this, storedEvent);
 
                         position = storedEvent.EventPosition;
                     }
@@ -38,14 +38,19 @@ namespace Squidex.Infrastructure.EventSourcing
             });
         }
 
+        public ValueTask CompleteAsync()
+        {
+            return new ValueTask(timer.StopAsync());
+        }
+
+        public void Dispose()
+        {
+            timer.StopAsync().Forget();
+        }
+
         public void WakeUp()
         {
             timer.SkipCurrentDelay();
-        }
-
-        public void Unsubscribe()
-        {
-            timer.StopAsync().Forget();
         }
     }
 }

@@ -92,8 +92,10 @@ jobs:
         with:
           image: squidex/build
           environment: |
+            CONFIG__BACKUPURL=http://localhost:5000
             CONFIG__WAIT=60
             CONFIG__SERVER__URL=http://localhost:8080
+            WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher
           default_network: host
           options: --name test1
           volumes: ${{ github.workspace }}:/src
@@ -104,8 +106,10 @@ jobs:
         with:
           image: squidex/build
           environment: |
+            CONFIG__BACKUPURL=http://localhost:5000
             CONFIG__WAIT=60
             CONFIG__SERVER__URL=http://localhost:8081/squidex
+            WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher
           default_network: host
           options: --name test2
           volumes: ${{ github.workspace }}:/src
@@ -143,6 +147,13 @@ jobs:
           string: "${{ env.GITHUB_REF_SLUG }}"
           split-by: "."
 
+      - name: Check Tag
+        id: normal-version
+        run: |
+          if [[ ${{ env.GITHUB_REF_SLUG }} =~ ^[0-9]+\.[0-9]+$ ]]; then
+              echo ::set-output name=match::true
+          fi
+
       - name: Get Image From Cache
         uses: actions/cache@v2
         with:
@@ -158,11 +169,16 @@ jobs:
           docker tag squidex-tmp squidex/squidex:${{ env.GITHUB_REF_SLUG }}
           docker tag squidex-tmp squidex/squidex:${{ steps.version.outputs._0 }}
 
-      - name: Push Tags
+      - name: Push Version
         run: |
           docker push squidex/squidex:latest
           docker push squidex/squidex:${{ env.GITHUB_REF_SLUG }}
           docker push squidex/squidex:${{ steps.version.outputs._0 }}
+
+      - name: Push Latest
+        run: |
+          docker push squidex/squidex:latest
+        if: steps.normal-version.outputs.match == 'true'
 
   release:
     needs: publish

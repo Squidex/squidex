@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -67,12 +67,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                     e(Not.Valid(nameof(command.Role)), nameof(command.Role));
                 }
 
-                if (command.ApiCallsLimit != null && command.ApiCallsLimit < 0)
+                if (command.ApiCallsLimit is < 0)
                 {
                     e(Not.GreaterEqualsThan(nameof(command.ApiCallsLimit), "0"), nameof(command.ApiCallsLimit));
                 }
 
-                if (command.ApiTrafficLimit != null && command.ApiTrafficLimit < 0)
+                if (command.ApiTrafficLimit is < 0)
                 {
                     e(Not.GreaterEqualsThan(nameof(command.ApiTrafficLimit), "0"), nameof(command.ApiTrafficLimit));
                 }

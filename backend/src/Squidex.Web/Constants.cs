@@ -14,13 +14,9 @@ namespace Squidex.Web
     {
         public const string SecurityDefinition = "squidex-oauth-auth";
 
-        public const string OrleansClusterId = "squidex-v2";
-
         public const string ApiSecurityScheme = "API";
 
         public const string PrefixApi = "/api";
-
-        public const string PrefixOrleans = "/orleans";
 
         public const string PrefixPortal = "/portal";
 

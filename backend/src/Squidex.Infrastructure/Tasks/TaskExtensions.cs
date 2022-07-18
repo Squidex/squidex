@@ -66,11 +66,10 @@ namespace Squidex.Infrastructure.Tasks
             {
                 await target.Completion.ConfigureAwait(false);
             }
-#pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
             catch
-#pragma warning restore RECS0022 // A catch clause that catches System.Exception and has an empty body
             {
-                // we do not want to change the stacktrace of the exception.
+                // We do not want to change the stacktrace of the exception.
+                return;
             }
 
             if (target.Completion.IsFaulted && target.Completion.Exception != null)

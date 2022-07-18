@@ -6,85 +6,113 @@
 // ==========================================================================
 
 using FakeItEasy;
-using Orleans;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Commands;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class ContentLoaderTests
     {
-        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
-        private readonly IContentGrain grain = A.Fake<IContentGrain>();
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
+        private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
+        private readonly IDomainObjectCache domainObjectCache = A.Fake<IDomainObjectCache>();
+        private readonly ContentDomainObject domainObject = A.Fake<ContentDomainObject>();
         private readonly DomainId appId = DomainId.NewGuid();
         private readonly DomainId id = DomainId.NewGuid();
+        private readonly DomainId unqiueId;
         private readonly ContentLoader sut;
 
         public ContentLoaderTests()
         {
-            var key = DomainId.Combine(appId, id).ToString();
+            ct = cts.Token;
 
-            A.CallTo(() => grainFactory.GetGrain<IContentGrain>(key, null))
-                .Returns(grain);
+            unqiueId = DomainId.Combine(appId, id);
 
-            sut = new ContentLoader(grainFactory);
+            A.CallTo(() => domainObjectCache.GetAsync<ContentDomainObject.State>(A<DomainId>._, A<long>._, ct))
+                .Returns(Task.FromResult<ContentDomainObject.State>(null!));
+
+            A.CallTo(() => domainObjectFactory.Create<ContentDomainObject>(unqiueId))
+                .Returns(domainObject);
+
+            sut = new ContentLoader(domainObjectFactory, domainObjectCache);
         }
 
         [Fact]
         public async Task Should_return_null_if_no_state_returned()
         {
-            A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IContentEntity>(null!));
+            var content = (ContentDomainObject.State)null!;
 
-            Assert.Null(await sut.GetAsync(appId, id, 10));
+            A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+                .Returns(content);
+
+            Assert.Null(await sut.GetAsync(appId, id, 10, ct));
         }
 
         [Fact]
         public async Task Should_return_null_if_state_empty()
         {
-            var content = new ContentEntity { Version = EtagVersion.Empty };
+            var content = new ContentDomainObject.State { Version = EtagVersion.Empty };
 
-            A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IContentEntity>(content));
+            A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+                .Returns(content);
 
-            Assert.Null(await sut.GetAsync(appId, id, 10));
+            Assert.Null(await sut.GetAsync(appId, id, 10, ct));
         }
 
         [Fact]
         public async Task Should_return_null_if_state_has_other_version()
         {
-            var content = new ContentEntity { Version = 5 };
+            var content = new ContentDomainObject.State { Version = 5 };
 
-            A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IContentEntity>(content));
+            A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+                .Returns(content);
 
-            Assert.Null(await sut.GetAsync(appId, id, 10));
+            Assert.Null(await sut.GetAsync(appId, id, 10, ct));
         }
 
         [Fact]
         public async Task Should_not_return_null_if_state_has_other_version_than_any()
         {
-            var content = new ContentEntity { Version = 5 };
+            var content = new ContentDomainObject.State { Version = 5 };
 
-            A.CallTo(() => grain.GetStateAsync(EtagVersion.Any))
-                .Returns(J.Of<IContentEntity>(content));
+            A.CallTo(() => domainObject.GetSnapshotAsync(EtagVersion.Any, ct))
+                .Returns(content);
 
-            await sut.GetAsync(appId, id, EtagVersion.Any);
+            var result = await sut.GetAsync(appId, id, EtagVersion.Any, ct);
+
+            Assert.Same(content, result);
         }
 
         [Fact]
         public async Task Should_return_content_from_state()
         {
-            var content = new ContentEntity { Version = 10 };
+            var content = new ContentDomainObject.State { Version = 10 };
 
-            A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IContentEntity>(content));
+            A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+                .Returns(content);
 
-            var result = await sut.GetAsync(appId, id, 10);
+            var result = await sut.GetAsync(appId, id, 10, ct);
 
             Assert.Same(content, result);
+        }
+
+        [Fact]
+        public async Task Should_return_content_from_cache()
+        {
+            var content = new ContentDomainObject.State { Version = 10 };
+
+            A.CallTo(() => domainObjectCache.GetAsync<ContentDomainObject.State>(DomainId.Combine(appId, id), 10, ct))
+                .Returns(content);
+
+            var result = await sut.GetAsync(appId, id, 10, ct);
+
+            Assert.Same(content, result);
+
+            A.CallTo(() => domainObjectFactory.Create<ContentDomainObject>(unqiueId))
+                .MustNotHaveHappened();
         }
     }
 }

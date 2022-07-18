@@ -17,9 +17,9 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal sealed class QueryByIds : OperationCollectionBase
+    internal sealed class QueryByIds : OperationBase
     {
-        public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(IAppEntity app, HashSet<DomainId> ids,
+        public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids,
             CancellationToken ct)
         {
             if (ids == null || ids.Count == 0)
@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 return ReadonlyList.Empty<ContentIdStatus>();
             }
 
-            var filter = CreateFilter(app.Id, null, ids);
+            var filter = CreateFilter(appId, null, ids);
 
             var contentEntities = await Collection.FindStatusAsync(filter, ct);
 

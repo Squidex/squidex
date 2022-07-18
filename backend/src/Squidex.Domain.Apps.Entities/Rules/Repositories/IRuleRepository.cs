@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Repositories
 {
     public interface IRuleRepository
     {
-        Task<List<DomainId>> QueryIdsAsync(DomainId appId,
+        Task<List<IRuleEntity>> QueryAllAsync(DomainId appId,
             CancellationToken ct = default);
     }
 }

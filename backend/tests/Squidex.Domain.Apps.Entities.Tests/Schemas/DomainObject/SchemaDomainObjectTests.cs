@@ -37,9 +37,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
         {
             var log = A.Fake<ILogger<SchemaDomainObject>>();
 
-            sut = new SchemaDomainObject(PersistenceFactory, log);
 #pragma warning disable MA0056 // Do not call overridable members in constructor
-            sut.Setup(Id);
+            sut = new SchemaDomainObject(Id, PersistenceFactory, log);
 #pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
@@ -786,7 +785,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
         private async Task<object> PublishAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
         {
-            var result = await sut.ExecuteAsync(CreateCommand(command));
+            var result = await sut.ExecuteAsync(CreateCommand(command), default);
 
             return result.Payload;
         }

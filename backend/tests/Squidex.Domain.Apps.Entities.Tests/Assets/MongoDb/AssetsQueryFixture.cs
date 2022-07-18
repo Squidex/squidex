@@ -117,9 +117,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         private static void SetupJson()
         {
-            var jsonSerializer = JsonSerializer.Create(TestUtils.DefaultSerializerSettings);
+            var serializer = JsonSerializer.Create(TestUtils.DefaultSerializerSettings);
 
-            BsonJsonConvention.Register(jsonSerializer);
+            BsonJsonConvention.Register(serializer);
         }
 
         public DomainId RandomAppId()

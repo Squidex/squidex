@@ -5,76 +5,95 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.States;
+using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class BackupService : IBackupService, IDeleter
     {
-        private readonly IGrainFactory grainFactory;
+        private readonly SimpleState<BackupRestoreState> restoreState;
+        private readonly IPersistenceFactory<BackupState> persistenceFactoryBackup;
+        private readonly IMessageBus messaging;
 
-        public BackupService(IGrainFactory grainFactory)
+        public BackupService(
+            IPersistenceFactory<BackupRestoreState> persistenceFactoryRestore,
+            IPersistenceFactory<BackupState> persistenceFactoryBackup,
+            IMessageBus messaging)
         {
-            this.grainFactory = grainFactory;
+            this.persistenceFactoryBackup = persistenceFactoryBackup;
+            this.messaging = messaging;
+
+            restoreState = new SimpleState<BackupRestoreState>(persistenceFactoryRestore, GetType(), "Default");
         }
 
         Task IDeleter.DeleteAppAsync(IAppEntity app,
             CancellationToken ct)
         {
-            return BackupGrain(app.Id).ClearAsync();
+            return messaging.PublishAsync(new BackupClear(app.Id), ct: ct);
         }
 
-        public Task StartBackupAsync(DomainId appId, RefToken actor)
+        public async Task StartBackupAsync(DomainId appId, RefToken actor,
+            CancellationToken ct = default)
         {
-            return BackupGrain(appId).BackupAsync(actor);
+            var state = await GetStateAsync(appId, ct);
+
+            state.Value.EnsureCanStart();
+
+            await messaging.PublishAsync(new BackupStart(appId, actor), ct: ct);
         }
 
-        public Task StartRestoreAsync(RefToken actor, Uri url, string? newAppName)
+        public async Task StartRestoreAsync(RefToken actor, Uri url, string? newAppName,
+            CancellationToken ct = default)
         {
-            return RestoreGrain().RestoreAsync(url, actor, newAppName);
+            await restoreState.LoadAsync(ct);
+
+            restoreState.Value.Job?.EnsureCanStart();
+
+            await messaging.PublishAsync(new BackupRestore(actor, url, newAppName), ct: ct);
         }
 
         public Task DeleteBackupAsync(DomainId appId, DomainId backupId,
             CancellationToken ct = default)
         {
-            return BackupGrain(appId).DeleteAsync(backupId);
+            return messaging.PublishAsync(new BackupDelete(appId, backupId), ct: ct);
         }
 
-        public async Task<IRestoreJob?> GetRestoreAsync(
+        public async Task<IRestoreJob> GetRestoreAsync(
             CancellationToken ct = default)
         {
-            var state = await RestoreGrain().GetStateAsync();
+            await restoreState.LoadAsync(ct);
 
-            return state.Value;
+            return restoreState.Value.Job ?? new RestoreJob();
         }
 
         public async Task<List<IBackupJob>> GetBackupsAsync(DomainId appId,
             CancellationToken ct = default)
         {
-            var state = await BackupGrain(appId).GetStateAsync();
+            var state = await GetStateAsync(appId, ct);
 
-            return state.Value;
+            return state.Value.Jobs.OfType<IBackupJob>().ToList();
         }
 
         public async Task<IBackupJob?> GetBackupAsync(DomainId appId, DomainId backupId,
             CancellationToken ct = default)
         {
-            var state = await BackupGrain(appId).GetStateAsync();
+            var state = await GetStateAsync(appId, ct);
 
-            return state.Value.Find(x => x.Id == backupId);
+            return state.Value.Jobs.Find(x => x.Id == backupId);
         }
 
-        private IRestoreGrain RestoreGrain()
+        private async Task<SimpleState<BackupState>> GetStateAsync(DomainId appId,
+            CancellationToken ct)
         {
-            return grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id);
-        }
+            var state = new SimpleState<BackupState>(persistenceFactoryBackup, GetType(), appId);
 
-        private IBackupGrain BackupGrain(DomainId appId)
-        {
-            return grainFactory.GetGrain<IBackupGrain>(appId.ToString());
+            await state.LoadAsync(ct);
+
+            return state;
         }
     }
 }

@@ -29,10 +29,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         public static async Task<RulesDto> FromRulesAsync(IEnumerable<IEnrichedRuleEntity> items, IRuleRunnerService ruleRunnerService, Resources resources)
         {
             var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(resources.Context.App.Id);
+            var runningAvailable = runningRuleId != default;
 
             var result = new RulesDto
             {
-                Items = items.Select(x => RuleDto.FromDomain(x, runningRuleId == null, ruleRunnerService, resources)).ToArray()
+                Items = items.Select(x => RuleDto.FromDomain(x, runningAvailable, ruleRunnerService, resources)).ToArray()
             };
 
             result.RunningRuleId = runningRuleId;
@@ -48,17 +49,20 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
             if (resources.CanCreateRule)
             {
-                AddPostLink("create", resources.Url<RulesController>(x => nameof(x.PostRule), values));
+                AddPostLink("create",
+                    resources.Url<RulesController>(x => nameof(x.PostRule), values));
             }
 
             if (resources.CanReadRuleEvents)
             {
-                AddGetLink("events", resources.Url<RulesController>(x => nameof(x.GetEvents), values));
+                AddGetLink("events",
+                    resources.Url<RulesController>(x => nameof(x.GetEvents), values));
             }
 
             if (resources.CanDeleteRuleEvents && runningRuleId != null)
             {
-                AddDeleteLink("run/cancel", resources.Url<RulesController>(x => nameof(x.DeleteRuleRun), values));
+                AddDeleteLink("run/cancel",
+                    resources.Url<RulesController>(x => nameof(x.DeleteRuleRun), values));
             }
 
             return this;

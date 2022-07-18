@@ -6,13 +6,11 @@
 // ==========================================================================
 
 using FakeItEasy;
-using Orleans;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
@@ -20,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 {
     public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject.State>
     {
-        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
+        private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
@@ -44,11 +42,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);
 
-            sut = new AppCommandMiddleware(grainFactory, appImageStore, assetThumbnailGenerator, contextProvider);
+            sut = new AppCommandMiddleware(domainObjectFactory, appImageStore, assetThumbnailGenerator, contextProvider);
         }
 
         [Fact]
-        public async Task Should_replace_context_app_with_grain_result()
+        public async Task Should_replace_context_app_with_domain_object_result()
         {
             var result = A.Fake<IAppEntity>();
 
@@ -88,13 +86,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             command.AppId = appId;
 
-            var grain = A.Fake<IAppGrain>();
+            var domainObject = A.Fake<AppDomainObject>();
 
-            A.CallTo(() => grain.ExecuteAsync(A<J<CommandRequest>>._))
+            A.CallTo(() => domainObject.ExecuteAsync(A<IAggregateCommand>._, A<CancellationToken>._))
                 .Returns(new CommandResult(command.AggregateId, 1, 0, result));
 
-            A.CallTo(() => grainFactory.GetGrain<IAppGrain>(command.AggregateId.ToString(), null))
-                .Returns(grain);
+            A.CallTo(() => domainObjectFactory.Create<AppDomainObject>(command.AggregateId))
+                .Returns(domainObject);
 
             return HandleAsync(sut, command);
         }

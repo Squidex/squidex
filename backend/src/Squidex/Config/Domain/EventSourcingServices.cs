@@ -6,11 +6,10 @@
 // ==========================================================================
 
 using EventStore.Client;
-using MongoDB.Driver;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Config.Domain
@@ -50,24 +49,23 @@ namespace Squidex.Config.Domain
                 }
             });
 
-            services.AddSingletonAs<OrleansEventNotifier>()
-                .As<IEventNotifier>();
-
             services.AddTransientAs<Rebuilder>()
                 .AsSelf();
 
-            services.AddSingletonAs<DefaultStreamNameResolver>()
-                .As<IStreamNameResolver>();
+            services.AddSingletonAs<EventConsumerManager>()
+                .As<IEventConsumerManager>();
 
-            services.AddSingletonAs<DefaultEventDataFormatter>()
-                .As<IEventDataFormatter>();
+            services.AddSingletonAs<DefaultEventStreamNames>()
+                .As<IEventStreamNames>();
 
-            services.AddSingletonAs(c =>
-            {
-                var allEventConsumers = c.GetServices<IEventConsumer>();
+            services.AddSingletonAs<DefaultEventFormatter>()
+                .As<IEventFormatter>();
 
-                return new EventConsumerFactory(n => allEventConsumers.First(x => x.Name == n));
-            });
+            services.AddSingletonAs<NoopEventNotifier>()
+                .As<IEventNotifier>();
+
+            services.AddSingleton<Func<IEventConsumer, EventConsumerProcessor>>(
+                sb => c => ActivatorUtilities.CreateInstance<EventConsumerProcessor>(sb, c));
         }
     }
 }

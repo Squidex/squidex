@@ -94,7 +94,7 @@ namespace Squidex.Web.CommandMiddlewares
         {
             var commandContext = new CommandContext(command, A.Fake<ICommandBus>()).Complete(result);
 
-            await sut.HandleAsync(commandContext);
+            await sut.HandleAsync(commandContext, default);
 
             return commandContext;
         }

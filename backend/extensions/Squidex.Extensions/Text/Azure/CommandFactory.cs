@@ -96,7 +96,7 @@ namespace Squidex.Extensions.Text.Azure
             {
                 ["docId"] = update.DocId.ToBase64(),
                 ["serveAll"] = update.ServeAll,
-                ["servePublished"] = update.ServePublished,
+                ["servePublished"] = update.ServePublished
             };
 
             batch.Add(IndexDocumentsAction.MergeOrUpload(document));

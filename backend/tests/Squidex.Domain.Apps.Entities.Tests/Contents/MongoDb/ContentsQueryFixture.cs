@@ -61,7 +61,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             ContentRepository =
                 new MongoContentRepository(
                     mongoDatabase,
-                    appProvider);
+                    appProvider,
+                    false);
 
             Task.Run(async () =>
             {
@@ -152,9 +153,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         private static void SetupJson()
         {
-            var jsonSerializer = JsonSerializer.Create(TestUtils.DefaultSerializerSettings);
+            var serializer = JsonSerializer.Create(TestUtils.DefaultSerializerSettings);
 
-            BsonJsonConvention.Register(jsonSerializer);
+            BsonJsonConvention.Register(serializer);
         }
 
         public DomainId RandomAppId()

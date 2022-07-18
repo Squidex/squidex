@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             {
                 try
                 {
-                    if (q.Ids != null && q.Ids.Count > 0)
+                    if (q.Ids is { Count: > 0 })
                     {
                         var filter = BuildFilter(appId, q.Ids.ToHashSet());
 
@@ -258,7 +258,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return Filter.And(
                 Filter.Gt(x => x.LastModified, default),
                 Filter.Gt(x => x.Id, DomainId.Create(string.Empty)),
-                Filter.Gt(x => x.IndexedAppId, appId),
+                Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.Ne(x => x.IsDeleted, true),
                 Filter.Ne(x => x.ParentId, parentId));
         }

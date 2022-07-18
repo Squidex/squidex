@@ -101,12 +101,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             {
                 filter?.Invoke(filterNode.ToString());
 
-                var foundIds = new List<(DomainId, DomainId, Status)>
+                var foundIds = new List<ContentIdStatus>
                 {
-                    (id, id, Status.Draft)
+                    new ContentIdStatus(id, id, Status.Draft)
                 };
 
-                return Task.FromResult<IReadOnlyList<(DomainId, DomainId, Status)>>(foundIds);
+                return Task.FromResult<IReadOnlyList<ContentIdStatus>>(foundIds);
             };
         }
     }

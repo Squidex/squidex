@@ -120,13 +120,12 @@ namespace Squidex.Infrastructure.UsageTracking
 
             ThrowIfDisposed();
 
-            var usages = await usageRepository.QueryAsync(key, fromDate, toDate, ct);
-
             var result = new Dictionary<string, List<(DateTime Date, Counters Counters)>>();
 
-            var categories = usages.GroupBy(x => GetCategory(x.Category)).ToDictionary(x => x.Key, x => x.ToList());
+            var usageData = await usageRepository.QueryAsync(key, fromDate, toDate, ct);
+            var usageGroups = usageData.GroupBy(x => GetCategory(x.Category)).ToDictionary(x => x.Key, x => x.ToList());
 
-            if (categories.Keys.Count == 0)
+            if (usageGroups.Keys.Count == 0)
             {
                 var enriched = new List<(DateTime Date, Counters Counters)>();
 
@@ -138,7 +137,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 result[FallbackCategory] = enriched;
             }
 
-            foreach (var (category, value) in categories)
+            foreach (var (category, value) in usageGroups)
             {
                 var enriched = new List<(DateTime Date, Counters Counters)>();
 

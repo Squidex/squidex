@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
@@ -20,17 +21,15 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 {
-    public sealed partial class RuleDomainObject : DomainObject<RuleDomainObject.State>
+    public partial class RuleDomainObject : DomainObject<RuleDomainObject.State>
     {
-        private readonly IAppProvider appProvider;
-        private readonly IRuleEnqueuer ruleEnqueuer;
+        private readonly IServiceProvider serviceProvider;
 
-        public RuleDomainObject(IPersistenceFactory<State> factory, ILogger<RuleDomainObject> log,
-            IAppProvider appProvider, IRuleEnqueuer ruleEnqueuer)
-            : base(factory, log)
+        public RuleDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<RuleDomainObject> log,
+            IServiceProvider serviceProvider)
+            : base(id, persistence, log)
         {
-            this.appProvider = appProvider;
-            this.ruleEnqueuer = ruleEnqueuer;
+            this.serviceProvider = serviceProvider;
         }
 
         protected override bool IsDeleted(State snapshot)
@@ -50,29 +49,30 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                 ruleCommand.RuleId.Equals(Snapshot.Id);
         }
 
-        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+            CancellationToken ct)
         {
             switch (command)
             {
                 case CreateRule createRule:
-                    return CreateReturnAsync(createRule, async c =>
+                    return CreateReturnAsync(createRule, async (c, ct) =>
                     {
-                        await GuardRule.CanCreate(c, appProvider);
+                        await GuardRule.CanCreate(c, AppProvider());
 
                         Create(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateRule updateRule:
-                    return UpdateReturnAsync(updateRule, async c =>
+                    return UpdateReturnAsync(updateRule, async (c, ct) =>
                     {
-                        await GuardRule.CanUpdate(c, Snapshot, appProvider);
+                        await GuardRule.CanUpdate(c, Snapshot, AppProvider());
 
                         Update(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case EnableRule enable:
                     return UpdateReturn(enable, c =>
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                         Enable(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case DisableRule disable:
                     return UpdateReturn(disable, c =>
@@ -88,21 +88,21 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                         Disable(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case DeleteRule delete:
                     return Update(delete, c =>
                     {
                         Delete(c);
-                    });
+                    }, ct);
 
                 case TriggerRule triggerRule:
-                    return UpdateReturnAsync(triggerRule, async c =>
+                    return UpdateReturnAsync(triggerRule, async (c, ct) =>
                     {
                         await Trigger(triggerRule);
 
                         return true;
-                    });
+                    }, ct);
 
                 default:
                     ThrowHelper.NotSupportedException();
@@ -117,7 +117,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             SimpleMapper.Map(command, @event);
             SimpleMapper.Map(Snapshot, @event);
 
-            await ruleEnqueuer.EnqueueAsync(Snapshot.RuleDef, Snapshot.Id, Envelope.Create(@event));
+            await RuleEnqueuer().EnqueueAsync(Snapshot.RuleDef, Snapshot.Id, Envelope.Create(@event));
+        }
+
+        private IRuleEnqueuer RuleEnqueuer()
+        {
+            return serviceProvider.GetRequiredService<IRuleEnqueuer>();
         }
 
         private void Create(CreateRule command)
@@ -148,6 +153,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
         {
             RaiseEvent(Envelope.Create(SimpleMapper.Map(command, @event)));
+        }
+
+        private IAppProvider AppProvider()
+        {
+            return serviceProvider.GetRequiredService<IAppProvider>();
         }
     }
 }

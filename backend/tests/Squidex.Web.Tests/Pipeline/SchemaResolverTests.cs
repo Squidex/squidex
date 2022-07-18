@@ -232,11 +232,8 @@ namespace Squidex.Web.Pipeline
 
             var schemaEntity = A.Fake<ISchemaEntity>();
 
-            A.CallTo(() => schemaEntity.SchemaDef)
-                .Returns(schema);
-
-            A.CallTo(() => schemaEntity.Id)
-                .Returns(schemaId.Id);
+            A.CallTo(() => schemaEntity.Id).Returns(schemaId.Id);
+            A.CallTo(() => schemaEntity.SchemaDef).Returns(schema);
 
             return schemaEntity;
         }

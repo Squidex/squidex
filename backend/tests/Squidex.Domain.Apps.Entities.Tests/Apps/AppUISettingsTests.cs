@@ -6,93 +6,200 @@
 // ==========================================================================
 
 using FakeItEasy;
-using Orleans;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public class AppUISettingsTests
+    public sealed class AppUISettingsTests
     {
-        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
-        private readonly IAppUISettingsGrain grain = A.Fake<IAppUISettingsGrain>();
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
+        private readonly TestState<AppUISettings.State> state;
+        private readonly DomainId appId = DomainId.NewGuid();
+        private readonly string userId = Guid.NewGuid().ToString();
+        private readonly string stateId;
         private readonly AppUISettings sut;
 
         public AppUISettingsTests()
         {
-            A.CallTo(() => grainFactory.GetGrain<IAppUISettingsGrain>(A<string>._, null))
-                .Returns(grain);
+            ct = cts.Token;
 
-            sut = new AppUISettings(grainFactory);
+            stateId = $"{appId}_{userId}";
+            state = new TestState<AppUISettings.State>(stateId);
+
+            sut = new AppUISettings(state.PersistenceFactory);
         }
 
         [Fact]
-        public async Task Should_call_grain_if_retrieving_settings()
+        public void Should_run_with_default_order()
         {
-            var settings = new JsonObject();
+            var order = ((IDeleter)sut).Order;
 
-            A.CallTo(() => grain.GetAsync())
-                .Returns(settings.AsJ());
-
-            var result = await sut.GetAsync(DomainId.NewGuid(), "user");
-
-            Assert.Same(settings, result);
+            Assert.Equal(0, order);
         }
 
         [Fact]
-        public async Task Should_call_grain_if_setting_value()
+        public async Task Should_delete_contributor_state()
         {
-            var value = new JsonObject();
+            await ((IDeleter)sut).DeleteContributorAsync(appId, userId, ct);
 
-            await sut.SetAsync(DomainId.NewGuid(), "user", "the.path", value);
-
-            A.CallTo(() => grain.SetAsync("the.path", A<J<JsonValue>>.That.Matches(x => x.Value == value)))
+            A.CallTo(() => state.Persistence.DeleteAsync(ct))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_call_grain_if_replacing_settings()
+        public async Task Should_delete_app_and_contributors()
         {
-            var value = new JsonObject();
+            var app = Mocks.App(NamedId.Of(appId, "my-app"));
 
-            await sut.SetAsync(DomainId.NewGuid(), "user", value);
+            A.CallTo(() => app.Contributors)
+                .Returns(AppContributors.Empty.Assign(userId, Role.Owner));
 
-            A.CallTo(() => grain.SetAsync(A<J<JsonObject>>.That.Matches(x => x.Value == value)))
+            var rootState = new TestState<AppUISettings.State>(appId, state.PersistenceFactory);
+
+            await ((IDeleter)sut).DeleteAppAsync(app, ct);
+
+            A.CallTo(() => state.Persistence.DeleteAsync(ct))
+                .MustHaveHappened();
+
+            A.CallTo(() => rootState.Persistence.DeleteAsync(ct))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_call_grain_if_removing_value()
+        public async Task Should_set_setting()
         {
-            await sut.RemoveAsync(DomainId.NewGuid(), "user", "the.path");
+            await sut.SetAsync(appId, userId, new JsonObject().Add("key", 42), ct);
 
-            A.CallTo(() => grain.RemoveAsync("the.path"))
+            var actual = await sut.GetAsync(appId, userId, ct);
+
+            var expected =
+                new JsonObject().Add("key", 42);
+
+            Assert.Equal(expected.ToString(), actual.ToString());
+
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, ct))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_clear_grain_when_app_deleted()
+        public async Task Should_set_root_value()
         {
-            var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
+            await sut.SetAsync(appId, userId, "key", 42, ct);
 
-            await ((IDeleter)sut).DeleteAppAsync(app, default);
+            var actual = await sut.GetAsync(appId, userId, ct);
 
-            A.CallTo(() => grain.ClearAsync())
+            var expected =
+                new JsonObject().Add("key", 42);
+
+            Assert.Equal(expected.ToString(), actual.ToString());
+
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, ct))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_clear_grain_when_contributor_removed()
+        public async Task Should_remove_root_value()
         {
-            var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
+            await sut.SetAsync(appId, userId, "key", 42, ct);
 
-            await ((IDeleter)sut).DeleteContributorAsync(app.Id, "user1", default);
+            await sut.RemoveAsync(appId, userId, "key", ct);
+            await sut.RemoveAsync(appId, userId, "key", ct);
 
-            A.CallTo(() => grain.ClearAsync())
+            var actual = await sut.GetAsync(appId, userId, ct);
+
+            var expected = new JsonObject();
+
+            Assert.Equal(expected.ToString(), actual.ToString());
+
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, ct))
+                .MustHaveHappenedTwiceExactly();
+        }
+
+        [Fact]
+        public async Task Should_set_nested_value()
+        {
+            await sut.SetAsync(appId, userId, "root.nested", 42, ct);
+
+            var actual = await sut.GetAsync(appId, userId, ct);
+
+            var expected =
+                new JsonObject().Add("root",
+                    new JsonObject().Add("nested", 42));
+
+            Assert.Equal(expected.ToString(), actual.ToString());
+
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, ct))
                 .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_write_state_if_value_not_changed()
+        {
+            await sut.SetAsync(appId, userId, "root.nested", 42, ct);
+            await sut.SetAsync(appId, userId, "root.nested", 42, ct);
+
+            var actual = await sut.GetAsync(appId, userId, ct);
+
+            var expected =
+                new JsonObject().Add("root",
+                    new JsonObject().Add("nested", 42));
+
+            Assert.Equal(expected.ToString(), actual.ToString());
+
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, ct))
+                .MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task Should_remove_nested_value()
+        {
+            await sut.SetAsync(appId, userId, "root.nested", 42, ct);
+
+            await sut.RemoveAsync(appId, userId, "root.nested", ct);
+            await sut.RemoveAsync(appId, userId, "key", ct);
+
+            var actual = await sut.GetAsync(appId, userId, ct);
+
+            var expected =
+                new JsonObject().Add("root",
+                    new JsonObject());
+
+            Assert.Equal(expected.ToString(), actual.ToString());
+
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, ct))
+                .MustHaveHappenedTwiceExactly();
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_nested_not_an_object()
+        {
+            await sut.SetAsync(appId, userId, "root.nested", 42, ct);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.SetAsync(appId, userId, "root.nested.value", 42, ct));
+        }
+
+        [Fact]
+        public async Task Should_do_nothing_if_deleting_and_nested_not_found()
+        {
+            await sut.RemoveAsync(appId, userId, "root.nested", ct);
+
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, A<CancellationToken>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_do_nothing_if_deleting_and_key_not_found()
+        {
+            await sut.RemoveAsync(appId, userId, "root", ct);
+
+            A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, A<CancellationToken>._))
+                .MustNotHaveHappened();
         }
     }
 }

@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
         {
             var errors = new List<ValidationError>();
 
-            if (trigger.NumDays != null && (trigger.NumDays < 1 || trigger.NumDays > 30))
+            if (trigger.NumDays is < 1 or > 30)
             {
                 errors.Add(new ValidationError(Not.Between(nameof(trigger.NumDays), 1, 30), nameof(trigger.NumDays)));
             }

@@ -112,7 +112,7 @@ namespace Squidex.Infrastructure.Queries
                 Fields = new[]
                 {
                     new FilterField(new FilterSchema(FilterSchemaType.Object), "property1"),
-                    new FilterField(FilterSchema.String, "property2"),
+                    new FilterField(FilterSchema.String, "property2")
                 }.ToReadonlyList()
             };
 
@@ -137,7 +137,7 @@ namespace Squidex.Infrastructure.Queries
                 Fields = new[]
                 {
                     new FilterField(new FilterSchema(FilterSchemaType.Object), "property1"),
-                    new FilterField(FilterSchema.String, "property2"),
+                    new FilterField(FilterSchema.String, "property2")
                 }.ToReadonlyList()
             };
 
@@ -162,7 +162,7 @@ namespace Squidex.Infrastructure.Queries
                 Fields = new[]
                 {
                     new FilterField(new FilterSchema(FilterSchemaType.Object), "property1"),
-                    new FilterField(FilterSchema.String, "property2"),
+                    new FilterField(FilterSchema.String, "property2")
                 }.ToReadonlyList()
             };
 

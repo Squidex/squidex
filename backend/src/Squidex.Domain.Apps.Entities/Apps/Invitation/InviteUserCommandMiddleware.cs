@@ -21,7 +21,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             this.userResolver = userResolver;
         }
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
             if (context.Command is AssignContributor assignContributor && ShouldResolve(assignContributor))
             {
@@ -31,11 +32,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
                 if (assignContributor.Invite)
                 {
-                    (user, created) = await userResolver.CreateUserIfNotExistsAsync(assignContributor.ContributorId, true);
+                    (user, created) = await userResolver.CreateUserIfNotExistsAsync(assignContributor.ContributorId, true, ct);
                 }
                 else
                 {
-                    user = await userResolver.FindByIdOrEmailAsync(assignContributor.ContributorId);
+                    user = await userResolver.FindByIdOrEmailAsync(assignContributor.ContributorId, ct);
                 }
 
                 if (user != null)
@@ -43,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
                     assignContributor.ContributorId = user.Id;
                 }
 
-                await next(context);
+                await next(context, ct);
 
                 if (created && context.PlainResult is IAppEntity app)
                 {
@@ -52,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             }
             else
             {
-                await next(context);
+                await next(context, ct);
             }
         }
 

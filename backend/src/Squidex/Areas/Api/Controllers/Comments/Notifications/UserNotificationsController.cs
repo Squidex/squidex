@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -25,7 +25,6 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
     [ApiExplorerSettings(GroupName = nameof(Notifications))]
     public sealed class UserNotificationsController : ApiController
     {
-        private static readonly NamedId<DomainId> NoApp = NamedId.Of(DomainId.Empty, "none");
         private readonly ICommentsLoader commentsLoader;
 
         public UserNotificationsController(ICommandBus commandBus, ICommentsLoader commentsLoader)
@@ -53,7 +52,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
         {
             CheckPermissions(userId);
 
-            var result = await commentsLoader.GetCommentsAsync(userId, version);
+            var result = await commentsLoader.GetCommentsAsync(userId, version, HttpContext.RequestAborted);
 
             var response = Deferred.Response(() =>
             {
@@ -83,12 +82,12 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
 
             var commmand = new DeleteComment
             {
-                AppId = NoApp,
+                AppId = CommentsCommand.NoApp,
                 CommentsId = userId,
                 CommentId = commentId
             };
 
-            await CommandBus.PublishAsync(commmand);
+            await CommandBus.PublishAsync(commmand, HttpContext.RequestAborted);
 
             return NoContent();
         }

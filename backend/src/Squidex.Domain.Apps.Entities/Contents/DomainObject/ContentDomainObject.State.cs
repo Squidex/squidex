@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 {
-    public sealed partial class ContentDomainObject
+    public partial class ContentDomainObject
     {
         public sealed class State : DomainObjectState<State>, IContentEntity
         {

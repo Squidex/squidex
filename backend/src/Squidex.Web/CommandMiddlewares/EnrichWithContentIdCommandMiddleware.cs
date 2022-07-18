@@ -14,9 +14,10 @@ namespace Squidex.Web.CommandMiddlewares
     {
         private const string SingletonId = "_schemaId_";
 
-        public Task HandleAsync(CommandContext context, NextDelegate next)
+        public Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
-            if (context.Command is ContentCommand contentCommand && contentCommand is not CreateContent)
+            if (context.Command is ContentCommand contentCommand and not CreateContent)
             {
                 if (contentCommand.ContentId.ToString().Equals(SingletonId, StringComparison.Ordinal))
                 {
@@ -24,7 +25,7 @@ namespace Squidex.Web.CommandMiddlewares
                 }
             }
 
-            return next(context);
+            return next(context, ct);
         }
     }
 }

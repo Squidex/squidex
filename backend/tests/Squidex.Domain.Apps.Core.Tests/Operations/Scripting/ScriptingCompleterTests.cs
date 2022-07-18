@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                     "ctx.command.parentPath",
                     "ctx.command.permanent",
                     "ctx.command.tags",
-                    "ctx.operation",
+                    "ctx.operation"
                 });
         }
 
@@ -374,7 +374,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 $"{path}.email",
                 $"{path}.id",
                 $"{path}.isClient",
-                $"{path}.isUser",
+                $"{path}.isUser"
             };
         }
     }

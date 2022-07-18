@@ -14,7 +14,5 @@ namespace Squidex.Infrastructure.UsageTracking
         long TotalCalls,
         long TotalBytes,
         long MonthCalls,
-        long MonthBytes)
-    {
-    }
+        long MonthBytes);
 }

@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps.Diagnostics;
 using Squidex.Infrastructure.Diagnostics;
-using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Config.Domain
 {
@@ -19,10 +17,7 @@ namespace Squidex.Config.Domain
                 "diagnostics:gc");
 
             services.AddHealthChecks()
-                .AddCheck<GCHealthCheck>("GC", tags: new[] { "node" })
-                .AddCheck<OrleansHealthCheck>("Orleans", tags: new[] { "cluster" })
-                .AddCheck<OrleansAppsHealthCheck>("OrleansApp", tags: new[] { "cluster" })
-                .AddCheck<EventConsumersHealthCheck>("EventConsumers", tags: new[] { "background" });
+                .AddCheck<GCHealthCheck>("GC", tags: new[] { "node" });
         }
     }
 }

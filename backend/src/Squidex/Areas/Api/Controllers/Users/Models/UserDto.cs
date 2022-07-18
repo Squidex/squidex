@@ -72,23 +72,28 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
             {
                 if (resources.CanLockUser && !IsLocked)
                 {
-                    AddPutLink("lock", resources.Url<UserManagementController>(c => nameof(c.LockUser), values));
+                    AddPutLink("lock",
+                        resources.Url<UserManagementController>(c => nameof(c.LockUser), values));
                 }
 
                 if (resources.CanUnlockUser && IsLocked)
                 {
-                    AddPutLink("unlock", resources.Url<UserManagementController>(c => nameof(c.UnlockUser), values));
+                    AddPutLink("unlock",
+                        resources.Url<UserManagementController>(c => nameof(c.UnlockUser), values));
                 }
 
-                AddDeleteLink("delete", resources.Url<UserManagementController>(x => nameof(x.DeleteUser), values));
+                AddDeleteLink("delete",
+                    resources.Url<UserManagementController>(x => nameof(x.DeleteUser), values));
             }
 
             if (resources.CanUpdateUser)
             {
-                AddPutLink("update", resources.Url<UserManagementController>(c => nameof(c.PutUser), values));
+                AddPutLink("update",
+                    resources.Url<UserManagementController>(c => nameof(c.PutUser), values));
             }
 
-            AddGetLink("picture", resources.Url<UsersController>(c => nameof(c.GetUserPicture), values));
+            AddGetLink("picture",
+                resources.Url<UsersController>(c => nameof(c.GetUserPicture), values));
 
             return this;
         }

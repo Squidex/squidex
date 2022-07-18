@@ -27,7 +27,7 @@ using Squidex.Web;
 namespace Squidex.Areas.Api.Controllers.Rules
 {
     /// <summary>
-    /// Manages and retrieves information about schemas.
+    /// Manages and retrieves information about rules.
     /// </summary>
     [ApiExplorerSettings(GroupName = nameof(Rules))]
     public sealed class RulesController : ApiController
@@ -237,7 +237,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var command = new TriggerRule { RuleId = id };
 
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -353,7 +353,9 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteRule(string app, DomainId id)
         {
-            await CommandBus.PublishAsync(new DeleteRule { RuleId = id });
+            var command = new DeleteRule { RuleId = id };
+
+            await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -512,7 +514,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
 
         private async Task<RuleDto> InvokeCommandAsync(ICommand command)
         {
-            var context = await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
             var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(Context.App.Id, HttpContext.RequestAborted);
 

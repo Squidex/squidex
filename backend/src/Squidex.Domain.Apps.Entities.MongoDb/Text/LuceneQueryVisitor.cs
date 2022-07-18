@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
             {
                 var fuzzy = new BsonDocument
                 {
-                    ["maxEdits"] = fuzzyQuery.MaxEdits,
+                    ["maxEdits"] = fuzzyQuery.MaxEdits
                 };
 
                 if (fuzzyQuery.PrefixLength > 0)
@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 
             var doc = new BsonDocument
             {
-                ["path"] = GetPath(terms[0].Field),
+                ["path"] = GetPath(terms[0].Field)
             };
 
             if (terms.Length == 1)
@@ -304,7 +304,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 
                 if (number == integer)
                 {
-                    if (integer <= int.MaxValue && integer >= int.MinValue)
+                    if (integer is <= int.MaxValue and >= int.MinValue)
                     {
                         result = (int)integer;
                     }

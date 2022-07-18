@@ -18,6 +18,7 @@ services:
       - IDENTITY__ADMINCLIENTID=root
       - IDENTITY__ADMINCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=
       - IDENTITY__MULTIPLEDOMAINS=true
+      - RULES__RULESCACHEDURATION=00:00:00
       - SCRIPTING__TIMEOUTEXECUTION=00:00:10
       - SCRIPTING__TIMEOUTSCRIPT=00:00:10
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
@@ -62,6 +63,14 @@ services:
       - internal
     depends_on:
       - mongo
+
+  webhookcatcher:
+    image: tarampampam/webhook-tester
+    command: serve --port 1026
+    ports:
+      - "1026:1026"
+    networks:
+      - internal
 
   squidex_proxy1:
     image: squidex/caddy-proxy

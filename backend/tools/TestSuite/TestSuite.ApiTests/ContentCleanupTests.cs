@@ -17,6 +17,8 @@ namespace TestSuite.ApiTests
 {
     public class ContentCleanupTests : IClassFixture<CreatedAppFixture>
     {
+        private readonly string schemaName = $"schema-{Guid.NewGuid()}";
+
         public CreatedAppFixture _ { get; }
 
         public ContentCleanupTests(CreatedAppFixture fixture)
@@ -27,8 +29,6 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_cleanup_old_data_from_update_response()
         {
-            var schemaName = $"schema-{Guid.NewGuid()}";
-
             // STEP 1: Create a schema.
             var schema = await TestEntity.CreateSchemaAsync(_.Schemas, _.AppName, schemaName);
 
@@ -60,8 +60,6 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_cleanup_old_references()
         {
-            var schemaName = $"schema-{Guid.NewGuid()}";
-
             // STEP 1: Create a schema.
             await TestEntityWithReferences.CreateSchemaAsync(_.Schemas, _.AppName, schemaName);
 

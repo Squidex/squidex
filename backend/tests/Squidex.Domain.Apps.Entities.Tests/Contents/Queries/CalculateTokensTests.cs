@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     public class CalculateTokensTests
     {
         private readonly ISchemaEntity schema;
-        private readonly IJsonSerializer jsonSerializer = A.Fake<IJsonSerializer>();
+        private readonly IJsonSerializer serializer = A.Fake<IJsonSerializer>();
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly Context requestContext;
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             schema = Mocks.Schema(appId, schemaId);
             schemaProvider = x => Task.FromResult((schema, ResolvedComponents.Empty));
 
-            sut = new CalculateTokens(urlGenerator, jsonSerializer);
+            sut = new CalculateTokens(urlGenerator, serializer);
         }
 
         [Fact]

@@ -6,12 +6,10 @@
 // ==========================================================================
 
 using FakeItEasy;
-using Orleans;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Shared.Users;
 using Xunit;
 
@@ -19,7 +17,9 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 {
     public class CommentsCommandMiddlewareTests
     {
-        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
+        private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly RefToken actor = RefToken.User("me");
@@ -30,34 +30,36 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         public CommentsCommandMiddlewareTests()
         {
+            ct = cts.Token;
+
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, default))
                 .Returns(Task.FromResult<IUser?>(null));
 
-            sut = new CommentsCommandMiddleware(grainFactory, userResolver);
+            sut = new CommentsCommandMiddleware(domainObjectFactory, userResolver);
         }
 
         [Fact]
-        public async Task Should_invoke_grain_for_comments_command()
+        public async Task Should_invoke_domain_object_for_comments_command()
         {
             var command = CreateCommentsCommand(new CreateComment());
             var context = CrateCommandContext(command);
 
-            var grain = A.Fake<ICommentsGrain>();
+            var domainObject = A.Fake<CommentsStream>();
 
-            A.CallTo(() => grainFactory.GetGrain<ICommentsGrain>(commentsId.ToString(), null))
-                .Returns(grain);
+            A.CallTo(() => domainObject.ExecuteAsync(command, ct))
+                .Returns(CommandResult.Empty(commentsId, 0, 0));
 
-            A.CallTo(() => grain.ExecuteAsync(A<J<CommentsCommand>>.That.Matches(x => x.Value == command)))
-                .Returns(CommandResult.Empty(commentsId, 0, 0).AsJ());
+            A.CallTo(() => domainObjectFactory.Create<CommentsStream>(commentsId))
+                .Returns(domainObject);
 
             var isNextCalled = false;
 
-            await sut.HandleAsync(context, c =>
+            await sut.HandleAsync(context, (c, ct) =>
             {
                 isNextCalled = true;
 
                 return Task.CompletedTask;
-            });
+            }, ct);
 
             Assert.True(isNextCalled);
         }
@@ -70,12 +72,13 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var command = CreateCommentsCommand(new CreateComment
             {
-                Text = "Hi @mail1@squidex.io, @mail2@squidex.io and @notfound@squidex.io"
+                Text = "Hi @mail1@squidex.io, @mail2@squidex.io and @notfound@squidex.io",
+                IsMention = false
             });
 
             var context = CrateCommandContext(command);
 
-            await sut.HandleAsync(context);
+            await sut.HandleAsync(context, ct);
 
             Assert.Equal(command.Mentions, new[] { "id1", "id2" });
         }
@@ -88,14 +91,15 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var command = CreateCommentsCommand(new CreateComment
             {
-                Text = "Hi @mail1@squidex.io and @mail2@squidex.io"
+                Text = "Hi @mail1@squidex.io and @mail2@squidex.io",
+                IsMention = false
             });
 
             var context = CrateCommandContext(command);
 
-            await sut.HandleAsync(context);
+            await sut.HandleAsync(context, ct);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -104,12 +108,13 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         {
             var command = CreateCommentsCommand(new CreateComment
             {
-                Text = "Hi invalid@squidex.io"
+                Text = "Hi invalid@squidex.io",
+                IsMention = false
             });
 
             var context = CrateCommandContext(command);
 
-            await sut.HandleAsync(context);
+            await sut.HandleAsync(context, ct);
 
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -118,15 +123,15 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         [Fact]
         public async Task Should_not_enrich_with_mentioned_user_ids_for_notification()
         {
-            var command = new CreateComment
+            var command = CreateCommentsCommand(new CreateComment
             {
                 Text = "Hi @invalid@squidex.io",
                 IsMention = true
-            };
+            });
 
             var context = CrateCommandContext(command);
 
-            await sut.HandleAsync(context);
+            await sut.HandleAsync(context, ct);
 
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();

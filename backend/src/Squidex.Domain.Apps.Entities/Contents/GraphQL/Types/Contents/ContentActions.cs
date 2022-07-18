@@ -470,7 +470,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 contentCommand.SchemaId = schemaId;
                 contentCommand.ExpectedVersion = fieldContext.GetArgument("expectedVersion", EtagVersion.Any);
 
-                var commandContext = await context.Resolve<ICommandBus>().PublishAsync(contentCommand);
+                var commandBus = context.Resolve<ICommandBus>();
+                var commandContext = await commandBus.PublishAsync(contentCommand, fieldContext.CancellationToken);
 
                 return commandContext.PlainResult!;
             });

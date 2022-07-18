@@ -8,7 +8,7 @@
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Migrations.OldEvents
 {
     [TypeName(nameof(NoopEvent))]
     public sealed class NoopEvent : SquidexEvent

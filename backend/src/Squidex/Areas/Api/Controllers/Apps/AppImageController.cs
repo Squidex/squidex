@@ -24,19 +24,16 @@ namespace Squidex.Areas.Api.Controllers.Apps
     public sealed class AppImageController : ApiController
     {
         private readonly IAppImageStore appImageStore;
-        private readonly IAppProvider appProvider;
         private readonly IAssetStore assetStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
 
         public AppImageController(ICommandBus commandBus,
             IAppImageStore appImageStore,
-            IAppProvider appProvider,
             IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator)
             : base(commandBus)
         {
             this.appImageStore = appImageStore;
-            this.appProvider = appProvider;
             this.assetStore = assetStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
@@ -104,7 +101,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             {
                 await using (var originalStream = assetOriginal.OpenWrite())
                 {
-                    await appImageStore.DownloadAsync(App.Id, originalStream);
+                    await appImageStore.DownloadAsync(App.Id, originalStream, ct);
                 }
             }
 
@@ -116,7 +113,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
                     {
                         await using (var resizeStream = assetResized.OpenWrite())
                         {
-                            await assetThumbnailGenerator.CreateThumbnailAsync(originalStream, mimeType, resizeStream, resizeOptions);
+                            await assetThumbnailGenerator.CreateThumbnailAsync(originalStream, mimeType, resizeStream, resizeOptions, ct);
                         }
                     }
                 }

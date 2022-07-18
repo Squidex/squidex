@@ -16,19 +16,20 @@ namespace Squidex.Infrastructure.Commands
             this.extensions = extensions.Reverse().ToList();
         }
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
             foreach (var handler in extensions)
             {
                 next = Join(handler, next);
             }
 
-            await next(context);
+            await next(context, ct);
         }
 
         private static NextDelegate Join(ICommandMiddleware handler, NextDelegate next)
         {
-            return context => handler.HandleAsync(context, next);
+            return (context, ct) => handler.HandleAsync(context, next, ct);
         }
     }
 }

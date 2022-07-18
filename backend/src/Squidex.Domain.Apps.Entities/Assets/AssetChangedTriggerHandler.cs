@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public bool Handles(AppEvent @event)
         {
-            return @event is AssetEvent && @event is not AssetMoved;
+            return @event is AssetEvent and not AssetMoved;
         }
 
         public async IAsyncEnumerable<EnrichedEvent> CreateSnapshotEventsAsync(RuleContext context,
@@ -74,7 +74,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var asset = await assetLoader.GetAsync(
                 assetEvent.AppId.Id,
                 assetEvent.AssetId,
-                @event.Headers.EventStreamNumber());
+                @event.Headers.EventStreamNumber(),
+                ct);
 
             if (asset != null)
             {

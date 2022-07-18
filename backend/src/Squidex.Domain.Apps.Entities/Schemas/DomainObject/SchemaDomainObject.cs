@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
@@ -25,8 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 {
     public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject.State>
     {
-        public SchemaDomainObject(IPersistenceFactory<State> persistence, ILogger<SchemaDomainObject> log)
-            : base(persistence, log)
+        public SchemaDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<SchemaDomainObject> log)
+            : base(id, persistence, log)
         {
         }
 
@@ -47,7 +46,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                 Equals(schemaCommand.SchemaId?.Id, Snapshot.Id);
         }
 
-        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+            CancellationToken ct)
         {
             switch (command)
             {
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         AddField(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case CreateSchema createSchema:
                     return CreateReturn(createSchema, c =>
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         Create(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case SynchronizeSchema synchronize:
                     return UpdateReturn(synchronize, c =>
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         Synchronize(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case DeleteField deleteField:
                     return UpdateReturn(deleteField, c =>
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         DeleteField(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case LockField lockField:
                     return UpdateReturn(lockField, c =>
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         LockField(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case HideField hideField:
                     return UpdateReturn(hideField, c =>
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         HideField(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case ShowField showField:
                     return UpdateReturn(showField, c =>
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         ShowField(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case DisableField disableField:
                     return UpdateReturn(disableField, c =>
@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         DisableField(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case EnableField enableField:
                     return UpdateReturn(enableField, c =>
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         EnableField(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateField updateField:
                     return UpdateReturn(updateField, c =>
@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         UpdateField(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case ReorderFields reorderFields:
                     return UpdateReturn(reorderFields, c =>
@@ -159,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         Reorder(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case ConfigureFieldRules configureFieldRules:
                     return UpdateReturn(configureFieldRules, c =>
@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         ConfigureFieldRules(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case ConfigurePreviewUrls configurePreviewUrls:
                     return UpdateReturn(configurePreviewUrls, c =>
@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         ConfigurePreviewUrls(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case ConfigureUIFields configureUIFields:
                     return UpdateReturn(configureUIFields, c =>
@@ -189,7 +189,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         ConfigureUIFields(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case ChangeCategory changeCategory:
                     return UpdateReturn(changeCategory, c =>
@@ -197,7 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         ChangeCategory(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UpdateSchema update:
                     return UpdateReturn(update, c =>
@@ -205,7 +205,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         Update(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case PublishSchema publish:
                     return UpdateReturn(publish, c =>
@@ -213,7 +213,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         Publish(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case UnpublishSchema unpublish:
                     return UpdateReturn(unpublish, c =>
@@ -221,7 +221,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         Unpublish(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case ConfigureScripts configureScripts:
                     return UpdateReturn(configureScripts, c =>
@@ -229,13 +229,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         ConfigureScripts(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case DeleteSchema deleteSchema:
                     return Update(deleteSchema, c =>
                     {
                         Delete(c);
-                    });
+                    }, ct);
 
                 default:
                     ThrowHelper.NotSupportedException();
@@ -407,9 +407,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
             return NamedId.Of(Snapshot.SchemaFieldsTotal + 1, command.Name);
         }
 
-        public Task<J<ISchemaEntity>> GetStateAsync()
+        public Task<ISchemaEntity> GetStateAsync()
         {
-            return J.AsTask<ISchemaEntity>(Snapshot);
+            return Task.FromResult<ISchemaEntity>(Snapshot);
         }
     }
 }

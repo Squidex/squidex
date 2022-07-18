@@ -19,7 +19,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
         {
             foreach (var (_, parameter) in context.Parameters)
             {
-                if (parameter.IsRequired && parameter.Schema != null && parameter.Schema.Type == JsonObjectType.String)
+                if (parameter.IsRequired && parameter.Schema is { Type: JsonObjectType.String })
                 {
                     parameter.Schema = StringSchema;
                 }

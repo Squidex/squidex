@@ -13,7 +13,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         int Order => 0;
 
-        Task EnhanceAsync(UploadAssetCommand command);
+        Task EnhanceAsync(UploadAssetCommand command,
+            CancellationToken ct);
 
         IEnumerable<string> Format(IAssetEntity asset);
     }

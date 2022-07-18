@@ -311,7 +311,7 @@ namespace Squidex.Infrastructure.Collections
             Assert.Equal(new[]
             {
                 new KeyValuePair<int, int>(1, 10),
-                new KeyValuePair<int, int>(2, 20),
+                new KeyValuePair<int, int>(2, 20)
             }, result.ToArray());
         }
 
@@ -333,7 +333,7 @@ namespace Squidex.Infrastructure.Collections
             Assert.Equal(new[]
             {
                 new KeyValuePair<int, int>(1, 10),
-                new KeyValuePair<int, int>(2, 20),
+                new KeyValuePair<int, int>(2, 20)
             }, result.ToArray());
         }
 
@@ -348,7 +348,7 @@ namespace Squidex.Infrastructure.Collections
             Assert.Equal(new[]
             {
                 new KeyValuePair<int, int>(1, 10),
-                new KeyValuePair<int, int>(2, 20),
+                new KeyValuePair<int, int>(2, 20)
             }, sut.ToArray());
         }
 

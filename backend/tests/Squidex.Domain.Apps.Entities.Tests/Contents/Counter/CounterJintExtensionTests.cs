@@ -8,7 +8,6 @@
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Orleans;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
 using Xunit;
@@ -17,15 +16,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
 {
     public class CounterJintExtensionTests
     {
-        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
-        private readonly ICounterGrain counter = A.Fake<ICounterGrain>();
+        private readonly ICounterService counterService = A.Fake<ICounterService>();
         private readonly JintScriptEngine sut;
 
         public CounterJintExtensionTests()
         {
             var extensions = new IJintExtension[]
             {
-                new CounterJintExtension(grainFactory)
+                new CounterJintExtension(counterService)
             };
 
             sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
@@ -41,10 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         {
             var appId = DomainId.NewGuid();
 
-            A.CallTo(() => grainFactory.GetGrain<ICounterGrain>(appId.ToString(), null))
-                .Returns(counter);
-
-            A.CallTo(() => counter.ResetAsync("my", 4))
+            A.CallTo(() => counterService.ResetAsync(appId, "my", 4, default))
                 .Returns(3);
 
             const string script = @"
@@ -66,10 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         {
             var appId = DomainId.NewGuid();
 
-            A.CallTo(() => grainFactory.GetGrain<ICounterGrain>(appId.ToString(), null))
-                .Returns(counter);
-
-            A.CallTo(() => counter.ResetAsync("my", 4))
+            A.CallTo(() => counterService.ResetAsync(appId, "my", 4, A<CancellationToken>._))
                 .Returns(3);
 
             const string script = @"
@@ -93,10 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         {
             var appId = DomainId.NewGuid();
 
-            A.CallTo(() => grainFactory.GetGrain<ICounterGrain>(appId.ToString(), null))
-                .Returns(counter);
-
-            A.CallTo(() => counter.IncrementAsync("my"))
+            A.CallTo(() => counterService.IncrementAsync(appId, "my", A<CancellationToken>._))
                 .Returns(3);
 
             const string script = @"
@@ -118,10 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         {
             var appId = DomainId.NewGuid();
 
-            A.CallTo(() => grainFactory.GetGrain<ICounterGrain>(appId.ToString(), null))
-                .Returns(counter);
-
-            A.CallTo(() => counter.IncrementAsync("my"))
+            A.CallTo(() => counterService.IncrementAsync(appId, "my", A<CancellationToken>._))
                 .Returns(3);
 
             const string script = @"

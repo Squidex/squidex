@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetsFluidExtensionTests()
         {
-            var services =
+            var serviceProvider =
                 new ServiceCollection()
                     .AddSingleton(appProvider)
                     .AddSingleton(assetFileStore)
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var extensions = new IFluidExtension[]
             {
                 new ContentFluidExtension(),
-                new AssetsFluidExtension(services)
+                new AssetsFluidExtension(serviceProvider)
             };
 
             A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, default))

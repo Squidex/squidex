@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
     public class AssetQueryServiceTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
         private readonly IAssetLoader assetLoader = A.Fake<IAssetLoader>();
@@ -28,11 +30,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public AssetQueryServiceTests()
         {
+            ct = cts.Token;
+
             requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
             SetupEnricher();
 
-            A.CallTo(() => queryParser.ParseAsync(requestContext, A<Q>._))
+            A.CallTo(() => queryParser.ParseAsync(requestContext, A<Q>._, ct))
                 .ReturnsLazily(c => Task.FromResult(c.GetArgument<Q>(1)!));
 
             var options = Options.Create(new AssetOptions());
@@ -54,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetBySlugAsync(appId.Id, "slug", A<CancellationToken>._))
                 .Returns(asset);
 
-            var result = await sut.FindBySlugAsync(requestContext, "slug");
+            var result = await sut.FindBySlugAsync(requestContext, "slug", ct);
 
             AssertAsset(asset, result);
         }
@@ -67,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetBySlugAsync(appId.Id, "slug", A<CancellationToken>._))
                 .Returns(Task.FromResult<IAssetEntity?>(null));
 
-            var result = await sut.FindBySlugAsync(requestContext, "slug");
+            var result = await sut.FindBySlugAsync(requestContext, "slug", ct);
 
             Assert.Null(result);
         }
@@ -80,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetAsync(appId.Id, asset.Id, A<CancellationToken>._))
                 .Returns(asset);
 
-            var result = await sut.FindAsync(requestContext, asset.Id);
+            var result = await sut.FindAsync(requestContext, asset.Id, ct: ct);
 
             AssertAsset(asset, result);
         }
@@ -93,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetAsync(appId.Id, asset.Id, A<CancellationToken>._))
                 .Returns(Task.FromResult<IAssetEntity?>(null));
 
-            var result = await sut.FindAsync(requestContext, asset.Id);
+            var result = await sut.FindAsync(requestContext, asset.Id, ct: ct);
 
             Assert.Null(result);
         }
@@ -103,10 +107,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var asset = CreateAsset(DomainId.NewGuid());
 
-            A.CallTo(() => assetLoader.GetAsync(appId.Id, asset.Id, 2))
+            A.CallTo(() => assetLoader.GetAsync(appId.Id, asset.Id, 2, A<CancellationToken>._))
                 .Returns(asset);
 
-            var result = await sut.FindAsync(requestContext, asset.Id, 2);
+            var result = await sut.FindAsync(requestContext, asset.Id, 2, ct);
 
             AssertAsset(asset, result);
         }
@@ -116,10 +120,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var asset = CreateAsset(DomainId.NewGuid());
 
-            A.CallTo(() => assetLoader.GetAsync(appId.Id, asset.Id, 2))
+            A.CallTo(() => assetLoader.GetAsync(appId.Id, asset.Id, 2, A<CancellationToken>._))
                 .Returns(Task.FromResult<IAssetEntity?>(null));
 
-            var result = await sut.FindAsync(requestContext, asset.Id, 2);
+            var result = await sut.FindAsync(requestContext, asset.Id, 2, ct);
 
             Assert.Null(result);
         }
@@ -132,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetAsync(asset.Id, A<CancellationToken>._))
                 .Returns(asset);
 
-            var result = await sut.FindGlobalAsync(requestContext, asset.Id);
+            var result = await sut.FindGlobalAsync(requestContext, asset.Id, ct);
 
             AssertAsset(asset, result);
         }
@@ -145,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetAsync(asset.Id, A<CancellationToken>._))
                 .Returns(Task.FromResult<IAssetEntity?>(null));
 
-            var result = await sut.FindGlobalAsync(requestContext, asset.Id);
+            var result = await sut.FindGlobalAsync(requestContext, asset.Id, ct);
 
             Assert.Null(result);
         }
@@ -158,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetByHashAsync(appId.Id, "hash", "name", 123, A<CancellationToken>._))
                 .Returns(asset);
 
-            var result = await sut.FindByHashAsync(requestContext, "hash", "name", 123);
+            var result = await sut.FindByHashAsync(requestContext, "hash", "name", 123, ct);
 
             AssertAsset(asset, result);
         }
@@ -171,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetByHashAsync(appId.Id, "hash", "name", 123, A<CancellationToken>._))
                 .Returns(Task.FromResult<IAssetEntity?>(null));
 
-            var result = await sut.FindByHashAsync(requestContext, "hash", "name", 123);
+            var result = await sut.FindByHashAsync(requestContext, "hash", "name", 123, ct);
 
             Assert.Null(result);
         }
@@ -189,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.QueryAsync(appId.Id, parentId, q, A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(8, asset1, asset2));
 
-            var result = await sut.QueryAsync(requestContext, parentId, q);
+            var result = await sut.QueryAsync(requestContext, parentId, q, ct);
 
             Assert.Equal(8, result.Total);
 
@@ -207,7 +211,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetFolderRepository.QueryAsync(appId.Id, parentId, A<CancellationToken>._))
                 .Returns(assetFolders);
 
-            var result = await sut.QueryAssetFoldersAsync(requestContext, parentId);
+            var result = await sut.QueryAssetFoldersAsync(requestContext, parentId, ct);
 
             Assert.Same(assetFolders, result);
         }
@@ -222,7 +226,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetFolderRepository.QueryAsync(appId.Id, parentId, A<CancellationToken>._))
                 .Returns(assetFolders);
 
-            var result = await sut.QueryAssetFoldersAsync(appId.Id, parentId);
+            var result = await sut.QueryAssetFoldersAsync(appId.Id, parentId, ct);
 
             Assert.Same(assetFolders, result);
         }
@@ -236,7 +240,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId1, A<CancellationToken>._))
                 .Returns(folder1);
 
-            var result = await sut.FindAssetFolderAsync(appId.Id, folderId1);
+            var result = await sut.FindAssetFolderAsync(appId.Id, folderId1, ct);
 
             Assert.Equal(result, new[] { folder1 });
         }
@@ -261,7 +265,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId3, A<CancellationToken>._))
                 .Returns(folder3);
 
-            var result = await sut.FindAssetFolderAsync(appId.Id, folderId3);
+            var result = await sut.FindAssetFolderAsync(appId.Id, folderId3, ct);
 
             Assert.Equal(result, new[] { folder1, folder2, folder3 });
         }
@@ -274,7 +278,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId1, A<CancellationToken>._))
                 .Returns(Task.FromResult<IAssetFolderEntity?>(null));
 
-            var result = await sut.FindAssetFolderAsync(appId.Id, folderId1);
+            var result = await sut.FindAssetFolderAsync(appId.Id, folderId1, ct);
 
             Assert.Empty(result);
         }
@@ -294,7 +298,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId2, A<CancellationToken>._))
                 .Returns(folder2);
 
-            var result = await sut.FindAssetFolderAsync(appId.Id, folderId2);
+            var result = await sut.FindAssetFolderAsync(appId.Id, folderId2, ct);
 
             Assert.Empty(result);
         }
@@ -314,7 +318,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId2, A<CancellationToken>._))
                 .Returns(folder2);
 
-            var result = await sut.FindAssetFolderAsync(appId.Id, folderId2);
+            var result = await sut.FindAssetFolderAsync(appId.Id, folderId2, ct);
 
             Assert.Empty(result);
         }
@@ -343,7 +347,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         private void SetupEnricher()
         {
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>._, A<Context>._, A<CancellationToken>._))
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>._, A<Context>._, ct))
                 .ReturnsLazily(x =>
                 {
                     var input = x.GetArgument<IEnumerable<IAssetEntity>>(0)!;

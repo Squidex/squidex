@@ -6,74 +6,113 @@
 // ==========================================================================
 
 using FakeItEasy;
-using Orleans;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Commands;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
     public class AssetLoaderTests
     {
-        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
-        private readonly IAssetGrain grain = A.Fake<IAssetGrain>();
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
+        private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
+        private readonly IDomainObjectCache domainObjectCache = A.Fake<IDomainObjectCache>();
+        private readonly AssetDomainObject domainObject = A.Fake<AssetDomainObject>();
         private readonly DomainId appId = DomainId.NewGuid();
         private readonly DomainId id = DomainId.NewGuid();
+        private readonly DomainId uniqueId;
         private readonly AssetLoader sut;
 
         public AssetLoaderTests()
         {
-            var key = DomainId.Combine(appId, id).ToString();
+            ct = cts.Token;
 
-            A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(key, null))
-                .Returns(grain);
+            uniqueId = DomainId.Combine(appId, id);
 
-            sut = new AssetLoader(grainFactory);
+            A.CallTo(() => domainObjectCache.GetAsync<AssetDomainObject.State>(A<DomainId>._, A<long>._, ct))
+                .Returns(Task.FromResult<AssetDomainObject.State>(null!));
+
+            A.CallTo(() => domainObjectFactory.Create<AssetDomainObject>(uniqueId))
+                .Returns(domainObject);
+
+            sut = new AssetLoader(domainObjectFactory, domainObjectCache);
         }
 
         [Fact]
         public async Task Should_return_null_if_no_state_returned()
         {
-            A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IAssetEntity>(null!));
+            var asset = (AssetDomainObject.State)null!;
 
-            Assert.Null(await sut.GetAsync(appId, id, 10));
+            A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+                .Returns(asset);
+
+            Assert.Null(await sut.GetAsync(appId, id, 10, ct));
         }
 
         [Fact]
         public async Task Should_return_null_if_state_empty()
         {
-            var content = new AssetEntity { Version = EtagVersion.Empty };
+            var asset = new AssetDomainObject.State { Version = EtagVersion.Empty };
 
-            A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IAssetEntity>(content));
+            A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+                .Returns(asset);
 
-            Assert.Null(await sut.GetAsync(appId, id, 10));
+            Assert.Null(await sut.GetAsync(appId, id, 10, ct));
         }
 
         [Fact]
         public async Task Should_return_null_if_state_has_other_version()
         {
-            var content = new AssetEntity { Version = 5 };
+            var asset = new AssetDomainObject.State { Version = 5 };
 
-            A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IAssetEntity>(content));
+            A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+                .Returns(asset);
 
-            Assert.Null(await sut.GetAsync(appId, id, 10));
+            Assert.Null(await sut.GetAsync(appId, id, 10, ct));
         }
 
         [Fact]
-        public async Task Should_return_content_from_state()
+        public async Task Should_not_return_null_if_state_has_other_version_than_any()
         {
-            var content = new AssetEntity { Version = 10 };
+            var asset = new AssetDomainObject.State { Version = 5 };
 
-            A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IAssetEntity>(content));
+            A.CallTo(() => domainObject.GetSnapshotAsync(EtagVersion.Any, ct))
+                .Returns(asset);
 
-            var result = await sut.GetAsync(appId, id, 10);
+            var result = await sut.GetAsync(appId, id, EtagVersion.Any, ct);
+
+            Assert.Same(asset, result);
+        }
+
+        [Fact]
+        public async Task Should_return_asset_from_state()
+        {
+            var asset = new AssetDomainObject.State { Version = 10 };
+
+            A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+                .Returns(asset);
+
+            var result = await sut.GetAsync(appId, id, 10, ct);
+
+            Assert.Same(asset, result);
+        }
+
+        [Fact]
+        public async Task Should_return_content_from_cache()
+        {
+            var content = new AssetDomainObject.State { Version = 10 };
+
+            A.CallTo(() => domainObjectCache.GetAsync<AssetDomainObject.State>(DomainId.Combine(appId, id), 10, ct))
+                .Returns(content);
+
+            var result = await sut.GetAsync(appId, id, 10, ct);
 
             Assert.Same(content, result);
+
+            A.CallTo(() => domainObjectFactory.Create<AssetDomainObject>(uniqueId))
+                .MustNotHaveHappened();
         }
     }
 }

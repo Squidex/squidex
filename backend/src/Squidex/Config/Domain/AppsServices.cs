@@ -10,7 +10,6 @@ using Squidex.Areas.Api.Controllers.UI;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure.Collections;
@@ -27,9 +26,6 @@ namespace Squidex.Config.Domain
                 services.AddSingletonAs<AppPermanentDeleter>()
                     .As<IEventConsumer>();
             }
-
-            services.AddTransientAs<AppDomainObject>()
-                .AsSelf();
 
             services.AddSingletonAs<RolePermissionsProvider>()
                 .AsSelf();
@@ -80,7 +76,7 @@ namespace Squidex.Config.Domain
                 {
                     Settings = new AppSettings
                     {
-                        Patterns = ReadonlyList.ToReadonlyList(patterns)
+                        Patterns = patterns.ToReadonlyList()
                     }
                 };
             });

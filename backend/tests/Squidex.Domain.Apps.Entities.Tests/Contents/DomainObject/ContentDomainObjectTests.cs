@@ -119,9 +119,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     .AddSingleton<IValidatorsFactory>(new DefaultValidatorsFactory())
                     .BuildServiceProvider();
 
-            sut = new ContentDomainObject(PersistenceFactory, log, serviceProvider);
 #pragma warning disable MA0056 // Do not call overridable members in constructor
-            sut.Setup(Id);
+            sut = new ContentDomainObject(Id, PersistenceFactory, log, serviceProvider);
 #pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
@@ -1029,7 +1028,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task<object> PublishAsync(ContentCommand command)
         {
-            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+            var result = await sut.ExecuteAsync(CreateContentCommand(command), default);
 
             return result.Payload;
         }

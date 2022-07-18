@@ -42,7 +42,8 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (resources.CanCreateRole)
             {
-                AddPostLink("create", resources.Url<AppRolesController>(x => nameof(x.PostRole), values));
+                AddPostLink("create",
+                    resources.Url<AppRolesController>(x => nameof(x.PostRole), values));
             }
 
             return this;

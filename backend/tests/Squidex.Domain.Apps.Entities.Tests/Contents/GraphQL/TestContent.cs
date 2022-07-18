@@ -368,15 +368,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     iv = new
                     {
                         value = 1
-                    },
+                    }
                 },
                 ["myString"] = new
                 {
-                    iv = (string?)null,
+                    iv = (string?)null
                 },
                 ["myStringEnum"] = new
                 {
-                    iv = "EnumA",
+                    iv = "EnumA"
                 },
                 ["myLocalizedString"] = new
                 {
@@ -423,7 +423,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         {
                             ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
                             ["schemaRef2Field"] = "Component2"
-                        },
+                        }
                     }
                 },
                 ["myTags"] = new
@@ -515,11 +515,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 },
                 ["myString"] = new
                 {
-                    iv = (string?)null,
+                    iv = (string?)null
                 },
                 ["myStringEnum"] = new
                 {
-                    iv = "EnumA",
+                    iv = "EnumA"
                 },
                 ["myLocalizedString"] = new
                 {
@@ -574,7 +574,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         {
                             ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
                             ["schemaRef2Field"] = "Component2"
-                        },
+                        }
                     }
                 },
                 ["myComponents"] = new
@@ -592,7 +592,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             ["__typename"] = "MyRefSchema2Component",
                             ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
                             ["schemaRef2Field"] = "Component2"
-                        },
+                        }
                     }
                 },
                 ["myTags"] = new
@@ -673,7 +673,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     {
                         ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
                         ["schemaRef2Field"] = "Component2"
-                    },
+                    }
                 },
                 ["myComponents"] = new object[]
                 {
@@ -688,7 +688,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         ["__typename"] = "MyRefSchema2Component",
                         ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
                         ["schemaRef2Field"] = "Component2"
-                    },
+                    }
                 },
                 ["myTags"] = new[]
                 {

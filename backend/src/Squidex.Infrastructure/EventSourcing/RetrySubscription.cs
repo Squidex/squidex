@@ -7,93 +7,131 @@
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed class RetrySubscription : IEventSubscription, IEventSubscriber
+    public sealed class RetrySubscription<T> : IEventSubscription, IEventSubscriber<T>
     {
         private readonly RetryWindow retryWindow = new RetryWindow(TimeSpan.FromMinutes(5), 5);
-        private readonly IEventSubscriber eventSubscriber;
-        private readonly Func<IEventSubscriber, IEventSubscription> eventSubscriptionFactory;
-        private readonly object lockObject = new object();
-        private CancellationTokenSource timerCancellation = new CancellationTokenSource();
-        private IEventSubscription? currentSubscription;
+        private readonly IEventSubscriber<T> eventSubscriber;
+        private readonly EventSubscriptionSource<T> eventSource;
+        private SubscriptionHolder? currentSubscription;
 
         public int ReconnectWaitMs { get; set; } = 5000;
 
-        public object? Sender => currentSubscription?.Sender;
+        public bool IsSubscribed => currentSubscription != null;
 
-        public RetrySubscription(IEventSubscriber eventSubscriber, Func<IEventSubscriber, IEventSubscription> eventSubscriptionFactory)
+        // Holds all information for a current subscription. Therefore we only have to maintain one reference.
+        private sealed class SubscriptionHolder : IDisposable
+        {
+            public CancellationTokenSource Cancellation { get; } = new CancellationTokenSource();
+
+            public IEventSubscription Subscription { get; }
+
+            public SubscriptionHolder(IEventSubscription subscription)
+            {
+                Subscription = subscription;
+            }
+
+            public void Dispose()
+            {
+                Cancellation.Cancel();
+
+                Subscription.Dispose();
+            }
+        }
+
+        public RetrySubscription(IEventSubscriber<T> eventSubscriber,
+            EventSubscriptionSource<T> eventSource)
         {
             Guard.NotNull(eventSubscriber);
-            Guard.NotNull(eventSubscriptionFactory);
+            Guard.NotNull(eventSource);
 
             this.eventSubscriber = eventSubscriber;
-            this.eventSubscriptionFactory = eventSubscriptionFactory;
+            this.eventSource = eventSource;
 
             Subscribe();
         }
 
+        public void Dispose()
+        {
+            Unsubscribe();
+        }
+
         private void Subscribe()
         {
-            if (currentSubscription == null)
+            lock (retryWindow)
             {
-                lock (lockObject)
+                if (currentSubscription != null)
                 {
-                    if (currentSubscription == null)
-                    {
-                        currentSubscription = eventSubscriptionFactory(this);
-                    }
+                    return;
                 }
+
+                currentSubscription = new SubscriptionHolder(eventSource(this));
             }
         }
 
-        public void Unsubscribe()
+        private void Unsubscribe()
         {
-            if (currentSubscription != null)
+            lock (retryWindow)
             {
-                lock (lockObject)
+                if (currentSubscription == null)
                 {
-                    if (currentSubscription != null)
-                    {
-                        timerCancellation.Cancel();
-                        timerCancellation.Dispose();
-
-                        currentSubscription.Unsubscribe();
-                        currentSubscription = null;
-
-                        timerCancellation = new CancellationTokenSource();
-                    }
+                    return;
                 }
+
+                currentSubscription.Dispose();
+                currentSubscription = null;
             }
         }
 
         public void WakeUp()
         {
-            currentSubscription?.WakeUp();
+            currentSubscription?.Subscription.WakeUp();
         }
 
-        public async Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
+        public ValueTask CompleteAsync()
         {
-            await eventSubscriber.OnEventAsync(subscription, storedEvent);
+            return currentSubscription?.Subscription.CompleteAsync() ?? default;
         }
 
-        public async Task OnErrorAsync(IEventSubscription subscription, Exception exception)
+        async ValueTask IEventSubscriber<T>.OnNextAsync(IEventSubscription subscription, T @event)
+        {
+            if (!ReferenceEquals(subscription, currentSubscription?.Subscription))
+            {
+                return;
+            }
+
+            await eventSubscriber.OnNextAsync(this, @event);
+        }
+
+        async ValueTask IEventSubscriber<T>.OnErrorAsync(IEventSubscription subscription, Exception exception)
         {
             if (exception is OperationCanceledException)
             {
                 return;
             }
 
-            if (retryWindow.CanRetryAfterFailure())
+            if (!ReferenceEquals(subscription, currentSubscription?.Subscription))
             {
-                Unsubscribe();
-
-                await Task.Delay(ReconnectWaitMs, timerCancellation.Token);
-
-                Subscribe();
+                return;
             }
-            else
+
+            Unsubscribe();
+
+            if (!retryWindow.CanRetryAfterFailure())
             {
-                await eventSubscriber.OnErrorAsync(subscription, exception);
+                await eventSubscriber.OnErrorAsync(this, exception);
+                return;
             }
+
+            try
+            {
+                await Task.Delay(ReconnectWaitMs, currentSubscription?.Cancellation?.Token ?? default);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
+            Subscribe();
         }
     }
 }

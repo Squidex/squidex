@@ -17,6 +17,11 @@ namespace Squidex.Infrastructure.Timers
         private int oneCallState;
         private CancellationTokenSource? wakeupToken;
 
+        public CompletionTimer(TimeSpan delay, Func<CancellationToken, Task> callback, TimeSpan initialDelay = default)
+            : this((int)delay.TotalMilliseconds, callback, (int)initialDelay.TotalMilliseconds)
+        {
+        }
+
         public CompletionTimer(int delayInMs, Func<CancellationToken, Task> callback, int initialDelay = 0)
         {
             Guard.NotNull(callback);

@@ -44,7 +44,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
 
             A.CallTo(() => tagService.NormalizeTagsAsync(appId, TagGroups.Schemas(schemaId),
                 A<HashSet<string>>.That.Is("n_raw2_1", "n_raw2_2", "n_raw4"),
-                A<HashSet<string>>.That.Is("o_raw2_1", "o_raw2_2", "o_raw4")))
+                A<HashSet<string>>.That.Is("o_raw2_1", "o_raw2_2", "o_raw4"),
+                default))
                 .Returns(new Dictionary<string, string>
                 {
                     ["n_raw2_2"] = "id2_2",
@@ -65,7 +66,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
 
             A.CallTo(() => tagService.NormalizeTagsAsync(appId, TagGroups.Schemas(schemaId),
                 A<HashSet<string>>.That.Is("name2_1", "name2_2", "name4"),
-                A<HashSet<string>>.That.IsEmpty()))
+                A<HashSet<string>>.That.IsEmpty(),
+                default))
                 .Returns(new Dictionary<string, string>
                 {
                     ["name2_2"] = "id2_2",
@@ -86,7 +88,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
 
             A.CallTo(() => tagService.NormalizeTagsAsync(appId, TagGroups.Schemas(schemaId),
                 A<HashSet<string>>.That.Is("id2_1", "id2_2", "id4"),
-                A<HashSet<string>>.That.IsEmpty()))
+                A<HashSet<string>>.That.IsEmpty(),
+                default))
                 .Returns(new Dictionary<string, string>
                 {
                     ["id2_2"] = "name2_2",

@@ -15,10 +15,10 @@ namespace Squidex.Infrastructure.EventSourcing
     public sealed class MongoEventStoreSubscription : IEventSubscription
     {
         private readonly MongoEventStore eventStore;
-        private readonly IEventSubscriber eventSubscriber;
+        private readonly IEventSubscriber<StoredEvent> eventSubscriber;
         private readonly CancellationTokenSource stopToken = new CancellationTokenSource();
 
-        public MongoEventStoreSubscription(MongoEventStore eventStore, IEventSubscriber eventSubscriber, string? streamFilter, string? position)
+        public MongoEventStoreSubscription(MongoEventStore eventStore, IEventSubscriber<StoredEvent> eventSubscriber, string? streamFilter, string? position)
         {
             this.eventStore = eventStore;
             this.eventSubscriber = eventSubscriber;
@@ -86,7 +86,7 @@ namespace Squidex.Infrastructure.EventSourcing
                         {
                             foreach (var storedEvent in change.FullDocument.Filtered(lastPosition))
                             {
-                                await eventSubscriber.OnEventAsync(this, storedEvent);
+                                await eventSubscriber.OnNextAsync(this, storedEvent);
                             }
                         }
 
@@ -123,7 +123,7 @@ namespace Squidex.Infrastructure.EventSourcing
                         }
                         else
                         {
-                            await eventSubscriber.OnEventAsync(this, storedEvent);
+                            await eventSubscriber.OnNextAsync(this, storedEvent);
 
                             lastRawPosition = storedEvent.EventPosition;
                         }
@@ -152,9 +152,18 @@ namespace Squidex.Infrastructure.EventSourcing
             return result;
         }
 
-        public void Unsubscribe()
+        public void Dispose()
         {
             stopToken.Cancel();
+        }
+
+        public ValueTask CompleteAsync()
+        {
+            return default;
+        }
+
+        public void WakeUp()
+        {
         }
     }
 }

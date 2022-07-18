@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ReferencesJintExtensionTests()
         {
-            var services =
+            var serviceProvider =
                 new ServiceCollection()
                     .AddSingleton(appProvider)
                     .AddSingleton(contentQuery)
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var extensions = new IJintExtension[]
             {
-                new ReferencesJintExtension(services)
+                new ReferencesJintExtension(serviceProvider)
             };
 
             A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, default))

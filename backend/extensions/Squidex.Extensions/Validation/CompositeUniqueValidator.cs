@@ -107,10 +107,7 @@ namespace Squidex.Extensions.Validation
             return
                 field.Partitioning == Partitioning.Invariant &&
                 field.RawProperties.Tags?.Contains(tag) == true &&
-                (field.RawProperties is BooleanFieldProperties ||
-                 field.RawProperties is NumberFieldProperties ||
-                 field.RawProperties is ReferencesFieldProperties ||
-                 field.RawProperties is StringFieldProperties);
+                field.RawProperties is BooleanFieldProperties or NumberFieldProperties or ReferencesFieldProperties or StringFieldProperties;
         }
     }
 }

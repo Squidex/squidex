@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
             var resolvedComponents = new ResolvedComponents(new Dictionary<DomainId, Schema>
             {
                 [componentId1] = component1,
-                [componentId2] = component2,
+                [componentId2] = component2
             });
 
             var schema = new Schema("user", type: type)

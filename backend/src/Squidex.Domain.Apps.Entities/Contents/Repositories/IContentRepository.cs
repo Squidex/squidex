@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Repositories
 {
     public interface IContentRepository
     {
-        IAsyncEnumerable<IContentEntity> StreamAll(IAppEntity app, HashSet<DomainId>? schemaIds,
+        IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
             CancellationToken ct = default);
 
         Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q, SearchScope scope,
@@ -25,10 +25,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Repositories
         Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q, SearchScope scope,
             CancellationToken ct = default);
 
-        Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(IAppEntity app, ISchemaEntity schema, FilterNode<ClrValue> filterNode,
+        Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
             CancellationToken ct = default);
 
-        Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(IAppEntity app, HashSet<DomainId> ids, SearchScope scope,
+        Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids, SearchScope scope,
             CancellationToken ct = default);
 
         Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, DomainId id, SearchScope scope,

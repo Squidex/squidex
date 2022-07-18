@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
                 if (version > EtagVersion.Empty)
                 {
-                    asset = await assetLoader.GetAsync(context.App.Id, id, version);
+                    asset = await assetLoader.GetAsync(context.App.Id, id, version, ct);
                 }
                 else
                 {
@@ -177,11 +177,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             using (Telemetry.Activities.StartActivity("AssetQueryService/QueryAsync"))
             {
-                q = await queryParser.ParseAsync(context, q);
+                q = await queryParser.ParseAsync(context, q, ct);
 
                 var assets = await QueryCoreAsync(context, parentId, q, ct);
 
-                if (q.Ids != null && q.Ids.Count > 0)
+                if (q.Ids is { Count: > 0 })
                 {
                     assets = assets.SortSet(x => x.Id, q.Ids);
                 }

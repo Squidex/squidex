@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 
             var searchQuery = new BsonDocument
             {
-                ["compound"] = compound,
+                ["compound"] = compound
             };
 
             if (index != null)

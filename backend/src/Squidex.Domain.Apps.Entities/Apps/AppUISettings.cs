@@ -5,69 +5,170 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
     public sealed class AppUISettings : IAppUISettings, IDeleter
     {
-        private readonly IGrainFactory grainFactory;
+        private readonly IPersistenceFactory<State> persistanceFactory;
 
-        public AppUISettings(IGrainFactory grainFactory)
+        [CollectionName("UISettings")]
+        public sealed class State
         {
-            this.grainFactory = grainFactory;
+            public JsonObject Settings { get; set; } = new JsonObject();
+
+            public void Set(JsonObject settings)
+            {
+                Settings = settings;
+            }
+
+            public bool Set(string path, JsonValue value)
+            {
+                var container = GetContainer(path, true, out var key);
+
+                if (container == null)
+                {
+                    ThrowHelper.InvalidOperationException("Path does not lead to an object.");
+                    return false;
+                }
+
+                if (!container.TryGetValue(key, out var existing) || !existing.Equals(value))
+                {
+                    container[key] = value;
+                    return true;
+                }
+
+                return false;
+            }
+
+            public bool Remove(string path)
+            {
+                var container = GetContainer(path, false, out var key);
+
+                if (container == null)
+                {
+                    return false;
+                }
+
+                return container.Remove(key);
+            }
+
+            private JsonObject? GetContainer(string path, bool add, out string key)
+            {
+                Guard.NotNullOrEmpty(path);
+
+                var segments = path.Split('.');
+
+                key = segments[^1];
+
+                var current = Settings;
+
+                if (segments.Length > 1)
+                {
+                    foreach (var segment in segments.Take(segments.Length - 1))
+                    {
+                        if (!current.TryGetValue(segment, out var found))
+                        {
+                            if (add)
+                            {
+                                found = new JsonObject();
+
+                                current[segment] = found;
+                            }
+                            else
+                            {
+                                return null;
+                            }
+                        }
+
+                        if (found.Value is JsonObject o)
+                        {
+                            current = o;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+
+                return current;
+            }
+        }
+
+        public AppUISettings(IPersistenceFactory<State> persistanceFactory)
+        {
+            this.persistanceFactory = persistanceFactory;
         }
 
         async Task IDeleter.DeleteContributorAsync(DomainId appId, string contributorId,
             CancellationToken ct)
         {
-            await GetGrain(appId, null).ClearAsync();
+            await ClearAsync(appId, contributorId, ct);
         }
 
         async Task IDeleter.DeleteAppAsync(IAppEntity app,
             CancellationToken ct)
         {
-            await GetGrain(app.Id, null).ClearAsync();
+            await ClearAsync(app.Id, null, ct);
 
             foreach (var userId in app.Contributors.Keys)
             {
-                await GetGrain(app.Id, userId).ClearAsync();
+                await ClearAsync(app.Id, userId, ct);
             }
         }
 
-        public async Task<JsonObject> GetAsync(DomainId appId, string? userId)
+        public async Task<JsonObject> GetAsync(DomainId appId, string? userId,
+            CancellationToken ct = default)
         {
-            var result = await GetGrain(appId, userId).GetAsync();
+            var state = await GetStateAsync(appId, userId, ct);
 
-            return result.Value;
+            return state.Value.Settings;
         }
 
-        public Task RemoveAsync(DomainId appId, string? userId, string path)
+        public async Task RemoveAsync(DomainId appId, string? userId, string path,
+            CancellationToken ct = default)
         {
-            return GetGrain(appId, userId).RemoveAsync(path);
+            var state = await GetStateAsync(appId, userId, ct);
+
+            await state.UpdateIfAsync(s => s.Remove(path), ct: ct);
         }
 
-        public Task SetAsync(DomainId appId, string? userId, string path, JsonValue value)
+        public async Task SetAsync(DomainId appId, string? userId, string path, JsonValue value,
+            CancellationToken ct = default)
         {
-            return GetGrain(appId, userId).SetAsync(path, value.AsJ());
+            var state = await GetStateAsync(appId, userId, ct);
+
+            await state.UpdateIfAsync(s => s.Set(path, value), ct: ct);
         }
 
-        public Task SetAsync(DomainId appId, string? userId, JsonObject settings)
+        public async Task SetAsync(DomainId appId, string? userId, JsonObject settings,
+            CancellationToken ct = default)
         {
-            return GetGrain(appId, userId).SetAsync(settings.AsJ());
+            var state = await GetStateAsync(appId, userId, ct);
+
+            await state.UpdateAsync(s => s.Set(settings), ct: ct);
         }
 
-        public Task ClearAsync(DomainId appId, string? userId)
+        public async Task ClearAsync(DomainId appId, string? userId,
+            CancellationToken ct = default)
         {
-            return GetGrain(appId, userId).ClearAsync();
+            var state = await GetStateAsync(appId, userId, ct);
+
+            await state.ClearAsync(ct);
         }
 
-        private IAppUISettingsGrain GetGrain(DomainId appId, string? userId)
+        private async Task<SimpleState<State>> GetStateAsync(DomainId appId, string? userId,
+            CancellationToken ct)
         {
-            return grainFactory.GetGrain<IAppUISettingsGrain>(GetKey(appId, userId));
+            var state = new SimpleState<State>(persistanceFactory, GetType(), GetKey(appId, userId));
+
+            await state.LoadAsync(ct);
+
+            return state;
         }
 
         private static string GetKey(DomainId appId, string? userId)

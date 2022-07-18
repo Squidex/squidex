@@ -47,7 +47,8 @@ namespace Squidex.Extensions.Assets.Azure
             this.log = log;
         }
 
-        public async Task EnhanceAsync(UploadAssetCommand command)
+        public async Task EnhanceAsync(UploadAssetCommand command,
+            CancellationToken ct)
         {
             try
             {
@@ -55,7 +56,7 @@ namespace Squidex.Extensions.Assets.Azure
                 {
                     await using (var stream = command.File.OpenRead())
                     {
-                        var result = await client.AnalyzeImageInStreamAsync(stream, features);
+                        var result = await client.AnalyzeImageInStreamAsync(stream, features, cancellationToken: ct);
 
                         command.Tags ??= new HashSet<string>();
 
@@ -72,7 +73,7 @@ namespace Squidex.Extensions.Assets.Azure
                             }
                         }
 
-                        var description = result.Description?.Captions?.OrderByDescending(x => x.Confidence)?.FirstOrDefault()?.Text;
+                        var description = result.Description?.Captions.MaxBy(x => x.Confidence)?.Text;
 
                         if (description != null)
                         {

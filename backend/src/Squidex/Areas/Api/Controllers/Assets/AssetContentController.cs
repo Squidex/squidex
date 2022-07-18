@@ -126,7 +126,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 else
                 {
                     // Fallback for old endpoint. Does not set the surrogate key.
-                    asset = await assetLoader.GetAsync(asset.AppId.Id, asset.Id, request.Version);
+                    asset = await assetLoader.GetAsync(asset.AppId.Id, asset.Id, request.Version, HttpContext.RequestAborted);
                 }
             }
 

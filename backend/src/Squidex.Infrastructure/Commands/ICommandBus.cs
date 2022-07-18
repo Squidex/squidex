@@ -9,6 +9,7 @@ namespace Squidex.Infrastructure.Commands
 {
     public interface ICommandBus
     {
-        Task<CommandContext> PublishAsync(ICommand command);
+        Task<CommandContext> PublishAsync(ICommand command,
+            CancellationToken ct);
     }
 }

@@ -80,10 +80,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.MongoDb
         {
             var app = A.Fake<IAppEntity>();
 
-            A.CallTo(() => app.Id)
-                .Returns(id);
-            A.CallTo(() => app.Version)
-                .Returns(version);
+            A.CallTo(() => app.Id).Returns(id);
+            A.CallTo(() => app.Version).Returns(version);
 
             return app;
         }
@@ -92,10 +90,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.MongoDb
         {
             var schema = A.Fake<ISchemaEntity>();
 
-            A.CallTo(() => schema.Id)
-                .Returns(id);
-            A.CallTo(() => schema.Version)
-                .Returns(version);
+            A.CallTo(() => schema.Id).Returns(id);
+            A.CallTo(() => schema.Version).Returns(version);
 
             return schema;
         }

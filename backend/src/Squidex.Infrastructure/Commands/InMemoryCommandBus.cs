@@ -9,60 +9,35 @@ namespace Squidex.Infrastructure.Commands
 {
     public sealed class InMemoryCommandBus : ICommandBus
     {
-        private readonly IStep pipeline;
-
-        private interface IStep
-        {
-            Task InvokeAsync(CommandContext context);
-        }
-
-        private sealed class NoopStep : IStep
-        {
-            public Task InvokeAsync(CommandContext context)
-            {
-                return Task.CompletedTask;
-            }
-        }
-
-        private sealed class DefaultStep : IStep
-        {
-            private readonly IStep next;
-            private readonly ICommandMiddleware middleware;
-
-            public DefaultStep(ICommandMiddleware middleware, IStep next)
-            {
-                this.middleware = middleware;
-
-                this.next = next;
-            }
-
-            public Task InvokeAsync(CommandContext context)
-            {
-                return middleware.HandleAsync(context, next.InvokeAsync);
-            }
-        }
+        private readonly NextDelegate pipeline;
 
         public InMemoryCommandBus(IEnumerable<ICommandMiddleware> middlewares)
         {
             var reverseMiddlewares = middlewares.Reverse().ToList();
 
-            IStep next = new NoopStep();
+            NextDelegate next = (c, ct) => Task.CompletedTask;
 
-            foreach (var middleware in reverseMiddlewares)
+            foreach (var middleware in middlewares.Reverse())
             {
-                next = new DefaultStep(middleware, next);
+                next = Create(next, middleware);
             }
 
             pipeline = next;
         }
 
-        public async Task<CommandContext> PublishAsync(ICommand command)
+        private static NextDelegate Create(NextDelegate next, ICommandMiddleware middleware)
+        {
+            return (c, ct) => middleware.HandleAsync(c, next, ct);
+        }
+
+        public async Task<CommandContext> PublishAsync(ICommand command,
+            CancellationToken ct)
         {
             Guard.NotNull(command);
 
             var context = new CommandContext(command, this);
 
-            await pipeline.InvokeAsync(context);
+            await pipeline(context, ct);
 
             return context;
         }

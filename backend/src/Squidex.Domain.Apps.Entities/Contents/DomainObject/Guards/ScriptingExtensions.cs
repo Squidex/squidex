@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 OldStatus = operation.Snapshot.Status,
                 Operation = "Update",
                 Status = operation.Snapshot.EditingStatus(),
-                StatusOld = default,
+                StatusOld = default
             });
 
             return TransformAsync(operation, script, vars);

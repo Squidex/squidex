@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Net;
 using Squidex.Assets;
 using Squidex.ClientLibrary.Management;
 using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
-#pragma warning disable SA1133 // Do not combine attributes
 
 namespace TestSuite.ApiTests
 {
@@ -362,7 +362,7 @@ namespace TestSuite.ApiTests
                 });
 
                 // Should return 403 when not authenticated.
-                Assert.Contains("403", ex.Message, StringComparison.Ordinal);
+                Assert.Equal(HttpStatusCode.Forbidden, ex.StatusCode);
             }
 
 
@@ -375,7 +375,7 @@ namespace TestSuite.ApiTests
                 });
 
                 // Should return 403 when not authenticated.
-                Assert.Contains("403", ex.Message, StringComparison.Ordinal);
+                Assert.Equal(HttpStatusCode.Forbidden, ex.StatusCode);
             }
         }
 
@@ -454,7 +454,7 @@ namespace TestSuite.ApiTests
             Assert.Single(assets_1.Items, x => x.Id == asset_1.Id);
         }
 
-        [Fact, Trait("Category", "NotAutomated")]
+        [Fact]
         public async Task Should_delete_recursively()
         {
             // STEP 1: Create asset folder
@@ -476,16 +476,7 @@ namespace TestSuite.ApiTests
             // STEP 4: Delete folder.
             await _.Assets.DeleteAssetFolderAsync(_.AppName, folder_1.Id);
 
-
-            // STEP 5: Wait for recursive deleter to delete the asset.
-            await Task.Delay(5000);
-
-            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
-            {
-                return _.Assets.GetAssetAsync(_.AppName, asset_1.Id);
-            });
-
-            Assert.Equal(404, ex.StatusCode);
+            Assert.True(await _.Assets.WaitForDeletionAsync(_.AppName, asset_1.Id, TimeSpan.FromSeconds(30)));
         }
 
         [Theory]

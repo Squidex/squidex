@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -13,10 +13,10 @@ namespace Squidex.Infrastructure
     [Serializable]
     public class DomainObjectNotFoundException : DomainObjectException
     {
-        private const string ValidationError = "OBJECT_NOTFOUND";
+        private const string ExposedErrorCode = "OBJECT_NOTFOUND";
 
         public DomainObjectNotFoundException(string id, Exception? inner = null)
-            : base(FormatMessage(id), id, ValidationError, inner)
+            : base(FormatMessage(id), id, ExposedErrorCode, inner)
         {
         }
 

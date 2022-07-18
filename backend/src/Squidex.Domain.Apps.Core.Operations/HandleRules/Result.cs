@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             var result = new Result { Exception = ex, Dump = dump ?? ex?.Message };
 
-            if (ex is OperationCanceledException || ex is TimeoutException)
+            if (ex is OperationCanceledException or TimeoutException)
             {
                 result.Status = RuleResult.Timeout;
             }

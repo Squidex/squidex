@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -13,14 +13,14 @@ namespace Squidex.Infrastructure
     [Serializable]
     public class DomainObjectVersionException : DomainObjectException
     {
-        private const string ValidationError = "OBJECT_VERSION_CONFLICT";
+        private const string ExposedErrorCode = "OBJECT_VERSION_CONFLICT";
 
         public long CurrentVersion { get; }
 
         public long ExpectedVersion { get; }
 
         public DomainObjectVersionException(string id, long currentVersion, long expectedVersion, Exception? inner = null)
-            : base(FormatMessage(id, currentVersion, expectedVersion), id, ValidationError, inner)
+            : base(FormatMessage(id, currentVersion, expectedVersion), id, ExposedErrorCode, inner)
         {
             CurrentVersion = currentVersion;
 

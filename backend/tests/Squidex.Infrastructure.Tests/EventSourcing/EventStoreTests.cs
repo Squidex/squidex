@@ -16,24 +16,32 @@ namespace Squidex.Infrastructure.EventSourcing
         private readonly Lazy<T> sut;
         private string subscriptionPosition;
 
-        public sealed class EventSubscriber : IEventSubscriber
+        public sealed class EventSubscriber : IEventSubscriber<StoredEvent>
         {
             public List<StoredEvent> Events { get; } = new List<StoredEvent>();
 
             public string LastPosition { get; set; }
 
-            public Task OnErrorAsync(IEventSubscription subscription, Exception exception)
+            public void Dispose()
+            {
+            }
+
+            public void WakeUp()
+            {
+            }
+
+            public ValueTask OnErrorAsync(IEventSubscription subscription, Exception exception)
             {
                 throw exception;
             }
 
-            public Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
+            public ValueTask OnNextAsync(IEventSubscription subscription, StoredEvent @event)
             {
-                LastPosition = storedEvent.EventPosition;
+                LastPosition = @event.EventPosition;
 
-                Events.Add(storedEvent);
+                Events.Add(@event);
 
-                return Task.CompletedTask;
+                return default;
             }
         }
 
@@ -483,7 +491,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
             finally
             {
-                subscription?.Unsubscribe();
+                subscription?.Dispose();
             }
         }
 

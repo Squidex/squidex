@@ -31,21 +31,18 @@ namespace Squidex.Domain.Apps.Entities.History
         private readonly IUrlGenerator urlGenerator;
         private readonly IUserResolver userResolver;
         private readonly ILogger<NotifoService> log;
-        private readonly IClock clock;
         private readonly INotifoClient? client;
+
+        public IClock Clock { get; set; } = SystemClock.Instance;
 
         public NotifoService(IOptions<NotifoOptions> options,
             IUrlGenerator urlGenerator,
             IUserResolver userResolver,
-            ILogger<NotifoService> log,
-            IClock clock)
+            ILogger<NotifoService> log)
         {
             this.options = options.Value;
-
             this.urlGenerator = urlGenerator;
             this.userResolver = userResolver;
-            this.clock = clock;
-
             this.log = log;
 
             if (options.Value.IsConfigured())
@@ -155,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
             try
             {
-                var now = clock.GetCurrentInstant();
+                var now = Clock.GetCurrentInstant();
 
                 var maxAge = now - MaxAge;
 
@@ -243,7 +240,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
         private IEnumerable<PublishDto> CreateRequests(Envelope<AppEvent> appEvent, HistoryEvent? historyEvent)
         {
-            if (appEvent.Payload is CommentCreated comment && comment.Mentions?.Length > 0)
+            if (appEvent.Payload is CommentCreated { Mentions.Length: > 0 } comment)
             {
                 foreach (var userId in comment.Mentions)
                 {
@@ -270,7 +267,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
             publishRequest.Properties["SquidexApp"] = payload.AppId.Name;
 
-            if (payload is ContentEvent @event && payload is not ContentDeleted)
+            if (payload is ContentEvent @event and not ContentDeleted)
             {
                 var url = urlGenerator.ContentUI(@event.AppId, @event.SchemaId, @event.ContentId);
 

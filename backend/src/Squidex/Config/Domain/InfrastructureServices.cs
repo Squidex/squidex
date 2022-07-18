@@ -19,14 +19,10 @@ using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Domain.Apps.Core.Templates.Extensions;
 using Squidex.Domain.Apps.Entities.Contents.Counter;
-using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
-using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline.Robots;
@@ -61,9 +57,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs(_ => SystemClock.Instance)
                 .As<IClock>();
 
-            services.AddSingletonAs<GrainBootstrap<IEventConsumerManagerGrain>>()
-                .AsSelf();
-
             services.AddSingletonAs<BackgroundRequestLogStore>()
                 .AsOptional<IRequestLogStore>();
 
@@ -76,7 +69,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<JintScriptEngine>()
                 .As<IScriptEngine>().As<IScriptDescriptor>();
 
-            services.AddSingletonAs<GrainTagService>()
+            services.AddSingletonAs<TagService>()
                 .As<ITagService>();
 
             services.AddSingletonAs<CounterJintExtension>()
@@ -112,7 +105,8 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<UserFluidExtension>()
                 .As<IFluidExtension>();
 
-            services.AddSingleton(DomainObjectGrainFormatter.Format);
+            services.AddSingletonAs<SimplePubSub>()
+                .As<IPubSub>();
         }
 
         public static void AddSquidexUsageTracking(this IServiceCollection services, IConfiguration config)
@@ -129,9 +123,6 @@ namespace Squidex.Config.Domain
                 .As<IApiUsageTracker>();
 
             services.AddSingletonAs<BackgroundUsageTracker>()
-                .AsSelf();
-
-            services.AddSingletonAs<GrainBootstrap<IUsageTrackerGrain>>()
                 .AsSelf();
         }
 

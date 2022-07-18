@@ -7,12 +7,10 @@
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Orleans;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.UsageTracking;
+using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
@@ -21,63 +19,60 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         private readonly MemoryCache memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IApiUsageTracker apiUsageTracker;
-        private readonly IGrainFactory grainFactory;
+        private readonly IMessageBus messaging;
 
-        public UsageGate(IAppPlansProvider appPlansProvider, IApiUsageTracker apiUsageTracker, IGrainFactory grainFactory)
+        public UsageGate(IAppPlansProvider appPlansProvider, IApiUsageTracker apiUsageTracker, IMessageBus messaging)
         {
             this.appPlansProvider = appPlansProvider;
             this.apiUsageTracker = apiUsageTracker;
-            this.grainFactory = grainFactory;
+            this.messaging = messaging;
         }
 
-        public virtual async Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateTime today)
+        public virtual async Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateTime today,
+            CancellationToken ct = default)
         {
             Guard.NotNull(app);
 
-            var appId = app.Id;
-
-            var isBlocked = false;
-
-            if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && client.ApiCallsLimit > 0)
-            {
-                var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today, clientId);
-
-                isBlocked = usage >= client.ApiCallsLimit;
-            }
-
             var (plan, _) = appPlansProvider.GetPlanForApp(app);
 
-            var limit = plan.MaxApiCalls;
+            var appId = app.Id;
+            var blocking = false;
+            var blockLimit = plan.MaxApiCalls;
 
-            if (limit > 0 || plan.BlockingApiCalls > 0)
+            if (blockLimit > 0 || plan.BlockingApiCalls > 0)
             {
-                var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today, null);
+                var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today, null, ct);
 
-                if (IsOver10Percent(limit, usage) && IsAboutToBeLocked(today, limit, usage) && !HasNotifiedBefore(app.Id))
+                if (IsOver10Percent(blockLimit, usage) && IsAboutToBeLocked(today, blockLimit, usage) && !HasNotifiedBefore(app.Id))
                 {
-                    var notification = new UsageNotification
+                    var notification = new UsageTrackingCheck
                     {
                         AppId = appId,
                         AppName = app.Name,
                         Usage = usage,
-                        UsageLimit = limit,
+                        UsageLimit = blockLimit,
                         Users = GetUsers(app)
                     };
 
-                    GetGrain().NotifyAsync(notification).Forget();
+                    await messaging.PublishAsync(notification, ct: ct);
 
                     TrackNotified(appId);
                 }
 
-                isBlocked = isBlocked || (plan.BlockingApiCalls > 0 && usage > plan.BlockingApiCalls);
+                blocking = plan.BlockingApiCalls > 0 && usage > plan.BlockingApiCalls;
             }
 
-            return isBlocked;
-        }
+            if (!blocking)
+            {
+                if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && client.ApiCallsLimit > 0)
+                {
+                    var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today, clientId, ct);
 
-        private IUsageNotifierGrain GetGrain()
-        {
-            return grainFactory.GetGrain<IUsageNotifierGrain>(SingleGrain.Id);
+                    blocking = usage >= client.ApiCallsLimit;
+                }
+            }
+
+            return blocking;
         }
 
         private bool HasNotifiedBefore(DomainId appId)

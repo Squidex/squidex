@@ -9,10 +9,5 @@
 
 namespace Squidex.Infrastructure.UsageTracking
 {
-    public sealed record ApiStats(
-        DateTime Date,
-        long TotalCalls, double AverageElapsedMs,
-        long TotalBytes)
-    {
-    }
+    public sealed record ApiStats(DateTime Date, long TotalCalls, double AverageElapsedMs, long TotalBytes);
 }

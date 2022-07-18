@@ -24,20 +24,21 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     {
         private readonly QueryModel queryModel = AssetQueryModel.Build();
         private readonly IEdmModel edmModel;
-        private readonly IJsonSerializer jsonSerializer;
+        private readonly IJsonSerializer serializer;
         private readonly ITagService tagService;
         private readonly AssetOptions options;
 
-        public AssetQueryParser(IJsonSerializer jsonSerializer, ITagService tagService, IOptions<AssetOptions> options)
+        public AssetQueryParser(IJsonSerializer serializer, ITagService tagService, IOptions<AssetOptions> options)
         {
-            this.jsonSerializer = jsonSerializer;
+            this.serializer = serializer;
             this.tagService = tagService;
             this.options = options.Value;
 
             edmModel = queryModel.ConvertToEdm("Squidex", "Asset");
         }
 
-        public virtual async Task<Q> ParseAsync(Context context, Q q)
+        public virtual async Task<Q> ParseAsync(Context context, Q q,
+            CancellationToken ct = default)
         {
             Guard.NotNull(context);
             Guard.NotNull(q);
@@ -46,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             {
                 var query = ParseClrQuery(q);
 
-                await TransformTagAsync(context, query);
+                await TransformTagAsync(context, query, ct);
 
                 WithSorting(query);
                 WithPaging(query, q);
@@ -84,9 +85,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         private void WithPaging(ClrQuery query, Q q)
         {
-            if (query.Take <= 0 || query.Take == long.MaxValue)
+            if (query.Take is <= 0 or long.MaxValue)
             {
-                if (q.Ids != null && q.Ids.Count > 0)
+                if (q.Ids is { Count: > 0 })
                 {
                     query.Take = q.Ids.Count;
                 }
@@ -114,17 +115,18 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             }
         }
 
-        private async Task TransformTagAsync(Context context, ClrQuery query)
+        private async Task TransformTagAsync(Context context, ClrQuery query,
+            CancellationToken ct)
         {
             if (query.Filter != null)
             {
-                query.Filter = await FilterTagTransformer.TransformAsync(query.Filter, context.App.Id, tagService);
+                query.Filter = await FilterTagTransformer.TransformAsync(query.Filter, context.App.Id, tagService, ct);
             }
         }
 
         private ClrQuery ParseJson(string json)
         {
-            return queryModel.Parse(json, jsonSerializer);
+            return queryModel.Parse(json, serializer);
         }
 
         private ClrQuery ParseOData(string odata)

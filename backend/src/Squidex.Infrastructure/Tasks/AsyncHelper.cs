@@ -51,37 +51,14 @@ namespace Squidex.Infrastructure.Tasks
                 .GetResult();
         }
 
-        public static async ValueTask WhenAllThrottledAsync<T>(IEnumerable<T> source, Func<T, CancellationToken, ValueTask> action, int maxDegreeOfParallelism = 0,
-            CancellationToken ct = default)
-        {
-            if (maxDegreeOfParallelism <= 0)
-            {
-                maxDegreeOfParallelism = Environment.ProcessorCount * 2;
-            }
-
-            var semaphore = new SemaphoreSlim(maxDegreeOfParallelism);
-
-            foreach (var item in source)
-            {
-                await semaphore.WaitAsync(ct);
-                try
-                {
-                    await action(item, ct);
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            }
-        }
-
-        public static void Batch<TIn, TOut>(this Channel<object> source, Channel<TOut> target, Func<IReadOnlyList<TIn>, TOut> converter, int batchSize, int timeout,
+        public static void Batch<TIn>(this Channel<object> source, Channel<object> target, int batchSize, int timeout,
             CancellationToken ct = default)
         {
             Task.Run(async () =>
             {
                 var batch = new List<TIn>(batchSize);
 
+                // Just a marker object to force sending out new batches.
                 var force = new object();
 
                 await using var timer = new Timer(_ => source.Writer.TryWrite(force));
@@ -90,19 +67,24 @@ namespace Squidex.Infrastructure.Tasks
                 {
                     if (batch.Count > 0)
                     {
-                        await target.Writer.WriteAsync(converter(batch), ct);
-                        batch.Clear();
+                        await target.Writer.WriteAsync(batch, ct);
+
+                        // Create a new batch, because the value is shared and might be processes by another concurrent task.
+                        batch = new List<TIn>();
                     }
                 }
 
+                // Exceptions usually that the process was stopped and the channel closed, therefore we do not catch them.
                 await foreach (var item in source.Reader.ReadAllAsync(ct))
                 {
                     if (ReferenceEquals(item, force))
                     {
+                        // Our item is the marker object from the timer.
                         await TrySendAsync();
                     }
                     else if (item is TIn typed)
                     {
+                        // The timeout just with the last event and should push events out if no further events are received.
                         timer.Change(timeout, Timeout.Infinite);
 
                         batch.Add(typed);

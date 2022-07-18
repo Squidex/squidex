@@ -40,16 +40,19 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers.Models
 
                 if (!IsResetting)
                 {
-                    AddPutLink("reset", resources.Url<EventConsumersController>(x => nameof(x.ResetEventConsumer), values));
+                    AddPutLink("reset",
+                        resources.Url<EventConsumersController>(x => nameof(x.ResetEventConsumer), values));
                 }
 
                 if (IsStopped)
                 {
-                    AddPutLink("start", resources.Url<EventConsumersController>(x => nameof(x.StartEventConsumer), values));
+                    AddPutLink("start",
+                        resources.Url<EventConsumersController>(x => nameof(x.StartEventConsumer), values));
                 }
                 else
                 {
-                    AddPutLink("stop", resources.Url<EventConsumersController>(x => nameof(x.StopEventConsumer), values));
+                    AddPutLink("stop",
+                        resources.Url<EventConsumersController>(x => nameof(x.StopEventConsumer), values));
                 }
             }
 

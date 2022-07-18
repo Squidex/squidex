@@ -13,20 +13,19 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 
-#pragma warning disable MA0106 // Avoid closure by using an overload with the 'factoryArgument' parameter
-
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal sealed class QueryInDedicatedCollection : OperationBase
+    internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
     {
         private readonly ConcurrentDictionary<(DomainId, DomainId), Task<IMongoCollection<MongoContentEntity>>> collections =
             new ConcurrentDictionary<(DomainId, DomainId), Task<IMongoCollection<MongoContentEntity>>>();
 
         private readonly IMongoClient mongoClient;
-        private readonly string mongoDatabasePrefix;
+        private readonly string mongoPrefix;
 
         [BsonIgnoreExtraElements]
         internal sealed class IdOnly
@@ -38,19 +37,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             public MongoContentEntity[] Joined { get; set; }
         }
 
-        public QueryInDedicatedCollection(IMongoClient mongoClient, string mongoDatabasePrefix)
+        public QueryInDedicatedCollection(IMongoClient mongoClient, string mongoPrefix)
         {
             this.mongoClient = mongoClient;
-            this.mongoDatabasePrefix = mongoDatabasePrefix;
+            this.mongoPrefix = mongoPrefix;
         }
 
         private Task<IMongoCollection<MongoContentEntity>> GetCollectionAsync(DomainId appId, DomainId schemaId)
         {
+#pragma warning disable MA0106 // Avoid closure by using an overload with the 'factoryArgument' parameter
             return collections.GetOrAdd((appId, schemaId), async key =>
             {
                 var (appId, schemaId) = key;
 
-                var schemaDatabase = mongoClient.GetDatabase($"{mongoDatabasePrefix}_{appId}");
+                var schemaDatabase = mongoClient.GetDatabase($"{mongoPrefix}_{appId}");
                 var schemaCollection = schemaDatabase.GetCollection<MongoContentEntity>($"{schemaId}");
 
                 await schemaCollection.Indexes.CreateManyAsync(
@@ -69,6 +69,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
                 return schemaCollection;
             });
+#pragma warning restore MA0106 // Avoid closure by using an overload with the 'factoryArgument' parameter
         }
 
         public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(IAppEntity app, ISchemaEntity schema, FilterNode<ClrValue> filterNode,
@@ -82,14 +83,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return contentItems.Select(x => new ContentIdStatus(x.IndexedSchemaId, x.Id, x.Status)).ToList();
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q,
+        public async Task<IResultList<IContentEntity>> QueryAsync(ISchemaEntity schema, Q q,
             CancellationToken ct)
         {
-            var query = q.Query.AdjustToModel(app.Id);
+            var query = q.Query.AdjustToModel(schema.AppId.Id);
 
             var filter = CreateFilter(query, q.Reference, q.CreatedBy);
 
-            var contentCollection = await GetCollectionAsync(app.Id, schema.Id);
+            var contentCollection = await GetCollectionAsync(schema.AppId.Id, schema.Id);
             var contentEntities = await FindContentsAsync(contentCollection, query, filter, ct);
             var contentTotal = (long)contentEntities.Count;
 
@@ -98,10 +99,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 if (q.NoTotal || (q.NoSlowTotal && q.Query.Filter != null))
                 {
                     contentTotal = -1;
-                }
-                else if (IsSatisfiedByIndex(query))
-                {
-                    contentTotal = await contentCollection.Find(filter).QuerySort(query).CountDocumentsAsync(ct);
                 }
                 else
                 {
@@ -115,28 +112,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         private static async Task<List<MongoContentEntity>> FindContentsAsync(IMongoCollection<MongoContentEntity> collection, ClrQuery query, FilterDefinition<MongoContentEntity> filter,
             CancellationToken ct)
         {
-            if (query.Skip > 0 && !IsSatisfiedByIndex(query))
-            {
-                var projection = Projection.Include("_id");
-
-                foreach (var field in query.GetAllFields())
-                {
-                    projection = projection.Include(field);
-                }
-
-                var joined =
-                    await collection.Aggregate()
-                        .Match(filter)
-                        .Project<IdOnly>(projection)
-                        .QuerySort(query)
-                        .QuerySkip(query)
-                        .QueryLimit(query)
-                        .Lookup<IdOnly, MongoContentEntity, IdOnly>(collection, x => x.Id, x => x.DocumentId, x => x.Joined)
-                        .ToListAsync(ct);
-
-                return joined.Select(x => x.Joined[0]).ToList();
-            }
-
             var result =
                 collection.Find(filter)
                     .QuerySort(query)
@@ -145,16 +120,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     .ToListAsync(ct);
 
             return await result;
-        }
-
-        private static bool IsSatisfiedByIndex(ClrQuery query)
-        {
-            return query.Sort != null &&
-                query.Sort.Count == 2 &&
-                query.Sort[0].Path.ToString() == "mt" &&
-                query.Sort[0].Order == SortOrder.Descending &&
-                query.Sort[1].Path.ToString() == "id" &&
-                query.Sort[1].Order == SortOrder.Ascending;
         }
 
         private static FilterDefinition<MongoContentEntity> BuildFilter(FilterNode<ClrValue>? filter)

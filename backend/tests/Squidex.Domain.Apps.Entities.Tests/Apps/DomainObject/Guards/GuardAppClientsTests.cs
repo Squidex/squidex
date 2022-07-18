@@ -164,10 +164,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             var app = A.Fake<IAppEntity>();
 
-            A.CallTo(() => app.Clients)
-                .Returns(clients);
-            A.CallTo(() => app.Roles)
-                .Returns(roles);
+            A.CallTo(() => app.Clients).Returns(clients);
+            A.CallTo(() => app.Roles).Returns(roles);
 
             return app;
         }

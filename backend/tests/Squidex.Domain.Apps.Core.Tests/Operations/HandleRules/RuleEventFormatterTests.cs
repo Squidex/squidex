@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             public (bool Match, ValueTask<string?>) Format(EnrichedEvent @event, object value, string[] path)
             {
-                if (path[0] == "data" && value is JsonValue jsonValue && jsonValue.Value is JsonArray)
+                if (path[0] == "data" && value is JsonValue { Value: JsonArray })
                 {
                     return (true, GetValueAsync());
                 }

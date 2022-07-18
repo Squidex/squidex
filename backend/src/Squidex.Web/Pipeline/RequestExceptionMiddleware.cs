@@ -81,7 +81,7 @@ namespace Squidex.Web.Pipeline
 
         private static bool IsErrorStatusCode(int statusCode)
         {
-            return statusCode >= 400 && statusCode < 600;
+            return statusCode is >= 400 and < 600;
         }
     }
 }

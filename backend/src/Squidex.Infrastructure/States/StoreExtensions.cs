@@ -11,9 +11,10 @@ namespace Squidex.Infrastructure.States
 {
     public static class StoreExtensions
     {
-        public static Task WriteEventAsync<T>(this IPersistence<T> persistence, Envelope<IEvent> @event)
+        public static Task WriteEventAsync<T>(this IPersistence<T> persistence, Envelope<IEvent> @event,
+            CancellationToken ct = default)
         {
-            return persistence.WriteEventsAsync(new[] { @event });
+            return persistence.WriteEventsAsync(new[] { @event }, ct);
         }
     }
 }

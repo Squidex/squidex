@@ -126,12 +126,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         private static bool CanHaveReferences(FieldProperties properties)
         {
-            return
-                properties is ArrayFieldProperties ||
-                properties is ReferencesFieldProperties ||
-                properties is AssetsFieldProperties ||
-                properties is ComponentFieldProperties ||
-                properties is ComponentsFieldProperties;
+            return properties is ArrayFieldProperties or ReferencesFieldProperties or AssetsFieldProperties or ComponentFieldProperties or ComponentsFieldProperties;
         }
 
         private static void AddIds(ref Args args)

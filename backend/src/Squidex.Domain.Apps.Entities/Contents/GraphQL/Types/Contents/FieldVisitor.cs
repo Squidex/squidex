@@ -17,7 +17,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public delegate T ValueResolver<T>(JsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
+    public delegate T ValueResolver<out T>(JsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
 
     public delegate Task<T> AsyncValueResolver<T>(JsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
 

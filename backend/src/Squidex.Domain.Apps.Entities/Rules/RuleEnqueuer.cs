@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
@@ -18,25 +19,27 @@ namespace Squidex.Domain.Apps.Entities.Rules
 {
     public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
     {
-        private static readonly TimeSpan CacheDuration = TimeSpan.FromSeconds(10);
         private readonly IMemoryCache cache;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly IRuleService ruleService;
         private readonly IAppProvider appProvider;
         private readonly ILocalCache localCache;
+        private readonly TimeSpan cacheDuration;
 
         public string Name
         {
             get => GetType().Name;
         }
 
-        public RuleEnqueuer(IAppProvider appProvider, IMemoryCache cache, ILocalCache localCache,
+        public RuleEnqueuer(IMemoryCache cache, ILocalCache localCache,
+            IAppProvider appProvider,
             IRuleEventRepository ruleEventRepository,
-            IRuleService ruleService)
+            IRuleService ruleService,
+            IOptions<RuleOptions> options)
         {
             this.appProvider = appProvider;
-
             this.cache = cache;
+            this.cacheDuration = options.Value.RuleCacheDuration;
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
             this.localCache = localCache;
@@ -57,6 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await foreach (var job in jobs)
             {
+                // We do not want to handle disabled rules in the normal flow.
                 if (job.Job != null && job.SkipReason == SkipReason.None)
                 {
                     await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError);
@@ -89,9 +93,10 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var cacheKey = $"{typeof(RuleEnqueuer)}_Rules_{appId}";
 
+            // Cache the rules for performance reasons for a short period of time (usually 10 sec).
             return cache.GetOrCreateAsync(cacheKey, entry =>
             {
-                entry.AbsoluteExpirationRelativeToNow = CacheDuration;
+                entry.AbsoluteExpirationRelativeToNow = cacheDuration;
 
                 return appProvider.GetRulesAsync(appId);
             });

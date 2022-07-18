@@ -23,20 +23,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
     public sealed class ConvertData : IContentEnricherStep
     {
         private readonly IUrlGenerator urlGenerator;
-        private readonly IJsonSerializer jsonSerializer;
         private readonly IAssetRepository assetRepository;
         private readonly IContentRepository contentRepository;
         private readonly ExcludeChangedTypes excludeChangedTypes;
 
-        public ConvertData(IUrlGenerator urlGenerator, IJsonSerializer jsonSerializer,
+        public ConvertData(IUrlGenerator urlGenerator, IJsonSerializer serializer,
             IAssetRepository assetRepository, IContentRepository contentRepository)
         {
             this.urlGenerator = urlGenerator;
-            this.jsonSerializer = jsonSerializer;
             this.assetRepository = assetRepository;
             this.contentRepository = contentRepository;
 
-            excludeChangedTypes = new ExcludeChangedTypes(jsonSerializer);
+            excludeChangedTypes = new ExcludeChangedTypes(serializer);
         }
 
         public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,

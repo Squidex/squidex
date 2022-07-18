@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetsJintExtensionTests()
         {
-            var services =
+            var serviceProvider =
                 new ServiceCollection()
                     .AddSingleton(appProvider)
                     .AddSingleton(assetFileStore)
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var extensions = new IJintExtension[]
             {
-                new AssetsJintExtension(services)
+                new AssetsJintExtension(serviceProvider)
             };
 
             A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, A<CancellationToken>._))

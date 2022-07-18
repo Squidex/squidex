@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.On(Envelope.Create(@event).SetRestored());
 
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, default))
+            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.On(Envelope.Create(@event));
 
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, default))
+            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 

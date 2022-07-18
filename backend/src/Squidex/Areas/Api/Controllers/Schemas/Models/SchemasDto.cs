@@ -35,7 +35,8 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
             if (resources.CanCreateSchema)
             {
-                AddPostLink("create", resources.Url<SchemasController>(x => nameof(x.PostSchema), values));
+                AddPostLink("create",
+                    resources.Url<SchemasController>(x => nameof(x.PostSchema), values));
             }
 
             return this;

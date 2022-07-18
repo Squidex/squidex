@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.States
 
         public bool IsSnapshotStale => false;
 
-        internal BatchPersistence(DomainId ownerKey, BatchContext<T> context, long version, IReadOnlyList<Envelope<IEvent>> @events,
+        internal BatchPersistence(DomainId ownerKey, BatchContext<T> context, long version, IReadOnlyList<Envelope<IEvent>> events,
             HandleEvent? applyEvent)
         {
             this.ownerKey = ownerKey;

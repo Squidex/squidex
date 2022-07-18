@@ -19,29 +19,29 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         {
             var result = new ResourcesDto();
 
-            result.AddGetLink("ping", resources.Url<PingController>(x => nameof(x.GetPing)));
+            result.AddGetLink("ping",
+    resources.Url<PingController>(x => nameof(x.GetPing)));
 
             if (resources.CanReadEvents)
             {
-                result.AddGetLink("admin/events", resources.Url<EventConsumersController>(x => nameof(x.GetEventConsumers)));
+                result.AddGetLink("admin/events",
+    resources.Url<EventConsumersController>(x => nameof(x.GetEventConsumers)));
             }
 
             if (resources.CanRestoreBackup)
             {
-                result.AddGetLink("admin/restore", resources.Url<RestoreController>(x => nameof(x.GetRestoreJob)));
+                result.AddGetLink("admin/restore",
+    resources.Url<RestoreController>(x => nameof(x.GetRestoreJob)));
             }
 
             if (resources.CanReadUsers)
             {
-                result.AddGetLink("admin/users", resources.Url<UserManagementController>(x => nameof(x.GetUsers)));
+                result.AddGetLink("admin/users",
+    resources.Url<UserManagementController>(x => nameof(x.GetUsers)));
             }
 
-            if (resources.CanReadOrleans)
-            {
-                result.AddGetLink("admin/orleans", "/orleans");
-            }
-
-            result.AddGetLink("languages", resources.Url<LanguagesController>(x => nameof(x.GetLanguages)));
+            result.AddGetLink("languages",
+    resources.Url<LanguagesController>(x => nameof(x.GetLanguages)));
 
             return result;
         }

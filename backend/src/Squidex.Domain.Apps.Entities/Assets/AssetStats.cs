@@ -9,10 +9,5 @@
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed record AssetStats(
-        DateTime Date,
-        long TotalCount,
-        long TotalSize)
-    {
-    }
+    public sealed record AssetStats(DateTime Date, long TotalCount, long TotalSize);
 }

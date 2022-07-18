@@ -11,6 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public interface IAssetLoader
     {
-        Task<IAssetEntity?> GetAsync(DomainId appId, DomainId id, long version = EtagVersion.Any);
+        Task<IAssetEntity?> GetAsync(DomainId appId, DomainId id, long version = EtagVersion.Any,
+            CancellationToken ct = default);
     }
 }

@@ -1,4 +1,4 @@
-<div class="card" (dblclick)="emitNavigate()" (mousedown)="preventSelection($event)">
+<div class="card" (dblclick)="emitNavigate()" (mousedown)="preventSelection($event)" [title]="assetFolder.folderName | sqxTranslate">
     <div class="card-body">
         <div class="row g-2">
             <div class="col-auto">

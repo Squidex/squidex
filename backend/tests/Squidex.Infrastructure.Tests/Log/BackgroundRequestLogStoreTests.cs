@@ -104,7 +104,7 @@ namespace Squidex.Infrastructure.Log
 
             Assert.Empty(results);
 
-            A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, ct))
+            A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 

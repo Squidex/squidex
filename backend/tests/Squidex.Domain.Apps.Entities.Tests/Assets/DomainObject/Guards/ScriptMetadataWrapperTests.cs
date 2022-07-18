@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
             Assert.Equal(new[]
             {
                 new KeyValuePair<string, object?>("key1", JsonValue.Create(1)),
-                new KeyValuePair<string, object?>("key2", JsonValue.Create(2)),
+                new KeyValuePair<string, object?>("key2", JsonValue.Create(2))
             }, sut.ToArray());
         }
 

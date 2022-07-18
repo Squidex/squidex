@@ -19,6 +19,8 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Text;
 
+#pragma warning disable SA1013 // Closing braces should be spaced correctly
+
 namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler
@@ -83,7 +85,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 await contentLoader.GetAsync(
                     contentEvent.AppId.Id,
                     contentEvent.ContentId,
-                    @event.Headers.EventStreamNumber());
+                    @event.Headers.EventStreamNumber(),
+                    ct);
 
             if (content != null)
             {
@@ -98,13 +101,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case ContentDeleted:
                     result.Type = EnrichedContentEventType.Deleted;
                     break;
-                case ContentStatusChanged e when e.Change == StatusChange.Published:
+                case ContentStatusChanged { Change: StatusChange.Published }:
                     result.Type = EnrichedContentEventType.Published;
                     break;
-                case ContentStatusChanged e when e.Change == StatusChange.Unpublished:
+                case ContentStatusChanged { Change: StatusChange.Unpublished }:
                     result.Type = EnrichedContentEventType.Unpublished;
                     break;
-                case ContentStatusChanged e when e.Change == StatusChange.Change:
+                case ContentStatusChanged { Change: StatusChange.Change }:
                     result.Type = EnrichedContentEventType.StatusChanged;
                     break;
                 case ContentUpdated:
@@ -117,7 +120,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 await contentLoader.GetAsync(
                                     content.AppId.Id,
                                     content.Id,
-                                    content.Version - 1);
+                                    content.Version - 1,
+                                    ct);
 
                             if (previousContent != null)
                             {
@@ -140,11 +144,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     return $"{e.SchemaId.Name.ToPascalCase()}Created";
                 case ContentDeleted e:
                     return $"{e.SchemaId.Name.ToPascalCase()}Deleted";
-                case ContentStatusChanged e when e.Change == StatusChange.Published:
+                case ContentStatusChanged { Change: StatusChange.Published } e:
                     return $"{e.SchemaId.Name.ToPascalCase()}Published";
-                case ContentStatusChanged e when e.Change == StatusChange.Unpublished:
+                case ContentStatusChanged { Change: StatusChange.Unpublished } e:
                     return $"{e.SchemaId.Name.ToPascalCase()}Unpublished";
-                case ContentStatusChanged e when e.Change == StatusChange.Change:
+                case ContentStatusChanged { Change: StatusChange.Change } e:
                     return $"{e.SchemaId.Name.ToPascalCase()}StatusChanged";
                 case ContentUpdated e:
                     return $"{e.SchemaId.Name.ToPascalCase()}Updated";

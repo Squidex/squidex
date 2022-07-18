@@ -32,9 +32,7 @@ namespace Squidex.Extensions.Actions
 
         public static bool IsContentDeletion(this EnrichedEvent @event)
         {
-            return @event is EnrichedContentEvent contentEvent &&
-                (contentEvent.Type == EnrichedContentEventType.Deleted ||
-                 contentEvent.Type == EnrichedContentEventType.Unpublished);
+            return @event is EnrichedContentEvent { Type: EnrichedContentEventType.Deleted or EnrichedContentEventType.Unpublished };
         }
 
         public static bool IsAssetDeletion(this EnrichedEvent @event)

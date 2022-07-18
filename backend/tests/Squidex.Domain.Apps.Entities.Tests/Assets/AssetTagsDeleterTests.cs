@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.DeleteAppAsync(app, ct);
 
-            A.CallTo(() => tagService.ClearAsync(app.Id, TagGroups.Assets))
+            A.CallTo(() => tagService.ClearAsync(app.Id, TagGroups.Assets, ct))
                 .MustHaveHappened();
         }
     }

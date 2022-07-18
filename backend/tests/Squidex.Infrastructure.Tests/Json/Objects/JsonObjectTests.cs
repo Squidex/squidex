@@ -331,7 +331,7 @@ namespace Squidex.Infrastructure.Json.Objects
                 JsonValue.Create(input),
                 JsonValue.Create((object?)input),
                 JsonValue.Create(input.ToDictionary(x => x.Key, x => x.Value.Value)),
-                input,
+                input
             };
 
             var result = new JsonObject().Add("1", 1).Add("2", 2);

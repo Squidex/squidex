@@ -15,16 +15,16 @@ namespace Squidex.Infrastructure.States
 {
     public abstract class MongoSnapshotStoreBase<T, TState> : MongoRepositoryBase<TState>, ISnapshotStore<T> where TState : MongoState<T>, new()
     {
-        protected MongoSnapshotStoreBase(IMongoDatabase database, JsonSerializer jsonSerializer)
-            : base(database, Register(jsonSerializer))
+        protected MongoSnapshotStoreBase(IMongoDatabase database, JsonSerializer serializer)
+            : base(database, Register(serializer))
         {
         }
 
-        private static bool Register(JsonSerializer jsonSerializer)
+        private static bool Register(JsonSerializer serializer)
         {
-            Guard.NotNull(jsonSerializer);
+            Guard.NotNull(serializer);
 
-            BsonJsonConvention.Register(jsonSerializer);
+            BsonJsonConvention.Register(serializer);
 
             return true;
         }

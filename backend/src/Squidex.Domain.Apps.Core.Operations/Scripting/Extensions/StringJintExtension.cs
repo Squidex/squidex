@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
     {
         private delegate JsValue StringSlugifyDelegate(string text, bool single = false);
 
-        private readonly Func<string, JsValue> sha256 = (text) =>
+        private readonly Func<string, JsValue> sha256 = text =>
         {
             try
             {
@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             }
         };
 
-        private readonly Func<string, JsValue> sha512 = (text) =>
+        private readonly Func<string, JsValue> sha512 = text =>
         {
             try
             {
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             }
         };
 
-        private readonly Func<string, JsValue> md5 = (text) =>
+        private readonly Func<string, JsValue> md5 = text =>
         {
             try
             {

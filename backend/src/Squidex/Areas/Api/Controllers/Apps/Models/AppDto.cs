@@ -133,104 +133,125 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         {
             var values = new { app = Name };
 
-            AddGetLink("ping", resources.Url<PingController>(x => nameof(x.GetAppPing), values));
+            AddGetLink("ping",
+                resources.Url<PingController>(x => nameof(x.GetAppPing), values));
 
             if (app.Image != null)
             {
-                AddGetLink("image", resources.Url<AppImageController>(x => nameof(x.GetImage), values));
+                AddGetLink("image",
+                    resources.Url<AppImageController>(x => nameof(x.GetImage), values));
             }
 
             if (isContributor)
             {
-                AddDeleteLink("leave", resources.Url<AppContributorsController>(x => nameof(x.DeleteMyself), values));
+                AddDeleteLink("leave",
+                    resources.Url<AppContributorsController>(x => nameof(x.DeleteMyself), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppDelete, Name, additional: permissions))
             {
-                AddDeleteLink("delete", resources.Url<AppsController>(x => nameof(x.DeleteApp), values));
+                AddDeleteLink("delete",
+                    resources.Url<AppsController>(x => nameof(x.DeleteApp), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppUpdate, Name, additional: permissions))
             {
-                AddPutLink("update", resources.Url<AppsController>(x => nameof(x.PutApp), values));
+                AddPutLink("update",
+                    resources.Url<AppsController>(x => nameof(x.PutApp), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppAssetsRead, Name, additional: permissions))
             {
-                AddGetLink("assets", resources.Url<AssetsController>(x => nameof(x.GetAssets), values));
+                AddGetLink("assets",
+                    resources.Url<AssetsController>(x => nameof(x.GetAssets), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppBackupsRead, Name, additional: permissions))
             {
-                AddGetLink("backups", resources.Url<BackupsController>(x => nameof(x.GetBackups), values));
+                AddGetLink("backups",
+                    resources.Url<BackupsController>(x => nameof(x.GetBackups), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppClientsRead, Name, additional: permissions))
             {
-                AddGetLink("clients", resources.Url<AppClientsController>(x => nameof(x.GetClients), values));
+                AddGetLink("clients",
+                    resources.Url<AppClientsController>(x => nameof(x.GetClients), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppContributorsRead, Name, additional: permissions))
             {
-                AddGetLink("contributors", resources.Url<AppContributorsController>(x => nameof(x.GetContributors), values));
+                AddGetLink("contributors",
+                    resources.Url<AppContributorsController>(x => nameof(x.GetContributors), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppLanguagesRead, Name, additional: permissions))
             {
-                AddGetLink("languages", resources.Url<AppLanguagesController>(x => nameof(x.GetLanguages), values));
+                AddGetLink("languages",
+                    resources.Url<AppLanguagesController>(x => nameof(x.GetLanguages), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppPlansRead, Name, additional: permissions))
             {
-                AddGetLink("plans", resources.Url<AppPlansController>(x => nameof(x.GetPlans), values));
+                AddGetLink("plans",
+                    resources.Url<AppPlansController>(x => nameof(x.GetPlans), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppRolesRead, Name, additional: permissions))
             {
-                AddGetLink("roles", resources.Url<AppRolesController>(x => nameof(x.GetRoles), values));
+                AddGetLink("roles",
+                    resources.Url<AppRolesController>(x => nameof(x.GetRoles), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppRulesRead, Name, additional: permissions))
             {
-                AddGetLink("rules", resources.Url<RulesController>(x => nameof(x.GetRules), values));
+                AddGetLink("rules",
+                    resources.Url<RulesController>(x => nameof(x.GetRules), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppSchemasRead, Name, additional: permissions))
             {
-                AddGetLink("schemas", resources.Url<SchemasController>(x => nameof(x.GetSchemas), values));
+                AddGetLink("schemas",
+                    resources.Url<SchemasController>(x => nameof(x.GetSchemas), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppWorkflowsRead, Name, additional: permissions))
             {
-                AddGetLink("workflows", resources.Url<AppWorkflowsController>(x => nameof(x.GetWorkflows), values));
+                AddGetLink("workflows",
+                    resources.Url<AppWorkflowsController>(x => nameof(x.GetWorkflows), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppSchemasCreate, Name, additional: permissions))
             {
-                AddPostLink("schemas/create", resources.Url<SchemasController>(x => nameof(x.PostSchema), values));
+                AddPostLink("schemas/create",
+                    resources.Url<SchemasController>(x => nameof(x.PostSchema), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppAssetsCreate, Name, additional: permissions))
             {
-                AddPostLink("assets/create", resources.Url<SchemasController>(x => nameof(x.PostSchema), values));
+                AddPostLink("assets/create",
+                    resources.Url<SchemasController>(x => nameof(x.PostSchema), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppImageUpload, Name, additional: permissions))
             {
-                AddPostLink("image/upload", resources.Url<AppsController>(x => nameof(x.UploadImage), values));
+                AddPostLink("image/upload",
+                    resources.Url<AppsController>(x => nameof(x.UploadImage), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppImageDelete, Name, additional: permissions))
             {
-                AddDeleteLink("image/delete", resources.Url<AppsController>(x => nameof(x.DeleteImage), values));
+                AddDeleteLink("image/delete",
+                    resources.Url<AppsController>(x => nameof(x.DeleteImage), values));
             }
 
             if (resources.IsAllowed(Shared.Permissions.AppAssetsScriptsUpdate, Name, additional: permissions))
             {
-                AddDeleteLink("assets/scripts", resources.Url<AppAssetsController>(x => nameof(x.GetAssetScripts), values));
+                AddDeleteLink("assets/scripts",
+                    resources.Url<AppAssetsController>(x => nameof(x.GetAssetScripts), values));
             }
 
-            AddGetLink("settings", resources.Url<AppSettingsController>(x => nameof(x.GetSettings), values));
+            AddGetLink("settings",
+                resources.Url<AppSettingsController>(x => nameof(x.GetSettings), values));
 
             return this;
         }

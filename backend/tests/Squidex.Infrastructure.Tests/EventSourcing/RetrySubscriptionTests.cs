@@ -13,36 +13,24 @@ namespace Squidex.Infrastructure.EventSourcing
     public class RetrySubscriptionTests
     {
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
-        private readonly IEventSubscriber eventSubscriber = A.Fake<IEventSubscriber>();
+        private readonly IEventSubscriber<StoredEvent> eventSubscriber = A.Fake<IEventSubscriber<StoredEvent>>();
         private readonly IEventSubscription eventSubscription = A.Fake<IEventSubscription>();
-        private readonly IEventSubscriber sutSubscriber;
-        private readonly RetrySubscription sut;
+        private readonly IEventSubscriber<StoredEvent> sutSubscriber;
+        private readonly RetrySubscription<StoredEvent> sut;
 
         public RetrySubscriptionTests()
         {
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
                 .Returns(eventSubscription);
 
-            A.CallTo(() => eventSubscription.Sender)
-                .Returns(eventSubscription);
-
-            sut = new RetrySubscription(eventSubscriber, s => eventStore.CreateSubscription(s)) { ReconnectWaitMs = 50 };
-
+            sut = new RetrySubscription<StoredEvent>(eventSubscriber, s => eventStore.CreateSubscription(s)) { ReconnectWaitMs = 50 };
             sutSubscriber = sut;
-        }
-
-        [Fact]
-        public void Should_return_original_subscription_as_sender()
-        {
-            var sender = sut.Sender;
-
-            Assert.Same(eventSubscription, sender);
         }
 
         [Fact]
         public void Should_subscribe_after_constructor()
         {
-            sut.Unsubscribe();
+            sut.Dispose();
 
             A.CallTo(() => eventStore.CreateSubscription(sut, A<string>._, A<string>._))
                 .MustHaveHappened();
@@ -51,16 +39,18 @@ namespace Squidex.Infrastructure.EventSourcing
         [Fact]
         public async Task Should_reopen_subscription_once_if_exception_is_retrieved()
         {
-            await OnErrorAsync(eventSubscription, new InvalidOperationException());
+            var ex = new InvalidOperationException();
+
+            await OnErrorAsync(eventSubscription, ex, times: 1);
 
             await Task.Delay(1000);
 
-            sut.Unsubscribe();
+            sut.Dispose();
 
-            A.CallTo(() => eventSubscription.Unsubscribe())
+            A.CallTo(() => eventSubscription.Dispose())
                 .MustHaveHappened(2, Times.Exactly);
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
                 .MustHaveHappened(2, Times.Exactly);
 
             A.CallTo(() => eventSubscriber.OnErrorAsync(eventSubscription, A<Exception>._))
@@ -72,37 +62,25 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var ex = new InvalidOperationException();
 
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
+            await OnErrorAsync(eventSubscription, ex, times: 6);
 
-            sut.Unsubscribe();
+            sut.Dispose();
 
-            A.CallTo(() => eventSubscriber.OnErrorAsync(eventSubscription, ex))
+            A.CallTo(() => eventSubscriber.OnErrorAsync(sut, ex))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_not_unsubscribe_after_last_error_to_keep_sender()
+        public async Task Should_ignore_operation_cancelled_error_from_inner_subscription_if_failed_often()
         {
-            var ex = new InvalidOperationException();
+            var ex = new OperationCanceledException();
 
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
+            await OnErrorAsync(eventSubscription, ex, times: 6);
 
-            A.CallTo(() => eventSubscriber.OnErrorAsync(eventSubscription, ex))
-                .MustHaveHappened();
+            sut.Dispose();
 
-            Assert.NotNull(sut.Sender);
-
-            sut.Unsubscribe();
+            A.CallTo(() => eventSubscriber.OnErrorAsync(sut, ex))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -110,9 +88,9 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var ex = new InvalidOperationException();
 
-            await OnErrorAsync(eventSubscription, ex);
+            await OnErrorAsync(eventSubscription, ex, times: 1);
 
-            sut.Unsubscribe();
+            sut.Dispose();
 
             A.CallTo(() => eventSubscriber.OnErrorAsync(eventSubscription, A<Exception>._))
                 .MustNotHaveHappened();
@@ -121,37 +99,66 @@ namespace Squidex.Infrastructure.EventSourcing
         [Fact]
         public async Task Should_forward_event_from_inner_subscription()
         {
-            var ev = new StoredEvent("Stream", "1", 2, new EventData("Type", new EnvelopeHeaders(), "Payload"));
+            var @event = new StoredEvent("Stream", "1", 2, new EventData("Type", new EnvelopeHeaders(), "Payload"));
 
-            await OnEventAsync(eventSubscription, ev);
+            await OnNextAsync(eventSubscription, @event);
 
-            sut.Unsubscribe();
+            sut.Dispose();
 
-            A.CallTo(() => eventSubscriber.OnEventAsync(eventSubscription, ev))
+            A.CallTo(() => eventSubscriber.OnNextAsync(sut, @event))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_forward_event_if_message_is_from_another_subscription()
+        public async Task Should_not_forward_event_if_message_is_from_another_subscription()
         {
-            var ev = new StoredEvent("Stream", "1", 2, new EventData("Type", new EnvelopeHeaders(), "Payload"));
+            var @event = new StoredEvent("Stream", "1", 2, new EventData("Type", new EnvelopeHeaders(), "Payload"));
 
-            await OnEventAsync(A.Fake<IEventSubscription>(), ev);
+            await OnNextAsync(A.Fake<IEventSubscription>(), @event);
 
-            sut.Unsubscribe();
+            sut.Dispose();
 
-            A.CallTo(() => eventSubscriber.OnEventAsync(A<IEventSubscription>._, A<StoredEvent>._))
-                .MustHaveHappened();
+            A.CallTo(() => eventSubscriber.OnNextAsync(A<IEventSubscription>._, A<StoredEvent>._))
+                .MustNotHaveHappened();
         }
 
-        private Task OnErrorAsync(IEventSubscription subscriber, Exception ex)
+        [Fact]
+        public async Task Should_be_able_to_unsubscribe_within_exception_handler()
         {
-            return sutSubscriber.OnErrorAsync(subscriber, ex);
+            var ex = new InvalidOperationException();
+
+            A.CallTo(() => eventSubscriber.OnErrorAsync(A<IEventSubscription>._, A<Exception>._))
+                .Invokes(() => sut.Dispose());
+
+            await OnErrorAsync(eventSubscription, ex, times: 6);
+
+            Assert.False(sut.IsSubscribed);
         }
 
-        private Task OnEventAsync(IEventSubscription subscriber, StoredEvent ev)
+        [Fact]
+        public async Task Should_be_able_to_unsubscribe_within_event_handler()
         {
-            return sutSubscriber.OnEventAsync(subscriber, ev);
+            var @event = new StoredEvent("Stream", "1", 2, new EventData("Type", new EnvelopeHeaders(), "Payload"));
+
+            A.CallTo(() => eventSubscriber.OnNextAsync(A<IEventSubscription>._, A<StoredEvent>._))
+                .Invokes(() => sut.Dispose());
+
+            await OnNextAsync(eventSubscription, @event);
+
+            Assert.False(sut.IsSubscribed);
+        }
+
+        private async ValueTask OnErrorAsync(IEventSubscription subscriber, Exception ex, int times)
+        {
+            for (var i = 0; i < times; i++)
+            {
+                await sutSubscriber.OnErrorAsync(subscriber, ex);
+            }
+        }
+
+        private ValueTask OnNextAsync(IEventSubscription subscriber, StoredEvent ev)
+        {
+            return sutSubscriber.OnNextAsync(subscriber, ev);
         }
     }
 }

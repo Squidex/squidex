@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
                 },
                 new FilterField(SharedSchemas.Status, "status")
                 {
-                    Description = FieldDescriptions.ContentStatus,
+                    Description = FieldDescriptions.ContentStatus
                 },
                 new FilterField(SharedSchemas.Status, "newStatus", IsNullable: true)
                 {

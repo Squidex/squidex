@@ -5,30 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Globalization;
 using MongoDB.Driver;
 using Squidex.Hosting;
 using Squidex.Hosting.Configuration;
 
-#pragma warning disable RECS0108 // Warns about static fields in generic types
-
 namespace Squidex.Infrastructure.MongoDb
 {
-    public abstract class MongoRepositoryBase<TEntity> : IInitializable
+    public abstract class MongoRepositoryBase<TEntity> : MongoBase<TEntity>, IInitializable
     {
-        private const string CollectionFormat = "{0}Set";
-
-        protected static readonly BulkWriteOptions BulkUnordered = new BulkWriteOptions { IsOrdered = true };
-        protected static readonly FieldDefinitionBuilder<TEntity> FieldBuilder = FieldDefinitionBuilder<TEntity>.Instance;
-        protected static readonly FilterDefinitionBuilder<TEntity> Filter = Builders<TEntity>.Filter;
-        protected static readonly IndexKeysDefinitionBuilder<TEntity> Index = Builders<TEntity>.IndexKeys;
-        protected static readonly InsertManyOptions InsertUnordered = new InsertManyOptions { IsOrdered = true };
-        protected static readonly ProjectionDefinitionBuilder<TEntity> Projection = Builders<TEntity>.Projection;
-        protected static readonly ReplaceOptions UpsertReplace = new ReplaceOptions { IsUpsert = true };
-        protected static readonly SortDefinitionBuilder<TEntity> Sort = Builders<TEntity>.Sort;
-        protected static readonly UpdateDefinitionBuilder<TEntity> Update = Builders<TEntity>.Update;
-        protected static readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
-
         private readonly IMongoDatabase mongoDatabase;
         private IMongoCollection<TEntity> mongoCollection;
 
@@ -51,15 +35,6 @@ namespace Squidex.Infrastructure.MongoDb
             get => mongoDatabase;
         }
 
-        static MongoRepositoryBase()
-        {
-            TypeConverterStringSerializer<RefToken>.Register();
-
-            InstantSerializer.Register();
-
-            DomainIdSerializer.Register();
-        }
-
         protected MongoRepositoryBase(IMongoDatabase database, bool setup = false)
         {
             Guard.NotNull(database);
@@ -77,10 +52,7 @@ namespace Squidex.Infrastructure.MongoDb
             return new MongoCollectionSettings();
         }
 
-        protected virtual string CollectionName()
-        {
-            return string.Format(CultureInfo.InvariantCulture, CollectionFormat, typeof(TEntity).Name);
-        }
+        protected abstract string CollectionName();
 
         protected virtual Task SetupCollectionAsync(IMongoCollection<TEntity> collection,
             CancellationToken ct)

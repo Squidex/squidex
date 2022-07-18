@@ -14,9 +14,10 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public sealed class AlwaysCreateClientCommandMiddleware : ICommandMiddleware
     {
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
-            await next(context);
+            await next(context, ct);
 
             if (context.IsCompleted && context.Command is CreateApp createApp)
             {
@@ -26,7 +27,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 {
                     command.AppId = appId;
 
-                    var newContext = await context.CommandBus.PublishAsync(command);
+                    // If we have the app already it is not worth to cancel the step here.
+                    var newContext = await context.CommandBus.PublishAsync(command, default);
 
                     context.Complete(newContext.PlainResult);
                 });

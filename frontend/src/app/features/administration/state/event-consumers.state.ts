@@ -76,6 +76,8 @@ export class EventConsumersState extends State<Snapshot> {
     public start(eventConsumer: EventConsumerDto): Observable<any> {
         return this.eventConsumersService.putStart(eventConsumer).pipe(
             tap(updated => {
+                this.dialogs.notifyInfo('i18n:eventConsumers.started');
+
                 this.replaceEventConsumer(updated);
             }),
             shareSubscribed(this.dialogs));
@@ -84,6 +86,8 @@ export class EventConsumersState extends State<Snapshot> {
     public stop(eventConsumer: EventConsumerDto): Observable<EventConsumerDto> {
         return this.eventConsumersService.putStop(eventConsumer).pipe(
             tap(updated => {
+                this.dialogs.notifyInfo('i18n:eventConsumers.stopped');
+
                 this.replaceEventConsumer(updated);
             }),
             shareSubscribed(this.dialogs));
@@ -92,6 +96,8 @@ export class EventConsumersState extends State<Snapshot> {
     public reset(eventConsumer: EventConsumerDto): Observable<EventConsumerDto> {
         return this.eventConsumersService.putReset(eventConsumer).pipe(
             tap(updated => {
+                this.dialogs.notifyInfo('i18n:eventConsumers.reset');
+
                 this.replaceEventConsumer(updated);
             }),
             shareSubscribed(this.dialogs));

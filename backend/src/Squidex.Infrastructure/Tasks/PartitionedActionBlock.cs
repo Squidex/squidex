@@ -35,13 +35,13 @@ namespace Squidex.Infrastructure.Tasks
 
             for (var i = 0; i < dataflowBlockOptions.MaxDegreeOfParallelism; i++)
             {
-                workers[i] = new ActionBlock<TInput>(action, new ExecutionDataflowBlockOptions()
+                workers[i] = new ActionBlock<TInput>(action, new ExecutionDataflowBlockOptions
                 {
                     BoundedCapacity = dataflowBlockOptions.BoundedCapacity,
                     CancellationToken = dataflowBlockOptions.CancellationToken,
                     MaxDegreeOfParallelism = 1,
                     MaxMessagesPerTask = 1,
-                    TaskScheduler = dataflowBlockOptions.TaskScheduler,
+                    TaskScheduler = dataflowBlockOptions.TaskScheduler
                 });
             }
 

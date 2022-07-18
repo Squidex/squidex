@@ -25,7 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IAppImageStore appImageStore;
         private readonly IAppsIndex appsIndex;
         private readonly IAppUISettings appUISettings;
-        private readonly HashSet<string> contributors = new HashSet<string>();
         private string? appReservation;
 
         public string Name { get; } = "Apps";
@@ -37,9 +36,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             IAppUISettings appUISettings)
         {
             this.appsIndex = appsIndex;
-            this.rebuilder = rebuilder;
             this.appImageStore = appImageStore;
             this.appUISettings = appUISettings;
+            this.rebuilder = rebuilder;
         }
 
         public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context,
@@ -59,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public async Task BackupAsync(BackupContext context,
             CancellationToken ct)
         {
-            var json = await appUISettings.GetAsync(context.AppId, null);
+            var json = await appUISettings.GetAsync(context.AppId, null, ct);
 
             await context.Writer.WriteJsonAsync(SettingsFile, json, ct);
         }
@@ -91,7 +90,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         }
 
                         contributorAssigned.ContributorId = user.Identifier;
-                        contributors.Add(contributorAssigned.ContributorId);
                         break;
                     }
 
@@ -103,7 +101,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         }
 
                         contributorRemoved.ContributorId = user.Identifier;
-                        contributors.Remove(contributorRemoved.ContributorId);
                         break;
                     }
             }
@@ -116,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var json = await context.Reader.ReadJsonAsync<JsonObject>(SettingsFile, ct);
 
-            await appUISettings.SetAsync(context.AppId, null, json);
+            await appUISettings.SetAsync(context.AppId, null, json, ct);
         }
 
         private async Task ReserveAppAsync(DomainId appId, string appName,
@@ -139,7 +136,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             await rebuilder.InsertManyAsync<AppDomainObject, AppDomainObject.State>(Enumerable.Repeat(context.AppId, 1), 1, default);
 
-            await appsIndex.RegisterAsync(context.AppId, appName);
             await appsIndex.RemoveReservationAsync(appReservation);
         }
 

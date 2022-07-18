@@ -43,7 +43,8 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (resources.CanCreateLanguage)
             {
-                AddPostLink("create", resources.Url<AppLanguagesController>(x => nameof(x.PostLanguage), values));
+                AddPostLink("create",
+                    resources.Url<AppLanguagesController>(x => nameof(x.PostLanguage), values));
             }
 
             return this;

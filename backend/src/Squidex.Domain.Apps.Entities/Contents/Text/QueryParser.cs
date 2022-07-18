@@ -51,8 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 lastIndexOfColon = indexOfColon;
 
-                var i = 0;
-
+                int i;
                 for (i = indexOfColon - 1; i >= position; i--)
                 {
                     var c = query[i];

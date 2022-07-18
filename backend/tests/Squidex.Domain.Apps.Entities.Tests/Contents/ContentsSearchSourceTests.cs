@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             Assert.Empty(result);
 
-            A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>._, A<SearchScope>._, ct))
+            A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>._, A<SearchScope>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             Assert.Empty(result);
 
-            A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>._, ct))
+            A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 

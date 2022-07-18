@@ -117,7 +117,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                                     distance = $"{query.Radius}m"
                                 }
                             }
-                        },
+                        }
                     }
                 },
                 _source = new[]

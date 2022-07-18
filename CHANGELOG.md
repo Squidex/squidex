@@ -3,6 +3,35 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.9.0] - 2022-07-14
+
+### Fixed
+
+* **Contents**: Disable the delete button on content list, if user does not have the necessary permissions.
+* **Contents**: Fixed a critical bug with the validation scheduler.
+* **Contents**: Use the correct asset folder, when asset is uploaded with button in rich text editor.
+* **Indexing**: Several bugfixes with index grains.
+* **Restore**: Fix a bug to restore apps without any published content items.
+* **Translations**: Map the translation result code properly.
+* **UI**: Several translation fixes.
+
+### Added
+
+* **UI**: Tooltips for asset folders.
+
+## [7.0.0-rc1] - 2022-07-11
+
+This version removes Orleans to make Squidex instances stateless and easier to deploy in multiple environments.
+
+If you want to deploy this version, one, and only one, node must be declared as worker with the environment variable `CLUSTERING__WORKER=true`.
+
+At the moment 2 extra components have been introduced:
+
+1. A distributed cache to store specific versions of a content item or asset item over a short period of time to make the rule service faster.
+2. A queue implementation to distribute workloads to the worker node.
+
+To make the migration as easy as possible, the default implementation uses MongoDb, but other implementations might follow.
+
 ## [6.8.0] - 2022-06-29
 
 ### Fixed

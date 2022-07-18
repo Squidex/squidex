@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.On(Envelope.Create(@event).SetRestored());
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -77,15 +77,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var childFolderId1 = DomainId.NewGuid();
             var childFolderId2 = DomainId.NewGuid();
 
-            A.CallTo(() => assetFolderRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId, A<CancellationToken>._))
+            A.CallTo(() => assetFolderRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId, default))
                 .Returns(new List<DomainId> { childFolderId1, childFolderId2 });
 
             await sut.On(Envelope.Create(@event));
 
-            A.CallTo(() => commandBus.PublishAsync(A<DeleteAssetFolder>.That.Matches(x => x.AssetFolderId == childFolderId1)))
+            A.CallTo(() => commandBus.PublishAsync(A<DeleteAssetFolder>.That.Matches(x => x.AssetFolderId == childFolderId1), default))
                 .MustHaveHappened();
 
-            A.CallTo(() => commandBus.PublishAsync(A<DeleteAssetFolder>.That.Matches(x => x.AssetFolderId == childFolderId2)))
+            A.CallTo(() => commandBus.PublishAsync(A<DeleteAssetFolder>.That.Matches(x => x.AssetFolderId == childFolderId2), default))
                 .MustHaveHappened();
         }
 
@@ -97,15 +97,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var childId1 = DomainId.NewGuid();
             var childId2 = DomainId.NewGuid();
 
-            A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId, A<CancellationToken>._))
+            A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId, default))
                 .Returns(new List<DomainId> { childId1, childId2 });
 
             await sut.On(Envelope.Create(@event));
 
-            A.CallTo(() => commandBus.PublishAsync(A<DeleteAsset>.That.Matches(x => x.AssetId == childId1)))
+            A.CallTo(() => commandBus.PublishAsync(A<DeleteAsset>.That.Matches(x => x.AssetId == childId1), default))
                 .MustHaveHappened();
 
-            A.CallTo(() => commandBus.PublishAsync(A<DeleteAsset>.That.Matches(x => x.AssetId == childId2)))
+            A.CallTo(() => commandBus.PublishAsync(A<DeleteAsset>.That.Matches(x => x.AssetId == childId2), default))
                 .MustHaveHappened();
         }
 
@@ -117,15 +117,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var childId1 = DomainId.NewGuid();
             var childId2 = DomainId.NewGuid();
 
-            A.CallTo(() => commandBus.PublishAsync(A<DeleteAsset>.That.Matches(x => x.AssetId == childId1)))
+            A.CallTo(() => commandBus.PublishAsync(A<DeleteAsset>.That.Matches(x => x.AssetId == childId1), default))
                 .Throws(new InvalidOperationException());
 
-            A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId, A<CancellationToken>._))
+            A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId, default))
                 .Returns(new List<DomainId> { childId1, childId2 });
 
             await sut.On(Envelope.Create(@event));
 
-            A.CallTo(() => commandBus.PublishAsync(A<DeleteAsset>.That.Matches(x => x.AssetId == childId2)))
+            A.CallTo(() => commandBus.PublishAsync(A<DeleteAsset>.That.Matches(x => x.AssetId == childId2), default))
                 .MustHaveHappened();
 
             A.CallTo(log).Where(x => x.Method.Name == "Log")

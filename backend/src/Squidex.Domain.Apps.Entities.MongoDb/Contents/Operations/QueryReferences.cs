@@ -14,7 +14,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal sealed class QueryReferences : OperationCollectionBase
+    internal sealed class QueryReferences : OperationBase
     {
         private readonly QueryByIds queryByIds;
 

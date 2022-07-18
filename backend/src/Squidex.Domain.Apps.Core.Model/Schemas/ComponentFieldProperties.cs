@@ -16,14 +16,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             init
             {
-                if (value != default)
-                {
-                    SchemaIds = ReadonlyList.Create(value);
-                }
-                else
-                {
-                    SchemaIds = null;
-                }
+                SchemaIds = value != default ? ReadonlyList.Create(value) : null;
             }
             get
             {

@@ -169,21 +169,24 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             {
                 var versioned = new { app, schema, values.id, version = Version - 1 };
 
-                AddGetLink("previous", resources.Url<ContentsController>(x => nameof(x.GetContentVersion), versioned));
+                AddGetLink("previous",
+                    resources.Url<ContentsController>(x => nameof(x.GetContentVersion), versioned));
             }
 
             if (NewStatus != null)
             {
                 if (resources.CanDeleteContentVersion(schema))
                 {
-                    AddDeleteLink("draft/delete", resources.Url<ContentsController>(x => nameof(x.DeleteVersion), values));
+                    AddDeleteLink("draft/delete",
+                        resources.Url<ContentsController>(x => nameof(x.DeleteVersion), values));
                 }
             }
             else if (Status == Status.Published)
             {
                 if (resources.CanCreateContentVersion(schema))
                 {
-                    AddPostLink("draft/create", resources.Url<ContentsController>(x => nameof(x.CreateDraft), values));
+                    AddPostLink("draft/create",
+                        resources.Url<ContentsController>(x => nameof(x.CreateDraft), values));
                 }
             }
 
@@ -202,17 +205,20 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             if (!content.IsSingleton && resources.CanDeleteContent(schema))
             {
-                AddDeleteLink("delete", resources.Url<ContentsController>(x => nameof(x.DeleteContent), values));
+                AddDeleteLink("delete",
+                    resources.Url<ContentsController>(x => nameof(x.DeleteContent), values));
             }
 
             if (content.CanUpdate && resources.CanUpdateContent(schema))
             {
-                AddPatchLink("patch", resources.Url<ContentsController>(x => nameof(x.PatchContent), values));
+                AddPatchLink("patch",
+                    resources.Url<ContentsController>(x => nameof(x.PatchContent), values));
             }
 
             if (content.CanUpdate && resources.CanUpdateContent(schema))
             {
-                AddPutLink("update", resources.Url<ContentsController>(x => nameof(x.PutContent), values));
+                AddPutLink("update",
+                    resources.Url<ContentsController>(x => nameof(x.PutContent), values));
             }
 
             return this;

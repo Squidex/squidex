@@ -17,7 +17,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal sealed class QueryScheduled : OperationCollectionBase
+    internal sealed class QueryScheduled : OperationBase
     {
         public override IEnumerable<CreateIndexModel<MongoContentEntity>> CreateIndexes()
         {

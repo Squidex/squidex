@@ -24,9 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
     {
         private readonly IServiceProvider serviceProvider;
 
-        public AssetFolderDomainObject(IPersistenceFactory<State> factory, ILogger<AssetFolderDomainObject> log,
+        public AssetFolderDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<AssetFolderDomainObject> log,
             IServiceProvider serviceProvider)
-            : base(factory, log)
+            : base(id, persistence, log)
         {
             this.serviceProvider = serviceProvider;
         }
@@ -48,39 +48,40 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 Equals(assetFolderCommand.AssetFolderId, Snapshot.Id);
         }
 
-        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+            CancellationToken ct)
         {
             switch (command)
             {
-                case CreateAssetFolder c:
-                    return CreateReturnAsync(c, async create =>
+                case CreateAssetFolder create:
+                    return CreateReturnAsync(create, async (c, ct) =>
                     {
-                        await CreateCore(create, c);
+                        await CreateCore(c, c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case MoveAssetFolder move:
-                    return UpdateReturnAsync(move, async c =>
+                    return UpdateReturnAsync(move, async (c, ct) =>
                     {
                         await MoveCore(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case RenameAssetFolder rename:
-                    return UpdateReturnAsync(rename, async c =>
+                    return UpdateReturnAsync(rename, async (c, ct) =>
                     {
                         await RenameCore(c);
 
                         return Snapshot;
-                    });
+                    }, ct);
 
                 case DeleteAssetFolder delete:
                     return Update(delete, c =>
                     {
                         Delete(c);
-                    });
+                    }, ct);
 
                 default:
                     ThrowHelper.NotSupportedException();

@@ -55,18 +55,18 @@ namespace Squidex.Extensions.Actions.Comment
         protected override async Task<Result> ExecuteJobAsync(CreateComment job,
             CancellationToken ct = default)
         {
-            if (job.CommentsId == default)
+            var command = job;
+
+            if (command.CommentsId == default)
             {
                 return Result.Ignored();
             }
 
-            var command = job;
-
             command.FromRule = true;
 
-            await commandBus.PublishAsync(command);
+            await commandBus.PublishAsync(command, ct);
 
-            return Result.Success($"Commented: {job.Text}");
+            return Result.Success($"Commented: {command.Text}");
         }
     }
 }

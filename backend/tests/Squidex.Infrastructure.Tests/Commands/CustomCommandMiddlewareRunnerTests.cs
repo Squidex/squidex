@@ -28,14 +28,15 @@ namespace Squidex.Infrastructure.Commands
                 this.value = value;
             }
 
-            public Task HandleAsync(CommandContext context, NextDelegate next)
+            public Task HandleAsync(CommandContext context, NextDelegate next,
+                CancellationToken ct)
             {
                 if (context.Command is Command command)
                 {
                     command.Values.Add(value);
                 }
 
-                return next(context);
+                return next(context, ct);
             }
         }
 
@@ -54,14 +55,14 @@ namespace Squidex.Infrastructure.Commands
 
             var isNextCalled = false;
 
-            await sut.HandleAsync(context, c =>
+            await sut.HandleAsync(context, (c, _) =>
             {
                 isNextCalled = true;
 
                 Assert.Equal(new[] { 10, 12, 14 }, command.Values);
 
                 return Task.CompletedTask;
-            });
+            }, default);
 
             Assert.True(isNextCalled);
         }

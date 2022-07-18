@@ -557,7 +557,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             sut.Execute(vars, script1, new ScriptOptions { AsContext = true });
 #pragma warning restore MA0042 // Do not use blocking calls in an async method
 
-            var vars2 = new DataScriptVars()
+            var vars2 = new DataScriptVars
             {
                 ["data"] = new ContentData()
             };

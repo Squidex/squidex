@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.EventSourcing
     public class PollingSubscriptionTests
     {
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
-        private readonly IEventSubscriber eventSubscriber = A.Fake<IEventSubscriber>();
+        private readonly IEventSubscriber<StoredEvent> eventSubscriber = A.Fake<IEventSubscriber<StoredEvent>>();
         private readonly string position = Guid.NewGuid().ToString();
 
         [Fact]
@@ -92,7 +92,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             await Task.Delay(200);
 
-            sut.Unsubscribe();
+            sut.Dispose();
         }
     }
 }

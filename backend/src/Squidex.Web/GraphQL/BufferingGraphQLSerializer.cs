@@ -45,7 +45,7 @@ namespace Squidex.Web.GraphQL
 
         public string Serialize<T>(T? value)
         {
-            return inner.Serialize<T>(value);
+            return inner.Serialize(value);
         }
 
         public T? Deserialize<T>(string? value)

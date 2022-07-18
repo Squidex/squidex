@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Xunit;
 
@@ -77,23 +76,25 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return new CommandContext(CreateCommand(command), A.Dummy<ICommandBus>());
         }
 
-        protected async Task<CommandContext> HandleAsync<TCommand>(ICommandMiddleware middleware, TCommand command) where TCommand : SquidexCommand
+        protected async Task<CommandContext> HandleAsync<TCommand>(ICommandMiddleware middleware, TCommand command,
+            CancellationToken ct = default) where TCommand : SquidexCommand
         {
             var context = new CommandContext(CreateCommand(command), A.Dummy<ICommandBus>());
 
-            await middleware.HandleAsync(context);
+            await middleware.HandleAsync(context, ct);
 
             return context;
         }
 
-        protected async Task<object> PublishIdempotentAsync<T>(DomainObject<T> domainObject, IAggregateCommand command) where T : class, IDomainState<T>, new()
+        protected async Task<object> PublishIdempotentAsync<T>(DomainObject<T> domainObject, IAggregateCommand command,
+            CancellationToken ct = default) where T : class, IDomainState<T>, new()
         {
-            var result = await domainObject.ExecuteAsync(command);
+            var result = await domainObject.ExecuteAsync(command, default);
 
             var previousSnapshot = domainObject.Snapshot;
             var previousVersion = domainObject.Snapshot.Version;
 
-            await domainObject.ExecuteAsync(command);
+            await domainObject.ExecuteAsync(command, ct);
 
             Assert.Same(previousSnapshot, domainObject.Snapshot);
             Assert.Equal(previousVersion, domainObject.Snapshot.Version);
@@ -111,22 +112,17 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
                 command.User = User;
             }
 
-            if (command is IAppCommand appCommand && appCommand.AppId == null)
+            if (command is IAppCommand { AppId: null } appCommand)
             {
                 appCommand.AppId = AppNamedId;
             }
 
-            if (command is ISchemaCommand schemaCommand && schemaCommand.SchemaId == null)
+            if (command is ISchemaCommand { SchemaId: null } schemaCommand)
             {
                 schemaCommand.SchemaId = SchemaNamedId;
             }
 
             return command;
-        }
-
-        protected static J<IAggregateCommand> J(IAggregateCommand command)
-        {
-            return command.AsJ();
         }
 
         protected TEvent CreateEvent<TEvent>(TEvent @event, bool fromClient = false) where TEvent : SquidexEvent

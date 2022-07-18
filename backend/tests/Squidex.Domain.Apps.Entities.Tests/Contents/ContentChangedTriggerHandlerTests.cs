@@ -26,6 +26,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public class ContentChangedTriggerHandlerTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IContentLoader contentLoader = A.Fake<IContentLoader>();
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
@@ -35,6 +37,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ContentChangedTriggerHandlerTests()
         {
+            ct = cts.Token;
+
             A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
                 .Returns(true);
 
@@ -125,14 +129,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var ctx = Context();
 
-            A.CallTo(() => contentRepository.StreamAll(ctx.AppId.Id, null, default))
+            A.CallTo(() => contentRepository.StreamAll(ctx.AppId.Id, null, ct))
                 .Returns(new List<ContentEntity>
                 {
                     new ContentEntity { SchemaId = schemaMatch },
                     new ContentEntity { SchemaId = schemaNonMatch }
                 }.ToAsyncEnumerable());
 
-            var result = await sut.CreateSnapshotEventsAsync(ctx, default).ToListAsync();
+            var result = await sut.CreateSnapshotEventsAsync(ctx, ct).ToListAsync(ct);
 
             var typed = result.OfType<EnrichedContentEvent>().ToList();
 
@@ -157,14 +161,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var ctx = Context(trigger);
 
-            A.CallTo(() => contentRepository.StreamAll(ctx.AppId.Id, A<HashSet<DomainId>>.That.Is(schemaMatch.Id), default))
+            A.CallTo(() => contentRepository.StreamAll(ctx.AppId.Id, A<HashSet<DomainId>>.That.Is(schemaMatch.Id), ct))
                 .Returns(new List<ContentEntity>
                 {
                     new ContentEntity { SchemaId = schemaMatch },
                     new ContentEntity { SchemaId = schemaMatch }
                 }.ToAsyncEnumerable());
 
-            var result = await sut.CreateSnapshotEventsAsync(ctx, default).ToListAsync();
+            var result = await sut.CreateSnapshotEventsAsync(ctx, ct).ToListAsync(ct);
 
             var typed = result.OfType<EnrichedContentEvent>().ToList();
 
@@ -183,10 +187,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-            A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 12))
+            A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 12, ct))
                 .Returns(new ContentEntity { AppId = ctx.AppId, SchemaId = schemaMatch });
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, ct).ToListAsync(ct);
 
             var enrichedEvent = result.Single() as EnrichedContentEvent;
 
@@ -205,13 +209,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var dataNow = new ContentData();
             var dataOld = new ContentData();
 
-            A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 12))
+            A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 12, ct))
                 .Returns(new ContentEntity { AppId = ctx.AppId, SchemaId = schemaMatch, Version = 12, Data = dataNow, Id = @event.ContentId });
 
-            A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 11))
+            A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 11, ct))
                 .Returns(new ContentEntity { AppId = ctx.AppId, SchemaId = schemaMatch, Version = 11, Data = dataOld });
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, ct).ToListAsync(ct);
 
             var enrichedEvent = result.Single() as EnrichedContentEvent;
 

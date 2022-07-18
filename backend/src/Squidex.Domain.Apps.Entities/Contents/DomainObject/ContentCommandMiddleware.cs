@@ -5,32 +5,36 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 {
-    public sealed class ContentCommandMiddleware : GrainCommandMiddleware<ContentCommand, IContentGrain>
+    public sealed class ContentCommandMiddleware : CachingDomainObjectMiddleware<ContentCommand, ContentDomainObject, ContentDomainObject.State>
     {
         private readonly IContentEnricher contentEnricher;
         private readonly IContextProvider contextProvider;
 
-        public ContentCommandMiddleware(IGrainFactory grainFactory, IContentEnricher contentEnricher, IContextProvider contextProvider)
-            : base(grainFactory)
+        public ContentCommandMiddleware(
+            IDomainObjectFactory domainObjectFactory,
+            IDomainObjectCache domainObjectCache,
+            IContentEnricher contentEnricher,
+            IContextProvider contextProvider)
+            : base(domainObjectFactory, domainObjectCache)
         {
             this.contentEnricher = contentEnricher;
             this.contextProvider = contextProvider;
         }
 
-        protected override async Task<object> EnrichResultAsync(CommandContext context, CommandResult result)
+        protected override async Task<object> EnrichResultAsync(CommandContext context, CommandResult result,
+            CancellationToken ct)
         {
-            var payload = await base.EnrichResultAsync(context, result);
+            var payload = await base.EnrichResultAsync(context, result, ct);
 
-            if (payload is IContentEntity content && payload is not IEnrichedContentEntity)
+            if (payload is IContentEntity content and not IEnrichedContentEntity)
             {
-                payload = await contentEnricher.EnrichAsync(content, true, contextProvider.Context, default);
+                payload = await contentEnricher.EnrichAsync(content, true, contextProvider.Context, ct);
             }
 
             return payload;

@@ -47,7 +47,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        public Task EnhanceAsync(UploadAssetCommand command)
+        public Task EnhanceAsync(UploadAssetCommand command,
+            CancellationToken ct)
         {
             try
             {

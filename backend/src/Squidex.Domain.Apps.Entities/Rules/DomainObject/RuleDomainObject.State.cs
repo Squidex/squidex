@@ -14,7 +14,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 {
-    public sealed partial class RuleDomainObject
+    public partial class RuleDomainObject
     {
         [CollectionName("Rules")]
         public sealed class State : DomainObjectState<State>, IRuleEntity

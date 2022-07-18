@@ -31,12 +31,12 @@ namespace Squidex.Infrastructure.Commands
         {
             var context = new CommandContext(command, commandBus);
 
-            await sut.HandleAsync(context, c =>
+            await sut.HandleAsync(context, (c, ct) =>
             {
                 context.Complete(true);
 
                 return Task.CompletedTask;
-            });
+            }, default);
 
             A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Debug)
                 .MustHaveHappened();
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.Commands
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await sut.HandleAsync(context, c => throw new InvalidOperationException());
+                await sut.HandleAsync(context, (c, ct) => throw new InvalidOperationException(), default);
             });
 
             A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Debug)
@@ -70,7 +70,7 @@ namespace Squidex.Infrastructure.Commands
         {
             var context = new CommandContext(command, commandBus);
 
-            await sut.HandleAsync(context, c => Task.CompletedTask);
+            await sut.HandleAsync(context, (c, ct) => Task.CompletedTask, default);
 
             A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Debug)
                 .MustHaveHappened();

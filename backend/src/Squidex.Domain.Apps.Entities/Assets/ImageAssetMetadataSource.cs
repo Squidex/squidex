@@ -20,17 +20,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 
-        public async Task EnhanceAsync(UploadAssetCommand command)
+        public async Task EnhanceAsync(UploadAssetCommand command,
+            CancellationToken ct)
         {
-            if (command.Type == AssetType.Unknown || command.Type == AssetType.Image)
+            if (command.Type is AssetType.Unknown or AssetType.Image)
             {
                 var mimeType = command.File.MimeType;
 
-                ImageInfo? imageInfo = null;
+                ImageInfo? imageInfo;
 
                 await using (var uploadStream = command.File.OpenRead())
                 {
-                    imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream, mimeType);
+                    imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream, mimeType, ct);
                 }
 
                 if (imageInfo != null)
@@ -45,13 +46,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         {
                             await using (var tempStream = tempFile.OpenWrite())
                             {
-                                await assetThumbnailGenerator.FixOrientationAsync(uploadStream, mimeType, tempStream);
+                                await assetThumbnailGenerator.FixOrientationAsync(uploadStream, mimeType, tempStream, ct);
                             }
                         }
 
                         await using (var tempStream = tempFile.OpenRead())
                         {
-                            imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(tempStream, mimeType) ?? imageInfo;
+                            imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(tempStream, mimeType, ct) ?? imageInfo;
                         }
 
                         await command.File.DisposeAsync();

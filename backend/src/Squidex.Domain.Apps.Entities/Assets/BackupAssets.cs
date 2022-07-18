@@ -137,13 +137,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var export = new TagsExport { Tags = tags, Alias = alias };
 
-            await tagService.RebuildTagsAsync(context.AppId, TagGroups.Assets, export);
+            await tagService.RebuildTagsAsync(context.AppId, TagGroups.Assets, export, ct);
         }
 
         private async Task BackupTagsAsync(BackupContext context,
             CancellationToken ct)
         {
-            var tags = await tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets);
+            var tags = await tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets, ct);
 
             if (tags.Tags != null)
             {

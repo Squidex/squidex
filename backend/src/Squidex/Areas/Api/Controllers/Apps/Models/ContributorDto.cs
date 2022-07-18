@@ -70,14 +70,16 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 {
                     var values = new { app };
 
-                    AddPostLink("update", resources.Url<AppContributorsController>(x => nameof(x.PostContributor), values));
+                    AddPostLink("update",
+                        resources.Url<AppContributorsController>(x => nameof(x.PostContributor), values));
                 }
 
                 if (resources.CanRevokeContributor)
                 {
                     var values = new { app, id = ContributorId };
 
-                    AddDeleteLink("delete", resources.Url<AppContributorsController>(x => nameof(x.DeleteContributor), values));
+                    AddDeleteLink("delete",
+                        resources.Url<AppContributorsController>(x => nameof(x.DeleteContributor), values));
                 }
             }
 

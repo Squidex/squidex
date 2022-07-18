@@ -17,7 +17,7 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal sealed class QueryByQuery : OperationCollectionBase
+    internal sealed class QueryByQuery : OperationBase
     {
         private readonly MongoCountCollection countCollection;
 
@@ -52,10 +52,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 .Descending(x => x.LastModified));
         }
 
-        public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(IAppEntity app, ISchemaEntity schema, FilterNode<ClrValue> filterNode,
+        public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
             CancellationToken ct)
         {
-            var filter = BuildFilter(app.Id, schema.Id, filterNode.AdjustToModel(app.Id));
+            var filter = BuildFilter(appId, schemaId, filterNode.AdjustToModel(appId));
 
             var contentEntities = await Collection.FindStatusAsync(filter, ct);
 
@@ -119,6 +119,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 }
                 else if (IsSatisfiedByIndex(query))
                 {
+                    // It is faster to filter with sorting when there is an index, because it forces the index to be used.
                     contentTotal = await Collection.Find(filter).QuerySort(query).CountDocumentsAsync(ct);
                 }
                 else
@@ -135,6 +136,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
             if (query.Skip > 0 && !IsSatisfiedByIndex(query))
             {
+                // If we have to skip over items, we could reach the limit of the sort buffer, therefore get the ids and all filter fields only
+                // in a first iteration and get the actual content in the a second query.
                 var projection = Projection.Include("_id");
 
                 foreach (var field in query.GetAllFields())
@@ -167,12 +170,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         private static bool IsSatisfiedByIndex(ClrQuery query)
         {
-            return query.Sort != null &&
-                query.Sort.Count == 2 &&
-                query.Sort[0].Path.ToString() == "mt" &&
-                query.Sort[0].Order == SortOrder.Descending &&
-                query.Sort[1].Path.ToString() == "id" &&
-                query.Sort[1].Order == SortOrder.Ascending;
+            return query.Sort is { Count: 2 } && query.Sort[0].Path.ToString() == "mt" && query.Sort[0].Order == SortOrder.Descending && query.Sort[1].Path.ToString() == "id" && query.Sort[1].Order == SortOrder.Ascending;
         }
 
         private static FilterDefinition<MongoContentEntity> BuildFilter(DomainId appId, DomainId schemaId,

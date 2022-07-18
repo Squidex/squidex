@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public static class Extensions
     {
-        public static Dictionary<string, GeoJSONObject>? ToGeo(this ContentData data, IJsonSerializer jsonSerializer)
+        public static Dictionary<string, GeoJSONObject>? ToGeo(this ContentData data, IJsonSerializer serializer)
         {
             Dictionary<string, GeoJSONObject>? result = null;
 
@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 {
                     foreach (var (key, jsonValue) in value)
                     {
-                        GeoJsonValue.TryParse(jsonValue, jsonSerializer, out var geoJson);
+                        GeoJsonValue.TryParse(jsonValue, serializer, out var geoJson);
 
                         if (geoJson != null)
                         {

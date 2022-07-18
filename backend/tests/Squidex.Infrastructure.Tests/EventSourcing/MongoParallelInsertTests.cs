@@ -7,11 +7,8 @@
 
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
-using Orleans.Internal;
-using Squidex.Infrastructure.EventSourcing.Grains;
-using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -22,145 +19,10 @@ namespace Squidex.Infrastructure.EventSourcing
     [Trait("Category", "Dependencies")]
     public sealed class MongoParallelInsertTests : IClassFixture<MongoEventStoreReplicaSetFixture>
     {
-        private readonly IGrainState<EventConsumerState> grainState = A.Fake<IGrainState<EventConsumerState>>();
-        private readonly ILogger<EventConsumerGrain> log = A.Fake<ILogger<EventConsumerGrain>>();
-        private readonly IEventDataFormatter eventDataFormatter;
+        private readonly TestState<EventConsumerState> state = new TestState<EventConsumerState>(DomainId.Empty);
+        private readonly IEventFormatter eventFormatter;
 
         public MongoEventStoreFixture _ { get; }
-
-        public class LimitedConcurrencyLevelTaskScheduler : TaskScheduler
-        {
-            [ThreadStatic]
-            private static bool currentThreadIsProcessingItems;
-
-            private readonly LinkedList<Task> tasks = new LinkedList<Task>();
-            private readonly int maxDegreeOfParallelism;
-            private int delegatesQueuedOrRunning;
-
-            public LimitedConcurrencyLevelTaskScheduler(int maxDegreeOfParallelism)
-            {
-                this.maxDegreeOfParallelism = maxDegreeOfParallelism;
-            }
-
-            protected sealed override void QueueTask(Task task)
-            {
-                lock (tasks)
-                {
-                    tasks.AddLast(task);
-
-                    if (delegatesQueuedOrRunning < maxDegreeOfParallelism)
-                    {
-                        ++delegatesQueuedOrRunning;
-
-                        NotifyThreadPoolOfPendingWork();
-                    }
-                }
-            }
-
-            private void NotifyThreadPoolOfPendingWork()
-            {
-                ThreadPool.UnsafeQueueUserWorkItem(_ =>
-                {
-                    currentThreadIsProcessingItems = true;
-                    try
-                    {
-                        while (true)
-                        {
-                            Task item;
-                            lock (tasks)
-                            {
-                                if (tasks.Count == 0)
-                                {
-                                    --delegatesQueuedOrRunning;
-                                    break;
-                                }
-
-                                item = tasks.First!.Value;
-
-                                tasks.RemoveFirst();
-                            }
-
-                            TryExecuteTask(item);
-                        }
-                    }
-                    finally
-                    {
-                        currentThreadIsProcessingItems = false;
-                    }
-                }, null);
-            }
-
-            protected sealed override bool TryExecuteTaskInline(Task task, bool taskWasPreviouslyQueued)
-            {
-                if (!currentThreadIsProcessingItems)
-                {
-                    return false;
-                }
-
-                if (taskWasPreviouslyQueued)
-                {
-                    TryDequeue(task);
-                }
-
-                return TryExecuteTask(task);
-            }
-
-            protected sealed override bool TryDequeue(Task task)
-            {
-                lock (tasks)
-                {
-                    return tasks.Remove(task);
-                }
-            }
-
-            public sealed override int MaximumConcurrencyLevel
-            {
-                get => maxDegreeOfParallelism;
-            }
-
-            protected sealed override IEnumerable<Task> GetScheduledTasks()
-            {
-                var lockTaken = false;
-                try
-                {
-                    Monitor.TryEnter(tasks, ref lockTaken);
-
-                    if (lockTaken)
-                    {
-                        return tasks.ToArray();
-                    }
-                    else
-                    {
-                        ThrowHelper.NotSupportedException();
-                        return default!;
-                    }
-                }
-                finally
-                {
-                    if (lockTaken)
-                    {
-                        Monitor.Exit(tasks);
-                    }
-                }
-            }
-        }
-
-        public sealed class MyEventConsumerGrain : EventConsumerGrain
-        {
-            private readonly TaskScheduler scheduler = new LimitedConcurrencyLevelTaskScheduler(1);
-
-            public TaskScheduler Scheduler => scheduler;
-
-            public MyEventConsumerGrain(
-                EventConsumerFactory eventConsumerFactory,
-                IGrainState<EventConsumerState> state,
-                IEventStore eventStore,
-                IEventDataFormatter eventDataFormatter,
-                ILogger<EventConsumerGrain> log)
-                : base(eventConsumerFactory, state, eventStore, eventDataFormatter, log)
-            {
-            }
-        }
 
         public class MyEvent : IEvent
         {
@@ -174,11 +36,11 @@ namespace Squidex.Infrastructure.EventSourcing
 
             public Func<int, Task> EventReceived { get; set; }
 
-            public string Name => "Test";
-
-            public string EventsFilter => ".*";
-
             public int Received { get; set; }
+
+            public string Name { get; } = RandomHash.Simple();
+
+            public string EventsFilter => $"^{Name}";
 
             public Task Completed => tcs.Task;
 
@@ -212,206 +74,163 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var typeNameRegistry = new TypeNameRegistry().Map(typeof(MyEvent), "My");
 
-            eventDataFormatter = new DefaultEventDataFormatter(typeNameRegistry, TestUtils.DefaultSerializer);
+            eventFormatter = new DefaultEventFormatter(typeNameRegistry, TestUtils.DefaultSerializer);
         }
 
         [Fact]
         public async Task Should_insert_and_retrieve_parallel()
         {
-            var expectedEvents = 10 * 1000;
+            const int expectedEvents = 2_000;
 
-            var consumer = new MyEventConsumer(expectedEvents);
-            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+            var eventConsumer = new MyEventConsumer(expectedEvents);
+            var eventProcessor = BuildProcessor(eventConsumer);
 
-            await consumerGrain.ActivateAsync(consumer.Name);
-            await consumerGrain.ActivateAsync();
+            await eventProcessor.InitializeAsync(default);
+            await eventProcessor.ActivateAsync();
 
-            Parallel.For(0, 20, x =>
-            {
-                for (var i = 0; i < 500; i++)
-                {
-                    var commitId = Guid.NewGuid();
+            await InsertAsync(eventConsumer, expectedEvents, parallelism: 20);
 
-                    var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
-
-                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
-                }
-            });
-
-            await AssertConsumerAsync(expectedEvents, consumer);
+            await AssertConsumerAsync(expectedEvents, eventConsumer);
         }
 
         [Fact]
         public async Task Should_insert_and_retrieve_parallel_with_multiple_events_per_commit()
         {
-            var expectedEvents = 10 * 1000;
+            const int expectedEvents = 2_000;
 
-            var consumer = new MyEventConsumer(expectedEvents);
-            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+            var eventConsumer = new MyEventConsumer(expectedEvents);
+            var eventProcessor = BuildProcessor(eventConsumer);
 
-            await consumerGrain.ActivateAsync(consumer.Name);
-            await consumerGrain.ActivateAsync();
+            await eventProcessor.InitializeAsync(default);
+            await eventProcessor.ActivateAsync();
 
-            Parallel.For(0, 10, x =>
-            {
-                for (var i = 0; i < 500; i++)
-                {
-                    var commitId = Guid.NewGuid();
+            await InsertAsync(eventConsumer, expectedEvents, messagesPerCommit: 2);
 
-                    var data1 = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
-                    var data2 = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
-
-                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data1, data2 }).Wait();
-                }
-            });
-
-            await AssertConsumerAsync(expectedEvents, consumer);
+            await AssertConsumerAsync(expectedEvents, eventConsumer);
         }
 
         [Fact]
         public async Task Should_insert_and_retrieve_afterwards()
         {
-            var expectedEvents = 10 * 1000;
+            const int expectedEvents = 2_000;
 
-            var consumer = new MyEventConsumer(expectedEvents);
-            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+            var eventConsumer = new MyEventConsumer(expectedEvents);
+            var eventProcessor = BuildProcessor(eventConsumer);
 
-            Parallel.For(0, 10, x =>
-            {
-                for (var i = 0; i < 1000; i++)
-                {
-                    var commitId = Guid.NewGuid();
+            await InsertAsync(eventConsumer, expectedEvents);
 
-                    var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+            await eventProcessor.InitializeAsync(default);
+            await eventProcessor.ActivateAsync();
 
-                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
-                }
-            });
-
-            await consumerGrain.ActivateAsync(consumer.Name);
-            await consumerGrain.ActivateAsync();
-
-            await AssertConsumerAsync(expectedEvents, consumer);
+            await AssertConsumerAsync(expectedEvents, eventConsumer);
         }
 
         [Fact]
         public async Task Should_insert_and_retrieve_partially_afterwards()
         {
-            var expectedEvents = 10 * 1000;
+            const int expectedEvents = 2_000;
 
-            var consumer = new MyEventConsumer(expectedEvents);
-            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+            var eventConsumer = new MyEventConsumer(expectedEvents);
+            var eventProcessor = BuildProcessor(eventConsumer);
 
-            Parallel.For(0, 10, x =>
-            {
-                for (var i = 0; i < 500; i++)
-                {
-                    var commitId = Guid.NewGuid();
+            await InsertAsync(eventConsumer, expectedEvents / 2);
 
-                    var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+            await eventProcessor.InitializeAsync(default);
+            await eventProcessor.ActivateAsync();
 
-                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
-                }
-            });
+            await InsertAsync(eventConsumer, expectedEvents / 2);
 
-            await consumerGrain.ActivateAsync(consumer.Name);
-            await consumerGrain.ActivateAsync();
-
-            Parallel.For(0, 10, x =>
-            {
-                for (var i = 0; i < 500; i++)
-                {
-                    var commitId = Guid.NewGuid();
-
-                    var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
-
-                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
-                }
-            });
-
-            await AssertConsumerAsync(expectedEvents, consumer);
+            await AssertConsumerAsync(expectedEvents, eventConsumer);
         }
 
         [Fact]
         public async Task Should_insert_and_retrieve_parallel_with_waits()
         {
-            var expectedEvents = 10 * 1000;
+            const int expectedEvents = 2_000;
 
-            var consumer = new MyEventConsumer(expectedEvents);
-            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+            var eventConsumer = new MyEventConsumer(expectedEvents);
+            var eventProcessor = BuildProcessor(eventConsumer);
 
-            await consumerGrain.ActivateAsync(consumer.Name);
-            await consumerGrain.ActivateAsync();
+            await eventProcessor.InitializeAsync(default);
+            await eventProcessor.ActivateAsync();
 
-            Parallel.For(0, 10, x =>
-            {
-                for (var j = 0; j < 10; j++)
-                {
-                    for (var i = 0; i < 100; i++)
-                    {
-                        var commitId = Guid.NewGuid();
+            await InsertAsync(eventConsumer, expectedEvents, iterations: 10);
 
-                        var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
-
-                        _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
-                    }
-
-                    Thread.Sleep(1000);
-                }
-            });
-
-            await AssertConsumerAsync(expectedEvents, consumer);
+            await AssertConsumerAsync(expectedEvents, eventConsumer);
         }
 
         [Fact]
         public async Task Should_insert_and_retrieve_parallel_with_stops_and_starts()
         {
-            var expectedEvents = 10 * 1000;
+            const int expectedEvents = 2_000;
 
-            var consumer = new MyEventConsumer(expectedEvents);
-            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+            var eventConsumer = new MyEventConsumer(expectedEvents);
+            var eventProcessor = BuildProcessor(eventConsumer);
 
-            var scheduler = consumerGrain.Scheduler;
-
-            consumer.EventReceived = count =>
+            eventConsumer.EventReceived = async count =>
             {
                 if (count % 1000 == 0)
                 {
-                    Task.Factory.StartNew(async () =>
-                    {
-                        await consumerGrain.StopAsync();
-                        await consumerGrain.StartAsync();
-                    }, default, default, scheduler).Forget();
+                    await eventProcessor.StopAsync();
+                    await eventProcessor.StartAsync();
                 }
-
-                return Task.CompletedTask;
             };
 
-            await consumerGrain.ActivateAsync(consumer.Name);
-            await consumerGrain.ActivateAsync();
+            await eventProcessor.InitializeAsync(default);
+            await eventProcessor.ActivateAsync();
 
-            Parallel.For(0, 10, x =>
-            {
-                for (var i = 0; i < 1000; i++)
-                {
-                    var commitId = Guid.NewGuid();
+            await InsertAsync(eventConsumer, expectedEvents);
 
-                    var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
-
-                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
-                }
-            });
-
-            await AssertConsumerAsync(expectedEvents, consumer);
+            await AssertConsumerAsync(expectedEvents, eventConsumer);
         }
 
-        private static async Task AssertConsumerAsync(int expectedEvents, MyEventConsumer consumer)
+        private EventConsumerProcessor BuildProcessor(IEventConsumer eventConsumer)
         {
-            await consumer.Completed.WithTimeout(TimeSpan.FromSeconds(100));
+            return new EventConsumerProcessor(
+                state.PersistenceFactory,
+                eventConsumer,
+                eventFormatter,
+                _.EventStore,
+                A.Fake<ILogger<EventConsumerProcessor>>());
+        }
 
+        private Task InsertAsync(IEventConsumer consumer, int numItems, int parallelism = 5, int messagesPerCommit = 1, int iterations = 1)
+        {
+            var perTask = numItems / (parallelism * messagesPerCommit * iterations);
+
+            return Parallel.ForEachAsync(Enumerable.Range(0, parallelism), async (_, _) =>
+            {
+                for (var i = 0; i < iterations; i++)
+                {
+                    for (var j = 0; j < perTask; j++)
+                    {
+                        var streamName = $"{consumer.Name}-{Guid.NewGuid()}";
+
+                        var commitId = Guid.NewGuid();
+                        var commitList = new List<EventData>();
+
+                        for (var k = 0; k < messagesPerCommit; k++)
+                        {
+                            commitList.Add(eventFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId));
+                        }
+
+                        await _.EventStore.AppendAsync(commitId, streamName, commitList);
+                    }
+
+                    if (i < iterations - 1)
+                    {
+                        await Task.Delay(1000);
+                    }
+                }
+            });
+        }
+
+        private static async Task AssertConsumerAsync(int expectedEvents, MyEventConsumer eventConsumer)
+        {
+            await Task.WhenAny(eventConsumer.Completed, Task.Delay(TimeSpan.FromSeconds(20)));
             await Task.Delay(2000);
 
-            Assert.Equal(expectedEvents, consumer.Received);
+            Assert.Equal(expectedEvents, eventConsumer.Received);
         }
     }
 }

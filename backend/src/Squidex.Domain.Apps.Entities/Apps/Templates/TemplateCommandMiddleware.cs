@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.CLI.Commands.Implementation;
 using Squidex.CLI.Commands.Implementation.FileSystem;
@@ -44,9 +43,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             this.log = log;
         }
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next,
+            CancellationToken ct)
         {
-            await next(context);
+            await next(context, ct);
 
             if (context.IsCompleted && context.Command is CreateApp createApp)
             {
