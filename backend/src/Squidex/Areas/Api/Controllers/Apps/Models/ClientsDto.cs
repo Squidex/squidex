@@ -40,7 +40,8 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (resources.CanCreateClient)
             {
-                AddPostLink("create", resources.Url<AppClientsController>(x => nameof(x.PostClient), values));
+                AddPostLink("create",
+                    resources.Url<AppClientsController>(x => nameof(x.PostClient), values));
             }
 
             return this;

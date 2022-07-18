@@ -65,12 +65,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (resources.CanUpdateClient)
             {
-                AddPutLink("update", resources.Url<AppClientsController>(x => nameof(x.PutClient), values));
+                AddPutLink("update",
+                    resources.Url<AppClientsController>(x => nameof(x.PutClient), values));
             }
 
             if (resources.CanDeleteClient)
             {
-                AddDeleteLink("delete", resources.Url<AppClientsController>(x => nameof(x.DeleteClient), values));
+                AddDeleteLink("delete",
+                    resources.Url<AppClientsController>(x => nameof(x.DeleteClient), values));
             }
 
             return this;

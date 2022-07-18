@@ -58,7 +58,8 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (resources.CanUpdateAssetsScripts)
             {
-                AddPutLink("update", resources.Url<AppAssetsController>(x => nameof(x.PutAssetScripts), values));
+                AddPutLink("update",
+                    resources.Url<AppAssetsController>(x => nameof(x.PutAssetScripts), values));
             }
 
             return this;

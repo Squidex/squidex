@@ -64,7 +64,8 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (resources.CanUpdateSettings)
             {
-                AddPutLink("update", resources.Url<AppSettingsController>(x => nameof(x.PutSettings), values));
+                AddPutLink("update",
+                    resources.Url<AppSettingsController>(x => nameof(x.PutSettings), values));
             }
 
             return this;

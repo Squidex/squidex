@@ -53,32 +53,39 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
             {
                 var values = new { app = resources.App, schema, parentId, id = FieldId };
 
-                AddPutLink("update", resources.Url<SchemaFieldsController>(x => nameof(x.PutNestedField), values));
+                AddPutLink("update",
+                    resources.Url<SchemaFieldsController>(x => nameof(x.PutNestedField), values));
 
                 if (IsHidden)
                 {
-                    AddPutLink("show", resources.Url<SchemaFieldsController>(x => nameof(x.ShowNestedField), values));
+                    AddPutLink("show",
+                        resources.Url<SchemaFieldsController>(x => nameof(x.ShowNestedField), values));
                 }
                 else
                 {
-                    AddPutLink("hide", resources.Url<SchemaFieldsController>(x => nameof(x.HideNestedField), values));
+                    AddPutLink("hide",
+                        resources.Url<SchemaFieldsController>(x => nameof(x.HideNestedField), values));
                 }
 
                 if (IsDisabled)
                 {
-                    AddPutLink("enable", resources.Url<SchemaFieldsController>(x => nameof(x.EnableNestedField), values));
+                    AddPutLink("enable",
+                        resources.Url<SchemaFieldsController>(x => nameof(x.EnableNestedField), values));
                 }
                 else
                 {
-                    AddPutLink("disable", resources.Url<SchemaFieldsController>(x => nameof(x.DisableNestedField), values));
+                    AddPutLink("disable",
+                        resources.Url<SchemaFieldsController>(x => nameof(x.DisableNestedField), values));
                 }
 
                 if (!IsLocked)
                 {
-                    AddPutLink("lock", resources.Url<SchemaFieldsController>(x => nameof(x.LockNestedField), values));
+                    AddPutLink("lock",
+                        resources.Url<SchemaFieldsController>(x => nameof(x.LockNestedField), values));
                 }
 
-                AddDeleteLink("delete", resources.Url<SchemaFieldsController>(x => nameof(x.DeleteNestedField), values));
+                AddDeleteLink("delete",
+                    resources.Url<SchemaFieldsController>(x => nameof(x.DeleteNestedField), values));
             }
         }
     }

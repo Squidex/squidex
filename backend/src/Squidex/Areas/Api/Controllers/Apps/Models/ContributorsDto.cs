@@ -77,7 +77,8 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (resources.CanAssignContributor && (MaxContributors < 0 || Items.Length < MaxContributors))
             {
-                AddPostLink("create", resources.Url<AppContributorsController>(x => nameof(x.PostContributor), values));
+                AddPostLink("create",
+                    resources.Url<AppContributorsController>(x => nameof(x.PostContributor), values));
             }
 
             return this;

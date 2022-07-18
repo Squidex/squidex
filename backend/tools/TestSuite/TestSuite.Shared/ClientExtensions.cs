@@ -11,6 +11,33 @@ namespace TestSuite
 {
     public static class ClientExtensions
     {
+        public static async Task<bool> WaitForDeletionAsync(this IAssetsClient assetsClient, string app, string id, TimeSpan timeout)
+        {
+            try
+            {
+                using var cts = new CancellationTokenSource(timeout);
+
+                while (!cts.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await assetsClient.GetAssetAsync(app, id, cts.Token);
+                    }
+                    catch (SquidexManagementException ex) when (ex.StatusCode == 404)
+                    {
+                        return true;
+                    }
+
+                    await Task.Delay(200, cts.Token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+            }
+
+            return false;
+        }
+
         public static async Task<BackupJobDto> WaitForBackupAsync(this IBackupsClient backupsClient, string app, TimeSpan timeout)
         {
             try

@@ -115,13 +115,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The field rules.
         /// </summary>
-        public List<FieldRuleDto> FieldRules { get; set; }
+        public List<FieldRuleDto> FieldRules { get; set; } = new List<FieldRuleDto>();
 
         /// <summary>
         /// The list of fields.
         /// </summary>
         [LocalizedRequired]
-        public List<FieldDto> Fields { get; set; }
+        public List<FieldDto> Fields { get; set; } = new List<FieldDto>();
 
         public static SchemaDto FromDomain(ISchemaEntity schema, Resources resources)
         {
@@ -132,9 +132,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
             SimpleMapper.Map(schema.SchemaDef.Scripts, result.Scripts);
             SimpleMapper.Map(schema.SchemaDef.Properties, result.Properties);
 
-            result.FieldRules = schema.SchemaDef.FieldRules.Select(FieldRuleDto.FromDomain).ToList();
-
-            result.Fields = new List<FieldDto>();
+            foreach (var rule in schema.SchemaDef.FieldRules)
+            {
+                result.FieldRules.Add(FieldRuleDto.FromDomain(rule));
+            }
 
             foreach (var field in schema.SchemaDef.Fields)
             {
@@ -154,51 +155,72 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
             AddSelfLink(resources.Url<SchemasController>(x => nameof(x.GetSchema), values));
 
-            if (resources.CanReadContent(Name) && Type == SchemaType.Default)
+            if (resources.CanReadContent(Name) && Type != SchemaType.Component)
             {
-                AddGetLink("contents", resources.Url<ContentsController>(x => nameof(x.GetContents), values));
+                AddGetLink("contents",
+                    resources.Url<ContentsController>(x => nameof(x.GetContents), values));
             }
 
             if (resources.CanCreateContent(Name) && Type == SchemaType.Default)
             {
-                AddPostLink("contents/create", resources.Url<ContentsController>(x => nameof(x.PostContent), values));
-                AddPostLink("contents/create/publish", resources.Url<ContentsController>(x => nameof(x.PostContent), values) + "?publish=true");
+                AddPostLink("contents/create",
+                    resources.Url<ContentsController>(x => nameof(x.PostContent), values));
+
+                AddPostLink("contents/create/publish",
+                    resources.Url<ContentsController>(x => nameof(x.PostContent), values) + "?publish=true");
             }
 
             if (resources.CanPublishSchema(Name))
             {
                 if (IsPublished)
                 {
-                    AddPutLink("unpublish", resources.Url<SchemasController>(x => nameof(x.UnpublishSchema), values));
+                    AddPutLink("unpublish",
+                        resources.Url<SchemasController>(x => nameof(x.UnpublishSchema), values));
                 }
                 else
                 {
-                    AddPutLink("publish", resources.Url<SchemasController>(x => nameof(x.PublishSchema), values));
+                    AddPutLink("publish",
+                        resources.Url<SchemasController>(x => nameof(x.PublishSchema), values));
                 }
             }
 
             if (allowUpdate)
             {
-                AddPostLink("fields/add", resources.Url<SchemaFieldsController>(x => nameof(x.PostField), values));
+                AddPostLink("fields/add",
+                    resources.Url<SchemaFieldsController>(x => nameof(x.PostField), values));
 
-                AddPutLink("fields/ui", resources.Url<SchemaFieldsController>(x => nameof(x.PutSchemaUIFields), values));
-                AddPutLink("fields/order", resources.Url<SchemaFieldsController>(x => nameof(x.PutSchemaFieldOrdering), values));
+                AddPutLink("fields/order",
+                    resources.Url<SchemaFieldsController>(x => nameof(x.PutSchemaFieldOrdering), values));
 
-                AddPutLink("update", resources.Url<SchemasController>(x => nameof(x.PutSchema), values));
-                AddPutLink("update/category", resources.Url<SchemasController>(x => nameof(x.PutCategory), values));
-                AddPutLink("update/rules", resources.Url<SchemasController>(x => nameof(x.PutRules), values));
-                AddPutLink("update/sync", resources.Url<SchemasController>(x => nameof(x.PutSchemaSync), values));
-                AddPutLink("update/urls", resources.Url<SchemasController>(x => nameof(x.PutPreviewUrls), values));
+                AddPutLink("fields/ui",
+                    resources.Url<SchemaFieldsController>(x => nameof(x.PutSchemaUIFields), values));
+
+                AddPutLink("update",
+                    resources.Url<SchemasController>(x => nameof(x.PutSchema), values));
+
+                AddPutLink("update/category",
+                    resources.Url<SchemasController>(x => nameof(x.PutCategory), values));
+
+                AddPutLink("update/rules",
+                    resources.Url<SchemasController>(x => nameof(x.PutRules), values));
+
+                AddPutLink("update/sync",
+                    resources.Url<SchemasController>(x => nameof(x.PutSchemaSync), values));
+
+                AddPutLink("update/urls",
+                    resources.Url<SchemasController>(x => nameof(x.PutPreviewUrls), values));
             }
 
             if (resources.CanUpdateSchemaScripts(Name))
             {
-                AddPutLink("update/scripts", resources.Url<SchemasController>(x => nameof(x.PutScripts), values));
+                AddPutLink("update/scripts",
+                    resources.Url<SchemasController>(x => nameof(x.PutScripts), values));
             }
 
             if (resources.CanDeleteSchema(Name))
             {
-                AddDeleteLink("delete", resources.Url<SchemasController>(x => nameof(x.DeleteSchema), values));
+                AddDeleteLink("delete",
+                    resources.Url<SchemasController>(x => nameof(x.DeleteSchema), values));
             }
 
             if (Fields != null)

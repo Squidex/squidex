@@ -61,12 +61,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (resources.CanUpdateWorkflow)
             {
-                AddPutLink("update", resources.Url<AppWorkflowsController>(x => nameof(x.PutWorkflow), values));
+                AddPutLink("update",
+                    resources.Url<AppWorkflowsController>(x => nameof(x.PutWorkflow), values));
             }
 
             if (resources.CanDeleteWorkflow)
             {
-                AddDeleteLink("delete", resources.Url<AppWorkflowsController>(x => nameof(x.DeleteWorkflow), values));
+                AddDeleteLink("delete",
+                    resources.Url<AppWorkflowsController>(x => nameof(x.DeleteWorkflow), values));
             }
 
             return this;

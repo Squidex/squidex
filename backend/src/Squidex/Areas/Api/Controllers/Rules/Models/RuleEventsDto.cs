@@ -48,11 +48,13 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                 {
                     var routeValues = new { values.app, id = ruleId };
 
-                    AddDeleteLink("cancel", resources.Url<RulesController>(x => nameof(x.DeleteRuleEvents), routeValues));
+                    AddDeleteLink("cancel",
+                        resources.Url<RulesController>(x => nameof(x.DeleteRuleEvents), routeValues));
                 }
                 else
                 {
-                    AddDeleteLink("cancel", resources.Url<RulesController>(x => nameof(x.DeleteEvents), values));
+                    AddDeleteLink("cancel",
+                        resources.Url<RulesController>(x => nameof(x.DeleteEvents), values));
                 }
             }
 

@@ -58,14 +58,16 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
             {
                 var values = new { app = resources.App, id = Id };
 
-                AddDeleteLink("delete", resources.Url<BackupsController>(x => nameof(x.DeleteBackup), values));
+                AddDeleteLink("delete",
+                    resources.Url<BackupsController>(x => nameof(x.DeleteBackup), values));
             }
 
             if (resources.CanDownloadBackup)
             {
                 var values = new { app = resources.App, appId = resources.AppId, id = Id };
 
-                AddGetLink("download", resources.Url<BackupContentController>(x => nameof(x.GetBackupContentV2), values));
+                AddGetLink("download",
+                    resources.Url<BackupContentController>(x => nameof(x.GetBackupContentV2), values));
             }
 
             return this;

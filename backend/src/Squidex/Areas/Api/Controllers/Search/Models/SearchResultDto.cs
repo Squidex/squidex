@@ -40,7 +40,8 @@ namespace Squidex.Areas.Api.Controllers.Search.Models
 
         protected SearchResultDto CreateLinks(SearchResult searchResult)
         {
-            AddGetLink("url", searchResult.Url);
+            AddGetLink("url",
+                searchResult.Url);
 
             return this;
         }

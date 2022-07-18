@@ -65,12 +65,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 if (resources.CanUpdateLanguage)
                 {
-                    AddPutLink("update", resources.Url<AppLanguagesController>(x => nameof(x.PutLanguage), values));
+                    AddPutLink("update",
+                        resources.Url<AppLanguagesController>(x => nameof(x.PutLanguage), values));
                 }
 
                 if (resources.CanDeleteLanguage && app.Languages.Languages.Count > 1)
                 {
-                    AddDeleteLink("delete", resources.Url<AppLanguagesController>(x => nameof(x.DeleteLanguage), values));
+                    AddDeleteLink("delete",
+                        resources.Url<AppLanguagesController>(x => nameof(x.DeleteLanguage), values));
                 }
             }
 

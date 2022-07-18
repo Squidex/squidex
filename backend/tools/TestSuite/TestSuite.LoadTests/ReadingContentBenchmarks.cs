@@ -13,7 +13,7 @@ using Xunit;
 namespace TestSuite.LoadTests
 {
     public class ReadingContentBenchmarks : IClassFixture<ReadingFixture>
-{
+    {
         public ReadingFixture _ { get; }
 
         public ReadingContentBenchmarks(ReadingFixture fixture)

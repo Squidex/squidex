@@ -113,44 +113,52 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
             {
                 if (IsEnabled)
                 {
-                    AddPutLink("disable", resources.Url<RulesController>(x => nameof(x.DisableRule), values));
+                    AddPutLink("disable",
+                        resources.Url<RulesController>(x => nameof(x.DisableRule), values));
                 }
                 else
                 {
-                    AddPutLink("enable", resources.Url<RulesController>(x => nameof(x.EnableRule), values));
+                    AddPutLink("enable",
+                        resources.Url<RulesController>(x => nameof(x.EnableRule), values));
                 }
             }
 
             if (resources.CanUpdateRule)
             {
-                AddPutLink("update", resources.Url<RulesController>(x => nameof(x.PutRule), values));
+                AddPutLink("update",
+                    resources.Url<RulesController>(x => nameof(x.PutRule), values));
             }
 
             if (resources.CanRunRuleEvents)
             {
-                AddPutLink("trigger", resources.Url<RulesController>(x => nameof(x.TriggerRule), values));
+                AddPutLink("trigger",
+                    resources.Url<RulesController>(x => nameof(x.TriggerRule), values));
 
                 if (canRun && ruleRunnerService.CanRunRule(rule))
                 {
-                    AddPutLink("run", resources.Url<RulesController>(x => nameof(x.PutRuleRun), values));
+                    AddPutLink("run",
+                        resources.Url<RulesController>(x => nameof(x.PutRuleRun), values));
                 }
 
                 if (canRun && ruleRunnerService.CanRunFromSnapshots(rule))
                 {
                     var snaphshotValues = new { values.app, values.id, fromSnapshots = true };
 
-                    AddPutLink("run/snapshots", resources.Url<RulesController>(x => nameof(x.PutRuleRun), snaphshotValues));
+                    AddPutLink("run/snapshots",
+                        resources.Url<RulesController>(x => nameof(x.PutRuleRun), snaphshotValues));
                 }
             }
 
             if (resources.CanReadRuleEvents)
             {
-                AddGetLink("logs", resources.Url<RulesController>(x => nameof(x.GetEvents), values));
+                AddGetLink("logs",
+                    resources.Url<RulesController>(x => nameof(x.GetEvents), values));
             }
 
             if (resources.CanDeleteRule)
             {
-                AddDeleteLink("delete", resources.Url<RulesController>(x => nameof(x.DeleteRule), values));
+                AddDeleteLink("delete",
+                    resources.Url<RulesController>(x => nameof(x.DeleteRule), values));
             }
 
             return this;
