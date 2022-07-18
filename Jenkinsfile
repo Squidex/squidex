@@ -17,7 +17,7 @@ pipeline {
   parameters {
     string(name: 'tag', description: 'The tag to deploy: ex. 6.7.0', defaultValue: 'latest')
     string(name: 'dbname', description: 'The current mongodb to use (like: homer-squidex-staging or homer-squidex-staging-v2upgrade)', defaultValue: 'none')
-    choice(name: 'cluster', choices: ['staging', 'production'], description: 'The Kubernetes Cluster to deploy to')$
+    choice(name: 'cluster', choices: ['staging', 'production'], description: 'The Kubernetes Cluster to deploy to')
     choice(name: 'namespace', choices: ['content-dev', 'content-v1', 'content-v2', 'content-v2upgrade'], description: 'The environment to deploy squidex to')
    }
   stages {
