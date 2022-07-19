@@ -24,6 +24,6 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: squidex
+              name: squidex-{{ .Values.version }}
               port:
                 number: 80
