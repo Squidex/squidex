@@ -22,10 +22,29 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.MongoDb;
+using Xunit;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 {
-    public sealed class ContentsQueryFixture
+    public sealed class ContentsQueryFixture : ContentsQueryFixtureBase
+    {
+        public ContentsQueryFixture()
+            : base(false)
+        {
+        }
+    }
+
+    public sealed class ContentsQueryDedicatedFixture : ContentsQueryFixtureBase
+    {
+        public ContentsQueryDedicatedFixture()
+            : base(true)
+        {
+        }
+    }
+
+    public abstract class ContentsQueryFixtureBase : IAsyncLifetime
     {
         private readonly Random random = new Random();
         private readonly int numValues = 10000;
@@ -49,12 +68,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             NamedId.Of(DomainId.Create("741e902c-fdfa-41ad-8e5a-b7cb9d6e3d94"), "my-schema5")
         };
 
-        public ContentsQueryFixture()
+        protected ContentsQueryFixtureBase(bool dedicatedCollections)
         {
+            SetupJson();
+
             mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
             mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
-
-            SetupJson();
 
             var appProvider = CreateAppProvider();
 
@@ -62,22 +81,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                 new MongoContentRepository(
                     mongoDatabase,
                     appProvider,
-                    false);
-
-            Task.Run(async () =>
-            {
-                await SetupAsync(ContentRepository, mongoDatabase);
-            }).Wait();
+                    dedicatedCollections);
         }
 
-        private async Task SetupAsync(MongoContentRepository contentRepository, IMongoDatabase database)
+        public Task DisposeAsync()
         {
-            await contentRepository.InitializeAsync(default);
+            return Task.CompletedTask;
+        }
 
-            await database.RunCommandAsync<BsonDocument>("{ profile : 0 }");
-            await database.DropCollectionAsync("system.profile");
+        public async Task InitializeAsync()
+        {
+            await ContentRepository.InitializeAsync(default);
 
-            var collections = contentRepository.GetInternalCollections();
+            await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 0 }");
+            await mongoDatabase.DropCollectionAsync("system.profile");
+
+            var collections = ContentRepository.GetInternalCollections();
 
             foreach (var collection in collections)
             {
@@ -138,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                 }
             }
 
-            await database.RunCommandAsync<BsonDocument>("{ profile : 2 }");
+            await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 2 }");
         }
 
         private static IAppProvider CreateAppProvider()

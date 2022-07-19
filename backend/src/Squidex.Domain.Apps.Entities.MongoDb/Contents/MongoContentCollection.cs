@@ -18,6 +18,8 @@ using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Translations;
 
+#pragma warning disable IDE0060 // Remove unused parameter
+
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEntity>
@@ -250,16 +252,26 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return Collection.Find(new BsonDocument()).ToAsyncEnumerable(ct);
         }
 
-        public Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity value,
+        public async Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity value,
             CancellationToken ct = default)
         {
-            return Collection.UpsertVersionedAsync(documentId, oldVersion, value.Version, value, ct);
+            if (queryInDedicatedCollection != null)
+            {
+                await queryInDedicatedCollection.UpsertVersionedAsync(documentId, oldVersion, value, default);
+            }
+
+            await Collection.UpsertVersionedAsync(documentId, oldVersion, value.Version, value, default);
         }
 
-        public Task RemoveAsync(DomainId key,
+        public async Task RemoveAsync(DomainId key,
             CancellationToken ct = default)
         {
-            return Collection.DeleteOneAsync(x => x.DocumentId == key, null, ct);
+            var previous = await Collection.FindOneAndDeleteAsync(x => x.DocumentId == key, null, default);
+
+            if (queryInDedicatedCollection != null && previous != null)
+            {
+                await queryInDedicatedCollection.RemoveAsync(previous, default);
+            }
         }
 
         public Task InsertManyAsync(IReadOnlyList<MongoContentEntity> snapshots,

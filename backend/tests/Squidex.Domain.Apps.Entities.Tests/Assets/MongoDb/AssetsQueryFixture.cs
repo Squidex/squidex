@@ -16,10 +16,11 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.MongoDb;
+using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 {
-    public sealed class AssetsQueryFixture
+    public sealed class AssetsQueryFixture : IAsyncLifetime
     {
         private readonly Random random = new Random();
         private readonly int numValues = 250;
@@ -41,78 +42,81 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
             mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
             mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
-            var assetRepository = new MongoAssetRepository(mongoDatabase);
+            AssetRepository = new MongoAssetRepository(mongoDatabase);
+        }
 
-            Task.Run(async () =>
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        public async Task InitializeAsync()
+        {
+            await AssetRepository.InitializeAsync(default);
+
+            await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 0 }");
+            await mongoDatabase.DropCollectionAsync("system.profile");
+
+            var collection = AssetRepository.GetInternalCollection();
+
+            var assetCount = await collection.Find(new BsonDocument()).CountDocumentsAsync();
+
+            if (assetCount == 0)
             {
-                await assetRepository.InitializeAsync(default);
+                var batch = new List<MongoAssetEntity>();
 
-                await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 0 }");
-                await mongoDatabase.DropCollectionAsync("system.profile");
-
-                var collection = assetRepository.GetInternalCollection();
-
-                var assetCount = await collection.Find(new BsonDocument()).CountDocumentsAsync();
-
-                if (assetCount == 0)
+                async Task ExecuteBatchAsync(MongoAssetEntity? entity)
                 {
-                    var batch = new List<MongoAssetEntity>();
-
-                    async Task ExecuteBatchAsync(MongoAssetEntity? entity)
+                    if (entity != null)
                     {
-                        if (entity != null)
-                        {
-                            batch.Add(entity);
-                        }
-
-                        if ((entity == null || batch.Count >= 1000) && batch.Count > 0)
-                        {
-                            await collection.InsertManyAsync(batch);
-
-                            batch.Clear();
-                        }
+                        batch.Add(entity);
                     }
 
-                    foreach (var appId in AppIds)
+                    if ((entity == null || batch.Count >= 1000) && batch.Count > 0)
                     {
-                        for (var i = 0; i < numValues; i++)
-                        {
-                            var fileName = i.ToString(CultureInfo.InvariantCulture);
+                        await collection.InsertManyAsync(batch);
 
-                            for (var j = 0; j < numValues; j++)
-                            {
-                                var tag = j.ToString(CultureInfo.InvariantCulture);
-
-                                var asset = new MongoAssetEntity
-                                {
-                                    DocumentId = DomainId.NewGuid(),
-                                    Tags = new HashSet<string> { tag },
-                                    Id = DomainId.NewGuid(),
-                                    FileHash = fileName,
-                                    FileName = fileName,
-                                    FileSize = 1024,
-                                    IndexedAppId = appId.Id,
-                                    IsDeleted = false,
-                                    IsProtected = false,
-                                    Metadata = new AssetMetadata
-                                    {
-                                        ["value"] = JsonValue.Create(tag)
-                                    },
-                                    Slug = fileName
-                                };
-
-                                await ExecuteBatchAsync(asset);
-                            }
-                        }
+                        batch.Clear();
                     }
-
-                    await ExecuteBatchAsync(null);
                 }
 
-                await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 2 }");
-            }).Wait();
+                foreach (var appId in AppIds)
+                {
+                    for (var i = 0; i < numValues; i++)
+                    {
+                        var fileName = i.ToString(CultureInfo.InvariantCulture);
 
-            AssetRepository = assetRepository;
+                        for (var j = 0; j < numValues; j++)
+                        {
+                            var tag = j.ToString(CultureInfo.InvariantCulture);
+
+                            var asset = new MongoAssetEntity
+                            {
+                                DocumentId = DomainId.NewGuid(),
+                                Tags = new HashSet<string> { tag },
+                                Id = DomainId.NewGuid(),
+                                FileHash = fileName,
+                                FileName = fileName,
+                                FileSize = 1024,
+                                IndexedAppId = appId.Id,
+                                IsDeleted = false,
+                                IsProtected = false,
+                                Metadata = new AssetMetadata
+                                {
+                                    ["value"] = JsonValue.Create(tag)
+                                },
+                                Slug = fileName
+                            };
+
+                            await ExecuteBatchAsync(asset);
+                        }
+                    }
+                }
+
+                await ExecuteBatchAsync(null);
+            }
+
+            await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 2 }");
         }
 
         private static void SetupJson()

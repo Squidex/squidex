@@ -120,16 +120,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
             else
             {
-                await DeletePublishedContentAsync(job.Value.AppId.Id, job.Value.Id, ct);
+                await DeletePublishedContentAsync(job.Value.UniqueId, ct);
             }
         }
 
-        private Task DeletePublishedContentAsync(DomainId appId, DomainId id,
+        private Task DeletePublishedContentAsync(DomainId key,
             CancellationToken ct = default)
         {
-            var documentId = DomainId.Combine(appId, id);
-
-            return collectionPublished.RemoveAsync(documentId, ct);
+            return collectionPublished.RemoveAsync(key, ct);
         }
 
         private async Task UpsertFrontendAsync(SnapshotWriteJob<ContentDomainObject.State> job,
