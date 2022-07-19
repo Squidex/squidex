@@ -154,7 +154,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
             AddSelfLink(resources.Url<SchemasController>(x => nameof(x.GetSchema), values));
 
-            if (resources.CanReadContent(Name) && Type == SchemaType.Default)
+            if (resources.CanReadContent(Name) && Type != SchemaType.Component)
             {
                 AddGetLink("contents", resources.Url<ContentsController>(x => nameof(x.GetContents), values));
             }
