@@ -114,6 +114,20 @@ jobs:
           options: --name test2
           volumes: ${{ github.workspace }}:/src
           run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+
+      - name: RUN TEST with dedicated collections
+        uses: kohlerdominik/docker-run-action@v1.0.0
+        with:
+          image: squidex/build
+          environment: |
+            CONFIG__BACKUPURL=http://localhost:5000
+            CONFIG__WAIT=60
+            CONFIG__SERVER__URL=http://localhost:8082
+            WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher
+          default_network: host
+          options: --name test3
+          volumes: ${{ github.workspace }}:/src
+          run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
        
       - name: Dump docker logs on failure
         if: failure()

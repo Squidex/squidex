@@ -9,13 +9,16 @@ using System.Globalization;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
@@ -54,69 +57,85 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         {
             await AssetRepository.InitializeAsync(default);
 
-            await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 0 }");
-            await mongoDatabase.DropCollectionAsync("system.profile");
+            await CreateDataAsync(default);
+            await ClearProfileAsync(default);
+        }
 
-            var collection = AssetRepository.GetInternalCollection();
-
-            var assetCount = await collection.Find(new BsonDocument()).CountDocumentsAsync();
-
-            if (assetCount == 0)
+        private async Task CreateDataAsync(
+            CancellationToken ct)
+        {
+            if (await AssetRepository.StreamAll(AppIds[0].Id, ct).AnyAsync(ct))
             {
-                var batch = new List<MongoAssetEntity>();
-
-                async Task ExecuteBatchAsync(MongoAssetEntity? entity)
-                {
-                    if (entity != null)
-                    {
-                        batch.Add(entity);
-                    }
-
-                    if ((entity == null || batch.Count >= 1000) && batch.Count > 0)
-                    {
-                        await collection.InsertManyAsync(batch);
-
-                        batch.Clear();
-                    }
-                }
-
-                foreach (var appId in AppIds)
-                {
-                    for (var i = 0; i < numValues; i++)
-                    {
-                        var fileName = i.ToString(CultureInfo.InvariantCulture);
-
-                        for (var j = 0; j < numValues; j++)
-                        {
-                            var tag = j.ToString(CultureInfo.InvariantCulture);
-
-                            var asset = new MongoAssetEntity
-                            {
-                                DocumentId = DomainId.NewGuid(),
-                                Tags = new HashSet<string> { tag },
-                                Id = DomainId.NewGuid(),
-                                FileHash = fileName,
-                                FileName = fileName,
-                                FileSize = 1024,
-                                IndexedAppId = appId.Id,
-                                IsDeleted = false,
-                                IsProtected = false,
-                                Metadata = new AssetMetadata
-                                {
-                                    ["value"] = JsonValue.Create(tag)
-                                },
-                                Slug = fileName
-                            };
-
-                            await ExecuteBatchAsync(asset);
-                        }
-                    }
-                }
-
-                await ExecuteBatchAsync(null);
+                return;
             }
 
-            await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 2 }");
+            var batch = new List<SnapshotWriteJob<AssetDomainObject.State>>();
+
+            async Task ExecuteBatchAsync(AssetDomainObject.State? entity)
+            {
+                if (entity != null)
+                {
+                    batch.Add(new SnapshotWriteJob<AssetDomainObject.State>(entity.UniqueId, entity, 0));
+                }
+
+                if ((entity == null || batch.Count >= 1000) && batch.Count > 0)
+                {
+                    var store = (ISnapshotStore<AssetDomainObject.State>)AssetRepository;
+
+                    await store.WriteManyAsync(batch, ct);
+
+                    batch.Clear();
+                }
+            }
+
+            var now = SystemClock.Instance.GetCurrentInstant();
+
+            var user = new RefToken(RefTokenType.Subject, "1");
+
+            foreach (var appId in AppIds)
+            {
+                for (var i = 0; i < numValues; i++)
+                {
+                    var fileName = i.ToString(CultureInfo.InvariantCulture);
+
+                    for (var j = 0; j < numValues; j++)
+                    {
+                        var tag = j.ToString(CultureInfo.InvariantCulture);
+
+                        var asset = new AssetDomainObject.State
+                        {
+                            Tags = new HashSet<string> { tag },
+                            Id = DomainId.NewGuid(),
+                            Created = now,
+                            CreatedBy = user,
+                            FileHash = fileName,
+                            FileName = fileName,
+                            FileSize = 1024,
+                            LastModified = now,
+                            LastModifiedBy = user,
+                            IsDeleted = false,
+                            IsProtected = false,
+                            Metadata = new AssetMetadata
+                            {
+                                ["value"] = JsonValue.Create(tag)
+                            },
+                            Slug = fileName
+                        };
+
+                        await ExecuteBatchAsync(asset);
+                    }
+                }
+            }
+
+            await ExecuteBatchAsync(null);
+        }
+
+        private async Task ClearProfileAsync(
+            CancellationToken ct)
+        {
+            await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 0 }", cancellationToken: ct);
+            await mongoDatabase.DropCollectionAsync("system.profile", ct);
+            await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 2 }", cancellationToken: ct);
         }
 
         private static void SetupJson()

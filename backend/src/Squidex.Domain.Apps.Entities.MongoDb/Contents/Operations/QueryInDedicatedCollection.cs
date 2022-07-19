@@ -6,12 +6,10 @@
 // ==========================================================================
 
 using System.Collections.Concurrent;
-using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -26,33 +24,25 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             new ConcurrentDictionary<(DomainId, DomainId), Task<IMongoCollection<MongoContentEntity>>>();
 
         private readonly IMongoClient mongoClient;
-        private readonly string mongoPrefix;
+        private readonly string prefixDatabase;
+        private readonly string prefixCollection;
 
-        [BsonIgnoreExtraElements]
-        internal sealed class IdOnly
-        {
-            [BsonId]
-            [BsonElement("_id")]
-            public DomainId Id { get; set; }
-
-            public MongoContentEntity[] Joined { get; set; }
-        }
-
-        public QueryInDedicatedCollection(IMongoClient mongoClient, string mongoPrefix)
+        public QueryInDedicatedCollection(IMongoClient mongoClient, string prefixDatabase, string prefixCollection)
         {
             this.mongoClient = mongoClient;
-            this.mongoPrefix = mongoPrefix;
+            this.prefixDatabase = prefixDatabase;
+            this.prefixCollection = prefixCollection;
         }
 
-        private Task<IMongoCollection<MongoContentEntity>> GetCollectionAsync(DomainId appId, DomainId schemaId)
+        public Task<IMongoCollection<MongoContentEntity>> GetCollectionAsync(DomainId appId, DomainId schemaId)
         {
 #pragma warning disable MA0106 // Avoid closure by using an overload with the 'factoryArgument' parameter
             return collections.GetOrAdd((appId, schemaId), async key =>
             {
                 var (appId, schemaId) = key;
 
-                var schemaDatabase = mongoClient.GetDatabase($"{mongoPrefix}_{appId}");
-                var schemaCollection = schemaDatabase.GetCollection<MongoContentEntity>($"{schemaId}");
+                var schemaDatabase = mongoClient.GetDatabase($"{prefixDatabase}_{appId}");
+                var schemaCollection = schemaDatabase.GetCollection<MongoContentEntity>($"{prefixCollection}_{schemaId}");
 
                 await schemaCollection.Indexes.CreateManyAsync(
                     new[]
@@ -76,23 +66,28 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(IAppEntity app, ISchemaEntity schema, FilterNode<ClrValue> filterNode,
             CancellationToken ct)
         {
-            var filter = BuildFilter(filterNode.AdjustToModel(app.Id));
+            // We need to translate the filter names to the document field names in MongoDB.
+            var adjustedFilter = filterNode.AdjustToModel(app.Id);
+
+            var filter = BuildFilter(adjustedFilter);
 
             var contentCollection = await GetCollectionAsync(schema.AppId.Id, schema.Id);
-            var contentItems = await contentCollection.FindStatusAsync(filter, ct);
+            var contentEntities = await contentCollection.FindStatusAsync(filter, ct);
+            var contentResults = contentEntities.Select(x => new ContentIdStatus(x.IndexedSchemaId, x.Id, x.Status)).ToList();
 
-            return contentItems.Select(x => new ContentIdStatus(x.IndexedSchemaId, x.Id, x.Status)).ToList();
+            return contentResults;
         }
 
         public async Task<IResultList<IContentEntity>> QueryAsync(ISchemaEntity schema, Q q,
             CancellationToken ct)
         {
+            // We need to translate the query names to the document field names in MongoDB.
             var query = q.Query.AdjustToModel(schema.AppId.Id);
 
             var filter = CreateFilter(query, q.Reference, q.CreatedBy);
 
             var contentCollection = await GetCollectionAsync(schema.AppId.Id, schema.Id);
-            var contentEntities = await FindContentsAsync(contentCollection, query, filter, ct);
+            var contentEntities = await contentCollection.QueryContentsAsync(filter, query, ct);
             var contentTotal = (long)contentEntities.Count;
 
             if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
@@ -101,6 +96,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 {
                     contentTotal = -1;
                 }
+                else if (query.IsSatisfiedByIndex())
+                {
+                    // It is faster to filter with sorting when there is an index, because it forces the index to be used.
+                    contentTotal = await contentCollection.Find(filter).QuerySort(query).CountDocumentsAsync(ct);
+                }
                 else
                 {
                     contentTotal = await contentCollection.Find(filter).CountDocumentsAsync(ct);
@@ -108,19 +108,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             }
 
             return ResultList.Create<IContentEntity>(contentTotal, contentEntities);
-        }
-
-        private static async Task<List<MongoContentEntity>> FindContentsAsync(IMongoCollection<MongoContentEntity> collection, ClrQuery query, FilterDefinition<MongoContentEntity> filter,
-            CancellationToken ct)
-        {
-            var result =
-                collection.Find(filter)
-                    .QuerySort(query)
-                    .QueryLimit(query)
-                    .QuerySkip(query)
-                    .ToListAsync(ct);
-
-            return await result;
         }
 
         public async Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity value,

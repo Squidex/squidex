@@ -19,28 +19,28 @@ using F = Squidex.Infrastructure.Queries.ClrFilter;
 namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 {
     [Trait("Category", "Dependencies")]
-    public abstract class ContentsQueryIntegrationTests : ContentsQueryIntegrationTestsBase, IClassFixture<ContentsQueryFixture>
+    public class ContentsQueryIntegrationTests : ContentsQueryTestsBase, IClassFixture<ContentsQueryFixture>
     {
-        protected ContentsQueryIntegrationTests(ContentsQueryFixture fixture)
+        public ContentsQueryIntegrationTests(ContentsQueryFixture fixture)
             : base(fixture)
         {
         }
     }
 
     [Trait("Category", "Dependencies")]
-    public abstract class ContentsQueryDedicatedIntegrationTests : ContentsQueryIntegrationTestsBase, IClassFixture<ContentsQueryDedicatedFixture>
+    public class ContentsQueryDedicatedIntegrationTests : ContentsQueryTestsBase, IClassFixture<ContentsQueryDedicatedFixture>
     {
-        protected ContentsQueryDedicatedIntegrationTests(ContentsQueryFixture fixture)
+        public ContentsQueryDedicatedIntegrationTests(ContentsQueryDedicatedFixture fixture)
             : base(fixture)
         {
         }
     }
 
-    public abstract class ContentsQueryIntegrationTestsBase
+    public abstract class ContentsQueryTestsBase
     {
         public ContentsQueryFixtureBase _ { get; }
 
-        protected ContentsQueryIntegrationTestsBase(ContentsQueryFixtureBase fixture)
+        protected ContentsQueryTestsBase(ContentsQueryFixtureBase fixture)
         {
             _ = fixture;
         }
@@ -52,6 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await _.ContentRepository.QueryIdsAsync(_.RandomAppId(), ids, SearchScope.Published);
 
+            // The IDs are random here, as it does not really matter.
             Assert.NotNull(contents);
         }
 
@@ -67,6 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), schemas, Q.Empty.WithIds(ids), SearchScope.All);
 
+            // The IDs are random here, as it does not really matter.
             Assert.NotNull(contents);
         }
 
@@ -77,6 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), _.RandomSchema(), Q.Empty.WithIds(ids), SearchScope.All);
 
+            // The IDs are random here, as it does not really matter.
             Assert.NotNull(contents);
         }
 
@@ -87,6 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await _.ContentRepository.QueryIdsAsync(_.RandomAppId(), _.RandomSchemaId(), filter);
 
+            // We have a concrete query, so we expect an result.
             Assert.NotEmpty(contents);
         }
 
@@ -100,6 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(_.ContentRepository, query, 1000, 0);
 
+            // We have a concrete query, so we expect an result.
             Assert.NotEmpty(contents);
         }
 
@@ -108,7 +113,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var time = SystemClock.Instance.GetCurrentInstant();
 
-            await _.ContentRepository.QueryScheduledWithoutDataAsync(time).ToListAsync();
+            var contents = await _.ContentRepository.QueryScheduledWithoutDataAsync(time).ToListAsync();
+
+            // The IDs are random here, as it does not really matter.
+            Assert.NotNull(contents);
         }
 
         [Fact]
@@ -118,6 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(_.ContentRepository, query);
 
+            // We have a concrete query, so we expect an result.
             Assert.NotEmpty(contents);
         }
 
@@ -128,7 +137,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(_.ContentRepository, query, reference: DomainId.NewGuid());
 
-            Assert.Empty(contents);
+            // The IDs are random here, as it does not really matter.
+            Assert.NotNull(contents);
         }
 
         [Fact]
@@ -144,6 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(_.ContentRepository, query, 1000, 9000);
 
+            // We have a concrete query, so we expect an result.
             Assert.NotEmpty(contents);
         }
 
@@ -157,6 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(_.ContentRepository, query);
 
+            // The full text is resolved by another system, so we cannot verify the result.
             Assert.NotNull(contents);
         }
 
@@ -170,6 +182,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(_.ContentRepository, query, 1000, 0);
 
+            // We have a concrete query, so we expect an result.
             Assert.NotEmpty(contents);
         }
 
@@ -183,6 +196,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(_.ContentRepository, query, 1000, 0, reference: DomainId.NewGuid());
 
+            // We do not insert test entities with references, so we cannot verify the result.
             Assert.Empty(contents);
         }
 

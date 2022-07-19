@@ -44,22 +44,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             queryAsStream = new QueryAsStream();
             queryBdId = new QueryById();
             queryByIds = new QueryByIds();
-            queryByQuery = new QueryByQuery(new MongoCountCollection(database, name));
             queryReferences = new QueryReferences(queryByIds);
             queryReferrers = new QueryReferrers();
             queryScheduled = new QueryScheduled();
+            queryByQuery = new QueryByQuery(new MongoCountCollection(database, name));
 
             if (dedicatedCollections)
             {
-                queryInDedicatedCollection = new QueryInDedicatedCollection(database.Client, name);
+                queryInDedicatedCollection =
+                    new QueryInDedicatedCollection(
+                        database.Client,
+                        database.DatabaseNamespace.DatabaseName,
+                        name);
             }
 
             this.readPreference = readPreference;
-        }
-
-        public IMongoCollection<MongoContentEntity> GetInternalCollection()
-        {
-            return Collection;
         }
 
         protected override string CollectionName()
@@ -274,15 +273,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task InsertManyAsync(IReadOnlyList<MongoContentEntity> snapshots,
-            CancellationToken ct = default)
+        public async Task AddCollectionsAsync(MongoContentEntity entity, Action<IMongoCollection<MongoContentEntity>, MongoContentEntity> add,
+            CancellationToken ct)
         {
-            if (snapshots.Count == 0)
+            if (queryInDedicatedCollection != null)
             {
-                return Task.CompletedTask;
+                add(await queryInDedicatedCollection.GetCollectionAsync(entity.AppId.Id, entity.SchemaId.Id), entity);
             }
 
-            return Collection.InsertManyAsync(snapshots, InsertUnordered, ct);
+            add(Collection, entity);
         }
     }
 }
