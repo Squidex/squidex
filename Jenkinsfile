@@ -60,7 +60,7 @@ pipeline {
       steps {
         script {
           replicas = 1 //Initially the deployment should just be a single pod
-          mongoLogin = sh(returnStdout: true, script:"aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text --region=us-east-1 | jq -r '.\"${namespace}_login\"'")
+          mongoLogin = sh(returnStdout: true, script:"aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text --region=us-east-1 | jq -r '.\"${namespace}_login\"'").trim()
           helmArgs = "--set replicaCount=${replicas} --set squidexTag=${tag} --set version=${squidex_version} --set mongoconnectionstring=${mongoLogin} --set mongourl=${mongo_url}"
           homerKubernetes.processConfigData(helm_data_file, namespace, cluster, helmArgs, "./helm-chart-deploy")
           homerKubernetes.validateParams()
