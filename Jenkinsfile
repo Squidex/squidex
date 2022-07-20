@@ -8,6 +8,8 @@ def full_image_name = null
 def cluster = null
 def namespace = null
 def helm_data_file = null
+def mongo_url = null
+def squidex_version = null //Sanitized version of tag without . in the number
 
 pipeline {
   agent any
@@ -35,6 +37,7 @@ pipeline {
               namespace = params.namespace
             }
             helm_data_file = "${cluster}/${namespace}.yaml"
+            squidex_version = tag.minus(".") //We need a DNS friendly value so need to remove dots
           }
       }
     }
@@ -42,17 +45,8 @@ pipeline {
     stage('Create New Environment MongoDB') {
       steps {
         timeout(time: 40, unit:'MINUTES') {
-          sh './mongo_snapshot.sh ${cluster} ${dbname} ${tag}'
-        }
-      }
-    }
-    stage('Update Kubernetes Deployment yaml'){
-      steps {
-        script {
-          deploymentName = homerKubernetes.getDeploymentName()
-          replicas = homerKubernetes.getReplicaCount(cluster, namespace, deploymentName)
-          homerKubernetes.updateDeploymentYaml(null, 'k8s/deployment.yaml', full_image_name)
-          homerKubernetes.updateReplicaCount(replicas)
+          sh './mongo_snapshot.sh ${cluster} ${dbname} ${squidex_version}'
+          mongo_url = sh(returnStdout:true, script: './mongo_url.sh ${cluster} ${dbname} ${squidex_version}')
         }
       }
     }
@@ -60,11 +54,10 @@ pipeline {
     stage('Render and validate the Kubernetes deployment yaml'){
       steps {
         script {
-          deploymentName = homerKubernetes.getDeploymentName()
           replicas = homerKubernetes.getReplicaCount(cluster, namespace, deploymentName)
-          homerKubernetes.updateDeploymentYaml(null, 'k8s/deployment.yaml',full_image_name)
-          homerKubernetes.updateReplicaCount(replicas)
-          homerKubernetes.processConfigData(helm_data_file, namespace, cluster)
+          mongoLogin = sh(returnStdout: true, script:"aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text | jq -r .${namespace}_login")
+          helmArgs = "--set replicaCount=${replicas} --set squidexTag=${tag} --set version=${squidex_version} --set mongoconnectionstring=${mongoLogin} --set mongourl=${mongo_url}"
+          homerKubernetes.processConfigData(helm_data_file, namespace, cluster, helmArgs, "./helm-chart-deploy")
           homerKubernetes.validateParams()
         }
       }
@@ -75,9 +68,6 @@ pipeline {
       steps {
         script {
           homerKubernetes.deploy(namespace, cluster, 'output.yaml')
-          homerKubernetes.deploy(namespace, cluster)
-          homerKubernetes.watchDeploy(namespace, cluster, "jenkins-deployment.yaml") // Watch/wait for deployment
-          homerKubernetes.deploy(namespace, cluster, 'k8s/service.yaml') //Create the service for the size
         }
       }
     }

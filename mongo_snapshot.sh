@@ -1,12 +1,12 @@
 #!/bin/bash
-
+set -x
 #setting up some vars for the version especially as a '.' is not allowed in an Atlas DB name
 # staging or production
 export environment=$1
 # cluster we want to use as the source
 export cluster=$2
-# cleaning up the version we are going to migrate to
-export version=`echo $3 | tr -d '.'`
+# version we are migrating to
+export version=$3
 # getting the secrets for atlas
 export MONGODB_ATLAS_PUBLIC_API_KEY=$(aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text | jq -r .squidex_atlas_api_key)
 export MONGODB_ATLAS_PRIVATE_API_KEY=$(aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text | jq -r .squidex_atlas_private_api_key)
@@ -23,18 +23,14 @@ fi
 
 if ! command -v atlas &> /dev/null
 then
-  echo "atlass is not installed, installing..."
-  wget https://fastdl.mongodb.org/mongocli/mongodb-atlas-cli_1.1.1_linux_x86_64.tar.gz
-  tar -xzf mongodb-atlas-cli_1.1.1_linux_x86_64.tar.gz
-  export PATH=$PATH:mongodb-atlas-cli_1.1.1_linux_x86_64/bin
-  exit
+  source ./mongo_deps.sh
 fi
 
 #get cluster version
-export cluster_version=`atlas clusters describe $cluster | grep $2 | awk '{print $3}' | grep -o '^[^.]*\.[0-9]*'`
+export cluster_version=`atlas clusters describe $cluster --projectId ${project} | grep $2 | awk '{print $3}' | grep -o '^[^.]*\.[0-9]*'`
 
 #creating snapshot of current cluster to use to build the new cluster
-export snapshot=`atlas backups snapshots create $cluster --desc test-upgrade-backup | awk -F\' '{print $2}'`
+export snapshot=`atlas backups snapshots create $cluster --desc test-upgrade-backup --projectId ${project} | awk -F\' '{print $2}'`
 
 #watching the cluster snapshot so when it is done, we can create our new database
 atlas backups snapshots watch ${snapshot} --clusterName $cluster
