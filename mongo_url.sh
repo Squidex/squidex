@@ -23,7 +23,7 @@ fi
 
 if ! command -v atlas &> /dev/null
 then
-  source ./mongo_deps.sh
+  source ./mongo_deps.sh > /dev/null 2>&1
 fi
 docker pull imega/jq > /dev/null 2>&1 #We don't want any docker output
 
