@@ -40,7 +40,8 @@ pipeline {
               namespace = params.namespace
             }
             helm_data_file = "${cluster}/${namespace}.yaml"
-            squidex_version = tag.minus(".") //We need a DNS friendly value so need to remove dots
+            squidex_version = tag.replaceAll("\\.","") //We need a DNS friendly value so need to remove dots
+            println("The sanitized squidex tag is ${squidex_version}")
           }
       }
     }
