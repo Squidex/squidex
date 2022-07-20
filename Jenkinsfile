@@ -50,7 +50,7 @@ pipeline {
         script{
           timeout(time: 40, unit:'MINUTES') {
             //sh "./mongo_snapshot.sh ${cluster} ${dbname} ${squidex_version}"
-            mongo_url = sh(returnStdout:true, script: "./mongo_url.sh ${cluster} ${dbname} ${squidex_version}")
+            mongo_url = sh(returnStdout:true, script: "./mongo_url.sh ${cluster} ${dbname} ${squidex_version}").trim()
           }
         }
       }
