@@ -8,8 +8,8 @@ export cluster=$2
 # version we are migrating to
 export version=$3
 # getting the secrets for atlas
-export MONGODB_ATLAS_PUBLIC_API_KEY=$(aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text | jq -r .squidex_atlas_api_key)
-export MONGODB_ATLAS_PRIVATE_API_KEY=$(aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text | jq -r .squidex_atlas_private_api_key)
+export MONGODB_ATLAS_PUBLIC_API_KEY=$(aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text --region us-east-1 | jq -r .squidex_atlas_api_key)
+export MONGODB_ATLAS_PRIVATE_API_KEY=$(aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text --region us-east-1 | jq -r .squidex_atlas_private_api_key)
 
 if [ $environment = "staging" ] ; then
   export project="5eea50347b142b17471b8f7d"

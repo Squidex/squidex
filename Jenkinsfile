@@ -28,7 +28,6 @@ pipeline {
     stage('Checkout') {
       steps {
           script {
-            git branch:'devops', credentialsId: 'jenkins-aws-user', url: 'https://github.com/LearnWithHomer/squidex'
             cluster = params.cluster
             dbname = params.dbname
             tag = params.tag
