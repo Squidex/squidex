@@ -1,8 +1,0 @@
-<ng-container *ngIf="isPlain; else html">
-    <span>
-        <span class="truncate">{{value}}</span>
-    </span>
-</ng-container>
-<ng-template #html>
-    <div class="html-value" [innerHTML]="value.html"></div>
-</ng-template>
