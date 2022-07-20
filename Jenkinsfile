@@ -6,6 +6,8 @@ def app = '' /* the docker app build gets stored here */
 def upstream_image_name = "squidex/squidex"
 def full_image_name = null
 def cluster = null
+def dbname = null
+def tag = null
 def namespace = null
 def helm_data_file = null
 def mongo_url = null
@@ -27,8 +29,9 @@ pipeline {
       steps {
           script {
             git branch:'devops', credentialsId: 'jenkins-aws-user', url: 'https://github.com/LearnWithHomer/squidex'
-            full_image_name = "${upstream_image_name}:${tag}"
             cluster = params.cluster
+            dbname = params.dbname
+            tag = params.tag
             /* in production the 'content-v1' namespace is named 'squidex',
                so we are overriding it here                                 */
             if (params.namespace == 'content-v1' && cluster == 'production') {
