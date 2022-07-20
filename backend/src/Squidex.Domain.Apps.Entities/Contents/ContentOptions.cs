@@ -11,9 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         public bool CanCache { get; set; }
 
-        public bool OptimizeTotal { get; set; } = true;
-
-        public bool OptimizeForSelfHosting { get; set; };
+        public bool OptimizeForSelfHosting { get; set; }
 
         public int DefaultPageSize { get; set; } = 200;
 
