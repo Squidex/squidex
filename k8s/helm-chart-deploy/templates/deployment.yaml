@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: squidex
+  name: squidex-{{ .Values.version }}
 spec:
-  replicas: $REPLICA_COUNT
+  replicas: {{ .Values.replicaCount }}
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: squidex
+      app: squidex-{{ .Values.version }}
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -16,11 +16,11 @@ spec:
   template:
     metadata:
       labels:
-        app: squidex
+        app: squidex-{{ .Values.version }}
     spec:
       containers:
         - name: squidex
-          image: $DOCKER_IMAGE
+          image: {{ .Values.squidexImage}}:{{ .Values.squidexTag}}
           imagePullPolicy: Always
           resources:
             requests:
@@ -77,16 +77,16 @@ spec:
               value: "MongoDB"
             - name: EVENTSTORE__MONGODB__CONFIGURATION
               valueFrom:
-                secretKeyRef:
-                  name: squidex
-                  key: mongo_connection_string
+                configMapKeyRef:
+                  name: squidex-{{ .Values.version }}
+                  key: MONGODB__CONFIGURATION
             - name: EVENTSTORE__MONGODB__DATABASE
               value: "Squidex"
             - name: STORE__MONGODB__CONFIGURATION
               valueFrom:
-                secretKeyRef:
-                  name: squidex
-                  key: mongo_connection_string
+                configMapKeyRef:
+                  name: squidex-{{ .Values.version }}
+                  key: MONGODB__CONFIGURATION
             - name: STORE__MONGODB__DATABASE
               value: "Squidex"
             - name: STORE__MONGODB__CONTENTDATABASE
