@@ -1,3 +1,4 @@
 contentVersion: v2
 secretsEnvironment: staging
 ingressHost: squidex-staging-v2.learnwithhomer.com
+squidexImage: squidex/squidex
