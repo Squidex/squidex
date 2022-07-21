@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Text;
-using GeoJSON.Net;
+using GeoJSON.Text;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;

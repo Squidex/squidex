@@ -9,11 +9,11 @@ using System.Globalization;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Templates;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
@@ -288,8 +288,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                             text = text.ToUpperInvariant();
                             break;
                         case "escape":
-                            text = JsonConvert.ToString(text);
-                            text = text[1..^1];
+                            text = text.JsonEscape();
                             break;
                         case "slugify":
                             text = text.Slugify();

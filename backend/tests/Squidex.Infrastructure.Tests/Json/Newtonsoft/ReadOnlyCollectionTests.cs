@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.Json.Newtonsoft
@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
         }
 
         [Fact]
-        public void Should_serialize_and_deserialize_dictionary_without_type_name()
+        public void Should_serialize_and_deserialize_dictionary()
         {
             var source = new MyClass<IReadOnlyDictionary<int, int>>
             {
@@ -29,16 +29,8 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 }
             };
 
-            var serializerSettings = new JsonSerializerSettings
-            {
-                ContractResolver = new ConverterContractResolver()
-            };
+            var serialized = source.SerializeAndDeserialize();
 
-            var json = JsonConvert.SerializeObject(source, serializerSettings);
-
-            var serialized = JsonConvert.DeserializeObject<MyClass<IReadOnlyDictionary<int, int>>>(json)!;
-
-            Assert.DoesNotContain("$type", json, StringComparison.Ordinal);
             Assert.Equal(2, serialized.Values.Count);
         }
 
@@ -54,16 +46,8 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 }
             };
 
-            var serializerSettings = new JsonSerializerSettings
-            {
-                ContractResolver = new ConverterContractResolver()
-            };
+            var serialized = source.SerializeAndDeserialize();
 
-            var json = JsonConvert.SerializeObject(source, serializerSettings);
-
-            var serialized = JsonConvert.DeserializeObject<MyClass<IReadOnlyList<int>>>(json)!;
-
-            Assert.DoesNotContain("$type", json, StringComparison.Ordinal);
             Assert.Equal(2, serialized.Values.Count);
         }
     }

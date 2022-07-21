@@ -35,11 +35,11 @@ namespace Squidex.Infrastructure.MongoDb
 
         static MongoQueryTests()
         {
-            DomainIdSerializer.Register();
+            BsonDomainIdSerializer.Register();
 
-            TypeConverterStringSerializer<RefToken>.Register();
+            BsonStringSerializer<RefToken>.Register();
 
-            InstantSerializer.Register();
+            BsonInstantSerializer.Register();
         }
 
         [Fact]

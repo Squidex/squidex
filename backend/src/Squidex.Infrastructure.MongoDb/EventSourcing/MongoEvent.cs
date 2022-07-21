@@ -16,13 +16,11 @@ namespace Squidex.Infrastructure.EventSourcing
         [BsonRequired]
         public string Type { get; set; }
 
-        [BsonJson]
         [BsonRequired]
         public string Payload { get; set; }
 
         [BsonElement("Metadata")]
         [BsonRequired]
-        [BsonJson]
         public EnvelopeHeaders Headers { get; set; }
 
         public static MongoEvent FromEventData(EventData data)

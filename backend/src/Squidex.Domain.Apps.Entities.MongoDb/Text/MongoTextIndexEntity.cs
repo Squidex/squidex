@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GeoJSON.Net;
+using GeoJSON.Text;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;

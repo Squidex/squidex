@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using NodaTime;
-using NodaTime.Serialization.JsonNet;
+using NodaTime.Serialization.SystemTextJson;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Apps.Json;
 using Squidex.Domain.Apps.Core.Contents;
@@ -21,9 +21,10 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Json.System;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Reflection;
@@ -34,10 +35,14 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
     {
         public static readonly IJsonSerializer DefaultSerializer = CreateSerializer();
 
-        public static readonly JsonSerializerSettings DefaultSerializerSettings = CreateSerializerSettings();
+        public static IJsonSerializer CreateSerializer(JsonConverter? converter = null)
+        {
+            var serializerSettings = DefaultOptions(converter);
 
-        public static JsonSerializerSettings CreateSerializerSettings(TypeNameHandling typeNameHandling = TypeNameHandling.Auto,
-            JsonConverter? converter = null)
+            return new SystemJsonSerializer(serializerSettings);
+        }
+
+        public static JsonSerializerOptions DefaultOptions(JsonConverter? converter = null)
         {
             var typeNameRegistry =
                 new TypeNameRegistry()
@@ -45,42 +50,45 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     .Map(new RuleTypeProvider())
                     .MapUnmapped(typeof(TestUtils).Assembly);
 
-            var serializerSettings = new JsonSerializerSettings
-            {
-                SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry),
+            var options = new JsonSerializerOptions(JsonSerializerDefaults.General);
 
-                ContractResolver = new ConverterContractResolver(
-                    new ContentFieldDataConverter(),
-                    new JsonValueConverter(),
-                    new StringEnumConverter(),
-                    new SurrogateConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>(),
-                    new SurrogateConverter<FilterNode<JsonValue>, JsonFilterSurrogate>(),
-                    new SurrogateConverter<LanguageConfig, LanguageConfigSurrogate>(),
-                    new SurrogateConverter<LanguagesConfig, LanguagesConfigSurrogate>(),
-                    new SurrogateConverter<Roles, RolesSurrogate>(),
-                    new SurrogateConverter<Rule, RuleSorrgate>(),
-                    new SurrogateConverter<Schema, SchemaSurrogate>(),
-                    new SurrogateConverter<WorkflowStep, WorkflowStepSurrogate>(),
-                    new SurrogateConverter<WorkflowTransition, WorkflowTransitionSurrogate>(),
-                    new TypeConverterJsonConverter<CompareOperator>(),
-                    new WriteonlyGeoJsonConverter()),
+            options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+            options.Converters.Add(new InheritanceConverter<IEvent>(typeNameRegistry));
+            options.Converters.Add(new InheritanceConverter<FieldProperties>(typeNameRegistry));
+            options.Converters.Add(new InheritanceConverter<RuleAction>(typeNameRegistry));
+            options.Converters.Add(new InheritanceConverter<RuleTrigger>(typeNameRegistry));
+            options.Converters.Add(new JsonValueConverter());
+            options.Converters.Add(new ReadonlyDictionaryConverterFactory());
+            options.Converters.Add(new ReadonlyListConverterFactory());
+            options.Converters.Add(new SurrogateJsonConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>());
+            options.Converters.Add(new SurrogateJsonConverter<FilterNode<JsonValue>, JsonFilterSurrogate>());
+            options.Converters.Add(new SurrogateJsonConverter<LanguageConfig, LanguageConfigSurrogate>());
+            options.Converters.Add(new SurrogateJsonConverter<LanguagesConfig, LanguagesConfigSurrogate>());
+            options.Converters.Add(new SurrogateJsonConverter<Roles, RolesSurrogate>());
+            options.Converters.Add(new SurrogateJsonConverter<Rule, RuleSorrgate>());
+            options.Converters.Add(new SurrogateJsonConverter<Schema, SchemaSurrogate>());
+            options.Converters.Add(new SurrogateJsonConverter<WorkflowStep, WorkflowStepSurrogate>());
+            options.Converters.Add(new SurrogateJsonConverter<WorkflowTransition, WorkflowTransitionSurrogate>());
+            options.Converters.Add(new StringConverter<CompareOperator>());
+            options.Converters.Add(new StringConverter<DomainId>());
+            options.Converters.Add(new StringConverter<NamedId<Guid>>());
+            options.Converters.Add(new StringConverter<NamedId<string>>());
+            options.Converters.Add(new StringConverter<Language>());
+            options.Converters.Add(new StringConverter<PropertyPath>(x => x));
+            options.Converters.Add(new StringConverter<Status>());
+            options.Converters.Add(new JsonStringEnumConverter());
 
-                TypeNameHandling = typeNameHandling
-            }.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+            options.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
+            options.IgnoreReadOnlyFields = false;
+            options.IgnoreReadOnlyProperties = false;
+            options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 
             if (converter != null)
             {
-                serializerSettings.Converters.Add(converter);
+                options.Converters.Add(converter);
             }
 
-            return serializerSettings;
-        }
-
-        public static IJsonSerializer CreateSerializer(TypeNameHandling typeNameHandling = TypeNameHandling.Auto, JsonConverter? converter = null)
-        {
-            var serializerSettings = CreateSerializerSettings(typeNameHandling, converter);
-
-            return new NewtonsoftJsonSerializer(serializerSettings);
+            return options;
         }
 
         public static (Schema Schema, ResolvedComponents) MixedSchema(SchemaType type = SchemaType.Default)

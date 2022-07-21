@@ -22,9 +22,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public AtlasTextIndexFixture()
         {
-            BsonJsonConvention.Register(JsonSerializer.Create(TestUtils.CreateSerializerSettings()));
+            BsonJsonConvention.Register(TestUtils.DefaultOptions());
 
-            DomainIdSerializer.Register();
+            BsonDomainIdSerializer.Register();
 
             var mongoClient = new MongoClient(TestConfig.Configuration["atlas:configuration"]);
             var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["atlas:database"]);

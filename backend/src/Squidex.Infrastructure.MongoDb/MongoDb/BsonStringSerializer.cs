@@ -12,7 +12,7 @@ using MongoDB.Bson.Serialization.Serializers;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public sealed class TypeConverterStringSerializer<T> : SerializerBase<T>
+    public sealed class BsonStringSerializer<T> : SerializerBase<T>
     {
         private readonly TypeConverter typeConverter = TypeDescriptor.GetConverter(typeof(T));
 
@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.MongoDb
         {
             try
             {
-                BsonSerializer.RegisterSerializer(new TypeConverterStringSerializer<T>());
+                BsonSerializer.RegisterSerializer(new BsonStringSerializer<T>());
             }
             catch (BsonSerializationException)
             {

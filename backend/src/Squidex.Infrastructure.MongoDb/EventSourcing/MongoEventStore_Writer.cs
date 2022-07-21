@@ -129,11 +129,11 @@ namespace Squidex.Infrastructure.EventSourcing
             CancellationToken ct = default)
         {
             var document =
-                await Collection.Find(Filter.Eq(EventStreamField, streamName))
+                await Collection.Find(Filter.Eq(x => x.EventStream, streamName))
                     .Project<BsonDocument>(Projection
-                        .Include(EventStreamOffsetField)
-                        .Include(EventsCountField))
-                    .Sort(Sort.Descending(EventStreamOffsetField)).Limit(1)
+                        .Include(x => x.EventStreamOffset)
+                        .Include(x => x.EventsCount))
+                    .Sort(Sort.Descending(x => x.EventStreamOffset)).Limit(1)
                     .FirstOrDefaultAsync(ct);
 
             if (document != null)

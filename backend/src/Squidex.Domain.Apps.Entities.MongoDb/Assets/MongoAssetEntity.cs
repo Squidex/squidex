@@ -103,7 +103,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonElement("dl")]
         public bool IsDeleted { get; set; }
 
-        [BsonJson]
         [BsonRequired]
         [BsonElement("md")]
         public AssetMetadata Metadata { get; set; }

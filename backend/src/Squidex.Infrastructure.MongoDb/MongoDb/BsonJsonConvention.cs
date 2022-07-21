@@ -6,16 +6,16 @@
 // ==========================================================================
 
 using System.Reflection;
+using System.Text.Json;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
-using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.MongoDb
 {
     public static class BsonJsonConvention
     {
-        public static void Register(JsonSerializer serializer)
+        public static void Register(JsonSerializerOptions options)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.MongoDb
                     if (attributes.OfType<BsonJsonAttribute>().Any())
                     {
                         var bsonSerializerType = typeof(BsonJsonSerializer<>).MakeGenericType(memberMap.MemberType);
-                        var bsonSerializer = Activator.CreateInstance(bsonSerializerType, serializer);
+                        var bsonSerializer = Activator.CreateInstance(bsonSerializerType, options);
 
                         memberMap.SetSerializer((IBsonSerializer)bsonSerializer!);
                     }

@@ -164,19 +164,6 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_serialize_and_deserialize_as_dictionary()
-        {
-            var dictionary = new Dictionary<DomainId, int>
-            {
-                [DomainId.Create("123")] = 321
-            };
-
-            var serialized = dictionary.SerializeAndDeserialize();
-
-            Assert.Equal(321, serialized[DomainId.Create("123")]);
-        }
-
-        [Fact]
         public void Should_serialize_and_deserialize_in_object()
         {
             var obj = new MyTest

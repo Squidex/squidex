@@ -13,13 +13,13 @@ using NodaTime.Text;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public sealed class InstantSerializer : SerializerBase<Instant>, IBsonPolymorphicSerializer, IRepresentationConfigurable<InstantSerializer>
+    public sealed class BsonInstantSerializer : SerializerBase<Instant>, IBsonPolymorphicSerializer, IRepresentationConfigurable<BsonInstantSerializer>
     {
         public static void Register()
         {
             try
             {
-                BsonSerializer.RegisterSerializer(new InstantSerializer());
+                BsonSerializer.RegisterSerializer(new BsonInstantSerializer());
             }
             catch (BsonSerializationException)
             {
@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         public BsonType Representation { get; }
 
-        public InstantSerializer(BsonType representation = BsonType.DateTime)
+        public BsonInstantSerializer(BsonType representation = BsonType.DateTime)
         {
             if (representation != BsonType.DateTime && representation != BsonType.Int64 && representation != BsonType.String)
             {
@@ -56,9 +56,10 @@ namespace Squidex.Infrastructure.MongoDb
                     return Instant.FromUnixTimeMilliseconds(context.Reader.ReadInt64());
                 case BsonType.String:
                     return InstantPattern.ExtendedIso.Parse(context.Reader.ReadString()).Value;
+                default:
+                    ThrowHelper.NotSupportedException("Unsupported Representation.");
+                    return default!;
             }
-
-            throw new NotSupportedException("Unsupported Representation.");
         }
 
         public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, Instant value)
@@ -67,21 +68,22 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 case BsonType.DateTime:
                     context.Writer.WriteDateTime(value.ToUnixTimeMilliseconds());
-                    return;
+                    break;
                 case BsonType.Int64:
                     context.Writer.WriteInt64(value.ToUnixTimeMilliseconds());
-                    return;
+                    break;
                 case BsonType.String:
                     context.Writer.WriteString(InstantPattern.ExtendedIso.Format(value));
-                    return;
+                    break;
+                default:
+                    ThrowHelper.NotSupportedException("Unsupported Representation.");
+                    break;
             }
-
-            throw new NotSupportedException("Unsupported Representation.");
         }
 
-        public InstantSerializer WithRepresentation(BsonType representation)
+        public BsonInstantSerializer WithRepresentation(BsonType representation)
         {
-            return Representation == representation ? this : new InstantSerializer(representation);
+            return Representation == representation ? this : new BsonInstantSerializer(representation);
         }
 
         IBsonSerializer IRepresentationConfigurable.WithRepresentation(BsonType representation)

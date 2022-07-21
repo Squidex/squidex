@@ -19,7 +19,6 @@ namespace Squidex.Infrastructure.MongoDb
         private const string CollectionFormat = "{0}Set";
 
         protected static readonly BulkWriteOptions BulkUnordered = new BulkWriteOptions { IsOrdered = true };
-        protected static readonly FieldDefinitionBuilder<TEntity> FieldBuilder = FieldDefinitionBuilder<TEntity>.Instance;
         protected static readonly FilterDefinitionBuilder<TEntity> Filter = Builders<TEntity>.Filter;
         protected static readonly IndexKeysDefinitionBuilder<TEntity> Index = Builders<TEntity>.IndexKeys;
         protected static readonly InsertManyOptions InsertUnordered = new InsertManyOptions { IsOrdered = true };
@@ -49,15 +48,6 @@ namespace Squidex.Infrastructure.MongoDb
         protected IMongoDatabase Database
         {
             get => mongoDatabase;
-        }
-
-        static MongoRepositoryBase()
-        {
-            TypeConverterStringSerializer<RefToken>.Register();
-
-            InstantSerializer.Register();
-
-            DomainIdSerializer.Register();
         }
 
         protected MongoRepositoryBase(IMongoDatabase database, bool setup = false)

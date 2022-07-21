@@ -7,7 +7,6 @@
 
 using FakeItEasy;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.TestHelpers;
 
@@ -28,7 +27,7 @@ namespace Squidex.Infrastructure.EventSourcing
             mongoClient = new MongoClient(connectionString);
             mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
-            BsonJsonConvention.Register(JsonSerializer.Create(TestUtils.DefaultSettings()));
+            BsonJsonConvention.Register(TestUtils.DefaultOptions());
 
             EventStore = new MongoEventStore(mongoDatabase, notifier);
             EventStore.InitializeAsync(default).Wait();

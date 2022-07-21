@@ -11,7 +11,6 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="GeoJSON.Net" Version="1.2.19" />
     <PackageReference Include="MailKit" Version="3.2.0" />
     <PackageReference Include="McMaster.NETCore.Plugins" Version="1.4.0" />
     <PackageReference Include="Meziantou.Analyzer" Version="1.0.702">

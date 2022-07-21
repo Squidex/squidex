@@ -8,25 +8,15 @@
 using System.Runtime.CompilerServices;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.States
 {
     public abstract class MongoSnapshotStoreBase<T, TState> : MongoRepositoryBase<TState>, ISnapshotStore<T> where TState : MongoState<T>, new()
     {
-        protected MongoSnapshotStoreBase(IMongoDatabase database, JsonSerializer serializer)
-            : base(database, Register(serializer))
+        protected MongoSnapshotStoreBase(IMongoDatabase database)
+            : base(database, true)
         {
-        }
-
-        private static bool Register(JsonSerializer serializer)
-        {
-            Guard.NotNull(serializer);
-
-            BsonJsonConvention.Register(serializer);
-
-            return true;
         }
 
         protected override string CollectionName()

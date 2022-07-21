@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         public StatusSerializerTests()
         {
-            TypeConverterStringSerializer<Status>.Register();
+            BsonStringSerializer<Status>.Register();
         }
 
         [Fact]

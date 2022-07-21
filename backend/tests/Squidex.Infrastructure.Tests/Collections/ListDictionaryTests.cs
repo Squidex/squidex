@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 #pragma warning disable xUnit2017 // Do not use Contains() to check if a value exists in a collection
@@ -459,6 +460,21 @@ namespace Squidex.Infrastructure.Collections
             sut.TrimExcess();
 
             Assert.Equal(2, sut.Capacity);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize()
+        {
+            var sut = new Dictionary<int, int>
+            {
+                [11] = 1,
+                [12] = 2,
+                [13] = 3
+            }.ToReadonlyDictionary();
+
+            var serialized = sut.SerializeAndDeserialize();
+
+            Assert.Equal(sut, serialized);
         }
     }
 }

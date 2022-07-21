@@ -11,13 +11,9 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public static class Batching
     {
-        public const int BufferSize = 100;
-
-        public const int Size = BufferSize * 2;
-
         public static readonly FindOptions Options = new FindOptions
         {
-            BatchSize = Size
+            BatchSize = 200
         };
     }
 }

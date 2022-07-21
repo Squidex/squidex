@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GeoJSON.Net;
-using GeoJSON.Net.Geometry;
+using GeoJSON.Text;
+using GeoJSON.Text.Geometry;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;

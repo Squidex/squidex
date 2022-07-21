@@ -20,8 +20,8 @@ namespace Squidex.Infrastructure.MongoDb
 
         public TypeConverterStringSerializerTests()
         {
-            TypeConverterStringSerializer<TimeSpan>.Register();
-            TypeConverterStringSerializer<RefToken>.Register();
+            BsonStringSerializer<TimeSpan>.Register();
+            BsonStringSerializer<RefToken>.Register();
         }
 
         [Fact]

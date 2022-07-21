@@ -12,6 +12,14 @@ namespace Squidex.Infrastructure.Collections
 {
     public class ReadonlyDictionaryTests
     {
+        internal sealed class Inherited : ReadonlyDictionary<int, int>
+        {
+            public Inherited(IDictionary<int, int> inner)
+                : base(inner)
+            {
+            }
+        }
+
         [Fact]
         public void Should_return_empty_instance_for_empty_source()
         {
@@ -91,6 +99,21 @@ namespace Squidex.Infrastructure.Collections
                 [12] = 2,
                 [13] = 3
             }.ToReadonlyDictionary();
+
+            var serialized = sut.SerializeAndDeserialize();
+
+            Assert.Equal(sut, serialized);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_inherited()
+        {
+            var sut = new Inherited(new Dictionary<int, int>
+            {
+                [11] = 1,
+                [12] = 2,
+                [13] = 3
+            });
 
             var serialized = sut.SerializeAndDeserialize();
 

@@ -20,9 +20,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public MongoTextIndexFixture()
         {
-            BsonJsonConvention.Register(JsonSerializer.Create(TestUtils.CreateSerializerSettings()));
+            BsonJsonConvention.Register(TestUtils.DefaultOptions());
 
-            DomainIdSerializer.Register();
+            BsonDomainIdSerializer.Register();
 
             var mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
             var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
