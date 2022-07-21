@@ -6,7 +6,7 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: squidex
+    app: squidex-{{ .Values.version }}
   ports:
     - protocol: TCP
       port: 80
