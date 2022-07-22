@@ -73,7 +73,7 @@ services:
       - SCRIPTING__TIMEOUTEXECUTION=00:00:10
       - SCRIPTING__TIMEOUTSCRIPT=00:00:10
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
-      - STORE__MONGODB__DATABASE=squidex1
+      - STORE__MONGODB__DATABASE=squidex3
       - STORE__MONGODB__CONTENTDATABASE=squidex3_content
       - STORE__TYPE=MongoDB
       - TEMPLATES__LOCALURL=http://localhost:5000
