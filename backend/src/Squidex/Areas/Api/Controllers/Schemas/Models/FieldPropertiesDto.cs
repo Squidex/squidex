@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Validation;
@@ -14,7 +13,7 @@ using Squidex.Web.Json;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    [JsonConverter(typeof(TypedJsonInheritanceConverter<FieldPropertiesDto>), "fieldType")]
+    [JsonInheritanceConverter(typeof(FieldPropertiesDto), "fieldType")]
     [KnownType(nameof(Subtypes))]
     public abstract class FieldPropertiesDto
     {

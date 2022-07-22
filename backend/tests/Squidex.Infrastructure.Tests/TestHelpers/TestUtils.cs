@@ -53,16 +53,16 @@ namespace Squidex.Infrastructure.TestHelpers
             BsonJsonValueSerializer.Register();
         }
 
-        public static IJsonSerializer CreateSerializer(TypeNameRegistry? typeNameRegistry = null)
+        public static IJsonSerializer CreateSerializer(params JsonConverter[] converters)
         {
-            var serializerSettings = DefaultOptions(typeNameRegistry);
+            var serializerSettings = DefaultOptions(converters);
 
             return new SystemJsonSerializer(serializerSettings);
         }
 
-        public static JsonSerializerOptions DefaultOptions(TypeNameRegistry? typeNameRegistry = null)
+        public static JsonSerializerOptions DefaultOptions(params JsonConverter[] converters)
         {
-            var options = new JsonSerializerOptions(JsonSerializerDefaults.General);
+            var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
             options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
             options.Converters.Add(new StringConverter<PropertyPath>(x => x));
@@ -73,20 +73,13 @@ namespace Squidex.Infrastructure.TestHelpers
             options.Converters.Add(new SurrogateJsonConverter<FilterNode<JsonValue>, JsonFilterSurrogate>());
             options.Converters.Add(new StringConverter<CompareOperator>());
             options.Converters.Add(new StringConverter<DomainId>());
+            options.Converters.Add(new StringConverter<NamedId<DomainId>>());
             options.Converters.Add(new StringConverter<NamedId<Guid>>());
             options.Converters.Add(new StringConverter<NamedId<string>>());
             options.Converters.Add(new StringConverter<Language>());
+            options.Converters.Add(new StringConverter<RefToken>());
             options.Converters.Add(new JsonStringEnumConverter());
-
-            options.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
-            options.IgnoreReadOnlyFields = false;
-            options.IgnoreReadOnlyProperties = false;
-            options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-
-            if (typeNameRegistry != null)
-            {
-                options.Converters.Add(new InheritanceConverter<IEvent>(typeNameRegistry));
-            }
+            options.Converters.AddRange(converters);
 
             return options;
         }

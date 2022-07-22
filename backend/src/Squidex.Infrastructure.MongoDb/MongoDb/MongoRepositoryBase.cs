@@ -37,6 +37,11 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 if (mongoCollection == null)
                 {
+                    InitializeAsync(default).Wait();
+                }
+
+                if (mongoCollection == null)
+                {
                     ThrowHelper.InvalidOperationException("Collection has not been initialized yet.");
                     return default!;
                 }
@@ -50,16 +55,11 @@ namespace Squidex.Infrastructure.MongoDb
             get => mongoDatabase;
         }
 
-        protected MongoRepositoryBase(IMongoDatabase database, bool setup = false)
+        protected MongoRepositoryBase(IMongoDatabase database)
         {
             Guard.NotNull(database);
 
             mongoDatabase = database;
-
-            if (setup)
-            {
-                CreateCollection();
-            }
         }
 
         protected virtual MongoCollectionSettings CollectionSettings()

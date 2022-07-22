@@ -81,7 +81,7 @@ namespace Squidex.Extensions.Actions.Algolia
                 {
                     AppId = action.AppId,
                     ApiKey = action.ApiKey,
-                    Content = content,
+                    Content = content.ToString(),
                     ContentId = contentId,
                     IndexName = await FormatAsync(action.IndexName, @event)
                 };
@@ -106,7 +106,9 @@ namespace Squidex.Extensions.Actions.Algolia
             {
                 if (job.Content != null)
                 {
-                    var response = await index.SaveObjectAsync(job.Content, null, ct, true);
+                    var parsed = JObject.Parse(job.Content);
+
+                    var response = await index.SaveObjectAsync(parsed, null, ct, true);
 
                     return Result.Success(JsonConvert.SerializeObject(response, Formatting.Indented));
                 }
@@ -134,6 +136,6 @@ namespace Squidex.Extensions.Actions.Algolia
 
         public string IndexName { get; set; }
 
-        public JObject Content { get; set; }
+        public string Content { get; set; }
     }
 }

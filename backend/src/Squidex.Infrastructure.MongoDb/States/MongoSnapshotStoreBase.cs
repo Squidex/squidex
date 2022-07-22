@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.States
     public abstract class MongoSnapshotStoreBase<T, TState> : MongoRepositoryBase<TState>, ISnapshotStore<T> where TState : MongoState<T>, new()
     {
         protected MongoSnapshotStoreBase(IMongoDatabase database)
-            : base(database, true)
+            : base(database)
         {
         }
 

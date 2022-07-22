@@ -9,12 +9,13 @@ using FakeItEasy;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.TestHelpers;
+using Xunit;
 
 #pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public abstract class MongoEventStoreFixture : IDisposable
+    public abstract class MongoEventStoreFixture : IAsyncLifetime
     {
         private readonly IMongoClient mongoClient;
         private readonly IMongoDatabase mongoDatabase;
@@ -30,19 +31,16 @@ namespace Squidex.Infrastructure.EventSourcing
             BsonJsonConvention.Register(TestUtils.DefaultOptions());
 
             EventStore = new MongoEventStore(mongoDatabase, notifier);
-            EventStore.InitializeAsync(default).Wait();
         }
 
-        public void Cleanup()
+        public Task InitializeAsync()
         {
-            mongoClient.DropDatabase("EventStoreTest");
+            return EventStore.InitializeAsync(default);
         }
 
-        public void Dispose()
+        public Task DisposeAsync()
         {
-            Cleanup();
-
-            GC.SuppressFinalize(this);
+            return mongoClient.DropDatabaseAsync(mongoDatabase.DatabaseNamespace.DatabaseName);
         }
     }
 

@@ -10,8 +10,8 @@ using GraphQL.DataLoader;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.MicrosoftDI;
-using GraphQL.NewtonsoftJson;
 using GraphQL.Server.Transports.AspNetCore;
+using GraphQL.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -22,7 +22,6 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Infrastructure.Caching;
-using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Pipeline.Plugins;
 using Squidex.Web;
@@ -105,7 +104,7 @@ namespace Squidex.Config.Web
             {
                 builder.AddApolloTracing();
                 builder.AddSchema<DummySchema>();
-                builder.AddSquidexJson(); // Use Newtonsoft.JSON for custom converters.
+                builder.AddSystemTextJson();
                 builder.AddDataLoader();
             });
 
@@ -120,22 +119,6 @@ namespace Squidex.Config.Web
 
             services.AddSingletonAs<GraphQLRunner>()
                 .AsSelf();
-        }
-
-        private static IGraphQLBuilder AddSquidexJson(this IGraphQLBuilder builder)
-        {
-            builder.AddSerializer(c =>
-            {
-                var errorInfoProvider = c.GetRequiredService<IErrorInfoProvider>();
-
-                return new BufferingGraphQLSerializer(new GraphQLSerializer(options =>
-                {
-                    options.Converters.Add(new JsonValueConverter());
-                    options.Converters.Add(new WriteonlyGeoJsonConverter());
-                }));
-            });
-
-            return builder;
         }
     }
 }

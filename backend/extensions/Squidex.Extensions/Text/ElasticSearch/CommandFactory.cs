@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GeoJSON.Net.Geometry;
+using GeoJSON.Text.Geometry;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 
 namespace Squidex.Extensions.Text.ElasticSearch

@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -66,7 +66,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> GetSettings(string app)
         {
-            var result = await appUISettings.GetAsync(AppId, null);
+            var result = await appUISettings.GetAsync(AppId, null, HttpContext.RequestAborted);
 
             return Ok(result);
         }
@@ -85,7 +85,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> GetUserSettings(string app)
         {
-            var result = await appUISettings.GetAsync(AppId, UserId());
+            var result = await appUISettings.GetAsync(AppId, UserId(), HttpContext.RequestAborted);
 
             return Ok(result);
         }
@@ -105,7 +105,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> PutSetting(string app, string key, [FromBody] UpdateSettingDto request)
         {
-            await appUISettings.SetAsync(AppId, null, key, request.Value);
+            await appUISettings.SetAsync(AppId, null, key, request.Value, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -125,7 +125,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> PutUserSetting(string app, string key, [FromBody] UpdateSettingDto request)
         {
-            await appUISettings.SetAsync(AppId, UserId(), key, request.Value);
+            await appUISettings.SetAsync(AppId, UserId(), key, request.Value, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -144,7 +144,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> DeleteSetting(string app, string key)
         {
-            await appUISettings.RemoveAsync(AppId, null, key);
+            await appUISettings.RemoveAsync(AppId, null, key, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -163,7 +163,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> DeleteUserSetting(string app, string key)
         {
-            await appUISettings.RemoveAsync(AppId, UserId(), key);
+            await appUISettings.RemoveAsync(AppId, UserId(), key, HttpContext.RequestAborted);
 
             return NoContent();
         }

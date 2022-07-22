@@ -16,15 +16,6 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public sealed class BsonJsonSerializer<T> : ClassSerializerBase<T?> where T : class
     {
-        private readonly JsonSerializerOptions options;
-
-        public BsonJsonSerializer(JsonSerializerOptions options)
-        {
-            Guard.NotNull(options);
-
-            this.options = options;
-        }
-
         public override T? Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
             var bsonReader = context.Reader;
@@ -44,7 +35,7 @@ namespace Squidex.Infrastructure.MongoDb
 
             stream.Position = 0;
 
-            return JsonSerializer.Deserialize<T>(stream, options);
+            return JsonSerializer.Deserialize<T>(stream, BsonJsonConvention.Options);
         }
 
         private static void Convert(IBsonReader reader, Utf8JsonWriter writer)
@@ -142,7 +133,7 @@ namespace Squidex.Infrastructure.MongoDb
         {
             var bsonWriter = context.Writer;
 
-            using (var jsonDocument = JsonSerializer.SerializeToDocument(value, options))
+            using (var jsonDocument = JsonSerializer.SerializeToDocument(value, BsonJsonConvention.Options))
             {
                 WriteElement(bsonWriter, jsonDocument.RootElement);
             }

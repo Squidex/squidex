@@ -6,15 +6,15 @@
 // ==========================================================================
 
 using MongoDB.Driver;
-using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.MongoDb.Text;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.MongoDb;
+using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed class MongoTextIndexFixture
+    public sealed class MongoTextIndexFixture : IAsyncLifetime
     {
         public MongoTextIndex Index { get; }
 
@@ -27,8 +27,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             var mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
             var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
-            Index = new MongoTextIndex(mongoDatabase, false);
-            Index.InitializeAsync(default).Wait();
+            Index = new MongoTextIndex(mongoDatabase);
+        }
+
+        public Task InitializeAsync()
+        {
+            return Index.InitializeAsync(default);
+        }
+
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
         }
     }
 }

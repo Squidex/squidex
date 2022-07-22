@@ -18,8 +18,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 {
     public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndexEntity<T>>, ITextIndex, IDeleter where T : class
     {
-        private readonly ProjectionDefinition<MongoTextIndexEntity<T>> searchTextProjection;
-        private readonly ProjectionDefinition<MongoTextIndexEntity<T>> searchGeoProjection;
         private readonly CommandFactory<T> commandFactory;
 
         protected sealed class MongoTextResult
@@ -39,12 +37,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
             public double Score { get; set; }
         }
 
-        protected MongoTextIndexBase(IMongoDatabase database, bool setup = false)
-            : base(database, setup)
+        protected MongoTextIndexBase(IMongoDatabase database)
+            : base(database)
         {
-            searchGeoProjection = Projection.Include(x => x.ContentId);
-            searchTextProjection = Projection.Include(x => x.ContentId).MetaTextScore("score");
-
 #pragma warning disable MA0056 // Do not call overridable members in constructor
             commandFactory = new CommandFactory<T>(BuildTexts);
 #pragma warning restore MA0056 // Do not call overridable members in constructor
@@ -114,7 +109,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
                     Filter.GeoWithinCenterSphere(x => x.GeoObject, query.Longitude, query.Latitude, query.Radius / 6378100));
 
             var byGeo =
-                await GetCollection(scope).Find(findFilter).Limit(query.Take).Project<MongoTextResult>(searchGeoProjection)
+                await GetCollection(scope).Find(findFilter).Limit(query.Take)
+                    .Project<MongoTextResult>(Projection.Include(x => x.ContentId))
                     .ToListAsync(ct);
 
             return byGeo.Select(x => x.ContentId).ToList();
@@ -185,15 +181,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
         private async Task SearchAsync(List<(DomainId, double)> result, FilterDefinition<MongoTextIndexEntity<T>> filter, SearchScope scope, int take, double factor,
             CancellationToken ct = default)
         {
-            var collection = GetCollection(scope);
+            var byText =
+                await GetCollection(scope).Find(filter).Limit(take)
+                    .Project<MongoTextResult>(Projection.Include(x => x.ContentId).MetaTextScore("score")).Sort(Sort.MetaTextScore("score"))
+                    .ToListAsync(ct);
 
-            var find =
-                collection.Find(filter).Limit(take)
-                    .Project<MongoTextResult>(searchTextProjection).Sort(Sort.MetaTextScore("score"));
-
-            var documents = await find.ToListAsync(ct);
-
-            result.AddRange(documents.Select(x => (x.ContentId, x.Score * factor)));
+            result.AddRange(byText.Select(x => (x.ContentId, x.Score * factor)));
         }
 
         private static FilterDefinition<MongoTextIndexEntity<T>> Filter_ByScope(SearchScope scope)

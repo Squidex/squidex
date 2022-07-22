@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Distributed;
 using Migrations.Migrations.MongoDb;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Extensions.DiagnosticSources;
-using Newtonsoft.Json;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
@@ -58,6 +58,11 @@ namespace Squidex.Config.Domain
             {
                 ["MongoDB"] = () =>
                 {
+                    BsonDomainIdSerializer.Register();
+                    BsonInstantSerializer.Register();
+                    BsonJsonConvention.Register();
+                    BsonJsonValueSerializer.Register();
+
                     var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
                     var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
                     var mongoContentDatabaseName = config.GetOptionalValue("store:mongoDb:contentDatabase", mongoDatabaseName);
@@ -174,10 +179,10 @@ namespace Squidex.Config.Domain
                             .AsOptional<ITextIndex>().As<IDeleter>();
                     }
 
-                    services.AddInitializer<JsonSerializer>("Serializer (BSON)", jsonNetSerializer =>
+                    services.AddInitializer<JsonSerializerOptions>("Serializer (BSON)", jsonSerializerOptions =>
                     {
-                        BsonJsonConvention.Register(jsonNetSerializer);
-                    }, -1);
+                        BsonJsonConvention.Options = jsonSerializerOptions;
+                    }, int.MinValue);
                 }
             });
 

@@ -7,7 +7,7 @@
 
 using System.Text;
 using Azure.Search.Documents.Models;
-using GeoJSON.Net.Geometry;
+using GeoJSON.Text.Geometry;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 
 namespace Squidex.Extensions.Text.Azure

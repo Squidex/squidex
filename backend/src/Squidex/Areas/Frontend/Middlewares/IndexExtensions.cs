@@ -7,10 +7,8 @@
 
 using System.Collections.Concurrent;
 using System.Globalization;
+using System.Text.Json;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using Squidex.Areas.Api.Controllers.UI;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Web;
@@ -20,10 +18,6 @@ namespace Squidex.Areas.Frontend.Middlewares
     public static class IndexExtensions
     {
         private static readonly ConcurrentDictionary<string, string> Texts = new ConcurrentDictionary<string, string>();
-        private static readonly JsonSerializer JsonSerializer = JsonSerializer.CreateDefault(new JsonSerializerSettings
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
-        });
 
         public static string AddOptions(this string html, HttpContext httpContext)
         {
@@ -43,22 +37,28 @@ namespace Squidex.Areas.Frontend.Middlewares
 
             if (uiOptions != null)
             {
-                var json = JObject.FromObject(uiOptions, JsonSerializer);
-
-                var values = httpContext.RequestServices.GetService<ExposedValues>();
-
-                if (values != null)
+                var clonedOptions = uiOptions with
                 {
-                    json["more"] ??= new JObject();
-                    json["more"]!["info"] = values.ToString();
+                    More = new Dictionary<string, object>
+                    {
+                        ["culture"] = CultureInfo.CurrentUICulture.Name
+                    }
+                };
+
+                var jsonOptions = httpContext.RequestServices.GetRequiredService<JsonSerializerOptions>();
+
+                using var jsonDocument = JsonSerializer.SerializeToDocument(uiOptions, jsonOptions);
+
+                if (httpContext.RequestServices.GetService<ExposedValues>() is ExposedValues values)
+                {
+                    clonedOptions.More["info"] = values.ToString();
                 }
 
-                var notifo = httpContext.RequestServices!.GetService<IOptions<NotifoOptions>>();
+                var notifo = httpContext.RequestServices!.GetService<IOptions<NotifoOptions>>()?.Value;
 
-                if (notifo?.Value.IsConfigured() == true)
+                if (notifo?.IsConfigured() == true)
                 {
-                    json["more"] ??= new JObject();
-                    json["more"]!["notifoApi"] = notifo.Value.ApiUrl;
+                    clonedOptions.More["notifoApi"] = notifo.ApiUrl;
                 }
 
                 var options = httpContext.Features.Get<OptionsFeature>();
@@ -67,14 +67,11 @@ namespace Squidex.Areas.Frontend.Middlewares
                 {
                     foreach (var (key, value) in options.Options)
                     {
-                        json[key] = JToken.FromObject(value);
+                        clonedOptions.More[key] = value;
                     }
                 }
 
-                json["more"] ??= new JObject();
-                json["more"]!["culture"] = CultureInfo.CurrentUICulture.Name;
-
-                scripts.Add($"var options = {json.ToString(Formatting.Indented)};");
+                scripts.Add($"var options = {JsonSerializer.Serialize(clonedOptions)};");
             }
 
             html = html.Replace(Placeholder, string.Join(Environment.NewLine, scripts), StringComparison.OrdinalIgnoreCase);

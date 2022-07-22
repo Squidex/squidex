@@ -20,8 +20,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
             : base(database)
         {
             this.name = $"{name}_Count";
-
-            InitializeAsync(default).Wait();
         }
 
         protected override string CollectionName()
@@ -34,8 +32,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
         {
             var (cachedTotal, isOutdated) = await CountAsync(key, ct);
 
+            // This is our hardcoded limit at the moment. Usually schemas are much smaller anyway.
             if (cachedTotal < 5_000)
             {
+                // We always want to have up to date collection sizes for smaller schemas.
                 return await RefreshTotalAsync(key, cachedTotal, provider, ct);
             }
 

@@ -5,11 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using FakeItEasy;
 using GraphQL;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
@@ -750,7 +749,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 var data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id);
 
-                var dataJson = JsonConvert.SerializeObject(data, Formatting.Indented);
+                var dataJson = JsonSerializer.Serialize(data);
 
                 // Use Properties without quotes.
                 dataJson = Regex.Replace(dataJson, "\"([^\"]+)\":", x => x.Groups[1].Value + ":");
@@ -775,7 +774,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id)
             };
 
-            return serializer.ReadNode<Inputs>(JObject.FromObject(input))!;
+            return serializer.ReadNode<Inputs>(input)!;
         }
     }
 }

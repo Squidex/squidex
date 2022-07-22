@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json;
 using NJsonSchema;
 using NJsonSchema.Generation;
 using NJsonSchema.Generation.TypeMappers;
@@ -60,10 +59,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
             services.AddSingleton(c =>
             {
-                var settings = new JsonSchemaGeneratorSettings
-                {
-                    SerializerSettings = c.GetRequiredService<JsonSerializerSettings>()
-                };
+                var settings = new JsonSchemaGeneratorSettings();
 
                 ConfigureSchemaSettings(settings, true);
 
@@ -72,10 +68,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
             services.AddSingleton(c =>
             {
-                var settings = new OpenApiDocumentGeneratorSettings
-                {
-                    SerializerSettings = c.GetRequiredService<JsonSerializerSettings>()
-                };
+                var settings = new OpenApiDocumentGeneratorSettings();
 
                 ConfigureSchemaSettings(settings, true);
 

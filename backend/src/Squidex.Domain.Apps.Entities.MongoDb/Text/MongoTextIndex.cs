@@ -11,8 +11,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 {
     public sealed class MongoTextIndex : MongoTextIndexBase<List<MongoTextIndexEntityText>>
     {
-        public MongoTextIndex(IMongoDatabase database, bool setup = false)
-            : base(database, setup)
+        public MongoTextIndex(IMongoDatabase database)
+            : base(database)
         {
         }
 

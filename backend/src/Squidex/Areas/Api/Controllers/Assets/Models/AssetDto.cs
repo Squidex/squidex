@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -130,7 +130,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The metadata.
         /// </summary>
-        [JsonProperty("_meta")]
+        [JsonPropertyName("_meta")]
         public AssetMeta Meta { get; set; }
 
         /// <summary>

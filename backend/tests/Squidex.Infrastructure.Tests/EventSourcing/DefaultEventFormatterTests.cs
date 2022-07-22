@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using NodaTime;
+using Squidex.Infrastructure.Json.System;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.TestHelpers;
@@ -34,7 +35,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     .Map(typeof(MyEvent), "Event")
                     .Map(typeof(MyOldEvent), "OldEvent");
 
-            sut = new DefaultEventFormatter(typeNameRegistry, TestUtils.CreateSerializer(typeNameRegistry));
+            sut = new DefaultEventFormatter(typeNameRegistry, TestUtils.DefaultSerializer);
         }
 
         [Fact]

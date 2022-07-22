@@ -71,10 +71,12 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
             options.Converters.Add(new SurrogateJsonConverter<WorkflowTransition, WorkflowTransitionSurrogate>());
             options.Converters.Add(new StringConverter<CompareOperator>());
             options.Converters.Add(new StringConverter<DomainId>());
+            options.Converters.Add(new StringConverter<NamedId<DomainId>>());
             options.Converters.Add(new StringConverter<NamedId<Guid>>());
             options.Converters.Add(new StringConverter<NamedId<string>>());
             options.Converters.Add(new StringConverter<Language>());
             options.Converters.Add(new StringConverter<PropertyPath>(x => x));
+            options.Converters.Add(new StringConverter<RefToken>());
             options.Converters.Add(new StringConverter<Status>());
             options.Converters.Add(new JsonStringEnumConverter());
 
