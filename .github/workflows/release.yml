@@ -83,6 +83,11 @@ jobs:
         with:
           cmd: yq e '.services.squidex2.image = "squidex-tmp"' -i backend/tests/docker-compose.yml
 
+      - name: Replace Image Name3
+        uses: mikefarah/yq@v4.9.1
+        with:
+          cmd: yq e '.services.squidex3.image = "squidex-tmp"' -i backend/tests/docker-compose.yml
+
       - name: Start Test
         run: docker-compose up -d
         working-directory: backend/tests
@@ -112,6 +117,20 @@ jobs:
             WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher
           default_network: host
           options: --name test2
+          volumes: ${{ github.workspace }}:/src
+          run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+
+      - name: RUN TEST with dedicated collections
+        uses: kohlerdominik/docker-run-action@v1.0.0
+        with:
+          image: squidex/build
+          environment: |
+            CONFIG__BACKUPURL=http://localhost:5000
+            CONFIG__WAIT=60
+            CONFIG__SERVER__URL=http://localhost:8082
+            WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher
+          default_network: host
+          options: --name test3
           volumes: ${{ github.workspace }}:/src
           run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
        

@@ -16,6 +16,9 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Translations;
+
+#pragma warning disable IDE0060 // Remove unused parameter
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
@@ -25,13 +28,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly QueryById queryBdId;
         private readonly QueryByIds queryByIds;
         private readonly QueryByQuery queryByQuery;
+        private readonly QueryInDedicatedCollection? queryInDedicatedCollection;
         private readonly QueryReferences queryReferences;
         private readonly QueryReferrers queryReferrers;
         private readonly QueryScheduled queryScheduled;
         private readonly ReadPreference readPreference;
         private readonly string name;
 
-        public MongoContentCollection(string name, IMongoDatabase database, IAppProvider appProvider, ReadPreference readPreference)
+        public MongoContentCollection(string name, IMongoDatabase database, ReadPreference readPreference,
+            bool dedicatedCollections)
             : base(database)
         {
             this.name = name;
@@ -39,17 +44,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             queryAsStream = new QueryAsStream();
             queryBdId = new QueryById();
             queryByIds = new QueryByIds();
-            queryByQuery = new QueryByQuery(appProvider, new MongoCountCollection(database, name));
             queryReferences = new QueryReferences(queryByIds);
             queryReferrers = new QueryReferrers();
             queryScheduled = new QueryScheduled();
+            queryByQuery = new QueryByQuery(new MongoCountCollection(database, name));
+
+            if (dedicatedCollections)
+            {
+                queryInDedicatedCollection =
+                    new QueryInDedicatedCollection(
+                        database.Client,
+                        database.DatabaseNamespace.DatabaseName,
+                        name);
+            }
 
             this.readPreference = readPreference;
-        }
-
-        public IMongoCollection<MongoContentEntity> GetInternalCollection()
-        {
-            return Collection;
         }
 
         protected override string CollectionName()
@@ -119,27 +128,38 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryAsync"))
             {
-                if (q.Ids is { Count: > 0 })
+                try
                 {
-                    return await queryByIds.QueryAsync(app.Id, schemas, q, ct);
-                }
+                    if (q.Ids is { Count: > 0 } && schemas.Count > 0)
+                    {
+                        return await queryByIds.QueryAsync(app, schemas, q, ct);
+                    }
 
-                if (q.ScheduledFrom != null && q.ScheduledTo != null)
+                    if (q.ScheduledFrom != null && q.ScheduledTo != null && schemas.Count > 0)
+                    {
+                        return await queryScheduled.QueryAsync(app, schemas, q, ct);
+                    }
+
+                    if (q.Referencing != default && schemas.Count > 0)
+                    {
+                        return await queryReferences.QueryAsync(app, schemas, q, ct);
+                    }
+
+                    if (q.Reference != default && schemas.Count > 0)
+                    {
+                        return await queryByQuery.QueryAsync(app, schemas, q, ct);
+                    }
+
+                    return ResultList.Empty<IContentEntity>();
+                }
+                catch (MongoCommandException ex) when (ex.Code == 96)
                 {
-                    return await queryScheduled.QueryAsync(app.Id, schemas, q, ct);
+                    throw new DomainException(T.Get("common.resultTooLarge"));
                 }
-
-                if (q.Referencing != default)
+                catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
                 {
-                    return await queryReferences.QueryAsync(app.Id, schemas, q, ct);
+                    throw new DomainException(T.Get("common.resultTooLarge"));
                 }
-
-                if (q.Reference != default)
-                {
-                    return await queryByQuery.QueryAsync(app, schemas, q, ct);
-                }
-
-                return ResultList.CreateFrom<IContentEntity>(0);
             }
         }
 
@@ -148,22 +168,38 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryAsync"))
             {
-                if (q.Ids is { Count: > 0 })
+                try
                 {
-                    return await queryByIds.QueryAsync(app.Id, new List<ISchemaEntity> { schema }, q, ct);
-                }
+                    if (q.Ids is { Count: > 0 })
+                    {
+                        return await queryByIds.QueryAsync(app, new List<ISchemaEntity> { schema }, q, ct);
+                    }
 
-                if (q.ScheduledFrom != null && q.ScheduledTo != null)
+                    if (q.ScheduledFrom != null && q.ScheduledTo != null)
+                    {
+                        return await queryScheduled.QueryAsync(app, new List<ISchemaEntity> { schema }, q, ct);
+                    }
+
+                    if (q.Referencing == default)
+                    {
+                        if (queryInDedicatedCollection != null)
+                        {
+                            return await queryInDedicatedCollection.QueryAsync(schema, q, ct);
+                        }
+
+                        return await queryByQuery.QueryAsync(schema, q, ct);
+                    }
+
+                    return ResultList.Empty<IContentEntity>();
+                }
+                catch (MongoCommandException ex) when (ex.Code == 96)
                 {
-                    return await queryScheduled.QueryAsync(app.Id, new List<ISchemaEntity> { schema }, q, ct);
+                    throw new DomainException(T.Get("common.resultTooLarge"));
                 }
-
-                if (q.Referencing == default)
+                catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
                 {
-                    return await queryByQuery.QueryAsync(app, schema, q, ct);
+                    throw new DomainException(T.Get("common.resultTooLarge"));
                 }
-
-                return ResultList.CreateFrom<IContentEntity>(0);
             }
         }
 
@@ -176,7 +212,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids,
+        public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryIdsAsync"))
@@ -185,7 +221,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
+        public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
             CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryIdsAsync"))
@@ -215,27 +251,37 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return Collection.Find(new BsonDocument()).ToAsyncEnumerable(ct);
         }
 
-        public Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity value,
+        public async Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity value,
             CancellationToken ct = default)
         {
-            return Collection.UpsertVersionedAsync(documentId, oldVersion, value.Version, value, ct);
-        }
-
-        public Task RemoveAsync(DomainId key,
-            CancellationToken ct = default)
-        {
-            return Collection.DeleteOneAsync(x => x.DocumentId == key, null, ct);
-        }
-
-        public Task InsertManyAsync(IReadOnlyList<MongoContentEntity> snapshots,
-            CancellationToken ct = default)
-        {
-            if (snapshots.Count == 0)
+            if (queryInDedicatedCollection != null)
             {
-                return Task.CompletedTask;
+                await queryInDedicatedCollection.UpsertVersionedAsync(documentId, oldVersion, value, default);
             }
 
-            return Collection.InsertManyAsync(snapshots, InsertUnordered, ct);
+            await Collection.UpsertVersionedAsync(documentId, oldVersion, value.Version, value, default);
+        }
+
+        public async Task RemoveAsync(DomainId key,
+            CancellationToken ct = default)
+        {
+            var previous = await Collection.FindOneAndDeleteAsync(x => x.DocumentId == key, null, default);
+
+            if (queryInDedicatedCollection != null && previous != null)
+            {
+                await queryInDedicatedCollection.RemoveAsync(previous, default);
+            }
+        }
+
+        public async Task AddCollectionsAsync(MongoContentEntity entity, Action<IMongoCollection<MongoContentEntity>, MongoContentEntity> add,
+            CancellationToken ct)
+        {
+            if (queryInDedicatedCollection != null)
+            {
+                add(await queryInDedicatedCollection.GetCollectionAsync(entity.AppId.Id, entity.SchemaId.Id), entity);
+            }
+
+            add(Collection, entity);
         }
     }
 }

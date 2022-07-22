@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
@@ -20,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         IAsyncEnumerable<SnapshotResult<ContentDomainObject.State>> ISnapshotStore<ContentDomainObject.State>.ReadAllAsync(
             CancellationToken ct)
         {
-            return collectionFrontend.StreamAll(ct)
+            return collectionComplete.StreamAll(ct)
                 .Select(x => new SnapshotResult<ContentDomainObject.State>(x.DocumentId, x.ToState(), x.Version, true));
         }
 
@@ -30,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             using (Telemetry.Activities.StartActivity("MongoContentRepository/ReadAsync"))
             {
                 var existing =
-                    await collectionFrontend.FindAsync(key, ct);
+                    await collectionComplete.FindAsync(key, ct);
 
                 if (existing?.IsSnapshot == true)
                 {
@@ -46,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/DeleteAppAsync"))
             {
-                await collectionFrontend.DeleteAppAsync(app.Id, ct);
+                await collectionComplete.DeleteAppAsync(app.Id, ct);
                 await collectionPublished.DeleteAppAsync(app.Id, ct);
             }
         }
@@ -56,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/ClearAsync"))
             {
-                await collectionFrontend.ClearAsync(ct);
+                await collectionComplete.ClearAsync(ct);
                 await collectionPublished.ClearAsync(ct);
             }
         }
@@ -66,8 +67,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/RemoveAsync"))
             {
-                await collectionFrontend.RemoveAsync(key, ct);
-                await collectionPublished.RemoveAsync(key, ct);
+                if (key == DomainId.Empty)
+                {
+                    return;
+                }
+
+                await Task.WhenAll(
+                    collectionComplete.RemoveAsync(key, ct),
+                    collectionPublished.RemoveAsync(key, ct));
             }
         }
 
@@ -76,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteAsync"))
             {
-                if (job.Value.SchemaId.Id == DomainId.Empty)
+                if (!IsValid(job.Value))
                 {
                     return;
                 }
@@ -92,22 +99,34 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteManyAsync"))
             {
-                var entitiesPublished = new List<MongoContentEntity>();
-                var entitiesFrontend = new List<MongoContentEntity>();
+                var updates = new Dictionary<IMongoCollection<MongoContentEntity>, List<MongoContentEntity>>();
 
-                foreach (var job in jobs.Where(IsValid))
+                var add = new Action<IMongoCollection<MongoContentEntity>, MongoContentEntity>((collection, entity) =>
                 {
-                    if (ShouldWritePublished(job.Value))
+                    updates.GetOrAddNew(collection).Add(entity);
+                });
+
+                foreach (var job in jobs)
+                {
+                    var isValid = IsValid(job.Value);
+
+                    if (isValid && ShouldWritePublished(job.Value))
                     {
-                        entitiesPublished.Add(await MongoContentEntity.CreatePublishedAsync(job, appProvider));
+                        await collectionPublished.AddCollectionsAsync(
+                            await MongoContentEntity.CreatePublishedAsync(job, appProvider), add, ct);
                     }
 
-                    entitiesFrontend.Add(await MongoContentEntity.CreateDraftAsync(job, appProvider));
+                    if (isValid)
+                    {
+                        await collectionComplete.AddCollectionsAsync(
+                            await MongoContentEntity.CreateAsync(job, appProvider), add, ct);
+                    }
                 }
 
-                await Task.WhenAll(
-                    collectionFrontend.InsertManyAsync(entitiesFrontend, ct),
-                    collectionPublished.InsertManyAsync(entitiesPublished, ct));
+                await Parallel.ForEachAsync(updates, ct, (update, ct) =>
+                {
+                    return new ValueTask(update.Key.InsertManyAsync(update.Value, InsertUnordered, ct));
+                });
             }
         }
 
@@ -120,24 +139,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
             else
             {
-                await DeletePublishedContentAsync(job.Value.AppId.Id, job.Value.Id, ct);
+                await DeletePublishedContentAsync(job.Value.UniqueId, ct);
             }
         }
 
-        private Task DeletePublishedContentAsync(DomainId appId, DomainId id,
+        private Task DeletePublishedContentAsync(DomainId key,
             CancellationToken ct = default)
         {
-            var documentId = DomainId.Combine(appId, id);
-
-            return collectionPublished.RemoveAsync(documentId, ct);
+            return collectionPublished.RemoveAsync(key, ct);
         }
 
         private async Task UpsertFrontendAsync(SnapshotWriteJob<ContentDomainObject.State> job,
             CancellationToken ct = default)
         {
-            var entity = await MongoContentEntity.CreateDraftAsync(job, appProvider);
+            var entity = await MongoContentEntity.CreateAsync(job, appProvider);
 
-            await collectionFrontend.UpsertVersionedAsync(entity.DocumentId, job.OldVersion, entity, ct);
+            await collectionComplete.UpsertVersionedAsync(entity.DocumentId, job.OldVersion, entity, ct);
         }
 
         private async Task UpsertPublishedContentAsync(SnapshotWriteJob<ContentDomainObject.State> job,
@@ -154,10 +171,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return value.Status == Status.Published && !value.IsDeleted;
         }
 
-        private static bool IsValid(SnapshotWriteJob<ContentDomainObject.State> job)
+        private static bool IsValid(ContentDomainObject.State state)
         {
             // Some data is corrupt and might throw an exception during migration if we do not skip them.
-            return job.Value.AppId != null || job.Value.CurrentVersion != null;
+            return
+                state.AppId != null &&
+                state.AppId.Id != DomainId.Empty &&
+                state.CurrentVersion != null &&
+                state.SchemaId != null &&
+                state.SchemaId.Id != DomainId.Empty;
         }
     }
 }

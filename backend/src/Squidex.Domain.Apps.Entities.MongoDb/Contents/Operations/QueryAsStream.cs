@@ -7,6 +7,7 @@
 
 using System.Runtime.CompilerServices;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 
@@ -25,12 +26,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         public async IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
             [EnumeratorCancellation] CancellationToken ct)
         {
-            var find =
-                schemaIds != null ?
-                    Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && schemaIds.Contains(x.IndexedSchemaId)) :
-                    Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted);
+            var filter = CreateFilter(appId, schemaIds);
 
-            using (var cursor = await find.ToCursorAsync(ct))
+            using (var cursor = await Collection.Find(filter).ToCursorAsync(ct))
             {
                 while (await cursor.MoveNextAsync(ct))
                 {
@@ -40,6 +38,23 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     }
                 }
             }
+        }
+
+        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, HashSet<DomainId>? schemaIds)
+        {
+            var filters = new List<FilterDefinition<MongoContentEntity>>
+            {
+                Filter.Gt(x => x.LastModified, default),
+                Filter.Gt(x => x.Id, default),
+                Filter.Eq(x => x.IndexedAppId, appId)
+            };
+
+            if (schemaIds != null)
+            {
+                filters.Add(Filter.In(x => x.IndexedSchemaId, schemaIds));
+            }
+
+            return Filter.And(filters);
         }
     }
 }

@@ -13,7 +13,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
     public sealed class AssetQueryService : IAssetQueryService
     {
-        private static readonly IResultList<IEnrichedAssetEntity> EmptyAssets = ResultList.CreateFrom<IEnrichedAssetEntity>(0);
         private readonly IAssetEnricher assetEnricher;
         private readonly IAssetRepository assetRepository;
         private readonly IAssetLoader assetLoader;
@@ -173,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             if (q == null)
             {
-                return EmptyAssets;
+                return ResultList.Empty<IEnrichedAssetEntity>();
             }
 
             using (Telemetry.Activities.StartActivity("AssetQueryService/QueryAsync"))
