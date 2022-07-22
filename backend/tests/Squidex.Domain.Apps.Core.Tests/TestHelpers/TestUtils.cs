@@ -35,14 +35,14 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
     {
         public static readonly IJsonSerializer DefaultSerializer = CreateSerializer();
 
-        public static IJsonSerializer CreateSerializer(JsonConverter? converter = null)
+        public static IJsonSerializer CreateSerializer(params JsonConverter[] converters)
         {
-            var serializerSettings = DefaultOptions(converter);
+            var serializerSettings = DefaultOptions(converters);
 
             return new SystemJsonSerializer(serializerSettings);
         }
 
-        public static JsonSerializerOptions DefaultOptions(JsonConverter? converter = null)
+        public static JsonSerializerOptions DefaultOptions(params JsonConverter[] converters)
         {
             var typeNameRegistry =
                 new TypeNameRegistry()
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     .Map(new RuleTypeProvider())
                     .MapUnmapped(typeof(TestUtils).Assembly);
 
-            var options = new JsonSerializerOptions(JsonSerializerDefaults.General);
+            var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
             options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
             options.Converters.Add(new InheritanceConverter<IEvent>(typeNameRegistry));
@@ -79,16 +79,8 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
             options.Converters.Add(new StringConverter<RefToken>());
             options.Converters.Add(new StringConverter<Status>());
             options.Converters.Add(new JsonStringEnumConverter());
-
-            options.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
-            options.IgnoreReadOnlyFields = false;
-            options.IgnoreReadOnlyProperties = false;
-            options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-
-            if (converter != null)
-            {
-                options.Converters.Add(converter);
-            }
+            options.Converters.AddRange(converters);
+            options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 
             return options;
         }
@@ -194,6 +186,20 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
             var json = DefaultSerializer.Serialize(value);
 
             return DefaultSerializer.Deserialize<T>(json);
+        }
+
+        public static string DeserializeAndSerialize<T>(this string json)
+        {
+            var deserialized = DefaultSerializer.Deserialize<T>(json);
+
+            return DefaultSerializer.Serialize(deserialized, true);
+        }
+
+        public static string CleanJson(this string json)
+        {
+            using var document = JsonDocument.Parse(json);
+
+            return DefaultSerializer.Serialize(document, true);
         }
     }
 }

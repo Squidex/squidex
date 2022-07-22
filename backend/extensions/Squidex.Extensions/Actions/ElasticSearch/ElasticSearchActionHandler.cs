@@ -5,12 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text.Json.Serialization;
 using Elasticsearch.Net;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 
 #pragma warning disable IDE0059 // Value assigned to symbol is never used
 #pragma warning disable MA0048 // File name must match type name
@@ -21,8 +22,9 @@ namespace Squidex.Extensions.Actions.ElasticSearch
     {
         private readonly ClientPool<(Uri Host, string Username, string Password), ElasticLowLevelClient> clients;
         private readonly IScriptEngine scriptEngine;
+        private readonly IJsonSerializer serializer;
 
-        public ElasticSearchActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine)
+        public ElasticSearchActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine, IJsonSerializer serializer)
             : base(formatter)
         {
             clients = new ClientPool<(Uri Host, string Username, string Password), ElasticLowLevelClient>(key =>
@@ -38,6 +40,7 @@ namespace Squidex.Extensions.Actions.ElasticSearch
             });
 
             this.scriptEngine = scriptEngine;
+            this.serializer = serializer;
         }
 
         protected override async Task<(string Description, ElasticSearchJob Data)> CreateJobAsync(EnrichedEvent @event, ElasticSearchAction action)
@@ -73,7 +76,7 @@ namespace Squidex.Extensions.Actions.ElasticSearch
             {
                 ruleDescription = $"Upsert to index: {action.IndexName}";
 
-                JObject json;
+                ElasticContent content;
                 try
                 {
                     string jsonString;
@@ -88,16 +91,22 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                         jsonString = ToJson(@event);
                     }
 
-                    json = JObject.Parse(jsonString);
+                    content = serializer.Deserialize<ElasticContent>(jsonString);
                 }
                 catch (Exception ex)
                 {
-                    json = new JObject(new JProperty("error", $"Invalid JSON: {ex.Message}"));
+                    content = new ElasticContent
+                    {
+                        More = new Dictionary<string, object>
+                        {
+                            ["error"] = $"Invalid JSON: {ex.Message}"
+                        }
+                    };
                 }
 
-                json.AddFirst(new JProperty("contentId", contentId));
+                content.ContentId = contentId;
 
-                ruleJob.Content = json.ToString();
+                ruleJob.Content = serializer.Serialize(content, true);
             }
 
             return (ruleDescription, ruleJob);
@@ -133,6 +142,14 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                 return Result.Failed(ex);
             }
         }
+    }
+
+    public sealed class ElasticContent
+    {
+        public string ContentId { get; set; }
+
+        [JsonExtensionData]
+        public Dictionary<string, object> More { get; set; } = new Dictionary<string, object>();
     }
 
     public sealed class ElasticSearchJob

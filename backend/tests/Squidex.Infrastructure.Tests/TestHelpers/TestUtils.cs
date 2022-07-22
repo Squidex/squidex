@@ -14,14 +14,12 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Json.System;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
-using Squidex.Infrastructure.Reflection;
 
 #pragma warning disable SYSLIB0011 // Type or member is obsolete
 
@@ -80,6 +78,7 @@ namespace Squidex.Infrastructure.TestHelpers
             options.Converters.Add(new StringConverter<RefToken>());
             options.Converters.Add(new JsonStringEnumConverter());
             options.Converters.AddRange(converters);
+            options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 
             return options;
         }

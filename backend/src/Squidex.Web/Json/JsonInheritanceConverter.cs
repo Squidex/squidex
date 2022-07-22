@@ -67,6 +67,11 @@ namespace Squidex.Web.Json
 
         private readonly IReadOnlyDictionary<string, Type> mapping;
 
+        public JsonInheritanceConverter()
+            : this(null, DefaultMapping.Value)
+        {
+        }
+
         public JsonInheritanceConverter(string? discriminatorName)
             : this(discriminatorName, DefaultMapping.Value)
         {

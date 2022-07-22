@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.MongoDb
 
             using (var writer = new Utf8JsonWriter(stream))
             {
-                Convert(bsonReader, writer);
+                FromBson(bsonReader, writer);
             }
 
             stream.Position = 0;
@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.MongoDb
             return JsonSerializer.Deserialize<T>(stream, BsonJsonConvention.Options);
         }
 
-        private static void Convert(IBsonReader reader, Utf8JsonWriter writer)
+        private static void FromBson(IBsonReader reader, Utf8JsonWriter writer)
         {
             void ReadDocument()
             {
@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure.MongoDb
                         Read();
                         break;
                     case BsonReaderState.Name:
-                        writer.WritePropertyName(reader.ReadName());
+                        writer.WritePropertyName(reader.ReadName().UnescapeBson());
                         Read();
                         break;
                     case BsonReaderState.Value:
@@ -87,6 +87,10 @@ namespace Squidex.Infrastructure.MongoDb
                             case BsonType.Null:
                                 reader.ReadNull();
                                 writer.WriteNullValue();
+                                break;
+                            case BsonType.Binary:
+                                var valueBinary = reader.ReadBinaryData();
+                                writer.WriteBase64StringValue(valueBinary.Bytes.AsSpan());
                                 break;
                             case BsonType.Boolean:
                                 var valueBoolean = reader.ReadBoolean();
@@ -173,7 +177,7 @@ namespace Squidex.Infrastructure.MongoDb
 
                     foreach (var property in element.EnumerateObject())
                     {
-                        writer.WriteName(property.Name);
+                        writer.WriteName(property.Name.EscapeJson());
                         WriteElement(writer, property.Value);
                     }
 

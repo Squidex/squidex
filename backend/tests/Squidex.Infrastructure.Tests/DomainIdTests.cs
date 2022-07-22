@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.ComponentModel;
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using FluentAssertions;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure
 
         public class MyTest
         {
-            [IgnoreDataMember]
+            [JsonIgnore]
             public DomainId Calculated
             {
                 get => DomainId.Combine(Id0, Id1.Id);

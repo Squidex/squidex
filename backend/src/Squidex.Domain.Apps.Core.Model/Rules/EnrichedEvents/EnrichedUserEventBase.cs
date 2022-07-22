@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 
@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
         [FieldDescription(nameof(FieldDescriptions.Actor))]
         public RefToken Actor { get; set; }
 
-        [FieldDescription(nameof(FieldDescriptions.User)), IgnoreDataMember]
+        [FieldDescription(nameof(FieldDescriptions.User)), JsonIgnore]
         public IUser? User { get; set; }
 
         public bool ShouldSerializeUser()

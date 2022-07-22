@@ -51,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers
 
             if (JsonQuery != null)
             {
-                result = result.WithJsonQuery(JsonQuery.ToString());
+                result = result.WithJsonQuery(JsonQuery.RootElement.ToString());
             }
 
             return result;

@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
@@ -30,31 +30,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             public bool IsDeleted { get; set; }
 
-            [IgnoreDataMember]
+            [JsonIgnore]
             public DomainId UniqueId
             {
                 get => DomainId.Combine(AppId, Id);
             }
 
-            [IgnoreDataMember]
+            [JsonIgnore]
             public ContentData Data
             {
                 get => NewVersion?.Data ?? CurrentData;
             }
 
-            [IgnoreDataMember]
+            [JsonIgnore]
             public ContentData CurrentData
             {
                 get => CurrentVersion.Data;
             }
 
-            [IgnoreDataMember]
+            [JsonIgnore]
             public Status? NewStatus
             {
                 get => NewVersion?.Status;
             }
 
-            [IgnoreDataMember]
+            [JsonIgnore]
             public Status Status
             {
                 get => CurrentVersion?.Status ?? default;
