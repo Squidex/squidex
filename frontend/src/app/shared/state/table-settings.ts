@@ -10,14 +10,14 @@ import { State, Types } from '@app/framework';
 import { MetaFields, SchemaDto, TableField } from './../services/schemas.service';
 import { UIState } from './ui.state';
 
-const META_FIELD_NAMES = Object.values(MetaFields);
+const META_FIELD_NAMES = Object.values(MetaFields).filter(x => x !== MetaFields.empty);
 
 export type FieldSizes = { [name: string]: number };
 export type FieldWrappings = { [name: string]: boolean };
 
 interface Snapshot {
     // The table fields in the right order.
-    fields: ReadonlyArray<string>;
+    fields: ReadonlyArray<TableField>;
 
     // The sizes of the columns if overriden.
     sizes: FieldSizes;
@@ -29,8 +29,8 @@ interface Snapshot {
 export class TableSettings extends State<Snapshot> {
     private readonly settingsKey: string;
 
-    public readonly schemaFields: ReadonlyArray<string>;
-    public readonly schemaDefaults: ReadonlyArray<string>;
+    public readonly schemaFields: ReadonlyArray<TableField>;
+    public readonly schemaDefaults: ReadonlyArray<TableField>;
 
     public fieldSizes =
         this.project(x => x.sizes);
@@ -41,11 +41,8 @@ export class TableSettings extends State<Snapshot> {
     public fields =
         this.project(x => x.fields);
 
-    public listFieldNames =
-        this.projectFrom(this.fields, x => this.getListFieldNames(x));
-
     public listFields =
-        this.projectFrom(this.listFieldNames, x => this.getListFields(x));
+        this.projectFrom(this.fields, x => x.length > 0 ? x : this.schemaDefaults);
 
     constructor(
         private readonly uiState: UIState,
@@ -53,8 +50,8 @@ export class TableSettings extends State<Snapshot> {
     ) {
         super({ fields: [], sizes: {}, wrappings: {} });
 
-        this.schemaFields = [...schema.contentFields.map(x => x.name), ...META_FIELD_NAMES].sort();
-        this.schemaDefaults = schema.defaultListFields.map(x => x['name'] || x);
+        this.schemaFields = [...schema.contentFields, ...META_FIELD_NAMES];
+        this.schemaDefaults = schema.defaultListFields;
 
         this.settingsKey = `schemas.${this.schema.name}.config`;
 
@@ -112,8 +109,8 @@ export class TableSettings extends State<Snapshot> {
         }
     }
 
-    public updateFields(fields: ReadonlyArray<string>, save = true) {
-        this.publishFields(fields);
+    public updateFields(fields: ReadonlyArray<TableField>, save = true) {
+        this.publishFields(fields.map(x => x.name));
 
         if (save) {
             this.saveConfig();
@@ -128,8 +125,10 @@ export class TableSettings extends State<Snapshot> {
         this.next({ wrappings });    
     }
 
-    private publishFields(fields: ReadonlyArray<string>) {
-        this.next({ fields: fields.filter(x => this.schemaFields.includes(x)) });
+    private publishFields(names: ReadonlyArray<string>) {
+        const fields = names.map(n => this.schemaFields.find(f => f.name === n)).filter(x => !!x) as any;
+
+        this.next({ fields });
     }
 
     private saveConfig() {
@@ -138,15 +137,9 @@ export class TableSettings extends State<Snapshot> {
         if (Object.keys(sizes).length === 0 && Object.keys(wrappings).length === 0 && fields.length === 0) {
             this.uiState.removeUser(this.settingsKey);                
         } else {
-            this.uiState.set(this.settingsKey, this.snapshot, true);
+            const update = { sizes, wrappings, fields: fields.map(x => x.name) };
+
+            this.uiState.set(this.settingsKey, update, true);
         }
-    }
-
-    private getListFields(names: ReadonlyArray<string>): ReadonlyArray<TableField> {
-        return names.map(n => this.schema.fields.find(f => f.name === n) || n);
-    }
-
-    private getListFieldNames(names: ReadonlyArray<string>): ReadonlyArray<string> {
-        return names.length === 0 ? this.schemaDefaults : names;
     }
 }

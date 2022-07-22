@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { LanguageDto, MetaFields, Query, RootFieldDto, TableField, Types } from '@app/shared/internal';
+import { LanguageDto, MetaFields, Query, TableField } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-content-list-header[field][language]',
@@ -15,6 +15,8 @@ import { LanguageDto, MetaFields, Query, RootFieldDto, TableField, Types } from 
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentListHeaderComponent {
+    public readonly metaFields = MetaFields;
+
     @Input()
     public field!: TableField;
 
@@ -27,26 +29,14 @@ export class ContentListHeaderComponent {
     @Input()
     public language!: LanguageDto;
 
-    public get metaFields() {
-        return MetaFields;
-    }
-
     public get isSortable() {
-        return Types.is(this.field, RootFieldDto) ? this.field.properties.isSortable : false;
-    }
-
-    public get fieldName() {
-        return Types.is(this.field, RootFieldDto) ? this.field.name : this.field;
-    }
-
-    public get fieldDisplayName() {
-        return Types.is(this.field, RootFieldDto) ? this.field.displayName : '';
+        return this.field.rootField?.properties.isSortable === true;
     }
 
     public get fieldPath() {
-        if (Types.isString(this.field)) {
-            return this.field;
-        } else if (this.field.isLocalizable && this.language) {
+        if (!this.field.rootField) {
+            return this.field.name;
+        } else if (this.field.rootField.isLocalizable && this.language) {
             return `data.${this.field.name}.${this.language.iso2Code}`;
         } else {
             return `data.${this.field.name}.iv`;
