@@ -100,6 +100,11 @@ jobs:
         with:
           cmd: yq e '.services.squidex2.image = "squidex-tmp"' -i backend/tests/docker-compose.yml
 
+      - name: Replace Image Name3
+        uses: mikefarah/yq@v4.9.1
+        with:
+          cmd: yq e '.services.squidex3.image = "squidex-tmp"' -i backend/tests/docker-compose.yml
+
       - name: Start Test
         run: docker-compose up -d
         working-directory: backend/tests
