@@ -125,6 +125,20 @@ services:
     networks:
       - internal
     restart: unless-stopped
+
+  squidex_proxy3:
+    image: squidex/caddy-proxy-path
+    ports:
+      - "8082:8082"
+    environment:
+      - SITE_ADDRESS=http://localhost:8082
+      - SITE_PATH=*
+      - SITE_SERVER="squidex3:5000"
+    depends_on:
+      - squidex2
+    networks:
+      - internal
+    restart: unless-stopped
     
 networks:
   internal:
