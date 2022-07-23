@@ -109,19 +109,14 @@
 						<ng-container *ngSwitchCase="'Stars'">
 							<sqx-stars [formControl]="$any(fieldForm)" [maximumStars]="field.rawProperties.maxValue"></sqx-stars>
 						</ng-container>
+						<ng-container *ngSwitchCase="'Radio'">
+                            <sqx-radio-group [formControl]="$any(fieldForm)" [values]="field.rawProperties.allowedValues" [unsorted]="true"></sqx-radio-group>
+						</ng-container>
 						<ng-container *ngSwitchCase="'Dropdown'">
 							<select class="form-select" [formControl]="$any(fieldForm)">
 								<option [ngValue]="null"></option>
 								<option *ngFor="let value of field.rawProperties.allowedValues" [ngValue]="value">{{value}}</option>
 							</select>
-						</ng-container>
-						<ng-container *ngSwitchCase="'Radio'">
-							<div class="form-check" *ngFor="let value of field.rawProperties.allowedValues">
-								<input class="form-check-input" type="radio" [value]="value" [formControl]="$any(fieldForm)" [name]="uniqueId" id="{{uniqueId}}_{{value}}">
-								<label class="form-check-label" for="{{uniqueId}}_{{value}}">
-									{{value}}
-								</label>
-							</div>
 						</ng-container>
 					</ng-container>
 				</ng-container>
@@ -212,12 +207,7 @@
 							</select>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Radio'">
-							<div class="form-check form-check-inline" *ngFor="let value of field.rawProperties.allowedValues">
-								<input class="form-check-input" type="radio" [value]="value" [formControl]="$any(fieldForm)" [name]="uniqueId" id="{{uniqueId}}_{{value}}">
-								<label class="form-check-label" for="{{uniqueId}}_{{value}}">
-									{{value}}
-								</label>
-							</div>
+                            <sqx-radio-group [formControl]="$any(fieldForm)" [values]="field.rawProperties.allowedValues" [unsorted]="true"></sqx-radio-group>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Color'">
                             <sqx-color-picker [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder"></sqx-color-picker>
