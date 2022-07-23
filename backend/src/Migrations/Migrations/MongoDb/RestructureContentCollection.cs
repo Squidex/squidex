@@ -12,7 +12,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations.MongoDb
 {
-    public sealed class RestructureContentCollection : IMigration
+    public sealed class RestructureContentCollection : MongoBase<BsonDocument>, IMigration
     {
         private readonly IMongoDatabase contentDatabase;
 
@@ -28,6 +28,7 @@ namespace Migrations.Migrations.MongoDb
             {
                 await contentDatabase.DropCollectionAsync("State_Contents", ct);
                 await contentDatabase.DropCollectionAsync("State_Content_Published", ct);
+
                 await contentDatabase.RenameCollectionAsync("State_Content_Draft", "State_Contents", cancellationToken: ct);
             }
 
@@ -35,7 +36,7 @@ namespace Migrations.Migrations.MongoDb
             {
                 var collection = contentDatabase.GetCollection<BsonDocument>("State_Contents");
 
-                await collection.UpdateManyAsync(new BsonDocument(), Builders<BsonDocument>.Update.Unset("dt"), cancellationToken: ct);
+                await collection.UpdateManyAsync(FindAll, Update.Unset("dt"), cancellationToken: ct);
             }
         }
     }

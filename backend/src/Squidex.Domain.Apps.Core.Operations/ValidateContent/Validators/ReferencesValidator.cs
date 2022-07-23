@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
-    public delegate Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> CheckContentsByIds(HashSet<DomainId> ids);
+    public delegate Task<IReadOnlyList<ContentIdStatus>> CheckContentsByIds(HashSet<DomainId> ids);
 
     public sealed class ReferencesValidator : IValidator
     {

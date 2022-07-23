@@ -8,10 +8,11 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations.MongoDb
 {
-    public sealed class ConvertOldSnapshotStores : IMigration
+    public sealed class ConvertOldSnapshotStores : MongoBase<BsonDocument>, IMigration
     {
         private readonly IMongoDatabase database;
 
@@ -23,21 +24,17 @@ namespace Migrations.Migrations.MongoDb
         public Task UpdateAsync(
             CancellationToken ct)
         {
+            // Do not resolve in constructor, because most of the time it is not executed anyway.
             var collections = new[]
             {
                 "States_Apps",
                 "States_Rules",
                 "States_Schemas"
-            };
+            }.Select(x => database.GetCollection<BsonDocument>(x));
 
-            var update = Builders<BsonDocument>.Update.Rename("State", "Doc");
+            var update = Update.Rename("State", "Doc");
 
-            var filter = new BsonDocument();
-
-            return Task.WhenAll(
-                collections
-                    .Select(x => database.GetCollection<BsonDocument>(x))
-                    .Select(x => x.UpdateManyAsync(filter, update, cancellationToken: ct)));
+            return Task.WhenAll(collections.Select(x => x.UpdateManyAsync(FindAll, update, cancellationToken: ct)));
         }
     }
 }

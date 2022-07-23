@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Migrations.Migrations.MongoDb
 {
-    public sealed class ConvertDocumentIds : IMigration
+    public sealed class ConvertDocumentIds : MongoBase<BsonDocument>, IMigration
     {
         private readonly IMongoDatabase database;
         private readonly IMongoDatabase databaseContent;
@@ -80,6 +80,7 @@ namespace Migrations.Migrations.MongoDb
             collectionNameV2 = $"{collectionNameV1}2";
             collectionNameV2 = collectionNameV2.Replace("State_", "States_", StringComparison.Ordinal);
 
+            // Do not resolve in constructor, because most of the time it is not executed anyway.
             var collectionV1 = database.GetCollection<BsonDocument>(collectionNameV1);
             var collectionV2 = database.GetCollection<BsonDocument>(collectionNameV2);
 
@@ -88,7 +89,7 @@ namespace Migrations.Migrations.MongoDb
                 return;
             }
 
-            await collectionV2.DeleteManyAsync(new BsonDocument(), ct);
+            await collectionV2.DeleteManyAsync(FindAll, ct);
 
             var batchBlock = new BatchBlock<BsonDocument>(SizeOfBatch, new GroupingDataflowBlockOptions
             {
@@ -126,7 +127,7 @@ namespace Migrations.Migrations.MongoDb
 
                         extraAction?.Invoke(document);
 
-                        var filter = Builders<BsonDocument>.Filter.Eq("_id", documentIdNew);
+                        var filter = Filter.Eq("_id", documentIdNew);
 
                         writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
                         {
@@ -153,7 +154,7 @@ namespace Migrations.Migrations.MongoDb
 
             batchBlock.BidirectionalLinkTo(actionBlock);
 
-            await foreach (var document in collectionV1.Find(new BsonDocument()).ToAsyncEnumerable(ct: ct))
+            await foreach (var document in collectionV1.Find(FindAll).ToAsyncEnumerable(ct: ct))
             {
                 if (!await batchBlock.SendAsync(document, ct))
                 {

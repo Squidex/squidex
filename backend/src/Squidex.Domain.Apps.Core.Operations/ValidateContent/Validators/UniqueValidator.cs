@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
-    public delegate Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> CheckUniqueness(FilterNode<ClrValue> filter);
+    public delegate Task<IReadOnlyList<ContentIdStatus>> CheckUniqueness(FilterNode<ClrValue> filter);
 
     public sealed class UniqueValidator : IValidator
     {

@@ -10,28 +10,14 @@ using MongoDB.Driver;
 using Squidex.Hosting;
 using Squidex.Hosting.Configuration;
 
-#pragma warning disable RECS0108 // Warns about static fields in generic types
-
 namespace Squidex.Infrastructure.MongoDb
 {
-    public abstract class MongoRepositoryBase<TEntity> : IInitializable
+    public abstract class MongoRepositoryBase<T> : MongoBase<T>, IInitializable
     {
-        private const string CollectionFormat = "{0}Set";
-
-        protected static readonly BulkWriteOptions BulkUnordered = new BulkWriteOptions { IsOrdered = true };
-        protected static readonly FilterDefinitionBuilder<TEntity> Filter = Builders<TEntity>.Filter;
-        protected static readonly IndexKeysDefinitionBuilder<TEntity> Index = Builders<TEntity>.IndexKeys;
-        protected static readonly InsertManyOptions InsertUnordered = new InsertManyOptions { IsOrdered = true };
-        protected static readonly ProjectionDefinitionBuilder<TEntity> Projection = Builders<TEntity>.Projection;
-        protected static readonly ReplaceOptions UpsertReplace = new ReplaceOptions { IsUpsert = true };
-        protected static readonly SortDefinitionBuilder<TEntity> Sort = Builders<TEntity>.Sort;
-        protected static readonly UpdateDefinitionBuilder<TEntity> Update = Builders<TEntity>.Update;
-        protected static readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
-
         private readonly IMongoDatabase mongoDatabase;
-        private IMongoCollection<TEntity> mongoCollection;
+        private IMongoCollection<T> mongoCollection;
 
-        protected IMongoCollection<TEntity> Collection
+        protected IMongoCollection<T> Collection
         {
             get
             {
@@ -69,10 +55,10 @@ namespace Squidex.Infrastructure.MongoDb
 
         protected virtual string CollectionName()
         {
-            return string.Format(CultureInfo.InvariantCulture, CollectionFormat, typeof(TEntity).Name);
+            return string.Format(CultureInfo.InvariantCulture, "{0}Set", typeof(T).Name);
         }
 
-        protected virtual Task SetupCollectionAsync(IMongoCollection<TEntity> collection,
+        protected virtual Task SetupCollectionAsync(IMongoCollection<T> collection,
             CancellationToken ct)
         {
             return Task.CompletedTask;
@@ -117,7 +103,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         private void CreateCollection()
         {
-            mongoCollection = mongoDatabase.GetCollection<TEntity>(
+            mongoCollection = mongoDatabase.GetCollection<T>(
                 CollectionName(),
                 CollectionSettings() ?? new MongoCollectionSettings());
         }

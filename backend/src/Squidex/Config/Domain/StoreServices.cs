@@ -58,15 +58,6 @@ namespace Squidex.Config.Domain
             {
                 ["MongoDB"] = () =>
                 {
-                    BsonDomainIdSerializer.Register();
-                    BsonInstantSerializer.Register();
-                    BsonJsonConvention.Register();
-                    BsonJsonValueSerializer.Register();
-                    BsonStringSerializer<RefToken>.Register();
-                    BsonStringSerializer<NamedId<DomainId>>.Register();
-                    BsonStringSerializer<NamedId<Guid>>.Register();
-                    BsonStringSerializer<NamedId<string>>.Register();
-
                     var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
                     var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
                     var mongoContentDatabaseName = config.GetOptionalValue("store:mongoDb:contentDatabase", mongoDatabaseName);

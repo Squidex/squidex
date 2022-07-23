@@ -25,6 +25,7 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Json.System;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Reflection;
@@ -34,6 +35,19 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
     public static class TestUtils
     {
         public static readonly IJsonSerializer DefaultSerializer = CreateSerializer();
+
+        static TestUtils()
+        {
+            SetupBson();
+        }
+
+        public static void SetupBson()
+        {
+            BsonDomainIdSerializer.Register();
+            BsonInstantSerializer.Register();
+            BsonJsonConvention.Register(DefaultOptions());
+            BsonJsonValueSerializer.Register();
+        }
 
         public static IJsonSerializer CreateSerializer(params JsonConverter[] converters)
         {

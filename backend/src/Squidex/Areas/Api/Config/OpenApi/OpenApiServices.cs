@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
+using System.Text.Json;
 
 namespace Squidex.Areas.Api.Config.OpenApi
 {
@@ -112,6 +113,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 CreateObjectMap<JsonObject>(),
                 CreateObjectMap<AssetMetadata>(),
 
+                CreateAnyMap<JsonDocument>(),
                 CreateAnyMap<JsonValue>(),
                 CreateAnyMap<FilterNode<JsonValue>>()
             };

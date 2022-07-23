@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -19,9 +20,9 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
-    public partial class MongoContentRepository : IContentRepository, IInitializable
+    public partial class MongoContentRepository : MongoBase<MongoContentEntity>, IContentRepository, IInitializable
     {
-        private readonly MongoContentCollection collectionFrontend;
+        private readonly MongoContentCollection collectionComplete;
         private readonly MongoContentCollection collectionPublished;
         private readonly IAppProvider appProvider;
 
@@ -30,15 +31,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             BsonStringSerializer<Status>.Register();
         }
 
-        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider)
+        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider,
+            IOptions<ContentOptions> options)
         {
-            collectionFrontend =
-                new MongoContentCollection("States_Contents_All3", database, appProvider,
-                    ReadPreference.Primary);
+            collectionComplete =
+                new MongoContentCollection("States_Contents_All3", database,
+                    ReadPreference.Primary, options.Value.OptimizeForSelfHosting);
 
             collectionPublished =
-                new MongoContentCollection("States_Contents_Published3", database, appProvider,
-                    ReadPreference.Secondary);
+                new MongoContentCollection("States_Contents_Published3", database,
+                    ReadPreference.Secondary, options.Value.OptimizeForSelfHosting);
 
             this.appProvider = appProvider;
         }
@@ -46,20 +48,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task InitializeAsync(
             CancellationToken ct)
         {
-            await collectionFrontend.InitializeAsync(ct);
+            await collectionComplete.InitializeAsync(ct);
             await collectionPublished.InitializeAsync(ct);
         }
 
         public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
             CancellationToken ct = default)
         {
-            return collectionFrontend.StreamAll(appId, schemaIds, ct);
+            return collectionComplete.StreamAll(appId, schemaIds, ct);
         }
 
         public IAsyncEnumerable<IContentEntity> QueryScheduledWithoutDataAsync(Instant now,
             CancellationToken ct = default)
         {
-            return collectionFrontend.QueryScheduledWithoutDataAsync(now, ct);
+            return collectionComplete.QueryScheduledWithoutDataAsync(now, ct);
         }
 
         public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q, SearchScope scope,
@@ -67,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             if (scope == SearchScope.All)
             {
-                return collectionFrontend.QueryAsync(app, schemas, q, ct);
+                return collectionComplete.QueryAsync(app, schemas, q, ct);
             }
             else
             {
@@ -80,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             if (scope == SearchScope.All)
             {
-                return collectionFrontend.QueryAsync(app, schema, q, ct);
+                return collectionComplete.QueryAsync(app, schema, q, ct);
             }
             else
             {
@@ -93,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             if (scope == SearchScope.All)
             {
-                return collectionFrontend.FindContentAsync(schema, id, ct);
+                return collectionComplete.FindContentAsync(schema, id, ct);
             }
             else
             {
@@ -101,12 +103,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids, SearchScope scope,
+        public Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids, SearchScope scope,
             CancellationToken ct = default)
         {
             if (scope == SearchScope.All)
             {
-                return collectionFrontend.QueryIdsAsync(appId, ids, ct);
+                return collectionComplete.QueryIdsAsync(appId, ids, ct);
             }
             else
             {
@@ -119,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             if (scope == SearchScope.All)
             {
-                return collectionFrontend.HasReferrersAsync(appId, contentId, ct);
+                return collectionComplete.HasReferrersAsync(appId, contentId, ct);
             }
             else
             {
@@ -130,19 +132,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public Task ResetScheduledAsync(DomainId documentId,
             CancellationToken ct = default)
         {
-            return collectionFrontend.ResetScheduledAsync(documentId, ct);
+            return collectionComplete.ResetScheduledAsync(documentId, ct);
         }
 
-        public Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
+        public Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
             CancellationToken ct = default)
         {
-            return collectionFrontend.QueryIdsAsync(appId, schemaId, filterNode, ct);
-        }
-
-        public IEnumerable<IMongoCollection<MongoContentEntity>> GetInternalCollections()
-        {
-            yield return collectionFrontend.GetInternalCollection();
-            yield return collectionPublished.GetInternalCollection();
+            return collectionComplete.QueryIdsAsync(appId, schemaId, filterNode, ct);
         }
     }
 }

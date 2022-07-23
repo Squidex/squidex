@@ -10,10 +10,11 @@ using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations
 {
-    public sealed class ConvertEventStoreAppId : IMigration
+    public sealed class ConvertEventStoreAppId : MongoBase<BsonDocument>, IMigration
     {
         private readonly IEventStore eventStore;
 
@@ -27,17 +28,10 @@ namespace Migrations.Migrations
         {
             if (eventStore is MongoEventStore mongoEventStore)
             {
+                // Do not resolve in constructor, because most of the time it is not executed anyway.
                 var collection = mongoEventStore.RawCollection;
 
-                var filter = Builders<BsonDocument>.Filter;
-
-                var updates = Builders<BsonDocument>.Update;
-
                 var writes = new List<WriteModel<BsonDocument>>();
-                var writeOptions = new BulkWriteOptions
-                {
-                    IsOrdered = false
-                };
 
                 async Task WriteAsync(WriteModel<BsonDocument>? model, bool force)
                 {
@@ -48,13 +42,12 @@ namespace Migrations.Migrations
 
                     if (writes.Count == 1000 || (force && writes.Count > 0))
                     {
-                        await collection.BulkWriteAsync(writes, writeOptions, ct);
-
+                        await collection.BulkWriteAsync(writes, BulkUnordered, ct);
                         writes.Clear();
                     }
                 }
 
-                await collection.Find(new BsonDocument()).ForEachAsync(async commit =>
+                await collection.Find(FindAll).ForEachAsync(async commit =>
                 {
                     UpdateDefinition<BsonDocument>? update = null;
 
@@ -68,11 +61,11 @@ namespace Migrations.Migrations
                         {
                             var appId = NamedId<Guid>.Parse(appIdValue.AsString, Guid.TryParse).Id.ToString();
 
-                            var eventUpdate = updates.Set($"Events.{index}.Metadata.AppId", appId);
+                            var eventUpdate = Update.Set($"Events.{index}.Metadata.AppId", appId);
 
                             if (update != null)
                             {
-                                update = updates.Combine(update, eventUpdate);
+                                update = Update.Combine(update, eventUpdate);
                             }
                             else
                             {
@@ -85,7 +78,7 @@ namespace Migrations.Migrations
 
                     if (update != null)
                     {
-                        var write = new UpdateOneModel<BsonDocument>(filter.Eq("_id", commit["_id"].AsString), update);
+                        var write = new UpdateOneModel<BsonDocument>(Filter.Eq("_id", commit["_id"].AsString), update);
 
                         await WriteAsync(write, false);
                     }

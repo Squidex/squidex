@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -14,28 +13,15 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
-using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryByQuery : OperationBase
     {
-        private readonly IAppProvider appProvider;
         private readonly MongoCountCollection countCollection;
 
-        [BsonIgnoreExtraElements]
-        internal sealed class IdOnly
+        public QueryByQuery(MongoCountCollection countCollection)
         {
-            [BsonId]
-            [BsonElement("_id")]
-            public DomainId Id { get; set; }
-
-            public MongoContentEntity[] Joined { get; set; }
-        }
-
-        public QueryByQuery(IAppProvider appProvider, MongoCountCollection countCollection)
-        {
-            this.appProvider = appProvider;
             this.countCollection = countCollection;
         }
 
@@ -55,171 +41,92 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 .Descending(x => x.LastModified));
         }
 
-        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
+        public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
             CancellationToken ct)
         {
-            Guard.NotNull(filterNode);
+            // We need to translate the query names to the document field names in MongoDB.
+            var adjustedFilter = filterNode.AdjustToModel(appId);
 
-            try
-            {
-                var schema = await appProvider.GetSchemaAsync(appId, schemaId, ct: ct);
+            var filter = BuildFilter(appId, schemaId, adjustedFilter);
 
-                if (schema == null)
-                {
-                    return new List<(DomainId SchemaId, DomainId Id, Status Status)>();
-                }
+            var contentEntities = await Collection.FindStatusAsync(filter, ct);
+            var contentResults = contentEntities.Select(x => new ContentIdStatus(x.IndexedSchemaId, x.Id, x.Status)).ToList();
 
-                var filter = BuildFilter(appId, schemaId, filterNode.AdjustToModel(appId));
-
-                var contentItems = await Collection.FindStatusAsync(filter, ct);
-
-                return contentItems.Select(x => (x.IndexedSchemaId, x.Id, x.Status)).ToList();
-            }
-            catch (MongoCommandException ex) when (ex.Code == 96)
-            {
-                throw new DomainException(T.Get("common.resultTooLarge"));
-            }
-            catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
-            {
-                throw new DomainException(T.Get("common.resultTooLarge"));
-            }
+            return contentResults;
         }
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q,
             CancellationToken ct)
         {
-            Guard.NotNull(app);
-            Guard.NotNull(q);
+            // We need to translate the query names to the document field names in MongoDB.
+            var query = q.Query.AdjustToModel(app.Id);
 
-            try
+            var (filter, isDefault) = CreateFilter(app.Id, schemas.Select(x => x.Id), query, q.Reference, q.CreatedBy);
+
+            var contentEntities = await Collection.QueryContentsAsync(filter, query, ct);
+            var contentTotal = (long)contentEntities.Count;
+
+            if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
             {
-                var query = q.Query.AdjustToModel(app.Id);
-
-                var (filter, isDefault) = CreateFilter(app.Id, schemas.Select(x => x.Id), query, q.Reference, q.CreatedBy);
-
-                var contentEntities = await FindContentsAsync(query, filter, ct);
-                var contentTotal = (long)contentEntities.Count;
-
-                if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
+                if (q.NoTotal || (q.NoSlowTotal && q.Query.Filter != null))
                 {
-                    if (q.NoTotal || (q.NoSlowTotal && q.Query.Filter != null))
-                    {
-                        contentTotal = -1;
-                    }
-                    else if (IsSatisfiedByIndex(query))
-                    {
-                        contentTotal = await Collection.Find(filter).QuerySort(query).CountDocumentsAsync(ct);
-                    }
-                    else
-                    {
-                        contentTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
-                    }
+                    contentTotal = -1;
                 }
+                else if (query.IsSatisfiedByIndex())
+                {
+                    // It is faster to filter with sorting when there is an index, because it forces the index to be used.
+                    contentTotal = await Collection.Find(filter).QuerySort(query).CountDocumentsAsync(ct);
+                }
+                else
+                {
+                    contentTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
+                }
+            }
 
-                return ResultList.Create<IContentEntity>(contentTotal, contentEntities);
-            }
-            catch (MongoCommandException ex) when (ex.Code == 96)
-            {
-                throw new DomainException(T.Get("common.resultTooLarge"));
-            }
-            catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
-            {
-                throw new DomainException(T.Get("common.resultTooLarge"));
-            }
+            return ResultList.Create<IContentEntity>(contentTotal, contentEntities);
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q,
+        public async Task<IResultList<IContentEntity>> QueryAsync(ISchemaEntity schema, Q q,
             CancellationToken ct)
         {
-            Guard.NotNull(app);
-            Guard.NotNull(schema);
-            Guard.NotNull(q);
+            // We need to translate the query names to the document field names in MongoDB.
+            var query = q.Query.AdjustToModel(schema.AppId.Id);
 
-            try
+            // Default means that no other filters are applied and we only query by app and schema.
+            var (filter, isDefault) = CreateFilter(schema.AppId.Id, Enumerable.Repeat(schema.Id, 1), query, q.Reference, q.CreatedBy);
+
+            var contentEntities = await Collection.QueryContentsAsync(filter, query, ct);
+            var contentTotal = (long)contentEntities.Count;
+
+            if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
             {
-                var query = q.Query.AdjustToModel(app.Id);
-
-                var (filter, isDefault) = CreateFilter(schema.AppId.Id, Enumerable.Repeat(schema.Id, 1), query, q.Reference, q.CreatedBy);
-
-                var contentEntities = await FindContentsAsync(query, filter, ct);
-                var contentTotal = (long)contentEntities.Count;
-
-                if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
+                if (q.NoTotal || (q.NoSlowTotal && q.Query.Filter != null))
                 {
-                    if (q.NoTotal || (q.NoSlowTotal && q.Query.Filter != null))
-                    {
-                        contentTotal = -1;
-                    }
-                    else if (isDefault)
-                    {
-                        // Cache total count by app and schema.
-                        var totalKey = $"{app.Id}_{schema.Id}";
-
-                        contentTotal = await countCollection.GetOrAddAsync(totalKey, ct => Collection.Find(filter).CountDocumentsAsync(ct), ct);
-                    }
-                    else if (IsSatisfiedByIndex(query))
-                    {
-                        contentTotal = await Collection.Find(filter).QuerySort(query).CountDocumentsAsync(ct);
-                    }
-                    else
-                    {
-                        contentTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
-                    }
+                    contentTotal = -1;
                 }
-
-                return ResultList.Create<IContentEntity>(contentTotal, contentEntities);
-            }
-            catch (MongoCommandException ex) when (ex.Code == 96)
-            {
-                throw new DomainException(T.Get("common.resultTooLarge"));
-            }
-            catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
-            {
-                throw new DomainException(T.Get("common.resultTooLarge"));
-            }
-        }
-
-        private async Task<List<MongoContentEntity>> FindContentsAsync(ClrQuery query, FilterDefinition<MongoContentEntity> filter,
-            CancellationToken ct)
-        {
-            if (query.Skip > 0 && !IsSatisfiedByIndex(query))
-            {
-                var projection = Projection.Include("_id");
-
-                foreach (var field in query.GetAllFields())
+                else if (isDefault)
                 {
-                    projection = projection.Include(field);
+                    // Cache total count by app and schema because no other filters are applied (aka default).
+                    var totalKey = $"{schema.AppId.Id}_{schema.Id}";
+
+                    contentTotal = await countCollection.GetOrAddAsync(totalKey, ct => Collection.Find(filter).CountDocumentsAsync(ct), ct);
                 }
-
-                var joined =
-                    await Collection.Aggregate()
-                        .Match(filter)
-                        .Project<IdOnly>(projection)
-                        .QuerySort(query)
-                        .QuerySkip(query)
-                        .QueryLimit(query)
-                        .Lookup<IdOnly, MongoContentEntity, IdOnly>(Collection, x => x.Id, x => x.DocumentId, x => x.Joined)
-                        .ToListAsync(ct);
-
-                return joined.Select(x => x.Joined[0]).ToList();
+                else if (query.IsSatisfiedByIndex())
+                {
+                    // It is faster to filter with sorting when there is an index, because it forces the index to be used.
+                    contentTotal = await Collection.Find(filter).QuerySort(query).CountDocumentsAsync(ct);
+                }
+                else
+                {
+                    contentTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
+                }
             }
 
-            var result =
-                Collection.Find(filter)
-                    .QuerySort(query)
-                    .QueryLimit(query)
-                    .QuerySkip(query)
-                    .ToListAsync(ct);
-
-            return await result;
+            return ResultList.Create<IContentEntity>(contentTotal, contentEntities);
         }
 
-        private static bool IsSatisfiedByIndex(ClrQuery query)
-        {
-            return query.Sort is { Count: 2 } && query.Sort[0].Path.ToString() == "mt" && query.Sort[0].Order == SortOrder.Descending && query.Sort[1].Path.ToString() == "id" && query.Sort[1].Order == SortOrder.Ascending;
-        }
-
-        private static FilterDefinition<MongoContentEntity> BuildFilter(DomainId appId, DomainId schemaId, FilterNode<ClrValue>? filter)
+        private static FilterDefinition<MongoContentEntity> BuildFilter(DomainId appId, DomainId schemaId,
+            FilterNode<ClrValue>? filter)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
@@ -242,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return Filter.And(filters);
         }
 
-        private static (FilterDefinition<MongoContentEntity>, bool) CreateFilter(DomainId appId, IEnumerable<DomainId> schemaIds,  ClrQuery? query,
+        private static (FilterDefinition<MongoContentEntity>, bool) CreateFilter(DomainId appId, IEnumerable<DomainId> schemaIds, ClrQuery? query,
             DomainId referenced, RefToken? createdBy)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>

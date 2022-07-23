@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return entity;
         }
 
-        public static async Task<MongoContentEntity> CreateDraftAsync(SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider)
+        public static async Task<MongoContentEntity> CreateAsync(SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider)
         {
             var entity = await CreateContentAsync(job.Value.Data, job, appProvider);
 

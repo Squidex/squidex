@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 .Returns(new List<DomainId> { id2 });
 
             A.CallTo(() => contentRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All, A<CancellationToken>._))
-                .Returns(new List<(DomainId, DomainId, Status)> { (id2, id2, Status.Published) });
+                .Returns(new List<ContentIdStatus> { new ContentIdStatus(id2, id2, Status.Published) });
 
             var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 .Returns(new List<DomainId>());
 
             A.CallTo(() => contentRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All, A<CancellationToken>._))
-                .Returns(new List<(DomainId, DomainId, Status)>());
+                .Returns(new List<ContentIdStatus>());
 
             var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 

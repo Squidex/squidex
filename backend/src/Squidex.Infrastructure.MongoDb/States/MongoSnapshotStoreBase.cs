@@ -91,7 +91,7 @@ namespace Squidex.Infrastructure.States
         {
             using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/ReadAllAsync"))
             {
-                var find = Collection.Find(new BsonDocument(), Batching.Options);
+                var find = Collection.Find(FindAll, Batching.Options);
 
                 await foreach (var document in find.ToAsyncEnumerable(ct))
                 {

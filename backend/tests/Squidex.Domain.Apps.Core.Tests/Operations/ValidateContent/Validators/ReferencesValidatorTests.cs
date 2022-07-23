@@ -219,9 +219,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             return x =>
             {
-                var result = references.Select(x => (schemaId, x.Id, x.Status)).ToList();
+                var result = references.Select(x => new ContentIdStatus(schemaId, x.Id, x.Status)).ToList();
 
-                return Task.FromResult<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>>(result);
+                return Task.FromResult<IReadOnlyList<ContentIdStatus>>(result);
             };
         }
     }

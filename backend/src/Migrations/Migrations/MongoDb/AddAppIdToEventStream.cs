@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Migrations.Migrations.MongoDb
 {
-    public sealed class AddAppIdToEventStream : IMigration
+    public sealed class AddAppIdToEventStream : MongoBase<BsonDocument>, IMigration
     {
         private readonly IMongoDatabase database;
 
@@ -31,6 +31,7 @@ namespace Migrations.Migrations.MongoDb
             const int SizeOfBatch = 1000;
             const int SizeOfQueue = 20;
 
+            // Do not resolve in constructor, because most of the time it is not executed anyway.
             var collectionV1 = database.GetCollection<BsonDocument>("Events");
             var collectionV2 = database.GetCollection<BsonDocument>("Events2");
 
@@ -38,11 +39,6 @@ namespace Migrations.Migrations.MongoDb
             {
                 BoundedCapacity = SizeOfQueue * SizeOfBatch
             });
-
-            var writeOptions = new BulkWriteOptions
-            {
-                IsOrdered = false
-            };
 
             var actionBlock = new ActionBlock<BsonDocument[]>(async batch =>
             {
@@ -102,7 +98,7 @@ namespace Migrations.Migrations.MongoDb
 
                     if (writes.Count > 0)
                     {
-                        await collectionV2.BulkWriteAsync(writes, writeOptions, ct);
+                        await collectionV2.BulkWriteAsync(writes, BulkUnordered, ct);
                     }
                 }
                 catch (OperationCanceledException ex)
@@ -119,7 +115,7 @@ namespace Migrations.Migrations.MongoDb
 
             batchBlock.BidirectionalLinkTo(actionBlock);
 
-            await foreach (var commit in collectionV1.Find(new BsonDocument()).ToAsyncEnumerable(ct: ct))
+            await foreach (var commit in collectionV1.Find(FindAll).ToAsyncEnumerable(ct: ct))
             {
                 if (!await batchBlock.SendAsync(commit, ct))
                 {

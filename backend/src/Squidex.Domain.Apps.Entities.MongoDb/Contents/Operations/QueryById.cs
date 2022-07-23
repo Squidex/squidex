@@ -17,20 +17,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         public async Task<IContentEntity?> QueryAsync(ISchemaEntity schema, DomainId id,
             CancellationToken ct)
         {
-            Guard.NotNull(schema);
+            var filter = Filter.Eq(x => x.DocumentId, DomainId.Combine(schema.AppId, id));
 
-            var documentId = DomainId.Combine(schema.AppId, id);
+            var contentEntity = await Collection.Find(filter).FirstOrDefaultAsync(ct);
 
-            var find = Collection.Find(x => x.DocumentId == documentId);
-
-            var contentEntity = await find.FirstOrDefaultAsync(ct);
-
-            if (contentEntity != null)
+            if (contentEntity == null || contentEntity.IndexedSchemaId != schema.Id)
             {
-                if (contentEntity.IndexedSchemaId != schema.Id)
-                {
-                    return null;
-                }
+                return null;
             }
 
             return contentEntity;
