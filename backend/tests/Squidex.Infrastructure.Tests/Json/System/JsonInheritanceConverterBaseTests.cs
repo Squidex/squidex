@@ -94,9 +94,10 @@ namespace Squidex.Infrastructure.Json.System
 
         private static IJsonSerializer CreateSerializer()
         {
-            var converter = new Converter();
-
-            return TestUtils.CreateSerializer(converter);
+            return TestUtils.CreateSerializer(options =>
+            {
+                options.Converters.Add(new Converter());
+            });
         }
     }
 }

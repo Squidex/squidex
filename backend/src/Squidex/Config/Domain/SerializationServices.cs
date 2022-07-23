@@ -66,7 +66,6 @@ namespace Squidex.Config.Domain
             options.Converters.Add(new StringConverter<RefToken>());
             options.Converters.Add(new StringConverter<Status>());
             options.Converters.Add(new JsonStringEnumConverter());
-            options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             options.IncludeFields = true;
 
             return options;

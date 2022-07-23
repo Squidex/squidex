@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
 
             var payloadType = typeNameRegistry.GetName(payloadValue.GetType());
-            var payloadJson = serializer.Serialize(envelope.Payload);
+            var payloadJson = serializer.Serialize(envelope.Payload, envelope.Payload.GetType());
 
             envelope.SetCommitId(commitId);
 

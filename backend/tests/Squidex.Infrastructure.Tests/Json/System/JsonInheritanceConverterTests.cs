@@ -76,14 +76,15 @@ namespace Squidex.Infrastructure.Json.System
 
         private static IJsonSerializer CreateSerializer()
         {
-            var typeRegistry =
-                new TypeNameRegistry()
-                    .Map(typeof(A), "A")
-                    .Map(typeof(B), "B");
+            return TestUtils.CreateSerializer(options =>
+            {
+                var typeRegistry =
+                    new TypeNameRegistry()
+                        .Map(typeof(A), "A")
+                        .Map(typeof(B), "B");
 
-            var converter = new InheritanceConverter<Base>(typeRegistry);
-
-            return TestUtils.CreateSerializer(converter);
+                options.Converters.Add(new InheritanceConverter<Base>(typeRegistry));
+            });
         }
     }
 }

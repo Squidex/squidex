@@ -61,13 +61,18 @@ namespace Squidex.Infrastructure.Json.System
             }
         }
 
-        public string Serialize<T>(T value, bool intented = false)
+        public string Serialize<T>(T value, bool indented = false)
+        {
+            return Serialize(value, typeof(T), indented);
+        }
+
+        public string Serialize(object? value, Type type, bool intented = false)
         {
             try
             {
                 var options = intented ? optionsIndented : optionsNormal;
 
-                return JsonSerializer.Serialize(value, options);
+                return JsonSerializer.Serialize(value, type, options);
             }
             catch (SystemJsonException ex)
             {
@@ -78,9 +83,14 @@ namespace Squidex.Infrastructure.Json.System
 
         public void Serialize<T>(T value, Stream stream, bool leaveOpen = false)
         {
+            Serialize(value, typeof(T), stream, leaveOpen);
+        }
+
+        public void Serialize(object? value, Type type, Stream stream, bool leaveOpen = false)
+        {
             try
             {
-                JsonSerializer.Serialize(value, optionsNormal);
+                JsonSerializer.Serialize(stream, value, optionsNormal);
             }
             catch (SystemJsonException ex)
             {

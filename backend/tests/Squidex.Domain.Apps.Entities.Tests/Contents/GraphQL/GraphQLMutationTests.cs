@@ -11,6 +11,7 @@ using FakeItEasy;
 using GraphQL;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -740,16 +741,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private string CreateQuery(string query)
         {
             query = query
-                .Replace("<ID>", contentId.ToString(), StringComparison.Ordinal)
                 .Replace("'", "\"", StringComparison.Ordinal)
                 .Replace("`", "\"", StringComparison.Ordinal)
+                .Replace("<ID>", contentId.ToString(), StringComparison.Ordinal)
                 .Replace("<FIELDS>", TestContent.AllFields, StringComparison.Ordinal);
 
             if (query.Contains("<DATA>", StringComparison.Ordinal))
             {
                 var data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id);
 
-                var dataJson = JsonSerializer.Serialize(data);
+                var dataJson = TestUtils.DefaultSerializer.Serialize(data, true);
 
                 // Use Properties without quotes.
                 dataJson = Regex.Replace(dataJson, "\"([^\"]+)\":", x => x.Groups[1].Value + ":");
@@ -774,7 +775,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id)
             };
 
-            return serializer.ReadNode<Inputs>(input)!;
+            var element = JsonSerializer.SerializeToElement(input, TestUtils.DefaultOptions());
+
+            return serializer.ReadNode<Inputs>(element)!;
         }
     }
 }

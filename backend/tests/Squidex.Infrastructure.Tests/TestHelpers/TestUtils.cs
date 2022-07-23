@@ -51,14 +51,14 @@ namespace Squidex.Infrastructure.TestHelpers
             BsonJsonValueSerializer.Register();
         }
 
-        public static IJsonSerializer CreateSerializer(params JsonConverter[] converters)
+        public static IJsonSerializer CreateSerializer(Action<JsonSerializerOptions>? configure = null)
         {
-            var serializerSettings = DefaultOptions(converters);
+            var serializerSettings = DefaultOptions(configure);
 
             return new SystemJsonSerializer(serializerSettings);
         }
 
-        public static JsonSerializerOptions DefaultOptions(params JsonConverter[] converters)
+        public static JsonSerializerOptions DefaultOptions(Action<JsonSerializerOptions>? configure = null)
         {
             var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
@@ -77,8 +77,7 @@ namespace Squidex.Infrastructure.TestHelpers
             options.Converters.Add(new StringConverter<Language>());
             options.Converters.Add(new StringConverter<RefToken>());
             options.Converters.Add(new JsonStringEnumConverter());
-            options.Converters.AddRange(converters);
-            options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            configure?.Invoke(options);
 
             return options;
         }
@@ -99,23 +98,26 @@ namespace Squidex.Infrastructure.TestHelpers
 
         public static T SerializeAndDeserializeBson<T>(this T value)
         {
-            var stream = new MemoryStream();
+            using var stream = new MemoryStream();
 
             using (var writer = new BsonBinaryWriter(stream))
             {
                 BsonSerializer.Serialize(writer, new ObjectHolder<T> { Value1 = value, Value2 = value });
-
-                writer.Flush();
             }
 
             stream.Position = 0;
 
             using (var reader = new BsonBinaryReader(stream))
             {
-                var result = BsonSerializer.Deserialize<ObjectHolder<T>>(reader);
-
-                return result.Value1;
+                return BsonSerializer.Deserialize<ObjectHolder<T>>(reader).Value1;
             }
+        }
+
+        public static T SerializeAndDeserialize<T>(this object value)
+        {
+            var json = DefaultSerializer.Serialize(value);
+
+            return DefaultSerializer.Deserialize<T>(json);
         }
 
         public static T SerializeAndDeserialize<T>(this T value)
@@ -137,6 +139,13 @@ namespace Squidex.Infrastructure.TestHelpers
             var json = DefaultSerializer.Serialize(new ObjectHolder<object> { Value1 = value, Value2 = value });
 
             return DefaultSerializer.Deserialize<ObjectHolder<T>>(json).Value1;
+        }
+
+        public static string CleanJson(this string json)
+        {
+            using var document = JsonDocument.Parse(json);
+
+            return DefaultSerializer.Serialize(document, true);
         }
     }
 }

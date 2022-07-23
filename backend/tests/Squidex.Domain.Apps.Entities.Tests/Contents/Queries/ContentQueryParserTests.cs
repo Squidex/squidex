@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_parse_json_query_without_schema()
         {
-            var query = Q.Empty.WithJsonQuery("{ 'filter': { 'path': 'status', 'op': 'eq', 'value': 'Draft' } }");
+            var query = Q.Empty.WithJsonQuery("{ \"filter\": { \"path\": \"status\", \"op\": \"eq\", \"value\": \"Draft\" } }");
 
             var q = await sut.ParseAsync(requestContext, query);
 
