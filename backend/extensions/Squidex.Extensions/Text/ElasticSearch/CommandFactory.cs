@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GeoJSON.Text.Geometry;
+using NetTopologySuite.Geometries;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 
 namespace Squidex.Extensions.Text.ElasticSearch
@@ -42,8 +42,8 @@ namespace Squidex.Extensions.Text.ElasticSearch
                         geoField = key;
                         geoObject = new
                         {
-                            lat = point.Coordinates.Latitude,
-                            lon = point.Coordinates.Longitude
+                            lat = point.Coordinate.X,
+                            lon = point.Coordinate.Y
                         };
                         break;
                     }

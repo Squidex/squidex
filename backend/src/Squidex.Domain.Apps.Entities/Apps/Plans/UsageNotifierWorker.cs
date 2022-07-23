@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         [CollectionName("UsageNotifications")]
         public sealed class State
         {
-            public Dictionary<DomainId, DateTime> NotificationsSent { get; } = new Dictionary<DomainId, DateTime>();
+            public Dictionary<DomainId, DateTime> NotificationsSent { get; set; } = new Dictionary<DomainId, DateTime>();
         }
 
         public IClock Clock { get; set; } = SystemClock.Instance;

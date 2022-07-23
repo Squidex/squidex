@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Migrations;
+using NetTopologySuite.IO.Converters;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using Squidex.Domain.Apps.Core;
@@ -40,6 +41,9 @@ namespace Squidex.Config.Domain
             options ??= new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
             options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+            // It is also a readonly list, so we have to register it first, so that other converters do not pick this up.
+            options.Converters.Add(new StringConverter<PropertyPath>(x => x));
+            options.Converters.Add(new GeoJsonConverterFactory());
             options.Converters.Add(new InheritanceConverter<IEvent>(typeNameRegistry));
             options.Converters.Add(new InheritanceConverter<FieldProperties>(typeNameRegistry));
             options.Converters.Add(new InheritanceConverter<RuleAction>(typeNameRegistry));
@@ -96,6 +100,11 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs(c => ConfigureJson(c.GetRequiredService<TypeNameRegistry>()))
                 .As<JsonSerializerOptions>();
+
+            services.Configure<JsonSerializerOptions>((c, options) =>
+            {
+                ConfigureJson(c.GetRequiredService<TypeNameRegistry>(), options);
+            });
 
             return services;
         }

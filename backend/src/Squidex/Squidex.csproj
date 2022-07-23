@@ -59,6 +59,7 @@
     <PackageReference Include="MongoDB.Driver" Version="2.15.1" />
     <PackageReference Include="MongoDB.Driver.Core.Extensions.OpenTelemetry" Version="1.0.0" />
     <PackageReference Include="Namotion.Reflection" Version="2.0.10" ExcludeAssets="all" />
+    <PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="2.1.1" />
     <PackageReference Include="NJsonSchema" Version="10.7.2" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="3.0.0" />
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0" />

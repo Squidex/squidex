@@ -131,7 +131,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// The metadata.
         /// </summary>
         [JsonPropertyName("_meta")]
-        public AssetMeta Meta { get; set; }
+        public AssetMeta? Meta { get; set; }
 
         /// <summary>
         /// Determines of the created file is an image.

@@ -12,6 +12,7 @@ using System.Text.Json.Serialization;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
+using NetTopologySuite.IO.Converters;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using Squidex.Domain.Apps.Core.Apps;
@@ -81,6 +82,9 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
             var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
             options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+            // It is also a readonly list, so we have to register it first, so that other converters do not pick this up.
+            options.Converters.Add(new StringConverter<PropertyPath>(x => x));
+            options.Converters.Add(new GeoJsonConverterFactory());
             options.Converters.Add(new InheritanceConverter<IEvent>(typeNameRegistry));
             options.Converters.Add(new InheritanceConverter<FieldProperties>(typeNameRegistry));
             options.Converters.Add(new InheritanceConverter<RuleAction>(typeNameRegistry));
@@ -103,7 +107,6 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
             options.Converters.Add(new StringConverter<NamedId<Guid>>());
             options.Converters.Add(new StringConverter<NamedId<string>>());
             options.Converters.Add(new StringConverter<Language>());
-            options.Converters.Add(new StringConverter<PropertyPath>(x => x));
             options.Converters.Add(new StringConverter<RefToken>());
             options.Converters.Add(new StringConverter<Status>());
             options.Converters.Add(new JsonStringEnumConverter());

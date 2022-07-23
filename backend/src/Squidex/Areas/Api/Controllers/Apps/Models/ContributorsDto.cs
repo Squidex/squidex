@@ -31,7 +31,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// The metadata to provide information about this request.
         /// </summary>
         [JsonPropertyName("_meta")]
-        public ContributorsMetadata Metadata { get; set; }
+        public ContributorsMetadata? Metadata { get; set; }
 
         public static async Task<ContributorsDto> FromAppAsync(IAppEntity app, Resources resources, IUserResolver userResolver, IAppPlansProvider plans, bool invited)
         {

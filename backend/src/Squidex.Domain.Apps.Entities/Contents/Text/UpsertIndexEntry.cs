@@ -5,14 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GeoJSON.Text;
+using NetTopologySuite.Geometries;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public sealed class UpsertIndexEntry : IndexCommand
     {
-        public Dictionary<string, GeoJSONObject>? GeoObjects { get; set; }
+        public Dictionary<string, Geometry>? GeoObjects { get; set; }
 
         public Dictionary<string, string>? Texts { get; set; }
 

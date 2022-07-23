@@ -7,7 +7,7 @@
 
 using System.Text;
 using Azure.Search.Documents.Models;
-using GeoJSON.Text.Geometry;
+using NetTopologySuite.Geometries;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 
 namespace Squidex.Extensions.Text.Azure
@@ -47,8 +47,8 @@ namespace Squidex.Extensions.Text.Azure
                             type = "Point",
                             coordinates = new[]
                             {
-                                point.Coordinates.Longitude,
-                                point.Coordinates.Latitude
+                                point.Coordinate.X,
+                                point.Coordinate.Y
                             }
                         };
                         break;

@@ -15,7 +15,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The language specific default value for the field value.
         /// </summary>
-        public LocalizedValue<bool?> DefaultValues { get; set; }
+        public LocalizedValue<bool?>? DefaultValues { get; set; }
 
         /// <summary>
         /// The default value for the field value.

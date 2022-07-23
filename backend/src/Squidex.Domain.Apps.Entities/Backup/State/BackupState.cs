@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.State
 {
     public sealed class BackupState
     {
-        public List<BackupJob> Jobs { get; } = new List<BackupJob>();
+        public List<BackupJob> Jobs { get; set;  } = new List<BackupJob>();
 
         public void EnsureCanStart()
         {
