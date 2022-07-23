@@ -104,25 +104,26 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
             canvas = document.createElement('canvas');
         }
 
-        if (canvas) {
-            const ctx = canvas.getContext('2d');
+        if (!canvas) {
+            return;
+        }
 
-            if (ctx) {
-                ctx.font = CACHED_FONT;
+        const ctx = canvas.getContext('2d');
 
-                let width = 0;
+        if (ctx) {
+            ctx.font = CACHED_FONT;
 
-                for (const value of this.valuesSorted) {
-                    width += 30;
-                    width += ctx.measureText(value.name).width;
-                }
+            let width = 0;
 
-                this.childrenWidth = width;
-
-                this.calculateSingleLine();
-
-                this.labelsMeasured = true;
+            for (const value of this.valuesSorted) {
+                width += 40;
+                width += ctx.measureText(value.name).width;
             }
+
+            this.childrenWidth = width;
+            this.calculateSingleLine();
+
+            this.labelsMeasured = true;
         }
     }
 

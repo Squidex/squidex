@@ -212,7 +212,7 @@
 							</select>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Radio'">
-							<div class="form-check custom-control-inline" *ngFor="let value of field.rawProperties.allowedValues">
+							<div class="form-check form-check-inline" *ngFor="let value of field.rawProperties.allowedValues">
 								<input class="form-check-input" type="radio" [value]="value" [formControl]="$any(fieldForm)" [name]="uniqueId" id="{{uniqueId}}_{{value}}">
 								<label class="form-check-label" for="{{uniqueId}}_{{value}}">
 									{{value}}
