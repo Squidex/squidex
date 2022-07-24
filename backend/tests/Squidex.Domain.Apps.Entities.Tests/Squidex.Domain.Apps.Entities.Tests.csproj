@@ -24,7 +24,7 @@
     <PackageReference Include="FakeItEasy" Version="7.3.1" />
     <PackageReference Include="FluentAssertions" Version="6.7.0" />
     <PackageReference Include="GraphQL" Version="5.3.0" />
-    <PackageReference Include="GraphQL.NewtonsoftJson" Version="5.3.0" />
+    <PackageReference Include="GraphQL.SystemTextJson" Version="5.3.0" />
     <PackageReference Include="Lorem.Universal.Net" Version="4.0.80" />
     <PackageReference Include="Meziantou.Analyzer" Version="1.0.702">
       <PrivateAssets>all</PrivateAssets>
@@ -61,6 +61,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Update="Apps\DomainObject\AppState.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\TestFiles\SampleAudio_0.4mb.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -68,6 +71,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\TestFiles\SampleVideo_1280x720_1mb.mp4">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Schemas\DomainObject\SchemaState.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 
@@ -16,7 +16,7 @@ namespace Squidex.Web
     {
         [LocalizedRequired]
         [Display(Description = "The links.")]
-        [JsonProperty("_links")]
+        [JsonPropertyName("_links")]
         public Dictionary<string, ResourceLink> Links { get; } = new Dictionary<string, ResourceLink>();
 
         protected void AddSelfLink(string href)

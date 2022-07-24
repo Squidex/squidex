@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
@@ -47,13 +47,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             public AssetType Type { get; set; }
 
-            [IgnoreDataMember]
+            [JsonIgnore]
             public DomainId AssetId
             {
                 get => Id;
             }
 
-            [IgnoreDataMember]
+            [JsonIgnore]
             public DomainId UniqueId
             {
                 get => DomainId.Combine(AppId, Id);

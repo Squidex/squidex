@@ -5,8 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GeoJSON.Net;
-using GeoJSON.Net.Geometry;
+using NetTopologySuite.Geometries;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
@@ -17,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 {
     public static class GeoJsonValue
     {
-        public static GeoJsonParseResult TryParse(JsonValue value, IJsonSerializer serializer, out GeoJSONObject? geoJSON)
+        public static GeoJsonParseResult TryParse(JsonValue value, IJsonSerializer serializer, out Geometry? geoJSON)
         {
             Guard.NotNull(serializer);
             Guard.NotNull(value);
@@ -41,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                     return GeoJsonParseResult.InvalidLongitude;
                 }
 
-                geoJSON = new Point(new Position(lat, lon));
+                geoJSON = new Point(new Coordinate(lat, lon));
 
                 return GeoJsonParseResult.Success;
             }
@@ -49,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             return GeoJsonParseResult.InvalidValue;
         }
 
-        private static bool TryParseGeoJson(JsonObject obj, IJsonSerializer serializer, out GeoJSONObject? geoJSON)
+        private static bool TryParseGeoJson(JsonObject obj, IJsonSerializer serializer, out Geometry? geoJSON)
         {
             geoJSON = null;
 
@@ -66,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
                     stream.Position = 0;
 
-                    geoJSON = serializer.Deserialize<GeoJSONObject>(stream, null, true);
+                    geoJSON = serializer.Deserialize<Geometry>(stream, null, true);
 
                     return true;
                 }

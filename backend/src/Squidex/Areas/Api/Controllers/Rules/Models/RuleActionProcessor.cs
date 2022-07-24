@@ -9,7 +9,6 @@ using Namotion.Reflection;
 using NJsonSchema;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
-using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 
@@ -32,17 +31,24 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
                 if (schema != null)
                 {
+                    var converter = new RuleActionConverter();
+
                     schema.DiscriminatorObject = new OpenApiDiscriminator
                     {
-                        JsonInheritanceConverter = new RuleActionConverter(),
-                        PropertyName = "actionType"
+                        PropertyName = converter.DiscriminatorName,
+
+                        // The converter must be set so that NJsonSchema can get the allowed types for that.
+                        JsonInheritanceConverter = converter,
                     };
 
-                    schema.Properties["actionType"] = new JsonSchemaProperty
+                    schema.Properties[converter.DiscriminatorName] = new JsonSchemaProperty
                     {
-                        Type = JsonObjectType.String
-                    }.SetRequired(true);
+                        Type = JsonObjectType.String,
+                        IsRequired = true,
+                        IsNullableRaw = true
+                    };
 
+                    // The types come from another assembly so we have to fix it here.
                     foreach (var (key, value) in ruleRegistry.Actions)
                     {
                         var derivedSchema = context.SchemaGenerator.Generate<JsonSchema>(value.Type.ToContextualType(), context.SchemaResolver);

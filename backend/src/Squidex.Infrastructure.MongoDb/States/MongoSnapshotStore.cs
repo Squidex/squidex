@@ -6,14 +6,13 @@
 // ==========================================================================
 
 using MongoDB.Driver;
-using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.States
 {
     public sealed class MongoSnapshotStore<T> : MongoSnapshotStoreBase<T, MongoState<T>>
     {
-        public MongoSnapshotStore(IMongoDatabase database, JsonSerializer serializer)
-            : base(database, serializer)
+        public MongoSnapshotStore(IMongoDatabase database)
+            : base(database)
         {
         }
     }

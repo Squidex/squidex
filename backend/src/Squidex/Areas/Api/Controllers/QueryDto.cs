@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 
@@ -27,8 +27,8 @@ namespace Squidex.Areas.Api.Controllers
         /// <summary>
         /// The optional json query.
         /// </summary>
-        [JsonProperty("q")]
-        public JObject? JsonQuery { get; set; }
+        [JsonPropertyName("q")]
+        public JsonDocument? JsonQuery { get; set; }
 
         /// <summary>
         /// The parent id (for assets).
@@ -51,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers
 
             if (JsonQuery != null)
             {
-                result = result.WithJsonQuery(JsonQuery.ToString());
+                result = result.WithJsonQuery(JsonQuery.RootElement.ToString());
             }
 
             return result;

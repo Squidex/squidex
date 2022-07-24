@@ -9,10 +9,11 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations
 {
-    public sealed class ConvertEventStore : IMigration
+    public sealed class ConvertEventStore : MongoBase<BsonDocument>, IMigration
     {
         private readonly IEventStore eventStore;
 
@@ -26,15 +27,10 @@ namespace Migrations.Migrations
         {
             if (eventStore is MongoEventStore mongoEventStore)
             {
+                // Do not resolve in constructor, because most of the time it is not executed anyway.
                 var collection = mongoEventStore.RawCollection;
 
-                var filter = Builders<BsonDocument>.Filter;
-
                 var writes = new List<WriteModel<BsonDocument>>();
-                var writeOptions = new BulkWriteOptions
-                {
-                    IsOrdered = false
-                };
 
                 async Task WriteAsync(WriteModel<BsonDocument>? model, bool force)
                 {
@@ -45,13 +41,12 @@ namespace Migrations.Migrations
 
                     if (writes.Count == 1000 || (force && writes.Count > 0))
                     {
-                        await collection.BulkWriteAsync(writes, writeOptions, ct);
-
+                        await collection.BulkWriteAsync(writes, BulkUnordered, ct);
                         writes.Clear();
                     }
                 }
 
-                await collection.Find(new BsonDocument()).ForEachAsync(async commit =>
+                await collection.Find(FindAll).ForEachAsync(async commit =>
                 {
                     foreach (BsonDocument @event in commit["Events"].AsBsonArray)
                     {
@@ -61,7 +56,7 @@ namespace Migrations.Migrations
                         @event["Metadata"] = meta;
                     }
 
-                    await WriteAsync(new ReplaceOneModel<BsonDocument>(filter.Eq("_id", commit["_id"].AsString), commit), false);
+                    await WriteAsync(new ReplaceOneModel<BsonDocument>(Filter.Eq("_id", commit["_id"].AsString), commit), false);
                 }, ct);
 
                 await WriteAsync(null, true);

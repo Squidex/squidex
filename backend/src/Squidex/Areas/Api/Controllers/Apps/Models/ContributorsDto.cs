@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure.Validation;
@@ -30,8 +30,8 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The metadata to provide information about this request.
         /// </summary>
-        [JsonProperty("_meta")]
-        public ContributorsMetadata Metadata { get; set; }
+        [JsonPropertyName("_meta")]
+        public ContributorsMetadata? Metadata { get; set; }
 
         public static async Task<ContributorsDto> FromAppAsync(IAppEntity app, Resources resources, IUserResolver userResolver, IAppPlansProvider plans, bool invited)
         {

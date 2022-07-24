@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
@@ -13,9 +14,6 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public abstract class MongoBase<TEntity>
     {
-        protected static readonly FieldDefinitionBuilder<TEntity> FieldBuilder =
-            FieldDefinitionBuilder<TEntity>.Instance;
-
         protected static readonly FilterDefinitionBuilder<TEntity> Filter =
             Builders<TEntity>.Filter;
 
@@ -43,13 +41,19 @@ namespace Squidex.Infrastructure.MongoDb
         protected static readonly UpdateOptions Upsert =
             new UpdateOptions { IsUpsert = true };
 
+        protected static readonly BsonDocument FindAll =
+            new BsonDocument();
+
         static MongoBase()
         {
-            TypeConverterStringSerializer<RefToken>.Register();
-
-            InstantSerializer.Register();
-
-            DomainIdSerializer.Register();
+            BsonDomainIdSerializer.Register();
+            BsonInstantSerializer.Register();
+            BsonJsonConvention.Register();
+            BsonJsonValueSerializer.Register();
+            BsonStringSerializer<RefToken>.Register();
+            BsonStringSerializer<NamedId<DomainId>>.Register();
+            BsonStringSerializer<NamedId<Guid>>.Register();
+            BsonStringSerializer<NamedId<string>>.Register();
         }
     }
 }

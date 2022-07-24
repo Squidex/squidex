@@ -7,7 +7,6 @@
 
 using Fluid;
 using Fluid.Values;
-using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Text;
 
@@ -29,12 +28,7 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
 
         private static readonly FilterDelegate Escape = (input, arguments, context) =>
         {
-            var result = input.ToStringValue();
-
-            result = JsonConvert.ToString(result);
-            result = result[1..^1];
-
-            return FluidValue.Create(result);
+            return FluidValue.Create(input.ToStringValue().JsonEscape());
         };
 
         private static readonly FilterDelegate Markdown2Text = (input, arguments, context) =>

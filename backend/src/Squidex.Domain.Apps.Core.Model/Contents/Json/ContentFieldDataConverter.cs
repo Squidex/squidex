@@ -5,30 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Contents.Json
 {
-    public sealed class ContentFieldDataConverter : JsonClassConverter<ContentFieldData>
+    public sealed class ContentFieldDataConverter : JsonConverter<ContentFieldData>
     {
-        protected override void WriteValue(JsonWriter writer, ContentFieldData value, JsonSerializer serializer)
-        {
-            writer.WriteStartObject();
-
-            foreach (var (key, jsonValue) in value)
-            {
-                writer.WritePropertyName(key);
-
-                serializer.Serialize(writer, jsonValue);
-            }
-
-            writer.WriteEndObject();
-        }
-
-        protected override ContentFieldData ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
+        public override ContentFieldData? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var result = new ContentFieldData();
 
@@ -36,15 +22,15 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
             {
                 switch (reader.TokenType)
                 {
-                    case JsonToken.PropertyName:
-                        var propertyName = reader.Value!.ToString()!;
+                    case JsonTokenType.PropertyName:
+                        var propertyName = reader.GetString()!;
 
                         if (!reader.Read())
                         {
-                            throw new JsonSerializationException("Unexpected end when reading Object.");
+                            throw new JsonException("Unexpected end when reading Object.");
                         }
 
-                        var value = serializer.Deserialize<JsonValue>(reader)!;
+                        var value = JsonSerializer.Deserialize<JsonValue>(ref reader, options)!;
 
                         if (propertyName == InvariantPartitioning.Key)
                         {
@@ -57,12 +43,26 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
 
                         result[propertyName] = value;
                         break;
-                    case JsonToken.EndObject:
+                    case JsonTokenType.EndObject:
                         return result;
                 }
             }
 
-            throw new JsonSerializationException("Unexpected end when reading Object.");
+            throw new JsonException("Unexpected end when reading Object.");
+        }
+
+        public override void Write(Utf8JsonWriter writer, ContentFieldData value, JsonSerializerOptions options)
+        {
+            writer.WriteStartObject();
+
+            foreach (var (key, jsonValue) in value)
+            {
+                writer.WritePropertyName(key);
+
+                JsonSerializer.Serialize(writer, jsonValue, options);
+            }
+
+            writer.WriteEndObject();
         }
     }
 }

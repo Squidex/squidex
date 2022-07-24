@@ -7,10 +7,11 @@
 
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Extensions.Text.Azure;
+using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed class AzureTextIndexFixture
+    public sealed class AzureTextIndexFixture : IAsyncLifetime
     {
         public AzureTextIndex Index { get; }
 
@@ -20,7 +21,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 TestConfig.Configuration["azureText:serviceEndpoint"],
                 TestConfig.Configuration["azureText:apiKey"],
                 TestConfig.Configuration["azureText:indexName"]);
-            Index.InitializeAsync(default).Wait();
+        }
+
+        public Task InitializeAsync()
+        {
+            return Index.InitializeAsync(default);
+        }
+
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
         }
     }
 }

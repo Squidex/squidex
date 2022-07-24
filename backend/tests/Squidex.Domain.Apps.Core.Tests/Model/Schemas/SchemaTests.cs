@@ -445,7 +445,6 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var schema_2 = schema_1.SetPreviewUrls(urls2);
 
             Assert.Equal("Url", schema_1.PreviewUrls["web"]);
-
             Assert.Equal(urls1, schema_1.PreviewUrls);
             Assert.Equal(urls1, schema_2.PreviewUrls);
             Assert.Same(schema_1, schema_2);
@@ -455,7 +454,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         public void Should_serialize_and_deserialize_schema()
         {
             var schemaSource =
-                TestUtils.MixedSchema(SchemaType.Singleton).Schema
+                TestSchema.MixedSchema(SchemaType.Singleton).Schema
                     .ChangeCategory("Category")
                     .SetFieldRules(FieldRule.Hide("2"))
                     .SetFieldsInLists("field2")

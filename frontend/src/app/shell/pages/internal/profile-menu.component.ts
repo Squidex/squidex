@@ -34,7 +34,7 @@ interface State {
 export class ProfileMenuComponent extends StatefulComponent<State> implements OnInit {
     public modalMenu = new ModalModel();
 
-    public language = this.uiOptions.get('more.culture');
+    public language = this.uiOptions.get('culture');
     public languages = UILanguages.ALL;
 
     constructor(changeDetector: ChangeDetectorRef, apiUrl: ApiUrlConfig,

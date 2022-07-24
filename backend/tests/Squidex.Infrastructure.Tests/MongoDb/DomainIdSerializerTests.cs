@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         public DomainIdSerializerTests()
         {
-            DomainIdSerializer.Register();
+            BsonDomainIdSerializer.Register();
         }
 
         [Fact]

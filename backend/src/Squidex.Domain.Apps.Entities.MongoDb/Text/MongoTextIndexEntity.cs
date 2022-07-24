@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GeoJSON.Net;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using NetTopologySuite.Geometries;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
@@ -58,6 +58,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
         [BsonIgnoreIfNull]
         [BsonElement("go")]
         [BsonJson]
-        public GeoJSONObject GeoObject { get; set; }
+        public Geometry GeoObject { get; set; }
     }
 }

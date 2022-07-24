@@ -42,7 +42,7 @@ export class AppsPageComponent implements OnInit {
         private readonly uiOptions: UIOptions,
     ) {
         if (uiOptions.get('showInfo')) {
-            this.info = uiOptions.get('more.info');
+            this.info = uiOptions.get('info');
         }
     }
 

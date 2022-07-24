@@ -10,7 +10,7 @@ using Squidex.Web.Json;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
-    public sealed class RuleActionConverter : TypedJsonInheritanceConverter<RuleAction>
+    public sealed class RuleActionConverter : JsonInheritanceConverter<RuleAction>
     {
         public static IReadOnlyDictionary<string, Type> Mapping { get; set; }
 

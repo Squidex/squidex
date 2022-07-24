@@ -7,15 +7,14 @@
 
 using System.Reflection;
 using System.Runtime.Serialization;
-using Newtonsoft.Json.Linq;
-using NJsonSchema.Converters;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.System;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 
 namespace Squidex.Web.Json
 {
-    public class TypedJsonInheritanceConverter<T> : JsonInheritanceConverter
+    public class JsonInheritanceConverter<T> : InheritanceConverterBase<T> where T : notnull
     {
         private static readonly Lazy<Dictionary<string, Type>> DefaultMapping = new Lazy<Dictionary<string, Type>>(() =>
         {
@@ -25,14 +24,14 @@ namespace Squidex.Web.Json
 
             void AddType(Type type)
             {
-                var discriminator = type.Name;
+                var typeName = type.Name;
 
-                if (discriminator.EndsWith(baseName, StringComparison.CurrentCulture))
+                if (typeName.EndsWith(baseName, StringComparison.CurrentCulture))
                 {
-                    discriminator = discriminator[..^baseName.Length];
+                    typeName = typeName[..^baseName.Length];
                 }
 
-                result[discriminator] = type;
+                result[typeName] = type;
             }
 
             foreach (var attribute in typeof(T).GetCustomAttributes<KnownTypeAttribute>())
@@ -68,28 +67,34 @@ namespace Squidex.Web.Json
 
         private readonly IReadOnlyDictionary<string, Type> mapping;
 
-        public TypedJsonInheritanceConverter(string discriminator)
-            : this(discriminator, DefaultMapping.Value)
+        public JsonInheritanceConverter()
+            : this(null, DefaultMapping.Value)
         {
         }
 
-        public TypedJsonInheritanceConverter(string discriminator, IReadOnlyDictionary<string, Type> mapping)
-            : base(typeof(T), discriminator)
+        public JsonInheritanceConverter(string? discriminatorName)
+            : this(discriminatorName, DefaultMapping.Value)
+        {
+        }
+
+        public JsonInheritanceConverter(string? discriminatorName, IReadOnlyDictionary<string, Type> mapping)
+            : base(GetDiscriminatorName(discriminatorName))
         {
             this.mapping = mapping ?? DefaultMapping.Value;
         }
 
-        protected override Type GetDiscriminatorType(JObject jObject, Type objectType, string discriminatorValue)
+        private static string GetDiscriminatorName(string? discriminatorName)
         {
-            if (discriminatorValue == null)
-            {
-                ThrowHelper.JsonException("Cannot find discriminator.");
-                return default!;
-            }
+            var attribute = typeof(T).GetCustomAttribute<JsonInheritanceConverterAttribute>();
 
-            if (!mapping.TryGetValue(discriminatorValue, out var type))
+            return attribute?.DiscriminatorName ?? discriminatorName ?? "discriminator";
+        }
+
+        public override Type GetDiscriminatorType(string name, Type typeToConvert)
+        {
+            if (!mapping.TryGetValue(name, out var type))
             {
-                ThrowHelper.JsonException($"Could not find subtype of '{objectType.Name}' with discriminator '{discriminatorValue}'.");
+                ThrowHelper.JsonException($"Could not find subtype of '{typeToConvert.Name}' with discriminator '{name}'.");
                 return default!;
             }
 

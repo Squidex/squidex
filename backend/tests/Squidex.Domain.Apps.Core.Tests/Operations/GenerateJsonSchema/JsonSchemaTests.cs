@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         {
             var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var (schema, components) = TestUtils.MixedSchema();
+            var (schema, components) = TestSchema.MixedSchema();
 
             var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), components);
 
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         {
             var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var (schema, components) = TestUtils.MixedSchema();
+            var (schema, components) = TestSchema.MixedSchema();
 
             var jsonSchema = schema.BuildJsonSchemaDynamic(languagesConfig.ToResolver(), components);
 
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         {
             var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var (schema, components) = TestUtils.MixedSchema();
+            var (schema, components) = TestSchema.MixedSchema();
 
             var jsonSchema = schema.BuildJsonSchemaFlat(languagesConfig.ToResolver(), components);
 

@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json;
+using System.Text.Json;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -54,7 +54,7 @@ namespace Squidex.Config.Messaging
             }
 
             services.AddSingleton<ITransportSerializer>(c =>
-                new NewtonsoftJsonTransportSerializer(c.GetRequiredService<JsonSerializerSettings>()));
+                new SystemTextJsonTransportSerializer(c.GetRequiredService<JsonSerializerOptions>()));
 
             services.AddMessagingTransport(config);
             services.AddMessaging(options =>

@@ -5,32 +5,30 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Globalization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Serialization;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json.System;
 
-#pragma warning disable SA1401 // Fields must be private
 #pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Domain.Apps.Entities.Backup.Model
 {
     public sealed class CompatibleStoredEvent
     {
-        [JsonProperty("n")]
-        public NewEvent NewEvent;
+        [JsonPropertyName("n")]
+        public NewEvent NewEvent { get; set; }
 
-        [JsonProperty]
-        public string StreamName;
+        [JsonPropertyName("streamName")]
+        public string StreamName { get; set; }
 
-        [JsonProperty]
-        public string EventPosition;
+        [JsonPropertyName("eventPosition")]
+        public string EventPosition { get; set; }
 
-        [JsonProperty]
-        public long EventStreamNumber;
+        [JsonPropertyName("eventStreamNumber")]
+        public long EventStreamNumber { get; set; }
 
-        [JsonProperty]
-        public CompatibleEventData Data;
+        [JsonPropertyName("data")]
+        public CompatibleEventData Data { get; set; }
 
         public static CompatibleStoredEvent V1(StoredEvent stored)
         {
@@ -65,41 +63,45 @@ namespace Squidex.Domain.Apps.Entities.Backup.Model
 
     public sealed class CompatibleEventData
     {
-        [JsonProperty]
-        public string Type;
+        [JsonPropertyName("type")]
+        public string Type { get; set; }
 
-        [JsonProperty]
-        public JRaw Payload;
+        [JsonPropertyName("metadata")]
+        public EnvelopeHeaders EventHeaders { get; set; }
 
-        [JsonProperty]
-        public EnvelopeHeaders Metadata;
+        [JsonPropertyName("payload")]
+        [JsonConverter(typeof(UnsafeRawJsonConverter))]
+        public string EventPayload { get; set; }
 
         public static CompatibleEventData V1(EventData data)
         {
-            var payload = new JRaw(data.Payload);
-
-            return new CompatibleEventData { Type = data.Type, Payload = payload, Metadata = data.Headers };
+            return new CompatibleEventData
+            {
+                Type = data.Type,
+                EventPayload = data.Payload,
+                EventHeaders = data.Headers
+            };
         }
 
         public EventData ToData()
         {
-            return new EventData(Type, Metadata, Payload.ToString(CultureInfo.InvariantCulture));
+            return new EventData(Type, EventHeaders, EventPayload);
         }
     }
 
     public sealed class NewEvent
     {
-        [JsonProperty("t")]
-        public string EventType;
+        [JsonPropertyName("t")]
+        public string EventType { get; set; }
 
-        [JsonProperty("s")]
-        public string StreamName;
+        [JsonPropertyName("s")]
+        public string StreamName { get; set; }
 
-        [JsonProperty("p")]
-        public string EventPayload;
+        [JsonPropertyName("p")]
+        public string EventPayload { get; set; }
 
-        [JsonProperty("h")]
-        public EnvelopeHeaders EventHeaders;
+        [JsonPropertyName("h")]
+        public EnvelopeHeaders EventHeaders { get; set; }
 
         public static NewEvent V2(StoredEvent stored)
         {

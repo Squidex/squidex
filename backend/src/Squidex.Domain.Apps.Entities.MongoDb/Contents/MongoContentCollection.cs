@@ -248,7 +248,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public IAsyncEnumerable<MongoContentEntity> StreamAll(
             CancellationToken ct)
         {
-            return Collection.Find(new BsonDocument()).ToAsyncEnumerable(ct);
+            return Collection.Find(FindAll).ToAsyncEnumerable(ct);
         }
 
         public async Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity value,

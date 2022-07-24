@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             for (var i = 1; i < path.Count; i++)
             {
-                result[i] = result[i].UnescapeEdmField().EscapeJson();
+                result[i] = result[i].UnescapeEdmField().JsonEscape();
             }
 
             return result;

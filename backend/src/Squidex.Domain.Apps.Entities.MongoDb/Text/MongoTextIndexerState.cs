@@ -36,8 +36,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
             });
         }
 
-        public MongoTextIndexerState(IMongoDatabase database, bool setup = false)
-            : base(database, setup)
+        public MongoTextIndexerState(IMongoDatabase database)
+            : base(database)
         {
         }
 

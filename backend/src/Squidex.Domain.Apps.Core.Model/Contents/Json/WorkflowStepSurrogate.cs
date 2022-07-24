@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
@@ -16,10 +16,10 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
     {
         public Dictionary<Status, WorkflowTransitionSurrogate> Transitions { get; set; }
 
-        [JsonProperty("noUpdate")]
+        [JsonPropertyName("noUpdate")]
         public bool NoUpdateFlag { get; set; }
 
-        [JsonProperty("noUpdateRules")]
+        [JsonPropertyName("noUpdateRules")]
         public NoUpdate? NoUpdate { get; set; }
 
         public string? Color { get; set; }

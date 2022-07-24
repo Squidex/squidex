@@ -12,6 +12,14 @@ namespace Squidex.Infrastructure.Collections
 {
     public class ReadonlyListTests
     {
+        internal sealed class Inherited : ReadonlyList<int>
+        {
+            public Inherited(IList<int> inner)
+                : base(inner)
+            {
+            }
+        }
+
         [Fact]
         public void Should_return_empty_instance_for_empty_array()
         {
@@ -61,7 +69,27 @@ namespace Squidex.Infrastructure.Collections
         [Fact]
         public void Should_serialize_and_deserialize()
         {
-            var sut = ReadonlyList.Create(1, 2, 3);
+            var sut = new List<int>
+            {
+                1,
+                2,
+                3
+            }.ToReadonlyList();
+
+            var serialized = sut.SerializeAndDeserialize();
+
+            Assert.Equal(sut, serialized);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_inherited()
+        {
+            var sut = new Inherited(new List<int>
+            {
+                1,
+                2,
+                3
+            });
 
             var serialized = sut.SerializeAndDeserialize();
 

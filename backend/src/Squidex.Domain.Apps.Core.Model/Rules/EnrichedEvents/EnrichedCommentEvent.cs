@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using Squidex.Shared.Users;
 
 #pragma warning disable CA1822 // Mark members as static
@@ -21,10 +21,10 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
         [FieldDescription(nameof(FieldDescriptions.CommentUrl))]
         public Uri? Url { get; set; }
 
-        [FieldDescription(nameof(FieldDescriptions.CommentMentionedUser)), IgnoreDataMember]
+        [FieldDescription(nameof(FieldDescriptions.CommentMentionedUser)), JsonIgnore]
         public IUser MentionedUser { get; set; }
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public override long Partition
         {
             get => MentionedUser?.Id.GetHashCode(StringComparison.Ordinal) ?? 0;

@@ -7,16 +7,12 @@
 
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Contents.Text;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 {
-    public sealed class CommandFactory<T> where T : class
+    public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where T : class
     {
-#pragma warning disable RECS0108 // Warns about static fields in generic types
-        private static readonly FilterDefinitionBuilder<MongoTextIndexEntity<T>> Filter = Builders<MongoTextIndexEntity<T>>.Filter;
-        private static readonly UpdateDefinitionBuilder<MongoTextIndexEntity<T>> Update = Builders<MongoTextIndexEntity<T>>.Update;
-#pragma warning restore RECS0108 // Warns about static fields in generic types
-
         private readonly Func<Dictionary<string, string>, T> textBuilder;
 
         public CommandFactory(Func<Dictionary<string, string>, T> textBuilder)

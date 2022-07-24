@@ -15,17 +15,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public void Should_serialize_and_deserialize()
         {
-            var sut = new CommandResult(DomainId.NewGuid(), 3, 2, "result");
-
-            var serialized = sut.SerializeAndDeserialize();
-
-            Assert.Equal(sut, serialized);
-        }
-
-        [Fact]
-        public void Should_serialize_and_deserialize_empty()
-        {
-            var sut = CommandResult.Empty(DomainId.NewGuid(), 3, 2);
+            var sut = new CommandResult(DomainId.NewGuid(), 3, 2, null!);
 
             var serialized = sut.SerializeAndDeserialize();
 

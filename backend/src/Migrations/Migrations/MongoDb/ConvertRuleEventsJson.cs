@@ -8,10 +8,11 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations.MongoDb
 {
-    public sealed class ConvertRuleEventsJson : IMigration
+    public sealed class ConvertRuleEventsJson : MongoBase<BsonDocument>, IMigration
     {
         private readonly IMongoCollection<BsonDocument> collection;
 
@@ -23,13 +24,13 @@ namespace Migrations.Migrations.MongoDb
         public async Task UpdateAsync(
             CancellationToken ct)
         {
-            foreach (var document in collection.Find(new BsonDocument()).ToEnumerable(ct))
+            foreach (var document in collection.Find(FindAll).ToEnumerable(ct))
             {
                 try
                 {
                     document["Job"]["actionData"] = document["Job"]["actionData"].ToBsonDocument().ToJson();
 
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", document["_id"].ToString());
+                    var filter = Filter.Eq("_id", document["_id"].ToString());
 
                     await collection.ReplaceOneAsync(filter, document, cancellationToken: ct);
                 }

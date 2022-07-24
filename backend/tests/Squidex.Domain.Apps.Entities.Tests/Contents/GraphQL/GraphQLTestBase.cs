@@ -9,12 +9,11 @@ using FakeItEasy;
 using GraphQL;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
-using GraphQL.NewtonsoftJson;
+using GraphQL.SystemTextJson;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
@@ -25,7 +24,6 @@ using Squidex.Domain.Apps.Entities.Contents.TestData;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Shared;
 using Squidex.Shared.Users;
 using Xunit;
@@ -36,13 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public class GraphQLTestBase : IClassFixture<TranslationsFixture>
     {
-        protected readonly GraphQLSerializer serializer = new GraphQLSerializer(options =>
-        {
-            options.Formatting = Formatting.Indented;
-            options.Converters.Add(new JsonValueConverter());
-            options.Converters.Add(new WriteonlyGeoJsonConverter());
-        });
-
+        protected readonly GraphQLSerializer serializer = new GraphQLSerializer(TestUtils.DefaultOptions());
         protected readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         protected readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();

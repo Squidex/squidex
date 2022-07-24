@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         IAsyncEnumerable<SnapshotResult<AssetDomainObject.State>> ISnapshotStore<AssetDomainObject.State>.ReadAllAsync(
             CancellationToken ct)
         {
-            return Collection.Find(new BsonDocument(), Batching.Options).ToAsyncEnumerable(ct)
+            return Collection.Find(FindAll, Batching.Options).ToAsyncEnumerable(ct)
                 .Select(x => new SnapshotResult<AssetDomainObject.State>(x.DocumentId, x.ToState(), x.Version));
         }
 

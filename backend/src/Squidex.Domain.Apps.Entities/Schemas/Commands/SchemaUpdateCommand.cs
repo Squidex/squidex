@@ -14,7 +14,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
     {
         public NamedId<DomainId> SchemaId { get; set; }
 
-        [IgnoreDataMember]
         public override DomainId AggregateId
         {
             get => DomainId.Combine(AppId, SchemaId.Id);

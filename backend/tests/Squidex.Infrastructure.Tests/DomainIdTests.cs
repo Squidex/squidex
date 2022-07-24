@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.ComponentModel;
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using FluentAssertions;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure
 
         public class MyTest
         {
-            [IgnoreDataMember]
+            [JsonIgnore]
             public DomainId Calculated
             {
                 get => DomainId.Combine(Id0, Id1.Id);
@@ -161,19 +161,6 @@ namespace Squidex.Infrastructure
             var serialized = domainId.SerializeAndDeserialize();
 
             Assert.Equal(domainId, serialized);
-        }
-
-        [Fact]
-        public void Should_serialize_and_deserialize_as_dictionary()
-        {
-            var dictionary = new Dictionary<DomainId, int>
-            {
-                [DomainId.Create("123")] = 321
-            };
-
-            var serialized = dictionary.SerializeAndDeserialize();
-
-            Assert.Equal(321, serialized[DomainId.Create("123")]);
         }
 
         [Fact]

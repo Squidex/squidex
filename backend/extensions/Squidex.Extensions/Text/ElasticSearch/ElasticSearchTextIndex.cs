@@ -7,12 +7,12 @@
 
 using System.Text.RegularExpressions;
 using Elasticsearch.Net;
-using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Extensions.Text.ElasticSearch
 {
@@ -23,14 +23,16 @@ namespace Squidex.Extensions.Text.ElasticSearch
         private readonly ElasticLowLevelClient client;
         private readonly QueryParser queryParser = new QueryParser(ElasticSearchIndexDefinition.GetFieldPath);
         private readonly string indexName;
+        private readonly IJsonSerializer jsonSerializer;
 
-        public ElasticSearchTextIndex(string configurationString, string indexName)
+        public ElasticSearchTextIndex(string configurationString, string indexName, IJsonSerializer jsonSerializer)
         {
             var config = new ConnectionConfiguration(new Uri(configurationString));
 
             client = new ElasticLowLevelClient(config);
 
             this.indexName = indexName;
+            this.jsonSerializer = jsonSerializer;
         }
 
         public Task InitializeAsync(
@@ -210,7 +212,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                 elasticQuery.query.@bool.should.Add(bySchema);
             }
 
-            var json = JsonConvert.SerializeObject(elasticQuery, Formatting.Indented);
+            var json = jsonSerializer.Serialize(elasticQuery, true);
 
             return await SearchAsync(elasticQuery, ct);
         }

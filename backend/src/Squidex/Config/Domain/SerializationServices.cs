@@ -6,9 +6,13 @@
 // ==========================================================================
 
 using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
 using Migrations;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using NetTopologySuite.IO.Converters;
+using NodaTime;
+using NodaTime.Serialization.SystemTextJson;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Apps.Json;
@@ -20,9 +24,10 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Json.System;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Reflection;
@@ -31,35 +36,43 @@ namespace Squidex.Config.Domain
 {
     public static class SerializationServices
     {
-        private static JsonSerializerSettings ConfigureJson(TypeNameHandling typeNameHandling, JsonSerializerSettings? settings = null)
+        private static JsonSerializerOptions ConfigureJson(TypeNameRegistry typeNameRegistry, JsonSerializerOptions? options = null)
         {
-            settings ??= new JsonSerializerSettings();
-            settings.Converters.Add(new StringEnumConverter());
+            options ??= new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
-            settings.ContractResolver = new ConverterContractResolver(
-                new ContentFieldDataConverter(),
-                new JsonValueConverter(),
-                new StringEnumConverter(),
-                new SurrogateConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>(),
-                new SurrogateConverter<FilterNode<JsonValue>, JsonFilterSurrogate>(),
-                new SurrogateConverter<LanguageConfig, LanguageConfigSurrogate>(),
-                new SurrogateConverter<LanguagesConfig, LanguagesConfigSurrogate>(),
-                new SurrogateConverter<Roles, RolesSurrogate>(),
-                new SurrogateConverter<Rule, RuleSorrgate>(),
-                new SurrogateConverter<Schema, SchemaSurrogate>(),
-                new SurrogateConverter<WorkflowStep, WorkflowStepSurrogate>(),
-                new SurrogateConverter<WorkflowTransition, WorkflowTransitionSurrogate>(),
-                new TypeConverterJsonConverter<CompareOperator>(),
-                new WriteonlyGeoJsonConverter());
+            options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+            // It is also a readonly list, so we have to register it first, so that other converters do not pick this up.
+            options.Converters.Add(new StringConverter<PropertyPath>(x => x));
+            options.Converters.Add(new GeoJsonConverterFactory());
+            options.Converters.Add(new InheritanceConverter<IEvent>(typeNameRegistry));
+            options.Converters.Add(new InheritanceConverter<FieldProperties>(typeNameRegistry));
+            options.Converters.Add(new InheritanceConverter<RuleAction>(typeNameRegistry));
+            options.Converters.Add(new InheritanceConverter<RuleTrigger>(typeNameRegistry));
+            options.Converters.Add(new JsonValueConverter());
+            options.Converters.Add(new ReadonlyDictionaryConverterFactory());
+            options.Converters.Add(new ReadonlyListConverterFactory());
+            options.Converters.Add(new SurrogateJsonConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>());
+            options.Converters.Add(new SurrogateJsonConverter<FilterNode<JsonValue>, JsonFilterSurrogate>());
+            options.Converters.Add(new SurrogateJsonConverter<LanguageConfig, LanguageConfigSurrogate>());
+            options.Converters.Add(new SurrogateJsonConverter<LanguagesConfig, LanguagesConfigSurrogate>());
+            options.Converters.Add(new SurrogateJsonConverter<Roles, RolesSurrogate>());
+            options.Converters.Add(new SurrogateJsonConverter<Rule, RuleSorrgate>());
+            options.Converters.Add(new SurrogateJsonConverter<Schema, SchemaSurrogate>());
+            options.Converters.Add(new SurrogateJsonConverter<WorkflowStep, WorkflowStepSurrogate>());
+            options.Converters.Add(new SurrogateJsonConverter<WorkflowTransition, WorkflowTransitionSurrogate>());
+            options.Converters.Add(new StringConverter<CompareOperator>());
+            options.Converters.Add(new StringConverter<DomainId>());
+            options.Converters.Add(new StringConverter<NamedId<DomainId>>());
+            options.Converters.Add(new StringConverter<NamedId<Guid>>());
+            options.Converters.Add(new StringConverter<NamedId<string>>());
+            options.Converters.Add(new StringConverter<Language>());
+            options.Converters.Add(new StringConverter<PropertyPath>(x => x));
+            options.Converters.Add(new StringConverter<RefToken>());
+            options.Converters.Add(new StringConverter<Status>());
+            options.Converters.Add(new JsonStringEnumConverter());
+            options.IncludeFields = true;
 
-            settings.NullValueHandling = NullValueHandling.Ignore;
-
-            settings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-            settings.DateParseHandling = DateParseHandling.None;
-
-            settings.TypeNameHandling = typeNameHandling;
-
-            return settings;
+            return options;
         }
 
         public static IServiceCollection AddSquidexSerializers(this IServiceCollection services)
@@ -79,39 +92,30 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<FieldTypeProvider>()
                 .As<ITypeProvider>();
 
-            services.AddSingletonAs<NewtonsoftJsonSerializer>()
+            services.AddSingletonAs<SystemJsonSerializer>()
                 .As<IJsonSerializer>();
 
             services.AddSingletonAs<TypeNameRegistry>()
                 .AsSelf();
 
-            services.AddSingletonAs(c => JsonSerializer.Create(c.GetRequiredService<JsonSerializerSettings>()))
-                .AsSelf();
+            services.AddSingletonAs(c => ConfigureJson(c.GetRequiredService<TypeNameRegistry>()))
+                .As<JsonSerializerOptions>();
 
-            services.AddSingletonAs(c =>
-                {
-                    var serializerSettings = ConfigureJson(TypeNameHandling.Auto, new JsonSerializerSettings());
-
-                    var typeNameRegistry = c.GetService<TypeNameRegistry>();
-
-                    if (typeNameRegistry != null)
-                    {
-                        serializerSettings.SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry);
-                    }
-
-                    return serializerSettings;
-                }).As<JsonSerializerSettings>();
+            services.Configure<JsonSerializerOptions>((c, options) =>
+            {
+                ConfigureJson(c.GetRequiredService<TypeNameRegistry>(), options);
+            });
 
             return services;
         }
 
         public static IMvcBuilder AddSquidexSerializers(this IMvcBuilder builder)
         {
-            builder.AddNewtonsoftJson(options =>
+            builder.Services.Configure<JsonOptions>((c, options) =>
             {
-                options.AllowInputFormatterExceptionMessages = false;
+                ConfigureJson(c.GetRequiredService<TypeNameRegistry>(), options.JsonSerializerOptions);
 
-                ConfigureJson(TypeNameHandling.None, options.SerializerSettings);
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             });
 
             return builder;

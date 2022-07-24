@@ -13,8 +13,8 @@ namespace Squidex.Infrastructure.Caching
 {
     public sealed class MongoDistributedCache : MongoRepositoryBase<MongoCacheEntry>, IDistributedCache
     {
-        public MongoDistributedCache(IMongoDatabase database, bool setup = false)
-            : base(database, setup)
+        public MongoDistributedCache(IMongoDatabase database)
+            : base(database)
         {
         }
 

@@ -29,12 +29,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         static AssetQueryTests()
         {
-            DomainIdSerializer.Register();
+            BsonDomainIdSerializer.Register();
 
-            TypeConverterStringSerializer<RefToken>.Register();
-            TypeConverterStringSerializer<Status>.Register();
+            BsonStringSerializer<RefToken>.Register();
+            BsonStringSerializer<Status>.Register();
 
-            InstantSerializer.Register();
+            BsonInstantSerializer.Register();
         }
 
         [Fact]

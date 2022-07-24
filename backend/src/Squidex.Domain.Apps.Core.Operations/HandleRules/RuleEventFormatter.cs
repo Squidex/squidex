@@ -9,11 +9,12 @@ using System.Globalization;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
+using NodaTime;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Templates;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
@@ -79,16 +80,20 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public virtual string ToPayload<T>(T @event)
         {
-            var payload = @event;
-
-            return serializer.Serialize(payload);
+            // Just serialize the payload.
+            return serializer.Serialize(@event, true);
         }
 
         public virtual string ToEnvelope(EnrichedEvent @event)
         {
-            var payload = new { type = @event.Name, payload = @event, timestamp = @event.Timestamp };
+            // Use the overloard with object to serialize a concrete type.
+            return ToEnvelope(@event.Name, @event, @event.Timestamp);
+        }
 
-            return serializer.Serialize(payload);
+        public virtual string ToEnvelope(string type, object payload, Instant timestamp)
+        {
+            // Provide this overload with object to serialize the derived type and not the static type.
+            return serializer.Serialize(new { type, payload, timestamp }, true);
         }
 
         public async ValueTask<string?> FormatAsync(string text, EnrichedEvent @event)
@@ -288,8 +293,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                             text = text.ToUpperInvariant();
                             break;
                         case "escape":
-                            text = JsonConvert.ToString(text);
-                            text = text[1..^1];
+                            text = text.JsonEscape();
                             break;
                         case "slugify":
                             text = text.Slugify();

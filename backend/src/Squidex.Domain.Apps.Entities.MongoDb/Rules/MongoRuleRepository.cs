@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using MongoDB.Driver;
-using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
@@ -18,8 +17,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 {
     public sealed class MongoRuleRepository : MongoSnapshotStoreBase<RuleDomainObject.State, MongoRuleEntity>, IRuleRepository, IDeleter
     {
-        public MongoRuleRepository(IMongoDatabase database, JsonSerializer serializer)
-            : base(database, serializer)
+        public MongoRuleRepository(IMongoDatabase database)
+            : base(database)
         {
         }
 

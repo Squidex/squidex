@@ -14,10 +14,6 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
     {
-        private static readonly FieldDefinition<MongoEventCommit, BsonTimestamp> TimestampField = FieldBuilder.Build(x => x.Timestamp);
-        private static readonly FieldDefinition<MongoEventCommit, long> EventsCountField = FieldBuilder.Build(x => x.EventsCount);
-        private static readonly FieldDefinition<MongoEventCommit, long> EventStreamOffsetField = FieldBuilder.Build(x => x.EventStreamOffset);
-        private static readonly FieldDefinition<MongoEventCommit, string> EventStreamField = FieldBuilder.Build(x => x.EventStream);
         private readonly IEventNotifier notifier;
 
         public IMongoCollection<BsonDocument> RawCollection

@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         static MongoContentRepository()
         {
-            TypeConverterStringSerializer<Status>.Register();
+            BsonStringSerializer<Status>.Register();
         }
 
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider,

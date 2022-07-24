@@ -5,21 +5,27 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using MongoDB.Driver;
 using Squidex.Hosting;
 using Squidex.Hosting.Configuration;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public abstract class MongoRepositoryBase<TEntity> : MongoBase<TEntity>, IInitializable
+    public abstract class MongoRepositoryBase<T> : MongoBase<T>, IInitializable
     {
         private readonly IMongoDatabase mongoDatabase;
-        private IMongoCollection<TEntity> mongoCollection;
+        private IMongoCollection<T> mongoCollection;
 
-        protected IMongoCollection<TEntity> Collection
+        protected IMongoCollection<T> Collection
         {
             get
             {
+                if (mongoCollection == null)
+                {
+                    InitializeAsync(default).Wait();
+                }
+
                 if (mongoCollection == null)
                 {
                     ThrowHelper.InvalidOperationException("Collection has not been initialized yet.");
@@ -35,16 +41,11 @@ namespace Squidex.Infrastructure.MongoDb
             get => mongoDatabase;
         }
 
-        protected MongoRepositoryBase(IMongoDatabase database, bool setup = false)
+        protected MongoRepositoryBase(IMongoDatabase database)
         {
             Guard.NotNull(database);
 
             mongoDatabase = database;
-
-            if (setup)
-            {
-                CreateCollection();
-            }
         }
 
         protected virtual MongoCollectionSettings CollectionSettings()
@@ -52,9 +53,12 @@ namespace Squidex.Infrastructure.MongoDb
             return new MongoCollectionSettings();
         }
 
-        protected abstract string CollectionName();
+        protected virtual string CollectionName()
+        {
+            return string.Format(CultureInfo.InvariantCulture, "{0}Set", typeof(T).Name);
+        }
 
-        protected virtual Task SetupCollectionAsync(IMongoCollection<TEntity> collection,
+        protected virtual Task SetupCollectionAsync(IMongoCollection<T> collection,
             CancellationToken ct)
         {
             return Task.CompletedTask;
@@ -99,7 +103,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         private void CreateCollection()
         {
-            mongoCollection = mongoDatabase.GetCollection<TEntity>(
+            mongoCollection = mongoDatabase.GetCollection<T>(
                 CollectionName(),
                 CollectionSettings() ?? new MongoCollectionSettings());
         }

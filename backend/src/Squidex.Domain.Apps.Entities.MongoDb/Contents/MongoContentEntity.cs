@@ -59,12 +59,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         [BsonIgnoreIfNull]
         [BsonElement("do")]
-        [BsonJson]
         public ContentData Data { get; set; }
 
         [BsonIgnoreIfNull]
         [BsonElement("dd")]
-        [BsonJson]
         public ContentData? DraftData { get; set; }
 
         [BsonIgnoreIfNull]

@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         public AssetsQueryFixture()
         {
-            SetupJson();
+            BsonJsonConvention.Register(TestUtils.DefaultOptions());
 
             mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
             mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
@@ -136,13 +136,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
             await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 0 }", cancellationToken: ct);
             await mongoDatabase.DropCollectionAsync("system.profile", ct);
             await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 2 }", cancellationToken: ct);
-        }
-
-        private static void SetupJson()
-        {
-            var serializer = JsonSerializer.Create(TestUtils.DefaultSerializerSettings);
-
-            BsonJsonConvention.Register(serializer);
         }
 
         public DomainId RandomAppId()

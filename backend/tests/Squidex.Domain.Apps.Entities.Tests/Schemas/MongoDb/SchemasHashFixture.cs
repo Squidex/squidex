@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.MongoDb
 
         public SchemasHashFixture()
         {
-            InstantSerializer.Register();
+            BsonInstantSerializer.Register();
 
             var mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
             var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);

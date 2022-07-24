@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Hosting;
 using Squidex.Hosting.Configuration;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Plugins;
 
 namespace Squidex.Extensions.Text.ElasticSearch
@@ -39,7 +40,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                 }
 
                 services.AddSingleton(
-                    c => new ElasticSearchTextIndex(elasticConfiguration, indexName));
+                    c => new ElasticSearchTextIndex(elasticConfiguration, indexName, c.GetRequiredService<IJsonSerializer>()));
 
                 services.AddSingleton<ITextIndex>(
                     c => c.GetRequiredService<ElasticSearchTextIndex>());

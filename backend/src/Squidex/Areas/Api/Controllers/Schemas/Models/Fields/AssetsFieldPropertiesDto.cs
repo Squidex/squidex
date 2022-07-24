@@ -22,7 +22,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The language specific default value as a list of asset ids.
         /// </summary>
-        public LocalizedValue<ReadonlyList<string>?> DefaultValues { get; set; }
+        public LocalizedValue<ReadonlyList<string>?>? DefaultValues { get; set; }
 
         /// <summary>
         /// The default value as a list of asset ids.

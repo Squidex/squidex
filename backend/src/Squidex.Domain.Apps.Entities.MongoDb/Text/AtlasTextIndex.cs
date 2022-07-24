@@ -28,8 +28,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
         private readonly AtlasOptions options;
         private string index;
 
-        public AtlasTextIndex(IMongoDatabase database, IOptions<AtlasOptions> options, bool setup = false)
-            : base(database, setup)
+        public AtlasTextIndex(IMongoDatabase database, IOptions<AtlasOptions> options)
+            : base(database)
         {
             this.options = options.Value;
         }

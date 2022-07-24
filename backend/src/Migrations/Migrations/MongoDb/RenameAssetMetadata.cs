@@ -8,10 +8,11 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations.MongoDb
 {
-    public sealed class RenameAssetMetadata : IMigration
+    public sealed class RenameAssetMetadata : MongoBase<BsonDocument>, IMigration
     {
         private readonly IMongoDatabase database;
 
@@ -23,45 +24,38 @@ namespace Migrations.Migrations.MongoDb
         public async Task UpdateAsync(
             CancellationToken ct)
         {
+            // Do not resolve in constructor, because most of the time it is not executed anyway.
             var collection = database.GetCollection<BsonDocument>("States_Assets");
 
-            var createMetadata =
-                Builders<BsonDocument>.Update
-                    .Set("md", new BsonDocument());
+            // Create metadata.
+            await collection.UpdateManyAsync(FindAll,
+                Update.Set("md", new BsonDocument()),
+                cancellationToken: ct);
 
-            await collection.UpdateManyAsync(new BsonDocument(), createMetadata, cancellationToken: ct);
+            // Remove null pixel infos.
+            await collection.UpdateManyAsync(new BsonDocument("ph", BsonValue.Create(null)),
+                Update.Unset("ph").Unset("pw"),
+                cancellationToken: ct);
 
-            var removeNullPixelInfos =
-                Builders<BsonDocument>.Update
-                    .Unset("ph")
-                    .Unset("pw");
+            // Set pixel metadata.
+            await collection.UpdateManyAsync(FindAll,
+                Update.Rename("ph", "md.pixelHeight").Rename("pw", "md.pixelWidth"),
+                cancellationToken: ct);
 
-            await collection.UpdateManyAsync(new BsonDocument("ph", BsonValue.Create(null)), removeNullPixelInfos, cancellationToken: ct);
+            // Set type to image.
+            await collection.UpdateManyAsync(new BsonDocument("im", true),
+                Update.Set("at", "Image"),
+                cancellationToken: ct);
 
-            var setPixelDimensions =
-                Builders<BsonDocument>.Update
-                    .Rename("ph", "md.pixelHeight")
-                    .Rename("pw", "md.pixelWidth");
+            // Set type to unknown.
+            await collection.UpdateManyAsync(new BsonDocument("im", false),
+                Update.Set("at", "Unknown"),
+                cancellationToken: ct);
 
-            await collection.UpdateManyAsync(new BsonDocument(), setPixelDimensions, cancellationToken: ct);
-
-            var setTypeToImage =
-                Builders<BsonDocument>.Update
-                    .Set("at", "Image");
-
-            await collection.UpdateManyAsync(new BsonDocument("im", true), setTypeToImage, cancellationToken: ct);
-
-            var setTypeToUnknown =
-                Builders<BsonDocument>.Update
-                    .Set("at", "Unknown");
-
-            await collection.UpdateManyAsync(new BsonDocument("im", false), setTypeToUnknown, cancellationToken: ct);
-
-            var removeIsImage =
-                Builders<BsonDocument>.Update
-                    .Unset("im");
-
-            await collection.UpdateManyAsync(new BsonDocument(), removeIsImage, cancellationToken: ct);
+            // Remove IsImage.
+            await collection.UpdateManyAsync(FindAll,
+                Update.Unset("im"),
+                cancellationToken: ct);
         }
     }
 }

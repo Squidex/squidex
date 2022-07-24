@@ -93,5 +93,13 @@ namespace Squidex.Infrastructure
 
             Assert.Equal("1_2", result);
         }
+
+        [Fact]
+        public void Should_escape_json()
+        {
+            var result = StringExtensions.JsonEscape("Hello \"World\"");
+
+            Assert.Equal("Hello \\\"World\\\"", result);
+        }
     }
 }

@@ -8,25 +8,15 @@
 using System.Runtime.CompilerServices;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.States
 {
     public abstract class MongoSnapshotStoreBase<T, TState> : MongoRepositoryBase<TState>, ISnapshotStore<T> where TState : MongoState<T>, new()
     {
-        protected MongoSnapshotStoreBase(IMongoDatabase database, JsonSerializer serializer)
-            : base(database, Register(serializer))
+        protected MongoSnapshotStoreBase(IMongoDatabase database)
+            : base(database)
         {
-        }
-
-        private static bool Register(JsonSerializer serializer)
-        {
-            Guard.NotNull(serializer);
-
-            BsonJsonConvention.Register(serializer);
-
-            return true;
         }
 
         protected override string CollectionName()
@@ -101,7 +91,7 @@ namespace Squidex.Infrastructure.States
         {
             using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/ReadAllAsync"))
             {
-                var find = Collection.Find(new BsonDocument(), Batching.Options);
+                var find = Collection.Find(FindAll, Batching.Options);
 
                 await foreach (var document in find.ToAsyncEnumerable(ct))
                 {

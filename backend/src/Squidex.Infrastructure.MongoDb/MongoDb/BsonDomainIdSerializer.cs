@@ -11,13 +11,13 @@ using MongoDB.Bson.Serialization.Serializers;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public sealed class DomainIdSerializer : SerializerBase<DomainId>, IBsonPolymorphicSerializer, IRepresentationConfigurable<DomainIdSerializer>
+    public sealed class BsonDomainIdSerializer : SerializerBase<DomainId>, IBsonPolymorphicSerializer, IRepresentationConfigurable<BsonDomainIdSerializer>
     {
         public static void Register()
         {
             try
             {
-                BsonSerializer.RegisterSerializer(new DomainIdSerializer());
+                BsonSerializer.RegisterSerializer(new BsonDomainIdSerializer());
             }
             catch (BsonSerializationException)
             {
@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.MongoDb
             context.Writer.WriteString(value.ToString());
         }
 
-        public DomainIdSerializer WithRepresentation(BsonType representation)
+        public BsonDomainIdSerializer WithRepresentation(BsonType representation)
         {
             if (representation != BsonType.String)
             {

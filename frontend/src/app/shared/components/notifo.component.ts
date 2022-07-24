@@ -37,7 +37,7 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
         private readonly renderer: Renderer2,
     ) {
         this.notifoApiKey = authService.user?.notifoToken;
-        this.notifoApiUrl = uiOptions.get('more.notifoApi');
+        this.notifoApiUrl = uiOptions.get('notifoApi');
 
         if (this.isConfigured) {
             if (this.notifoApiUrl.indexOf('localhost:5002') >= 0) {

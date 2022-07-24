@@ -1,0 +1,324 @@
+{
+    "appId": "7c45937e-e489-453f-81f8-a1432e778ea2,test",
+    "schemaDef": {
+        "name": "test",
+        "isPublished": true,
+        "type": "Default",
+        "properties": {
+            "tags": [
+                "1",
+                "2",
+                "3"
+            ],
+            "contentsSidebarUrl": "contents-sidebar",
+            "contentSidebarUrl": "content-sidebar",
+            "contentEditorUrl": "content-editor",
+            "validateOnPublish": true,
+            "label": "label",
+            "hints": "hints"
+        },
+        "scripts": {
+            "change": "change",
+            "create": "create",
+            "update": "update",
+            "delete": "delete",
+            "query": "query",
+            "queryPre": "prepare"
+        },
+        "fieldsInLists": [
+            "string"
+        ],
+        "fieldsInReferences": [
+            "boolean"
+        ],
+        "fieldRules": [
+            {
+                "action": "Disable",
+                "field": "array",
+                "condition": "1 == 2"
+            }
+        ],
+        "fields": [
+            {
+                "id": 1,
+                "name": "string",
+                "partitioning": "language",
+                "isHidden": false,
+                "isLocked": false,
+                "isDisabled": false,
+                "properties": {
+                    "$type": "StringField",
+                    "isUnique": false,
+                    "isEmbeddable": false,
+                    "inlineEditable": true,
+                    "createEnum": false,
+                    "contentType": "Unspecified",
+                    "editor": "Input",
+                    "isRequired": true,
+                    "isRequiredOnPublish": true,
+                    "isHalfWidth": false
+                }
+            },
+            {
+                "id": 2,
+                "name": "assets",
+                "partitioning": "language",
+                "isHidden": false,
+                "isLocked": false,
+                "isDisabled": false,
+                "properties": {
+                    "$type": "AssetsField",
+                    "previewMode": "FileName",
+                    "expectedType": "Image",
+                    "allowDuplicates": false,
+                    "resolveFirst": false,
+                    "allowedExtensions": [
+                        "a",
+                        "b",
+                        "c",
+                        "d"
+                    ],
+                    "isRequired": false,
+                    "isRequiredOnPublish": false,
+                    "isHalfWidth": false
+                }
+            },
+            {
+                "id": 3,
+                "name": "boolean",
+                "partitioning": "language",
+                "isHidden": false,
+                "isLocked": false,
+                "isDisabled": false,
+                "properties": {
+                    "$type": "BooleanField",
+                    "defaultValues": {
+                        "en": true,
+                        "de": false
+                    },
+                    "inlineEditable": false,
+                    "editor": "Checkbox",
+                    "isRequired": false,
+                    "isRequiredOnPublish": false,
+                    "isHalfWidth": false
+                }
+            },
+            {
+                "id": 4,
+                "name": "component",
+                "partitioning": "language",
+                "isHidden": false,
+                "isLocked": false,
+                "isDisabled": false,
+                "properties": {
+                    "$type": "ComponentField",
+                    "schemaId": "62a1d2a8-f08d-4870-8cb9-cb3ba286d56c",
+                    "schemaIds": [
+                        "62a1d2a8-f08d-4870-8cb9-cb3ba286d56c"
+                    ],
+                    "isRequired": false,
+                    "isRequiredOnPublish": false,
+                    "isHalfWidth": false
+                }
+            },
+            {
+                "id": 5,
+                "name": "components",
+                "partitioning": "language",
+                "isHidden": false,
+                "isLocked": false,
+                "isDisabled": false,
+                "properties": {
+                    "$type": "ComponentsField",
+                    "schemaId": "62a1d2a8-f08d-4870-8cb9-cb3ba286d56c",
+                    "schemaIds": [
+                        "62a1d2a8-f08d-4870-8cb9-cb3ba286d56c"
+                    ],
+                    "isRequired": false,
+                    "isRequiredOnPublish": false,
+                    "isHalfWidth": false
+                }
+            },
+            {
+                "id": 6,
+                "name": "date",
+                "partitioning": "language",
+                "isHidden": false,
+                "isLocked": false,
+                "isDisabled": false,
+                "properties": {
+                    "$type": "DateTimeField",
+                    "maxValue": "2022-07-22T17:21:13Z",
+                    "minValue": "2022-07-22T17:21:12Z",
+                    "editor": "DateTime",
+                    "isRequired": true,
+                    "isRequiredOnPublish": true,
+                    "isHalfWidth": false
+                }
+            },
+            {
+                "id": 7,
+                "name": "geolocation",
+                "partitioning": "language",
+                "isHidden": false,
+                "isLocked": false,
+                "isDisabled": false,
+                "properties": {
+                    "$type": "GeolocationField",
+                    "editor": "Map",
+                    "isRequired": false,
+                    "isRequiredOnPublish": false,
+                    "isHalfWidth": true
+                }
+            },
+            {
+                "id": 8,
+                "name": "json",
+                "partitioning": "language",
+                "isHidden": false,
+                "isLocked": false,
+                "isDisabled": false,
+                "properties": {
+                    "$type": "JsonField",
+                    "isRequired": false,
+                    "isRequiredOnPublish": false,
+                    "isHalfWidth": false
+                }
+            },
+            {
+                "id": 9,
+                "name": "number",
+                "partitioning": "language",
+                "isHidden": false,
+                "isLocked": false,
+                "isDisabled": false,
+                "properties": {
+                    "$type": "NumberField",
+                    "isUnique": false,
+                    "inlineEditable": false,
+                    "editor": "Input",
+                    "isRequired": false,
+                    "isRequiredOnPublish": false,
+                    "isHalfWidth": false,
+                    "tags": [
+                        "1",
+                        "2",
+                        "3"
+                    ]
+                }
+            },
+            {
+                "id": 10,
+                "name": "references",
+                "partitioning": "language",
+                "isHidden": false,
+                "isLocked": false,
+                "isDisabled": false,
+                "properties": {
+                    "$type": "ReferencesField",
+                    "resolveReference": false,
+                    "allowDuplicates": false,
+                    "mustBePublished": false,
+                    "editor": "List",
+                    "schemaId": "62a1d2a8-f08d-4870-8cb9-cb3ba286d56c",
+                    "schemaIds": [
+                        "62a1d2a8-f08d-4870-8cb9-cb3ba286d56c"
+                    ],
+                    "isRequired": false,
+                    "isRequiredOnPublish": false,
+                    "isHalfWidth": false
+                }
+            },
+            {
+                "id": 11,
+                "name": "tags",
+                "partitioning": "language",
+                "isHidden": false,
+                "isLocked": false,
+                "isDisabled": false,
+                "properties": {
+                    "$type": "TagsField",
+                    "defaultValues": {
+                        "de-DE": [
+                            "4",
+                            "5",
+                            "6"
+                        ]
+                    },
+                    "defaultValue": [
+                        "1",
+                        "2",
+                        "3"
+                    ],
+                    "createEnum": false,
+                    "editor": "Tags",
+                    "normalization": "None",
+                    "isRequired": false,
+                    "isRequiredOnPublish": false,
+                    "isHalfWidth": false
+                }
+            },
+            {
+                "id": 12,
+                "name": "array",
+                "partitioning": "language",
+                "isHidden": false,
+                "isLocked": false,
+                "isDisabled": false,
+                "properties": {
+                    "$type": "ArrayField",
+                    "isRequired": false,
+                    "isRequiredOnPublish": false,
+                    "isHalfWidth": false
+                },
+                "children": [
+                    {
+                        "id": 14,
+                        "name": "nested",
+                        "isHidden": false,
+                        "isLocked": false,
+                        "isDisabled": false,
+                        "properties": {
+                            "$type": "StringField",
+                            "isUnique": false,
+                            "isEmbeddable": false,
+                            "inlineEditable": false,
+                            "createEnum": false,
+                            "contentType": "Unspecified",
+                            "editor": "Input",
+                            "isRequired": false,
+                            "isRequiredOnPublish": false,
+                            "isHalfWidth": false
+                        }
+                    }
+                ]
+            },
+            {
+                "id": 13,
+                "name": "ui",
+                "partitioning": "invariant",
+                "isHidden": false,
+                "isLocked": false,
+                "isDisabled": false,
+                "properties": {
+                    "$type": "UIField",
+                    "editor": "Separator",
+                    "isRequired": false,
+                    "isRequiredOnPublish": false,
+                    "isHalfWidth": false
+                }
+            }
+        ],
+        "previewUrls": {
+            "Web": "URL"
+        }
+    },
+    "schemaFieldsTotal": 14,
+    "isDeleted": false,
+    "id": "62a1d2a8-f08d-4870-8cb9-cb3ba286d56c",
+    "createdBy": "subject:62cee33bcc71c0d140ad103a",
+    "lastModifiedBy": "subject:62cee33bcc71c0d140ad103a",
+    "created": "2022-07-22T17:18:04Z",
+    "lastModified": "2022-07-22T17:21:54Z",
+    "version": 30
+}

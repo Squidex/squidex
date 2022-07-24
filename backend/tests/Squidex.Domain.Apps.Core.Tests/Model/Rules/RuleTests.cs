@@ -82,12 +82,9 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
             var rule_3 = rule_2.Enable();
 
             Assert.NotSame(rule_1, rule_2);
-
             Assert.False(rule_1.IsEnabled);
-
             Assert.True(rule_2.IsEnabled);
             Assert.True(rule_3.IsEnabled);
-
             Assert.Same(rule_2, rule_3);
         }
 
@@ -98,10 +95,8 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
             var rule_2 = rule_1.Disable();
 
             Assert.NotSame(rule_0, rule_1);
-
             Assert.False(rule_1.IsEnabled);
             Assert.False(rule_2.IsEnabled);
-
             Assert.Same(rule_1, rule_2);
         }
 
@@ -112,7 +107,6 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
             var rule_2 = rule_1.Rename("MyName");
 
             Assert.NotSame(rule_0, rule_1);
-
             Assert.Equal("MyName", rule_1.Name);
             Assert.Equal("MyName", rule_2.Name);
             Assert.Same(rule_1, rule_2);

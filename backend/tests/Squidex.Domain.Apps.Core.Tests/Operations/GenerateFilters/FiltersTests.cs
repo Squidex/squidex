@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateFilters
         {
             var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var (schema, components) = TestUtils.MixedSchema();
+            var (schema, components) = TestSchema.MixedSchema();
 
             var queryModel = ContentQueryModel.Build(schema, languagesConfig.ToResolver(), components);
 

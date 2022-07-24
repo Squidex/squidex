@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             public bool IsDeleted { get; set; }
 
-            [IgnoreDataMember]
+            [JsonIgnore]
             public DomainId UniqueId
             {
                 get => Id;

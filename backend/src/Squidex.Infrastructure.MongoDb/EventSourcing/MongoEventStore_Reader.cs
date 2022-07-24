@@ -47,10 +47,10 @@ namespace Squidex.Infrastructure.EventSourcing
 
             using (Telemetry.Activities.StartActivity("MongoEventStore/QueryLatestAsync"))
             {
-                var filter = Filter.Eq(EventStreamField, streamName);
+                var filter = Filter.Eq(x => x.EventStream, streamName);
 
                 var commits =
-                    await Collection.Find(filter).Sort(Sort.Descending(TimestampField)).Limit(count)
+                    await Collection.Find(filter).Sort(Sort.Descending(x => x.Timestamp)).Limit(count)
                         .ToListAsync(ct);
 
                 var result = commits.Select(x => x.Filtered()).Reverse().SelectMany(x => x).TakeLast(count).ToList();
@@ -68,11 +68,11 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 var filter =
                     Filter.And(
-                        Filter.Eq(EventStreamField, streamName),
-                        Filter.Gte(EventStreamOffsetField, streamPosition - MaxCommitSize));
+                        Filter.Eq(x => x.EventStream, streamName),
+                        Filter.Gte(x => x.EventStreamOffset, streamPosition - MaxCommitSize));
 
                 var commits =
-                    await Collection.Find(filter).Sort(Sort.Ascending(TimestampField))
+                    await Collection.Find(filter).Sort(Sort.Ascending(x => x.Timestamp))
                         .ToListAsync(ct);
 
                 var result = commits.SelectMany(x => x.Filtered(streamPosition)).ToList();
@@ -92,11 +92,11 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 var filter =
                     Filter.And(
-                        Filter.In(EventStreamField, streamNames),
-                        Filter.Gte(EventStreamOffsetField, position));
+                        Filter.In(x => x.EventStream, streamNames),
+                        Filter.Gte(x => x.EventStreamOffset, position));
 
                 var commits =
-                    await Collection.Find(filter).Sort(Sort.Ascending(TimestampField))
+                    await Collection.Find(filter).Sort(Sort.Ascending(x => x.Timestamp))
                         .ToListAsync(ct);
 
                 var result = commits.GroupBy(x => x.EventStream)
@@ -122,7 +122,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var find =
                 Collection.Find(filterDefinition, Batching.Options)
-                    .Limit(take).Sort(Sort.Descending(TimestampField).Ascending(EventStreamField));
+                    .Limit(take).Sort(Sort.Descending(x => x.Timestamp).Ascending(x => x.EventStream));
 
             var taken = 0;
 
@@ -162,7 +162,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var find =
                 Collection.Find(filterDefinition)
-                    .Limit(take).Sort(Sort.Ascending(TimestampField).Ascending(EventStreamField));
+                    .Limit(take).Sort(Sort.Ascending(x => x.Timestamp).Ascending(x => x.EventStream));
 
             var taken = 0;
 

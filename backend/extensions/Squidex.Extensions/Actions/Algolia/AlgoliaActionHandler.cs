@@ -5,12 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text.Json.Serialization;
 using Algolia.Search.Clients;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Infrastructure.Json;
 
 #pragma warning disable IDE0059 // Value assigned to symbol is never used
 #pragma warning disable MA0048 // File name must match type name
@@ -21,8 +22,9 @@ namespace Squidex.Extensions.Actions.Algolia
     {
         private readonly ClientPool<(string AppId, string ApiKey, string IndexName), ISearchIndex> clients;
         private readonly IScriptEngine scriptEngine;
+        private readonly IJsonSerializer serializer;
 
-        public AlgoliaActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine)
+        public AlgoliaActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine, IJsonSerializer serializer)
             : base(formatter)
         {
             clients = new ClientPool<(string AppId, string ApiKey, string IndexName), ISearchIndex>(key =>
@@ -33,6 +35,7 @@ namespace Squidex.Extensions.Actions.Algolia
             });
 
             this.scriptEngine = scriptEngine;
+            this.serializer = serializer;
         }
 
         protected override async Task<(string Description, AlgoliaJob Data)> CreateJobAsync(EnrichedEvent @event, AlgoliaAction action)
@@ -43,7 +46,7 @@ namespace Squidex.Extensions.Actions.Algolia
 
                 var ruleDescription = string.Empty;
                 var contentId = entityEvent.Id.ToString();
-                var content = (JObject)null;
+                var content = (AlgoliaContent)null;
 
                 if (delete)
                 {
@@ -67,21 +70,27 @@ namespace Squidex.Extensions.Actions.Algolia
                             jsonString = ToJson(@event);
                         }
 
-                        content = JObject.Parse(jsonString);
+                        content = serializer.Deserialize<AlgoliaContent>(jsonString);
                     }
                     catch (Exception ex)
                     {
-                        content = new JObject(new JProperty("error", $"Invalid JSON: {ex.Message}"));
+                        content = new AlgoliaContent
+                        {
+                            More = new Dictionary<string, object>
+                            {
+                                ["error"] = $"Invalid JSON: {ex.Message}"
+                            }
+                        };
                     }
 
-                    content["objectID"] = contentId;
+                    content.ObjectID = contentId;
                 }
 
                 var ruleJob = new AlgoliaJob
                 {
                     AppId = action.AppId,
                     ApiKey = action.ApiKey,
-                    Content = content,
+                    Content = serializer.Serialize(content, true),
                     ContentId = contentId,
                     IndexName = await FormatAsync(action.IndexName, @event)
                 };
@@ -106,15 +115,20 @@ namespace Squidex.Extensions.Actions.Algolia
             {
                 if (job.Content != null)
                 {
-                    var response = await index.SaveObjectAsync(job.Content, null, ct, true);
+                    var raw = new[]
+                    {
+                        new JRaw(job.Content)
+                    };
 
-                    return Result.Success(JsonConvert.SerializeObject(response, Formatting.Indented));
+                    var response = await index.SaveObjectsAsync(raw, null, ct, true);
+
+                    return Result.Success(serializer.Serialize(response, true));
                 }
                 else
                 {
                     var response = await index.DeleteObjectAsync(job.ContentId, null, ct);
 
-                    return Result.Success(JsonConvert.SerializeObject(response, Formatting.Indented));
+                    return Result.Success(serializer.Serialize(response, true));
                 }
             }
             catch (Exception ex)
@@ -122,6 +136,15 @@ namespace Squidex.Extensions.Actions.Algolia
                 return Result.Failed(ex);
             }
         }
+    }
+
+    public sealed class AlgoliaContent
+    {
+        [JsonPropertyName("objectID")]
+        public string ObjectID { get; set; }
+
+        [JsonExtensionData]
+        public Dictionary<string, object> More { get; set; } = new Dictionary<string, object>();
     }
 
     public sealed class AlgoliaJob
@@ -134,6 +157,6 @@ namespace Squidex.Extensions.Actions.Algolia
 
         public string IndexName { get; set; }
 
-        public JObject Content { get; set; }
+        public string Content { get; set; }
     }
 }

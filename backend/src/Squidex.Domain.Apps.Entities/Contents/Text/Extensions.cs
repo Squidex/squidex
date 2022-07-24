@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Text;
-using GeoJSON.Net;
+using NetTopologySuite.Geometries;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
@@ -16,9 +16,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public static class Extensions
     {
-        public static Dictionary<string, GeoJSONObject>? ToGeo(this ContentData data, IJsonSerializer serializer)
+        public static Dictionary<string, Geometry>? ToGeo(this ContentData data, IJsonSerializer serializer)
         {
-            Dictionary<string, GeoJSONObject>? result = null;
+            Dictionary<string, Geometry>? result = null;
 
             foreach (var (field, value) in data)
             {
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                         if (geoJson != null)
                         {
-                            result ??= new Dictionary<string, GeoJSONObject>();
+                            result ??= new Dictionary<string, Geometry>();
                             result[$"{field}.{key}"] = geoJson;
                         }
                     }

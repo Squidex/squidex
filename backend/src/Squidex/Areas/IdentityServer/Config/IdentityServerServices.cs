@@ -116,19 +116,19 @@ namespace Squidex.Areas.IdentityServer.Config
                     options.UseAspNetCore();
                 });
 
-            services.Configure<AntiforgeryOptions>((services, options) =>
+            services.Configure<AntiforgeryOptions>((c, options) =>
             {
-                var identityOptions = services.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
+                var identityOptions = c.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
 
                 options.SuppressXFrameOptionsHeader = identityOptions.SuppressXFrameOptionsHeader;
             });
 
-            services.Configure<OpenIddictServerOptions>((services, options) =>
+            services.Configure<OpenIddictServerOptions>((c, options) =>
             {
-                var urlGenerator = services.GetRequiredService<IUrlGenerator>();
+                var urlGenerator = c.GetRequiredService<IUrlGenerator>();
 
                 var identityPrefix = Constants.PrefixIdentityServer;
-                var identityOptions = services.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
+                var identityOptions = c.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
 
                 Func<string, Uri> buildUrl;
 

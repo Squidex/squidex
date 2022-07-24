@@ -1153,6 +1153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             return query
                 .Replace("'", "\"", StringComparison.Ordinal)
+                .Replace("`", "\"", StringComparison.Ordinal)
                 .Replace("<ID>", id.ToString(), StringComparison.Ordinal)
                 .Replace("<FIELDS_ASSET>", TestAsset.AllFields, StringComparison.Ordinal)
                 .Replace("<FIELDS_CONTENT>", TestContent.AllFields, StringComparison.Ordinal)

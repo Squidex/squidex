@@ -7,10 +7,11 @@
 
 using EventStore.Client;
 using Squidex.Infrastructure.TestHelpers;
+using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed class GetEventStoreFixture : IDisposable
+    public sealed class GetEventStoreFixture : IAsyncLifetime
     {
         private readonly EventStoreClientSettings settings;
 
@@ -23,15 +24,14 @@ namespace Squidex.Infrastructure.EventSourcing
             settings = EventStoreClientSettings.Create(TestConfig.Configuration["eventStore:configuration"]);
 
             EventStore = new GetEventStore(settings, TestUtils.DefaultSerializer);
-            EventStore.InitializeAsync(default).Wait();
         }
 
-        public void Dispose()
+        public Task InitializeAsync()
         {
-            CleanupAsync().Wait();
+            return EventStore.InitializeAsync(default);
         }
 
-        private async Task CleanupAsync()
+        public async Task DisposeAsync()
         {
             var projectionsManager = new EventStoreProjectionManagementClient(settings);
 

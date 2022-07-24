@@ -12,6 +12,30 @@ namespace Squidex.Infrastructure.Json.Objects
 {
     public class JsonValuesSerializationTests
     {
+        public enum SerializerMode
+        {
+            Json,
+            Bson
+        }
+
+        private static IEnumerable<object[]> Serializers()
+        {
+            yield return new object[] { SerializerMode.Json };
+            yield return new object[] { SerializerMode.Bson };
+        }
+
+        private static T Serialize<T>(T input, SerializerMode mode)
+        {
+            if (mode == SerializerMode.Bson)
+            {
+                return input.SerializeAndDeserializeBson();
+            }
+            else
+            {
+                return input.SerializeAndDeserialize();
+            }
+        }
+
         [Fact]
         public void Should_deserialize_integer()
         {
@@ -20,91 +44,100 @@ namespace Squidex.Infrastructure.Json.Objects
             Assert.Equal(JsonValue.Create(123), serialized);
         }
 
-        [Fact]
-        public void Should_serialize_and_deserialize_null()
+        [Theory]
+        [MemberData(nameof(Serializers))]
+        public void Should_serialize_and_deserialize_null(SerializerMode mode)
         {
             var value = JsonValue.Null;
 
-            var serialized = value.SerializeAndDeserialize();
+            var serialized = Serialize(value, mode);
 
             Assert.Equal(value, serialized);
         }
 
-        [Fact]
-        public void Should_serialize_and_deserialize_date()
+        [Theory]
+        [MemberData(nameof(Serializers))]
+        public void Should_serialize_and_deserialize_date(SerializerMode mode)
         {
             var value = JsonValue.Create("2008-09-15T15:53:00");
 
-            var serialized = value.SerializeAndDeserialize();
+            var serialized = Serialize(value, mode);
 
             Assert.Equal(value, serialized);
         }
 
-        [Fact]
-        public void Should_serialize_and_deserialize_string()
+        [Theory]
+        [MemberData(nameof(Serializers))]
+        public void Should_serialize_and_deserialize_string(SerializerMode mode)
         {
             var value = JsonValue.Create("my-string");
 
-            var serialized = value.SerializeAndDeserialize();
+            var serialized = Serialize(value, mode);
 
             Assert.Equal(value, serialized);
         }
 
-        [Fact]
-        public void Should_serialize_and_deserialize_boolean()
+        [Theory]
+        [MemberData(nameof(Serializers))]
+        public void Should_serialize_and_deserialize_boolean(SerializerMode mode)
         {
             var value = JsonValue.Create(true);
 
-            var serialized = value.SerializeAndDeserialize();
+            var serialized = Serialize(value, mode);
 
             Assert.Equal(value, serialized);
         }
 
-        [Fact]
-        public void Should_serialize_and_deserialize_number()
+        [Theory]
+        [MemberData(nameof(Serializers))]
+        public void Should_serialize_and_deserialize_number(SerializerMode mode)
         {
             var value = JsonValue.Create(123);
 
-            var serialized = value.SerializeAndDeserialize();
+            var serialized = Serialize(value, mode);
 
             Assert.Equal(value, serialized);
         }
 
-        [Fact]
-        public void Should_serialize_and_deserialize_double_number()
+        [Theory]
+        [MemberData(nameof(Serializers))]
+        public void Should_serialize_and_deserialize_double_number(SerializerMode mode)
         {
             var value = JsonValue.Create(123.5);
 
-            var serialized = value.SerializeAndDeserialize();
+            var serialized = Serialize(value, mode);
 
             Assert.Equal(value, serialized);
         }
 
-        [Fact]
-        public void Should_serialize_and_deserialize_array()
+        [Theory]
+        [MemberData(nameof(Serializers))]
+        public void Should_serialize_and_deserialize_array(SerializerMode mode)
         {
             var value = JsonValue.Array(1, 2);
 
-            var serialized = value.SerializeAndDeserialize();
+            var serialized = Serialize(value, mode);
 
             Assert.Equal(value, serialized);
         }
 
-        [Fact]
-        public void Should_serialize_and_deserialize_object()
+        [Theory]
+        [MemberData(nameof(Serializers))]
+        public void Should_serialize_and_deserialize_object(SerializerMode mode)
         {
             var value =
                 new JsonObject()
                     .Add("1", 1)
                     .Add("2", 1);
 
-            var serialized = value.SerializeAndDeserialize();
+            var serialized = Serialize(value, mode);
 
             Assert.Equal(value, serialized);
         }
 
-        [Fact]
-        public void Should_serialize_and_deserialize_complex_object()
+        [Theory]
+        [MemberData(nameof(Serializers))]
+        public void Should_serialize_and_deserialize_complex_object(SerializerMode mode)
         {
             var value =
                 new JsonObject()
@@ -115,7 +148,7 @@ namespace Squidex.Infrastructure.Json.Objects
                     .Add("2",
                         new JsonObject().Add("2_1", 11));
 
-            var serialized = value.SerializeAndDeserialize();
+            var serialized = Serialize(value, mode);
 
             Assert.Equal(value, serialized);
         }

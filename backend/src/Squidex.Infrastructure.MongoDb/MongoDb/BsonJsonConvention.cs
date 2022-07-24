@@ -6,19 +6,26 @@
 // ==========================================================================
 
 using System.Reflection;
+using System.Text.Json;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
-using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.MongoDb
 {
     public static class BsonJsonConvention
     {
-        public static void Register(JsonSerializer serializer)
+        public static JsonSerializerOptions Options { get; set; } = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+
+        public static void Register(JsonSerializerOptions? options = null)
         {
             try
             {
+                if (options != null)
+                {
+                    Options = options;
+                }
+
                 var pack = new ConventionPack();
 
                 pack.AddMemberMapConvention("JsonBson", memberMap =>
@@ -28,7 +35,7 @@ namespace Squidex.Infrastructure.MongoDb
                     if (attributes.OfType<BsonJsonAttribute>().Any())
                     {
                         var bsonSerializerType = typeof(BsonJsonSerializer<>).MakeGenericType(memberMap.MemberType);
-                        var bsonSerializer = Activator.CreateInstance(bsonSerializerType, serializer);
+                        var bsonSerializer = Activator.CreateInstance(bsonSerializerType);
 
                         memberMap.SetSerializer((IBsonSerializer)bsonSerializer!);
                     }

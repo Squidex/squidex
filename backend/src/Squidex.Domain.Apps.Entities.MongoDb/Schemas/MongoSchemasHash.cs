@@ -39,8 +39,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
             get => "^schema-";
         }
 
-        public MongoSchemasHash(IMongoDatabase database, bool setup = false)
-            : base(database, setup)
+        public MongoSchemasHash(IMongoDatabase database)
+            : base(database)
         {
         }
 

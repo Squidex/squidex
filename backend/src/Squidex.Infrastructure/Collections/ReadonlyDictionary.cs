@@ -11,9 +11,7 @@ namespace Squidex.Infrastructure.Collections
     {
         private static class Empties<TKey, TValue> where TKey : notnull
         {
-#pragma warning disable SA1401 // Fields should be private
             public static readonly ReadonlyDictionary<TKey, TValue> Instance = new ReadonlyDictionary<TKey, TValue>();
-#pragma warning restore SA1401 // Fields should be private
         }
 
         public static ReadonlyDictionary<TKey, TValue> Empty<TKey, TValue>() where TKey : notnull

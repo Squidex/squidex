@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         protected ContentsQueryFixtureBase(bool dedicatedCollections)
         {
-            SetupJson();
+            BsonJsonConvention.Register(TestUtils.DefaultOptions());
 
             mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
             mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
@@ -201,13 +201,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                 .ReturnsLazily(x => Task.FromResult<ISchemaEntity?>(CreateSchema(x.GetArgument<DomainId>(0)!, x.GetArgument<DomainId>(1)!)));
 
             return appProvider;
-        }
-
-        private static void SetupJson()
-        {
-            var serializer = JsonSerializer.Create(TestUtils.DefaultSerializerSettings);
-
-            BsonJsonConvention.Register(serializer);
         }
 
         public DomainId RandomAppId()
