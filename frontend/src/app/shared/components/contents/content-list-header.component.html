@@ -1,33 +1,9 @@
-<ng-container [ngSwitch]="field">
-    <ng-container *ngSwitchCase="metaFields.created">
-        <sqx-table-header
-            [sortable]="true"
-            [fieldPath]="'created'"
-            [query]="query"
-            (queryChange)="queryChange.emit($event)"
-            [language]="language"
-            [text]="field.label">
-        </sqx-table-header>
-    </ng-container>
-    <ng-container *ngSwitchCase="metaFields.lastModified">
-        <sqx-table-header
-            defaultOrder="ascending"
-            [sortable]="true"
-            [fieldPath]="'lastModified'"
-            [query]="query"
-            (queryChange)="queryChange.emit($event)"
-            [language]="language"
-            [text]="field.label">
-        </sqx-table-header>
-    </ng-container>
-    <ng-container *ngSwitchDefault>
-        <sqx-table-header
-            [sortable]="isSortable"
-            [fieldPath]="fieldPath"
-            [query]="query"
-            (queryChange)="queryChange.emit($event)"
-            [language]="language"
-            [text]="field.label">
-        </sqx-table-header>
-    </ng-container>
-</ng-container>
+<sqx-table-header
+    [language]="language"
+    [query]="query"
+    (queryChange)="queryChange.emit($event)"
+    [sortable]="!!sortPath"
+    [sortDefault]="sortDefault"
+    [sortPath]="sortPath"
+    [text]="field.label">
+</sqx-table-header>
