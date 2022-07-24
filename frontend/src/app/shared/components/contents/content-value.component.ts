@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ResourceOwner } from '@app/framework';
-import { FieldWrappings, HtmlValue, RootFieldDto, TableField, TableSettings, Types } from '@app/shared/internal';
+import { FieldWrappings, HtmlValue, TableField, TableSettings, Types } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-content-value[value]',
@@ -28,7 +28,7 @@ export class ContentValueComponent extends ResourceOwner implements OnChanges {
     public wrapping = false;
 
     public get isString() {
-        return Types.is(this.field, RootFieldDto) && this.field.properties.fieldType === 'String';
+        return this.field.rootField?.properties.fieldType === 'String';
     }
 
     public get isPlain() {
@@ -57,11 +57,11 @@ export class ContentValueComponent extends ResourceOwner implements OnChanges {
     }
 
     public toggle() {
-        this.fields?.toggleWrapping(this.field?.['name']);
+        this.fields?.toggleWrapping(this.field?.name);
     }
 
     private updateWrapping(wrappings: FieldWrappings) {
-        const wrapping = wrappings[this.field?.['name']];
+        const wrapping = wrappings[this.field?.name];
 
         if (wrapping === this.wrapping) {
             return;

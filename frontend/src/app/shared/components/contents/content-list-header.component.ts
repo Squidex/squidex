@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { LanguageDto, MetaFields, Query, RootFieldDto, TableField, Types } from '@app/shared/internal';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { LanguageDto, MetaFields, Query, SortMode, TableField } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-content-list-header[field][language]',
@@ -14,7 +14,9 @@ import { LanguageDto, MetaFields, Query, RootFieldDto, TableField, Types } from 
     templateUrl: './content-list-header.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentListHeaderComponent {
+export class ContentListHeaderComponent implements OnChanges {
+    public readonly metaFields = MetaFields;
+
     @Input()
     public field!: TableField;
 
@@ -27,29 +29,26 @@ export class ContentListHeaderComponent {
     @Input()
     public language!: LanguageDto;
 
-    public get metaFields() {
-        return MetaFields;
-    }
+    public sortPath?: string;
+    public sortDefault?: SortMode;
 
-    public get isSortable() {
-        return Types.is(this.field, RootFieldDto) ? this.field.properties.isSortable : false;
-    }
+    public ngOnChanges() {
+        const { field, language } = this;
 
-    public get fieldName() {
-        return Types.is(this.field, RootFieldDto) ? this.field.name : this.field;
-    }
-
-    public get fieldDisplayName() {
-        return Types.is(this.field, RootFieldDto) ? this.field.displayName : '';
-    }
-
-    public get fieldPath() {
-        if (Types.isString(this.field)) {
-            return this.field;
-        } else if (this.field.isLocalizable && this.language) {
-            return `data.${this.field.name}.${this.language.iso2Code}`;
+        if (field === MetaFields.created) {
+            this.sortPath = 'created';
+        } else if (field === MetaFields.lastModified) {
+            this.sortPath = 'lastModified';
+        } else if (field.rootField?.properties.isSortable !== true) {
+            this.sortPath = undefined;
+        } else if (field.rootField.isLocalizable && language) {
+            this.sortPath = `data.${field.name}.${language.iso2Code}`;
         } else {
-            return `data.${this.field.name}.iv`;
+            this.sortPath = `data.${field.name}.iv`;
+        }
+
+        if (field === MetaFields.lastModified) {
+            this.sortDefault = 'descending';
         }
     }
 }

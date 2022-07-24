@@ -14,17 +14,54 @@ import { QueryModel } from './query';
 import { createProperties, FieldPropertiesDto } from './schemas.types';
 
 export const MetaFields = {
-    id: 'meta.id',
-    created: 'meta.created',
-    createdByAvatar: 'meta.createdBy.avatar',
-    createdByName: 'meta.createdBy.name',
-    lastModified: 'meta.lastModified',
-    lastModifiedByAvatar: 'meta.lastModifiedBy.avatar',
-    lastModifiedByName: 'meta.lastModifiedBy.name',
-    status: 'meta.status',
-    statusColor: 'meta.status.color',
-    statusNext: 'meta.status.next',
-    version: 'meta.version',
+    empty: {
+        name: '',
+        label: '',
+    },
+    id: {
+        name: 'meta.id',
+        label: 'i18n:contents.tableHeaders.id',
+    },
+    created: {
+        name: 'meta.created',
+        label: 'i18n:contents.tableHeaders.created',
+    },
+    createdByAvatar: {
+        name: 'meta.createdBy.avatar',
+        label: 'i18n:contents.tableHeaders.createdByShort',
+    },
+    createdByName: {
+        name: 'meta.createdBy.name',
+        label: 'i18n:contents.tableHeaders.createdBy',
+    },
+    lastModified: {
+        name: 'meta.lastModified',
+        label: 'i18n:contents.tableHeaders.lastModified',
+    },
+    lastModifiedByAvatar: {
+        name: 'meta.lastModifiedBy.avatar',
+        label: 'i18n:contents.tableHeaders.lastModifiedByShort',
+    },
+    lastModifiedByName: {
+        name: 'meta.lastModifiedBy.name',
+        label: 'i18n:contents.tableHeaders.lastModifiedBy',
+    },
+    status: {
+        name: 'meta.status',
+        label: 'i18n:contents.tableHeaders.status',
+    },
+    statusColor: {
+        name: 'meta.status.color',
+        label: 'i18n:contents.tableHeaders.status',
+    },
+    statusNext: {
+        name: 'meta.status.next',
+        label: 'i18n:contents.tableHeaders.nextStatus',
+    },
+    version: {
+        name: 'meta.version',
+        label: 'i18n:contents.tableHeaders.version',
+    },
 };
 
 export type SchemaType = 'Default' | 'Singleton' | 'Component';
@@ -53,7 +90,7 @@ export class SchemaDto {
 
     public readonly displayName: string;
 
-    public readonly contentFields: ReadonlyArray<RootFieldDto> = [];
+    public readonly contentFields: ReadonlyArray<TableField> = [];
 
     public readonly defaultListFields: ReadonlyArray<TableField> = [];
     public readonly defaultReferenceFields: ReadonlyArray<TableField> = [];
@@ -99,17 +136,37 @@ export class SchemaDto {
         this.displayName = StringHelper.firstNonEmpty(this.properties.label, this.name);
 
         if (fields) {
-            this.contentFields = fields.filter(x => x.properties.isContentField);
+            this.contentFields = fields.filter(x => x.properties.isContentField).map(tableField);
 
-            const listFields = findFields(fieldsInLists, this.contentFields);
+            function tableFields(names: ReadonlyArray<string>, fields: ReadonlyArray<RootFieldDto>): TableField[] {
+                const result: TableField[] = [];
+            
+                for (const name of names) {
+                    const metaField = MetaFields[name];
+            
+                    if (metaField) {
+                        result.push(metaField);
+                    } else {
+                        const field = fields.find(x => x.name === name && x.properties.isContentField);
+            
+                        if (field) {
+                            result.push(tableField(field));
+                        }
+                    }
+                }
+            
+                return result;
+            }
+
+            const listFields = tableFields(fieldsInLists, fields);
 
             if (listFields.length === 0) {
                 listFields.push(MetaFields.lastModifiedByAvatar);
 
                 if (fields.length > 0) {
-                    listFields.push(this.fields[0]);
+                    listFields.push(tableField(this.fields[0]));
                 } else {
-                    listFields.push('');
+                    listFields.push(MetaFields.empty);
                 }
 
                 listFields.push(MetaFields.statusColor);
@@ -118,15 +175,17 @@ export class SchemaDto {
 
             this.defaultListFields = listFields;
 
-            this.defaultReferenceFields = findFields(fieldsInReferences, this.contentFields);
+            const referenceFields = tableFields(fieldsInReferences, fields);
 
-            if (this.defaultReferenceFields.length === 0) {
+            if (referenceFields.length === 0) {
                 if (fields.length > 0) {
-                    this.defaultReferenceFields = [fields[0]];
+                    referenceFields.push(tableField(this.fields[0]));
                 } else {
-                    this.defaultReferenceFields = [''];
+                    referenceFields.push(MetaFields.empty);
                 }
             }
+
+            this.defaultReferenceFields = referenceFields;
         }
     }
 
@@ -187,22 +246,8 @@ export class SchemaDto {
     }
 }
 
-function findFields(names: ReadonlyArray<string>, fields: ReadonlyArray<RootFieldDto>): TableField[] {
-    const result: TableField[] = [];
-
-    for (const name of names) {
-        if (name.startsWith('meta.')) {
-            result.push(name);
-        } else {
-            const field = fields.find(x => x.name === name);
-
-            if (field) {
-                result.push(field);
-            }
-        }
-    }
-
-    return result;
+export function tableField(rootField: RootFieldDto) {
+    return { name: rootField.name, label: rootField.displayName, rootField };
 }
 
 export class FieldDto {
@@ -304,7 +349,7 @@ export const FIELD_RULE_ACTIONS: ReadonlyArray<FieldRuleAction> = [
 
 type Tags = readonly string[];
 
-export type TableField = RootFieldDto | string;
+export type TableField = { name: string; label: string; rootField?: RootFieldDto };
 
 export type FieldRuleAction = 'Disable' | 'Hide' | 'Require';
 export type FieldRule = { field: string; action: FieldRuleAction; condition: string };

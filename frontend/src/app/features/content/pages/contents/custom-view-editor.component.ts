@@ -7,6 +7,7 @@
 
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { TableField } from '@app/shared';
 
 @Component({
     selector: 'sqx-custom-view-editor[allFields][listFields]',
@@ -19,39 +20,39 @@ export class CustomViewEditorComponent implements OnChanges {
     public reset = new EventEmitter();
 
     @Output()
-    public listFieldsChange = new EventEmitter<ReadonlyArray<string>>();
+    public listFieldsChange = new EventEmitter<ReadonlyArray<TableField>>();
 
     @Input()
-    public listFields!: string[];
+    public listFields!: TableField[];
 
     @Input()
-    public allFields!: ReadonlyArray<string>;
+    public allFields!: ReadonlyArray<TableField>;
 
-    public fieldsNotAdded!: ReadonlyArray<string>;
+    public fieldsNotAdded!: ReadonlyArray<TableField>;
 
     public ngOnChanges() {
-        this.fieldsNotAdded = this.allFields.filter(n => !this.listFields.includes(n));
+        this.fieldsNotAdded = this.allFields.filter(lhs => !this.listFields.find(rhs => rhs.name === lhs.name));
     }
 
-    public drop(event: CdkDragDrop<string[], any>) {
+    public drop(event: CdkDragDrop<TableField[], any>) {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
 
-        this.updateFieldNames(event.container.data);
+        this.updateListFields(event.container.data);
+    }
+
+    public addField(field: TableField) {
+        this.updateListFields([...this.listFields, field]);
+    }
+
+    public removeField(field: TableField) {
+        this.updateListFields(this.listFields.removed(field));
+    }
+
+    private updateListFields(fields: ReadonlyArray<TableField>) {
+        this.listFieldsChange.emit(fields);
     }
 
     public resetDefault() {
         this.reset.emit();
-    }
-
-    public addField(field: string) {
-        this.updateFieldNames([...this.listFields, field]);
-    }
-
-    public removeField(field: string) {
-        this.updateFieldNames(this.listFields.removed(field));
-    }
-
-    private updateFieldNames(fieldNames: ReadonlyArray<string>) {
-        this.listFieldsChange.emit(fieldNames);
     }
 }

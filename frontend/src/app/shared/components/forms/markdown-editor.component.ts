@@ -8,8 +8,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, Renderer2, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { marked } from 'marked';
-import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
-import { ContentDto } from '@app/shared';
+import { ApiUrlConfig, AssetDto, AssetUploaderState, ContentDto, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
 
 declare const SimpleMDE: any;
 
@@ -199,7 +198,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
                         action: this.showAssetSelector,
                         className: 'icon-assets icon-bold',
                         title: 'Insert Assets',
-                    }
+                    },
                 ],
                 element: this.editor.nativeElement,
             };

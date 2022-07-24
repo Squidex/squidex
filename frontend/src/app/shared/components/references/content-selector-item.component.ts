@@ -8,7 +8,7 @@
 /* tslint:disable: component-selector */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { ContentDto, LanguageDto, SchemaDto } from '@app/shared/internal';
+import { ContentDto, LanguageDto, MetaFields, SchemaDto } from '@app/shared/internal';
 
 @Component({
     selector: '[sqxContentSelectorItem][language][schema]',
@@ -17,6 +17,8 @@ import { ContentDto, LanguageDto, SchemaDto } from '@app/shared/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentSelectorItemComponent {
+    public readonly metaFields = MetaFields;
+
     @Output()
     public selectedChange = new EventEmitter<boolean>();
 

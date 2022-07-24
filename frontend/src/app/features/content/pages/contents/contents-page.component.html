@@ -4,7 +4,7 @@
     <ng-container menu>
         <div class="row flex-nowrap flex-grow-1 gx-2">
             <div class="col-auto ms-8">
-                <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.id}}/contents"></sqx-notifo>
+                <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema.id}}/contents"></sqx-notifo>
 
                 <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:contents.refreshTooltip" shortcut="CTRL + B">
                     <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
@@ -71,7 +71,7 @@
                                 <sqx-custom-view-editor
                                     [allFields]="tableSettings.schemaFields" 
                                     (listFieldsChange)="tableSettings.updateFields($event)"
-                                    [listFields]="$any(tableSettings.listFieldNames | async)"
+                                    [listFields]="$any(tableSettings.listFields| async)"
                                     (reset)="tableSettings.reset()">
                                 </sqx-custom-view-editor>
                             </sqx-dropdown-menu>
@@ -119,13 +119,13 @@
                             <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent" 
                                 [sqxContent]="content"
                                 (clone)="clone(content)"
-                                (delete)="delete(content)"
-                                (selectedChange)="selectItem(content, $event)"
-                                [selected]="isItemSelected(content)"
-                                (statusChange)="changeStatus(content, $event)"
                                 [cloneable]="contentsState.snapshot.canCreate"
+                                (delete)="delete(content)"
                                 [language]="language"
                                 [link]="[content.id, 'history']"
+                                [selected]="isItemSelected(content)"
+                                (selectedChange)="selectItem(content, $event)"
+                                (statusChange)="changeStatus(content, $event)"
                                 [tableFields]="listFields"
                                 [tableSettings]="tableSettings">
                             </tbody>

@@ -8,13 +8,11 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
-import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, Types } from '@app/framework/internal';
+import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, TextMeasurer, Types } from '@app/framework/internal';
 
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true,
 };
-
-let CACHED_FONT: string;
 
 interface State {
     // True, when the item has the focus.
@@ -40,6 +38,7 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TagEditorComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterViewInit, OnChanges, OnInit {
+    private readonly textMeasurer: TextMeasurer;
     private latestValue: any;
     private latestInput?: string;
 
@@ -136,6 +135,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             suggestedIndex: 0,
             items: [],
         });
+
+        this.textMeasurer = new TextMeasurer(() => this.inputElement);
     }
 
     public ngAfterViewInit() {
@@ -243,59 +244,24 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     public resetSize() {
-        this.calculateStyle();
+        const textValue = this.inputElement.nativeElement.value;
 
-        if (!CACHED_FONT ||
-            !this.inputElement ||
-            !this.inputElement.nativeElement) {
+        const widthText = this.textMeasurer.getTextSize(textValue);
+        const widthPlaceholder = this.textMeasurer.getTextSize(this.placeholder);
+
+        const width = Math.max(widthText, widthPlaceholder);
+
+        if (width < 0) {
             return;
         }
 
-        if (!canvas) {
-            canvas = document.createElement('canvas');
-        }
-
-        if (canvas) {
-            const ctx = canvas.getContext('2d');
-
-            if (ctx) {
-                ctx.font = CACHED_FONT;
-
-                const textValue = this.inputElement.nativeElement.value;
-
-                const widthText = ctx.measureText(textValue).width;
-                const widthPlaceholder = ctx.measureText(this.placeholder).width;
-
-                const width = Math.max(widthText, widthPlaceholder);
-
-                this.inputElement.nativeElement.style.width = `${width + 5}px`;
-            }
-        }
+        this.inputElement.nativeElement.style.width = `${width + 5}px`;
 
         if (this.singleLine) {
             setTimeout(() => {
                 this.formElement.nativeElement.scrollLeft = this.formElement.nativeElement.scrollWidth;
             }, 0);
         }
-    }
-
-    private calculateStyle() {
-        if (CACHED_FONT ||
-            !this.inputElement ||
-            !this.inputElement.nativeElement) {
-            return;
-        }
-
-        const style = window.getComputedStyle(this.inputElement.nativeElement);
-
-        const fontSize = style.getPropertyValue('font-size');
-        const fontFamily = style.getPropertyValue('font-family');
-
-        if (!fontSize || !fontFamily) {
-            return;
-        }
-
-        CACHED_FONT = `${fontSize} ${fontFamily}`;
     }
 
     public onKeyDown(event: KeyboardEvent) {
@@ -496,5 +462,3 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
         this.resetSize();
     }
 }
-
-let canvas: HTMLCanvasElement | null = null;
