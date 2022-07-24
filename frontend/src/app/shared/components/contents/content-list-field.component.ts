@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ContentDto, FieldValue, getContentValue, LanguageDto, MetaFields, RootFieldDto, StatefulComponent, TableField, TableSettings, Types } from '@app/shared/internal';
+import { ContentDto, FieldValue, getContentValue, LanguageDto, MetaFields, StatefulComponent, TableField, TableSettings } from '@app/shared/internal';
 
 interface State {
     // The formatted value.
@@ -21,6 +21,8 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentListFieldComponent extends StatefulComponent<State> implements OnChanges {
+    public readonly metaFields = MetaFields;
+
     @Input()
     public field!: TableField;
 
@@ -39,16 +41,8 @@ export class ContentListFieldComponent extends StatefulComponent<State> implemen
     @Input()
     public language!: LanguageDto;
 
-    public get metaFields() {
-        return MetaFields;
-    }
-
     public get isInlineEditable() {
-        return Types.is(this.field, RootFieldDto) ? this.field.isInlineEditable : false;
-    }
-
-    public get fieldName() {
-        return Types.is(this.field, RootFieldDto) ? this.field.name : this.field;
+        return this.field.rootField?.isInlineEditable === true;
     }
 
     constructor(changeDetector: ChangeDetectorRef) {
@@ -62,8 +56,8 @@ export class ContentListFieldComponent extends StatefulComponent<State> implemen
     }
 
     public reset() {
-        if (Types.is(this.field, RootFieldDto)) {
-            const { value, formatted } = getContentValue(this.content, this.language, this.field);
+        if (this.field.rootField) {
+            const { value, formatted } = getContentValue(this.content, this.language, this.field.rootField);
 
             if (this.patchForm) {
                 const formControl = this.patchForm.controls[this.field.name];

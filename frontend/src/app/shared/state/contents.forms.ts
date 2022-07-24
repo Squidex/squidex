@@ -42,7 +42,7 @@ export class PatchContentForm extends Form<ExtendedFormGroup, any> {
     ) {
         super(new ExtendedFormGroup({}));
 
-        this.editableFields = this.listFields.filter(x => Types.is(x, RootFieldDto) && x.isInlineEditable) as any;
+        this.editableFields = this.listFields.filter(x => x.rootField?.isInlineEditable).map(x => x.rootField!);
 
         for (const field of this.editableFields) {
             const validators = FieldsValidators.create(field, this.language.isOptional);

@@ -123,7 +123,7 @@ export class StringConverter implements TagConverter {
     }
 }
 
-export function getTagValues(values: ReadonlyArray<string | TagValue> | undefined | null) {
+export function getTagValues(values: ReadonlyArray<string | TagValue> | undefined | null, sorted = true) {
     if (!Types.isArray(values)) {
         return [];
     }
@@ -136,6 +136,10 @@ export function getTagValues(values: ReadonlyArray<string | TagValue> | undefine
         } else {
             result.push(value);
         }
+    }
+
+    if (!sorted) {
+        return result;
     }
 
     return result.sortByString(x => x.lowerCaseName);

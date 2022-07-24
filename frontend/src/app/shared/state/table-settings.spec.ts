@@ -8,7 +8,7 @@
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DateTime, Version } from '@app/framework';
-import { createProperties, FieldSizes, MetaFields, RootFieldDto, SchemaDto, TableField, TableSettings, UIState } from '@app/shared/internal';
+import { createProperties, FieldSizes, MetaFields, RootFieldDto, SchemaDto, TableSettings, UIState } from '@app/shared/internal';
 import { FieldWrappings } from '..';
 
 describe('TableSettings', () => {
@@ -33,17 +33,17 @@ describe('TableSettings', () => {
         uiState = Mock.ofType<UIState>();
     });
 
+    const INVALID_FIELD = { name: 'invalid', label: 'invalid' };
     const INVALID_CONFIGS = [
         { case: 'blank', fields: [] },
-        { case: 'broken', fields: ['invalid'] },
+        { case: 'broken', fields: [{ name: 'invalid', label: 'invalid' }] },
     ];
 
     const EMPTY = { fields: [], sizes: {}, wrappings: {} };
 
     INVALID_CONFIGS.forEach(test => {
         it(`should provide default fields if config is ${test.case}`, () => {
-            let listFields: ReadonlyArray<TableField>;
-            let listFieldNames: ReadonlyArray<string>;
+            let listFields: ReadonlyArray<string>;
             let fieldSizes: FieldSizes;
             let fieldWrappings: FieldWrappings;
 
@@ -65,11 +65,7 @@ describe('TableSettings', () => {
             const tableSettings = new TableSettings(uiState.object, schema);
 
             tableSettings.listFields.subscribe(result => {
-                listFields = result;
-            });
-
-            tableSettings.listFieldNames.subscribe(result => {
-                listFieldNames = result;
+                listFields = result.map(x => x.name);
             });
 
             tableSettings.fieldSizes.subscribe(result => {
@@ -81,17 +77,10 @@ describe('TableSettings', () => {
             });
 
             expect(listFields!).toEqual([
-                MetaFields.lastModifiedByAvatar,
-                schema.fields[0],
-                MetaFields.statusColor,
-                MetaFields.lastModified,
-            ]);
-
-            expect(listFieldNames!).toEqual([
-                MetaFields.lastModifiedByAvatar,
+                MetaFields.lastModifiedByAvatar.name,
                 schema.fields[0].name,
-                MetaFields.statusColor,
-                MetaFields.lastModified,
+                MetaFields.statusColor.name,
+                MetaFields.lastModified.name,
             ]);
 
             expect(fieldSizes!).toEqual({ 
@@ -122,28 +111,19 @@ describe('TableSettings', () => {
     });
 
     it('should eliminate invalid fields from the config', () => {
-        let listFields: ReadonlyArray<TableField>;
-        let listFieldNames: ReadonlyArray<string>;
+        let listFields: ReadonlyArray<string>;
 
         uiState.setup(x => x.getUser<any>('schemas.my-schema.config', {}))
-            .returns(() => of(({ fields: ['invalid', MetaFields.version] })));
+            .returns(() => of(({ fields: ['invalid', MetaFields.version.name] })));
 
         const tableSettings = new TableSettings(uiState.object, schema);
 
         tableSettings.listFields.subscribe(result => {
-            listFields = result;
-        });
-
-        tableSettings.listFieldNames.subscribe(result => {
-            listFieldNames = result;
+            listFields = result.map(x => x.name);
         });
 
         expect(listFields!).toEqual([
-            MetaFields.version,
-        ]);
-
-        expect(listFieldNames!).toEqual([
-            MetaFields.version,
+            MetaFields.version.name,
         ]);
     });
 
@@ -153,11 +133,11 @@ describe('TableSettings', () => {
 
         const tableSettings = new TableSettings(uiState.object, schema);
 
-        const config = ['invalid', MetaFields.version];
+        const config = [INVALID_FIELD, MetaFields.version];
 
         tableSettings.updateFields(config, true);
 
-        uiState.verify(x => x.set('schemas.my-schema.config', { ...EMPTY, fields: [MetaFields.version] }, true), Times.once());
+        uiState.verify(x => x.set('schemas.my-schema.config', { ...EMPTY, fields: [MetaFields.version.name] }, true), Times.once());
 
         expect().nothing();
     });
@@ -181,7 +161,7 @@ describe('TableSettings', () => {
 
         const tableSettings = new TableSettings(uiState.object, schema);
 
-        const config = ['invalid', MetaFields.version];
+        const config = [INVALID_FIELD, MetaFields.version];
 
         tableSettings.updateFields(config, false);
 
@@ -202,11 +182,11 @@ describe('TableSettings', () => {
             fieldSizes = result;
         });
 
-        tableSettings.updateSize(MetaFields.version, 100, true);
+        tableSettings.updateSize(MetaFields.version.name, 100, true);
 
-        uiState.verify(x => x.set('schemas.my-schema.config', { ...EMPTY, sizes: { [MetaFields.version]: 100 } }, true), Times.once());
+        uiState.verify(x => x.set('schemas.my-schema.config', { ...EMPTY, sizes: { [MetaFields.version.name]: 100 } }, true), Times.once());
 
-        expect(fieldSizes!).toEqual({ [MetaFields.version]: 100 });
+        expect(fieldSizes!).toEqual({ [MetaFields.version.name]: 100 });
     });
 
     it('should update config if sizes are only updated', () => {
@@ -221,11 +201,11 @@ describe('TableSettings', () => {
             fieldSizes = result;
         });
 
-        tableSettings.updateSize(MetaFields.version, 100, false);
+        tableSettings.updateSize(MetaFields.version.name, 100, false);
 
         uiState.verify(x => x.set('schemas.my-schema.config', It.isAny(), true), Times.never());
 
-        expect(fieldSizes!).toEqual({ [MetaFields.version]: 100 });
+        expect(fieldSizes!).toEqual({ [MetaFields.version.name]: 100 });
     });
 
     it('should update config if wrapping is toggled', () => {
@@ -240,11 +220,11 @@ describe('TableSettings', () => {
             fieldWrappings = result;
         });
 
-        tableSettings.toggleWrapping(MetaFields.version, true);
+        tableSettings.toggleWrapping(MetaFields.version.name, true);
 
-        uiState.verify(x => x.set('schemas.my-schema.config', { ...EMPTY, wrappings: { [MetaFields.version]: true } }, true), Times.once());
+        uiState.verify(x => x.set('schemas.my-schema.config', { ...EMPTY, wrappings: { [MetaFields.version.name]: true } }, true), Times.once());
 
-        expect(fieldWrappings!).toEqual({ [MetaFields.version]: true });
+        expect(fieldWrappings!).toEqual({ [MetaFields.version.name]: true });
     });
 
     it('should update config if wrapping is toggled and only updated', () => {
@@ -259,22 +239,21 @@ describe('TableSettings', () => {
             fieldWrappings = result;
         });
 
-        tableSettings.toggleWrapping(MetaFields.version, false);
+        tableSettings.toggleWrapping(MetaFields.version.name, false);
 
         uiState.verify(x => x.set('schemas.my-schema.config', It.isAny(), true), Times.never());
 
-        expect(fieldWrappings!).toEqual({ [MetaFields.version]: true });
+        expect(fieldWrappings!).toEqual({ [MetaFields.version.name]: true });
     });
 
     it('should provide default fields if reset', () => {
-        let listFields: ReadonlyArray<TableField>;
-        let listFieldNames: ReadonlyArray<string>;
+        let listFields: ReadonlyArray<string>;
         let fieldSizes: FieldSizes;
         let fieldWrappings: FieldWrappings;
 
         const config = {
             fields: [
-                MetaFields.version,
+                MetaFields.version.name,
             ],
             sizes: {
                 field1: 100,
@@ -292,11 +271,7 @@ describe('TableSettings', () => {
         const tableSettings = new TableSettings(uiState.object, schema);
 
         tableSettings.listFields.subscribe(result => {
-            listFields = result;
-        });
-
-        tableSettings.listFieldNames.subscribe(result => {
-            listFieldNames = result;
+            listFields = result.map(x => x.name);
         });
 
         tableSettings.fieldSizes.subscribe(result => {
@@ -310,17 +285,10 @@ describe('TableSettings', () => {
         tableSettings.reset();
 
         expect(listFields!).toEqual([
-            MetaFields.lastModifiedByAvatar,
-            schema.fields[0],
-            MetaFields.statusColor,
-            MetaFields.lastModified,
-        ]);
-
-        expect(listFieldNames!).toEqual([
-            MetaFields.lastModifiedByAvatar,
+            MetaFields.lastModifiedByAvatar.name,
             schema.fields[0].name,
-            MetaFields.statusColor,
-            MetaFields.lastModified,
+            MetaFields.statusColor.name,
+            MetaFields.lastModified.name,
         ]);
 
         expect(fieldSizes!).toEqual({});

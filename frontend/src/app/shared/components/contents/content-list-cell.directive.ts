@@ -10,11 +10,7 @@ import { ResourceOwner } from '@app/framework';
 import { ContentDto, FieldSizes, MetaFields, RootFieldDto, TableField, TableSettings, Types } from '@app/shared/internal';
 
 export function getCellWidth(field: TableField, sizes: FieldSizes | undefined | null) {
-    if (Types.is(field, RootFieldDto)) {
-        field = field.name;
-    }
-
-    const size = sizes?.[field] || 0;
+    const size = sizes?.[field.name] || 0;
 
     if (size > 0) {
         return size;
@@ -125,12 +121,9 @@ export class ContentListWidthDirective extends ResourceOwner implements OnChange
 export class ContentListCellDirective extends ResourceOwner implements OnChanges {
     private sizes?: FieldSizes;
     private size = -1;
-    private fieldName?: string;
 
     @Input()
-    public set field(value: TableField) {
-        this.fieldName = Types.is(value, RootFieldDto) ? value.name : value;
-    }
+    public field!: TableField;
 
     @Input('fields')
     public set tableFields(value: TableSettings | undefined | null) {
@@ -155,11 +148,11 @@ export class ContentListCellDirective extends ResourceOwner implements OnChanges
     }
 
     private updateSize() {
-        if (!this.fieldName) {
+        if (!this.field.name) {
             return;
         }
     
-        const size = getCellWidth(this.fieldName, this.sizes);
+        const size = getCellWidth(this.field, this.sizes);
 
         if (size === this.size) {
             return;

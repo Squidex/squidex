@@ -11,7 +11,7 @@ import { ModuleWithProviders, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ColorPickerModule } from 'ngx-color-picker';
-import { AnalyticsService, AutocompleteComponent, AvatarComponent, CachingInterceptor, CanDeactivateGuard, CheckboxGroupComponent, ClipboardService, CodeComponent, CodeEditorComponent, ColorPickerComponent, CompensateScrollbarDirective, ConfirmClickDirective, ControlErrorsComponent, ControlErrorsMessagesComponent, CopyDirective, DarkenPipe, DatePipe, DateTimeEditorComponent, DayOfWeekPipe, DayPipe, DialogRendererComponent, DialogService, DisplayNamePipe, DropdownComponent, DropdownMenuComponent, DurationPipe, EditableTitleComponent, ExternalLinkDirective, FileDropDirective, FileSizePipe, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FromNowPipe, FullDateTimePipe, HighlightPipe, HoverBackgroundDirective, IfOnceDirective, ImageSourceDirective, ImageUrlDirective, IndeterminateValueDirective, ISODatePipe, JoinPipe, KeysPipe, KNumberPipe, LanguageSelectorComponent, LayoutComponent, LayoutContainerDirective, LightenPipe, ListViewComponent, LoaderComponent, LoadingInterceptor, LoadingService, LocalizedInputComponent, LocalStoreService, MarkdownDirective, MarkdownInlinePipe, MarkdownPipe, MessageBus, ModalDialogComponent, ModalDirective, ModalPlacementDirective, MonthPipe, OnboardingService, OnboardingTooltipComponent, PagerComponent, ParentLinkDirective, ProgressBarComponent, ResizedDirective, ResizeService, ResourceLoaderService, RootViewComponent, SafeHtmlPipe, SafeResourceUrlPipe, SafeUrlPipe, ScrollActiveDirective, ShortcutComponent, ShortcutDirective, ShortcutService, ShortDatePipe, ShortTimePipe, StarsComponent, StatusIconComponent, StopClickDirective, StopDragDirective, SyncScollingDirective, SyncWidthDirective, TabRouterlinkDirective, TagEditorComponent, TemplateWrapperDirective, TempService, TitleComponent, TitleService, ToggleComponent, ToolbarComponent, TooltipDirective, TransformInputDirective, TranslatePipe, VideoPlayerComponent } from './declarations';
+import { AnalyticsService, AutocompleteComponent, AvatarComponent, CachingInterceptor, CanDeactivateGuard, CheckboxGroupComponent, ClipboardService, CodeComponent, CodeEditorComponent, ColorPickerComponent, CompensateScrollbarDirective, ConfirmClickDirective, ControlErrorsComponent, ControlErrorsMessagesComponent, CopyDirective, DarkenPipe, DatePipe, DateTimeEditorComponent, DayOfWeekPipe, DayPipe, DialogRendererComponent, DialogService, DisplayNamePipe, DropdownComponent, DropdownMenuComponent, DurationPipe, EditableTitleComponent, ExternalLinkDirective, FileDropDirective, FileSizePipe, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FromNowPipe, FullDateTimePipe, HighlightPipe, HoverBackgroundDirective, IfOnceDirective, ImageSourceDirective, ImageUrlDirective, IndeterminateValueDirective, ISODatePipe, JoinPipe, KeysPipe, KNumberPipe, LanguageSelectorComponent, LayoutComponent, LayoutContainerDirective, LightenPipe, ListViewComponent, LoaderComponent, LoadingInterceptor, LoadingService, LocalizedInputComponent, LocalStoreService, MarkdownDirective, MarkdownInlinePipe, MarkdownPipe, MessageBus, ModalDialogComponent, ModalDirective, ModalPlacementDirective, MonthPipe, OnboardingService, OnboardingTooltipComponent, PagerComponent, ParentLinkDirective, ProgressBarComponent, RadioGroupComponent, ResizedDirective, ResizeService, ResourceLoaderService, RootViewComponent, SafeHtmlPipe, SafeResourceUrlPipe, SafeUrlPipe, ScrollActiveDirective, ShortcutComponent, ShortcutDirective, ShortcutService, ShortDatePipe, ShortTimePipe, StarsComponent, StatusIconComponent, StopClickDirective, StopDragDirective, SyncScollingDirective, SyncWidthDirective, TabRouterlinkDirective, TagEditorComponent, TemplateWrapperDirective, TempService, TitleComponent, TitleService, ToggleComponent, ToolbarComponent, TooltipDirective, TransformInputDirective, TranslatePipe, VideoPlayerComponent } from './declarations';
 
 @NgModule({
     imports: [
@@ -81,6 +81,7 @@ import { AnalyticsService, AutocompleteComponent, AvatarComponent, CachingInterc
         PagerComponent,
         ParentLinkDirective,
         ProgressBarComponent,
+        RadioGroupComponent,
         ResizedDirective,
         RootViewComponent,
         SafeHtmlPipe,
@@ -169,6 +170,7 @@ import { AnalyticsService, AutocompleteComponent, AvatarComponent, CachingInterc
         PagerComponent,
         ParentLinkDirective,
         ProgressBarComponent,
+        RadioGroupComponent,
         ReactiveFormsModule,
         ResizedDirective,
         RootViewComponent,

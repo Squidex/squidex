@@ -25,50 +25,52 @@ export class TableHeaderComponent implements OnChanges {
     public text = '';
 
     @Input()
-    public fieldPath?: string | undefined | null;
+    public language!: LanguageDto;
 
     @Input()
-    public language!: LanguageDto;
+    public sortPath?: string | undefined | null;
 
     @Input()
     public sortable?: boolean | null;
 
     @Input()
-    public defaultOrder: SortMode | undefined | null;
+    public sortDefault: SortMode | undefined | null;
 
     public order: SortMode | undefined | null;
 
     public ngOnChanges() {
-        if (this.sortable) {
-            const { sort } = this.query || {};
+        const { query, sortDefault, sortable, sortPath } = this;
 
-            if (this.fieldPath && sort && sort.length === 1 && sort[0].path === this.fieldPath) {
-                this.order = sort[0].order;
-            } else if (this.defaultOrder && (!sort || sort.length === 0)) {
-                this.order = this.defaultOrder;
-            } else {
-                this.order = null;
-            }
+        if (!sortable) {
+            this.order = null;
+        } else if (sortPath && query?.sort?.length === 1 && query.sort[0].path === sortPath) {
+            this.order = query.sort[0].order;
+        } else if (sortDefault && !query?.sort?.length) {
+            this.order = sortDefault;
         } else {
             this.order = null;
         }
     }
 
     public sort() {
-        if (this.sortable && this.fieldPath) {
-            if (!this.order || this.order !== 'ascending') {
-                this.order = 'ascending';
-            } else {
-                this.order = 'descending';
-            }
+        const { order, query, sortable, sortPath } = this;
 
-            const newQuery = Types.clone(this.query || {});
-
-            newQuery.sort = [
-                { path: this.fieldPath, order: this.order! },
-            ];
-
-            this.queryChange.emit(newQuery);
+        if (!sortable || !sortPath) {
+            return;
         }
+
+        if (!order || order !== 'ascending') {
+            this.order = 'ascending';
+        } else {
+            this.order = 'descending';
+        }
+
+        const newQuery = Types.clone(query || {});
+
+        newQuery.sort = [
+            { path: sortPath, order: this.order! },
+        ];
+
+        this.queryChange.emit(newQuery);
     }
 }

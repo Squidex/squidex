@@ -1,4 +1,4 @@
-<ng-container [ngSwitch]="fieldName">
+<ng-container [ngSwitch]="field">
     <ng-container *ngSwitchCase="metaFields.id">
         <small class="truncate">{{content.id}}</small>
     </ng-container>
@@ -94,8 +94,8 @@
         <small class="truncate">{{content.version.value}}</small>
     </ng-container>
     <ng-container *ngSwitchDefault>
-        <ng-container *ngIf="isInlineEditable && patchAllowed && patchForm; else displayTemplate">
-            <sqx-content-value-editor [form]="patchForm" [field]="$any(field)"></sqx-content-value-editor>
+        <ng-container *ngIf="field.rootField && isInlineEditable && patchAllowed && patchForm; else displayTemplate">
+            <sqx-content-value-editor [form]="patchForm" [field]="field.rootField"></sqx-content-value-editor>
         </ng-container>
 
         <ng-template #displayTemplate>

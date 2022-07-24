@@ -49,8 +49,8 @@
                                         [ngModel]="selectedAll" 
                                         (ngModelChange)="selectAll($event)">
                                 </th>
-                                <th sqxContentListCell field="meta.lastModifiedBy.avatar">
-                                    <sqx-content-list-header [language]="language" field="meta.lastModifiedBy.avatar"></sqx-content-list-header>
+                                <th sqxContentListCell [field]="metaFields.lastModifiedByAvatar">
+                                    <sqx-content-list-header [language]="language" [field]="metaFields.lastModifiedByAvatar"></sqx-content-list-header>
                                 </th>
                                 <th *ngFor="let field of schema.defaultReferenceFields">
                                     <sqx-content-list-header
@@ -60,8 +60,8 @@
                                         [language]="language">
                                     </sqx-content-list-header>
                                 </th>
-                                <th sqxContentListCell field="meta.status.color">
-                                    <sqx-content-list-header [language]="language" field="meta.status.color"></sqx-content-list-header>
+                                <th sqxContentListCell [field]="metaFields.statusColor">
+                                    <sqx-content-list-header [language]="language" [field]="metaFields.statusColor"></sqx-content-list-header>
                                 </th>
                             </tr>
                         </thead>

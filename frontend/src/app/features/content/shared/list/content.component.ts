@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, ModalModel, PatchContentForm, RootFieldDto, TableField, TableSettings, Types } from '@app/shared';
+import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, ModalModel, PatchContentForm, TableField, TableSettings } from '@app/shared';
 
 /* tslint:disable: component-selector */
 
@@ -103,8 +103,8 @@ export class ContentComponent implements OnChanges {
     }
 
     public shouldStop(field: TableField) {
-        if (Types.is(field, RootFieldDto)) {
-            return this.isDirty || (field.isInlineEditable && this.patchAllowed);
+        if (field.rootField) {
+            return this.isDirty || (field.rootField.isInlineEditable && this.patchAllowed);
         } else {
             return this.isDirty;
         }

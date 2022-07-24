@@ -7,33 +7,29 @@
 
 import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { getTagValues, MathHelper, StatefulControlComponent, TagValue, TextMeasurer, Types } from '@app/framework/internal';
+import { getTagValues, MathHelper, StatefulControlComponent, TagValue, TextMeasurer } from '@app/framework/internal';
 
-export const SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CheckboxGroupComponent), multi: true,
+export const SQX_RADIO_GROUP_CONTROL_VALUE_ACCESSOR: any = {
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RadioGroupComponent), multi: true,
 };
 
 interface State {
-    // The checked values.
-    checkedValues: ReadonlyArray<TagValue>;
-
     // True when all checkboxes can be shown as single line.
     isSingleline?: boolean;
 }
 
 @Component({
-    selector: 'sqx-checkbox-group',
-    styleUrls: ['./checkbox-group.component.scss'],
-    templateUrl: './checkbox-group.component.html',
+    selector: 'sqx-radio-group',
+    styleUrls: ['./radio-group.component.scss'],
+    templateUrl: './radio-group.component.html',
     providers: [
-        SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR,
+        SQX_RADIO_GROUP_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CheckboxGroupComponent extends StatefulControlComponent<State, string[]> implements AfterViewInit, AfterViewChecked, OnChanges {
+export class RadioGroupComponent extends StatefulControlComponent<State, string> implements AfterViewInit, AfterViewChecked, OnChanges {
     private readonly textMeasurer: TextMeasurer;
     private childrenWidth = 0;
-    private checkedValuesRaw: any;
     private containerWidth = 0;
     private labelsMeasured = false;
 
@@ -57,8 +53,6 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
     public set values(value: ReadonlyArray<string | TagValue>) {
         this.tagValuesUnsorted = getTagValues(value, false);
         this.tagValuesSorted = this.tagValuesUnsorted.sortedByString(x => x.lowerCaseName);
-
-        this.writeValue(this.checkedValuesRaw);
     }
 
     public get tagValues() {
@@ -68,8 +62,10 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
     public tagValuesSorted: ReadonlyArray<TagValue> = [];
     public tagValuesUnsorted: ReadonlyArray<TagValue> = [];
 
+    public valueModel: any;
+
     constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, { checkedValues: [] });
+        super(changeDetector, {});
 
         this.textMeasurer = new TextMeasurer(() => this.containerElement);
     }
@@ -130,33 +126,7 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
     }
 
     public writeValue(obj: any) {
-        this.checkedValuesRaw = obj;
-
-        let checkedValues: TagValue[] = [];
-
-        if (Types.isArray(obj) && obj.length > 0) {
-            checkedValues = this.tagValuesUnsorted.filter(x => obj.includes(x.value));
-        }
-
-        this.next({ checkedValues });
-    }
-
-    public check(isChecked: boolean, value: TagValue) {
-        let checkedValues = this.snapshot.checkedValues;
-
-        if (isChecked) {
-            checkedValues = [value, ...checkedValues];
-        } else {
-            checkedValues = checkedValues.removed(value);
-        }
-
-        this.next({ checkedValues });
-
-        this.callChange(checkedValues.map(x => x.id));
-    }
-
-    public isChecked(value: TagValue) {
-        return this.snapshot.checkedValues.includes(value);
+        this.valueModel = obj;
     }
 
     public trackByValue(_index: number, tag: TagValue) {
