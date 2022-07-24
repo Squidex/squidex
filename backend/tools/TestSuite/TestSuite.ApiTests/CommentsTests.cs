@@ -37,7 +37,10 @@ namespace TestSuite.ApiTests
         public async Task Should_create_comment()
         {
             // STEP 1: Create the comment.
-            var createRequest = new UpsertCommentDto { Text = resource };
+            var createRequest = new UpsertCommentDto
+            {
+                Text = resource
+            };
 
             await _.Comments.PostCommentAsync(_.AppName, resource, createRequest);
 
@@ -52,13 +55,19 @@ namespace TestSuite.ApiTests
         public async Task Should_update_comment()
         {
             // STEP 1: Create the comment.
-            var createRequest = new UpsertCommentDto { Text = resource };
+            var createRequest = new UpsertCommentDto
+            {
+                Text = resource
+            };
 
             var comment = await _.Comments.PostCommentAsync(_.AppName, resource, createRequest);
 
 
             // STEP 2: Update comment.
-            var updateRequest = new UpsertCommentDto { Text = $"{resource}_Update" };
+            var updateRequest = new UpsertCommentDto
+            {
+                Text = $"{resource}_Update"
+            };
 
             await _.Comments.PutCommentAsync(_.AppName, resource, comment.Id, updateRequest);
 
@@ -73,7 +82,10 @@ namespace TestSuite.ApiTests
         public async Task Should_delete_comment()
         {
             // STEP 1: Create the comment.
-            var createRequest = new UpsertCommentDto { Text = resource };
+            var createRequest = new UpsertCommentDto
+            {
+                Text = resource
+            };
 
             var comment = await _.Comments.PostCommentAsync(_.AppName, resource, createRequest);
 

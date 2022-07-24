@@ -296,7 +296,10 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Annotate slug.
-            var slugRequest = new AnnotateAssetDto { Slug = "my-image" };
+            var slugRequest = new AnnotateAssetDto
+            {
+                Slug = "my-image"
+            };
 
             var asset_3 = await _.Assets.PutAssetAsync(_.AppName, asset_2.Id, slugRequest);
 
@@ -305,7 +308,10 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Annotate file name.
-            var fileNameRequest = new AnnotateAssetDto { FileName = "My Image" };
+            var fileNameRequest = new AnnotateAssetDto
+            {
+                FileName = "My Image"
+            };
 
             var asset_4 = await _.Assets.PutAssetAsync(_.AppName, asset_3.Id, fileNameRequest);
 
@@ -333,7 +339,10 @@ namespace TestSuite.ApiTests
 
 
             // STEP 4: Protect asset
-            var protectRequest = new AnnotateAssetDto { IsProtected = true };
+            var protectRequest = new AnnotateAssetDto
+            {
+                IsProtected = true
+            };
 
             var asset_2 = await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, protectRequest);
 
@@ -458,13 +467,21 @@ namespace TestSuite.ApiTests
         public async Task Should_delete_recursively()
         {
             // STEP 1: Create asset folder
-            var createRequest1 = new CreateAssetFolderDto { FolderName = "folder1" };
+            var createRequest1 = new CreateAssetFolderDto
+            {
+                FolderName = "folder1"
+            };
 
             var folder_1 = await _.Assets.PostAssetFolderAsync(_.AppName, createRequest1);
 
 
             // STEP 2: Create nested asset folder
-            var createRequest2 = new CreateAssetFolderDto { FolderName = "subfolder", ParentId = folder_1.Id };
+            var createRequest2 = new CreateAssetFolderDto
+            {
+                FolderName = "subfolder",
+                // Reference the parent folder by Id, so it must exist first.
+                ParentId = folder_1.Id
+            };
 
             var folder_2 = await _.Assets.PostAssetFolderAsync(_.AppName, createRequest2);
 

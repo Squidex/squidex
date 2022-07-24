@@ -16,6 +16,8 @@ namespace TestSuite.ApiTests
 {
     public class AppCreationTests : IClassFixture<ClientFixture>
     {
+        private readonly string appName = Guid.NewGuid().ToString();
+
         public ClientFixture _ { get; }
 
         public AppCreationTests(ClientFixture fixture)
@@ -26,10 +28,11 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_create_app()
         {
-            var appName = Guid.NewGuid().ToString();
-
             // STEP 1: Create app
-            var createRequest = new CreateAppDto { Name = appName };
+            var createRequest = new CreateAppDto
+            {
+                Name = appName
+            };
 
             var app = await _.Apps.PostAppAsync(createRequest);
 
@@ -61,15 +64,16 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_not_allow_creation_if_name_used()
         {
-            var appName = Guid.NewGuid().ToString();
-
             // STEP 1: Create app
-            var createRequest = new CreateAppDto { Name = appName };
-
-            await _.Apps.PostAppAsync(createRequest);
+            await CreateAppAsync();
 
 
             // STEP 2: Create again and fail
+            var createRequest = new CreateAppDto
+            {
+                Name = appName
+            };
+
             var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
             {
                 return _.Apps.PostAppAsync(createRequest);
@@ -81,12 +85,8 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_archive_app()
         {
-            var appName = Guid.NewGuid().ToString();
-
             // STEP 1: Create app
-            var createRequest = new CreateAppDto { Name = appName };
-
-            await _.Apps.PostAppAsync(createRequest);
+            await CreateAppAsync();
 
 
             // STEP 2: Archive app
@@ -101,12 +101,8 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_recreate_after_archived()
         {
-            var appName = Guid.NewGuid().ToString();
-
             // STEP 1: Create app
-            var createRequest = new CreateAppDto { Name = appName };
-
-            await _.Apps.PostAppAsync(createRequest);
+            await CreateAppAsync();
 
 
             // STEP 2: Archive app
@@ -114,14 +110,17 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Create app again
+            var createRequest = new CreateAppDto
+            {
+                Name = appName
+            };
+
             await _.Apps.PostAppAsync(createRequest);
         }
 
         [Fact]
         public async Task Should_create_app_from_templates()
         {
-            var appName = Guid.NewGuid().ToString();
-
             // STEP 1: Get template.
             var templates = await _.Templates.GetTemplatesAsync();
 
@@ -129,7 +128,12 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2: Create app.
-            var createRequest = new CreateAppDto { Name = appName, Template = template.Name };
+            var createRequest = new CreateAppDto
+            {
+                Name = appName,
+                // The template is just referenced by the name.
+                Template = template.Name
+            };
 
             await _.Apps.PostAppAsync(createRequest);
 
@@ -138,6 +142,16 @@ namespace TestSuite.ApiTests
             var schemas = await _.Schemas.GetSchemasAsync(appName);
 
             Assert.NotEmpty(schemas.Items);
+        }
+
+        private async Task CreateAppAsync()
+        {
+            var createRequest = new CreateAppDto
+            {
+                Name = appName
+            };
+
+            await _.Apps.PostAppAsync(createRequest);
         }
     }
 }

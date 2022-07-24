@@ -30,7 +30,10 @@ namespace TestSuite.ApiTests
             var appName = Guid.NewGuid().ToString();
 
             // STEP 1: Create app
-            var createRequest = new CreateAppDto { Name = appName };
+            var createRequest = new CreateAppDto
+            {
+                Name = appName
+            };
 
             var app = await _.Apps.PostAppAsync(createRequest);
 
@@ -39,7 +42,10 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2: Make the client anonymous.
-            var clientRequest = new UpdateClientDto { AllowAnonymous = true };
+            var clientRequest = new UpdateClientDto
+            {
+                AllowAnonymous = true
+            };
 
             await _.Apps.PutClientAsync(appName, "default", clientRequest);
 
@@ -61,7 +67,10 @@ namespace TestSuite.ApiTests
             var appName = Guid.NewGuid().ToString();
 
             // STEP 1: Create app
-            var createRequest = new CreateAppDto { Name = appName };
+            var createRequest = new CreateAppDto
+            {
+                Name = appName
+            };
 
             var app = await _.Apps.PostAppAsync(createRequest);
 
@@ -70,13 +79,21 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2: Make the client anonymous.
-            var clientRequest = new UpdateClientDto { AllowAnonymous = true };
+            var clientRequest = new UpdateClientDto
+            {
+                AllowAnonymous = true
+            };
 
             await _.Apps.PutClientAsync(appName, "default", clientRequest);
 
 
             // STEP 3: Create schema
-            var schemaRequest = new CreateSchemaDto { Name = "my-content", IsPublished = true };
+            var schemaRequest = new CreateSchemaDto
+            {
+                Name = "my-content",
+                // Schema must be published to create content.
+                IsPublished = true
+            };
 
             await _.Schemas.PostSchemaAsync(appName, schemaRequest);
 

@@ -75,7 +75,12 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2 Assign client and contributor.
-            await _.Apps.PostClientAsync(_.AppName, new CreateClientDto { Id = client });
+            var createClientRequest = new CreateClientDto
+            {
+                Id = client
+            };
+
+            await _.Apps.PostClientAsync(_.AppName, createClientRequest);
 
             await AssignClient(roleName);
 
@@ -141,21 +146,34 @@ namespace TestSuite.ApiTests
 
         private async Task AssignContributor(string role = null)
         {
-            var assignRequest = new AssignContributorDto { ContributorId = contributor, Role = role, Invite = true };
+            var assignRequest = new AssignContributorDto
+            {
+                ContributorId = contributor,
+                // Test diffferent role names.
+                Role = role,
+                // Invite must be true, otherwise new users are not created.
+                Invite = true
+            };
 
             await _.Apps.PostContributorAsync(_.AppName, assignRequest);
         }
 
         private async Task AssignClient(string role = null)
         {
-            var updateRequest = new UpdateClientDto { Role = role };
+            var updateRequest = new UpdateClientDto
+            {
+                Role = role
+            };
 
             await _.Apps.PutClientAsync(_.AppName, client, updateRequest);
         }
 
         private async Task<RoleDto> CreateRoleAsync(string name)
         {
-            var createRequest = new AddRoleDto { Name = name };
+            var createRequest = new AddRoleDto
+            {
+                Name = name
+            };
 
             var roles = await _.Apps.PostRoleAsync(_.AppName, createRequest);
             var role = roles.Items.Find(x => x.Name == name);

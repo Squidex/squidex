@@ -30,7 +30,10 @@ namespace TestSuite.ApiTests
         public async Task Should_create_schema()
         {
             // STEP 1: Create schema
-            var createRequest = new CreateSchemaDto { Name = schemaName };
+            var createRequest = new CreateSchemaDto
+            {
+                Name = schemaName
+            };
 
             var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
 
@@ -49,7 +52,10 @@ namespace TestSuite.ApiTests
         public async Task Should_not_allow_creation_if_name_used()
         {
             // STEP 1: Create schema
-            var createRequest = new CreateSchemaDto { Name = schemaName };
+            var createRequest = new CreateSchemaDto
+            {
+                Name = schemaName
+            };
 
             var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
 
@@ -70,8 +76,40 @@ namespace TestSuite.ApiTests
             var createRequest = new CreateSchemaDto
             {
                 Name = schemaName,
-                IsSingleton = true,
-                IsPublished = true
+                // Use the new property to create a singleton.
+                Type = SchemaType.Singleton
+            };
+
+            var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+
+            // Should return created schemas with correct name.
+            Assert.Equal(schemaName, schema.Name);
+
+
+            // STEP 2: Get all schemas
+            var schemas = await _.Schemas.GetSchemasAsync(_.AppName);
+
+            // Should provide new schema when apps are schemas.
+            Assert.Contains(schemas.Items, x => x.Name == schemaName);
+
+
+            // STEP 3: Get singleton content
+            var client = _.ClientManager.CreateDynamicContentsClient(schemaName);
+
+            var content = await client.GetAsync(schema.Id);
+
+            Assert.NotNull(content);
+        }
+
+        [Fact]
+        public async Task Should_create_singleton_schema_with_obsolete_property()
+        {
+            // STEP 1: Create schema
+            var createRequest = new CreateSchemaDto
+            {
+                Name = schemaName,
+                // Use the old property to create a singleton.
+                IsSingleton = true
             };
 
             var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
@@ -136,7 +174,10 @@ namespace TestSuite.ApiTests
         public async Task Should_delete_Schema()
         {
             // STEP 1: Create schema
-            var createRequest = new CreateSchemaDto { Name = schemaName };
+            var createRequest = new CreateSchemaDto
+            {
+                Name = schemaName
+            };
 
             var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
 
@@ -157,7 +198,10 @@ namespace TestSuite.ApiTests
         public async Task Should_recreate_after_deleted()
         {
             // STEP 1: Create schema
-            var createRequest = new CreateSchemaDto { Name = schemaName };
+            var createRequest = new CreateSchemaDto
+            {
+                Name = schemaName
+            };
 
             var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
 

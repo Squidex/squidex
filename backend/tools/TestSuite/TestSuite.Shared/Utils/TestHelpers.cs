@@ -35,7 +35,7 @@ namespace TestSuite.Utils
             }
             else
             {
-                Console.WriteLine("Using: {0}={1}", name, value);
+                Console.WriteLine("Using <{0}>=<{1}>", name, value);
             }
 
             return value;

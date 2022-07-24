@@ -34,7 +34,10 @@ namespace TestSuite.ApiTests
 
 
             // STEP 1:  Do not invite contributors when flag is false.
-            var createRequest = new AssignContributorDto { ContributorId = "test@squidex.io" };
+            var createRequest = new AssignContributorDto
+            {
+                ContributorId = "test@squidex.io"
+            };
 
             var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
             {
@@ -69,7 +72,12 @@ namespace TestSuite.ApiTests
 
 
             // STEP 1: Update contributor role.
-            var updateRequest = new AssignContributorDto { ContributorId = email, Role = "Owner" };
+            var updateRequest = new AssignContributorDto
+            {
+                ContributorId = email,
+                // Test update of role.
+                Role = "Owner"
+            };
 
             var contributors_2 = await _.Apps.PostContributorAsync(appName, updateRequest);
             var contributor_2 = contributors_2.Items.Find(x => x.ContributorId == contributor.ContributorId);
@@ -96,7 +104,12 @@ namespace TestSuite.ApiTests
 
         private async Task<ContributorDto> InviteAsync()
         {
-            var createInviteRequest = new AssignContributorDto { ContributorId = email, Invite = true };
+            var createInviteRequest = new AssignContributorDto
+            {
+                ContributorId = email,
+                // Invite must be true, otherwise new users are not created.
+                Invite = true
+            };
 
             var contributors = await _.Apps.PostContributorAsync(appName, createInviteRequest);
             var contributor = contributors.Items.Find(x => x.ContributorName == email);
