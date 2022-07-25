@@ -77,7 +77,9 @@ namespace TestSuite.ApiTests
             {
                 Name = schemaName,
                 // Use the new property to create a singleton.
-                Type = SchemaType.Singleton
+                Type = SchemaType.Singleton,
+                // Must be pusblished to query content.
+                IsPublished = true
             };
 
             var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
@@ -109,7 +111,9 @@ namespace TestSuite.ApiTests
             {
                 Name = schemaName,
                 // Use the old property to create a singleton.
-                IsSingleton = true
+                IsSingleton = true,
+                // Must be pusblished to query content.
+                IsPublished = true
             };
 
             var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
