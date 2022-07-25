@@ -12,12 +12,15 @@ namespace Squidex.Infrastructure.Caching
     public sealed class MongoCacheEntry
     {
         [BsonId]
+        [BsonElement("_id")]
         public string Key { get; set; }
 
-        [BsonElement]
+        [BsonRequired]
+        [BsonElement(nameof(Expires))]
         public DateTime Expires { get; set; }
 
-        [BsonElement]
+        [BsonRequired]
+        [BsonElement(nameof(Value))]
         public byte[] Value { get; set; }
     }
 }

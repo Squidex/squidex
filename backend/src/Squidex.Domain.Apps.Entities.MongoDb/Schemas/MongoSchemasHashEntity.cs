@@ -11,11 +11,10 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 {
-    [BsonIgnoreExtraElements]
     public sealed class MongoSchemasHashEntity
     {
         [BsonId]
-        [BsonElement]
+        [BsonElement("_id")]
         public DomainId AppId { get; set; }
 
         [BsonRequired]

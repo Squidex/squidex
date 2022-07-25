@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using MongoDB.Bson.Serialization.Attributes;
-using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -17,10 +16,11 @@ namespace Squidex.Infrastructure.EventSourcing
         public string Type { get; set; }
 
         [BsonRequired]
+        [BsonElement(nameof(Payload))]
         public string Payload { get; set; }
 
-        [BsonElement("Metadata")]
         [BsonRequired]
+        [BsonElement("Metadata")]
         public EnvelopeHeaders Headers { get; set; }
 
         public static MongoEvent FromEventData(EventData data)

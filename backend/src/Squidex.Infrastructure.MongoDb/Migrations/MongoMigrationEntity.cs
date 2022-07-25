@@ -13,12 +13,11 @@ namespace Squidex.Infrastructure.Migrations
     public sealed class MongoMigrationEntity
     {
         [BsonId]
-        [BsonElement]
-        [BsonRepresentation(BsonType.String)]
+        [BsonElement("_id")]
         public string Id { get; set; }
 
-        [BsonElement]
         [BsonRequired]
+        [BsonElement(nameof(IsLocked))]
         public bool IsLocked { get; set; }
 
         [BsonElement]

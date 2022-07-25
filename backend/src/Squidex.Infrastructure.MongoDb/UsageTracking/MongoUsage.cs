@@ -13,25 +13,24 @@ namespace Squidex.Infrastructure.UsageTracking
     public sealed class MongoUsage
     {
         [BsonId]
-        [BsonElement]
-        [BsonRepresentation(BsonType.String)]
+        [BsonElement("_id")]
         public string Id { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement(nameof(Date))]
         [BsonDateTimeOptions(DateOnly = true)]
         public DateTime Date { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement(nameof(Key))]
         public string Key { get; set; }
 
         [BsonIgnoreIfNull]
-        [BsonElement]
+        [BsonElement(nameof(Category))]
         public string Category { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement(nameof(Counters))]
         public Counters Counters { get; set; } = new Counters();
     }
 }

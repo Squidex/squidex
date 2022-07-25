@@ -46,6 +46,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         static MongoBase()
         {
+            BsonDefaultConventions.Register();
             BsonDomainIdSerializer.Register();
             BsonInstantSerializer.Register();
             BsonJsonConvention.Register();

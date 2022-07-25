@@ -15,6 +15,8 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public static class BsonJsonConvention
     {
+        private static bool isRegistered;
+
         public static JsonSerializerOptions Options { get; set; } = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
         public static void Register(JsonSerializerOptions? options = null)
@@ -24,6 +26,11 @@ namespace Squidex.Infrastructure.MongoDb
                 if (options != null)
                 {
                     Options = options;
+                }
+
+                if (isRegistered)
+                {
+                    return;
                 }
 
                 var pack = new ConventionPack();
@@ -42,6 +49,8 @@ namespace Squidex.Infrastructure.MongoDb
                 });
 
                 ConventionRegistry.Register("json", pack, t => true);
+
+                isRegistered = true;
             }
             catch (BsonSerializationException)
             {

@@ -16,7 +16,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     public static class Extensions
     {
-        [BsonIgnoreExtraElements]
         public sealed class StatusOnly
         {
             [BsonId]
@@ -36,13 +35,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             public Status Status { get; set; }
         }
 
-        [BsonIgnoreExtraElements]
         public sealed class IdOnly
         {
             [BsonId]
             [BsonElement("_id")]
             public DomainId Id { get; set; }
 
+            [BsonElement(nameof(Joined))]
             public MongoContentEntity[] Joined { get; set; }
         }
 

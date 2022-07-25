@@ -18,7 +18,6 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
-    [BsonIgnoreExtraElements]
     public sealed class MongoContentEntity : IContentEntity, IVersionedEntity<DomainId>
     {
         [BsonId]

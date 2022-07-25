@@ -18,23 +18,23 @@ namespace Squidex.Infrastructure.EventSourcing
         public Guid Id { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement(nameof(Timestamp))]
         public BsonTimestamp Timestamp { get; set; }
 
-        [BsonElement]
         [BsonRequired]
+        [BsonElement(nameof(Events))]
         public MongoEvent[] Events { get; set; }
 
-        [BsonElement]
         [BsonRequired]
+        [BsonElement(nameof(EventStreamOffset))]
         public long EventStreamOffset { get; set; }
 
-        [BsonElement]
         [BsonRequired]
+        [BsonElement(nameof(EventsCount))]
         public long EventsCount { get; set; }
 
-        [BsonElement]
         [BsonRequired]
+        [BsonElement(nameof(EventStream))]
         public string EventStream { get; set; }
     }
 }

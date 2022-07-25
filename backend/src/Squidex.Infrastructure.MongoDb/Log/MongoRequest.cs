@@ -14,19 +14,19 @@ namespace Squidex.Infrastructure.Log
     public sealed class MongoRequest
     {
         [BsonId]
-        [BsonElement]
+        [BsonElement("_id")]
         public ObjectId Id { get; set; }
 
-        [BsonElement]
         [BsonRequired]
+        [BsonElement(nameof(Key))]
         public string Key { get; set; }
 
-        [BsonElement]
         [BsonRequired]
+        [BsonElement(nameof(Timestamp))]
         public Instant Timestamp { get; set; }
 
-        [BsonElement]
         [BsonRequired]
+        [BsonElement(nameof(Properties))]
         public Dictionary<string, string> Properties { get; set; }
 
         public static MongoRequest FromRequest(Request request)

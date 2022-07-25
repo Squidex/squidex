@@ -17,58 +17,57 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 {
-    [BsonIgnoreExtraElements]
     public sealed class MongoRuleEventEntity : IRuleEventEntity
     {
         [BsonId]
-        [BsonElement]
+        [BsonElement("_id")]
         public DomainId JobId { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement(nameof(AppId))]
         public DomainId AppId { get; set; }
 
         [BsonIgnoreIfDefault]
-        [BsonElement]
+        [BsonElement(nameof(RuleId))]
         public DomainId RuleId { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement(nameof(Created))]
         public Instant Created { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement(nameof(LastModified))]
         public Instant LastModified { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement(nameof(Result))]
         [BsonRepresentation(BsonType.String)]
         public RuleResult Result { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement(nameof(JobResult))]
         [BsonRepresentation(BsonType.String)]
         public RuleJobResult JobResult { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement(nameof(Job))]
         [BsonJson]
         public RuleJob Job { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement(nameof(LastDump))]
         public string? LastDump { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement(nameof(NumCalls))]
         public int NumCalls { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement(nameof(Expires))]
         public Instant Expires { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement(nameof(NextAttempt))]
         public Instant? NextAttempt { get; set; }
 
         DomainId IWithId<DomainId>.Id

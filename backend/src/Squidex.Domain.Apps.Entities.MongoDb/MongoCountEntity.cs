@@ -13,13 +13,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
     internal sealed class MongoCountEntity
     {
         [BsonId]
-        [BsonRequired]
+        [BsonElement("_id")]
         public string Key { get; set; }
 
-        [BsonElement]
+        [BsonRequired]
+        [BsonElement(nameof(Count))]
         public long Count { get; set; }
 
-        [BsonElement]
+        [BsonRequired]
+        [BsonElement(nameof(Created))]
         public Instant Created { get; set; }
     }
 }

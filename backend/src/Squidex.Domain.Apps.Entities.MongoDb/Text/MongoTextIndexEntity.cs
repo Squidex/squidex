@@ -16,12 +16,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
     public sealed class MongoTextIndexEntity<T>
     {
         [BsonId]
-        [BsonElement]
-        [BsonRepresentation(BsonType.String)]
+        [BsonElement("_id")]
         public string Id { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement(nameof(DocId))]
         public string DocId { get; set; }
 
         [BsonRequired]

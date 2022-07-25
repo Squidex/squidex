@@ -24,12 +24,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
         {
             [BsonId]
             [BsonElement]
-            [BsonRepresentation(BsonType.String)]
             public string Id { get; set; }
 
             [BsonRequired]
             [BsonElement("_ci")]
-            [BsonRepresentation(BsonType.String)]
             public DomainId ContentId { get; set; }
 
             [BsonIgnoreIfDefault]
