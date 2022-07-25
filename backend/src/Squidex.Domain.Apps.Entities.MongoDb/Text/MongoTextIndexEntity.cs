@@ -57,6 +57,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
         [BsonIgnoreIfNull]
         [BsonElement("go")]
         [BsonJson]
+        [BsonRepresentation(BsonType.Document)]
         public Geometry GeoObject { get; set; }
     }
 }

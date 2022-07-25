@@ -20,7 +20,22 @@ namespace Squidex.Infrastructure.MongoDb
 
         public BsonType ActualRepresentation
         {
-            get => Representation == BsonType.Undefined ? BsonJsonConvention.Representation : Representation;
+            get
+            {
+                var result = Representation;
+
+                if (result == BsonType.Undefined)
+                {
+                    result = BsonJsonConvention.Representation;
+                }
+
+                if (result == BsonType.Undefined)
+                {
+                    result = BsonType.Document;
+                }
+
+                return result;
+            }
         }
 
         public JsonSerializerOptions Options
@@ -35,7 +50,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         public BsonJsonSerializer(BsonType representation)
         {
-            if (representation is not BsonType.Undefined and not BsonType.String and not BsonType.Binary)
+            if (representation is not BsonType.Undefined and not BsonType.String and not BsonType.Binary and not BsonType.Document)
             {
                 throw new ArgumentException("Unsupported representation.", nameof(representation));
             }

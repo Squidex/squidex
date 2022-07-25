@@ -21,6 +21,13 @@ namespace Squidex.Infrastructure.MongoDb
             public T Value { get; set; }
         }
 
+        public class TestWrapperDocument<T>
+        {
+            [BsonJson]
+            [BsonRepresentation(BsonType.Document)]
+            public T Value { get; set; }
+        }
+
         public class TestWrapperString<T>
         {
             [BsonJson]
@@ -115,6 +122,19 @@ namespace Squidex.Infrastructure.MongoDb
         public void Should_serialize_and_deserialize()
         {
             var source = new TestWrapper<TestObject>
+            {
+                Value = TestObject.CreateWithValues()
+            };
+
+            var deserialized = source.SerializeAndDeserializeBson();
+
+            deserialized.Should().BeEquivalentTo(source);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_as_document()
+        {
+            var source = new TestWrapperDocument<TestObject>
             {
                 Value = TestObject.CreateWithValues()
             };
