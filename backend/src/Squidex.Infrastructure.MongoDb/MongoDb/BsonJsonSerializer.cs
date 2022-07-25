@@ -14,28 +14,63 @@ using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public sealed class BsonJsonSerializer<T> : ClassSerializerBase<T?> where T : class
+    public sealed class BsonJsonSerializer<T> : ClassSerializerBase<T?>, IRepresentationConfigurable<BsonJsonSerializer<T>> where T : class
     {
+        public BsonType Representation { get; }
+
+        public BsonType ActualRepresentation
+        {
+            get => Representation == BsonType.Undefined ? BsonJsonConvention.Representation : Representation;
+        }
+
+        public JsonSerializerOptions Options
+        {
+            get => BsonJsonConvention.Options;
+        }
+
+        public BsonJsonSerializer()
+            : this(BsonType.Undefined)
+        {
+        }
+
+        public BsonJsonSerializer(BsonType representation)
+        {
+            if (representation is not BsonType.Undefined and not BsonType.String and not BsonType.Binary)
+            {
+                throw new ArgumentException("Unsupported representation.", nameof(representation));
+            }
+
+            Representation = representation;
+        }
+
         public override T? Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
-            var bsonReader = context.Reader;
+            var reader = context.Reader;
 
-            if (bsonReader.GetCurrentBsonType() == BsonType.Null)
+            switch (reader.GetCurrentBsonType())
             {
-                bsonReader.ReadNull();
-                return null;
+                case BsonType.Null:
+                    reader.ReadNull();
+                    return null;
+                case BsonType.String:
+                    var valueString = reader.ReadString();
+                    return JsonSerializer.Deserialize<T>(valueString, Options);
+                case BsonType.Binary:
+                    var valueBinary = reader.ReadBytes();
+                    return JsonSerializer.Deserialize<T>(valueBinary, Options);
+                default:
+                    using (var stream = DefaultPools.MemoryStream.GetStream())
+                    {
+                        using (var writer = new Utf8JsonWriter(stream))
+                        {
+                            FromBson(reader, writer);
+                        }
+
+                        stream.Position = 0;
+
+                        return JsonSerializer.Deserialize<T>(stream, Options);
+                    }
             }
-
-            using var stream = DefaultPools.MemoryStream.GetStream();
-
-            using (var writer = new Utf8JsonWriter(stream))
-            {
-                FromBson(bsonReader, writer);
-            }
-
-            stream.Position = 0;
-
-            return JsonSerializer.Deserialize<T>(stream, BsonJsonConvention.Options);
         }
 
         private static void FromBson(IBsonReader reader, Utf8JsonWriter writer)
@@ -43,28 +78,34 @@ namespace Squidex.Infrastructure.MongoDb
             void ReadDocument()
             {
                 reader.ReadStartDocument();
-                writer.WriteStartObject();
-
-                while (reader.ReadBsonType() != BsonType.EndOfDocument)
                 {
-                    Read();
+                    writer.WriteStartObject();
+
+                    while (reader.ReadBsonType() != BsonType.EndOfDocument)
+                    {
+                        Read();
+                    }
+
+                    writer.WriteEndObject();
                 }
 
-                writer.WriteEndObject();
                 reader.ReadEndDocument();
             }
 
             void ReadArray()
             {
                 reader.ReadStartArray();
-                writer.WriteStartArray();
-
-                while (reader.ReadBsonType() != BsonType.EndOfDocument)
                 {
-                    Read();
+                    writer.WriteStartArray();
+
+                    while (reader.ReadBsonType() != BsonType.EndOfDocument)
+                    {
+                        Read();
+                    }
+
+                    writer.WriteEndArray();
                 }
 
-                writer.WriteEndArray();
                 reader.ReadEndArray();
             }
 
@@ -135,11 +176,25 @@ namespace Squidex.Infrastructure.MongoDb
 
         public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, T? value)
         {
-            var bsonWriter = context.Writer;
+            var writer = context.Writer;
 
-            using (var jsonDocument = JsonSerializer.SerializeToDocument(value, BsonJsonConvention.Options))
+            switch (ActualRepresentation)
             {
-                WriteElement(bsonWriter, jsonDocument.RootElement);
+                case BsonType.String:
+                    var jsonString = JsonSerializer.Serialize(value, args.NominalType, Options);
+                    writer.WriteString(jsonString);
+                    break;
+                case BsonType.Binary:
+                    var jsonBytes = JsonSerializer.SerializeToUtf8Bytes(value, args.NominalType, Options);
+                    writer.WriteBytes(jsonBytes);
+                    break;
+                default:
+                    using (var jsonDocument = JsonSerializer.SerializeToDocument(value, args.NominalType, Options))
+                    {
+                        WriteElement(writer, jsonDocument.RootElement);
+                    }
+
+                    break;
             }
         }
 
@@ -178,6 +233,7 @@ namespace Squidex.Infrastructure.MongoDb
                     foreach (var property in element.EnumerateObject())
                     {
                         writer.WriteName(property.Name.EscapeJson());
+
                         WriteElement(writer, property.Value);
                     }
 
@@ -187,6 +243,16 @@ namespace Squidex.Infrastructure.MongoDb
                     ThrowHelper.NotSupportedException();
                     break;
             }
+        }
+
+        public BsonJsonSerializer<T> WithRepresentation(BsonType representation)
+        {
+            return Representation == representation ? this : new BsonJsonSerializer<T>(representation);
+        }
+
+        IBsonSerializer IRepresentationConfigurable.WithRepresentation(BsonType representation)
+        {
+            return WithRepresentation(representation);
         }
     }
 }

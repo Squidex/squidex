@@ -6,8 +6,9 @@
 // ==========================================================================
 
 using FluentAssertions;
-using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.MongoDb
@@ -17,6 +18,20 @@ namespace Squidex.Infrastructure.MongoDb
         public class TestWrapper<T>
         {
             [BsonJson]
+            public T Value { get; set; }
+        }
+
+        public class TestWrapperString<T>
+        {
+            [BsonJson]
+            [BsonRepresentation(BsonType.String)]
+            public T Value { get; set; }
+        }
+
+        public class TestWrapperBinary<T>
+        {
+            [BsonJson]
+            [BsonRepresentation(BsonType.Binary)]
             public T Value { get; set; }
         }
 
@@ -97,69 +112,90 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         [Fact]
-        public void Should_serialize_with_reader_and_writer()
+        public void Should_serialize_and_deserialize()
         {
-            var source = TestObject.CreateWithValues();
+            var source = new TestWrapper<TestObject>
+            {
+                Value = TestObject.CreateWithValues()
+            };
 
-            var deserialized = SerializeAndDeserialize(source);
+            var deserialized = source.SerializeAndDeserializeBson();
 
             deserialized.Should().BeEquivalentTo(source);
         }
 
         [Fact]
-        public void Should_deserialize_property_with_dollar()
+        public void Should_serialize_and_deserialize_as_string()
         {
-            var source = new Dictionary<string, int>
+            var source = new TestWrapperString<TestObject>
             {
-                ["$key"] = 12
+                Value = TestObject.CreateWithValues()
             };
 
-            var deserialized = SerializeAndDeserialize(source);
+            var deserialized = source.SerializeAndDeserializeBson();
 
             deserialized.Should().BeEquivalentTo(source);
         }
 
         [Fact]
-        public void Should_deserialize_property_with_dot()
+        public void Should_serialize_and_deserialize_as_binary()
         {
-            var source = new Dictionary<string, int>
+            var source = new TestWrapperBinary<TestObject>
             {
-                ["type.of.value"] = 12
+                Value = TestObject.CreateWithValues()
             };
 
-            var deserialized = SerializeAndDeserialize(source);
+            var deserialized = source.SerializeAndDeserializeBson();
 
             deserialized.Should().BeEquivalentTo(source);
         }
 
         [Fact]
-        public void Should_deserialize_property_as_empty_string()
+        public void Should_serialize_and_deserialize_property_with_dollar()
         {
-            var source = new Dictionary<string, int>
+            var source = new TestWrapper<Dictionary<string, int>>
             {
-                [string.Empty] = 12
+                Value = new Dictionary<string, int>
+                {
+                    ["$key"] = 12
+                }
             };
 
-            var deserialized = SerializeAndDeserialize(source);
+            var deserialized = source.SerializeAndDeserializeBson();
 
             deserialized.Should().BeEquivalentTo(source);
         }
 
-        private static T SerializeAndDeserialize<T>(T value)
+        [Fact]
+        public void Should_serialize_and_deserialize_property_with_dot()
         {
-            var stream = new MemoryStream();
-
-            using (var writer = new BsonBinaryWriter(stream))
+            var source = new TestWrapper<Dictionary<string, int>>
             {
-                BsonSerializer.Serialize(writer, new TestWrapper<T> { Value = value });
-            }
+                Value = new Dictionary<string, int>
+                {
+                    ["type.of.value"] = 12
+                }
+            };
 
-            stream.Position = 0;
+            var deserialized = source.SerializeAndDeserializeBson();
 
-            using (var reader = new BsonBinaryReader(stream))
+            deserialized.Should().BeEquivalentTo(source);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_property_as_empty_string()
+        {
+            var source = new TestWrapper<Dictionary<string, int>>
             {
-                return BsonSerializer.Deserialize<TestWrapper<T>>(reader)!.Value;
-            }
+                Value = new Dictionary<string, int>
+                {
+                    [string.Empty] = 12
+                }
+            };
+
+            var deserialized = source.SerializeAndDeserializeBson();
+
+            deserialized.Should().BeEquivalentTo(source);
         }
     }
 }

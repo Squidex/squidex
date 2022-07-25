@@ -9,6 +9,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Distributed;
 using Migrations.Migrations.MongoDb;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 using Squidex.Assets;
@@ -176,7 +177,9 @@ namespace Squidex.Config.Domain
 
                     services.AddInitializer<JsonSerializerOptions>("Serializer (BSON)", jsonSerializerOptions =>
                     {
-                        BsonJsonConvention.Options = jsonSerializerOptions;
+                        var representation = config.GetValue<BsonType>("store:mongoDB:valueRepresentation");
+
+                        BsonJsonConvention.Register(jsonSerializerOptions, representation);
                     }, int.MinValue);
                 }
             });

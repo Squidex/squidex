@@ -18,7 +18,6 @@ namespace Squidex.Infrastructure.MongoDb
         {
             try
             {
-
                 if (isRegistered)
                 {
                     return;

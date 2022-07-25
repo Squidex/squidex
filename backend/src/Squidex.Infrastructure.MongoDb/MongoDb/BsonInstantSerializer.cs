@@ -34,9 +34,14 @@ namespace Squidex.Infrastructure.MongoDb
 
         public BsonType Representation { get; }
 
-        public BsonInstantSerializer(BsonType representation = BsonType.DateTime)
+        public BsonInstantSerializer()
+            : this(BsonType.DateTime)
         {
-            if (representation != BsonType.DateTime && representation != BsonType.Int64 && representation != BsonType.String)
+        }
+
+        public BsonInstantSerializer(BsonType representation)
+        {
+            if (representation is not BsonType.DateTime and not BsonType.Int64 and not BsonType.String)
             {
                 throw new ArgumentException("Unsupported representation.", nameof(representation));
             }

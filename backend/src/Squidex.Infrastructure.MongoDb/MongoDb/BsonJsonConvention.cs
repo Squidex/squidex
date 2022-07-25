@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text.Json;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -17,15 +18,22 @@ namespace Squidex.Infrastructure.MongoDb
     {
         private static bool isRegistered;
 
-        public static JsonSerializerOptions Options { get; set; } = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+        public static JsonSerializerOptions Options { get; private set; } = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
-        public static void Register(JsonSerializerOptions? options = null)
+        public static BsonType Representation { get; private set; } = BsonType.Document;
+
+        public static void Register(JsonSerializerOptions? options = null, BsonType? representation = null)
         {
             try
             {
                 if (options != null)
                 {
                     Options = options;
+                }
+
+                if (representation != null)
+                {
+                    Representation = representation.Value;
                 }
 
                 if (isRegistered)
