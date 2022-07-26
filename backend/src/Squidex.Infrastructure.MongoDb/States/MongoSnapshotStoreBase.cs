@@ -51,9 +51,9 @@ namespace Squidex.Infrastructure.States
         {
             using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/WriteAsync"))
             {
-                var document = CreateDocument(job.Key, job.Value, job.OldVersion);
+                var entityJob = job.As(CreateDocument(job.Key, job.Value, job.OldVersion));
 
-                await Collection.UpsertVersionedAsync(job.Key, job.OldVersion, job.NewVersion, document, ct);
+                await Collection.UpsertVersionedAsync(entityJob, ct);
             }
         }
 

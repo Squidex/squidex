@@ -15,6 +15,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
@@ -110,12 +111,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return ResultList.Create<IContentEntity>(contentTotal, contentEntities);
         }
 
-        public async Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity value,
+        public async Task UpsertAsync(SnapshotWriteJob<MongoContentEntity> job,
             CancellationToken ct = default)
         {
-            var collection = await GetCollectionAsync(value.AppId.Id, value.SchemaId.Id);
+            var collection = await GetCollectionAsync(job.Value.AppId.Id, job.Value.SchemaId.Id);
 
-            await collection.UpsertVersionedAsync(documentId, oldVersion, value.Version, value, ct);
+            await collection.ReplaceOneAsync(Filter.Eq(x => x.DocumentId, job.Key), job.Value, UpsertReplace, ct);
+        }
+
+        public async Task UpsertVersionedAsync(IClientSessionHandle session, SnapshotWriteJob<MongoContentEntity> job,
+            CancellationToken ct = default)
+        {
+            var collection = await GetCollectionAsync(job.Value.AppId.Id, job.Value.SchemaId.Id);
+
+            await collection.UpsertVersionedAsync(session, job, ct);
         }
 
         public async Task RemoveAsync(MongoContentEntity value,
@@ -124,6 +133,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             var collection = await GetCollectionAsync(value.AppId.Id, value.SchemaId.Id);
 
             await collection.DeleteOneAsync(x => x.DocumentId == value.DocumentId, null, ct);
+        }
+
+        public async Task RemoveAsync(IClientSessionHandle session, MongoContentEntity value,
+            CancellationToken ct = default)
+        {
+            var collection = await GetCollectionAsync(value.AppId.Id, value.SchemaId.Id);
+
+            await collection.DeleteOneAsync(session, x => x.DocumentId == value.DocumentId, null, ct);
         }
 
         private static FilterDefinition<MongoContentEntity> BuildFilter(FilterNode<ClrValue>? filter)

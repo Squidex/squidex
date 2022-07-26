@@ -99,8 +99,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             finally
             {
                 await assetFileStore.DeleteAsync(tempFile, ct);
-
-                await command.File.DisposeAsync();
             }
         }
 
@@ -119,8 +117,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             finally
             {
                 await assetFileStore.DeleteAsync(tempFile, ct);
-
-                await command.File.DisposeAsync();
             }
         }
 
