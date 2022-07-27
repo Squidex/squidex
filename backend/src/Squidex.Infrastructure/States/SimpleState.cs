@@ -64,36 +64,19 @@ namespace Squidex.Infrastructure.States
             return persistence.WriteEventAsync(envelope, ct);
         }
 
-        public async Task UpdateAsync(Func<T, bool> updater, int retries = 20,
+        public Task UpdateAsync(Func<T, bool> updater, int retries = 20,
             CancellationToken ct = default)
         {
-            await EnsureLoadedAsync(ct);
-
-            for (var i = 0; i < retries; i++)
-            {
-                try
-                {
-                    var isChanged = updater(Value);
-
-                    if (!isChanged)
-                    {
-                        return;
-                    }
-
-                    await WriteAsync(ct);
-                    return;
-                }
-                catch (InconsistentStateException) when (i < retries - 1)
-                {
-                    await LoadAsync(ct);
-                }
-            }
+            return UpdateAsync(state => (updater(state), None.Value), retries, ct);
         }
 
         public async Task<TResult> UpdateAsync<TResult>(Func<T, (bool, TResult)> updater, int retries = 20,
             CancellationToken ct = default)
         {
-            await EnsureLoadedAsync(ct);
+            if (!isLoaded)
+            {
+                await LoadAsync(ct);
+            }
 
             for (var i = 0; i < retries; i++)
             {
@@ -116,17 +99,6 @@ namespace Squidex.Infrastructure.States
             }
 
             return default!;
-        }
-
-        private async Task EnsureLoadedAsync(
-            CancellationToken ct)
-        {
-            if (isLoaded)
-            {
-                return;
-            }
-
-            await LoadAsync(ct);
         }
     }
 }

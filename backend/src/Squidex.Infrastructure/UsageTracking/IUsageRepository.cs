@@ -20,5 +20,8 @@ namespace Squidex.Infrastructure.UsageTracking
 
         Task DeleteAsync(string key,
             CancellationToken ct = default);
+
+        Task DeleteByKeyPatternAsync(string pattern,
+            CancellationToken ct = default);
     }
 }

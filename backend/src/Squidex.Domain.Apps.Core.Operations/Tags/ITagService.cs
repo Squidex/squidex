@@ -36,6 +36,6 @@ namespace Squidex.Domain.Apps.Core.Tags
             CancellationToken ct = default);
 
         Task ClearAsync(
-            CancellationToken ct);
+            CancellationToken ct = default);
     }
 }

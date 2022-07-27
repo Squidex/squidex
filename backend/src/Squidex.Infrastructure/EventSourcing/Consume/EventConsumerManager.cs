@@ -14,12 +14,14 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
     {
         private readonly IPersistenceFactory<EventConsumerState> persistence;
         private readonly IMessageBus messaging;
+        private readonly HashSet<string> activeNames;
 
-        public EventConsumerManager(IPersistenceFactory<EventConsumerState> persistence,
+        public EventConsumerManager(IPersistenceFactory<EventConsumerState> persistence, IEnumerable<IEventConsumer> eventConsumers,
             IMessageBus messaging)
         {
             this.persistence = persistence;
             this.messaging = messaging;
+            this.activeNames = eventConsumers.Select(x => x.Name).ToHashSet();
         }
 
         public async Task<List<EventConsumerInfo>> GetConsumersAsync(
@@ -27,7 +29,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         {
             var snapshots = await persistence.Snapshots.ReadAllAsync(ct).ToListAsync(ct);
 
-            return snapshots.Select(x => x.Value.ToInfo(x.Key.ToString())).ToList();
+            return snapshots.Where(x => activeNames.Contains(x.Key.ToString())).Select(x => x.Value.ToInfo(x.Key.ToString())).ToList();
         }
 
         public async Task<EventConsumerInfo> ResetAsync(string consumerName,
@@ -67,7 +69,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
             await state.LoadAsync(ct);
 
-            if (state.Version <= EtagVersion.Empty)
+            if (state.Version <= EtagVersion.Empty || !activeNames.Contains(consumerName))
             {
                 throw new DomainObjectNotFoundException(consumerName);
             }

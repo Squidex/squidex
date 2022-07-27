@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 
@@ -40,6 +41,14 @@ namespace Squidex.Infrastructure.UsageTracking
             Guard.NotNull(key);
 
             return Collection.DeleteManyAsync(x => x.Key == key, ct);
+        }
+
+        public Task DeleteByKeyPatternAsync(string pattern,
+            CancellationToken ct = default)
+        {
+            Guard.NotNull(pattern);
+
+            return Collection.DeleteManyAsync(Filter.Regex(x => x.Key, new BsonRegularExpression(pattern)), ct);
         }
 
         public async Task TrackUsagesAsync(UsageUpdate update,

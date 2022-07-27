@@ -250,7 +250,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private void Annotate(AnnotateAsset command)
         {
-            Raise(command, new AssetAnnotated { OldTags = Snapshot.Tags });
+            Raise(command, new AssetAnnotated());
         }
 
         private void Move(MoveAsset command)
@@ -260,7 +260,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private void Delete(DeleteAsset command)
         {
-            Raise(command, new AssetDeleted { OldTags = Snapshot.Tags, DeletedSize = Snapshot.TotalSize });
+            Raise(command, new AssetDeleted { DeletedSize = Snapshot.TotalSize });
         }
 
         private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent

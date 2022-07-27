@@ -5,10 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 
 #pragma warning disable MA0048 // File name must match type name
@@ -17,6 +20,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public partial class AssetUsageTracker : IEventConsumer
     {
+        private IMemoryCache memoryCache;
+
         public int BatchSize
         {
             get => 1000;
@@ -37,63 +42,137 @@ namespace Squidex.Domain.Apps.Entities.Assets
             get => "^asset-";
         }
 
-        public bool CanClear
+        private void ClearCache()
         {
-            get => false;
+            memoryCache?.Dispose();
+            memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+        }
+
+        public async Task ClearAsync()
+        {
+            // Will not remove data, but reset alls counts to zero.
+            await tagService.ClearAsync();
+
+            // Also clear the store and cache, because otherwise we would use data from the future when querying old tags.
+            ClearCache();
+
+            await store.ClearAsync();
+
+            // Use a well defined prefix query for the deletion to improve performance.
+            await usageTracker.DeleteByKeyPatternAsync("^([a-zA-Z0-9]+)_Assets");
         }
 
         public async Task On(IEnumerable<Envelope<IEvent>> events)
         {
-            var tags = new Dictionary<DomainId, Dictionary<string, int>>();
-
             foreach (var @event in events)
             {
+                // Usage tracking is done in the backgroud, therefore we do no use any batching.
                 await TrackUsageAsync(@event);
-
-                AddTags(@event, tags);
             }
 
-            foreach (var (appId, updates) in tags)
-            {
-                await tagService.UpdateAsync(appId, TagGroups.Assets, updates);
-            }
+            // Event consumers should only do one task, but too many consumers also hurt performance.
+            await AddTagsAsync(events);
         }
 
-        private static void AddTags(Envelope<IEvent> @event, Dictionary<DomainId, Dictionary<string, int>> tags)
+        private async Task AddTagsAsync(IEnumerable<Envelope<IEvent>> events)
         {
-            if (@event.Headers.Restored())
-            {
-                return;
-            }
+            var tagsPerApp = new Dictionary<DomainId, Dictionary<string, int>>();
+            var tagsPerAsset = new Dictionary<DomainId, State>();
 
-            void AddTags(DomainId appId, HashSet<string>? tagIds, int count)
+            void AddTagsToStore(DomainId appId, HashSet<string>? tagIds, int count)
             {
                 if (tagIds != null)
                 {
+                    var perApp = tagsPerApp.GetOrAddNew(appId);
+
                     foreach (var tag in tagIds)
                     {
-                        var perApp = tags.GetOrAddNew(appId);
-
                         perApp[tag] = perApp.GetOrAddDefault(tag) + count;
                     }
                 }
             }
 
-            switch (@event.Payload)
+            void AddTagsToCache(DomainId key, HashSet<string>? tags, long version)
             {
-                case AssetCreated assetCreated:
-                    AddTags(assetCreated.AppId.Id, assetCreated.Tags, 1);
-                    break;
+                // Also cache null tags to keep them in as valid state in cache and store.
+                var state = new State { Tags = tags };
 
-                case AssetAnnotated assetAnnotated when assetAnnotated.Tags != null && assetAnnotated.OldTags != null:
-                    AddTags(assetAnnotated.AppId.Id, assetAnnotated.Tags, 1);
-                    AddTags(assetAnnotated.AppId.Id, assetAnnotated.OldTags, -1);
-                    break;
+                // Write tags to a buffer so that we can write them to a store in batches.
+                tagsPerAsset[key] = state;
 
-                case AssetDeleted assetDeleted:
-                    AddTags(assetDeleted.AppId.Id, assetDeleted.OldTags, -1);
-                    break;
+                // Write to the cache immediately, to be available for the next event. Use a relatively long cache time for live updates.
+                memoryCache.Set(key, state, TimeSpan.FromHours(1));
             }
+
+            foreach (var @event in events)
+            {
+                var typedEvent = (AssetEvent)@event.Payload;
+                var appId = typedEvent.AppId.Id;
+                var assetId = typedEvent.AssetId;
+                var assetKey = @event.Headers.AggregateId();
+                var version = @event.Headers.EventStreamNumber();
+
+                switch (typedEvent)
+                {
+                    case AssetCreated assetCreated:
+                        {
+                            AddTagsToStore(appId, assetCreated.Tags, 1);
+
+                            AddTagsToCache(assetKey, assetCreated.Tags, version);
+                            break;
+                        }
+
+                    case AssetAnnotated assetAnnotated when assetAnnotated.Tags != null:
+                        {
+                            var oldTags = await GetAndUpdateOldTagsAsync(appId, assetId, assetKey, version, default);
+
+                            AddTagsToStore(appId, assetAnnotated.Tags, 1);
+                            AddTagsToStore(appId, oldTags, -1);
+
+                            AddTagsToCache(assetKey, assetAnnotated.Tags, version);
+                            break;
+                        }
+
+                    case AssetDeleted assetDeleted:
+                        {
+                            var oldTags = await GetAndUpdateOldTagsAsync(appId, assetId, assetKey, version, default);
+
+                            AddTagsToStore(appId, oldTags, -1);
+                            break;
+                        }
+                }
+            }
+
+            // There is no good solution for batching anyway, so there is no need to build a method for that.
+            foreach (var (appId, updates) in tagsPerApp)
+            {
+                await tagService.UpdateAsync(appId, TagGroups.Assets, updates);
+            }
+
+            await store.WriteManyAsync(tagsPerAsset.Select(x => new SnapshotWriteJob<State>(x.Key, x.Value, 0)));
+        }
+
+        private async Task<HashSet<string>?> GetAndUpdateOldTagsAsync(DomainId appId, DomainId assetId, DomainId key, long version,
+            CancellationToken ct)
+        {
+            // Store the latest tags in memory for fast access.
+            if (memoryCache.TryGetValue<State>(key, out var state))
+            {
+                return state.Tags;
+            }
+
+            var stored = await store.ReadAsync(key, ct);
+
+            // Stored state can be null, if not serialized yet.
+            if (stored.Value != null)
+            {
+                return stored.Value.Tags;
+            }
+
+            // This will replay a lot of events, so it is the slowest alternative.
+            var previousAsset = await assetLoader.GetAsync(appId, assetId, version - 1, ct);
+
+            return previousAsset?.Tags;
         }
 
         private Task TrackUsageAsync(Envelope<IEvent> @event)

@@ -52,9 +52,6 @@ namespace Squidex.Infrastructure.MongoDb
             BsonJsonConvention.Register();
             BsonJsonValueSerializer.Register();
             BsonStringSerializer<RefToken>.Register();
-            BsonStringSerializer<NamedId<DomainId>>.Register();
-            BsonStringSerializer<NamedId<Guid>>.Register();
-            BsonStringSerializer<NamedId<string>>.Register();
         }
     }
 }

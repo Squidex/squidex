@@ -15,11 +15,10 @@ namespace Squidex.Infrastructure.UsageTracking
         private readonly IUsageTracker inner;
         private readonly IMemoryCache cache;
 
+        public string FallbackCategory => inner.FallbackCategory;
+
         public CachingUsageTracker(IUsageTracker inner, IMemoryCache cache)
         {
-            Guard.NotNull(inner);
-            Guard.NotNull(cache);
-
             this.inner = inner;
             this.cache = cache;
         }
@@ -30,6 +29,14 @@ namespace Squidex.Infrastructure.UsageTracking
             Guard.NotNull(key);
 
             return inner.DeleteAsync(key, ct);
+        }
+
+        public Task DeleteByKeyPatternAsync(string pattern,
+            CancellationToken ct = default)
+        {
+            Guard.NotNull(pattern);
+
+            return inner.DeleteByKeyPatternAsync(pattern, ct);
         }
 
         public Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate,

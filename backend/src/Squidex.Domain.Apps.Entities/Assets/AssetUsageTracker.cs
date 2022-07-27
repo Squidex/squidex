@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 
 #pragma warning disable CS0649
@@ -19,14 +20,26 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private const string CounterTotalCount = "TotalAssets";
         private const string CounterTotalSize = "TotalSize";
         private static readonly DateTime SummaryDate;
-        private readonly IUsageTracker usageTracker;
+        private readonly IAssetLoader assetLoader;
+        private readonly ISnapshotStore<State> store;
         private readonly ITagService tagService;
+        private readonly IUsageTracker usageTracker;
 
-        public AssetUsageTracker(IUsageTracker usageTracker,
-            ITagService tagService)
+        [CollectionName("Index_TagHistory")]
+        public sealed class State
         {
-            this.usageTracker = usageTracker;
+            public HashSet<string>? Tags { get; set; }
+        }
+
+        public AssetUsageTracker(IUsageTracker usageTracker, IAssetLoader assetLoader, ITagService tagService,
+            ISnapshotStore<State> store)
+        {
+            this.assetLoader = assetLoader;
             this.tagService = tagService;
+            this.store = store;
+            this.usageTracker = usageTracker;
+
+            ClearCache();
         }
 
         Task IDeleter.DeleteAppAsync(IAppEntity app,
@@ -52,12 +65,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var usages = await usageTracker.QueryAsync(GetKey(appId), fromDate, toDate);
 
-            if (usages.TryGetValue("*", out var byCategory1))
+            if (usages.TryGetValue(usageTracker.FallbackCategory, out var byCategory1))
             {
                 AddCounters(enriched, byCategory1);
             }
             else if (usages.TryGetValue("Default", out var byCategory2))
             {
+                // Fallback for older versions where default was uses as tracking category.
                 AddCounters(enriched, byCategory2);
             }
 

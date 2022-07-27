@@ -5,13 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
-
-namespace Squidex.Domain.Apps.Events.Assets
+namespace Squidex.Infrastructure.States
 {
-    [EventType(nameof(AssetDeleted))]
-    public sealed class AssetDeleted : AssetEvent
+    public interface IOnRead
     {
-        public long DeletedSize { get; set; }
+        ValueTask OnReadAsync();
     }
 }

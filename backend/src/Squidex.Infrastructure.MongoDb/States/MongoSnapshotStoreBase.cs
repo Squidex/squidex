@@ -39,6 +39,11 @@ namespace Squidex.Infrastructure.States
 
                 if (existing != null)
                 {
+                    if (existing.Document is IOnRead onRead)
+                    {
+                        await onRead.OnReadAsync();
+                    }
+
                     return new SnapshotResult<T>(existing.DocumentId, existing.Document, existing.Version);
                 }
 
@@ -95,6 +100,11 @@ namespace Squidex.Infrastructure.States
 
                 await foreach (var document in find.ToAsyncEnumerable(ct))
                 {
+                    if (document.Document is IOnRead onRead)
+                    {
+                        await onRead.OnReadAsync();
+                    }
+
                     yield return new SnapshotResult<T>(document.DocumentId, document.Document, document.Version, true);
                 }
             }

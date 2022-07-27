@@ -130,24 +130,6 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void GetOrNew_should_return_value_if_key_exists()
-        {
-            var list = new List<int>();
-            listDictionary[12] = list;
-
-            Assert.Equal(list, listDictionary.GetOrNew(12));
-        }
-
-        [Fact]
-        public void GetOrNew_should_return_default_but_not_add_it_if_key_not_exists()
-        {
-            var list = new List<int>();
-
-            Assert.Equal(list, listDictionary.GetOrNew(12));
-            Assert.False(listDictionary.ContainsKey(12));
-        }
-
-        [Fact]
         public void GetOrAddNew_should_return_value_if_key_exists()
         {
             var list = new List<int>();

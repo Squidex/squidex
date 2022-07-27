@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 AppId = appId
             };
 
-            A.CallTo(() => tagService.DenormalizeTagsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Is("id1", "id2"), ct))
+            A.CallTo(() => tagService.GetTagNamesAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Is("id1", "id2"), ct))
                 .Returns(new Dictionary<string, string>
                 {
                     ["id1"] = "name1",
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 AppId = appId
             };
 
-            A.CallTo(() => tagService.DenormalizeTagsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Is("id1", "id2", "id3"), ct))
+            A.CallTo(() => tagService.GetTagNamesAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Is("id1", "id2", "id3"), ct))
                 .Returns(new Dictionary<string, string>
                 {
                     ["id1"] = "name1",

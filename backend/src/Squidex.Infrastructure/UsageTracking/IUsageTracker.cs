@@ -9,6 +9,8 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public interface IUsageTracker
     {
+        string FallbackCategory { get; }
+
         Task TrackAsync(DateTime date, string key, string? category, Counters counters,
             CancellationToken ct = default);
 
@@ -22,6 +24,9 @@ namespace Squidex.Infrastructure.UsageTracking
             CancellationToken ct = default);
 
         Task DeleteAsync(string key,
+            CancellationToken ct = default);
+
+        Task DeleteByKeyPatternAsync(string pattern,
             CancellationToken ct = default);
     }
 }

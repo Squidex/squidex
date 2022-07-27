@@ -5,9 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading.Tasks.Dataflow;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Tags
 {
@@ -16,32 +18,51 @@ namespace Squidex.Domain.Apps.Entities.Tags
         private readonly IPersistenceFactory<State> persistenceFactory;
 
         [CollectionName("Index_Tags")]
-        public sealed class State : TagsExport
+        public sealed class State : TagsExport, IOnRead
         {
-            public bool Rebuild(TagsExport export)
+            public ValueTask OnReadAsync()
+            {
+                if (Tags == null)
+                {
+                    Tags = new Dictionary<string, Tag>();
+                }
+
+                if (Alias == null)
+                {
+                    Alias = new Dictionary<string, string>();
+                }
+
+                return default;
+            }
+
+            public bool Clear()
             {
                 var isChanged = false;
 
-                if (!Tags.EqualsDictionary(export.Tags))
+                foreach (var (_, tag) in Tags)
                 {
-                    Tags = export.Tags;
-                    isChanged = true;
-                }
+                    isChanged = tag.Count > 0;
 
-                if (!Alias.EqualsDictionary(export.Alias))
-                {
-                    Alias = export.Alias;
-                    isChanged = true;
+                    tag.Count = 0;
                 }
 
                 return isChanged;
             }
 
+            public bool Rebuild(TagsExport export)
+            {
+                Tags = export.Tags;
+
+                if (Alias.EqualsDictionary(export.Alias))
+                {
+                    Alias = export.Alias;
+                }
+
+                return true;
+            }
+
             public bool Rename(string name, string newName)
             {
-                Guard.NotNull(name);
-                Guard.NotNull(newName);
-
                 name = NormalizeName(name);
 
                 if (!TryGetTag(name, out var tag))
@@ -94,8 +115,6 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             public (bool, Dictionary<string, string>) GetIds(HashSet<string> names)
             {
-                Guard.NotNull(names);
-
                 var tagIds = new Dictionary<string, string>();
 
                 var isChanged = false;
@@ -140,13 +159,6 @@ namespace Squidex.Domain.Apps.Entities.Tags
                 var clone = Tags.Values.ToDictionary(x => x.Name, x => x.Count);
 
                 return new TagsSet(clone, version);
-            }
-
-            public TagsExport GetExportableTags()
-            {
-                var clone = Clone();
-
-                return clone;
             }
 
             private static string NormalizeName(string name)
@@ -242,7 +254,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         {
             var state = await GetStateAsync(id, group, ct);
 
-            return state.Value.GetExportableTags();
+            return state.Value;
         }
 
         public async Task ClearAsync(DomainId id, string group,
@@ -263,10 +275,52 @@ namespace Squidex.Domain.Apps.Entities.Tags
             return state;
         }
 
-        public Task ClearAsync(
-            CancellationToken ct)
+        public async Task ClearAsync(
+            CancellationToken ct = default)
         {
-            return persistenceFactory.Snapshots.ClearAsync(ct);
+            var writerBlock = new ActionBlock<SnapshotResult<State>[]>(async batch =>
+            {
+                try
+                {
+                    var isChanged = !batch.All(x => !x.Value.Clear());
+
+                    if (isChanged)
+                    {
+                        var jobs = batch.Select(x => new SnapshotWriteJob<State>(x.Key, x.Value, x.Version));
+
+                        await persistenceFactory.Snapshots.WriteManyAsync(jobs, ct);
+                    }
+                }
+                catch (OperationCanceledException ex)
+                {
+                    // Dataflow swallows operation cancelled exception.
+                    throw new AggregateException(ex);
+                }
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                BoundedCapacity = 2,
+                MaxDegreeOfParallelism = 1,
+                MaxMessagesPerTask = 1,
+            });
+
+            // Create batches of 500 items to clear the tag count for better performance.
+            var batchBlock = new BatchBlock<SnapshotResult<State>>(500, new GroupingDataflowBlockOptions
+            {
+                BoundedCapacity = 500
+            });
+
+            batchBlock.BidirectionalLinkTo(writerBlock);
+
+            await foreach (var state in persistenceFactory.Snapshots.ReadAllAsync(ct))
+            {
+                // Uses back-propagation to not query additional items from the database, when queue is full.
+                await batchBlock.SendAsync(state, ct);
+            }
+
+            batchBlock.Complete();
+
+            await writerBlock.Completion;
         }
     }
 }

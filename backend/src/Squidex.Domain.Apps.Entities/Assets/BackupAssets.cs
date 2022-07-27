@@ -9,6 +9,7 @@ using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -71,6 +72,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             switch (@event.Payload)
             {
+                case AppCreated:
+                    // Restore the tags first so that the processing of consecutive events have the necessary structure.
+                    await RestoreTagsAsync(context, ct);
+                    break;
                 case AssetFolderCreated:
                     assetFolderIds.Add(@event.Headers.AggregateId());
                     break;
@@ -100,8 +105,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public async Task RestoreAsync(RestoreContext context,
             CancellationToken ct)
         {
-            await RestoreTagsAsync(context, ct);
-
             if (assetIds.Count > 0)
             {
                 await rebuilder.InsertManyAsync<AssetDomainObject, AssetDomainObject.State>(assetIds, BatchSize, ct);
@@ -125,6 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var alias = (Dictionary<string, string>?)null;
 
+            // For backwards compabibility we store the tags and the aliases in different locations.
             if (await context.Reader.HasFileAsync(TagsAliasFile, ct))
             {
                 alias = await context.Reader.ReadJsonAsync<Dictionary<string, string>>(TagsAliasFile, ct);
@@ -133,6 +137,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
             if (alias == null && tags == null)
             {
                 return;
+            }
+
+            if (tags != null)
+            {
+                // Import the tags without count, because they will populated later by the event processor.
+                foreach (var (_, tag) in tags)
+                {
+                    tag.Count = 0;
+                }
             }
 
             var export = new TagsExport { Tags = tags!, Alias = alias! };
@@ -147,11 +160,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (tags.Tags != null)
             {
+                // Export the tags with count, even though we do not need it. But in general it makes the code easier.
                 await context.Writer.WriteJsonAsync(TagsFile, tags.Tags, ct);
             }
 
             if (tags.Alias?.Count > 0)
             {
+                // For backwards compabibility we store the tags and the aliases in different locations.
                 await context.Writer.WriteJsonAsync(TagsAliasFile, tags.Alias, ct);
             }
         }
