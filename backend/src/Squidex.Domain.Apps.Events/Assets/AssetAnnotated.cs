@@ -22,5 +22,7 @@ namespace Squidex.Domain.Apps.Events.Assets
         public AssetMetadata? Metadata { get; set; }
 
         public HashSet<string>? Tags { get; set; }
+
+        public HashSet<string>? OldTags { get; set; }
     }
 }

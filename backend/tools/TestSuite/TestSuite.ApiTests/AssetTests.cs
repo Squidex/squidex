@@ -320,6 +320,58 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_annotate_asset_in_parallel()
+        {
+            var metadataRequest = new AnnotateAssetDto
+            {
+                Tags = new List<string>
+                {
+                    $"tag_{Guid.NewGuid()}",
+                    $"tag_{Guid.NewGuid()}"
+                }
+            };
+
+
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            var numErrors = 0;
+            var numSuccess = 0;
+
+            // STEP 3: Make parallel upserts.
+            await Parallel.ForEachAsync(Enumerable.Range(0, 20), async (i, ct) =>
+            {
+                try
+                {
+                    await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, metadataRequest);
+
+                    Interlocked.Increment(ref numSuccess);
+                }
+                catch (SquidexManagementException ex) when (ex.StatusCode is 409 or 412)
+                {
+                    Interlocked.Increment(ref numErrors);
+                    return;
+                }
+            });
+
+            // At least some errors and success should have happened.
+            Assert.True(numErrors > 0);
+            Assert.True(numSuccess > 0);
+
+
+            // STEP 3: Make an normal update to ensure nothing is corrupt.
+            await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, metadataRequest);
+
+
+            // STEP 4: Check tags
+            var tags = await _.Assets.WaitForTagsAsync(_.AppName, metadataRequest.Tags[0], TimeSpan.FromMinutes(2));
+
+            Assert.Equal(1, tags[metadataRequest.Tags[0]]);
+            Assert.Equal(1, tags[metadataRequest.Tags[1]]);
+        }
+
+        [Fact]
         public async Task Should_protect_asset()
         {
             var fileName = $"{Guid.NewGuid()}.png";

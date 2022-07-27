@@ -130,7 +130,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 if (result.IsChanged && context.Command is UploadAssetCommand)
                 {
                     var tempFile = context.ContextId.ToString();
-
                     try
                     {
                         await assetFileStore.CopyAsync(tempFile, asset.AppId.Id, asset.AssetId, asset.FileVersion, null, ct);

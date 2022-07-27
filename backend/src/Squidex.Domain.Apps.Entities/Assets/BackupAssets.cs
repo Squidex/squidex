@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 return;
             }
 
-            var export = new TagsExport { Tags = tags, Alias = alias };
+            var export = new TagsExport { Tags = tags!, Alias = alias! };
 
             await tagService.RebuildTagsAsync(context.AppId, TagGroups.Assets, export, ct);
         }

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -36,18 +37,77 @@ namespace Squidex.Domain.Apps.Entities.Assets
             get => "^asset-";
         }
 
-        public Task On(Envelope<IEvent> @event)
+        public bool CanClear
+        {
+            get => false;
+        }
+
+        public async Task On(IEnumerable<Envelope<IEvent>> events)
+        {
+            var tags = new Dictionary<DomainId, Dictionary<string, int>>();
+
+            foreach (var @event in events)
+            {
+                await TrackUsageAsync(@event);
+
+                AddTags(@event, tags);
+            }
+
+            foreach (var (appId, updates) in tags)
+            {
+                await tagService.UpdateAsync(appId, TagGroups.Assets, updates);
+            }
+        }
+
+        private static void AddTags(Envelope<IEvent> @event, Dictionary<DomainId, Dictionary<string, int>> tags)
+        {
+            if (@event.Headers.Restored())
+            {
+                return;
+            }
+
+            void AddTags(DomainId appId, HashSet<string>? tagIds, int count)
+            {
+                if (tagIds != null)
+                {
+                    foreach (var tag in tagIds)
+                    {
+                        var perApp = tags.GetOrAddNew(appId);
+
+                        perApp[tag] = perApp.GetOrAddDefault(tag) + count;
+                    }
+                }
+            }
+
+            switch (@event.Payload)
+            {
+                case AssetCreated assetCreated:
+                    AddTags(assetCreated.AppId.Id, assetCreated.Tags, 1);
+                    break;
+
+                case AssetAnnotated assetAnnotated when assetAnnotated.Tags != null && assetAnnotated.OldTags != null:
+                    AddTags(assetAnnotated.AppId.Id, assetAnnotated.Tags, 1);
+                    AddTags(assetAnnotated.AppId.Id, assetAnnotated.OldTags, -1);
+                    break;
+
+                case AssetDeleted assetDeleted:
+                    AddTags(assetDeleted.AppId.Id, assetDeleted.OldTags, -1);
+                    break;
+            }
+        }
+
+        private Task TrackUsageAsync(Envelope<IEvent> @event)
         {
             switch (@event.Payload)
             {
-                case AssetCreated e:
-                    return UpdateSizeAsync(e.AppId.Id, GetDate(@event), e.FileSize, 1);
+                case AssetCreated assetCreated:
+                    return UpdateSizeAsync(assetCreated.AppId.Id, GetDate(@event), assetCreated.FileSize, 1);
 
-                case AssetUpdated e:
-                    return UpdateSizeAsync(e.AppId.Id, GetDate(@event), e.FileSize, 0);
+                case AssetUpdated assetUpdated:
+                    return UpdateSizeAsync(assetUpdated.AppId.Id, GetDate(@event), assetUpdated.FileSize, 0);
 
-                case AssetDeleted e:
-                    return UpdateSizeAsync(e.AppId.Id, GetDate(@event), -e.DeletedSize, -1);
+                case AssetDeleted assetDeleted:
+                    return UpdateSizeAsync(assetDeleted.AppId.Id, GetDate(@event), -assetDeleted.DeletedSize, -1);
             }
 
             return Task.CompletedTask;

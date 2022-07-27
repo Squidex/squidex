@@ -17,6 +17,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         string EventsFilter => ".*";
 
+        bool CanClear => true;
+
         bool Handles(StoredEvent @event)
         {
             return true;

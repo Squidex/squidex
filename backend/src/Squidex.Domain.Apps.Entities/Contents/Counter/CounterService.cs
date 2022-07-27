@@ -20,14 +20,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         {
             public Dictionary<string, long> Counters { get; set; } = new Dictionary<string, long>();
 
-            public void Increment(string name)
+            public bool Increment(string name)
             {
                 Counters[name] = Counters.GetValueOrDefault(name) + 1;
+
+                return true;
             }
 
-            public void Reset(string name, long value)
+            public bool Reset(string name, long value)
             {
                 Counters[name] = value;
+
+                return true;
             }
         }
 

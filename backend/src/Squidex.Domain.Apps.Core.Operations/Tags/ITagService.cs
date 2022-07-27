@@ -14,10 +14,10 @@ namespace Squidex.Domain.Apps.Core.Tags
         Task<Dictionary<string, string>> GetTagIdsAsync(DomainId id, string group, HashSet<string> names,
             CancellationToken ct = default);
 
-        Task<Dictionary<string, string>> NormalizeTagsAsync(DomainId id, string group, HashSet<string>? names, HashSet<string>? ids,
+        Task<Dictionary<string, string>> GetTagNamesAsync(DomainId id, string group, HashSet<string> ids,
             CancellationToken ct = default);
 
-        Task<Dictionary<string, string>> DenormalizeTagsAsync(DomainId id, string group, HashSet<string> ids,
+        Task UpdateAsync(DomainId id, string group, Dictionary<string, int> updates,
             CancellationToken ct = default);
 
         Task<TagsSet> GetTagsAsync(DomainId id, string group,
@@ -34,5 +34,8 @@ namespace Squidex.Domain.Apps.Core.Tags
 
         Task ClearAsync(DomainId id, string group,
             CancellationToken ct = default);
+
+        Task ClearAsync(
+            CancellationToken ct);
     }
 }

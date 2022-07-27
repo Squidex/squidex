@@ -18,128 +18,128 @@ namespace Squidex.Domain.Apps.Entities.Tags
         [CollectionName("Index_Tags")]
         public sealed class State : TagsExport
         {
-            public void Rebuild(TagsExport export)
+            public bool Rebuild(TagsExport export)
             {
-                Tags = export.Tags;
+                var isChanged = false;
 
-                Alias = export.Alias;
+                if (!Tags.EqualsDictionary(export.Tags))
+                {
+                    Tags = export.Tags;
+                    isChanged = true;
+                }
+
+                if (!Alias.EqualsDictionary(export.Alias))
+                {
+                    Alias = export.Alias;
+                    isChanged = true;
+                }
+
+                return isChanged;
             }
 
-            public void Rename(string name, string newName)
+            public bool Rename(string name, string newName)
             {
                 Guard.NotNull(name);
                 Guard.NotNull(newName);
 
                 name = NormalizeName(name);
 
-                var (_, tag) = FindTag(name);
-
-                if (tag == null)
+                if (!TryGetTag(name, out var tag))
                 {
-                    return;
+                    return false;
                 }
 
                 newName = NormalizeName(newName);
 
-                tag.Name = newName;
-
-                if (Alias != null)
+                if (string.Equals(name, newName, StringComparison.OrdinalIgnoreCase))
                 {
-                    foreach (var alias in Alias.Where(x => x.Value == name).ToList())
-                    {
-                        Alias.Remove(alias.Key);
+                    return false;
+                }
 
-                        if (alias.Key != newName)
-                        {
-                            Alias[alias.Key] = newName;
-                        }
+                tag.Value.Name = newName;
+
+                foreach (var alias in Alias.Where(x => x.Value == name).ToList())
+                {
+                    Alias.Remove(alias.Key);
+
+                    if (alias.Key != tag.Value.Name)
+                    {
+                        Alias[alias.Key] = tag.Value.Name;
                     }
                 }
 
-                Alias ??= new Dictionary<string, string>();
-                Alias[name] = newName;
+                return true;
             }
 
-            public Dictionary<string, string> Normalize(HashSet<string>? names, HashSet<string>? ids)
+            public bool Update(Dictionary<string, int> updates)
             {
-                var result = new Dictionary<string, string>();
+                var isChanged = false;
 
-                if (names != null)
+                foreach (var (id, update) in updates)
                 {
-                    foreach (var tag in names)
+                    if (update != 0 && Tags.TryGetValue(id, out var tag))
                     {
-                        var name = NormalizeName(tag);
+                        var newCount = Math.Max(0, tag.Count + update);
 
-                        if (!string.IsNullOrWhiteSpace(name))
+                        if (newCount != tag.Count)
                         {
-                            result.Add(name, GetId(name, ids));
+                            tag.Count = newCount;
+                            isChanged = true;
                         }
                     }
                 }
 
-                if (ids != null)
-                {
-                    foreach (var id in ids)
-                    {
-                        if (!result.ContainsValue(id))
-                        {
-                            if (Tags != null && Tags.TryGetValue(id, out var tagInfo))
-                            {
-                                tagInfo.Count--;
-
-                                if (tagInfo.Count <= 0)
-                                {
-                                    Tags.Remove(id);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                return result;
+                return isChanged;
             }
 
-            public Dictionary<string, string> GetTagIds(HashSet<string> names)
+            public (bool, Dictionary<string, string>) GetIds(HashSet<string> names)
             {
                 Guard.NotNull(names);
 
-                var result = new Dictionary<string, string>();
+                var tagIds = new Dictionary<string, string>();
 
-                foreach (var tag in names)
+                var isChanged = false;
+
+                foreach (var name in names.Select(NormalizeName))
                 {
-                    var name = NormalizeName(tag);
-
-                    var (id, _) = FindTag(name);
-
-                    if (!string.IsNullOrWhiteSpace(id))
+                    if (TryGetTag(name, out var tag))
                     {
-                        result.Add(name, id);
+                        tagIds[name] = tag.Key;
+                    }
+                    else
+                    {
+                        var id = Guid.NewGuid().ToString();
+
+                        Tags[id] = new Tag { Name = name };
+                        tagIds[name] = id;
+
+                        isChanged = true;
                     }
                 }
 
-                return result;
+                return (isChanged, tagIds);
             }
 
-            public Dictionary<string, string> Denormalize(HashSet<string> ids)
+            public Dictionary<string, string> GetNames(HashSet<string> ids)
             {
-                var result = new Dictionary<string, string>();
+                var tagNames = new Dictionary<string, string>();
 
                 foreach (var id in ids)
                 {
-                    if (Tags?.TryGetValue(id, out var tagInfo) == true)
+                    if (Tags.TryGetValue(id, out var tagInfo))
                     {
-                        result[id] = tagInfo.Name;
+                        tagNames[id] = tagInfo.Name;
                     }
                 }
 
-                return result;
+                return tagNames;
             }
 
             public TagsSet GetTags(long version)
             {
-                var tags = Tags?.Values.ToDictionary(x => x.Name, x => x.Count) ?? new Dictionary<string, int>();
+                var clone = Tags.Values.ToDictionary(x => x.Name, x => x.Count);
 
-                return new TagsSet(tags, version);
+                return new TagsSet(clone, version);
             }
 
             public TagsExport GetExportableTags()
@@ -149,41 +149,29 @@ namespace Squidex.Domain.Apps.Entities.Tags
                 return clone;
             }
 
-            private string GetId(string name, HashSet<string>? ids)
-            {
-                var (id, tag) = FindTag(name);
-
-                if (tag != null)
-                {
-                    if (ids == null || !ids.Contains(id))
-                    {
-                        tag.Count++;
-                    }
-                }
-                else
-                {
-                    id = DomainId.NewGuid().ToString();
-
-                    Tags ??= new Dictionary<string, Tag>();
-                    Tags.Add(id, new Tag { Name = name });
-                }
-
-                return id;
-            }
-
             private static string NormalizeName(string name)
             {
                 return name.Trim().ToLowerInvariant();
             }
 
-            private KeyValuePair<string, Tag> FindTag(string name)
+            private bool TryGetTag(string name, out KeyValuePair<string, Tag> result)
             {
-                if (Alias?.TryGetValue(name, out var newName) == true)
+                result = default;
+
+                if (Alias.TryGetValue(name, out var newName))
                 {
                     name = newName;
                 }
 
-                return Tags?.FirstOrDefault(x => x.Value.Name == name) ?? default;
+                var found = Tags.FirstOrDefault(x => x.Value.Name == name);
+
+                if (found.Value != null)
+                {
+                    result = new KeyValuePair<string, Tag>(found.Key, found.Value);
+                    return true;
+                }
+
+                return false;
             }
         }
 
@@ -220,25 +208,25 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             var state = await GetStateAsync(id, group, ct);
 
-            return await state.UpdateAsync(s => s.GetTagIds(names), ct: ct);
+            return await state.UpdateAsync(s => s.GetIds(names), ct: ct);
         }
 
-        public async Task<Dictionary<string, string>> DenormalizeTagsAsync(DomainId id, string group, HashSet<string> ids,
+        public async Task<Dictionary<string, string>> GetTagNamesAsync(DomainId id, string group, HashSet<string> ids,
             CancellationToken ct = default)
         {
             Guard.NotNull(ids);
 
             var state = await GetStateAsync(id, group, ct);
 
-            return await state.UpdateAsync(s => s.Denormalize(ids), ct: ct);
+            return state.Value.GetNames(ids);
         }
 
-        public async Task<Dictionary<string, string>> NormalizeTagsAsync(DomainId id, string group, HashSet<string>? names, HashSet<string>? ids,
+        public async Task UpdateAsync(DomainId id, string group, Dictionary<string, int> update,
             CancellationToken ct = default)
         {
             var state = await GetStateAsync(id, group, ct);
 
-            return await state.UpdateAsync(s => s.Normalize(names, ids), ct: ct);
+            await state.UpdateAsync(s => s.Update(update), ct: ct);
         }
 
         public async Task<TagsSet> GetTagsAsync(DomainId id, string group,
@@ -273,6 +261,12 @@ namespace Squidex.Domain.Apps.Entities.Tags
             await state.LoadAsync(ct);
 
             return state;
+        }
+
+        public Task ClearAsync(
+            CancellationToken ct)
+        {
+            return persistenceFactory.Snapshots.ClearAsync(ct);
         }
     }
 }

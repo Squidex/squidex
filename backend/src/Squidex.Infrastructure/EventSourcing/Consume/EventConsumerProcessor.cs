@@ -144,6 +144,11 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
         public virtual async Task ResetAsync()
         {
+            if (!eventConsumer.CanClear)
+            {
+                return;
+            }
+
             await UpdateAsync(async () =>
             {
                 Unsubscribe();

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.UsageTracking;
@@ -19,10 +20,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private const string CounterTotalSize = "TotalSize";
         private static readonly DateTime SummaryDate;
         private readonly IUsageTracker usageTracker;
+        private readonly ITagService tagService;
 
-        public AssetUsageTracker(IUsageTracker usageTracker)
+        public AssetUsageTracker(IUsageTracker usageTracker,
+            ITagService tagService)
         {
             this.usageTracker = usageTracker;
+            this.tagService = tagService;
         }
 
         Task IDeleter.DeleteAppAsync(IAppEntity app,

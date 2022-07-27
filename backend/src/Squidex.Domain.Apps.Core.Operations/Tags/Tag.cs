@@ -7,10 +7,10 @@
 
 namespace Squidex.Domain.Apps.Core.Tags
 {
-    public sealed class Tag
+    public sealed record Tag
     {
         public string Name { get; set; }
 
-        public int Count { get; set; } = 1;
+        public int Count { get; set; }
     }
 }

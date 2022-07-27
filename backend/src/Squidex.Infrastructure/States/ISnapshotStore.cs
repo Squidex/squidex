@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.States
 
     public record struct SnapshotWriteJob<T>(DomainId Key, T Value, long NewVersion, long OldVersion = EtagVersion.Any)
     {
-        public SnapshotWriteJob<TOther> As<TOther>(TOther snapshot)
+        public readonly SnapshotWriteJob<TOther> As<TOther>(TOther snapshot)
         {
             return new SnapshotWriteJob<TOther>(Key, snapshot, NewVersion, OldVersion);
         }

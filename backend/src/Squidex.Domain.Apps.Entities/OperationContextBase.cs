@@ -18,7 +18,8 @@ namespace Squidex.Domain.Apps.Entities
     {
         private readonly List<ValidationError> errors = new List<ValidationError>();
         private readonly IServiceProvider serviceProvider;
-        private readonly Func<TSnapShot> snapshot;
+        private readonly Func<TSnapShot> snapshotProvider;
+        private readonly TSnapShot snapshotInitial;
 
         public RefToken Actor => Command.Actor;
 
@@ -28,17 +29,22 @@ namespace Squidex.Domain.Apps.Entities
 
         public TCommand Command { get; init; }
 
-        public TSnapShot Snapshot => snapshot();
+        public TSnapShot Snapshot => snapshotProvider();
+
+        public TSnapShot SnapshotInitial => snapshotInitial;
 
         public ClaimsPrincipal? User => Command.User;
 
-        protected OperationContextBase(IServiceProvider serviceProvider, Func<TSnapShot> snapshot)
+        public Dictionary<string, object> Context { get; } = new Dictionary<string, object>();
+
+        protected OperationContextBase(IServiceProvider serviceProvider, Func<TSnapShot> snapshotProvider)
         {
             Guard.NotNull(serviceProvider);
-            Guard.NotNull(snapshot);
+            Guard.NotNull(snapshotProvider);
 
             this.serviceProvider = serviceProvider;
-            this.snapshot = snapshot;
+            this.snapshotProvider = snapshotProvider;
+            this.snapshotInitial = snapshotProvider();
         }
 
         public T Resolve<T>() where T : notnull

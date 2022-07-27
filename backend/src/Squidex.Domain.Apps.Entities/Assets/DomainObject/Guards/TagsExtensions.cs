@@ -11,20 +11,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 {
     public static class TagsExtensions
     {
-        public static async Task<HashSet<string>> NormalizeTags(this AssetOperation operation, HashSet<string> tags)
+        public static async Task<HashSet<string>> NormalizeTagsAsync(this AssetOperation operation, HashSet<string> names)
         {
             var tagService = operation.Resolve<ITagService>();
 
-            var normalized = await tagService.NormalizeTagsAsync(operation.App.Id, TagGroups.Assets, tags, operation.Snapshot.Tags);
+            var normalized = await tagService.GetTagIdsAsync(operation.App.Id, TagGroups.Assets, names);
 
             return new HashSet<string>(normalized.Values);
-        }
-
-        public static async Task UnsetTags(this AssetOperation operation)
-        {
-            var tagService = operation.Resolve<ITagService>();
-
-            await tagService.NormalizeTagsAsync(operation.App.Id, TagGroups.Assets, null, operation.Snapshot.Tags);
         }
     }
 }
