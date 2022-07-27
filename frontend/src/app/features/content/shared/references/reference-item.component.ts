@@ -8,7 +8,7 @@
 /* tslint:disable: component-selector */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { AppLanguageDto, ContentDto, getContentValue } from '@app/shared';
+import { AppLanguageDto, ContentDto, getContentValue, MetaFields } from '@app/shared';
 
 @Component({
     selector: '[sqxReferenceItem][language]',
@@ -17,6 +17,8 @@ import { AppLanguageDto, ContentDto, getContentValue } from '@app/shared';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReferenceItemComponent implements OnChanges {
+    public readonly metaFields = MetaFields;
+    
     @Output()
     public delete = new EventEmitter();
 

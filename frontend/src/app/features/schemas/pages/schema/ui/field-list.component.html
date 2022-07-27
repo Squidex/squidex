@@ -10,7 +10,7 @@
     </div>
 
     <div *ngFor="let field of fieldsAdded" class="table-items-row table-items-row-summary" cdkDrag>
-        <i class="icon-drag2 drag-handle"></i> <span>{{field}}</span>
+        <i class="icon-drag2 drag-handle"></i> <span>{{field.name}}</span>
     </div>
 </div>
 
@@ -23,6 +23,6 @@
     <label>{{ 'schemas.ui.unassignedFields' | sqxTranslate }}</label>
     
     <div *ngFor="let field of fieldsNotAdded" class="table-items-row table-items-row-summary" cdkDrag>
-        <i class="icon-drag2 drag-handle"></i> <span>{{field}}</span>
+        <i class="icon-drag2 drag-handle"></i> <span>{{field.name}}</span>
     </div>
 </div>

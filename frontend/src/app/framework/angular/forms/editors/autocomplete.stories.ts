@@ -86,13 +86,6 @@ Icon.args = {
     icon: 'user',
 };
 
-export const IconLoading = Template.bind({});
-
-IconLoading.args = {
-    source: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing'], 4000),
-    icon: 'user',
-};
-
 export const StyleEmpty = Template.bind({});
 
 StyleEmpty.args = {
@@ -103,4 +96,11 @@ export const StyleUnderlined = Template.bind({});
 
 StyleUnderlined.args = {
     inputStyle: 'underlined',
+};
+
+export const IconLoading = Template.bind({});
+
+IconLoading.args = {
+    source: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing'], 4000),
+    icon: 'user',
 };
