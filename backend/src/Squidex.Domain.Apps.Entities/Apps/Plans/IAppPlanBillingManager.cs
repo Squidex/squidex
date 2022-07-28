@@ -13,7 +13,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
     {
         bool HasPortal { get; }
 
-        Task<IChangePlanResult> ChangePlanAsync(string userId, NamedId<DomainId> appId, string? planId, string? referer,
+        Task<Uri?> MustRedirectToPortalAsync(string userId, NamedId<DomainId> appId, string? planId, string? referer,
+            CancellationToken ct = default);
+
+        Task SubscribeAsync(string userId, NamedId<DomainId> appId, string? planId, string? referer,
+            CancellationToken ct = default);
+
+        Task UnsubscribeAsync(string userId, NamedId<DomainId> appId, string? referer,
             CancellationToken ct = default);
 
         Task<string> GetPortalLinkAsync(string userId,

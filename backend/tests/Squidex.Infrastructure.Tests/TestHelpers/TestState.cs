@@ -33,16 +33,6 @@ namespace Squidex.Infrastructure.TestHelpers
         {
         }
 
-        public void AddEvent(Envelope<IEvent> @event)
-        {
-            events.Add(@event);
-        }
-
-        public void AddEvent(IEvent @event)
-        {
-            events.Add(Envelope.Create(@event));
-        }
-
         public TestState(DomainId id, IPersistenceFactory<T>? persistenceFactory = null)
         {
             Id = id;
@@ -114,6 +104,16 @@ namespace Squidex.Infrastructure.TestHelpers
                 {
                     Snapshot = new T();
                 });
+        }
+
+        public void AddEvent(Envelope<IEvent> @event)
+        {
+            events.Add(@event);
+        }
+
+        public void AddEvent(IEvent @event)
+        {
+            events.Add(Envelope.Create(@event));
         }
     }
 }

@@ -71,6 +71,9 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             A.CallTo(() => eventConsumer.Name)
                 .Returns(consumerName);
 
+            A.CallTo(() => eventConsumer.CanClear)
+                .Returns(true);
+
             A.CallTo(() => eventConsumer.Handles(A<StoredEvent>._))
                 .Returns(true);
 
@@ -203,6 +206,26 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, null))
                 .MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task Should_not_reset_consumer_if_not_allowed()
+        {
+            A.CallTo(() => eventConsumer.CanClear)
+                .Returns(false);
+
+            await sut.InitializeAsync(default);
+            await sut.ActivateAsync();
+
+            await sut.StopAsync();
+            await sut.ResetAsync();
+
+            await sut.CompleteAsync();
+
+            AssertGrainState(isStopped: true, position: initialPosition);
+
+            A.CallTo(() => eventConsumer.ClearAsync())
+                .MustNotHaveHappened();
         }
 
         [Fact]

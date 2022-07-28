@@ -166,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             if (create.Tags != null)
             {
-                create.Tags = await operation.NormalizeTagsAsync(create.Tags);
+                create.Tags = await operation.GetTagIdsAsync(create.Tags);
             }
 
             Create(create);
@@ -181,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             if (annotate.Tags != null)
             {
-                annotate.Tags = await operation.NormalizeTagsAsync(annotate.Tags);
+                annotate.Tags = await operation.GetTagIdsAsync(annotate.Tags);
             }
 
             Annotate(annotate);

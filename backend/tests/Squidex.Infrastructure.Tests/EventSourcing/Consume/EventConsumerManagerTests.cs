@@ -83,12 +83,13 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         [Fact]
         public async Task Should_publish_event_on_start()
         {
-            var testState = new TestState<EventConsumerState>(DomainId.Create(consumerName1), persistenceFactory)
+            var testState = new TestState<EventConsumerState>(consumerName1, persistenceFactory)
             {
                 Snapshot = new EventConsumerState
                 {
                     Position = "42"
-                }
+                },
+                Version = 0
             };
 
             var response = await sut.StartAsync(consumerName1, default);
@@ -102,12 +103,13 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         [Fact]
         public async Task Should_publish_event_on_stop()
         {
-            var testState = new TestState<EventConsumerState>(DomainId.Create(consumerName1), persistenceFactory)
+            var testState = new TestState<EventConsumerState>(consumerName1, persistenceFactory)
             {
                 Snapshot = new EventConsumerState
                 {
                     Position = "42"
-                }
+                },
+                Version = 0
             };
 
             var response = await sut.StopAsync(consumerName1, default);
@@ -121,12 +123,13 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         [Fact]
         public async Task Should_publish_event_on_reset()
         {
-            var testState = new TestState<EventConsumerState>(DomainId.Create(consumerName1), persistenceFactory)
+            var testState = new TestState<EventConsumerState>(consumerName1, persistenceFactory)
             {
                 Snapshot = new EventConsumerState
                 {
                     Position = "42"
-                }
+                },
+                Version = 0
             };
 
             var response = await sut.ResetAsync(consumerName1, default);

@@ -81,9 +81,9 @@ namespace Squidex.Areas.Api.Controllers.Plans
 
             string? redirectUri = null;
 
-            if (context.PlainResult is RedirectToCheckoutResult result)
+            if (context.PlainResult is PlanChangedResult result)
             {
-                redirectUri = result.Url.ToString();
+                redirectUri = result.RedirectUri?.ToString();
             }
 
             return Ok(new PlanChangedDto { RedirectUri = redirectUri });

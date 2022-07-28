@@ -6,18 +6,26 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Tags;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 {
     public static class TagsExtensions
     {
-        public static async Task<HashSet<string>> NormalizeTagsAsync(this AssetOperation operation, HashSet<string> names)
+        public static async Task<HashSet<string>> GetTagIdsAsync(this AssetOperation operation, HashSet<string>? names)
         {
-            var tagService = operation.Resolve<ITagService>();
+            var result = new HashSet<string>(names?.Count ?? 0);
 
-            var normalized = await tagService.GetTagIdsAsync(operation.App.Id, TagGroups.Assets, names);
+            if (names != null)
+            {
+                var tagService = operation.Resolve<ITagService>();
 
-            return new HashSet<string>(normalized.Values);
+                var normalized = await tagService.GetTagIdsAsync(operation.App.Id, TagGroups.Assets, names);
+
+                result.AddRange(normalized.Values);
+            }
+
+            return result;
         }
     }
 }
