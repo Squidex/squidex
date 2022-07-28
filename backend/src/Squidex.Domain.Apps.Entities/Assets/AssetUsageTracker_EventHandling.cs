@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public int BatchSize
         {
-            get => 1;
+            get => 1000;
         }
 
         public int BatchDelay
