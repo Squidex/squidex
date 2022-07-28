@@ -12,7 +12,47 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public sealed class PollingSubscription : IEventSubscription
     {
+        private readonly RecentEvents recentEvents = new RecentEvents();
         private readonly CompletionTimer timer;
+
+        private sealed class RecentEvents
+        {
+            private const int Capacity = 50;
+            private readonly HashSet<Guid> eventIds = new HashSet<Guid>(Capacity);
+            private readonly Queue<(Guid, string)> eventQueue = new Queue<(Guid, string)>(Capacity);
+
+            public string? FirstPosition()
+            {
+                if (eventQueue.Count == 0)
+                {
+                    return null;
+                }
+
+                return eventQueue.Peek().Item2;
+            }
+
+            public bool Add(StoredEvent @event)
+            {
+                var id = @event.Data.Headers.EventId();
+
+                if (eventIds.Contains(id))
+                {
+                    return false;
+                }
+
+                while (eventQueue.Count >= Capacity)
+                {
+                    var (storedId, _) = eventQueue.Dequeue();
+
+                    eventIds.Remove(storedId);
+                }
+
+                eventIds.Add(id);
+                eventQueue.Enqueue((id, @event.EventPosition));
+
+                return true;
+            }
+        }
 
         public PollingSubscription(
             IEventStore eventStore,
@@ -24,12 +64,23 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 try
                 {
-                    await foreach (var storedEvent in eventStore.QueryAllAsync(streamFilter, position, ct: ct))
+                    var newEventCount = 0;
+                    do
                     {
-                        await eventSubscriber.OnNextAsync(this, storedEvent);
+                        newEventCount = 0;
 
-                        position = storedEvent.EventPosition;
+                        await foreach (var storedEvent in eventStore.QueryAllAsync(streamFilter, position, ct: ct))
+                        {
+                            if (recentEvents.Add(storedEvent))
+                            {
+                                await eventSubscriber.OnNextAsync(this, storedEvent);
+                                newEventCount++;
+                            }
+
+                            position = recentEvents.FirstPosition();
+                        }
                     }
+                    while (newEventCount > 50);
                 }
                 catch (Exception ex)
                 {
