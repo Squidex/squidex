@@ -290,7 +290,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
                 if (!c.FromCallback)
                 {
-                    var redirectUri = await Billing().MustRedirectToPortalAsync(userId, Snapshot.NamedId(), c.PlanId, default);
+                    var redirectUri = await Billing().MustRedirectToPortalAsync(userId, Snapshot.NamedId(), c.PlanId, ct);
 
                     if (redirectUri != null)
                     {
@@ -301,7 +301,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 ChangePlan(c);
 
                 return new PlanChangedResult(c.PlanId);
-            });
+            }, ct);
 
             if (changePlan.FromCallback)
             {
