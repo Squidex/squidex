@@ -368,7 +368,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 4: Check tags
-            var tags = await _.Assets.WaitForTagsAsync(_.AppName, metadataRequest.Tags[0], TimeSpan.FromMinutes(2));
+            var tags = await _.Assets.WaitForTagsAsync(_.AppName, tag1, TimeSpan.FromMinutes(2));
 
             Assert.Equal(1, tags?[tag1]);
             Assert.Equal(1, tags?[tag2]);

@@ -60,7 +60,7 @@ namespace TestSuite
             {
             }
 
-            return null;
+            return await assetsClient.GetTagsAsync(app);
         }
 
         public static async Task<BackupJobDto> WaitForBackupAsync(this IBackupsClient backupsClient, string app, TimeSpan timeout)
