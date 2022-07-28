@@ -322,12 +322,15 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_annotate_asset_in_parallel()
         {
+            var tag1 = $"tag_{Guid.NewGuid()}";
+            var tag2 = $"tag_{Guid.NewGuid()}";
+
             var metadataRequest = new AnnotateAssetDto
             {
                 Tags = new List<string>
                 {
-                    $"tag_{Guid.NewGuid()}",
-                    $"tag_{Guid.NewGuid()}"
+                    tag1,
+                    tag2
                 }
             };
 
@@ -367,8 +370,8 @@ namespace TestSuite.ApiTests
             // STEP 4: Check tags
             var tags = await _.Assets.WaitForTagsAsync(_.AppName, metadataRequest.Tags[0], TimeSpan.FromMinutes(2));
 
-            Assert.Equal(1, tags[metadataRequest.Tags[0]]);
-            Assert.Equal(1, tags[metadataRequest.Tags[1]]);
+            Assert.Equal(1, tags?[tag1]);
+            Assert.Equal(1, tags?[tag2]);
         }
 
         [Fact]
