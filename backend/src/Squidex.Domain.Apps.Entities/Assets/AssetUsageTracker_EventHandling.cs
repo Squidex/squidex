@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Tags;
@@ -94,7 +95,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             void AddTagsToCache(DomainId key, HashSet<string>? tags, long version)
             {
-                // Also cache null tags to keep them in as valid state in cache and store.
                 var state = new State { Tags = tags };
 
                 // Write tags to a buffer so that we can write them to a store in batches.
@@ -149,6 +149,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 await tagService.UpdateAsync(appId, TagGroups.Assets, updates);
             }
+
+            Console.WriteLine($"Writing tags: {JsonSerializer.Serialize(tagsPerApp)}");
 
             await store.WriteManyAsync(tagsPerAsset.Select(x => new SnapshotWriteJob<State>(x.Key, x.Value, 0)));
         }
