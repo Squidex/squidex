@@ -373,52 +373,49 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_update_content_in_parallel()
         {
-            for (var i = 0; i < 200; i++)
+            TestEntity content = null;
+            try
             {
-                TestEntity content = null;
-                try
+                // STEP 1: Create a new item.
+                content = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, ContentCreateOptions.AsPublish);
+
+
+                var numErrors = 0;
+                var numSuccess = 0;
+
+                // STEP 3: Make parallel updates.
+                await Parallel.ForEachAsync(Enumerable.Range(0, 20), async (i, ct) =>
                 {
-                    // STEP 1: Create a new item.
-                    content = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, ContentCreateOptions.AsPublish);
-
-
-                    var numErrors = 0;
-                    var numSuccess = 0;
-
-                    // STEP 3: Make parallel updates.
-                    await Parallel.ForEachAsync(Enumerable.Range(0, 20), async (i, ct) =>
+                    try
                     {
-                        try
-                        {
-                            await _.Contents.UpdateAsync(content.Id, new TestEntityData { Number = i });
+                        await _.Contents.UpdateAsync(content.Id, new TestEntityData { Number = i });
 
-                            Interlocked.Increment(ref numSuccess);
-                        }
-                        catch (SquidexException ex) when (ex.StatusCode is 409 or 412)
-                        {
-                            Interlocked.Increment(ref numErrors);
-                            return;
-                        }
-                    });
-
-                    // At least some errors and success should have happened.
-                    Assert.True(numErrors > 0);
-                    Assert.True(numSuccess > 0);
-
-
-                    // STEP 3: Make an normal update to ensure nothing is corrupt.
-                    await _.Contents.UpdateAsync(content.Id, new TestEntityData { Number = 2 });
-
-                    var updated = await _.Contents.GetAsync(content.Id);
-
-                    Assert.Equal(2, content.Data.Number);
-                }
-                finally
-                {
-                    if (content != null)
-                    {
-                        await _.Contents.DeleteAsync(content.Id);
+                        Interlocked.Increment(ref numSuccess);
                     }
+                    catch (SquidexException ex) when (ex.StatusCode is 409 or 412)
+                    {
+                        Interlocked.Increment(ref numErrors);
+                        return;
+                    }
+                });
+
+                // At least some errors and success should have happened.
+                Assert.True(numErrors > 0);
+                Assert.True(numSuccess > 0);
+
+
+                // STEP 3: Make an normal update to ensure nothing is corrupt.
+                await _.Contents.UpdateAsync(content.Id, new TestEntityData { Number = 2 });
+
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal(2, content.Data.Number);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
                 }
             }
         }
