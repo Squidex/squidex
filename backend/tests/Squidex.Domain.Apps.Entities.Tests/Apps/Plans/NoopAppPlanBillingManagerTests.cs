@@ -22,13 +22,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         [Fact]
         public async Task Should_do_nothing_if_subscribing()
         {
-            await sut.SubscribeAsync(null!, null!, null, null);
+            await sut.SubscribeAsync(null!, null!, null!);
         }
 
         [Fact]
         public async Task Should_do_nothing_if_unsubscribing()
         {
-            await sut.SubscribeAsync(null!, null!, null, null);
+            await sut.UnsubscribeAsync(null!, null!);
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         [Fact]
         public async Task Should_do_nothing_if_checking_for_redirect()
         {
-            var result = await sut.MustRedirectToPortalAsync(null!, null!, null, null);
+            var result = await sut.MustRedirectToPortalAsync(null!, null!, null);
 
             Assert.Null(result);
         }

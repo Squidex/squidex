@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             A.CallTo(() => appPlansProvider.GetPlan(planIdPaid))
                 .Returns(new ConfigAppLimitsPlan { Id = planIdPaid, MaxContributors = 30 });
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, A<string>._, A<string>._, default))
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, A<string>._, default))
                 .Returns(Task.FromResult<Uri?>(null));
 
             // Create a non-empty setting, otherwise the event is not raised as it does not change the domain object.
@@ -220,7 +220,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var command = new ChangePlan { PlanId = planIdPaid };
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, command.Referer, default))
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
                 .Returns(Task.FromResult<Uri?>(null));
 
             await ExecuteCreateAsync();
@@ -236,10 +236,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
                 );
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, command.Referer, default))
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
                 .MustHaveHappened();
 
-            A.CallTo(() => appPlansBillingManager.SubscribeAsync(Actor.Identifier, AppNamedId, planIdPaid, command.Referer, default))
+            A.CallTo(() => appPlansBillingManager.SubscribeAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
                 .MustHaveHappened();
         }
 
@@ -261,10 +261,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
                 );
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<string?>._, default))
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => appPlansBillingManager.SubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<string?>._, A<CancellationToken>._))
+            A.CallTo(() => appPlansBillingManager.SubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -287,10 +287,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppPlanReset())
                 );
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<string?>._, default))
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => appPlansBillingManager.UnsubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
+            A.CallTo(() => appPlansBillingManager.UnsubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -313,10 +313,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppPlanReset())
                 );
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, command.Referer, default))
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => appPlansBillingManager.UnsubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
+            A.CallTo(() => appPlansBillingManager.UnsubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -325,7 +325,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var command = new ChangePlan { PlanId = planIdPaid };
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, command.Referer, default))
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
                 .Returns(new Uri("http://squidex.io"));
 
             await ExecuteCreateAsync();
@@ -350,10 +350,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             Assert.Equal(planIdPaid, sut.Snapshot.Plan?.PlanId);
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, command.Referer, default))
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => appPlansBillingManager.SubscribeAsync(Actor.Identifier, AppNamedId, planIdPaid, A<string?>._, default))
+            A.CallTo(() => appPlansBillingManager.SubscribeAsync(Actor.Identifier, AppNamedId, planIdPaid, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -668,7 +668,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppDeleted())
                 );
 
-            A.CallTo(() => appPlansBillingManager.SubscribeAsync(command.Actor.Identifier, AppNamedId, null, A<string?>._, default))
+            A.CallTo(() => appPlansBillingManager.UnsubscribeAsync(command.Actor.Identifier, AppNamedId, default))
                 .MustHaveHappened();
         }
 

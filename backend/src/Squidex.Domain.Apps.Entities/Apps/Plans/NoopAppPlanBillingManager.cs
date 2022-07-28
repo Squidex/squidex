@@ -22,19 +22,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             return Task.FromResult(string.Empty);
         }
 
-        public Task<Uri?> MustRedirectToPortalAsync(string userId, NamedId<DomainId> appId, string? planId, string? referer,
+        public Task<Uri?> MustRedirectToPortalAsync(string userId, NamedId<DomainId> appId, string? planId,
             CancellationToken ct = default)
         {
             return Task.FromResult<Uri?>(null);
         }
 
-        public Task SubscribeAsync(string userId, NamedId<DomainId> appId, string? planId, string? referer,
+        public Task SubscribeAsync(string userId, NamedId<DomainId> appId, string planId,
             CancellationToken ct = default)
         {
             return Task.CompletedTask;
         }
 
-        public Task UnsubscribeAsync(string userId, NamedId<DomainId> appId, string? referer,
+        public Task UnsubscribeAsync(string userId, NamedId<DomainId> appId,
             CancellationToken ct = default)
         {
             return Task.CompletedTask;

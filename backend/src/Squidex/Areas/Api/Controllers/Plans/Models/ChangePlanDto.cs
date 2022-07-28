@@ -19,11 +19,9 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         [LocalizedRequired]
         public string PlanId { get; set; }
 
-        public ChangePlan ToCommand(HttpContext httpContext)
+        public ChangePlan ToCommand()
         {
             var result = SimpleMapper.Map(this, new ChangePlan());
-
-            result.Referer = httpContext.Request.Headers["Referer"];
 
             return result;
         }
