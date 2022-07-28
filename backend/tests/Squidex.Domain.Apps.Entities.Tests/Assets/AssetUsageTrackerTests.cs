@@ -33,6 +33,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             assetKey = DomainId.Combine(appId, assetId);
 
+            A.CallTo(() => usageTracker.FallbackCategory)
+                .Returns("*");
+
             sut = new AssetUsageTracker(usageTracker, assetLoader, tagService, store);
         }
 

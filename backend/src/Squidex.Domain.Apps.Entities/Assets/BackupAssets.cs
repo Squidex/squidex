@@ -119,36 +119,32 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private async Task RestoreTagsAsync(RestoreContext context,
             CancellationToken ct)
         {
-            var tags = (Dictionary<string, Tag>?)null;
+            var export = new TagsExport();
 
             if (await context.Reader.HasFileAsync(TagsFile, ct))
             {
-                tags = await context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(TagsFile, ct);
+                export.Tags = await context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(TagsFile, ct);
             }
-
-            var alias = (Dictionary<string, string>?)null;
 
             // For backwards compabibility we store the tags and the aliases in different locations.
             if (await context.Reader.HasFileAsync(TagsAliasFile, ct))
             {
-                alias = await context.Reader.ReadJsonAsync<Dictionary<string, string>>(TagsAliasFile, ct);
+                export.Alias = await context.Reader.ReadJsonAsync<Dictionary<string, string>>(TagsAliasFile, ct);
             }
 
-            if (alias == null && tags == null)
+            if (export.Alias == null && export.Tags == null)
             {
                 return;
             }
 
-            if (tags != null)
+            if (export.Tags != null)
             {
                 // Import the tags without count, because they will populated later by the event processor.
-                foreach (var (_, tag) in tags)
+                foreach (var (_, tag) in export.Tags)
                 {
                     tag.Count = 0;
                 }
             }
-
-            var export = new TagsExport { Tags = tags!, Alias = alias! };
 
             await tagService.RebuildTagsAsync(context.AppId, TagGroups.Assets, export, ct);
         }

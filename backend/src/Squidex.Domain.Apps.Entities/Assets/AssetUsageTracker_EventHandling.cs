@@ -107,6 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             foreach (var @event in events)
             {
                 var typedEvent = (AssetEvent)@event.Payload;
+
                 var appId = typedEvent.AppId.Id;
                 var assetId = typedEvent.AssetId;
                 var assetKey = @event.Headers.AggregateId();

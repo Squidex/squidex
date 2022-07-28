@@ -35,6 +35,21 @@ namespace Squidex.Domain.Apps.Entities.Tags
                 return default;
             }
 
+            public bool Rebuild(TagsExport export)
+            {
+                if (export.Tags != null)
+                {
+                    Tags = export.Tags;
+                }
+
+                if (export.Alias != null)
+                {
+                    Alias = export.Alias;
+                }
+
+                return true;
+            }
+
             public bool Clear()
             {
                 var isChanged = false;
@@ -47,18 +62,6 @@ namespace Squidex.Domain.Apps.Entities.Tags
                 }
 
                 return isChanged;
-            }
-
-            public bool Rebuild(TagsExport export)
-            {
-                Tags = export.Tags;
-
-                if (Alias.EqualsDictionary(export.Alias))
-                {
-                    Alias = export.Alias;
-                }
-
-                return true;
             }
 
             public bool Rename(string name, string newName)
@@ -105,6 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
                         if (newCount != tag.Count)
                         {
                             tag.Count = newCount;
+
                             isChanged = true;
                         }
                     }

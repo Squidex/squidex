@@ -135,7 +135,8 @@ namespace Squidex.Domain.Apps.Entities.Tags
                     ["id1"] = new Tag { Name = "tag1", Count = 1 },
                     ["id2"] = new Tag { Name = "tag2", Count = 2 },
                     ["id3"] = new Tag { Name = "tag3", Count = 6 }
-                }
+                },
+                Alias = null!
             };
 
             await sut.RebuildTagsAsync(appId, group, tags, ct);
@@ -151,7 +152,28 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             var export = await sut.GetExportableTagsAsync(appId, group, ct);
 
-            export.Should().BeEquivalentTo(tags);
+            Assert.Equal(tags.Tags, export.Tags);
+            Assert.Empty(export.Alias);
+        }
+
+        [Fact]
+        public async Task Should_rebuild_with_broken_export()
+        {
+            var tags = new TagsExport
+            {
+                Alias = new Dictionary<string, string>
+                {
+                    ["id1"] = "id2"
+                },
+                Tags = null!
+            };
+
+            await sut.RebuildTagsAsync(appId, group, tags, ct);
+
+            var export = await sut.GetExportableTagsAsync(appId, group, ct);
+
+            Assert.Equal(tags.Alias, export.Alias);
+            Assert.Empty(export.Tags);
         }
 
         [Fact]
