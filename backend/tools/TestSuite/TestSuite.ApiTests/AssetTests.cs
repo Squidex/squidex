@@ -370,8 +370,10 @@ namespace TestSuite.ApiTests
             // STEP 4: Check tags
             var tags = await _.Assets.WaitForTagsAsync(_.AppName, tag1, TimeSpan.FromMinutes(2));
 
-            Assert.Equal(1, tags?[tag1]);
-            Assert.Equal(1, tags?[tag2]);
+            Assert.Contains(tag1, tags);
+            Assert.Contains(tag2, tags);
+            Assert.Equal(1, tags[tag1]);
+            Assert.Equal(1, tags[tag2]);
         }
 
         [Fact]
