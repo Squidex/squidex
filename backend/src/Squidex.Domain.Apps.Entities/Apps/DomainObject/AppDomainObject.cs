@@ -264,7 +264,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     }, ct);
 
                 case ChangePlan changePlan:
-                    return ChangePlanAsync(changePlan, ct);
+                    return ChangeBillingPlanAsync(changePlan, ct);
 
                 default:
                     ThrowHelper.NotSupportedException();
@@ -272,7 +272,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             }
         }
 
-        private async Task<CommandResult> ChangePlanAsync(ChangePlan changePlan,
+        private async Task<CommandResult> ChangeBillingPlanAsync(ChangePlan changePlan,
             CancellationToken ct)
         {
             var userId = changePlan.Actor.Identifier;
