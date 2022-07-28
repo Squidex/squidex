@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json.System;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 
@@ -150,7 +151,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 await tagService.UpdateAsync(appId, TagGroups.Assets, updates);
             }
 
-            Console.WriteLine($"Writing tags: {JsonSerializer.Serialize(tagsPerApp)}");
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new StringConverter<DomainId>());
+
+            Console.WriteLine($"Writing tags: {JsonSerializer.Serialize(tagsPerApp, options)}");
 
             await store.WriteManyAsync(tagsPerAsset.Select(x => new SnapshotWriteJob<State>(x.Key, x.Value, 0)));
         }
