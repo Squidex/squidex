@@ -3,6 +3,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.0.0-rc3] - 2022-07-29
+
+### Fixed
+
+* **Assets**: Fix recursive asset deletion. Query was selecting the wrong assets.
+* **Assets**: Compatibility with 6.X collections fixed.
+* **Contents**: Compatibility with 6.X collections fixed.
+
+### Changed
+
+* **Assets**: Moved the update of tag counts to a event consumers to improve consistency.
+
+### Added
+
+* **API**: New tests to cover more cases.
+
 ## [7.0.0-rc2] - 2022-07-25
 
 ### Fixed
@@ -23,6 +39,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 * **Contents**: New flag to store each contnent in a dedicated collection, so that indexes can be created.
+
+## [6.11.0] - 2022-07-29
+
+### Fixed
+
+* **Assets**: Fix recursive asset deletion. Query was selecting the wrong assets.
 
 ## [6.10.0] - 2022-07-19
 

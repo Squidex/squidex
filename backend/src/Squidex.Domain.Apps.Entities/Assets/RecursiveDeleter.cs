@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Events.Assets;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
@@ -66,49 +65,39 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 return;
             }
 
-            if (@event.Payload is AssetFolderDeleted folderDeleted)
+            if (@event.Payload is not AssetFolderDeleted folderDeleted)
             {
-                async Task PublishAsync(SquidexCommand command)
+                return;
+            }
+
+            async Task PublishAsync(SquidexCommand command)
+            {
+                try
                 {
-                    try
-                    {
-                        if (command is IAppCommand appCommand)
-                        {
-                            // Unfortunately, the commands to not share a base class.
-                            appCommand.AppId = folderDeleted.AppId;
-                        }
+                    command.Actor = folderDeleted.Actor;
 
-                        command.Actor = folderDeleted.Actor;
-
-                        await commandBus.PublishAsync(command, default);
-                    }
-                    catch (DomainObjectNotFoundException)
-                    {
-                        // The asset could already be deleted by another operation.
-                    }
-                    catch (Exception ex)
-                    {
-                        log.LogError(ex, "Failed to delete asset recursively.");
-                    }
+                    await commandBus.PublishAsync(command);
                 }
-
-                var appId = folderDeleted.AppId;
-
-                var childAssetFolders = await assetFolderRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId, default);
-
-                foreach (var assetFolderId in childAssetFolders)
+                catch (Exception ex)
                 {
-                    // These deletions will create more events which will then be deleted as well.
-                    await PublishAsync(new DeleteAssetFolder { AssetFolderId = assetFolderId });
+                    log.LogError(ex, "Failed to delete asset recursively.");
                 }
+            }
 
-                var childAssets = await assetRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId, default);
+            var appId = folderDeleted.AppId;
 
-                foreach (var assetId in childAssets)
-                {
-                    // Basically the leaves of the tree.
-                    await PublishAsync(new DeleteAsset { AssetId = assetId });
-                }
+            var childAssetFolders = await assetFolderRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId, default);
+
+            foreach (var assetFolderId in childAssetFolders)
+            {
+                await PublishAsync(new DeleteAssetFolder { AppId = appId, AssetFolderId = assetFolderId });
+            }
+
+            var childAssets = await assetRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId, default);
+
+            foreach (var assetId in childAssets)
+            {
+                await PublishAsync(new DeleteAsset { AppId = appId, AssetId = assetId });
             }
         }
     }
