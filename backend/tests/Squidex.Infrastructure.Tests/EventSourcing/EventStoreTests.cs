@@ -316,15 +316,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var allExpected = events.Select((x, i) => new StoredEvent(streamName, "Position", i, events[i])).ToArray();
 
-            var takeStep = count / 10;
-
-            for (var take = 0; take < count; take += takeStep)
+            for (var take = 0; take < count; take += count / 10)
             {
-                var expected = allExpected.TakeLast(take).ToArray();
+                var eventsExpected = allExpected.TakeLast(take).ToArray();
+                var eventsQueried = await Sut.QueryReverseAsync(streamName, take);
 
-                var readEvents = await Sut.QueryReverseAsync(streamName, take);
-
-                ShouldBeEquivalentTo(readEvents, expected);
+                ShouldBeEquivalentTo(eventsQueried, eventsExpected);
             }
         }
 
@@ -351,15 +348,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var allExpected = events.Select((x, i) => new StoredEvent(streamName, "Position", i, events[i])).ToArray();
 
-            var takeStep = count / 10;
-
-            for (var take = 0; take < count; take += takeStep)
+            for (var take = 0; take < count; take += count / 10)
             {
-                var expected = allExpected.Reverse().Take(take).ToArray();
+                var eventsExpected = allExpected.Reverse().Take(take).ToArray();
+                var eventsQueried = await Sut.QueryAllReverseAsync(streamName, default, take).ToArrayAsync();
 
-                var readEvents = await Sut.QueryAllReverseAsync(streamName, default, take).ToArrayAsync();
-
-                ShouldBeEquivalentTo(readEvents, expected);
+                ShouldBeEquivalentTo(eventsQueried, eventsExpected);
             }
         }
 

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Linq;
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -143,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                             AddTagsToCache(assetKey, assetAnnotated.Tags, version);
 
-                            Write("ANNOTATED");
+                            Write($"ANNOTATED {version}, {string.Join(",", assetAnnotated.Tags)}, {string.Join(",", oldTags ?? new HashSet<string>())}");
                             break;
                         }
 
