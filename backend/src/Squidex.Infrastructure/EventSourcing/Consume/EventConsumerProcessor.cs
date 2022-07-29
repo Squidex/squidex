@@ -144,6 +144,11 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
         public virtual async Task ResetAsync()
         {
+            if (!eventConsumer.CanClear)
+            {
+                return;
+            }
+
             await UpdateAsync(async () =>
             {
                 Unsubscribe();
@@ -160,7 +165,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         {
             if (events.Count > 0)
             {
-                await eventConsumer!.On(events);
+                await eventConsumer.On(events);
             }
         }
 
@@ -197,7 +202,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
                     }
 
                     log.LogCritical(ex, "Failed to update consumer {consumer} at position {position} from {caller}.",
-                        eventConsumer!.Name, position, caller);
+                        eventConsumer.Name, position, caller);
 
                     State = previousState.Stopped(ex);
                 }
@@ -214,17 +219,17 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         {
             if (log.IsEnabled(LogLevel.Debug))
             {
-                log.LogDebug("Event consumer {consumer} reset started", eventConsumer!.Name);
+                log.LogDebug("Event consumer {consumer} reset started", eventConsumer.Name);
             }
 
             var watch = ValueStopwatch.StartNew();
             try
             {
-                await eventConsumer!.ClearAsync();
+                await eventConsumer.ClearAsync();
             }
             finally
             {
-                log.LogDebug("Event consumer {consumer} reset completed after {time}ms.", eventConsumer!.Name, watch.Stop());
+                log.LogDebug("Event consumer {consumer} reset completed after {time}ms.", eventConsumer.Name, watch.Stop());
             }
         }
 
@@ -264,7 +269,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
         protected virtual IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> subscriber)
         {
-            return eventStore.CreateSubscription(subscriber, eventConsumer!.EventsFilter, State.Position);
+            return eventStore.CreateSubscription(subscriber, eventConsumer.EventsFilter, State.Position);
         }
     }
 }

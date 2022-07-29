@@ -166,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             if (create.Tags != null)
             {
-                create.Tags = await operation.NormalizeTags(create.Tags);
+                create.Tags = await operation.GetTagIdsAsync(create.Tags);
             }
 
             Create(create);
@@ -181,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             if (annotate.Tags != null)
             {
-                annotate.Tags = await operation.NormalizeTags(annotate.Tags);
+                annotate.Tags = await operation.GetTagIdsAsync(annotate.Tags);
             }
 
             Annotate(annotate);
@@ -224,8 +224,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 await operation.ExecuteDeleteScriptAsync(delete);
             }
 
-            await operation.UnsetTags();
-
             Delete(delete);
         }
 
@@ -262,7 +260,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private void Delete(DeleteAsset command)
         {
-            Raise(command, new AssetDeleted { DeletedSize = Snapshot.TotalSize });
+            Raise(command, new AssetDeleted { OldTags = Snapshot.Tags, DeletedSize = Snapshot.TotalSize });
         }
 
         private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent

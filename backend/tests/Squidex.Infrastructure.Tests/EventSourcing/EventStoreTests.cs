@@ -50,8 +50,6 @@ namespace Squidex.Infrastructure.EventSourcing
             get => sut.Value;
         }
 
-        protected abstract int SubscriptionDelayInMs { get; }
-
         protected EventStoreTests()
         {
 #pragma warning disable MA0056 // Do not call overridable members in constructor
@@ -318,15 +316,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var allExpected = events.Select((x, i) => new StoredEvent(streamName, "Position", i, events[i])).ToArray();
 
-            var takeStep = count / 10;
-
-            for (var take = 0; take < count; take += takeStep)
+            for (var take = 0; take < count; take += count / 10)
             {
-                var expected = allExpected.TakeLast(take).ToArray();
+                var eventsExpected = allExpected.TakeLast(take).ToArray();
+                var eventsQueried = await Sut.QueryReverseAsync(streamName, take);
 
-                var readEvents = await Sut.QueryReverseAsync(streamName, take);
-
-                ShouldBeEquivalentTo(readEvents, expected);
+                ShouldBeEquivalentTo(eventsQueried, eventsExpected);
             }
         }
 
@@ -353,15 +348,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var allExpected = events.Select((x, i) => new StoredEvent(streamName, "Position", i, events[i])).ToArray();
 
-            var takeStep = count / 10;
-
-            for (var take = 0; take < count; take += takeStep)
+            for (var take = 0; take < count; take += count / 10)
             {
-                var expected = allExpected.Reverse().Take(take).ToArray();
+                var eventsExpected = allExpected.Reverse().Take(take).ToArray();
+                var eventsQueried = await Sut.QueryAllReverseAsync(streamName, default, take).ToArrayAsync();
 
-                var readEvents = await Sut.QueryAllReverseAsync(streamName, default, take).ToArrayAsync();
-
-                ShouldBeEquivalentTo(readEvents, expected);
+                ShouldBeEquivalentTo(eventsQueried, eventsExpected);
             }
         }
 
@@ -438,7 +430,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static EventData CreateEventData(int i)
         {
-            return new EventData($"Type{i}", new EnvelopeHeaders(), i.ToString(CultureInfo.InvariantCulture));
+            var headers = new EnvelopeHeaders
+            {
+                [CommonHeaders.EventId] = Guid.NewGuid().ToString()
+            };
+
+            return new EventData($"Type{i}", headers, i.ToString(CultureInfo.InvariantCulture));
         }
 
         private async Task<IReadOnlyList<StoredEvent>?> QueryAllAsync(string? streamFilter = null, string? position = null)

@@ -31,6 +31,24 @@ namespace Squidex.Infrastructure.UsageTracking
         }
 
         [Fact]
+        public void Should_forward_fallback_category()
+        {
+            A.CallTo(() => inner.FallbackCategory)
+                .Returns("*");
+
+            Assert.Equal("*", sut.FallbackCategory);
+        }
+
+        [Fact]
+        public async Task Should_forward_delete_prefix_call()
+        {
+            await sut.DeleteByKeyPatternAsync("pattern", ct);
+
+            A.CallTo(() => inner.DeleteByKeyPatternAsync("pattern", ct))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_forward_delete_call()
         {
             await sut.DeleteAsync(key, ct);

@@ -119,21 +119,60 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public static async Task<bool> UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, T document,
+        public static async Task<bool> UpsertVersionedAsync<T>(this IMongoCollection<T> collection, IClientSessionHandle session, SnapshotWriteJob<T> job,
             CancellationToken ct = default)
-            where T : IVersionedEntity<TKey> where TKey : notnull
+            where T : IVersionedEntity<DomainId>
         {
+            var (key, snapshot, newVersion, oldVersion) = job;
             try
             {
-                document.DocumentId = key;
-                document.Version = newVersion;
+                snapshot.DocumentId = key;
+                snapshot.Version = newVersion;
 
                 Expression<Func<T, bool>> filter =
                     oldVersion > EtagVersion.Any ?
                     x => x.DocumentId.Equals(key) && x.Version == oldVersion :
                     x => x.DocumentId.Equals(key);
 
-                var result = await collection.ReplaceOneAsync(filter, document, UpsertReplace, ct);
+                var result = await collection.ReplaceOneAsync(session, filter, job.Value, UpsertReplace, ct);
+
+                return result.IsAcknowledged && result.ModifiedCount == 1;
+            }
+            catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
+            {
+                var existingVersion =
+                    await collection.Find(session, x => x.DocumentId.Equals(key)).Only(x => x.DocumentId, x => x.Version)
+                        .FirstOrDefaultAsync(ct);
+
+                if (existingVersion != null)
+                {
+                    var field = Field.Of<T>(x => nameof(x.Version));
+
+                    throw new InconsistentStateException(existingVersion[field].AsInt64, oldVersion);
+                }
+                else
+                {
+                    throw new InconsistentStateException(EtagVersion.Any, oldVersion);
+                }
+            }
+        }
+
+        public static async Task<bool> UpsertVersionedAsync<T>(this IMongoCollection<T> collection, SnapshotWriteJob<T> job,
+            CancellationToken ct = default)
+            where T : IVersionedEntity<DomainId>
+        {
+            var (key, snapshot, newVersion, oldVersion) = job;
+            try
+            {
+                snapshot.DocumentId = key;
+                snapshot.Version = newVersion;
+
+                Expression<Func<T, bool>> filter =
+                    oldVersion > EtagVersion.Any ?
+                    x => x.DocumentId.Equals(key) && x.Version == oldVersion :
+                    x => x.DocumentId.Equals(key);
+
+                var result = await collection.ReplaceOneAsync(filter, snapshot, UpsertReplace, ct);
 
                 return result.IsAcknowledged && result.ModifiedCount == 1;
             }

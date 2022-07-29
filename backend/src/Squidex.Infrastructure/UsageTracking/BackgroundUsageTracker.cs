@@ -14,13 +14,14 @@ namespace Squidex.Infrastructure.UsageTracking
     public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
     {
         private const int Intervall = 60 * 1000;
-        private const string FallbackCategory = "*";
         private readonly IUsageRepository usageRepository;
         private readonly ILogger<BackgroundUsageTracker> log;
         private readonly CompletionTimer timer;
         private ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters> jobs = new ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters>();
 
         public bool ForceWrite { get; set; }
+
+        public string FallbackCategory => "*";
 
         public BackgroundUsageTracker(IUsageRepository usageRepository,
             ILogger<BackgroundUsageTracker> log)
@@ -94,6 +95,14 @@ namespace Squidex.Infrastructure.UsageTracking
             Guard.NotNull(key);
 
             return usageRepository.DeleteAsync(key, ct);
+        }
+
+        public Task DeleteByKeyPatternAsync(string pattern,
+            CancellationToken ct = default)
+        {
+            Guard.NotNull(pattern);
+
+            return usageRepository.DeleteByKeyPatternAsync(pattern, ct);
         }
 
         public Task TrackAsync(DateTime date, string key, string? category, Counters counters,
@@ -187,7 +196,7 @@ namespace Squidex.Infrastructure.UsageTracking
             return result;
         }
 
-        private static string GetCategory(string? category)
+        private string GetCategory(string? category)
         {
             return !string.IsNullOrWhiteSpace(category) ? category.Trim() : FallbackCategory;
         }

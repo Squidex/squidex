@@ -14,11 +14,12 @@ namespace Squidex.Infrastructure.States
         {
             public List<NameReservation> Reservations { get; set; } = new List<NameReservation>();
 
-            public string? Reserve(DomainId id, string name)
+            public (bool, string?) Reserve(DomainId id, string name)
             {
                 string? token = null;
 
                 var reservation = Reservations.Find(x => x.Name == name);
+                var reserved = false;
 
                 if (reservation?.Id == id)
                 {
@@ -29,14 +30,15 @@ namespace Squidex.Infrastructure.States
                     token = RandomHash.Simple();
 
                     Reservations.Add(new NameReservation(token, name, id));
+                    reserved = true;
                 }
 
-                return token;
+                return (reserved, token);
             }
 
-            public void Remove(string? token)
+            public bool Remove(string? token)
             {
-                Reservations.RemoveAll(x => x.Token == token);
+                return Reservations.RemoveAll(x => x.Token == token) > 0;
             }
         }
 

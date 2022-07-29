@@ -39,8 +39,9 @@ namespace Squidex.Domain.Apps.Entities.Tags
         [Fact]
         public async Task Should_delete_and_reset_state_if_cleaning()
         {
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name1", "name2"), null, ct);
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name2", "name3"), null, ct);
+            await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1", "tag2"), ct);
+            await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag2", "tag3"), ct);
+
             await sut.ClearAsync(appId, group, ct);
 
             var allTags = await sut.GetTagsAsync(appId, group, ct);
@@ -52,69 +53,76 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
-        public async Task Should_rename_tag()
+        public async Task Should_unset_count_on_full_clear()
         {
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("tag1"), null, ct);
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("tag1"), null, ct);
+            var ids = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1", "tag2"), ct);
 
-            await sut.RenameTagAsync(appId, group, "tag1", "tag1_new", ct);
+            await sut.UpdateAsync(appId, group, new Dictionary<string, int>
+            {
+                [ids["tag1"]] = 1,
+                [ids["tag2"]] = 1
+            }, ct);
 
-            // Forward the old name to the new name.
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("tag1"), null, ct);
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("tag1_new"), null, ct);
+            // Clear is called by the event consumer to fill the counts again, therefore we do not delete other things.
+            await sut.ClearAsync(ct);
 
             var allTags = await sut.GetTagsAsync(appId, group, ct);
 
             Assert.Equal(new Dictionary<string, int>
             {
-                ["tag1_new"] = 4
+                ["tag1"] = 0,
+                ["tag2"] = 0
             }, allTags);
+
+            A.CallTo(() => state.Persistence.DeleteAsync(ct))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_rename_tag()
+        {
+            var ids_0 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1"), ct);
+
+            await sut.RenameTagAsync(appId, group, "tag1", "tag1_new", ct);
+
+            // Forward the old name to the new name.
+            var ids_1 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1_new"), ct);
+
+            var allTags = await sut.GetTagsAsync(appId, group, ct);
+
+            Assert.Equal(ids_0.Values, ids_1.Values);
         }
 
         [Fact]
         public async Task Should_rename_tag_twice()
         {
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("tag1"), null, ct);
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("tag1"), null, ct);
+            var ids_0 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1"), ct);
 
-            await sut.RenameTagAsync(appId, group, "tag1", "tag1_new1", ct);
-
-            // Rename again.
-            await sut.RenameTagAsync(appId, group, "tag1_new1", "tag1_new2", ct);
+            await sut.RenameTagAsync(appId, group, "tag1", "tag2", ct);
+            await sut.RenameTagAsync(appId, group, "tag2", "tag3", ct);
 
             // Forward the old name to the new name.
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("tag1"), null, ct);
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("tag1_new1"), null, ct);
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("tag1_new2"), null, ct);
+            var ids_1 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag2"), ct);
+            var ids_2 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag3"), ct);
 
-            var allTags = await sut.GetTagsAsync(appId, group, ct);
-
-            Assert.Equal(new Dictionary<string, int>
-            {
-                ["tag1_new2"] = 5
-            }, allTags);
+            // Assert.Equal(ids_0.Values, ids_1.Values);
+            Assert.Equal(ids_0.Values, ids_2.Values);
         }
 
         [Fact]
         public async Task Should_rename_tag_back()
         {
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("tag1"), null, ct);
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("tag1"), null, ct);
+            var ids_0 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1"), ct);
 
-            await sut.RenameTagAsync(appId, group, "tag1", "tag1_new1", ct);
+            await sut.RenameTagAsync(appId, group, "tag1", "tag2", ct);
 
             // Rename back.
-            await sut.RenameTagAsync(appId, group, "tag1_new1", "tag1", ct);
+            await sut.RenameTagAsync(appId, group, "tag2", "tag1", ct);
 
             // Forward the old name to the new name.
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("tag1"), null, ct);
+            var ids_1 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1"), ct);
 
-            var allTags = await sut.GetTagsAsync(appId, group, ct);
-
-            Assert.Equal(new Dictionary<string, int>
-            {
-                ["tag1"] = 3
-            }, allTags);
+            Assert.Equal(ids_0.Values, ids_1.Values);
         }
 
         [Fact]
@@ -124,10 +132,11 @@ namespace Squidex.Domain.Apps.Entities.Tags
             {
                 Tags = new Dictionary<string, Tag>
                 {
-                    ["id1"] = new Tag { Name = "name1", Count = 1 },
-                    ["id2"] = new Tag { Name = "name2", Count = 2 },
-                    ["id3"] = new Tag { Name = "name3", Count = 6 }
-                }
+                    ["id1"] = new Tag { Name = "tag1", Count = 1 },
+                    ["id2"] = new Tag { Name = "tag2", Count = 2 },
+                    ["id3"] = new Tag { Name = "tag3", Count = 6 }
+                },
+                Alias = null!
             };
 
             await sut.RebuildTagsAsync(appId, group, tags, ct);
@@ -136,76 +145,146 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             Assert.Equal(new Dictionary<string, int>
             {
-                ["name1"] = 1,
-                ["name2"] = 2,
-                ["name3"] = 6
+                ["tag1"] = 1,
+                ["tag2"] = 2,
+                ["tag3"] = 6
             }, allTags);
 
             var export = await sut.GetExportableTagsAsync(appId, group, ct);
 
-            export.Should().BeEquivalentTo(tags);
+            Assert.Equal(tags.Tags, export.Tags);
+            Assert.Empty(export.Alias);
         }
 
         [Fact]
-        public async Task Should_add_tags()
+        public async Task Should_rebuild_with_broken_export()
         {
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name1", "name2"), null, ct);
-            await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name2", "name3"), null, ct);
+            var tags = new TagsExport
+            {
+                Alias = new Dictionary<string, string>
+                {
+                    ["id1"] = "id2"
+                },
+                Tags = null!
+            };
+
+            await sut.RebuildTagsAsync(appId, group, tags, ct);
+
+            var export = await sut.GetExportableTagsAsync(appId, group, ct);
+
+            Assert.Equal(tags.Alias, export.Alias);
+            Assert.Empty(export.Tags);
+        }
+
+        [Fact]
+        public async Task Should_add_tag_but_not_count_tags()
+        {
+            await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1", "tag2"), ct);
+            await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag2", "tag3"), ct);
 
             var allTags = await sut.GetTagsAsync(appId, group, ct);
 
             Assert.Equal(new Dictionary<string, int>
             {
-                ["name1"] = 1,
-                ["name2"] = 2,
-                ["name3"] = 1
+                ["tag1"] = 0,
+                ["tag2"] = 0,
+                ["tag3"] = 0
             }, allTags);
         }
 
         [Fact]
-        public async Task Should_not_add_tags_if_already_added()
+        public async Task Should_add_and_increment_tags()
         {
-            var result1 = await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name1", "name2"), null, ct);
-            var result2 = await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name1", "name2", "name3"), new HashSet<string>(result1.Values), ct);
+            var ids = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1", "tag2", "tag3"), ct);
+
+            await sut.UpdateAsync(appId, group, new Dictionary<string, int>
+            {
+                [ids["tag1"]] = 1,
+                [ids["tag2"]] = 1
+            }, ct);
+
+            await sut.UpdateAsync(appId, group, new Dictionary<string, int>
+            {
+                [ids["tag2"]] = 1,
+                [ids["tag3"]] = 1
+            }, ct);
 
             var allTags = await sut.GetTagsAsync(appId, group, ct);
 
             Assert.Equal(new Dictionary<string, int>
             {
-                ["name1"] = 1,
-                ["name2"] = 1,
-                ["name3"] = 1
+                ["tag1"] = 1,
+                ["tag2"] = 2,
+                ["tag3"] = 1
             }, allTags);
         }
 
         [Fact]
-        public async Task Should_remove_tags()
+        public async Task Should_add_and_decrement_tags()
         {
-            var result1 = await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name1", "name2"), null, ct);
-            var result2 = await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name2", "name3"), null, ct);
+            var ids = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1", "tag2", "tag3"), ct);
 
-            // Tags from the first normalization are decreased and removed if count reaches zero.
-            await sut.NormalizeTagsAsync(appId, group, null, new HashSet<string>(result1.Values), ct);
+            await sut.UpdateAsync(appId, group, new Dictionary<string, int>
+            {
+                [ids["tag1"]] = 1,
+                [ids["tag2"]] = 1
+            }, ct);
+
+            await sut.UpdateAsync(appId, group, new Dictionary<string, int>
+            {
+                [ids["tag2"]] = -2,
+                [ids["tag3"]] = -2
+            }, ct);
 
             var allTags = await sut.GetTagsAsync(appId, group, ct);
 
             Assert.Equal(new Dictionary<string, int>
             {
-                ["name2"] = 1,
-                ["name3"] = 1
+                ["tag1"] = 1,
+                ["tag2"] = 0,
+                ["tag3"] = 0
             }, allTags);
+        }
+
+        [Fact]
+        public async Task Should_not_update_non_existing_tags()
+        {
+            // We have no names for these IDs so we cannot update it.
+            await sut.UpdateAsync(appId, group, new Dictionary<string, int>
+            {
+                ["id1"] = 1,
+                ["id2"] = 1
+            }, ct);
+
+            var allTags = await sut.GetTagsAsync(appId, group, ct);
+
+            Assert.Empty(allTags);
         }
 
         [Fact]
         public async Task Should_resolve_tag_names()
         {
             // Get IDs from names.
-            var tagIds = await sut.NormalizeTagsAsync(appId, group, HashSet.Of("name1", "name2"), null, ct);
+            var tagIds = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1", "tag2"), ct);
 
             // Get names from IDs (reverse operation).
-            var tagNames = await sut.GetTagIdsAsync(appId, group, HashSet.Of("name1", "name2", "invalid1"), ct);
+            var tagNames = await sut.GetTagNamesAsync(appId, group, tagIds.Values.ToHashSet(), ct);
 
-            Assert.Equal(tagIds, tagNames);
+            Assert.Equal(tagIds.Keys.ToArray(), tagNames.Values.ToArray());
+        }
+
+        [Fact]
+        public async Task Should_get_exportable_tags()
+        {
+            var ids = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1", "tag2"), ct);
+
+            var allTags = await sut.GetExportableTagsAsync(appId, group, ct);
+
+            allTags.Tags.Should().BeEquivalentTo(new Dictionary<string, Tag>
+            {
+                [ids["tag1"]] = new Tag { Name = "tag1", Count = 0 },
+                [ids["tag2"]] = new Tag { Name = "tag2", Count = 0 },
+            });
         }
     }
 }

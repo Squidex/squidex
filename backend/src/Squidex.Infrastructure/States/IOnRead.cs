@@ -5,9 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Plans
+namespace Squidex.Infrastructure.States
 {
-    public interface IChangePlanResult
+    public interface IOnRead
     {
+        ValueTask OnReadAsync();
     }
 }

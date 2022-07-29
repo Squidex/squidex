@@ -59,6 +59,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             A.CallTo(() => appPlansProvider.GetPlan(planIdPaid))
                 .Returns(new ConfigAppLimitsPlan { Id = planIdPaid, MaxContributors = 30 });
 
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, A<string>._, default))
+                .Returns(Task.FromResult<Uri?>(null));
+
             // Create a non-empty setting, otherwise the event is not raised as it does not change the domain object.
             initialSettings = new InitialSettings
             {
@@ -217,14 +220,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var command = new ChangePlan { PlanId = planIdPaid };
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid, command.Referer, default))
-                .Returns(new PlanChangedResult());
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
+                .Returns(Task.FromResult<Uri?>(null));
 
             await ExecuteCreateAsync();
 
             var result = await PublishIdempotentAsync(command);
 
-            Assert.True(result is PlanChangedResult);
+            result.ShouldBeEquivalent(new PlanChangedResult(planIdPaid));
 
             Assert.Equal(planIdPaid, sut.Snapshot.Plan!.PlanId);
 
@@ -232,6 +235,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
                 );
+
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
+                .MustHaveHappened();
+
+            A.CallTo(() => appPlansBillingManager.SubscribeAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -243,7 +252,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(None.Value);
+            result.ShouldBeEquivalent(new PlanChangedResult(planIdPaid));
 
             Assert.Equal(planIdPaid, sut.Snapshot.Plan!.PlanId);
 
@@ -252,7 +261,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
                 );
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<string?>._, A<CancellationToken>._))
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => appPlansBillingManager.SubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -261,15 +273,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var command = new ChangePlan { PlanId = planIdFree, FromCallback = true };
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid, command.Referer, default))
-                .Returns(new PlanChangedResult());
-
             await ExecuteCreateAsync();
             await ExecuteChangePlanAsync();
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(None.Value);
+            result.ShouldBeEquivalent(new PlanChangedResult(planIdFree, true));
 
             Assert.Null(sut.Snapshot.Plan);
 
@@ -278,7 +287,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppPlanReset())
                 );
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(A<string>._, A<NamedId<DomainId>>._, planIdFree, A<string?>._, A<CancellationToken>._))
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
+                .MustHaveHappenedOnceExactly();
+
+            A.CallTo(() => appPlansBillingManager.UnsubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -287,18 +299,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var command = new ChangePlan { PlanId = planIdFree };
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid, command.Referer, default))
-                .Returns(new PlanChangedResult());
-
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdFree, command.Referer, default))
-                .Returns(new PlanChangedResult());
-
             await ExecuteCreateAsync();
             await ExecuteChangePlanAsync();
 
             var result = await PublishIdempotentAsync(command);
 
-            Assert.True(result is PlanChangedResult);
+            result.ShouldBeEquivalent(new PlanChangedResult(planIdFree, true));
 
             Assert.Null(sut.Snapshot.Plan);
 
@@ -306,6 +312,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppPlanReset())
                 );
+
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
+                .MustHaveHappenedOnceExactly();
+
+            A.CallTo(() => appPlansBillingManager.UnsubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<CancellationToken>._))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -313,14 +325,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var command = new ChangePlan { PlanId = planIdPaid };
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid, command.Referer, default))
-                .Returns(new RedirectToCheckoutResult(new Uri("http://squidex.io")));
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
+                .Returns(new Uri("http://squidex.io"));
 
             await ExecuteCreateAsync();
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new RedirectToCheckoutResult(new Uri("http://squidex.io")));
+            result.ShouldBeEquivalent(new PlanChangedResult(planIdPaid, false, new Uri("http://squidex.io")));
 
             Assert.Null(sut.Snapshot.Plan);
         }
@@ -334,9 +346,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(None.Value);
+            result.ShouldBeEquivalent(new PlanChangedResult(planIdPaid));
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid, A<string?>._, default))
+            Assert.Equal(planIdPaid, sut.Snapshot.Plan?.PlanId);
+
+            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, A<CancellationToken>._))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => appPlansBillingManager.SubscribeAsync(Actor.Identifier, AppNamedId, planIdPaid, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -651,7 +668,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppDeleted())
                 );
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, AppNamedId, null, A<string?>._, default))
+            A.CallTo(() => appPlansBillingManager.UnsubscribeAsync(command.Actor.Identifier, AppNamedId, default))
                 .MustHaveHappened();
         }
 

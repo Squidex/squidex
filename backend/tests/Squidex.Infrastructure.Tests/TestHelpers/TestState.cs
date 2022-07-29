@@ -14,8 +14,11 @@ namespace Squidex.Infrastructure.TestHelpers
     public sealed class TestState<T> where T : class, new()
     {
         private readonly List<Envelope<IEvent>> events = new List<Envelope<IEvent>>();
+        private readonly ISnapshotStore<T> snapshotStore = A.Fake<ISnapshotStore<T>>();
         private HandleSnapshot<T>? handleSnapshot;
         private HandleEvent? handleEvent;
+
+        public DomainId Id { get; }
 
         public IPersistenceFactory<T> PersistenceFactory { get; }
 
@@ -30,19 +33,23 @@ namespace Squidex.Infrastructure.TestHelpers
         {
         }
 
-        public void AddEvent(Envelope<IEvent> @event)
-        {
-            events.Add(@event);
-        }
-
-        public void AddEvent(IEvent @event)
-        {
-            events.Add(Envelope.Create(@event));
-        }
-
         public TestState(DomainId id, IPersistenceFactory<T>? persistenceFactory = null)
         {
+            Id = id;
+
             PersistenceFactory = persistenceFactory ?? A.Fake<IPersistenceFactory<T>>();
+
+            A.CallTo(() => PersistenceFactory.Snapshots)
+                .Returns(snapshotStore);
+
+            A.CallTo(() => Persistence.Version)
+                .ReturnsLazily(() => Version);
+
+            A.CallTo(() => snapshotStore.ReadAllAsync(A<CancellationToken>._))
+                .ReturnsLazily(() => new List<SnapshotResult<T>>
+                {
+                    new SnapshotResult<T>(id, Snapshot, Version, true)
+                }.ToAsyncEnumerable());
 
             A.CallTo(() => PersistenceFactory.WithEventSourcing(A<Type>._, id, A<HandleEvent>._))
                 .Invokes(x =>
@@ -97,6 +104,16 @@ namespace Squidex.Infrastructure.TestHelpers
                 {
                     Snapshot = new T();
                 });
+        }
+
+        public void AddEvent(Envelope<IEvent> @event)
+        {
+            events.Add(@event);
+        }
+
+        public void AddEvent(IEvent @event)
+        {
+            events.Add(Envelope.Create(@event));
         }
     }
 }

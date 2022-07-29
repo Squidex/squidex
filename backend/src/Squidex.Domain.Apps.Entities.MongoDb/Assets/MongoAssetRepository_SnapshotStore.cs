@@ -55,9 +55,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             using (Telemetry.Activities.StartActivity("MongoAssetRepository/WriteAsync"))
             {
-                var entity = MongoAssetEntity.Create(job);
+                var entityJob = job.As(MongoAssetEntity.Create(job));
 
-                await Collection.UpsertVersionedAsync(job.Key, job.OldVersion, job.NewVersion, entity, ct);
+                await Collection.UpsertVersionedAsync(entityJob, ct);
             }
         }
 

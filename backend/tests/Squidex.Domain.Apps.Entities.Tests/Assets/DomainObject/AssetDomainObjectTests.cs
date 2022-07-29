@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
-            A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>._, A<HashSet<string>>._, default))
+            A.CallTo(() => tagService.GetTagIdsAsync(AppId, TagGroups.Assets, A<HashSet<string>>._, default))
                 .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x) ?? new Dictionary<string, string>()));
 
             var log = A.Fake<ILogger<AssetDomainObject>>();
@@ -367,7 +367,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
-        public async Task Delete_should_create_events_with_total_file_size_and_update_deleted_flag()
+        public async Task Delete_should_create_events_with_total_file_size_and_tags_and_update_deleted_flag()
         {
             var command = new DeleteAsset();
 
@@ -382,7 +382,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetDeleted { DeletedSize = 2048 })
+                    CreateAssetEvent(new AssetDeleted { DeletedSize = 2048, OldTags = new HashSet<string>() })
                 );
 
             A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), default))

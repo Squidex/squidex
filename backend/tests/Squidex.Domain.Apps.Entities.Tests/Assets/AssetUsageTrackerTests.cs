@@ -8,9 +8,11 @@
 using FakeItEasy;
 using FluentAssertions;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 using Xunit;
 
@@ -18,13 +20,23 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class AssetUsageTrackerTests
     {
+        private readonly IAssetLoader assetLoader = A.Fake<IAssetLoader>();
+        private readonly ISnapshotStore<AssetUsageTracker.State> store = A.Fake<ISnapshotStore<AssetUsageTracker.State>>();
+        private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly IUsageTracker usageTracker = A.Fake<IUsageTracker>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly DomainId assetId = DomainId.NewGuid();
+        private readonly DomainId assetKey;
         private readonly AssetUsageTracker sut;
 
         public AssetUsageTrackerTests()
         {
-            sut = new AssetUsageTracker(usageTracker);
+            assetKey = DomainId.Combine(appId, assetId);
+
+            A.CallTo(() => usageTracker.FallbackCategory)
+                .Returns("*");
+
+            sut = new AssetUsageTracker(usageTracker, assetLoader, tagService, store);
         }
 
         [Fact]
@@ -130,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             @event.AppId = appId;
 
             var envelope =
-                Envelope.Create(@event)
+                Envelope.Create<IEvent>(@event)
                     .SetTimestamp(Instant.FromDateTimeUtc(date));
 
             Counters? countersSummary = null;
@@ -142,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => usageTracker.TrackAsync(date, $"{appId.Id}_Assets", null, A<Counters>._, default))
                 .Invokes(x => countersDate = x.GetArgument<Counters>(3));
 
-            await sut.On(envelope);
+            await sut.On(new[] { envelope });
 
             var expected = new Counters
             {
@@ -152,6 +164,295 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             countersSummary.Should().BeEquivalentTo(expected);
             countersDate.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public async Task Should_write_tags_when_asset_created()
+        {
+            var @event = new AssetCreated
+            {
+                AppId = appId,
+                Tags = new HashSet<string>
+                {
+                    "tag1",
+                    "tag2"
+                },
+                AssetId = assetId
+            };
+
+            var envelope =
+                Envelope.Create<IEvent>(@event)
+                    .SetAggregateId(assetKey);
+
+            Dictionary<string, int>? update = null;
+
+            A.CallTo(() => tagService.UpdateAsync(appId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
+                .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
+
+            await sut.On(new[] { envelope });
+
+            update.Should().BeEquivalentTo(new Dictionary<string, int>
+            {
+                ["tag1"] = 1,
+                ["tag2"] = 1
+            });
+        }
+
+        [Fact]
+        public async Task Should_group_tags_by_app()
+        {
+            var @event1 = new AssetCreated
+            {
+                AppId = appId,
+                Tags = new HashSet<string>
+                {
+                    "tag1",
+                    "tag2"
+                },
+                AssetId = assetId
+            };
+
+            var @event2 = new AssetCreated
+            {
+                AppId = appId,
+                Tags = new HashSet<string>
+                {
+                    "tag2",
+                    "tag3"
+                },
+                AssetId = assetId
+            };
+
+            var envelope1 =
+                Envelope.Create<IEvent>(@event1)
+                    .SetAggregateId(assetKey);
+
+            var envelope2 =
+                Envelope.Create<IEvent>(@event2)
+                    .SetAggregateId(assetKey);
+
+            Dictionary<string, int>? update = null;
+
+            A.CallTo(() => tagService.UpdateAsync(appId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
+                .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
+
+            await sut.On(new[] { envelope1, envelope2 });
+
+            update.Should().BeEquivalentTo(new Dictionary<string, int>
+            {
+                ["tag1"] = 1,
+                ["tag2"] = 2,
+                ["tag3"] = 1
+            });
+
+            A.CallTo(() => store.WriteManyAsync(A<IEnumerable<SnapshotWriteJob<AssetUsageTracker.State>>>._, default))
+                .MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task Should_merge_tags_with_previous_event_on_annotate()
+        {
+            var @event1 = new AssetCreated
+            {
+                AppId = appId,
+                Tags = new HashSet<string>
+                {
+                    "tag1",
+                    "tag2"
+                },
+                AssetId = assetId
+            };
+
+            var @event2 = new AssetAnnotated
+            {
+                AppId = appId,
+                Tags = new HashSet<string>
+                {
+                    "tag2",
+                    "tag3"
+                },
+                AssetId = assetId
+            };
+
+            var envelope1 =
+                Envelope.Create<IEvent>(@event1)
+                    .SetAggregateId(assetKey);
+
+            var envelope2 =
+                Envelope.Create<IEvent>(@event2)
+                    .SetAggregateId(assetKey);
+
+            Dictionary<string, int>? update = null;
+
+            A.CallTo(() => tagService.UpdateAsync(appId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
+                .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
+
+            await sut.On(new[] { envelope1, envelope2 });
+
+            update.Should().BeEquivalentTo(new Dictionary<string, int>
+            {
+                ["tag1"] = 0,
+                ["tag2"] = 1,
+                ["tag3"] = 1
+            });
+        }
+
+        [Fact]
+        public async Task Should_merge_tags_with_previous_event_on_annotate_from_other_batch()
+        {
+            var @event1 = new AssetCreated
+            {
+                AppId = appId,
+                Tags = new HashSet<string>
+                {
+                    "tag1",
+                    "tag2"
+                },
+                AssetId = assetId
+            };
+
+            var @event2 = new AssetAnnotated
+            {
+                AppId = appId,
+                Tags = new HashSet<string>
+                {
+                    "tag2",
+                    "tag3"
+                },
+                AssetId = assetId
+            };
+
+            var envelope1 =
+                Envelope.Create<IEvent>(@event1)
+                    .SetAggregateId(assetKey);
+
+            var envelope2 =
+                Envelope.Create<IEvent>(@event2)
+                    .SetAggregateId(assetKey);
+
+            Dictionary<string, int>? update = null;
+
+            A.CallTo(() => tagService.UpdateAsync(appId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
+                .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
+
+            await sut.On(new[] { envelope1 });
+            await sut.On(new[] { envelope2 });
+
+            update.Should().BeEquivalentTo(new Dictionary<string, int>
+            {
+                ["tag1"] = -1,
+                ["tag2"] = 0,
+                ["tag3"] = 1
+            });
+        }
+
+        [Fact]
+        public async Task Should_merge_tags_with_previous_event_on_delete()
+        {
+            var @event1 = new AssetCreated
+            {
+                AppId = appId,
+                Tags = new HashSet<string>
+                {
+                    "tag1",
+                    "tag2"
+                },
+                AssetId = assetId
+            };
+
+            var @event2 = new AssetDeleted { AppId = appId, AssetId = assetId };
+
+            var envelope1 =
+                Envelope.Create<IEvent>(@event1)
+                    .SetAggregateId(assetKey);
+
+            var envelope2 =
+                Envelope.Create<IEvent>(@event2)
+                    .SetAggregateId(assetKey);
+
+            Dictionary<string, int>? update = null;
+
+            A.CallTo(() => tagService.UpdateAsync(appId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
+                .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
+
+            await sut.On(new[] { Envelope.Create<IEvent>(@event1), Envelope.Create<IEvent>(@event2) });
+
+            update.Should().BeEquivalentTo(new Dictionary<string, int>
+            {
+                ["tag1"] = 0,
+                ["tag2"] = 0
+            });
+        }
+
+        [Fact]
+        public async Task Should_merge_tags_with_stored_state_if_previous_event_not_in_cached()
+        {
+            var state = new AssetUsageTracker.State
+            {
+                Tags = new HashSet<string>
+                {
+                    "tag1",
+                    "tag2"
+                }
+            };
+
+            A.CallTo(() => store.ReadAsync(assetKey, default))
+                .Returns(new SnapshotResult<AssetUsageTracker.State>(assetKey, state, 0));
+
+            var @event = new AssetDeleted { AppId = appId, AssetId = assetId };
+
+            var envelope =
+                Envelope.Create<IEvent>(@event)
+                    .SetAggregateId(assetKey);
+
+            Dictionary<string, int>? update = null;
+
+            A.CallTo(() => tagService.UpdateAsync(appId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
+                .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
+
+            await sut.On(new[] { envelope });
+
+            update.Should().BeEquivalentTo(new Dictionary<string, int>
+            {
+                ["tag1"] = -1,
+                ["tag2"] = -1
+            });
+        }
+
+        [Fact]
+        public async Task Should_merge_tags_with_asset_if_previous_tags_not_in_store()
+        {
+            IAssetEntity asset = new AssetEntity
+            {
+                Tags = new HashSet<string>
+                {
+                    "tag1",
+                    "tag2"
+                }
+            };
+
+            A.CallTo(() => assetLoader.GetAsync(appId.Id, assetId, 41, default))
+                .Returns(asset);
+
+            var @event = new AssetDeleted { AppId = appId, AssetId = assetId };
+
+            var envelope =
+                Envelope.Create<IEvent>(@event)
+                    .SetEventStreamNumber(42)
+                    .SetAggregateId(assetKey);
+
+            Dictionary<string, int>? update = null;
+
+            A.CallTo(() => tagService.UpdateAsync(appId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
+                .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
+
+            await sut.On(new[] { envelope });
+
+            update.Should().BeEquivalentTo(new Dictionary<string, int>
+            {
+                ["tag1"] = -1,
+                ["tag2"] = -1
+            });
         }
     }
 }

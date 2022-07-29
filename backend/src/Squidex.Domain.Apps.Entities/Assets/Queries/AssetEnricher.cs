@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var uniqueIds = group.Where(x => x.Tags != null).SelectMany(x => x.Tags).ToHashSet();
 
-            return await tagService.DenormalizeTagsAsync(group.Key, TagGroups.Assets, uniqueIds, ct);
+            return await tagService.GetTagNamesAsync(group.Key, TagGroups.Assets, uniqueIds, ct);
         }
     }
 }

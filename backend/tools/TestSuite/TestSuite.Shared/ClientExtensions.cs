@@ -38,6 +38,31 @@ namespace TestSuite
             return false;
         }
 
+        public static async Task<IDictionary<string, int>> WaitForTagsAsync(this IAssetsClient assetsClient, string app, string id, TimeSpan timeout)
+        {
+            try
+            {
+                using var cts = new CancellationTokenSource(timeout);
+
+                while (!cts.IsCancellationRequested)
+                {
+                    var tags = await assetsClient.GetTagsAsync(app, cts.Token);
+
+                    if (tags.TryGetValue(id, out var count) && count > 0)
+                    {
+                        return tags;
+                    }
+
+                    await Task.Delay(200, cts.Token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+            }
+
+            return await assetsClient.GetTagsAsync(app);
+        }
+
         public static async Task<BackupJobDto> WaitForBackupAsync(this IBackupsClient backupsClient, string app, TimeSpan timeout)
         {
             try

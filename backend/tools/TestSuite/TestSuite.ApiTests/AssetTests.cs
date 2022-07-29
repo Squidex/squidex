@@ -320,6 +320,63 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_annotate_asset_in_parallel()
+        {
+            var tag1 = $"tag_{Guid.NewGuid()}";
+            var tag2 = $"tag_{Guid.NewGuid()}";
+
+            var metadataRequest = new AnnotateAssetDto
+            {
+                Tags = new List<string>
+                {
+                    tag1,
+                    tag2
+                }
+            };
+
+
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            var numErrors = 0;
+            var numSuccess = 0;
+
+            // STEP 3: Make parallel upserts.
+            await Parallel.ForEachAsync(Enumerable.Range(0, 20), async (i, ct) =>
+            {
+                try
+                {
+                    await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, metadataRequest);
+
+                    Interlocked.Increment(ref numSuccess);
+                }
+                catch (SquidexManagementException ex) when (ex.StatusCode is 409 or 412)
+                {
+                    Interlocked.Increment(ref numErrors);
+                    return;
+                }
+            });
+
+            // At least some errors and success should have happened.
+            Assert.True(numErrors > 0);
+            Assert.True(numSuccess > 0);
+
+
+            // STEP 3: Make an normal update to ensure nothing is corrupt.
+            await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, metadataRequest);
+
+
+            // STEP 4: Check tags
+            var tags = await _.Assets.WaitForTagsAsync(_.AppName, tag1, TimeSpan.FromMinutes(2));
+
+            Assert.Contains(tag1, tags);
+            Assert.Contains(tag2, tags);
+            Assert.Equal(1, tags[tag1]);
+            Assert.Equal(1, tags[tag2]);
+        }
+
+        [Fact]
         public async Task Should_protect_asset()
         {
             var fileName = $"{Guid.NewGuid()}.png";
@@ -490,10 +547,18 @@ namespace TestSuite.ApiTests
             var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png", null, folder_2.Id);
 
 
-            // STEP 4: Delete folder.
+            // STEP 4: Create asset outside folder
+            var asset_2 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 5: Delete folder.
             await _.Assets.DeleteAssetFolderAsync(_.AppName, folder_1.Id);
 
+            // Ensure that asset in folder is deleted.
             Assert.True(await _.Assets.WaitForDeletionAsync(_.AppName, asset_1.Id, TimeSpan.FromSeconds(30)));
+
+            // Ensure that other asset is not deleted.
+            Assert.NotNull(await _.Assets.GetAssetAsync(_.AppName, asset_2.Id));
         }
 
         [Theory]

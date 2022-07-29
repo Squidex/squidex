@@ -39,6 +39,11 @@ namespace Squidex.Infrastructure.States
 
                 if (existing != null)
                 {
+                    if (existing.Document is IOnRead onRead)
+                    {
+                        await onRead.OnReadAsync();
+                    }
+
                     return new SnapshotResult<T>(existing.DocumentId, existing.Document, existing.Version);
                 }
 
@@ -51,9 +56,9 @@ namespace Squidex.Infrastructure.States
         {
             using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/WriteAsync"))
             {
-                var document = CreateDocument(job.Key, job.Value, job.OldVersion);
+                var entityJob = job.As(CreateDocument(job.Key, job.Value, job.OldVersion));
 
-                await Collection.UpsertVersionedAsync(job.Key, job.OldVersion, job.NewVersion, document, ct);
+                await Collection.UpsertVersionedAsync(entityJob, ct);
             }
         }
 
@@ -95,6 +100,11 @@ namespace Squidex.Infrastructure.States
 
                 await foreach (var document in find.ToAsyncEnumerable(ct))
                 {
+                    if (document.Document is IOnRead onRead)
+                    {
+                        await onRead.OnReadAsync();
+                    }
+
                     yield return new SnapshotResult<T>(document.DocumentId, document.Document, document.Version, true);
                 }
             }

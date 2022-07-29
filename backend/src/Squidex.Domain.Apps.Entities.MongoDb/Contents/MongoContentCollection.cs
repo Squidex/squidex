@@ -16,6 +16,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Translations;
 
 #pragma warning disable IDE0060 // Remove unused parameter
@@ -251,25 +252,47 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return Collection.Find(FindAll).ToAsyncEnumerable(ct);
         }
 
-        public async Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity value,
+        public async Task UpsertAsync(SnapshotWriteJob<MongoContentEntity> job,
             CancellationToken ct = default)
         {
             if (queryInDedicatedCollection != null)
             {
-                await queryInDedicatedCollection.UpsertVersionedAsync(documentId, oldVersion, value, default);
+                await queryInDedicatedCollection.UpsertAsync(job, ct);
             }
 
-            await Collection.UpsertVersionedAsync(documentId, oldVersion, value.Version, value, default);
+            await Collection.ReplaceOneAsync(Filter.Eq(x => x.DocumentId, job.Key), job.Value, UpsertReplace, ct);
+        }
+
+        public async Task UpsertVersionedAsync(IClientSessionHandle session, SnapshotWriteJob<MongoContentEntity> job,
+            CancellationToken ct = default)
+        {
+            if (queryInDedicatedCollection != null)
+            {
+                await queryInDedicatedCollection.UpsertVersionedAsync(session, job, ct);
+            }
+
+            await Collection.UpsertVersionedAsync(session, job, ct);
         }
 
         public async Task RemoveAsync(DomainId key,
             CancellationToken ct = default)
         {
-            var previous = await Collection.FindOneAndDeleteAsync(x => x.DocumentId == key, null, default);
+            var previous = await Collection.FindOneAndDeleteAsync(x => x.DocumentId == key, null, ct);
 
             if (queryInDedicatedCollection != null && previous != null)
             {
-                await queryInDedicatedCollection.RemoveAsync(previous, default);
+                await queryInDedicatedCollection.RemoveAsync(previous, ct);
+            }
+        }
+
+        public async Task RemoveAsync(IClientSessionHandle session, DomainId key,
+            CancellationToken ct = default)
+        {
+            var previous = await Collection.FindOneAndDeleteAsync(session, x => x.DocumentId == key, null, ct);
+
+            if (queryInDedicatedCollection != null && previous != null)
+            {
+                await queryInDedicatedCollection.RemoveAsync(session, previous, ct);
             }
         }
 

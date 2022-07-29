@@ -33,6 +33,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 var existing =
                     await collectionComplete.FindAsync(key, ct);
 
+                // Support for all versions, where we do not have full snapshots in the collection.
                 if (existing?.IsSnapshot == true)
                 {
                     return new SnapshotResult<ContentDomainObject.State>(existing.DocumentId, existing.ToState(), existing.Version);
@@ -67,6 +68,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/RemoveAsync"))
             {
+                // Some data is corrupt and might throw an exception if we do not ignore it.
                 if (key == DomainId.Empty)
                 {
                     return;
@@ -83,14 +85,33 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteAsync"))
             {
+                // Some data is corrupt and might throw an exception if we do not ignore it.
                 if (!IsValid(job.Value))
                 {
                     return;
                 }
 
-                await Task.WhenAll(
-                    UpsertFrontendAsync(job, ct),
-                    UpsertPublishedAsync(job, ct));
+                if (!CanUseTransactions)
+                {
+                    // If transactions are not supported we update the documents without version checks,
+                    // otherwise we would not be able to recover from inconsistencies.
+                    await Task.WhenAll(
+                        UpsertCompleteAsync(job, default),
+                        UpsertPublishedAsync(job, default));
+                    return;
+                }
+
+                using (var session = await database.Client.StartSessionAsync(cancellationToken: ct))
+                {
+                    // Make an update with full transaction support to be more consistent.
+                    await session.WithTransactionAsync(async (session, ct) =>
+                    {
+                        await Task.WhenAll(
+                            UpsertVersionedCompleteAsync(session, job, ct),
+                            UpsertVersionedPublishedAsync(session, job, ct));
+                        return true;
+                    }, null, ct);
+                }
             }
         }
 
@@ -99,11 +120,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteManyAsync"))
             {
-                var updates = new Dictionary<IMongoCollection<MongoContentEntity>, List<MongoContentEntity>>();
+                var collectionUpdates = new Dictionary<IMongoCollection<MongoContentEntity>, List<MongoContentEntity>>();
 
                 var add = new Action<IMongoCollection<MongoContentEntity>, MongoContentEntity>((collection, entity) =>
                 {
-                    updates.GetOrAddNew(collection).Add(entity);
+                    collectionUpdates.GetOrAddNew(collection).Add(entity);
                 });
 
                 foreach (var job in jobs)
@@ -123,7 +144,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     }
                 }
 
-                await Parallel.ForEachAsync(updates, ct, (update, ct) =>
+                var parallelOptions = new ParallelOptions
+                {
+                    CancellationToken = ct,
+                    // This is just an estimate, but we do not want ot have unlimited parallelism.
+                    MaxDegreeOfParallelism = 8
+                };
+
+                // Make one update per collection.
+                await Parallel.ForEachAsync(collectionUpdates, parallelOptions, (update, ct) =>
                 {
                     return new ValueTask(update.Key.InsertManyAsync(update.Value, InsertUnordered, ct));
                 });
@@ -131,38 +160,49 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         }
 
         private async Task UpsertPublishedAsync(SnapshotWriteJob<ContentDomainObject.State> job,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             if (ShouldWritePublished(job.Value))
             {
-                await UpsertPublishedContentAsync(job, ct);
+                var entityJob = job.As(await MongoContentEntity.CreatePublishedAsync(job, appProvider));
+
+                await collectionPublished.UpsertAsync(entityJob, ct);
             }
             else
             {
-                await DeletePublishedContentAsync(job.Value.UniqueId, ct);
+                await collectionPublished.RemoveAsync(job.Key, ct);
             }
         }
 
-        private Task DeletePublishedContentAsync(DomainId key,
-            CancellationToken ct = default)
+        private async Task UpsertVersionedPublishedAsync(IClientSessionHandle session, SnapshotWriteJob<ContentDomainObject.State> job,
+            CancellationToken ct)
         {
-            return collectionPublished.RemoveAsync(key, ct);
+            if (ShouldWritePublished(job.Value))
+            {
+                var entityJob = job.As(await MongoContentEntity.CreatePublishedAsync(job, appProvider));
+
+                await collectionPublished.UpsertVersionedAsync(session, entityJob, ct);
+            }
+            else
+            {
+                await collectionPublished.RemoveAsync(session, job.Key, ct);
+            }
         }
 
-        private async Task UpsertFrontendAsync(SnapshotWriteJob<ContentDomainObject.State> job,
-            CancellationToken ct = default)
+        private async Task UpsertCompleteAsync(SnapshotWriteJob<ContentDomainObject.State> job,
+            CancellationToken ct)
         {
-            var entity = await MongoContentEntity.CreateAsync(job, appProvider);
+            var entityJob = job.As(await MongoContentEntity.CreateAsync(job, appProvider));
 
-            await collectionComplete.UpsertVersionedAsync(entity.DocumentId, job.OldVersion, entity, ct);
+            await collectionComplete.UpsertAsync(entityJob, ct);
         }
 
-        private async Task UpsertPublishedContentAsync(SnapshotWriteJob<ContentDomainObject.State> job,
-            CancellationToken ct = default)
+        private async Task UpsertVersionedCompleteAsync(IClientSessionHandle session, SnapshotWriteJob<ContentDomainObject.State> job,
+            CancellationToken ct)
         {
-            var entity = await MongoContentEntity.CreatePublishedAsync(job, appProvider);
+            var entityJob = job.As(await MongoContentEntity.CreateAsync(job, appProvider));
 
-            await collectionPublished.UpsertVersionedAsync(entity.DocumentId, job.OldVersion, entity, ct);
+            await collectionComplete.UpsertVersionedAsync(session, entityJob, ct);
         }
 
         private static bool ShouldWritePublished(ContentDomainObject.State value)

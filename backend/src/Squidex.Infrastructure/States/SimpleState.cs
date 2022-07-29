@@ -64,83 +64,41 @@ namespace Squidex.Infrastructure.States
             return persistence.WriteEventAsync(envelope, ct);
         }
 
-        public async Task UpdateIfAsync(Func<T, bool> updater, int retries = 20,
+        public Task UpdateAsync(Func<T, bool> updater, int retries = 20,
             CancellationToken ct = default)
         {
-            await EnsureLoadedAsync(ct);
+            return UpdateAsync(state => (updater(state), None.Value), retries, ct);
+        }
+
+        public async Task<TResult> UpdateAsync<TResult>(Func<T, (bool, TResult)> updater, int retries = 20,
+            CancellationToken ct = default)
+        {
+            if (!isLoaded)
+            {
+                await LoadAsync(ct);
+            }
 
             for (var i = 0; i < retries; i++)
             {
                 try
                 {
-                    if (!updater(Value))
+                    var (isChanged, result) = updater(Value);
+
+                    if (!isChanged)
                     {
-                        return;
+                        return result;
                     }
-
-                    await WriteAsync(ct);
-                    return;
-                }
-                catch (InconsistentStateException) when (i < retries)
-                {
-                    await LoadAsync(ct);
-                }
-            }
-        }
-
-        public async Task UpdateAsync(Action<T> updater, int retries = 20,
-            CancellationToken ct = default)
-        {
-            await EnsureLoadedAsync(ct);
-
-            for (var i = 0; i < retries; i++)
-            {
-                try
-                {
-                    updater(Value);
-
-                    await WriteAsync(ct);
-                    return;
-                }
-                catch (InconsistentStateException) when (i < retries)
-                {
-                    await LoadAsync(ct);
-                }
-            }
-        }
-
-        public async Task<TResult> UpdateAsync<TResult>(Func<T, TResult> updater, int retries = 5,
-            CancellationToken ct = default)
-        {
-            await EnsureLoadedAsync(ct);
-
-            for (var i = 0; i < retries; i++)
-            {
-                try
-                {
-                    var result = updater(Value);
 
                     await WriteAsync(ct);
                     return result;
                 }
-                catch (InconsistentStateException) when (i < retries)
+                catch (InconsistentStateException) when (i < retries - 1)
                 {
                     await LoadAsync(ct);
                 }
             }
 
             return default!;
-        }
-
-        private async Task EnsureLoadedAsync(
-            CancellationToken ct)
-        {
-            if (isLoaded)
-            {
-                return;
-            }
-
-            await LoadAsync(ct);
         }
     }
 }

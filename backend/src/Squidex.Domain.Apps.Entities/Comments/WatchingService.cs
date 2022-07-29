@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             public Dictionary<string, Instant> Users { get; } = new Dictionary<string, Instant>();
 
-            public string[] Add(string watcherId, IClock clock)
+            public (bool, string[]) Add(string watcherId, IClock clock)
             {
                 var now = clock.GetCurrentInstant();
 
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
                 Users[watcherId] = now;
 
-                return Users.Keys.ToArray();
+                return (true, Users.Keys.ToArray());
             }
         }
 

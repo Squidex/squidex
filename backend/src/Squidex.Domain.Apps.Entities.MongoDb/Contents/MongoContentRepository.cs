@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Clusters;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -24,7 +25,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     {
         private readonly MongoContentCollection collectionComplete;
         private readonly MongoContentCollection collectionPublished;
+        private readonly IMongoDatabase database;
         private readonly IAppProvider appProvider;
+
+        public bool CanUseTransactions { get; private set; }
 
         static MongoContentRepository()
         {
@@ -34,6 +38,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider,
             IOptions<ContentOptions> options)
         {
+            this.database = database;
+
             collectionComplete =
                 new MongoContentCollection("States_Contents_All3", database,
                     ReadPreference.Primary, options.Value.OptimizeForSelfHosting);
@@ -50,6 +56,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             await collectionComplete.InitializeAsync(ct);
             await collectionPublished.InitializeAsync(ct);
+
+            var clusterVersion = await database.GetMajorVersionAsync(ct);
+            var clusteredAsReplica = database.Client.Cluster.Description.Type == ClusterType.ReplicaSet;
+
+            CanUseTransactions = clusteredAsReplica && clusterVersion >= 4;
         }
 
         public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,

@@ -20,9 +20,17 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             public JsonObject Settings { get; set; } = new JsonObject();
 
-            public void Set(JsonObject settings)
+            public bool Set(JsonObject settings)
             {
-                Settings = settings;
+                var isChanged = false;
+
+                if (!Settings.Equals(settings))
+                {
+                    Settings = settings;
+                    isChanged = true;
+                }
+
+                return isChanged;
             }
 
             public bool Set(string path, JsonValue value)
@@ -134,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var state = await GetStateAsync(appId, userId, ct);
 
-            await state.UpdateIfAsync(s => s.Remove(path), ct: ct);
+            await state.UpdateAsync(s => s.Remove(path), ct: ct);
         }
 
         public async Task SetAsync(DomainId appId, string? userId, string path, JsonValue value,
@@ -142,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var state = await GetStateAsync(appId, userId, ct);
 
-            await state.UpdateIfAsync(s => s.Set(path, value), ct: ct);
+            await state.UpdateAsync(s => s.Set(path, value), ct: ct);
         }
 
         public async Task SetAsync(DomainId appId, string? userId, JsonObject settings,

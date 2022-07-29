@@ -10,6 +10,7 @@ using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -97,13 +98,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateRestoreContext();
 
+            var envelope =
+                new Envelope<IEvent>(new AppCreated
+                {
+                    AppId = appId
+                });
+
             A.CallTo(() => context.Reader.HasFileAsync(A<string>._, ct))
                 .Returns(true);
 
             A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(A<string>._, ct))
                 .Returns(tags);
 
-            await sut.RestoreAsync(context, ct);
+            await sut.RestoreEventAsync(envelope, context, ct);
 
             A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Tags == tags), ct))
                 .MustHaveHappened();
@@ -116,13 +123,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateRestoreContext();
 
+            var envelope =
+                new Envelope<IEvent>(new AppCreated
+                {
+                    AppId = appId
+                });
+
             A.CallTo(() => context.Reader.HasFileAsync(A<string>._, ct))
                 .Returns(false).Once().Then.Returns(true);
 
             A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, ct))
                 .Returns(alias);
 
-            await sut.RestoreAsync(context, ct);
+            await sut.RestoreEventAsync(envelope, context, ct);
 
             A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Alias == alias), ct))
                 .MustHaveHappened();
@@ -135,13 +148,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateRestoreContext();
 
+            var envelope =
+                new Envelope<IEvent>(new AppCreated
+                {
+                    AppId = appId
+                });
+
             A.CallTo(() => context.Reader.HasFileAsync(A<string>._, ct))
                 .Returns(false);
 
             A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, ct))
                 .Returns(alias);
 
-            await sut.RestoreAsync(context, ct);
+            await sut.RestoreEventAsync(envelope, context, ct);
 
             A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
