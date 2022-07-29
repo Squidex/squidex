@@ -16,8 +16,6 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         public GetEventStoreFixture _ { get; }
 
-        protected override int SubscriptionDelayInMs { get; } = 1000;
-
         public GetEventStoreTests(GetEventStoreFixture fixture)
         {
             _ = fixture;

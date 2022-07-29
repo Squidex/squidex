@@ -50,8 +50,6 @@ namespace Squidex.Infrastructure.EventSourcing
             get => sut.Value;
         }
 
-        protected abstract int SubscriptionDelayInMs { get; }
-
         protected EventStoreTests()
         {
 #pragma warning disable MA0056 // Do not call overridable members in constructor
@@ -438,7 +436,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static EventData CreateEventData(int i)
         {
-            return new EventData($"Type{i}", new EnvelopeHeaders(), i.ToString(CultureInfo.InvariantCulture));
+            var headers = new EnvelopeHeaders
+            {
+                [CommonHeaders.EventId] = Guid.NewGuid().ToString()
+            };
+
+            return new EventData($"Type{i}", headers, i.ToString(CultureInfo.InvariantCulture));
         }
 
         private async Task<IReadOnlyList<StoredEvent>?> QueryAllAsync(string? streamFilter = null, string? position = null)

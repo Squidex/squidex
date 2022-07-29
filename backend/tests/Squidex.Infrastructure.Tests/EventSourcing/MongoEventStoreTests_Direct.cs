@@ -16,8 +16,6 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         public MongoEventStoreFixture _ { get; }
 
-        protected override int SubscriptionDelayInMs { get; } = 1000;
-
         public MongoEventStoreTests_Direct(MongoEventStoreDirectFixture fixture)
         {
             _ = fixture;
