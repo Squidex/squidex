@@ -9,8 +9,5 @@
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed record StoredEvent(string StreamName, string EventPosition, long EventStreamNumber, EventData Data)
-    {
-        public Dictionary<string, string>? Context { get; init; }
-    }
+    public sealed record StoredEvent(string StreamName, string EventPosition, long EventStreamNumber, EventData Data);
 }

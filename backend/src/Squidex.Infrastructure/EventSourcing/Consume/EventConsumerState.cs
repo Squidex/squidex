@@ -7,21 +7,13 @@
 
 using Squidex.Infrastructure.Reflection;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Infrastructure.EventSourcing.Consume
 {
-    public sealed record EventConsumerState
+    public sealed record EventConsumerState(string? Position, int Count, bool IsStopped = false, string? Error = null)
     {
-        public static readonly EventConsumerState Initial = new EventConsumerState();
-
-        public string? Position { get; init; }
-
-        public string? Error { get; init; }
-
-        public bool IsStopped { get; init; }
-
-        public long Count { get; init; }
-
-        public Dictionary<string, string>? Context { get; init; }
+        public static readonly EventConsumerState Initial = new EventConsumerState(null, 0);
 
         public bool IsPaused
         {
@@ -33,24 +25,24 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             get => IsStopped && !string.IsNullOrWhiteSpace(Error);
         }
 
-        public EventConsumerState Handled(string position, Dictionary<string, string>? context, int offset = 1)
+        public EventConsumerState()
+            : this(null, 0)
         {
-            return new EventConsumerState
-            {
-                Context = context,
-                Count = Count + offset,
-                Position = position
-            };
         }
 
-        public EventConsumerState Started()
+        public EventConsumerState Handled(string position, int offset = 1)
         {
-            return this with { Error = null, IsStopped = false };
+            return new EventConsumerState(position, Count + offset);
         }
 
         public EventConsumerState Stopped(Exception? ex = null)
         {
-            return this with { Error = ex?.Message, IsStopped = true };
+            return new EventConsumerState(Position, Count, true, ex?.Message);
+        }
+
+        public EventConsumerState Started()
+        {
+            return new EventConsumerState(Position, Count);
         }
 
         public EventConsumerInfo ToInfo(string name)

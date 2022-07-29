@@ -21,17 +21,17 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         private static readonly List<StoredEvent> EmptyEvents = new List<StoredEvent>();
 
-        public IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> subscriber, SubscriptionQuery query)
+        public IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> subscriber, string? streamFilter = null, string? position = null)
         {
             Guard.NotNull(subscriber);
 
             if (CanUseChangeStreams)
             {
-                return new MongoEventStoreSubscription(this, subscriber, query);
+                return new MongoEventStoreSubscription(this, subscriber, streamFilter, position);
             }
             else
             {
-                return new PollingSubscription(this, subscriber, query);
+                return new PollingSubscription(this, subscriber, streamFilter, position);
             }
         }
 

@@ -16,20 +16,15 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
         private readonly IEventSubscriber<StoredEvent> eventSubscriber = A.Fake<IEventSubscriber<StoredEvent>>();
-        private SubscriptionQuery query;
-
-        public PollingSubscriptionTests()
-        {
-            query.Position = Guid.NewGuid().ToString();
-            query.StreamFilter = "^my-stream";
-        }
+        private readonly string position = Guid.NewGuid().ToString();
+        private readonly string filter = "^my-stream";
 
         [Fact]
         public async Task Should_subscribe_on_start()
         {
-            await SubscribeAsync();
+            await SubscribeAsync(false);
 
-            A.CallTo(() => eventStore.QueryAllAsync(query.StreamFilter, query.Position, A<int>._, A<CancellationToken>._))
+            A.CallTo(() => eventStore.QueryAllAsync(filter, position, A<int>._, A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -38,7 +33,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var ex = new InvalidOperationException();
 
-            A.CallTo(() => eventStore.QueryAllAsync(query.StreamFilter, query.Position, A<int>._, A<CancellationToken>._))
+            A.CallTo(() => eventStore.QueryAllAsync(filter, position, A<int>._, A<CancellationToken>._))
                 .Throws(ex);
 
             var sut = await SubscribeAsync(false);
@@ -52,7 +47,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var ex = new OperationCanceledException();
 
-            A.CallTo(() => eventStore.QueryAllAsync(query.StreamFilter, query.Position, A<int>._, A<CancellationToken>._))
+            A.CallTo(() => eventStore.QueryAllAsync(filter, position, A<int>._, A<CancellationToken>._))
                 .Throws(ex);
 
             var sut = await SubscribeAsync(false);
@@ -66,7 +61,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var ex = new AggregateException(new OperationCanceledException());
 
-            A.CallTo(() => eventStore.QueryAllAsync(query.StreamFilter, query.Position, A<int>._, A<CancellationToken>._))
+            A.CallTo(() => eventStore.QueryAllAsync(filter, position, A<int>._, A<CancellationToken>._))
                 .Throws(ex);
 
             var sut = await SubscribeAsync(false);
@@ -80,7 +75,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var sut = await SubscribeAsync(true);
 
-            A.CallTo(() => eventStore.QueryAllAsync(query.StreamFilter, A<string>._, A<int>._, A<CancellationToken>._))
+            A.CallTo(() => eventStore.QueryAllAsync(filter, A<string>._, A<int>._, A<CancellationToken>._))
                 .MustHaveHappened(2, Times.Exactly);
         }
 
@@ -91,7 +86,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var receivedEvents = new List<StoredEvent>();
 
-            A.CallTo(() => eventStore.QueryAllAsync(query.StreamFilter, query.Position, A<int>._, A<CancellationToken>._))
+            A.CallTo(() => eventStore.QueryAllAsync(filter, position, A<int>._, A<CancellationToken>._))
                 .Returns(events.ToAsyncEnumerable());
 
             A.CallTo(() => eventSubscriber.OnNextAsync(A<IEventSubscription>._, A<StoredEvent>._))
@@ -99,21 +94,23 @@ namespace Squidex.Infrastructure.EventSourcing
 
             await SubscribeAsync(true);
 
-            receivedEvents.Should().BeEquivalentTo(events, options => options.Excluding(x => x.Context));
+            receivedEvents.Should().BeEquivalentTo(events);
         }
 
         [Fact]
-        public async Task Should_receive_missing_events_with_second_pull()
+        public async Task Should_continue_on_last_position()
         {
-            var events1 = Enumerable.Range(0, 200).Where(x => x % 2 == 0).Select(CreateEvent).ToArray();
-            var events2 = Enumerable.Range(0, 200).Where(x => x % 2 == 1).Select(CreateEvent).ToArray();
+            var events1 = Enumerable.Range(10, 10).Select(CreateEvent).ToArray();
+            var events2 = Enumerable.Range(20, 10).Select(CreateEvent).ToArray();
+
+            var lastPosition = events1[^1].EventPosition;
 
             var receivedEvents = new List<StoredEvent>();
 
-            A.CallTo(() => eventStore.QueryAllAsync(query.StreamFilter, query.Position, A<int>._, A<CancellationToken>._))
+            A.CallTo(() => eventStore.QueryAllAsync(filter, position, A<int>._, A<CancellationToken>._))
                 .Returns(events1.ToAsyncEnumerable());
 
-            A.CallTo(() => eventStore.QueryAllAsync(query.StreamFilter, "100", A<int>._, A<CancellationToken>._))
+            A.CallTo(() => eventStore.QueryAllAsync(filter, lastPosition, A<int>._, A<CancellationToken>._))
                 .Returns(events2.ToAsyncEnumerable());
 
             A.CallTo(() => eventSubscriber.OnNextAsync(A<IEventSubscription>._, A<StoredEvent>._))
@@ -121,59 +118,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             await SubscribeAsync(true);
 
-            receivedEvents.Should().BeEquivalentTo(events1.Union(events2), options => options.Excluding(x => x.Context));
-        }
-
-        [Fact]
-        public async Task Should_receive_missing_events_with_next_subscription()
-        {
-            var events1 = Enumerable.Range(0, 200).Where(x => x % 2 == 0).Select(CreateEvent).ToArray();
-            var events2 = Enumerable.Range(0, 200).Where(x => x % 2 == 1).Select(CreateEvent).ToArray();
-
-            var receivedEvents = new List<StoredEvent>();
-
-            A.CallTo(() => eventStore.QueryAllAsync(query.StreamFilter, query.Position, A<int>._, A<CancellationToken>._))
-                .Returns(events1.ToAsyncEnumerable());
-
-            A.CallTo(() => eventStore.QueryAllAsync(query.StreamFilter, "100", A<int>._, A<CancellationToken>._))
-                .Returns(events2.ToAsyncEnumerable());
-
-            A.CallTo(() => eventSubscriber.OnNextAsync(A<IEventSubscription>._, A<StoredEvent>._))
-                .Invokes(x => receivedEvents.Add(x.GetArgument<StoredEvent>(1)!));
-
-            await SubscribeAsync(false, true);
-
-            query.Context = receivedEvents[^1].Context;
-
-            await SubscribeAsync(false);
-
-            receivedEvents.Should().BeEquivalentTo(events1.Union(events2), options => options.Excluding(x => x.Context));
-        }
-
-        [Fact]
-        public async Task Should_not_receive_same_events_again_with_second_subscription()
-        {
-            var events1 = Enumerable.Range(0, 200).Where(x => x % 2 == 0).Select(CreateEvent).ToArray();
-            var events2 = Enumerable.Range(0, 200).Where(x => x % 2 == 1).Select(CreateEvent).ToArray();
-
-            var receivedEvents = new List<StoredEvent>();
-
-            A.CallTo(() => eventStore.QueryAllAsync(query.StreamFilter, query.Position, A<int>._, A<CancellationToken>._))
-                .Returns(events1.ToAsyncEnumerable());
-
-            A.CallTo(() => eventStore.QueryAllAsync(query.StreamFilter, "100", A<int>._, A<CancellationToken>._))
-                .Returns(events2.ToAsyncEnumerable());
-
-            A.CallTo(() => eventSubscriber.OnNextAsync(A<IEventSubscription>._, A<StoredEvent>._))
-                .Invokes(x => receivedEvents.Add(x.GetArgument<StoredEvent>(1)!));
-
-            await SubscribeAsync(false);
-
-            query.Context = receivedEvents[^1].Context;
-
-            await SubscribeAsync(false);
-
-            receivedEvents.Should().BeEquivalentTo(events1.Union(events2), options => options.Excluding(x => x.Context));
+            receivedEvents.Should().BeEquivalentTo(events1.Union(events2));
         }
 
         private StoredEvent CreateEvent(int position)
@@ -191,9 +136,9 @@ namespace Squidex.Infrastructure.EventSourcing
                     "payload"));
         }
 
-        private async Task<IEventSubscription> SubscribeAsync(bool wakeup = true, bool queryOnce = false)
+        private async Task<IEventSubscription> SubscribeAsync(bool wakeup = true)
         {
-            var sut = new PollingSubscription(eventStore, eventSubscriber, query, queryOnce);
+            var sut = new PollingSubscription(eventStore, eventSubscriber, filter, position);
 
             try
             {

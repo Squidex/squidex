@@ -62,9 +62,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
                                     if (!completed.IsCancellationRequested)
                                     {
                                         // Also invoke the subscriber if the event is null to update the position.
-                                        var parsedEvent = new ParsedEvent(@event, storedEvent.EventPosition, storedEvent.Context);
-
-                                        await eventSubscriber.OnNextAsync(this, parsedEvent);
+                                        await eventSubscriber.OnNextAsync(this, new ParsedEvent(@event, storedEvent.EventPosition));
                                     }
 
                                     break;
