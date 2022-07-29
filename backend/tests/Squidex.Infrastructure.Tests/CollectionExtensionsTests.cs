@@ -112,7 +112,7 @@ namespace Squidex.Infrastructure
         {
             valueDictionary[12] = 34;
 
-            Assert.Equal(34, valueDictionary.GetOrAdd(12, x => 34));
+            Assert.Equal(34, valueDictionary.GetOrAdd(12, x => 44));
         }
 
         [Fact]

@@ -547,10 +547,18 @@ namespace TestSuite.ApiTests
             var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png", null, folder_2.Id);
 
 
-            // STEP 4: Delete folder.
+            // STEP 4: Create asset outside folder
+            var asset_2 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 5: Delete folder.
             await _.Assets.DeleteAssetFolderAsync(_.AppName, folder_1.Id);
 
+            // Ensure that asset in folder is deleted.
             Assert.True(await _.Assets.WaitForDeletionAsync(_.AppName, asset_1.Id, TimeSpan.FromSeconds(30)));
+
+            // Ensure that other asset is not deleted.
+            Assert.NotNull(await _.Assets.GetAssetAsync(_.AppName, asset_2.Id));
         }
 
         [Theory]

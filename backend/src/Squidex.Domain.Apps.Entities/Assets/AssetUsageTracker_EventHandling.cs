@@ -5,15 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Json.System;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 
@@ -109,16 +106,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 memoryCache.Set(key, state, TimeSpan.FromHours(1));
             }
 
-            static void Write(string text)
-            {
-                if (Directory.Exists("D:\\"))
-                {
-                    File.AppendAllLines("D:\\Foo.log", new[] { text });
-                }
-
-                Console.WriteLine($"TAGGING: {text}");
-            }
-
             foreach (var @event in events)
             {
                 var typedEvent = (AssetEvent)@event.Payload;
@@ -133,10 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     case AssetCreated assetCreated:
                         {
                             AddTagsToStore(appId, assetCreated.Tags, 1);
-
                             AddTagsToCache(assetKey, assetCreated.Tags, version);
-
-                            Write($"CREATED {version}, NEW: {string.Join(",", assetCreated.Tags ?? new HashSet<string>())}");
                             break;
                         }
 
@@ -146,21 +130,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                             AddTagsToStore(appId, assetAnnotated.Tags, 1);
                             AddTagsToStore(appId, oldTags, -1);
-
                             AddTagsToCache(assetKey, assetAnnotated.Tags, version);
-
-                            Write($"ANNOTATED {version}, NEW: {string.Join(",", assetAnnotated.Tags ?? new HashSet<string>())}, OLD: {string.Join(",", oldTags ?? new HashSet<string>())}");
                             break;
                         }
 
                     case AssetDeleted assetDeleted:
                         {
+                            // We need the old tags here for permanent deletions.
                             var oldTags =
                                 assetDeleted.OldTags ??
-                                await GetAndUpdateOldTagsAsync(appId, assetId, assetKey, version, default);
+                                {await GetAndUpdateOldTagsAsync(appId, assetId, assetKey, version, default);
 
                             AddTagsToStore(appId, oldTags, -1);
-                            Write($"DELETED {version}, OLD: {string.Join(",", oldTags ?? new HashSet<string>())}");
                             break;
                         }
                 }
@@ -171,12 +152,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 await tagService.UpdateAsync(appId, TagGroups.Assets, updates);
             }
-
-            var options = new JsonSerializerOptions();
-            options.Converters.Add(new StringConverter<DomainId>());
-            options.WriteIndented = true;
-
-            Write($"Writing tags: {JsonSerializer.Serialize(tagsPerApp, options)}");
 
             await store.WriteManyAsync(tagsPerAsset.Select(x => new SnapshotWriteJob<State>(x.Key, x.Value, 0)));
         }
