@@ -74,10 +74,10 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
                                 {
                                     // Events can be null if the event consumer is not interested in the stored event.
                                     var eventList = batch.Select(x => x.Event).NotNull().ToList();
-                                    var eventPosition = batch[^1].Position;
+                                    var eventEnd = batch[^1];
 
                                     // Use a struct here to save a few allocations.
-                                    await eventSink.OnNextAsync(this, new ParsedEvents(eventList, eventPosition));
+                                    await eventSink.OnNextAsync(this, new ParsedEvents(eventList, eventEnd.Position, eventEnd.Context));
                                 }
 
                                 break;

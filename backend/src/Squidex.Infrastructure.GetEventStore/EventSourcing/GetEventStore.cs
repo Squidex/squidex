@@ -46,11 +46,9 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> subscriber, string? streamFilter = null, string? position = null)
+        public IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> subscriber, SubscriptionQuery query)
         {
-            Guard.NotNull(streamFilter);
-
-            return new GetEventStoreSubscription(subscriber, client, projectionClient, serializer, position, StreamPrefix, streamFilter);
+            return new GetEventStoreSubscription(subscriber, client, projectionClient, serializer, query, StreamPrefix);
         }
 
         public async IAsyncEnumerable<StoredEvent> QueryAllAsync(string? streamFilter = null, string? position = null, int take = int.MaxValue,

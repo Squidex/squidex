@@ -461,7 +461,17 @@ namespace Squidex.Infrastructure.EventSourcing
             IEventSubscription? subscription = null;
             try
             {
-                subscription = Sut.CreateSubscription(subscriber, streamFilter, fromBeginning ? null : subscriptionPosition);
+                var query = new SubscriptionQuery
+                {
+                    StreamFilter = streamFilter
+                };
+
+                if (!fromBeginning)
+                {
+                    query.Position = subscriptionPosition;
+                }
+
+                subscription = Sut.CreateSubscription(subscriber, query);
 
                 if (subscriptionRunning != null)
                 {

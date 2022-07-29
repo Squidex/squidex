@@ -18,15 +18,15 @@ namespace Squidex.Infrastructure.EventSourcing
         private readonly IEventSubscriber<StoredEvent> eventSubscriber;
         private readonly CancellationTokenSource stopToken = new CancellationTokenSource();
 
-        public MongoEventStoreSubscription(MongoEventStore eventStore, IEventSubscriber<StoredEvent> eventSubscriber, string? streamFilter, string? position)
+        public MongoEventStoreSubscription(MongoEventStore eventStore, IEventSubscriber<StoredEvent> eventSubscriber, SubscriptionQuery query)
         {
             this.eventStore = eventStore;
             this.eventSubscriber = eventSubscriber;
 
-            QueryAsync(streamFilter, position).Forget();
+            QueryAsync(query).Forget();
         }
 
-        private async Task QueryAsync(string? streamFilter, string? position)
+        private async Task QueryAsync(SubscriptionQuery query)
         {
             try
             {
@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 try
                 {
-                    lastRawPosition = await QueryOldAsync(streamFilter, position);
+                    lastRawPosition = await QueryOldAsync(query.StreamFilter, query.Position);
                 }
                 catch (OperationCanceledException)
                 {
@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 if (!stopToken.IsCancellationRequested)
                 {
-                    await QueryCurrentAsync(streamFilter, lastRawPosition);
+                    await QueryCurrentAsync(query.StreamFilter, lastRawPosition);
                 }
             }
             catch (Exception ex)

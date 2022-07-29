@@ -10,7 +10,7 @@
 
 namespace Squidex.Infrastructure.EventSourcing.Consume
 {
-    public record struct ParsedEvent(Envelope<IEvent>? Event, string Position);
+    public record struct ParsedEvent(Envelope<IEvent>? Event, string Position, Dictionary<string, string>? Context);
 
-    public record struct ParsedEvents(List<Envelope<IEvent>> Events, string Position);
+    public record struct ParsedEvents(List<Envelope<IEvent>> Events, string Position, Dictionary<string, string>? Context);
 }

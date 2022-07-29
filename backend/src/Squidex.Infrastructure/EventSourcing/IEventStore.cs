@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.EventSourcing
         Task DeleteStreamAsync(string streamName,
             CancellationToken ct = default);
 
-        IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> eventSubscriber, string? streamFilter = null, string? position = null);
+        IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> eventSubscriber, SubscriptionQuery query);
 
         async Task AppendUnsafeAsync(IEnumerable<EventCommit> commits,
             CancellationToken ct = default)

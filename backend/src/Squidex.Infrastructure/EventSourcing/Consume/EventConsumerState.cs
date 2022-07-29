@@ -7,13 +7,21 @@
 
 using Squidex.Infrastructure.Reflection;
 
-#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
-
 namespace Squidex.Infrastructure.EventSourcing.Consume
 {
-    public sealed record EventConsumerState(string? Position, int Count, bool IsStopped = false, string? Error = null)
+    public sealed record EventConsumerState
     {
-        public static readonly EventConsumerState Initial = new EventConsumerState(null, 0);
+        public static readonly EventConsumerState Initial = new EventConsumerState();
+
+        public string? Position { get; init; }
+
+        public string? Error { get; init; }
+
+        public bool IsStopped { get; init; }
+
+        public long Count { get; init; }
+
+        public Dictionary<string, string>? Context { get; init; }
 
         public bool IsPaused
         {
@@ -25,24 +33,24 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             get => IsStopped && !string.IsNullOrWhiteSpace(Error);
         }
 
-        public EventConsumerState()
-            : this(null, 0)
+        public EventConsumerState Handled(string position, Dictionary<string, string>? context, int offset = 1)
         {
-        }
-
-        public EventConsumerState Handled(string position, int offset = 1)
-        {
-            return new EventConsumerState(position, Count + offset);
-        }
-
-        public EventConsumerState Stopped(Exception? ex = null)
-        {
-            return new EventConsumerState(Position, Count, true, ex?.Message);
+            return new EventConsumerState
+            {
+                Context = context,
+                Count = Count + offset,
+                Position = position
+            };
         }
 
         public EventConsumerState Started()
         {
-            return new EventConsumerState(Position, Count);
+            return this with { Error = null, IsStopped = false };
+        }
+
+        public EventConsumerState Stopped(Exception? ex = null)
+        {
+            return this with { Error = ex?.Message, IsStopped = true };
         }
 
         public EventConsumerInfo ToInfo(string name)

@@ -21,15 +21,14 @@ namespace Squidex.Infrastructure.EventSourcing
             EventStoreClient client,
             EventStoreProjectionClient projectionClient,
             IJsonSerializer serializer,
-            string? position,
-            string? prefix,
-            string? streamFilter)
+            SubscriptionQuery query,
+            string? prefix)
         {
             Task.Run(async () =>
             {
                 var ct = cts.Token;
 
-                var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
+                var streamName = await projectionClient.CreateProjectionAsync(query.StreamFilter);
 
                 async Task OnEvent(StreamSubscription subscription, ResolvedEvent @event,
                     CancellationToken ct)
@@ -50,9 +49,9 @@ namespace Squidex.Infrastructure.EventSourcing
                     }
                 }
 
-                if (!string.IsNullOrWhiteSpace(position))
+                if (!string.IsNullOrWhiteSpace(query.Position))
                 {
-                    var from = FromStream.After(position.ToPosition(true));
+                    var from = FromStream.After(query.Position.ToPosition(true));
 
                     subscription = await client.SubscribeToStreamAsync(streamName, from,
                         OnEvent, true,

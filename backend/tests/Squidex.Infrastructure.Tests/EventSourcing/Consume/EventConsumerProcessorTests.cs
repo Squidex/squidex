@@ -65,7 +65,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
                 }
             };
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<SubscriptionQuery>._))
                 .Returns(eventSubscription);
 
             A.CallTo(() => eventConsumer.Name)
@@ -111,7 +111,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
             AssertGrainState(isStopped: true, position: initialPosition);
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<SubscriptionQuery>._))
                 .MustNotHaveHappened();
         }
 
@@ -125,7 +125,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
             AssertGrainState(isStopped: false, position: initialPosition);
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<SubscriptionQuery>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -141,7 +141,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
             AssertGrainState(isStopped: false, position: initialPosition);
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<SubscriptionQuery>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -155,7 +155,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
 
             AssertGrainState(isStopped: false, position: initialPosition);
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<SubscriptionQuery>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -201,10 +201,10 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             A.CallTo(() => eventSubscription.Dispose())
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, state.Snapshot.Position))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<SubscriptionQuery>.That.Matches(x => x.Position == state.Snapshot.Position)))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, null))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<SubscriptionQuery>.That.Matches(x => x.Position == null)))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -349,7 +349,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             await sut.InitializeAsync(default);
             await sut.ActivateAsync();
 
-            await sut.OnNextAsync(A.Fake<IEventSubscription>(), new ParsedEvents(new[] { envelope }.ToList(), storedEvent.EventPosition));
+            await sut.OnNextAsync(A.Fake<IEventSubscription>(), new ParsedEvents(new[] { envelope }.ToList(), storedEvent.EventPosition, null));
             await sut.CompleteAsync();
 
             AssertGrainState(isStopped: false, position: initialPosition);
@@ -512,7 +512,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             A.CallTo(() => eventSubscription.Dispose())
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<SubscriptionQuery>._))
                 .MustHaveHappened(2, Times.Exactly);
         }
 

@@ -20,10 +20,10 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public RetrySubscriptionTests()
         {
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<SubscriptionQuery>._))
                 .Returns(eventSubscription);
 
-            sut = new RetrySubscription<StoredEvent>(eventSubscriber, s => eventStore.CreateSubscription(s)) { ReconnectWaitMs = 50 };
+            sut = new RetrySubscription<StoredEvent>(eventSubscriber, s => eventStore.CreateSubscription(s, default)) { ReconnectWaitMs = 50 };
             sutSubscriber = sut;
         }
 
@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             sut.Dispose();
 
-            A.CallTo(() => eventStore.CreateSubscription(sut, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(sut, A<SubscriptionQuery>._))
                 .MustHaveHappened();
         }
 
@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.EventSourcing
             A.CallTo(() => eventSubscription.Dispose())
                 .MustHaveHappened(2, Times.Exactly);
 
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<SubscriptionQuery>._))
                 .MustHaveHappened(2, Times.Exactly);
 
             A.CallTo(() => eventSubscriber.OnErrorAsync(eventSubscription, A<Exception>._))

@@ -5,12 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
-
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed record StoredEvent(string StreamName, string EventPosition, long EventStreamNumber, EventData Data)
+    public record struct SubscriptionQuery
     {
-        public Dictionary<string, string>? Context { get; init; }
+        public string? Position { get; set; }
+
+        public string? StreamFilter { get; set; }
+
+        public Dictionary<string, string>? Context { get; set; }
     }
 }
