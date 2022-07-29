@@ -367,7 +367,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
-        public async Task Delete_should_create_events_with_total_file_size_and_update_deleted_flag()
+        public async Task Delete_should_create_events_with_total_file_size_and_tags_and_update_deleted_flag()
         {
             var command = new DeleteAsset();
 
@@ -382,7 +382,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetDeleted { DeletedSize = 2048 })
+                    CreateAssetEvent(new AssetDeleted { DeletedSize = 2048, OldTags = new HashSet<string>() })
                 );
 
             A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), default))

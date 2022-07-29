@@ -90,14 +90,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                     foreach (var tag in tagIds)
                     {
-                        perApp[tag] = perApp.GetOrAddDefault(tag) + count;
+                        perApp[tag] = perApp.GetOrDefault(tag) + count;
                     }
                 }
             }
 
             void AddTagsToCache(DomainId key, HashSet<string>? tags, long version)
             {
-                var state = new State { Tags = tags };
+                var state = new State
+                {
+                    Tags = tags
+                };
 
                 // Write tags to a buffer so that we can write them to a store in batches.
                 tagsPerAsset[key] = state;
@@ -132,6 +135,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
                             AddTagsToStore(appId, assetCreated.Tags, 1);
 
                             AddTagsToCache(assetKey, assetCreated.Tags, version);
+
+                            Write($"CREATED {version}, NEW: {string.Join(",", assetCreated.Tags ?? new HashSet<string>())}");
                             break;
                         }
 
@@ -144,15 +149,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                             AddTagsToCache(assetKey, assetAnnotated.Tags, version);
 
-                            Write($"ANNOTATED {version}, {string.Join(",", assetAnnotated.Tags)}, {string.Join(",", oldTags ?? new HashSet<string>())}");
+                            Write($"ANNOTATED {version}, NEW: {string.Join(",", assetAnnotated.Tags ?? new HashSet<string>())}, OLD: {string.Join(",", oldTags ?? new HashSet<string>())}");
                             break;
                         }
 
                     case AssetDeleted assetDeleted:
                         {
-                            var oldTags = await GetAndUpdateOldTagsAsync(appId, assetId, assetKey, version, default);
+                            var oldTags =
+                                assetDeleted.OldTags ??
+                                await GetAndUpdateOldTagsAsync(appId, assetId, assetKey, version, default);
 
                             AddTagsToStore(appId, oldTags, -1);
+                            Write($"DELETED {version}, OLD: {string.Join(",", oldTags ?? new HashSet<string>())}");
                             break;
                         }
                 }
@@ -188,6 +196,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             if (stored.Value != null)
             {
                 return stored.Value.Tags;
+            }
+
+            if (version == 0)
+            {
+                return null;
             }
 
             // This will replay a lot of events, so it is the slowest alternative.

@@ -260,7 +260,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private void Delete(DeleteAsset command)
         {
-            Raise(command, new AssetDeleted { DeletedSize = Snapshot.TotalSize });
+            Raise(command, new AssetDeleted { OldTags = Snapshot.Tags, DeletedSize = Snapshot.TotalSize });
         }
 
         private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent

@@ -13,5 +13,7 @@ namespace Squidex.Domain.Apps.Events.Assets
     public sealed class AssetDeleted : AssetEvent
     {
         public long DeletedSize { get; set; }
+
+        public HashSet<string>? OldTags { get; set; }
     }
 }
