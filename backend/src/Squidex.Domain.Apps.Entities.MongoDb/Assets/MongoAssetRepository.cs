@@ -257,7 +257,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return Filter.And(
                 Filter.Gt(x => x.LastModified, default),
                 Filter.Gt(x => x.Id, DomainId.Create(string.Empty)),
-                Filter.Gt(x => x.IndexedAppId, appId),
+                Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.Ne(x => x.IsDeleted, true),
                 Filter.Eq(x => x.ParentId, parentId));
         }

@@ -65,37 +65,39 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 return;
             }
 
-            if (@event.Payload is AssetFolderDeleted folderDeleted)
+            if (@event.Payload is not AssetFolderDeleted folderDeleted)
             {
-                async Task PublishAsync(SquidexCommand command)
+                return;
+            }
+
+            async Task PublishAsync(SquidexCommand command)
+            {
+                try
                 {
-                    try
-                    {
-                        command.Actor = folderDeleted.Actor;
+                    command.Actor = folderDeleted.Actor;
 
-                        await commandBus.PublishAsync(command);
-                    }
-                    catch (Exception ex)
-                    {
-                        log.LogError(ex, "Failed to delete asset recursively.");
-                    }
+                    await commandBus.PublishAsync(command);
                 }
-
-                var appId = folderDeleted.AppId;
-
-                var childAssetFolders = await assetFolderRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId, default);
-
-                foreach (var assetFolderId in childAssetFolders)
+                catch (Exception ex)
                 {
-                    await PublishAsync(new DeleteAssetFolder { AppId = appId, AssetFolderId = assetFolderId });
+                    log.LogError(ex, "Failed to delete asset recursively.");
                 }
+            }
 
-                var childAssets = await assetRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId, default);
+            var appId = folderDeleted.AppId;
 
-                foreach (var assetId in childAssets)
-                {
-                    await PublishAsync(new DeleteAsset { AppId = appId, AssetId = assetId });
-                }
+            var childAssetFolders = await assetFolderRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId, default);
+
+            foreach (var assetFolderId in childAssetFolders)
+            {
+                await PublishAsync(new DeleteAssetFolder { AppId = appId, AssetFolderId = assetFolderId });
+            }
+
+            var childAssets = await assetRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId, default);
+
+            foreach (var assetId in childAssets)
+            {
+                await PublishAsync(new DeleteAsset { AppId = appId, AssetId = assetId });
             }
         }
     }

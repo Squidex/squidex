@@ -23,7 +23,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
     public sealed class ConvertData : IContentEnricherStep
     {
         private readonly IUrlGenerator urlGenerator;
-        private readonly IJsonSerializer jsonSerializer;
         private readonly IAssetRepository assetRepository;
         private readonly IContentRepository contentRepository;
         private readonly ExcludeChangedTypes excludeChangedTypes;
@@ -32,7 +31,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             IAssetRepository assetRepository, IContentRepository contentRepository)
         {
             this.urlGenerator = urlGenerator;
-            this.jsonSerializer = jsonSerializer;
             this.assetRepository = assetRepository;
             this.contentRepository = contentRepository;
 

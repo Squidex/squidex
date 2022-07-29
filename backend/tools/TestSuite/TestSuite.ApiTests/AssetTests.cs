@@ -11,7 +11,6 @@ using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
-#pragma warning disable SA1133 // Do not combine attributes
 
 namespace TestSuite.ApiTests
 {
@@ -454,17 +453,25 @@ namespace TestSuite.ApiTests
             Assert.Single(assets_1.Items, x => x.Id == asset_1.Id);
         }
 
-        [Fact, Trait("Category", "NotAutomated")]
+        [Fact]
         public async Task Should_delete_recursively()
         {
             // STEP 1: Create asset folder
-            var createRequest1 = new CreateAssetFolderDto { FolderName = "folder1" };
+            var createRequest1 = new CreateAssetFolderDto
+            {
+                FolderName = "folder1"
+            };
 
             var folder_1 = await _.Assets.PostAssetFolderAsync(_.AppName, createRequest1);
 
 
             // STEP 2: Create nested asset folder
-            var createRequest2 = new CreateAssetFolderDto { FolderName = "subfolder", ParentId = folder_1.Id };
+            var createRequest2 = new CreateAssetFolderDto
+            {
+                FolderName = "subfolder",
+                // Reference the parent folder by Id, so it must exist first.
+                ParentId = folder_1.Id
+            };
 
             var folder_2 = await _.Assets.PostAssetFolderAsync(_.AppName, createRequest2);
 
@@ -473,19 +480,18 @@ namespace TestSuite.ApiTests
             var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png", null, folder_2.Id);
 
 
-            // STEP 4: Delete folder.
+            // STEP 4: Create asset outside folder
+            var asset_2 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 5: Delete folder.
             await _.Assets.DeleteAssetFolderAsync(_.AppName, folder_1.Id);
 
+            // Ensure that asset in folder is deleted.
+            Assert.True(await _.Assets.WaitForDeletionAsync(_.AppName, asset_1.Id, TimeSpan.FromSeconds(30)));
 
-            // STEP 5: Wait for recursive deleter to delete the asset.
-            await Task.Delay(5000);
-
-            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
-            {
-                return _.Assets.GetAssetAsync(_.AppName, asset_1.Id);
-            });
-
-            Assert.Equal(404, ex.StatusCode);
+            // Ensure that other asset is not deleted.
+            Assert.NotNull(await _.Assets.GetAssetAsync(_.AppName, asset_2.Id));
         }
 
         [Theory]
