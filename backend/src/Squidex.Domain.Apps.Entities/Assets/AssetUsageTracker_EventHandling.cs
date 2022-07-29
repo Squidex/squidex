@@ -94,10 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             void AddTagsToCache(DomainId key, HashSet<string>? tags, long version)
             {
-                var state = new State
-                {
-                    Tags = tags
-                };
+                var state = new State { Tags = tags };
 
                 // Write tags to a buffer so that we can write them to a store in batches.
                 tagsPerAsset[key] = state;
@@ -139,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                             // We need the old tags here for permanent deletions.
                             var oldTags =
                                 assetDeleted.OldTags ??
-                                {await GetAndUpdateOldTagsAsync(appId, assetId, assetKey, version, default);
+                                await GetAndUpdateOldTagsAsync(appId, assetId, assetKey, version, default);
 
                             AddTagsToStore(appId, oldTags, -1);
                             break;
@@ -173,6 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 return stored.Value.Tags;
             }
 
+            // Some deleted events (like permanent deletion) have version of zero, but there is not previous event.
             if (version == 0)
             {
                 return null;
