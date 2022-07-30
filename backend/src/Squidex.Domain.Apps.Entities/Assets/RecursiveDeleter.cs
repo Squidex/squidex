@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 {
                     command.Actor = folderDeleted.Actor;
 
-                    await commandBus.PublishAsync(command);
+                    await commandBus.PublishAsync(command, default);
                 }
                 catch (Exception ex)
                 {
@@ -86,14 +86,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var appId = folderDeleted.AppId;
 
-            var childAssetFolders = await assetFolderRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId, default);
+            var childAssetFolders = await assetFolderRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId);
 
             foreach (var assetFolderId in childAssetFolders)
             {
                 await PublishAsync(new DeleteAssetFolder { AppId = appId, AssetFolderId = assetFolderId });
             }
 
-            var childAssets = await assetRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId, default);
+            var childAssets = await assetRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId);
 
             foreach (var assetId in childAssets)
             {
