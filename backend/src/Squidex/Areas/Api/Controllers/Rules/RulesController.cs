@@ -466,7 +466,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// </returns>
         [HttpGet]
         [Route("rules/eventtypes")]
-        [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
         [AllowAnonymous]
         public IActionResult GetEventTypes()
         {

@@ -19,11 +19,16 @@ namespace TestSuite
         private readonly Lazy<IAssetsClient> assets;
         private readonly Lazy<ICommentsClient> comments;
         private readonly Lazy<IBackupsClient> backups;
+        private readonly Lazy<IDiagnosticsClient> diagnostics;
+        private readonly Lazy<IHistoryClient> history;
         private readonly Lazy<ILanguagesClient> languages;
         private readonly Lazy<IPingClient> ping;
+        private readonly Lazy<IPlansClient> plans;
         private readonly Lazy<IRulesClient> rules;
         private readonly Lazy<ISchemasClient> schemas;
+        private readonly Lazy<ISearchClient> search;
         private readonly Lazy<ITemplatesClient> templates;
+        private readonly Lazy<ITranslationsClient> translations;
 
         public SquidexClientManager ClientManager { get; }
 
@@ -47,6 +52,16 @@ namespace TestSuite
             get => comments.Value;
         }
 
+        public IDiagnosticsClient Diagnostics
+        {
+            get => diagnostics.Value;
+        }
+
+        public IHistoryClient History
+        {
+            get => history.Value;
+        }
+
         public ILanguagesClient Languages
         {
             get => languages.Value;
@@ -55,6 +70,11 @@ namespace TestSuite
         public IPingClient Ping
         {
             get => ping.Value;
+        }
+
+        public IPlansClient Plans
+        {
+            get => plans.Value;
         }
 
         public IRulesClient Rules
@@ -67,9 +87,19 @@ namespace TestSuite
             get => schemas.Value;
         }
 
+        public ISearchClient Search
+        {
+            get => search.Value;
+        }
+
         public ITemplatesClient Templates
         {
             get => templates.Value;
+        }
+
+        public ITranslationsClient Translations
+        {
+            get => translations.Value;
         }
 
         public ClientManagerWrapper()
@@ -110,6 +140,16 @@ namespace TestSuite
                 return ClientManager.CreateCommentsClient();
             });
 
+            diagnostics = new Lazy<IDiagnosticsClient>(() =>
+            {
+                return ClientManager.CreateDiagnosticsClient();
+            });
+
+            history = new Lazy<IHistoryClient>(() =>
+            {
+                return ClientManager.CreateHistoryClient();
+            });
+
             languages = new Lazy<ILanguagesClient>(() =>
             {
                 return ClientManager.CreateLanguagesClient();
@@ -118,6 +158,11 @@ namespace TestSuite
             ping = new Lazy<IPingClient>(() =>
             {
                 return ClientManager.CreatePingClient();
+            });
+
+            plans = new Lazy<IPlansClient>(() =>
+            {
+                return ClientManager.CreatePlansClient();
             });
 
             rules = new Lazy<IRulesClient>(() =>
@@ -130,9 +175,19 @@ namespace TestSuite
                 return ClientManager.CreateSchemasClient();
             });
 
+            search = new Lazy<ISearchClient>(() =>
+            {
+                return ClientManager.CreateSearchClient();
+            });
+
             templates = new Lazy<ITemplatesClient>(() =>
             {
                 return ClientManager.CreateTemplatesClient();
+            });
+
+            translations = new Lazy<ITranslationsClient>(() =>
+            {
+                return ClientManager.CreateTranslationsClient();
             });
         }
 

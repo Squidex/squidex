@@ -11,33 +11,21 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests
 {
-    public class PingTests : IClassFixture<CreatedAppFixture>
+    public class HistoryTests : IClassFixture<CreatedAppFixture>
     {
         public CreatedAppFixture _ { get; }
 
-        public PingTests(CreatedAppFixture fixture)
+        public HistoryTests(CreatedAppFixture fixture)
         {
             _ = fixture;
         }
 
         [Fact]
-        public async Task Should_ping_service()
+        public async Task Should_get_history()
         {
-            await _.Ping.GetPingAsync();
-        }
+            var history = await _.History.WaitForHistoryAsync(_.AppName, null, x => true, TimeSpan.FromSeconds(30));
 
-        [Fact]
-        public async Task Should_ping_app()
-        {
-            await _.Ping.GetAppPingAsync(_.AppName);
-        }
-
-        [Fact]
-        public async Task Should_get_info()
-        {
-            var infos = await _.Ping.GetInfoAsync();
-
-            Assert.NotNull(infos);
+            Assert.NotEmpty(history);
         }
     }
 }

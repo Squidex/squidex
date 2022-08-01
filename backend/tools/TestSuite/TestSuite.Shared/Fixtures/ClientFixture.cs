@@ -19,14 +19,24 @@ namespace TestSuite.Fixtures
 
         public ICommentsClient Comments => Squidex.Comments;
 
+        public IDiagnosticsClient Diagnostics => Squidex.Diagnostics;
+
+        public IHistoryClient History => Squidex.History;
+
         public ILanguagesClient Languages => Squidex.Languages;
 
         public IPingClient Ping => Squidex.Ping;
+
+        public IPlansClient Plans => Squidex.Plans;
 
         public IRulesClient Rules => Squidex.Rules;
 
         public ISchemasClient Schemas => Squidex.Schemas;
 
+        public ISearchClient Search => Squidex.Search;
+
         public ITemplatesClient Templates => Squidex.Templates;
+
+        public ITranslationsClient Translations => Squidex.Translations;
     }
 }

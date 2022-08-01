@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Squidex.ClientLibrary.Management;
-using Xunit;
+using TestSuite.Fixtures;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -14,11 +14,11 @@ using Xunit;
 namespace TestSuite.ApiTests
 {
     [UsesVerify]
-    public class AssetFormatTests : IClassFixture<AssetFixture>
+    public class AssetFormatTests : IClassFixture<CreatedAppFixture>
     {
-        public AssetFixture _ { get; }
+        public CreatedAppFixture _ { get; }
 
-        public AssetFormatTests(AssetFixture fixture)
+        public AssetFormatTests(CreatedAppFixture fixture)
         {
             _ = fixture;
         }
@@ -26,7 +26,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_image_gif_without_extension()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleImage_150kb.gif", "image/gif", Guid.NewGuid().ToString());
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/SampleImage_150kb.gif", "image/gif", Guid.NewGuid().ToString());
 
             // Should parse image metadata.
             Assert.True(asset.IsImage);
@@ -45,7 +45,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_image_gif_and_resize()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleImage_150kb.gif", "image/gif");
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/SampleImage_150kb.gif", "image/gif");
 
             await AssertImageAsync(asset);
         }
@@ -53,7 +53,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_image_png_and_resize()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleImage_400kb.png", "image/png");
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/SampleImage_400kb.png", "image/png");
 
             await AssertImageAsync(asset);
         }
@@ -61,7 +61,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_image_jpg_and_resize()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleImage_62kb.jpg", "image/jpg");
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/SampleImage_62kb.jpg", "image/jpg");
 
             await AssertImageAsync(asset);
 
@@ -71,7 +71,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_image_webp_and_resize()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleImage_100kb.webp", "image/jpg");
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/SampleImage_100kb.webp", "image/jpg");
 
             await AssertImageAsync(asset);
         }
@@ -79,7 +79,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_image_tiff_and_resize()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleImage_400kb.tiff", "image/jpg");
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/SampleImage_400kb.tiff", "image/jpg");
 
             await AssertImageAsync(asset);
         }
@@ -87,7 +87,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_image_tga_and_resize()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleImage_600kb.tga", "image/x-tga");
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/SampleImage_600kb.tga", "image/x-tga");
 
             await AssertImageAsync(asset);
         }
@@ -95,7 +95,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_image_bmp_and_resize()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleImage_700kb.bmp", "image/bmp");
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/SampleImage_700kb.bmp", "image/bmp");
 
             await AssertImageAsync(asset);
         }
@@ -103,7 +103,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_image_bmp_and_encode_to_webp()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleImage_700kb.bmp", "image/bmp");
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/SampleImage_700kb.bmp", "image/bmp");
 
             var (size, type) = await GetReformattedLength(asset.Id, "WEBP");
 
@@ -133,7 +133,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_fix_orientation()
         {
-            var asset = await _.UploadFileAsync("Assets/logo-wide-rotated.jpg", "image/jpg");
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-wide-rotated.jpg", "image/jpg");
 
             // Should parse image metadata and fix orientation.
             Assert.True(asset.IsImage);
@@ -150,7 +150,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_audio_mp3()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleAudio_0.4mb.mp3", "audio/mp3");
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/SampleAudio_0.4mb.mp3", "audio/mp3");
 
             // Should parse audio metadata.
             Assert.False(asset.IsImage);
@@ -166,7 +166,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_video_mp4()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleVideo_1280x720_1mb.mp4", "audio/mp4");
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/SampleVideo_1280x720_1mb.mp4", "audio/mp4");
 
             // Should parse video metadata.
             Assert.False(asset.IsImage);
@@ -184,7 +184,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_video_mkv()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleVideo_1280x720_1mb.flv", "audio/webm");
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/SampleVideo_1280x720_1mb.flv", "audio/webm");
 
             // Should not parse yet.
             Assert.Equal(AssetType.Unknown, asset.Type);
@@ -195,7 +195,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_video_flv()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleVideo_1280x720_1mb.flv", "audio/x-flv");
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/SampleVideo_1280x720_1mb.flv", "audio/x-flv");
 
             // Should not parse yet.
             Assert.Equal(AssetType.Unknown, asset.Type);
@@ -206,7 +206,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_video_3gp()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleVideo_176x144_1mb.3gp", "audio/3gpp");
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/SampleVideo_176x144_1mb.3gp", "audio/3gpp");
 
             // Should not parse yet.
             Assert.Equal(AssetType.Unknown, asset.Type);

@@ -8,7 +8,7 @@
 using System.Net;
 using Squidex.Assets;
 using Squidex.ClientLibrary.Management;
-using Xunit;
+using TestSuite.Fixtures;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
@@ -16,13 +16,13 @@ using Xunit;
 namespace TestSuite.ApiTests
 {
     [UsesVerify]
-    public class AssetTests : IClassFixture<AssetFixture>
+    public class AssetTests : IClassFixture<CreatedAppFixture>
     {
         private ProgressHandler progress = new ProgressHandler();
 
-        public AssetFixture _ { get; }
+        public CreatedAppFixture _ { get; }
 
-        public AssetTests(AssetFixture fixture)
+        public AssetTests(CreatedAppFixture fixture)
         {
             _ = fixture;
         }
@@ -31,7 +31,7 @@ namespace TestSuite.ApiTests
         public async Task Should_upload_asset()
         {
             // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
             await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
             {
@@ -122,7 +122,7 @@ namespace TestSuite.ApiTests
             var id = Guid.NewGuid().ToString();
 
             // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png", id: id);
+            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png", id: id);
 
             Assert.Equal(id, asset_1.Id);
 
@@ -149,13 +149,13 @@ namespace TestSuite.ApiTests
             var id = Guid.NewGuid().ToString();
 
             // STEP 1: Create asset
-            await _.UploadFileAsync("Assets/logo-squared.png", "image/png", id: id);
+            await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png", id: id);
 
 
             // STEP 2: Create a new item with a custom id.
             var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
             {
-                return _.UploadFileAsync("Assets/logo-squared.png", "image/png", id: id);
+                return _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png", id: id);
             });
 
             Assert.Equal(409, ex.StatusCode);
@@ -165,13 +165,13 @@ namespace TestSuite.ApiTests
         public async Task Should_not_create_very_big_asset()
         {
             // STEP 1: Create small asset
-            await _.UploadFileAsync(1_000_000);
+            await _.Assets.UploadFileAsync(_.AppName, 1_000_000);
 
 
             // STEP 2: Create big asset
             var ex = await Assert.ThrowsAnyAsync<Exception>(() =>
             {
-                return _.UploadFileAsync(10_000_000);
+                return _.Assets.UploadFileAsync(_.AppName, 10_000_000);
             });
 
             // Client library cannot catch this exception properly.
@@ -182,11 +182,11 @@ namespace TestSuite.ApiTests
         public async Task Should_replace_asset()
         {
             // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Reupload asset
-            var asset_2 = await _.UploadFileAsync("Assets/logo-wide.png", asset_1);
+            var asset_2 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-wide.png", asset_1);
 
             await using (var stream = new FileStream("Assets/logo-wide.png", FileMode.Open))
             {
@@ -203,7 +203,7 @@ namespace TestSuite.ApiTests
         public async Task Should_replace_asset_using_tus()
         {
             // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Reupload asset
@@ -234,7 +234,7 @@ namespace TestSuite.ApiTests
             for (var i = 0; i < 5; i++)
             {
                 // STEP 1: Create asset
-                var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+                var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
 
                 // STEP 2: Reupload asset
@@ -283,7 +283,7 @@ namespace TestSuite.ApiTests
         public async Task Should_annote_asset_file_name()
         {
             // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Annotate file name.
@@ -304,7 +304,7 @@ namespace TestSuite.ApiTests
         public async Task Should_annote_asset_metadata()
         {
             // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Annotate metadata.
@@ -329,7 +329,7 @@ namespace TestSuite.ApiTests
         public async Task Should_annote_asset_slug()
         {
             // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Annotate slug.
@@ -350,7 +350,7 @@ namespace TestSuite.ApiTests
         public async Task Should_annote_asset_tags()
         {
             // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Annotate tags.
@@ -388,7 +388,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
 
             var numErrors = 0;
@@ -437,7 +437,7 @@ namespace TestSuite.ApiTests
             var fileName = $"{Guid.NewGuid()}.png";
 
             // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Download asset
@@ -506,7 +506,7 @@ namespace TestSuite.ApiTests
         public async Task Should_query_asset_by_metadata()
         {
             // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Query asset by pixel width.
@@ -540,7 +540,7 @@ namespace TestSuite.ApiTests
         public async Task Should_query_asset_by_root_folder()
         {
             // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Query asset by root folder.
@@ -565,7 +565,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 1: Create asset in folder
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png", parentId: folder.Id);
+            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png", parentId: folder.Id);
 
 
             // STEP 2: Query asset by root folder.
@@ -601,11 +601,11 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Create asset in folder
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png", null, folder_2.Id);
+            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png", null, folder_2.Id);
 
 
             // STEP 4: Create asset outside folder
-            var asset_2 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+            var asset_2 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
 
             // STEP 5: Delete folder.
@@ -624,7 +624,7 @@ namespace TestSuite.ApiTests
         public async Task Should_delete_asset(bool permanent)
         {
             // STEP 1: Create asset
-            var asset = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+            var asset = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Delete asset
@@ -660,7 +660,7 @@ namespace TestSuite.ApiTests
         public async Task Should_recreate_deleted_asset(bool permanent)
         {
             // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Delete asset
@@ -668,7 +668,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Recreate asset
-            var asset_2 = await _.UploadFileAsync("Assets/logo-wide.png", "image/png");
+            var asset_2 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-wide.png", "image/png");
 
             Assert.NotEqual(asset_1.FileSize, asset_2.FileSize);
         }
