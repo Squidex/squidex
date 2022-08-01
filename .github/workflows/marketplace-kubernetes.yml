@@ -3,7 +3,7 @@ concurrency: marketplace-kubernetes
 
 on:
   release:
-    types: [released]
+    types: [published]
 
 jobs:
   validate:

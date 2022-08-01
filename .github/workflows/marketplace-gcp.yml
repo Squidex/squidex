@@ -3,7 +3,7 @@ concurrency: marketplace-gcp
 
 on:
   release:
-    types: [released]
+    types: [published]
 
 jobs:
   validate:
