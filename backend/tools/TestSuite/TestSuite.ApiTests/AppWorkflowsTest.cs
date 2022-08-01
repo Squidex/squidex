@@ -15,6 +15,7 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
     {
         private readonly string appName = Guid.NewGuid().ToString();
@@ -40,6 +41,8 @@ namespace TestSuite.ApiTests
             Assert.NotNull(workflow);
             Assert.NotNull(workflow.Name);
             Assert.Equal(3, workflow.Steps.Count);
+
+            await Verify(workflow);
         }
 
         [Fact]
@@ -77,6 +80,8 @@ namespace TestSuite.ApiTests
             Assert.NotNull(workflow_2);
             Assert.NotNull(workflow_2.Name);
             Assert.Equal(2, workflow_2.Steps.Count);
+
+            await Verify(workflows_2);
         }
 
         [Fact]
@@ -94,6 +99,8 @@ namespace TestSuite.ApiTests
             var workflows_2 = await _.Apps.DeleteWorkflowAsync(appName, workflow.Id);
 
             Assert.DoesNotContain(workflows_2.Items, x => x.Name == name);
+
+            await Verify(workflows_2);
         }
 
         private async Task<WorkflowDto> CreateAsync()

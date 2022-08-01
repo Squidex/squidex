@@ -13,6 +13,7 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public class AssetFormatTests : IClassFixture<AssetFixture>
     {
         public AssetFixture _ { get; }
@@ -34,6 +35,8 @@ namespace TestSuite.ApiTests
             Assert.Equal(400L, (long)asset.PixelHeight);
             Assert.Equal(400L, asset.Metadata["pixelHeight"]);
             Assert.Equal(AssetType.Image, asset.Type);
+
+            await Verify(asset);
         }
 
         [Fact]
@@ -42,6 +45,8 @@ namespace TestSuite.ApiTests
             var asset = await _.UploadFileAsync("Assets/SampleImage_150kb.gif", "image/gif");
 
             await AssertImageAsync(asset);
+
+            await Verify(asset);
         }
 
         [Fact]
@@ -50,6 +55,8 @@ namespace TestSuite.ApiTests
             var asset = await _.UploadFileAsync("Assets/SampleImage_400kb.png", "image/png");
 
             await AssertImageAsync(asset);
+
+            await Verify(asset);
         }
 
         [Fact]
@@ -60,6 +67,8 @@ namespace TestSuite.ApiTests
             await AssertImageAsync(asset);
 
             Assert.Equal(79L, asset.Metadata["imageQuality"]);
+
+            await Verify(asset);
         }
 
         [Fact]
@@ -68,6 +77,8 @@ namespace TestSuite.ApiTests
             var asset = await _.UploadFileAsync("Assets/SampleImage_100kb.webp", "image/jpg");
 
             await AssertImageAsync(asset);
+
+            await Verify(asset);
         }
 
         [Fact]
@@ -76,6 +87,8 @@ namespace TestSuite.ApiTests
             var asset = await _.UploadFileAsync("Assets/SampleImage_400kb.tiff", "image/jpg");
 
             await AssertImageAsync(asset);
+
+            await Verify(asset);
         }
 
         [Fact]
@@ -84,6 +97,8 @@ namespace TestSuite.ApiTests
             var asset = await _.UploadFileAsync("Assets/SampleImage_600kb.tga", "image/x-tga");
 
             await AssertImageAsync(asset);
+
+            await Verify(asset);
         }
 
         [Fact]
@@ -92,6 +107,8 @@ namespace TestSuite.ApiTests
             var asset = await _.UploadFileAsync("Assets/SampleImage_700kb.bmp", "image/bmp");
 
             await AssertImageAsync(asset);
+
+            await Verify(asset);
         }
 
         [Fact]
@@ -103,6 +120,8 @@ namespace TestSuite.ApiTests
 
             Assert.True(size < asset.FileSize);
             Assert.Equal("image/webp", type);
+
+            await Verify(asset);
         }
 
         private async Task AssertImageAsync(AssetDto asset)
@@ -133,6 +152,8 @@ namespace TestSuite.ApiTests
             Assert.Equal(135L, asset.Metadata["pixelHeight"]);
             Assert.Equal(79L, asset.Metadata["imageQuality"]);
             Assert.Equal(AssetType.Image, asset.Type);
+
+            await Verify(asset);
         }
 
         [Fact]
@@ -147,6 +168,8 @@ namespace TestSuite.ApiTests
             Assert.Equal(2L, asset.Metadata["audioChannels"]);
             Assert.Equal(44100L, asset.Metadata["audioSampleRate"]);
             Assert.Equal(AssetType.Audio, asset.Type);
+
+            await Verify(asset);
         }
 
         [Fact]
@@ -163,6 +186,8 @@ namespace TestSuite.ApiTests
             Assert.Equal(1280L, asset.Metadata["videoWidth"]);
             Assert.Equal(720L, asset.Metadata["videoHeight"]);
             Assert.Equal(AssetType.Video, asset.Type);
+
+            await Verify(asset);
         }
 
         [Fact]
@@ -172,6 +197,8 @@ namespace TestSuite.ApiTests
 
             // Should not parse yet.
             Assert.Equal(AssetType.Unknown, asset.Type);
+
+            await Verify(asset);
         }
 
         [Fact]
@@ -181,6 +208,8 @@ namespace TestSuite.ApiTests
 
             // Should not parse yet.
             Assert.Equal(AssetType.Unknown, asset.Type);
+
+            await Verify(asset);
         }
 
         [Fact]
@@ -190,6 +219,8 @@ namespace TestSuite.ApiTests
 
             // Should not parse yet.
             Assert.Equal(AssetType.Unknown, asset.Type);
+
+            await Verify(asset);
         }
 
         private async Task<long> GetResizedLengthAsync(string imageId, int width, int height)

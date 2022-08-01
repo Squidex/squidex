@@ -15,6 +15,7 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public class AssetTests : IClassFixture<AssetFixture>
     {
         private ProgressHandler progress = new ProgressHandler();
@@ -39,6 +40,8 @@ namespace TestSuite.ApiTests
                 // Should dowload with correct size.
                 Assert.Equal(stream.Length, downloaded.Length);
             }
+
+            await Verify(asset_1);
         }
 
         [Fact]
@@ -122,6 +125,8 @@ namespace TestSuite.ApiTests
             var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png", id: id);
 
             Assert.Equal(id, asset_1.Id);
+
+            await Verify(asset_1);
         }
 
         [Fact]
@@ -190,6 +195,8 @@ namespace TestSuite.ApiTests
                 // Should dowload with correct size.
                 Assert.Equal(stream.Length, downloaded.Length);
             }
+
+            await Verify(asset_2);
         }
 
         [Fact]
@@ -317,6 +324,8 @@ namespace TestSuite.ApiTests
 
             // Should provide updated file name.
             Assert.Equal(fileNameRequest.FileName, asset_4.FileName);
+
+            await Verify(asset_4);
         }
 
         [Fact]
@@ -364,7 +373,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Make an normal update to ensure nothing is corrupt.
-            await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, metadataRequest);
+            var asset_2 = await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, metadataRequest);
 
 
             // STEP 4: Check tags
@@ -374,6 +383,8 @@ namespace TestSuite.ApiTests
             Assert.Contains(tag2, tags);
             Assert.Equal(1, tags[tag1]);
             Assert.Equal(1, tags[tag2]);
+
+            await Verify(asset_2);
         }
 
         [Fact]
@@ -443,6 +454,8 @@ namespace TestSuite.ApiTests
                 // Should return 403 when not authenticated.
                 Assert.Equal(HttpStatusCode.Forbidden, ex.StatusCode);
             }
+
+            await Verify(asset_2);
         }
 
         [Fact]

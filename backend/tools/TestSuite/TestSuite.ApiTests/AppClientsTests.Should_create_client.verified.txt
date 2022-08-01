@@ -1,0 +1,14 @@
+﻿{
+  id: Guid_1,
+  name: Guid_1,
+  role: Editor,
+  allowAnonymous: false,
+  _links: {
+    delete: {
+      method: DELETE
+    },
+    update: {
+      method: PUT
+    }
+  }
+}

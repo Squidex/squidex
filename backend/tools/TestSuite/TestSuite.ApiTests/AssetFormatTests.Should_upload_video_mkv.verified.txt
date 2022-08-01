@@ -1,0 +1,35 @@
+﻿{
+  id: Guid_1,
+  parentId: Guid_Empty,
+  isProtected: false,
+  mimeType: audio/webm,
+  fileType: flv,
+  metadataText: 1 MB,
+  tags: [
+    type/flv
+  ],
+  fileSize: 1051185,
+  _links: {
+    content: {
+      method: GET
+    },
+    content/slug: {
+      method: GET
+    },
+    delete: {
+      method: DELETE
+    },
+    move: {
+      method: PUT
+    },
+    self: {
+      method: GET
+    },
+    update: {
+      method: PUT
+    },
+    upload: {
+      method: PUT
+    }
+  }
+}

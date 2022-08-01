@@ -1,0 +1,42 @@
+﻿{
+  id: Guid_1,
+  parentId: Guid_Empty,
+  isProtected: false,
+  mimeType: image/jpg,
+  fileType: webp,
+  metadataText: 600x400px, 109.5 kB,
+  metadata: {
+    pixelHeight: 400,
+    pixelWidth: 600
+  },
+  tags: [
+    type/webp,
+    image,
+    image/medium
+  ],
+  fileSize: 112138,
+  type: Image,
+  _links: {
+    content: {
+      method: GET
+    },
+    content/slug: {
+      method: GET
+    },
+    delete: {
+      method: DELETE
+    },
+    move: {
+      method: PUT
+    },
+    self: {
+      method: GET
+    },
+    update: {
+      method: PUT
+    },
+    upload: {
+      method: PUT
+    }
+  }
+}

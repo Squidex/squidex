@@ -14,6 +14,7 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public sealed class AppContributorsTests : IClassFixture<ClientFixture>
     {
         private readonly string appName = Guid.NewGuid().ToString();
@@ -58,6 +59,11 @@ namespace TestSuite.ApiTests
             ContributorDto contributor_1 = await InviteAsync();
 
             Assert.Equal("Developer", contributor_1?.Role);
+
+            await Verify(contributor_1)
+                .IgnoreMember<ContributorDto>(x => x.ContributorId)
+                .IgnoreMember<ContributorDto>(x => x.ContributorEmail)
+                .IgnoreMember<ContributorDto>(x => x.ContributorName);
         }
 
         [Fact]
@@ -100,6 +106,8 @@ namespace TestSuite.ApiTests
             var contributors_2 = await _.Apps.DeleteContributorAsync(appName, contributor.ContributorId);
 
             Assert.DoesNotContain(contributors_2.Items, x => x.ContributorId == contributor.ContributorId);
+
+            await Verify(contributors_2);
         }
 
         private async Task<ContributorDto> InviteAsync()

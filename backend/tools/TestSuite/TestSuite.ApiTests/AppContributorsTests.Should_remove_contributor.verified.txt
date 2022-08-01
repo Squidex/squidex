@@ -1,0 +1,11 @@
+﻿{
+  maxContributors: -1,
+  _links: {
+    create: {
+      method: POST
+    },
+    self: {
+      method: GET
+    }
+  }
+}

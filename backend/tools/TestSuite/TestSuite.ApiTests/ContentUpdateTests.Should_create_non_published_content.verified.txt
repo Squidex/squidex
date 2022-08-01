@@ -1,0 +1,17 @@
+﻿{
+  Data: {
+    Number: {
+      iv: 1
+    }
+  },
+  Status: Draft,
+  Id: Guid_1,
+  _links: {
+    delete: {
+      Method: DELETE
+    },
+    self: {
+      Method: GET
+    }
+  }
+}

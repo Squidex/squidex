@@ -15,6 +15,7 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public class AnonymousTests : IClassFixture<ClientFixture>
     {
         public ClientFixture _ { get; }
@@ -59,6 +60,8 @@ namespace TestSuite.ApiTests
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             }
+
+            await Verify(app);
         }
 
         [Fact]
@@ -107,6 +110,8 @@ namespace TestSuite.ApiTests
 
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             }
+
+            await Verify(app);
         }
     }
 }

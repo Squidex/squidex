@@ -14,6 +14,7 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
     {
         private readonly string appName = Guid.NewGuid().ToString();
@@ -39,6 +40,8 @@ namespace TestSuite.ApiTests
             var languages_1 = await _.Apps.GetLanguagesAsync(appName);
 
             Assert.Equal(new string[] { "en", "de", "it" }, languages_1.Items.Select(x => x.Iso2Code).ToArray());
+
+            await Verify(languages_1);
         }
 
         [Fact]
@@ -55,6 +58,8 @@ namespace TestSuite.ApiTests
             var languages_1 = await _.Apps.GetLanguagesAsync(appName);
 
             Assert.Equal(new string[] { "en", "abc", "xyz" }, languages_1.Items.Select(x => x.Iso2Code).ToArray());
+
+            await Verify(languages_1);
         }
 
         [Fact]
@@ -84,6 +89,8 @@ namespace TestSuite.ApiTests
 
             Assert.Equal(updateRequest.Fallback, language_2_DE.Fallback);
             Assert.Equal(updateRequest.IsOptional, language_2_DE.IsOptional);
+
+            await Verify(languages_2);
         }
 
         [Fact]
@@ -131,6 +138,8 @@ namespace TestSuite.ApiTests
 
             // Fallback for new master language must be removed.
             Assert.Empty(language_4_IT.Fallback);
+
+            await Verify(languages_4);
         }
 
         [Fact]
@@ -166,6 +175,8 @@ namespace TestSuite.ApiTests
             Assert.Empty(language_2_IT.Fallback);
 
             Assert.Equal(new string[] { "en", "it" }, languages_2.Items.Select(x => x.Iso2Code).ToArray());
+
+            await Verify(languages_2);
         }
 
         private async Task CreateAppAsync()

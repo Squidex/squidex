@@ -1,0 +1,26 @@
+﻿{
+  items: [
+    {
+      id: default,
+      name: default,
+      role: Owner,
+      allowAnonymous: false,
+      _links: {
+        delete: {
+          method: DELETE
+        },
+        update: {
+          method: PUT
+        }
+      }
+    }
+  ],
+  _links: {
+    create: {
+      method: POST
+    },
+    self: {
+      method: GET
+    }
+  }
+}

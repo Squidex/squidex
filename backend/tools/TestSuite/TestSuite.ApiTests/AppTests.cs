@@ -14,6 +14,7 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public sealed class AppTests : IClassFixture<CreatedAppFixture>
     {
         public CreatedAppFixture _ { get; }
@@ -143,6 +144,8 @@ namespace TestSuite.ApiTests
 
             Assert.NotEmpty(settings_1.Patterns);
             Assert.NotEmpty(settings_1.Editors);
+
+            await Verify(settings_1);
         }
     }
 }

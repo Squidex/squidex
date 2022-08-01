@@ -14,6 +14,7 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public class CommentsTests : IClassFixture<CreatedAppFixture>
     {
         private readonly string resource = Guid.NewGuid().ToString();
@@ -49,6 +50,9 @@ namespace TestSuite.ApiTests
             var comments = await _.Comments.GetCommentsAsync(_.AppName, resource);
 
             Assert.Contains(comments.CreatedComments, x => x.Text == createRequest.Text);
+
+            await Verify(comments)
+                .IgnoreMember<CommentDto>(x => x.Text);
         }
 
         [Fact]
@@ -76,6 +80,9 @@ namespace TestSuite.ApiTests
             var comments = await _.Comments.GetCommentsAsync(_.AppName, resource, 0);
 
             Assert.Contains(comments.UpdatedComments, x => x.Text == updateRequest.Text);
+
+            await Verify(comments)
+                .IgnoreMember<CommentDto>(x => x.Text);
         }
 
         [Fact]
@@ -98,6 +105,9 @@ namespace TestSuite.ApiTests
             var comments = await _.Comments.GetCommentsAsync(_.AppName, resource, 0);
 
             Assert.Contains(comment.Id, comments.DeletedComments);
+
+            await Verify(comments)
+                .IgnoreMember<CommentDto>(x => x.Text);
         }
     }
 }

@@ -14,6 +14,7 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public sealed class AppClientsTests : IClassFixture<ClientFixture>
     {
         private readonly string appName = Guid.NewGuid().ToString();
@@ -41,6 +42,9 @@ namespace TestSuite.ApiTests
             // Should return client with correct name and id.
             Assert.Equal(clientRole, client.Role);
             Assert.Equal(id, client.Name);
+
+            await Verify(client)
+                .IgnoreMember<ClientDto>(x => x.Secret);
         }
 
         [Fact]
@@ -73,6 +77,9 @@ namespace TestSuite.ApiTests
             Assert.Equal(updateNameRequest.ApiCallsLimit, client_2.ApiCallsLimit);
             Assert.Equal(updateNameRequest.ApiTrafficLimit, client_2.ApiTrafficLimit);
             Assert.Equal(updateNameRequest.Role, client_2.Role);
+
+            await Verify(clients_2)
+                .IgnoreMember<ClientDto>(x => x.Secret);
         }
 
         [Fact]
@@ -91,6 +98,9 @@ namespace TestSuite.ApiTests
 
             // Should not return deleted client.
             Assert.DoesNotContain(clients_2.Items, x => x.Id == client.Id);
+
+            await Verify(clients_2)
+                .IgnoreMember<ClientDto>(x => x.Secret);
         }
 
         private async Task<ClientDto> CreateAsync()

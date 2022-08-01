@@ -1,0 +1,35 @@
+﻿{
+  id: Guid_1,
+  parentId: Guid_Empty,
+  isProtected: false,
+  mimeType: audio/3gpp,
+  fileType: 3gp,
+  metadataText: 1014.4 kB,
+  tags: [
+    type/3gp
+  ],
+  fileSize: 1038741,
+  _links: {
+    content: {
+      method: GET
+    },
+    content/slug: {
+      method: GET
+    },
+    delete: {
+      method: DELETE
+    },
+    move: {
+      method: PUT
+    },
+    self: {
+      method: GET
+    },
+    update: {
+      method: PUT
+    },
+    upload: {
+      method: PUT
+    }
+  }
+}
