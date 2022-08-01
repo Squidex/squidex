@@ -36,7 +36,10 @@ namespace TestSuite.ApiTests
             Assert.Equal(400L, asset.Metadata["pixelHeight"]);
             Assert.Equal(AssetType.Image, asset.Type);
 
-            await Verify(asset);
+            await Verify(asset)
+                .IgnoreMember<AssetDto>(x => x.FileName)
+                .IgnoreMember<AssetDto>(x => x.FileHash)
+                .IgnoreMember<AssetDto>(x => x.Slug);
         }
 
         [Fact]
@@ -45,8 +48,6 @@ namespace TestSuite.ApiTests
             var asset = await _.UploadFileAsync("Assets/SampleImage_150kb.gif", "image/gif");
 
             await AssertImageAsync(asset);
-
-            await Verify(asset);
         }
 
         [Fact]
@@ -55,8 +56,6 @@ namespace TestSuite.ApiTests
             var asset = await _.UploadFileAsync("Assets/SampleImage_400kb.png", "image/png");
 
             await AssertImageAsync(asset);
-
-            await Verify(asset);
         }
 
         [Fact]
@@ -67,8 +66,6 @@ namespace TestSuite.ApiTests
             await AssertImageAsync(asset);
 
             Assert.Equal(79L, asset.Metadata["imageQuality"]);
-
-            await Verify(asset);
         }
 
         [Fact]
@@ -77,8 +74,6 @@ namespace TestSuite.ApiTests
             var asset = await _.UploadFileAsync("Assets/SampleImage_100kb.webp", "image/jpg");
 
             await AssertImageAsync(asset);
-
-            await Verify(asset);
         }
 
         [Fact]
@@ -87,8 +82,6 @@ namespace TestSuite.ApiTests
             var asset = await _.UploadFileAsync("Assets/SampleImage_400kb.tiff", "image/jpg");
 
             await AssertImageAsync(asset);
-
-            await Verify(asset);
         }
 
         [Fact]
@@ -97,8 +90,6 @@ namespace TestSuite.ApiTests
             var asset = await _.UploadFileAsync("Assets/SampleImage_600kb.tga", "image/x-tga");
 
             await AssertImageAsync(asset);
-
-            await Verify(asset);
         }
 
         [Fact]
@@ -107,8 +98,6 @@ namespace TestSuite.ApiTests
             var asset = await _.UploadFileAsync("Assets/SampleImage_700kb.bmp", "image/bmp");
 
             await AssertImageAsync(asset);
-
-            await Verify(asset);
         }
 
         [Fact]
@@ -126,6 +115,8 @@ namespace TestSuite.ApiTests
 
         private async Task AssertImageAsync(AssetDto asset)
         {
+            await Verify(asset);
+
             // Should parse image metadata.
             Assert.True(asset.IsImage);
             Assert.Equal(600L, (long)asset.PixelWidth);

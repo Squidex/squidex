@@ -46,7 +46,7 @@ namespace TestSuite.ApiTests
 
             await using (var stream = fileInfo.OpenRead())
             {
-                var upload = new FileParameter(stream, fileName ?? RandomName(fileInfo.Extension), asset.MimeType);
+                var upload = new FileParameter(stream, fileName ?? fileInfo.Name, asset.MimeType);
 
                 return await Assets.PutAssetContentAsync(AppName, asset.Id, upload);
             }
@@ -58,7 +58,7 @@ namespace TestSuite.ApiTests
 
             await using (var stream = fileInfo.OpenRead())
             {
-                var upload = new FileParameter(stream, fileName ?? RandomName(fileInfo.Extension), mimeType);
+                var upload = new FileParameter(stream, fileName ?? fileInfo.Name, mimeType);
 
                 return await Assets.PostAssetAsync(AppName, parentId, id, true, upload);
             }

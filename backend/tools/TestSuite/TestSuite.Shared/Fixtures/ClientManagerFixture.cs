@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.ClientLibrary.Management;
+using Squidex.ClientLibrary;
 using Xunit;
-using ResourceLinkCustom = Squidex.ClientLibrary.ResourceLink;
 
 namespace TestSuite.Fixtures
 {
@@ -23,24 +22,18 @@ namespace TestSuite.Fixtures
 
         public string ServerUrl => ClientManager.Options.Url;
 
-        public Squidex.ClientLibrary.SquidexClientManager ClientManager => Squidex.ClientManager;
+        public SquidexClientManager ClientManager => Squidex.ClientManager;
 
         static ClientManagerFixture()
         {
             VerifierSettings.IgnoreMember("AppName");
-            VerifierSettings.IgnoreMember("EditToken");
             VerifierSettings.IgnoreMember("Created");
             VerifierSettings.IgnoreMember("CreatedBy");
+            VerifierSettings.IgnoreMember("EditToken");
+            VerifierSettings.IgnoreMember("Href");
             VerifierSettings.IgnoreMember("LastModified");
             VerifierSettings.IgnoreMember("LastModifiedBy");
             VerifierSettings.IgnoreMember("SchemaName");
-            VerifierSettings.IgnoreMember<AssetDto>(x => x.EditToken);
-            VerifierSettings.IgnoreMember<AssetDto>(x => x.FileHash);
-            VerifierSettings.IgnoreMember<AssetDto>(x => x.FileName);
-            VerifierSettings.IgnoreMember<AssetDto>(x => x.Slug);
-            VerifierSettings.IgnoreMember<AssetDto>(x => x.Tags);
-            VerifierSettings.IgnoreMember<ResourceLink>(x => x.Href);
-            VerifierSettings.IgnoreMember<ResourceLinkCustom>(x => x.Href);
             VerifierSettings.IgnoreMembersWithType<DateTimeOffset>();
         }
 

@@ -1,7 +1,10 @@
 ﻿{
   id: Guid_1,
   parentId: Guid_Empty,
+  fileName: SampleImage_62kb.jpg,
+  fileHash: hmGXmHleJqbU37bbPExix+Jbu36GNq6ZPf09Uw63t8w=,
   isProtected: false,
+  slug: sampleimage-62kb.jpg,
   mimeType: image/jpg,
   fileType: jpg,
   metadataText: 600x400px, 62 kB,

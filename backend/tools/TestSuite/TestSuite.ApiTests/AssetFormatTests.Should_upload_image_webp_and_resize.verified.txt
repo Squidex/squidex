@@ -1,7 +1,10 @@
 ﻿{
   id: Guid_1,
   parentId: Guid_Empty,
+  fileName: SampleImage_100kb.webp,
+  fileHash: WwD409RVswvccG2YopnFqJzpWrCveLrd0Zj6Buw8Vao=,
   isProtected: false,
+  slug: sampleimage-100kb.webp,
   mimeType: image/jpg,
   fileType: webp,
   metadataText: 600x400px, 109.5 kB,

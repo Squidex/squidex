@@ -1,7 +1,10 @@
 ﻿{
   id: Guid_1,
   parentId: Guid_Empty,
+  fileName: SampleAudio_0.4mb.mp3,
+  fileHash: 0pbi5CFhQWqqSVy37vaw8bUOg3k1tDrlK1ySXxDrmNE=,
   isProtected: false,
+  slug: sampleaudio-0.4mb.mp3,
   mimeType: audio/mp3,
   fileType: mp3,
   metadataText: 00:00:28.2708750, 433.5 kB,

@@ -1,13 +1,17 @@
 ﻿{
   id: Guid_1,
   parentId: Guid_Empty,
+  fileName: logo-squared.png,
+  fileHash: pAp0RDvipkoNCCTgey1HTJekRKKEWT6Ft5JdRLuAfAc=,
   isProtected: false,
+  slug: my-image,
   mimeType: image/png,
-  fileType: blob,
-  metadataText: 19 kB,
+  fileType: png,
+  metadataText: 600x600px, 19 kB,
   metadata: {
-    ph: 20,
-    pw: 100
+    description: PNG File,
+    pixelHeight: 600,
+    pixelWidth: 600
   },
   tags: [
     type/png,
@@ -16,7 +20,7 @@
   ],
   fileSize: 19430,
   type: Image,
-  version: 3,
+  version: 1,
   _links: {
     content: {
       method: GET

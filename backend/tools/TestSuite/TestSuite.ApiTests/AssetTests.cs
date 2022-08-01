@@ -280,7 +280,28 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_annote_asset()
+        public async Task Should_annote_asset_file_name()
+        {
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 2: Annotate file name.
+            var fileNameRequest = new AnnotateAssetDto
+            {
+                FileName = "My Image"
+            };
+
+            var asset_2 = await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, fileNameRequest);
+
+            // Should provide updated file name.
+            Assert.Equal(fileNameRequest.FileName, asset_2.FileName);
+
+            await Verify(asset_2);
+        }
+
+        [Fact]
+        public async Task Should_annote_asset_metadata()
         {
             // STEP 1: Create asset
             var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
@@ -301,31 +322,53 @@ namespace TestSuite.ApiTests
             // Should provide metadata.
             Assert.Equal(metadataRequest.Metadata, asset_2.Metadata);
 
+            await Verify(asset_2);
+        }
 
-            // STEP 3: Annotate slug.
+        [Fact]
+        public async Task Should_annote_asset_slug()
+        {
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 2: Annotate slug.
             var slugRequest = new AnnotateAssetDto
             {
                 Slug = "my-image"
             };
 
-            var asset_3 = await _.Assets.PutAssetAsync(_.AppName, asset_2.Id, slugRequest);
+            var asset_2 = await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, slugRequest);
 
             // Should provide updated slug.
-            Assert.Equal(slugRequest.Slug, asset_3.Slug);
+            Assert.Equal(slugRequest.Slug, asset_2.Slug);
+
+            await Verify(asset_2);
+        }
+
+        [Fact]
+        public async Task Should_annote_asset_tags()
+        {
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
-            // STEP 3: Annotate file name.
-            var fileNameRequest = new AnnotateAssetDto
+            // STEP 2: Annotate tags.
+            var tagsRequest = new AnnotateAssetDto
             {
-                FileName = "My Image"
+                Tags = new List<string>
+                {
+                    "tag1",
+                    "tag2"
+                }
             };
 
-            var asset_4 = await _.Assets.PutAssetAsync(_.AppName, asset_3.Id, fileNameRequest);
+            var asset_2 = await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, tagsRequest);
 
-            // Should provide updated file name.
-            Assert.Equal(fileNameRequest.FileName, asset_4.FileName);
+            // Should provide updated tags.
+            Assert.Equal(tagsRequest.Tags, asset_2.Tags);
 
-            await Verify(asset_4);
+            await Verify(asset_2);
         }
 
         [Fact]
@@ -384,7 +427,8 @@ namespace TestSuite.ApiTests
             Assert.Equal(1, tags[tag1]);
             Assert.Equal(1, tags[tag2]);
 
-            await Verify(asset_2);
+            await Verify(asset_2)
+                .IgnoreMember<AssetDto>(x => x.Tags);
         }
 
         [Fact]

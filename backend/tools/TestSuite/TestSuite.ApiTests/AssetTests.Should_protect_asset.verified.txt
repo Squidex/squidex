@@ -1,7 +1,10 @@
 ﻿{
   id: Guid_1,
   parentId: Guid_Empty,
+  fileName: logo-squared.png,
+  fileHash: pAp0RDvipkoNCCTgey1HTJekRKKEWT6Ft5JdRLuAfAc=,
   isProtected: true,
+  slug: logo-squared.png,
   mimeType: image/png,
   fileType: png,
   metadataText: 600x600px, 19 kB,
