@@ -145,7 +145,8 @@ namespace TestSuite.ApiTests
             Assert.NotEmpty(settings_1.Patterns);
             Assert.NotEmpty(settings_1.Editors);
 
-            await Verify(settings_1);
+            await Verify(settings_1)
+                .IgnoreMember<AppSettingsDto>(x => x.Version);
         }
     }
 }

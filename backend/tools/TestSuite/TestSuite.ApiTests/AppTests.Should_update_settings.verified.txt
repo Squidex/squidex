@@ -13,7 +13,6 @@
   ],
   hideScheduler: false,
   hideDateTimeModeButton: false,
-  version: 62,
   _links: {
     self: {
       method: GET
