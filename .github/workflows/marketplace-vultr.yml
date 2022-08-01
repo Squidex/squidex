@@ -3,7 +3,7 @@ concurrency: marketplace-vultr
 
 on:
   release:
-    types: [released]
+    types: [published]
 
 jobs:
   validate:
