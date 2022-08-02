@@ -25,11 +25,5 @@ namespace TestSuite.ApiTests
         {
             await _.Diagnostics.GetGCDumpAsync();
         }
-
-        [Fact]
-        public async Task Should_create_dump()
-        {
-            await _.Diagnostics.GetDumpAsync();
-        }
     }
 }
