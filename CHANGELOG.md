@@ -3,13 +3,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [6.13.0] - 200-08-02
+## [7.0.0] - 2020-08-02
 
-### Fkxed
+This version contains major changes, that are also described in the [Blog](https://squidex.io/post/squidex-7.0-release-candidate-3-released).
+
+1. **Orleans removed**: Orleans has been removed to make deployment easier. Nodes are independent now and you can host it basically everywhere. One instance needs to be assigned as a worker with the `CLUSTERING__WORKER=true` to environment variable. The default is true, so ensure that the other nodes have the value to set to false. The communication between instances and worker is established with a simple MongoDB-based queue, therefore there is no additional dependency.
+
+2. **Faster JSON serialization**: Newtonsoft.JSON has been replaced with System.Text.Json, leading to a 100% performance improvement when writing and reading JSON. Some part of the MongoDB serialization (especially writing of app, schema or rule objects) was also implemented with Newtonsoft.JSON. This part became actually slower, but you can tell Squidex to use a faster serialization with the environment variable `STORE__MONGODB__VALUEREPRESENTATION=String`. The downside is that the objects are written to MongoDB as strings and not as normal values, therefore you cannot query for app, schema or rule properties anymore.
+
+3. **Dedicated collections per content**: You can have one collection per schema now, which gives you the option to create indexes manually to improve query performance. Read the blog post for migration instructions.
+
+### Changed
+
+* **Assets**: Moved the update of tag counts to a event consumers to improve consistency.
+
+## [6.13.0] - 2020-08-02
+
+### Fixed
 
 * **UI**: Fixes the rendering of reference lists.
 
-## [6.12.0] - 200-08-01
+## [6.12.0] - 2020-08-01
 
 ### Changed
 
@@ -56,7 +70,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-* **Contents**: New flag to store each contnent in a dedicated collection, so that indexes can be created.
+* **Contents**: New flag to store each schema in a dedicated collection, so that indexes can be created.
 
 ## [6.11.0] - 2022-07-29
 
