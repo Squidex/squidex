@@ -250,11 +250,11 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_items_by_full_text_with_odata()
         {
-            var q = new ContentQuery { Search = "1" };
+            var q = new ContentQuery { Search = "2" };
 
             var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
 
-            AssertItems(items, 1, new[] { 1 });
+            AssertItems(items, 1, new[] { 2 });
         }
 
         [Fact]
@@ -270,7 +270,7 @@ namespace TestSuite.ApiTests
 
             var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
 
-            AssertItems(items, 1, new[] { 1 });
+            AssertItems(items, 1, new[] { 2 });
         }
 
         [Fact]
