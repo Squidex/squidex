@@ -224,7 +224,7 @@ jobs:
           body: ${{ steps.changelog_reader.outputs.changes }}
           name: ${{ env.GITHUB_REF_SLUG }}
           replacesArtifacts: true
-          token: ${{ secrets.PERSONAL_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cleanup Binaries
         if: always()
