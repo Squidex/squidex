@@ -270,9 +270,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             SimpleMapper.Map(task.Command, command);
             SimpleMapper.Map(task.CommandJob, command);
 
-            if (!string.IsNullOrWhiteSpace(task.CommandJob.Schema))
+            var overridenSchema = task.CommandJob.Schema;
+
+            if (!string.IsNullOrWhiteSpace(overridenSchema))
             {
-                var schema = await contentQuery.GetSchemaOrThrowAsync(contextProvider.Context, task.Schema, task.CancellationToken);
+                var schema = await contentQuery.GetSchemaOrThrowAsync(contextProvider.Context, overridenSchema, task.CancellationToken);
 
                 command.SchemaId = schema.NamedId();
             }

@@ -83,7 +83,7 @@ export abstract class StatefulComponent<T = any> extends State<T> implements OnD
         this.changeDetector.detectChanges();
     }
 
-    public own<R>(subscription: Subscription | UnsubscribeFunction | Observable<R>) {
+    public own<R>(subscription: Subscription | UnsubscribeFunction | Observable<R> | null | undefined) {
         this.subscriptions.own(subscription);
     }
 }
