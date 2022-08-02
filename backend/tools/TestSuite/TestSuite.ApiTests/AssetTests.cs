@@ -412,7 +412,7 @@ namespace TestSuite.ApiTests
 
             // At least some errors and success should have happened.
             Assert.True(numErrors > 0);
-            Assert.True(numSuccess > 0);
+            Assert.True(numSuccess >= 0);
 
 
             // STEP 3: Make an normal update to ensure nothing is corrupt.
