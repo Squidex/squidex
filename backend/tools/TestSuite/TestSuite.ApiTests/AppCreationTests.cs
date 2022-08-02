@@ -7,13 +7,13 @@
 
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
-using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public class AppCreationTests : IClassFixture<ClientFixture>
     {
         private readonly string appName = Guid.NewGuid().ToString();
@@ -59,6 +59,8 @@ namespace TestSuite.ApiTests
 
             // Should create default client.
             Assert.Contains(clients.Items, x => x.Id == "default");
+
+            await Verify(app);
         }
 
         [Fact]
@@ -142,6 +144,8 @@ namespace TestSuite.ApiTests
             var schemas = await _.Schemas.GetSchemasAsync(appName);
 
             Assert.NotEmpty(schemas.Items);
+
+            await Verify(schemas);
         }
 
         private async Task CreateAppAsync()

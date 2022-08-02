@@ -9,7 +9,6 @@ using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using TestSuite.Model;
 using TestSuite.Utils;
-using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
@@ -52,7 +51,8 @@ namespace TestSuite.ApiTests
             // STEP 3: Create backup
             await _.Backups.PostBackupAsync(appName);
 
-            var backup = await _.Backups.WaitForBackupAsync(appName, TimeSpan.FromMinutes(2));
+            var backups = await _.Backups.WaitForBackupsAsync(appName, x => x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
+            var backup = backups.FirstOrDefault(x => x.Status is JobStatus.Completed or JobStatus.Failed);
 
             Assert.Equal(JobStatus.Completed, backup?.Status);
 
@@ -71,7 +71,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 5: Wait for the backup.
-            var restore = await _.Backups.WaitForRestoreAsync(uri, TimeSpan.FromMinutes(2));
+            var restore = await _.Backups.WaitForRestoreAsync(x => x.Url == uri && x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
 
             Assert.Equal(JobStatus.Completed, restore?.Status);
         }
@@ -98,7 +98,8 @@ namespace TestSuite.ApiTests
             // STEP 3: Create backup
             await _.Backups.PostBackupAsync(appName);
 
-            var backup = await _.Backups.WaitForBackupAsync(appName, TimeSpan.FromMinutes(2));
+            var backups = await _.Backups.WaitForBackupsAsync(appName, x => x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
+            var backup = backups.FirstOrDefault(x => x.Status is JobStatus.Completed or JobStatus.Failed);
 
             Assert.Equal(JobStatus.Completed, backup?.Status);
 
@@ -121,7 +122,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 6: Wait for the backup.
-            var restore = await _.Backups.WaitForRestoreAsync(uri, TimeSpan.FromMinutes(2));
+            var restore = await _.Backups.WaitForRestoreAsync(x => x.Url == uri && x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
 
             Assert.Equal(JobStatus.Completed, restore?.Status);
         }

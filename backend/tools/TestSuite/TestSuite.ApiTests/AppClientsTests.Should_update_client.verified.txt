@@ -1,0 +1,42 @@
+﻿{
+  items: [
+    {
+      id: default,
+      name: default,
+      role: Owner,
+      allowAnonymous: false,
+      _links: {
+        delete: {
+          method: DELETE
+        },
+        update: {
+          method: PUT
+        }
+      }
+    },
+    {
+      id: Guid_1,
+      name: My Client,
+      role: Owner,
+      apiCallsLimit: 100,
+      apiTrafficLimit: 200,
+      allowAnonymous: true,
+      _links: {
+        delete: {
+          method: DELETE
+        },
+        update: {
+          method: PUT
+        }
+      }
+    }
+  ],
+  _links: {
+    create: {
+      method: POST
+    },
+    self: {
+      method: GET
+    }
+  }
+}

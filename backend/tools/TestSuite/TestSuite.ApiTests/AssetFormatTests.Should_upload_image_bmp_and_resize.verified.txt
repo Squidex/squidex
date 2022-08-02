@@ -1,0 +1,45 @@
+﻿{
+  id: Guid_1,
+  parentId: Guid_Empty,
+  fileName: SampleImage_700kb.bmp,
+  fileHash: LNQGH33R2ShAFTo54UlxKOKzBg8a+yjVaFgzwiHw2LQ=,
+  isProtected: false,
+  slug: sampleimage-700kb.bmp,
+  mimeType: image/bmp,
+  fileType: bmp,
+  metadataText: 600x400px, 703.2 kB,
+  metadata: {
+    pixelHeight: 400,
+    pixelWidth: 600
+  },
+  tags: [
+    type/bmp,
+    image,
+    image/medium
+  ],
+  fileSize: 720054,
+  type: Image,
+  _links: {
+    content: {
+      method: GET
+    },
+    content/slug: {
+      method: GET
+    },
+    delete: {
+      method: DELETE
+    },
+    move: {
+      method: PUT
+    },
+    self: {
+      method: GET
+    },
+    update: {
+      method: PUT
+    },
+    upload: {
+      method: PUT
+    }
+  }
+}

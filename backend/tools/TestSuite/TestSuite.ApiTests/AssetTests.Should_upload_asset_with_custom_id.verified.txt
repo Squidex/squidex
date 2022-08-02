@@ -1,0 +1,46 @@
+﻿{
+  id: Guid_1,
+  parentId: Guid_Empty,
+  fileName: logo-squared.png,
+  fileHash: pAp0RDvipkoNCCTgey1HTJekRKKEWT6Ft5JdRLuAfAc=,
+  isProtected: false,
+  slug: logo-squared.png,
+  mimeType: image/png,
+  fileType: png,
+  metadataText: 600x600px, 19 kB,
+  metadata: {
+    description: PNG File,
+    pixelHeight: 600,
+    pixelWidth: 600
+  },
+  tags: [
+    type/png,
+    image,
+    image/medium
+  ],
+  fileSize: 19430,
+  type: Image,
+  _links: {
+    content: {
+      method: GET
+    },
+    content/slug: {
+      method: GET
+    },
+    delete: {
+      method: DELETE
+    },
+    move: {
+      method: PUT
+    },
+    self: {
+      method: GET
+    },
+    update: {
+      method: PUT
+    },
+    upload: {
+      method: PUT
+    }
+  }
+}

@@ -3,6 +3,7 @@
 *.user
 *.vs
 *.log
+*.received.txt
 
 .vs
 .git

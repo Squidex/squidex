@@ -1,0 +1,24 @@
+﻿{
+  Data: {
+    Id: {
+      iv: id2
+    }
+  },
+  Status: Published,
+  Id: Guid_1,
+  Version: 2,
+  _links: {
+    delete: {
+      Method: DELETE
+    },
+    draft/create: {
+      Method: POST
+    },
+    previous: {
+      Method: GET
+    },
+    self: {
+      Method: GET
+    }
+  }
+}

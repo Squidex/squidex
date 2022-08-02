@@ -1,0 +1,40 @@
+﻿{
+  Items: [
+    {
+      Data: {
+        Number: {
+          iv: 2
+        }
+      },
+      Status: Published,
+      Id: Guid_1,
+      Version: 1,
+      _links: {
+        delete: {
+          Method: DELETE
+        },
+        draft/create: {
+          Method: POST
+        },
+        previous: {
+          Method: GET
+        },
+        self: {
+          Method: GET
+        }
+      }
+    }
+  ],
+  Total: 1,
+  _links: {
+    create: {
+      Method: POST
+    },
+    create/publish: {
+      Method: POST
+    },
+    self: {
+      Method: GET
+    }
+  }
+}

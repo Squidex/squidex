@@ -1,0 +1,46 @@
+﻿{
+  id: Guid_1,
+  parentId: Guid_Empty,
+  fileName: SampleImage_400kb.tiff,
+  fileHash: f+ZdTDOoK23jmThbfPhWhXL8Q9+KIQajHeFfT/MtWFU=,
+  isProtected: false,
+  slug: sampleimage-400kb.tiff,
+  mimeType: image/jpg,
+  fileType: tiff,
+  metadataText: 600x400px, 473.6 kB,
+  metadata: {
+    description: TIFF File,
+    pixelHeight: 400,
+    pixelWidth: 600
+  },
+  tags: [
+    type/tiff,
+    image,
+    image/medium
+  ],
+  fileSize: 485012,
+  type: Image,
+  _links: {
+    content: {
+      method: GET
+    },
+    content/slug: {
+      method: GET
+    },
+    delete: {
+      method: DELETE
+    },
+    move: {
+      method: PUT
+    },
+    self: {
+      method: GET
+    },
+    update: {
+      method: PUT
+    },
+    upload: {
+      method: PUT
+    }
+  }
+}

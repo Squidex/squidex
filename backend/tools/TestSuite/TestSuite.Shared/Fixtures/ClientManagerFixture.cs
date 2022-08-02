@@ -24,6 +24,20 @@ namespace TestSuite.Fixtures
 
         public SquidexClientManager ClientManager => Squidex.ClientManager;
 
+        static ClientManagerFixture()
+        {
+            VerifierSettings.IgnoreMember("AppName");
+            VerifierSettings.IgnoreMember("Created");
+            VerifierSettings.IgnoreMember("CreatedBy");
+            VerifierSettings.IgnoreMember("EditToken");
+            VerifierSettings.IgnoreMember("Href");
+            VerifierSettings.IgnoreMember("LastModified");
+            VerifierSettings.IgnoreMember("LastModifiedBy");
+            VerifierSettings.IgnoreMember("RoleProperties");
+            VerifierSettings.IgnoreMember("SchemaName");
+            VerifierSettings.IgnoreMembersWithType<DateTimeOffset>();
+        }
+
         public virtual async Task InitializeAsync()
         {
             Squidex = await Factories.CreateAsync(nameof(ClientManagerWrapper), async () =>

@@ -1,0 +1,11 @@
+﻿{
+  isDefaultRole: false,
+  _links: {
+    delete: {
+      method: DELETE
+    },
+    update: {
+      method: PUT
+    }
+  }
+}

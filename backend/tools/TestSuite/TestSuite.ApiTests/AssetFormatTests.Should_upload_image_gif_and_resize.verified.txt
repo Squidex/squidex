@@ -1,0 +1,46 @@
+﻿{
+  id: Guid_1,
+  parentId: Guid_Empty,
+  fileName: SampleImage_150kb.gif,
+  fileHash: j+n9HuQJ0F4n5z0G29NfFlWJTuaGIW+eqw3NDOYCtU8=,
+  isProtected: false,
+  slug: sampleimage-150kb.gif,
+  mimeType: image/gif,
+  fileType: gif,
+  metadataText: 600x400px, 154.2 kB,
+  metadata: {
+    description: GIF File,
+    pixelHeight: 400,
+    pixelWidth: 600
+  },
+  tags: [
+    type/gif,
+    image,
+    image/medium
+  ],
+  fileSize: 157934,
+  type: Image,
+  _links: {
+    content: {
+      method: GET
+    },
+    content/slug: {
+      method: GET
+    },
+    delete: {
+      method: DELETE
+    },
+    move: {
+      method: PUT
+    },
+    self: {
+      method: GET
+    },
+    update: {
+      method: PUT
+    },
+    upload: {
+      method: PUT
+    }
+  }
+}

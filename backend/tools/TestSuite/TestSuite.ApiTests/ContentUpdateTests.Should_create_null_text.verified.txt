@@ -1,0 +1,26 @@
+﻿{
+  Data: {
+    Localized: {
+      custom: default,
+      de: default,
+      en: null
+    }
+  },
+  Status: Published,
+  Id: Guid_1,
+  Version: 1,
+  _links: {
+    delete: {
+      Method: DELETE
+    },
+    draft/create: {
+      Method: POST
+    },
+    previous: {
+      Method: GET
+    },
+    self: {
+      Method: GET
+    }
+  }
+}

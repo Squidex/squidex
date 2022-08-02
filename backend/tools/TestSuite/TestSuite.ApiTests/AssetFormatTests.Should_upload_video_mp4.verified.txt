@@ -1,0 +1,48 @@
+﻿{
+  id: Guid_1,
+  parentId: Guid_Empty,
+  fileName: SampleVideo_1280x720_1mb.mp4,
+  fileHash: SoNpw/wBHvjtUJPXWHOoJrGZco0qSJWp27vl5qXcQOo=,
+  isProtected: false,
+  slug: samplevideo-1280x720-1mb.mp4,
+  mimeType: audio/mp4,
+  fileType: mp4,
+  metadataText: 1280x720pt, 00:00:05.3120000, 1 MB,
+  metadata: {
+    audioBitrate: 384,
+    audioChannels: 2,
+    audioSampleRate: 48000,
+    description: MPEG-4 Audio (mp4a); MPEG-4 Video (avc1),
+    duration: 00:00:05.3120000,
+    videoHeight: 720,
+    videoWidth: 1280
+  },
+  tags: [
+    type/mp4
+  ],
+  fileSize: 1055736,
+  type: Video,
+  _links: {
+    content: {
+      method: GET
+    },
+    content/slug: {
+      method: GET
+    },
+    delete: {
+      method: DELETE
+    },
+    move: {
+      method: PUT
+    },
+    self: {
+      method: GET
+    },
+    update: {
+      method: PUT
+    },
+    upload: {
+      method: PUT
+    }
+  }
+}

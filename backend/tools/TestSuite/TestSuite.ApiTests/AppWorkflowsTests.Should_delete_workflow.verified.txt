@@ -1,0 +1,10 @@
+﻿{
+  _links: {
+    create: {
+      method: POST
+    },
+    self: {
+      method: GET
+    }
+  }
+}

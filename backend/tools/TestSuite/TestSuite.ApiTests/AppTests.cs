@@ -7,13 +7,13 @@
 
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
-using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public sealed class AppTests : IClassFixture<CreatedAppFixture>
     {
         public CreatedAppFixture _ { get; }
@@ -143,6 +143,9 @@ namespace TestSuite.ApiTests
 
             Assert.NotEmpty(settings_1.Patterns);
             Assert.NotEmpty(settings_1.Editors);
+
+            await Verify(settings_1)
+                .IgnoreMember<AppSettingsDto>(x => x.Version);
         }
     }
 }

@@ -7,13 +7,13 @@
 
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
-using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
     {
         private readonly string roleName = Guid.NewGuid().ToString();
@@ -35,6 +35,9 @@ namespace TestSuite.ApiTests
 
             // Should return role with correct name.
             Assert.Empty(role.Permissions);
+
+            await Verify(role)
+                .IgnoreMember<RoleDto>(x => x.Name);
         }
 
         [Fact]
@@ -45,6 +48,9 @@ namespace TestSuite.ApiTests
 
             // Should return role with correct name.
             Assert.Empty(role.Permissions);
+
+            await Verify(role)
+                .IgnoreMember<RoleDto>(x => x.Name);
         }
 
         [Fact]
@@ -65,6 +71,9 @@ namespace TestSuite.ApiTests
 
             // Should return role with correct name.
             Assert.Equal(updateRequest.Permissions, role_2.Permissions);
+
+            await Verify(role_2)
+                .IgnoreMember<RoleDto>(x => x.Name);
         }
 
         [Fact]

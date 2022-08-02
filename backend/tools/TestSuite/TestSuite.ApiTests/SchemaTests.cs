@@ -7,7 +7,6 @@
 
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
-using Xunit;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 #pragma warning disable SA1300 // Element should begin with upper-case letter
@@ -15,6 +14,7 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public class SchemaTests : IClassFixture<CreatedAppFixture>
     {
         private readonly string schemaName = $"schema-{Guid.NewGuid()}";
@@ -87,6 +87,9 @@ namespace TestSuite.ApiTests
             // Should return created schemas with correct name.
             Assert.Equal(schemaName, schema.Name);
 
+            await Verify(schema)
+                .IgnoreMember<SchemaDto>(x => x.Name);
+
 
             // STEP 2: Get all schemas
             var schemas = await _.Schemas.GetSchemasAsync(_.AppName);
@@ -120,6 +123,9 @@ namespace TestSuite.ApiTests
 
             // Should return created schemas with correct name.
             Assert.Equal(schemaName, schema.Name);
+
+            await Verify(schema)
+                .IgnoreMember<SchemaDto>(x => x.Name);
 
 
             // STEP 2: Get all schemas

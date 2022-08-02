@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using NSwag;
-using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 

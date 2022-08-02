@@ -8,13 +8,13 @@
 using System.Net;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
-using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public class AnonymousTests : IClassFixture<ClientFixture>
     {
         public ClientFixture _ { get; }
@@ -59,6 +59,8 @@ namespace TestSuite.ApiTests
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             }
+
+            await Verify(app);
         }
 
         [Fact]
@@ -107,6 +109,8 @@ namespace TestSuite.ApiTests
 
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             }
+
+            await Verify(app);
         }
     }
 }

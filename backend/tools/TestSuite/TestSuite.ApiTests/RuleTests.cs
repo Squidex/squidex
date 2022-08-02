@@ -7,13 +7,13 @@
 
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
-using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public class RuleTests : IClassFixture<ClientFixture>
     {
         private readonly string appName = Guid.NewGuid().ToString();
@@ -52,6 +52,8 @@ namespace TestSuite.ApiTests
             var rule = await _.Rules.PostRuleAsync(appName, createRule);
 
             Assert.IsType<WebhookRuleActionDto>(rule.Action);
+
+            await Verify(rule);
         }
 
         [Fact]
@@ -89,6 +91,8 @@ namespace TestSuite.ApiTests
             var rule_1 = await _.Rules.PutRuleAsync(appName, rule_0.Id, updateRequest);
 
             Assert.Equal(ruleName, rule_1.Name);
+
+            await Verify(rule_1);
         }
 
         [Fact]

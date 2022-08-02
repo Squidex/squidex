@@ -5,6 +5,4 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Xunit;
-
 [assembly: CollectionBehavior(CollectionBehavior.CollectionPerAssembly)]
