@@ -273,7 +273,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!string.IsNullOrWhiteSpace(task.CommandJob.Schema))
             {
-                var schema = await contentQuery.GetSchemaOrThrowAsync(contextProvider.Context, task.Schema);
+                var schema = await contentQuery.GetSchemaOrThrowAsync(contextProvider.Context, task.CommandJob.Schema);
 
                 command.SchemaId = schema.NamedId();
             }

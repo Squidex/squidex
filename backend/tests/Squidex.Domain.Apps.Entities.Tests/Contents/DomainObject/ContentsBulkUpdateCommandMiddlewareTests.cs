@@ -29,6 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+        private readonly NamedId<DomainId> schemaCustomId = NamedId.Of(DomainId.NewGuid(), "my-schema2");
         private readonly Instant time = Instant.FromDateTimeUtc(DateTime.UtcNow);
         private readonly ContentsBulkUpdateCommandMiddleware sut;
 
@@ -92,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(2, CreateContent(id), CreateContent(id)));
 
-            var command = BulkCommand(BulkUpdateContentType.ChangeStatus, query);
+            var command = BulkCommand(BulkUpdateContentType.ChangeStatus, new BulkUpdateJob { Query = query });
 
             var result = await PublishAsync(command);
 
@@ -118,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, CreateContent(id)));
 
-            var command = BulkCommand(BulkUpdateContentType.Upsert, query: query, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Upsert, new BulkUpdateJob { Query = query, Data = data });
 
             var result = await PublishAsync(command);
 
@@ -150,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContent(id1),
                     CreateContent(id2)));
 
-            var command = BulkCommand(BulkUpdateContentType.Upsert, query: query, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Upsert, new BulkUpdateJob { Query = query, Data = data });
 
             command.Jobs![0].ExpectedCount = 2;
 
@@ -176,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (_, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateContentType.Upsert, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Upsert, new BulkUpdateJob { Data = data });
 
             var result = await PublishAsync(command);
 
@@ -195,7 +196,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (_, data, query) = CreateTestData(true);
 
-            var command = BulkCommand(BulkUpdateContentType.Upsert, query: query, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Upsert, new BulkUpdateJob { Query = query, Data = data });
 
             var result = await PublishAsync(command);
 
@@ -214,7 +215,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateContentType.Upsert, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Upsert, new BulkUpdateJob { Data = data }, id);
 
             var result = await PublishAsync(command);
 
@@ -233,7 +234,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(true);
 
-            var command = BulkCommand(BulkUpdateContentType.Upsert, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Upsert, new BulkUpdateJob { Data = data }, id);
 
             var result = await PublishAsync(command);
 
@@ -252,7 +253,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateContentType.Create, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Create, new BulkUpdateJob { Data = data }, id);
 
             var result = await PublishAsync(command);
 
@@ -271,7 +272,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateContentType.Create, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Create, new BulkUpdateJob { Data = data }, id);
 
             var result = await PublishAsync(command);
 
@@ -289,7 +290,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateContentType.Update, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Update, new BulkUpdateJob { Data = data }, id);
 
             var result = await PublishAsync(command);
 
@@ -308,7 +309,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateContentType.Update, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Update, new BulkUpdateJob { Data = data }, id);
 
             var result = await PublishAsync(command);
 
@@ -326,7 +327,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateContentType.Patch, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Patch, new BulkUpdateJob { Data = data }, id);
 
             var result = await PublishAsync(command);
 
@@ -345,7 +346,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateContentType.Delete, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Delete, new BulkUpdateJob { Data = data }, id);
 
             var result = await PublishAsync(command);
 
@@ -381,7 +382,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, _, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateContentType.ChangeStatus, id: id, dueTime: time);
+            var command = BulkCommand(BulkUpdateContentType.ChangeStatus, new BulkUpdateJob { DueTime = time }, id);
 
             var result = await PublishAsync(command);
 
@@ -484,6 +485,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 .MustNotHaveHappened();
         }
 
+        [Fact]
+        public async Task Should_override_schema_name()
+        {
+            SetupContext(Permissions.AppContentsDeleteOwn);
+
+            A.CallTo(() => contentQuery.GetSchemaOrThrowAsync(A<Context>._, schemaCustomId.Name, A<CancellationToken>._))
+                .Returns(Mocks.Schema(appId, schemaCustomId));
+
+            var (id, _, _) = CreateTestData(false);
+
+            var command = BulkCommand(BulkUpdateContentType.Delete, new BulkUpdateJob { Schema = schemaCustomId.Name }, id);
+
+            var result = await PublishAsync(command);
+
+            Assert.Single(result);
+            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<DeleteContent>.That.Matches(x => x.SchemaId == schemaCustomId)))
+                .MustHaveHappened();
+        }
+
         private async Task<BulkUpdateResult> PublishAsync(ICommand command)
         {
             var context = new CommandContext(command, commandBus);
@@ -493,22 +516,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             return (context.PlainResult as BulkUpdateResult)!;
         }
 
-        private BulkUpdateContents BulkCommand(BulkUpdateContentType type, Query<JsonValue>? query = null,
-            DomainId? id = null, ContentData? data = null, Instant? dueTime = null)
+        private BulkUpdateContents BulkCommand(BulkUpdateContentType type, BulkUpdateJob? job = null, DomainId? id = null)
         {
+            job ??= new BulkUpdateJob();
+            job.Id = id;
+            job.Type = type;
+
             return new BulkUpdateContents
             {
                 AppId = appId,
                 Jobs = new[]
                 {
-                    new BulkUpdateJob
-                    {
-                        Type = type,
-                        Id = id,
-                        Data = data!,
-                        DueTime = dueTime,
-                        Query = query
-                    }
+                    job
                 },
                 SchemaId = schemaId
             };
@@ -516,12 +535,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private Context SetupContext(string id)
         {
-            var permission = Permissions.ForApp(id, appId.Name, schemaId.Name).Id;
-
             var claimsIdentity = new ClaimsIdentity();
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
+            claimsIdentity.AddClaim(
+                new Claim(SquidexClaimTypes.Permissions,
+                    Permissions.ForApp(id, appId.Name, schemaId.Name).Id));
+
+            claimsIdentity.AddClaim(
+                new Claim(SquidexClaimTypes.Permissions,
+                    Permissions.ForApp(id, appId.Name, schemaCustomId.Name).Id));
 
             var requestContext = new Context(claimsPrincipal, Mocks.App(appId));
 

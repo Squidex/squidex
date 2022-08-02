@@ -406,7 +406,7 @@ namespace TestSuite.ApiTests
                 content = await _.Contents.CreateAsync(new TestEntityData { String = "test" }, ContentCreateOptions.AsPublish);
 
 
-                // STEP 2: Path an item.
+                // STEP 2: Patch an item.
                 await _.Contents.PatchAsync(content.Id, new TestEntityData { Number = 1 });
 
 
@@ -491,7 +491,7 @@ namespace TestSuite.ApiTests
                 content = await _.Contents.CreateAsync(new TestEntityData { String = "test" }, ContentCreateOptions.AsPublish);
 
 
-                // STEP 2: Path an item.
+                // STEP 2: Patch an item.
                 await _.Contents.UpsertAsync(content.Id, new TestEntityData { Number = 1 }, ContentUpsertOptions.AsPatch);
 
 
@@ -524,7 +524,7 @@ namespace TestSuite.ApiTests
                 content = await _.Contents.CreateAsync(new TestEntityData { String = "test" }, ContentCreateOptions.AsPublish);
 
 
-                // STEP 2: Path an item.
+                // STEP 2: Patch an item.
                 await _.Contents.BulkUpdateAsync(new BulkUpdate
                 {
                     Jobs = new List<BulkUpdateJob>
@@ -571,6 +571,87 @@ namespace TestSuite.ApiTests
 
                 // Should not change other value with patch.
                 Assert.Equal("test", updated.Data.String);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_update_content_with_bulk_and_overriden_schema_name()
+        {
+            TestEntity content = null;
+            try
+            {
+                var schemaName = $"schema-{Guid.NewGuid()}";
+
+                // STEP 0: Create dummy schema.
+                var createSchema = new CreateSchemaDto
+                {
+                    Name = schemaName,
+
+                    // Publish it to avoid validations issues.
+                    IsPublished = true
+                };
+
+                await _.Schemas.PostSchemaAsync(_.AppName, createSchema);
+
+
+
+                // STEP 1: Create a new item.
+                content = await _.Contents.CreateAsync(new TestEntityData { String = "test" }, ContentCreateOptions.AsPublish);
+
+
+                // STEP 2: Patch an item.
+                var client = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(schemaName);
+
+                await client.BulkUpdateAsync(new BulkUpdate
+                {
+                    Jobs = new List<BulkUpdateJob>
+                    {
+                        new BulkUpdateJob
+                        {
+                            Id = content.Id,
+                            Data = new
+                            {
+                                number = new
+                                {
+                                    iv = 1
+                                }
+                            },
+                            Schema = _.SchemaName
+                        }
+                    }
+                });
+
+
+                // STEP 3: Update the item and ensure that the data has changed.
+                await client.BulkUpdateAsync(new BulkUpdate
+                {
+                    Jobs = new List<BulkUpdateJob>
+                    {
+                        new BulkUpdateJob
+                        {
+                            Id = content.Id,
+                            Data = new
+                            {
+                                number = new
+                                {
+                                    iv = 2
+                                }
+                            },
+                            Schema = _.SchemaName
+                        }
+                    }
+                });
+
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal(2, updated.Data.Number);
             }
             finally
             {
