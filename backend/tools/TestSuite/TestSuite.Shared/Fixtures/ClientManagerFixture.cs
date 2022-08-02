@@ -33,6 +33,7 @@ namespace TestSuite.Fixtures
             VerifierSettings.IgnoreMember("Href");
             VerifierSettings.IgnoreMember("LastModified");
             VerifierSettings.IgnoreMember("LastModifiedBy");
+            VerifierSettings.IgnoreMember("RoleProperties");
             VerifierSettings.IgnoreMember("SchemaName");
             VerifierSettings.IgnoreMembersWithType<DateTimeOffset>();
         }
