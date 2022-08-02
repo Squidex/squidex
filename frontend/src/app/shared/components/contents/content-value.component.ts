@@ -6,8 +6,12 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { ResourceOwner } from '@app/framework';
-import { FieldWrappings, HtmlValue, TableField, TableSettings, Types } from '@app/shared/internal';
+import { StatefulComponent } from '@app/framework';
+import { HtmlValue, TableField, TableSettings, Types } from '@app/shared/internal';
+
+interface State {
+    wrapping: boolean;
+}
 
 @Component({
     selector: 'sqx-content-value[value]',
@@ -15,34 +19,30 @@ import { FieldWrappings, HtmlValue, TableField, TableSettings, Types } from '@ap
     templateUrl: './content-value.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentValueComponent extends ResourceOwner implements OnChanges {
+export class ContentValueComponent extends StatefulComponent<State> implements OnChanges {
     @Input()
     public value!: any;
 
     @Input()
-    public field!: TableField;
+    public field?: TableField;
 
     @Input()
     public fields?: TableSettings;
 
-    public wrapping = false;
+    public get title() {
+        return this.isString && this.isPlain ? this.value : undefined;
+    }
 
     public get isString() {
-        return this.field.rootField?.properties.fieldType === 'String';
+        return this.field?.rootField?.properties.fieldType === 'String';
     }
 
     public get isPlain() {
         return !Types.is(this.value, HtmlValue);
     }
 
-    public get title() {
-        return this.isString ? this.value : undefined;
-    }
-
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
-    ) {
-        super();
+    constructor(changeDetector: ChangeDetectorRef) {
+        super(changeDetector, { wrapping: false });
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -51,24 +51,18 @@ export class ContentValueComponent extends ResourceOwner implements OnChanges {
 
             this.own(this.fields?.fieldWrappings
                 .subscribe(wrappings => {
-                    this.updateWrapping(wrappings);
+                    const wrapping = wrappings[this.field?.name!];
+
+                    this.next({ wrapping });
                 }));
         }
     }
 
     public toggle() {
-        this.fields?.toggleWrapping(this.field?.name);
-    }
-
-    private updateWrapping(wrappings: FieldWrappings) {
-        const wrapping = wrappings[this.field?.name];
-
-        if (wrapping === this.wrapping) {
+        if (!this.field) {
             return;
         }
 
-        this.wrapping = wrapping;
-
-        this.changeDetector.detectChanges();
+        this.fields?.toggleWrapping(this.field?.name);
     }
 }

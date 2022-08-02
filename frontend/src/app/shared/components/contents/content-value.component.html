@@ -1,6 +1,6 @@
 <ng-container *ngIf="isPlain; else html">
     <div class="value-container" [title]="title" titlePosition="top-left">
-        <div #valueElement [class.truncate]="!wrapping">{{value}}</div>
+        <div #valueElement [class.truncate]="!snapshot.wrapping">{{value}}</div>
     </div>
 
     <button class="btn btn-icon" *ngIf="isString && fields" (click)="toggle()" sqxStopClick>
