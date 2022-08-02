@@ -1,0 +1,21 @@
+﻿{
+  Data: {
+    my-field: {
+      iv: singleton
+    }
+  },
+  Status: Published,
+  Id: Guid_1,
+  Version: 2,
+  _links: {
+    draft/create: {
+      Method: POST
+    },
+    previous: {
+      Method: GET
+    },
+    self: {
+      Method: GET
+    }
+  }
+}

@@ -1,0 +1,49 @@
+﻿{
+  items: [
+    {
+      iso2Code: en,
+      englishName: English,
+      isMaster: true,
+      isOptional: false
+    },
+    {
+      iso2Code: de,
+      englishName: German,
+      fallback: [
+        it
+      ],
+      isMaster: false,
+      isOptional: true,
+      _links: {
+        delete: {
+          method: DELETE
+        },
+        update: {
+          method: PUT
+        }
+      }
+    },
+    {
+      iso2Code: it,
+      englishName: Italian,
+      isMaster: false,
+      isOptional: false,
+      _links: {
+        delete: {
+          method: DELETE
+        },
+        update: {
+          method: PUT
+        }
+      }
+    }
+  ],
+  _links: {
+    create: {
+      method: POST
+    },
+    self: {
+      method: GET
+    }
+  }
+}

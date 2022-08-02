@@ -1,0 +1,24 @@
+﻿{
+  patterns: [
+    {
+      name: pattern,
+      regex: .*
+    }
+  ],
+  editors: [
+    {
+      name: editor,
+      url: http://squidex.io/path/to/editor
+    }
+  ],
+  hideScheduler: false,
+  hideDateTimeModeButton: false,
+  _links: {
+    self: {
+      method: GET
+    },
+    update: {
+      method: PUT
+    }
+  }
+}

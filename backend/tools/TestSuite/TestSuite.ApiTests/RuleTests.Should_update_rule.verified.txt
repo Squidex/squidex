@@ -1,0 +1,31 @@
+﻿{
+  id: Guid_1,
+  version: 1,
+  isEnabled: true,
+  name: Guid_2,
+  trigger: {
+    triggerType: ContentChanged,
+    handleAll: true
+  },
+  action: {
+    actionType: Webhook,
+    url: http://squidex.io
+  },
+  _links: {
+    delete: {
+      method: DELETE
+    },
+    disable: {
+      method: PUT
+    },
+    logs: {
+      method: GET
+    },
+    trigger: {
+      method: PUT
+    },
+    update: {
+      method: PUT
+    }
+  }
+}

@@ -63,7 +63,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/backups/")]
-        [ProducesResponseType(typeof(List<BackupJobDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BackupJobDto[]), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppBackupsCreate)]
         [ApiCosts(0)]
         public async Task<IActionResult> PostBackup(string app)
@@ -84,7 +84,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/backups/{id}")]
-        [ProducesResponseType(typeof(List<BackupJobDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BackupJobDto[]), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppBackupsDelete)]
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteBackup(string app, DomainId id)

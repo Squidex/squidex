@@ -1,0 +1,46 @@
+﻿{
+  id: Guid_1,
+  parentId: Guid_Empty,
+  fileName: SampleAudio_0.4mb.mp3,
+  fileHash: 0pbi5CFhQWqqSVy37vaw8bUOg3k1tDrlK1ySXxDrmNE=,
+  isProtected: false,
+  slug: sampleaudio-0.4mb.mp3,
+  mimeType: audio/mp3,
+  fileType: mp3,
+  metadataText: 00:00:28.2708750, 433.5 kB,
+  metadata: {
+    audioBitrate: 128,
+    audioChannels: 2,
+    audioSampleRate: 44100,
+    description: MPEG Version 1 Audio, Layer 3,
+    duration: 00:00:28.2708750
+  },
+  tags: [
+    type/mp3
+  ],
+  fileSize: 443926,
+  type: Audio,
+  _links: {
+    content: {
+      method: GET
+    },
+    content/slug: {
+      method: GET
+    },
+    delete: {
+      method: DELETE
+    },
+    move: {
+      method: PUT
+    },
+    self: {
+      method: GET
+    },
+    update: {
+      method: PUT
+    },
+    upload: {
+      method: PUT
+    }
+  }
+}

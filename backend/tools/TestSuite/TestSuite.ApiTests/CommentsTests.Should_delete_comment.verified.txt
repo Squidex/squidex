@@ -1,0 +1,6 @@
+﻿{
+  deletedComments: [
+    Guid_1
+  ],
+  version: 1
+}

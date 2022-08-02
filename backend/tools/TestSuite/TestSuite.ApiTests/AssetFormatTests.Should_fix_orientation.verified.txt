@@ -1,0 +1,47 @@
+﻿{
+  id: Guid_1,
+  parentId: Guid_Empty,
+  fileName: logo-wide-rotated.jpg,
+  fileHash: TLNAlI4UM3i8O4IF/O7ZuH3PrI3+bsz4AsBt9NrEydI=,
+  isProtected: false,
+  slug: logo-wide-rotated.jpg,
+  mimeType: image/jpg,
+  fileType: jpg,
+  metadataText: 600x135px, 15.1 kB,
+  metadata: {
+    description: JFIF File,
+    imageQuality: 79,
+    pixelHeight: 135,
+    pixelWidth: 600
+  },
+  tags: [
+    type/jpg,
+    image,
+    image/medium
+  ],
+  fileSize: 15425,
+  type: Image,
+  _links: {
+    content: {
+      method: GET
+    },
+    content/slug: {
+      method: GET
+    },
+    delete: {
+      method: DELETE
+    },
+    move: {
+      method: PUT
+    },
+    self: {
+      method: GET
+    },
+    update: {
+      method: PUT
+    },
+    upload: {
+      method: PUT
+    }
+  }
+}

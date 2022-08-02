@@ -1,0 +1,27 @@
+﻿{
+  Data: {
+    Number: {
+      iv: 2
+    },
+    String: {
+      iv: test
+    }
+  },
+  Status: Published,
+  Id: Guid_1,
+  Version: 3,
+  _links: {
+    delete: {
+      Method: DELETE
+    },
+    draft/create: {
+      Method: POST
+    },
+    previous: {
+      Method: GET
+    },
+    self: {
+      Method: GET
+    }
+  }
+}

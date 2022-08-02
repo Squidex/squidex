@@ -1,0 +1,8 @@
+﻿{
+  createdComments: [
+    {
+      id: Guid_1,
+      user: client:root
+    }
+  ]
+}

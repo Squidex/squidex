@@ -1,0 +1,42 @@
+﻿{
+  id: Guid_1,
+  parentId: Guid_Empty,
+  isProtected: false,
+  mimeType: image/gif,
+  fileType: blob,
+  metadataText: 600x400px, 154.2 kB,
+  metadata: {
+    pixelHeight: 400,
+    pixelWidth: 600
+  },
+  tags: [
+    type/blob,
+    image,
+    image/medium
+  ],
+  fileSize: 157934,
+  type: Image,
+  _links: {
+    content: {
+      method: GET
+    },
+    content/slug: {
+      method: GET
+    },
+    delete: {
+      method: DELETE
+    },
+    move: {
+      method: PUT
+    },
+    self: {
+      method: GET
+    },
+    update: {
+      method: PUT
+    },
+    upload: {
+      method: PUT
+    }
+  }
+}

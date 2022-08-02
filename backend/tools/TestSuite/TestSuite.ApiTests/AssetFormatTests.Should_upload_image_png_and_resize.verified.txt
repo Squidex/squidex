@@ -1,0 +1,46 @@
+﻿{
+  id: Guid_1,
+  parentId: Guid_Empty,
+  fileName: SampleImage_400kb.png,
+  fileHash: RpNNfc8ES2rBybyEgqP//18IgQReGtvjzb845gh0Ews=,
+  isProtected: false,
+  slug: sampleimage-400kb.png,
+  mimeType: image/png,
+  fileType: png,
+  metadataText: 600x400px, 428.9 kB,
+  metadata: {
+    description: PNG File,
+    pixelHeight: 400,
+    pixelWidth: 600
+  },
+  tags: [
+    type/png,
+    image,
+    image/medium
+  ],
+  fileSize: 439244,
+  type: Image,
+  _links: {
+    content: {
+      method: GET
+    },
+    content/slug: {
+      method: GET
+    },
+    delete: {
+      method: DELETE
+    },
+    move: {
+      method: PUT
+    },
+    self: {
+      method: GET
+    },
+    update: {
+      method: PUT
+    },
+    upload: {
+      method: PUT
+    }
+  }
+}

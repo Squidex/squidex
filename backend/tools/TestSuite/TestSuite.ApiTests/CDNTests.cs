@@ -7,7 +7,6 @@
 
 using TestSuite.Fixtures;
 using TestSuite.Model;
-using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 

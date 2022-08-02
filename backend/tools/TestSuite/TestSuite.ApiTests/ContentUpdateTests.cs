@@ -9,7 +9,6 @@ using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Model;
-using Xunit;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 #pragma warning disable SA1300 // Element should begin with upper-case letter
@@ -17,6 +16,7 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
+    [UsesVerify]
     public class ContentUpdateTests : IClassFixture<ContentFixture>
     {
         public ContentFixture _ { get; }
@@ -139,6 +139,8 @@ namespace TestSuite.ApiTests
                 var updated = await _.Contents.GetAsync(content.Id);
 
                 Assert.Equal(text, updated.Data.String);
+
+                await Verify(updated);
             }
             finally
             {
@@ -169,6 +171,8 @@ namespace TestSuite.ApiTests
                 var updated = await _.Contents.GetAsync(content.Id, QueryContext.Default.IgnoreFallback());
 
                 Assert.Null(updated.Data.Localized["en"]);
+
+                await Verify(updated);
             }
             finally
             {
@@ -221,6 +225,8 @@ namespace TestSuite.ApiTests
                 {
                     return _.Contents.GetAsync(content.Id);
                 });
+
+                await Verify(content);
             }
             finally
             {
@@ -519,6 +525,8 @@ namespace TestSuite.ApiTests
 
                 // Should not change other value with patch.
                 Assert.Equal("test", updated.Data.String);
+
+                await Verify(updated);
             }
             finally
             {
@@ -545,6 +553,8 @@ namespace TestSuite.ApiTests
                 var updated = await _.Contents.GetAsync(content.Id);
 
                 Assert.Equal("id2", updated.Data.Id);
+
+                await Verify(updated);
             }
             finally
             {
@@ -571,6 +581,8 @@ namespace TestSuite.ApiTests
                 var updated = await _.Contents.GetAsync(content.Id);
 
                 Assert.Null(updated.Data.String);
+
+                await Verify(updated);
             }
             finally
             {
@@ -604,6 +616,8 @@ namespace TestSuite.ApiTests
 
                 // Should not change other value with patch.
                 Assert.Equal("test", updated.Data.String);
+
+                await Verify(updated);
             }
             finally
             {
@@ -671,6 +685,8 @@ namespace TestSuite.ApiTests
 
                 // Should not change other value with patch.
                 Assert.Equal("test", updated.Data.String);
+
+                await Verify(updated);
             }
             finally
             {
@@ -938,6 +954,8 @@ namespace TestSuite.ApiTests
             });
 
             Assert.Equal("singleton", content_2.Data["my-field"]["iv"]);
+
+            await Verify(content_2);
         }
 
         [Fact]
@@ -970,6 +988,8 @@ namespace TestSuite.ApiTests
                 var data_1 = await _.Contents.GetDataAsync(content.Id, content.Version - 1);
 
                 Assert.Equal(1, data_1.Number);
+
+                await Verify(data_1);
             }
             finally
             {

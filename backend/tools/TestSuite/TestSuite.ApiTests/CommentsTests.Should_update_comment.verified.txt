@@ -1,0 +1,9 @@
+﻿{
+  updatedComments: [
+    {
+      id: Guid_1,
+      user: client:root
+    }
+  ],
+  version: 1
+}

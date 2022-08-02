@@ -9,7 +9,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using TestSuite.Model;
-using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 
@@ -251,23 +250,11 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_return_items_by_full_text_with_odata()
         {
-            var q = new ContentQuery { Search = "1" };
+            var q = new ContentQuery { Search = "2" };
 
-            // Query multiple times to wait for async text indexer.
-            for (var i = 0; i < 10; i++)
-            {
-                await Task.Delay(500);
+            var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
 
-                var items = await _.Contents.GetAsync(q);
-
-                if (items.Items.Any())
-                {
-                    AssertItems(items, 1, new[] { 1 });
-                    return;
-                }
-            }
-
-            Assert.False(true);
+            AssertItems(items, 1, new[] { 2 });
         }
 
         [Fact]
@@ -281,21 +268,9 @@ namespace TestSuite.ApiTests
                 }
             };
 
-            // Query multiple times to wait for async text indexer.
-            for (var i = 0; i < 10; i++)
-            {
-                await Task.Delay(500);
+            var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
 
-                var items = await _.Contents.GetAsync(q);
-
-                if (items.Items.Any())
-                {
-                    AssertItems(items, 1, new[] { 2 });
-                    return;
-                }
-            }
-
-            Assert.False(true);
+            AssertItems(items, 1, new[] { 2 });
         }
 
         [Fact]
@@ -303,21 +278,9 @@ namespace TestSuite.ApiTests
         {
             var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(3 3)') lt 1000" };
 
-            // Query multiple times to wait for async text indexer.
-            for (var i = 0; i < 20; i++)
-            {
-                await Task.Delay(500);
+            var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
 
-                var items = await _.Contents.GetAsync(q);
-
-                if (items.Items.Any())
-                {
-                    AssertItems(items, 1, new[] { 3 });
-                    return;
-                }
-            }
-
-            Assert.False(true);
+            AssertItems(items, 1, new[] { 3 });
         }
 
         [Fact]
@@ -341,21 +304,9 @@ namespace TestSuite.ApiTests
                 }
             };
 
-            // Query multiple times to wait for async text indexer.
-            for (var i = 0; i < 20; i++)
-            {
-                await Task.Delay(500);
+            var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
 
-                var items = await _.Contents.GetAsync(q);
-
-                if (items.Items.Any())
-                {
-                    AssertItems(items, 1, new[] { 3 });
-                    return;
-                }
-            }
-
-            Assert.False(true);
+            AssertItems(items, 1, new[] { 3 });
         }
 
         [Fact]
@@ -363,21 +314,9 @@ namespace TestSuite.ApiTests
         {
             var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(4 4)') lt 1000" };
 
-            // Query multiple times to wait for async text indexer.
-            for (var i = 0; i < 10; i++)
-            {
-                await Task.Delay(500);
+            var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
 
-                var items = await _.Contents.GetAsync(q);
-
-                if (items.Items.Any())
-                {
-                    AssertItems(items, 1, new[] { 4 });
-                    return;
-                }
-            }
-
-            Assert.False(true);
+            AssertItems(items, 1, new[] { 4 });
         }
 
         [Fact]
@@ -401,21 +340,9 @@ namespace TestSuite.ApiTests
                 }
             };
 
-            // Query multiple times to wait for async text indexer.
-            for (var i = 0; i < 10; i++)
-            {
-                await Task.Delay(500);
+            var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
 
-                var items = await _.Contents.GetAsync(q);
-
-                if (items.Items.Any())
-                {
-                    AssertItems(items, 1, new[] { 4 });
-                    return;
-                }
-            }
-
-            Assert.False(true);
+            AssertItems(items, 1, new[] { 4 });
         }
 
         [Fact]

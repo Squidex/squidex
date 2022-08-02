@@ -1,0 +1,38 @@
+﻿{
+  id: Guid_1,
+  parentId: Guid_Empty,
+  fileName: SampleVideo_176x144_1mb.3gp,
+  fileHash: 5zD+lLsuo4GmL9csQoc25ihbmRzkRUAym+PNe1Z73Y0=,
+  isProtected: false,
+  slug: samplevideo-176x144-1mb.3gp,
+  mimeType: audio/3gpp,
+  fileType: 3gp,
+  metadataText: 1014.4 kB,
+  tags: [
+    type/3gp
+  ],
+  fileSize: 1038741,
+  _links: {
+    content: {
+      method: GET
+    },
+    content/slug: {
+      method: GET
+    },
+    delete: {
+      method: DELETE
+    },
+    move: {
+      method: PUT
+    },
+    self: {
+      method: GET
+    },
+    update: {
+      method: PUT
+    },
+    upload: {
+      method: PUT
+    }
+  }
+}
