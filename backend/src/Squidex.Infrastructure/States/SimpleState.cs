@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using NodaTime;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
@@ -13,6 +14,7 @@ namespace Squidex.Infrastructure.States
     {
         private readonly IPersistence<T> persistence;
         private bool isLoaded;
+        private Instant lastWrite;
 
         public T Value { get; set; } = new T();
 
@@ -20,6 +22,8 @@ namespace Squidex.Infrastructure.States
         {
             get => persistence.Version;
         }
+
+        public IClock Clock { get; set; } = SystemClock.Instance;
 
         public SimpleState(IPersistenceFactory<T> persistenceFactory, Type ownerType, string id)
             : this(persistenceFactory, ownerType, DomainId.Create(id))
@@ -52,16 +56,35 @@ namespace Squidex.Infrastructure.States
             return persistence.DeleteAsync(ct);
         }
 
-        public Task WriteAsync(
+        public async Task WriteAsync(int ifNotWrittenWithinMs,
             CancellationToken ct = default)
         {
-            return persistence.WriteSnapshotAsync(Value, ct);
+            var now = Clock.GetCurrentInstant();
+
+            if (ifNotWrittenWithinMs > 0 && now.Minus(lastWrite).TotalMilliseconds < ifNotWrittenWithinMs)
+            {
+                return;
+            }
+
+            await persistence.WriteSnapshotAsync(Value, ct);
+
+            lastWrite = now;
         }
 
-        public Task WriteEventAsync(Envelope<IEvent> envelope,
+        public async Task WriteAsync(
             CancellationToken ct = default)
         {
-            return persistence.WriteEventAsync(envelope, ct);
+            await persistence.WriteSnapshotAsync(Value, ct);
+
+            lastWrite = Clock.GetCurrentInstant();
+        }
+
+        public async Task WriteEventAsync(Envelope<IEvent> envelope,
+            CancellationToken ct = default)
+        {
+            await persistence.WriteEventAsync(envelope, ct);
+
+            lastWrite = Clock.GetCurrentInstant();
         }
 
         public Task UpdateAsync(Func<T, bool> updater, int retries = 20,
@@ -73,6 +96,9 @@ namespace Squidex.Infrastructure.States
         public async Task<TResult> UpdateAsync<TResult>(Func<T, (bool, TResult)> updater, int retries = 20,
             CancellationToken ct = default)
         {
+            Guard.GreaterEquals(retries, 1);
+            Guard.LessThan(retries, 100);
+
             if (!isLoaded)
             {
                 await LoadAsync(ct);

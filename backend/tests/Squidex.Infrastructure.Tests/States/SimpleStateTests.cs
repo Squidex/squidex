@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using FakeItEasy;
+using NodaTime;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -203,6 +204,30 @@ namespace Squidex.Infrastructure.States
 
             A.CallTo(() => testState.Persistence.ReadAsync(A<long>._, ct))
                 .MustHaveHappenedANumberOfTimesMatching(x => x == 1);
+        }
+
+        [Fact]
+        public async Task Should_not_written_if_period_not_over()
+        {
+            var now = SystemClock.Instance.GetCurrentInstant();
+
+            var clock = A.Fake<IClock>();
+
+            A.CallTo(() => clock.GetCurrentInstant())
+                .Returns(now).NumberOfTimes(5).Then
+                .Returns(now.Plus(Duration.FromSeconds(2)));
+
+            sut.Clock = clock;
+
+            for (var i = 0; i < 10; i++)
+            {
+                await sut.WriteAsync(1000, ct);
+            }
+
+            await sut.UpdateAsync(x => true, ct: ct);
+
+            A.CallTo(() => testState.Persistence.WriteSnapshotAsync(sut.Value, ct))
+                .MustHaveHappenedANumberOfTimesMatching(x => x == 3);
         }
     }
 }

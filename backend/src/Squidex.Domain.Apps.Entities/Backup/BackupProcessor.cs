@@ -21,9 +21,8 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class BackupProcessor
+    public sealed partial class BackupProcessor
     {
-        private static readonly Duration UpdateDuration = Duration.FromSeconds(1);
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IBackupArchiveStore backupArchiveStore;
         private readonly IBackupHandlerFactory backupHandlerFactory;
@@ -35,44 +34,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly ReentrantScheduler scheduler = new ReentrantScheduler(1);
         private readonly DomainId appId;
         private Run? currentRun;
-
-        // Use a run to store all state that is necessary for a single run.
-        private sealed class Run : IDisposable
-        {
-            private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
-            private readonly CancellationTokenSource cancellationLinked;
-
-            public IEnumerable<IBackupHandler> Handlers { get; init; }
-
-            public RefToken Actor { get; init; }
-
-            public BackupJob Job { get; init; }
-
-            public CancellationToken CancellationToken => cancellationLinked.Token;
-
-            public Run(CancellationToken ct)
-            {
-                cancellationLinked = CancellationTokenSource.CreateLinkedTokenSource(ct, cancellationSource.Token);
-            }
-
-            public void Dispose()
-            {
-                cancellationSource.Dispose();
-                cancellationLinked.Dispose();
-            }
-
-            public void Cancel()
-            {
-                try
-                {
-                    cancellationSource.Cancel();
-                }
-                catch (ObjectDisposedException)
-                {
-                    // Cancellation token might have been disposed, if the run is completed.
-                }
-            }
-        }
 
         public IClock Clock { get; set; } = SystemClock.Instance;
 
@@ -195,10 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                             writer.WriteEvent(storedEvent, ct);
 
-                            run.Job.HandledEvents = writer.WrittenEvents;
-                            run.Job.HandledAssets = writer.WrittenAttachments;
-
-                            lastTimestamp = await WritePeriodically(lastTimestamp);
+                            await LogAsync(run, writer.WrittenEvents, writer.WrittenAttachments);
                         }
 
                         foreach (var handler in run.Handlers)
@@ -224,8 +182,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     await backupArchiveStore.UploadAsync(run.Job.Id, stream, ct);
                 }
-
-                run.Job.Status = JobStatus.Completed;
+                await SetStatusAsync(run, JobStatus.Completed);
             }
             catch (OperationCanceledException)
             {
@@ -233,35 +190,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
             catch (Exception ex)
             {
+                await SetStatusAsync(run, JobStatus.Failed);
+
                 log.LogError(ex, "Faield to make backup with backup id '{backupId}'.", run.Job.Id);
-
-                run.Job.Status = JobStatus.Failed;
-            }
-            finally
-            {
-                run.Job.Stopped = Clock.GetCurrentInstant();
-
-                await state.WriteAsync(default);
             }
         }
 
         private string GetFilter()
         {
             return $"^[^\\-]*-{Regex.Escape(appId.ToString())}";
-        }
-
-        private async Task<Instant> WritePeriodically(Instant lastTimestamp)
-        {
-            var now = Clock.GetCurrentInstant();
-
-            if ((now - lastTimestamp) >= UpdateDuration)
-            {
-                lastTimestamp = now;
-
-                await state.WriteAsync();
-            }
-
-            return lastTimestamp;
         }
 
         public Task DeleteAsync(DomainId id)
@@ -300,6 +237,32 @@ namespace Squidex.Domain.Apps.Entities.Backup
             state.Value.Jobs.Remove(job);
 
             await state.WriteAsync();
+        }
+
+        private Task SetStatusAsync(Run run, JobStatus status)
+        {
+            var now = Clock.GetCurrentInstant();
+
+            run.Job.Status = status;
+
+            if (status == JobStatus.Failed || status == JobStatus.Completed)
+            {
+                run.Job.Stopped = now;
+            }
+            else if (status == JobStatus.Started)
+            {
+                run.Job.Started = now;
+            }
+
+            return state.WriteAsync(ct: default);
+        }
+
+        private Task LogAsync(Run run, int numEvents, int numAttachments)
+        {
+            run.Job.HandledEvents = numEvents;
+            run.Job.HandledAssets = numAttachments;
+
+            return state.WriteAsync(100, run.CancellationToken);
         }
     }
 }

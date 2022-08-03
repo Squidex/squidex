@@ -32,15 +32,31 @@ namespace Squidex.Infrastructure.Json.System
 
         public override T? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var text = reader.GetString();
-            try
+            switch (reader.TokenType)
             {
-                return convertFromString(text!);
-            }
-            catch (Exception ex)
-            {
-                ThrowHelper.JsonException("Error while converting from string.", ex);
-                return default;
+                case JsonTokenType.String:
+                    var text = reader.GetString();
+                    try
+                    {
+                        return convertFromString(text!);
+                    }
+                    catch (Exception ex)
+                    {
+                        ThrowHelper.JsonException("Error while converting from string.", ex);
+                        return default;
+                    }
+
+                case JsonTokenType.StartObject:
+                    var optionsWithoutSelf = new JsonSerializerOptions(options);
+
+                    // Remove the current converter, otherwise we would create a stackoverflow exception.
+                    optionsWithoutSelf.Converters.Remove(this);
+
+                    return JsonSerializer.Deserialize<T>(ref reader, optionsWithoutSelf);
+
+                default:
+                    ThrowHelper.JsonException($"Expected string or object, got {reader.TokenType}.");
+                    return default;
             }
         }
 

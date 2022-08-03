@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -43,19 +43,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                         throw new DomainObjectNotFoundException(command.ContributorId);
                     }
 
-                    if (!command.Restoring)
+                    if (!command.IgnoreActor && string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase))
                     {
-                        if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase))
-                        {
-                            throw new DomainForbiddenException(T.Get("apps.contributors.cannotChangeYourself"));
-                        }
+                        throw new DomainForbiddenException(T.Get("apps.contributors.cannotChangeYourself"));
+                    }
 
-                        if (!contributors.TryGetValue(command.ContributorId, out _))
+                    if (!command.IgnorePlans && !contributors.TryGetValue(command.ContributorId, out _))
+                    {
+                        if (plan.MaxContributors > 0 && contributors.Count >= plan.MaxContributors)
                         {
-                            if (plan.MaxContributors > 0 && contributors.Count >= plan.MaxContributors)
-                            {
-                                e(T.Get("apps.contributors.maxReached"));
-                            }
+                            e(T.Get("apps.contributors.maxReached"));
                         }
                     }
                 }

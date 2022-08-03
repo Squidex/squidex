@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text.Json.Serialization;
+using Squidex.Infrastructure.Json.System;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -12,6 +14,12 @@ namespace Squidex.Infrastructure
 {
     public class NamedIdTests
     {
+        internal sealed record Wrapper
+        {
+            [JsonConverter(typeof(StringConverter<NamedId<long>>))]
+            public NamedId<long> Value { get; set; }
+        }
+
         [Fact]
         public void Should_instantiate_token()
         {
@@ -111,6 +119,34 @@ namespace Squidex.Infrastructure
             var serialized = value.SerializeAndDeserialize();
 
             Assert.Equal(value, serialized);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_old_object()
+        {
+            var value = new { id = 42L, name = "my-name" };
+
+            var serialized = value.SerializeAndDeserialize<NamedId<long>>();
+
+            Assert.Equal(NamedId.Of(42L, "my-name"), serialized);
+        }
+
+        [Fact]
+        public void Should_deserialize_from_old_object_with_explicit_converter()
+        {
+            var value = new
+            {
+                value = new { id = 42, name = "my-name" }
+            };
+
+            var expected = new Wrapper
+            {
+                Value = NamedId.Of(42L, "my-name")
+            };
+
+            var serialized = value.SerializeAndDeserialize<Wrapper>();
+
+            Assert.Equal(expected, serialized);
         }
 
         [Fact]

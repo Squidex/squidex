@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -15,7 +15,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 
         public string Role { get; set; } = Roles.Editor;
 
-        public bool Restoring { get; set; }
+        public bool IgnoreActor { get; set; }
+
+        public bool IgnorePlans { get; set; }
 
         public bool Invite { get; set; }
     }

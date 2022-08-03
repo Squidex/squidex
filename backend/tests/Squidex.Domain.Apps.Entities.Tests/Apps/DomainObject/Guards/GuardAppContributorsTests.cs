@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         [Fact]
         public async Task CanAssign_should_not_throw_exception_if_user_already_exists_with_some_role_but_is_from_restore()
         {
-            var command = new AssignContributor { ContributorId = "1", Role = Role.Owner, Restoring = true };
+            var command = new AssignContributor { ContributorId = "1", Role = Role.Owner, IgnoreActor = true };
 
             var contributors_1 = contributors_0.Assign("1", Role.Owner);
 
@@ -127,6 +127,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         }
 
         [Fact]
+        public async Task CanAssign_should_not_throw_exception_if_contributor_max_reached_but_ignored()
+        {
+            A.CallTo(() => appPlan.MaxContributors)
+                .Returns(2);
+
+            var command = new AssignContributor { ContributorId = "3", IgnorePlans = true };
+
+            var contributors_1 = contributors_0.Assign("1", Role.Owner);
+            var contributors_2 = contributors_1.Assign("2", Role.Editor);
+
+            await GuardAppContributors.CanAssign(command, App(contributors_2), users, appPlan);
+        }
+
+        [Fact]
         public async Task CanAssign_should_not_throw_exception_if_user_found()
         {
             A.CallTo(() => appPlan.MaxContributors)
@@ -162,12 +176,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         }
 
         [Fact]
-        public async Task CanAssign_should_not_throw_exception_if_contributor_max_reached_but_from_restore()
+        public async Task CanAssign_should_not_throw_exception_if_contributor_max_reached_but_ígnored()
         {
             A.CallTo(() => appPlan.MaxContributors)
                 .Returns(2);
 
-            var command = new AssignContributor { ContributorId = "3", Restoring = true };
+            var command = new AssignContributor { ContributorId = "3", IgnorePlans = true };
 
             var contributors_1 = contributors_0.Assign("1", Role.Editor);
             var contributors_2 = contributors_1.Assign("2", Role.Editor);

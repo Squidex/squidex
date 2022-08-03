@@ -23,7 +23,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class RestoreProcessor
+    public sealed partial class RestoreProcessor
     {
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IBackupHandlerFactory backupHandlerFactory;
@@ -36,65 +36,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly ReentrantScheduler scheduler = new ReentrantScheduler(1);
         private readonly SimpleState<BackupRestoreState> state;
         private Run? currentRun;
-
-        // Use a run to store all state that is necessary for a single run.
-        private sealed class Run : IDisposable
-        {
-            private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
-            private readonly CancellationTokenSource cancellationLinked;
-            private readonly IClock clock;
-
-            public IEnumerable<IBackupHandler> Handlers { get; init; }
-
-            public IBackupReader Reader { get; set; }
-
-            public RestoreJob Job { get; init; }
-
-            public RestoreContext Context { get; set; }
-
-            public StreamMapper StreamMapper { get; set; }
-
-            public CancellationToken CancellationToken => cancellationLinked.Token;
-
-            public Run(IClock clock, CancellationToken ct)
-            {
-                cancellationLinked = CancellationTokenSource.CreateLinkedTokenSource(ct, cancellationSource.Token);
-
-                this.clock = clock;
-            }
-
-            public void Log(string message, bool replace = false)
-            {
-                if (replace && Job.Log.Count > 0)
-                {
-                    Job.Log[^1] = $"{clock.GetCurrentInstant()}: {message}";
-                }
-                else
-                {
-                    Job.Log.Add($"{clock.GetCurrentInstant()}: {message}");
-                }
-            }
-
-            public void Dispose()
-            {
-                Reader?.Dispose();
-
-                cancellationSource.Dispose();
-                cancellationLinked.Dispose();
-            }
-
-            public void Cancel()
-            {
-                try
-                {
-                    cancellationSource.Cancel();
-                }
-                catch (ObjectDisposedException)
-                {
-                    // Cancellation token might have been disposed, if the run is completed.
-                }
-            }
-        }
 
         public IClock Clock { get; set; } = SystemClock.Instance;
 
@@ -155,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 state.Value.Job?.EnsureCanStart();
 
                 // Set the current run first to indicate that we are running a rule at the moment.
-                var run = currentRun = new Run(Clock, ct)
+                var run = currentRun = new Run(ct)
                 {
                     Job = new RestoreJob
                     {
@@ -192,11 +133,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 try
                 {
-                    run.Log("Started. The restore process has the following steps:");
-                    run.Log("  * Download backup");
-                    run.Log("  * Restore events and attachments.");
-                    run.Log("  * Restore all objects like app, schemas and contents");
-                    run.Log("  * Complete the restore operation for all objects");
+                    await LogAsync(run, "Started. The restore process has the following steps:");
+                    await LogAsync(run, "  * Download backup");
+                    await LogAsync(run, "  * Restore events and attachments.");
+                    await LogAsync(run, "  * Restore all objects like app, schemas and contents");
+                    await LogAsync(run, "  * Complete the restore operation for all objects");
 
                     log.LogInformation("Backup with job id {backupId} with from URL '{url}' started.", run.Job.Id, run.Job.Url);
 
@@ -216,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                             await handler.RestoreAsync(run.Context, ct);
                         }
 
-                        run.Log($"Restored {handler.Name}");
+                        await LogAsync(run, $"Restored {handler.Name}");
                     }
 
                     foreach (var handler in run.Handlers)
@@ -226,42 +167,34 @@ namespace Squidex.Domain.Apps.Entities.Backup
                             await handler.CompleteRestoreAsync(run.Context, run.Job.NewAppName!);
                         }
 
-                        run.Log($"Completed {handler.Name}");
+                        await LogAsync(run, $"Completed {handler.Name}");
                     }
 
                     await AssignContributorAsync(run);
 
-                    run.Job.Status = JobStatus.Completed;
-                    run.Log("Completed, Yeah!");
+                    await SetStatusAsync(run, JobStatus.Completed, "Completed, Yeah!");
 
                     log.LogInformation("Backup with job id {backupId} from URL '{url}' completed.", run.Job.Id, run.Job.Url);
                 }
                 catch (Exception ex)
                 {
+                    var message = "Failed with internal error.";
+
                     switch (ex)
                     {
                         case BackupRestoreException backupException:
-                            run.Log(backupException.Message);
+                            message = backupException.Message;
                             break;
                         case FileNotFoundException fileNotFoundException:
-                            run.Log(fileNotFoundException.Message);
-                            break;
-                        default:
-                            run.Log("Failed with internal error");
+                            message = fileNotFoundException.Message;
                             break;
                     }
 
                     await CleanupAsync(run);
 
-                    run.Job.Status = JobStatus.Failed;
+                    await SetStatusAsync(run, JobStatus.Failed, message);
 
                     log.LogError(ex, "Backup with job id {backupId} from URL '{url}' failed.", run.Job.Id, run.Job.Url);
-                }
-                finally
-                {
-                    run.Job.Stopped = Clock.GetCurrentInstant();
-
-                    await state.WriteAsync(ct);
                 }
             }
         }
@@ -270,30 +203,39 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             if (run.Job.Actor?.IsUser != true)
             {
-                run.Log("Current user not assigned because restore was triggered by client.");
+                await LogAsync(run, "Current user not assigned because restore was triggered by client.");
                 return;
             }
 
             try
             {
                 // Add the current user to the app, so that the admin can see it and verify integrity.
-                var command = new AssignContributor
+                await PublishAsync(run, new AssignContributor
                 {
-                    Actor = run.Job.Actor,
-                    AppId = run.Job.AppId,
                     ContributorId = run.Job.Actor.Identifier,
-                    Restoring = true,
+                    IgnoreActor = true,
+                    IgnorePlans = true,
                     Role = Role.Owner
-                };
+                });
 
-                await commandBus.PublishAsync(command, default);
-
-                run.Log("Assigned current user.");
+                await LogAsync(run, "Assigned current user.");
             }
             catch (DomainException ex)
             {
-                run.Log($"Failed to assign contributor: {ex.Message}");
+                await LogAsync(run, $"Failed to assign contributor: {ex.Message}");
             }
+        }
+
+        private Task PublishAsync(Run run, AppCommand command)
+        {
+            command.Actor = run.Job.Actor;
+
+            if (command is IAppCommand appCommand)
+            {
+                appCommand.AppId = run.Job.AppId;
+            }
+
+            return commandBus.PublishAsync(command, default);
         }
 
         private async Task CleanupAsync(Run run)
@@ -321,11 +263,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             using (Telemetry.Activities.StartActivity("Download"))
             {
-                run.Log("Downloading Backup");
+                await LogAsync(run, "Downloading Backup");
 
                 var reader = await backupArchiveLocation.OpenReaderAsync(run.Job.Url, run.Job.Id, ct);
 
-                run.Log("Downloaded Backup");
+                await LogAsync(run, "Downloaded Backup");
 
                 return reader;
             }
@@ -355,7 +297,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     handled += commits.Count;
 
-                    run.Log($"Reading {run.Reader.ReadEvents}/{handled} events and {run.Reader.ReadAttachments} attachments completed.", true);
+                    await LogAsync(run, $"Reading {run.Reader.ReadEvents}/{handled} events and {run.Reader.ReadAttachments} attachments completed.", true);
                 }
                 catch (OperationCanceledException ex)
                 {
@@ -453,14 +395,50 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             using (Telemetry.Activities.StartActivity("CreateUsers"))
             {
-                run.Log("Creating Users");
+                await LogAsync(run, "Creating Users");
 
                 await userMapping.RestoreAsync(run.Reader, userResolver, ct);
 
-                run.Log("Created Users");
+                await LogAsync(run, "Created Users");
             }
 
             run.Context = new RestoreContext(run.Job.AppId.Id, userMapping, run.Reader, previousAppId);
+        }
+
+        private Task SetStatusAsync(Run run, JobStatus status, string message)
+        {
+            var now = Clock.GetCurrentInstant();
+
+            run.Job.Status = status;
+
+            if (status == JobStatus.Failed || status == JobStatus.Completed)
+            {
+                run.Job.Stopped = now;
+            }
+            else if (status == JobStatus.Started)
+            {
+                run.Job.Started = now;
+            }
+
+            run.Job.Log.Add($"{now}: {message}");
+
+            return state.WriteAsync(ct: default);
+        }
+
+        private Task LogAsync(Run run, string message, bool replace = false)
+        {
+            var now = Clock.GetCurrentInstant();
+
+            if (replace && run.Job.Log.Count > 0)
+            {
+                run.Job.Log[^1] = $"{now}: {message}";
+            }
+            else
+            {
+                run.Job.Log.Add($"{now}: {message}");
+            }
+
+            return state.WriteAsync(100, run.CancellationToken);
         }
     }
 }
