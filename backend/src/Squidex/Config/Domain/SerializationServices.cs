@@ -64,6 +64,7 @@ namespace Squidex.Config.Domain
             options.Converters.Add(new StringConverter<DomainId>());
             options.Converters.Add(new StringConverter<NamedId<DomainId>>());
             options.Converters.Add(new StringConverter<NamedId<Guid>>());
+            options.Converters.Add(new StringConverter<NamedId<long>>());
             options.Converters.Add(new StringConverter<NamedId<string>>());
             options.Converters.Add(new StringConverter<Language>());
             options.Converters.Add(new StringConverter<PropertyPath>(x => x));
