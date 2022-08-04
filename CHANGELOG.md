@@ -3,7 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [7.0.0] - 2020-08-02
+## [7.0.1] - 2022-08-04
+
+### Fixed
+
+* **JSON**: Correct usage of a JSON serializer for field IDs with fallback support.
+* **Restore**: Provide log output during restore operation.
+
+## [7.0.0] - 2022-08-02
 
 This version contains major changes, that are also described in the [Blog](https://squidex.io/post/squidex-7.0-release-candidate-3-released).
 
@@ -17,13 +24,13 @@ This version contains major changes, that are also described in the [Blog](https
 
 * **Assets**: Moved the update of tag counts to a event consumers to improve consistency.
 
-## [6.13.0] - 2020-08-02
+## [6.13.0] - 2022-08-02
 
 ### Fixed
 
 * **UI**: Fixes the rendering of reference lists.
 
-## [6.12.0] - 2020-08-01
+## [6.12.0] - 2022-08-01
 
 ### Changed
 
