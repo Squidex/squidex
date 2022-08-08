@@ -128,7 +128,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private async Task ProcessAsync(Run run,
             CancellationToken ct)
         {
-            var lastTimestamp = run.Job.Started;
             try
             {
                 await using (var stream = backupArchiveLocation.OpenStream(run.Job.Id))
@@ -182,6 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     await backupArchiveStore.UploadAsync(run.Job.Id, stream, ct);
                 }
+
                 await SetStatusAsync(run, JobStatus.Completed);
             }
             catch (OperationCanceledException)

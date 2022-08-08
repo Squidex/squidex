@@ -37,27 +37,31 @@ namespace Squidex.Extensions.APM.Stackdriver
         {
             var isEnabled = config.GetValue<bool>("logging:stackdriver:enabled");
 
-            if (isEnabled)
+            if (!isEnabled)
             {
-                var projectId = config.GetValue<string>("logging:stackdriver:projectId");
-
-                if (!string.IsNullOrWhiteSpace(projectId))
-                {
-                    services.AddSingleton<ITelemetryConfigurator>(
-                        new Configurator(projectId));
-
-                    services.AddSingleton<ILogAppender,
-                        StackdriverSeverityLogAppender>();
-
-                    services.AddSingleton<ILogAppender,
-                        StackdriverExceptionHandler>();
-
-                    var serviceName = config.GetValue<string>("logging:name") ?? "Squidex";
-                    var serviceVersion = Assembly.GetEntryAssembly()?.GetName().Version?.ToString();
-
-                    services.AddSingleton(c => ContextExceptionLogger.Create(projectId, serviceVersion, serviceVersion, null));
-                }
+                return;
             }
+
+            var projectId = config.GetValue<string>("logging:stackdriver:projectId");
+
+            if (string.IsNullOrWhiteSpace(projectId))
+            {
+                return;
+            }
+
+            services.AddSingleton<ITelemetryConfigurator>(
+                new Configurator(projectId));
+
+            services.AddSingleton<ILogAppender,
+                StackdriverSeverityLogAppender>();
+
+            services.AddSingleton<ILogAppender,
+                StackdriverExceptionHandler>();
+
+            var serviceName = config.GetValue<string>("logging:name") ?? "Squidex";
+            var serviceVersion = Assembly.GetEntryAssembly()?.GetName().Version?.ToString();
+
+            services.AddSingleton(c => ContextExceptionLogger.Create(projectId, serviceVersion, serviceVersion, null));
         }
     }
 }
