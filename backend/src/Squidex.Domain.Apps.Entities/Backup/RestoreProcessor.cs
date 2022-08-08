@@ -150,6 +150,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         await ReadEventsAsync(run, ct);
                     }
 
+                    if (run.Context == null)
+                    {
+                        throw new BackupRestoreException("Backup has no event.");
+                    }
+
                     foreach (var handler in run.Handlers)
                     {
                         using (Telemetry.Activities.StartActivity($"{handler.GetType().Name}/RestoreAsync"))
@@ -170,6 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         await LogAsync(run, $"Completed {handler.Name}");
                     }
 
+                    // Add the current user to the app, so that the admin can see it and verify integrity.
                     await AssignContributorAsync(run);
 
                     await SetStatusAsync(run, JobStatus.Completed, "Completed, Yeah!");
@@ -178,6 +184,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 }
                 catch (Exception ex)
                 {
+                    // Cleanup as soon as possible.
+                    await CleanupAsync(run);
+
                     var message = "Failed with internal error.";
 
                     switch (ex)
@@ -189,8 +198,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
                             message = fileNotFoundException.Message;
                             break;
                     }
-
-                    await CleanupAsync(run);
 
                     await SetStatusAsync(run, JobStatus.Failed, message);
 
