@@ -39,24 +39,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_not_compute_ui_tokens_for_frontend()
-        {
-            var source = CreateContent();
-
-            await sut.EnrichAsync(new Context(Mocks.FrontendUser(), Mocks.App(appId)), new[] { source }, schemaProvider, default);
-
-            Assert.Null(source.EditToken);
-
-            A.CallTo(() => urlGenerator.Root())
-                .MustNotHaveHappened();
-        }
-
-        [Fact]
         public async Task Should_compute_ui_tokens()
         {
             var source = CreateContent();
 
             await sut.EnrichAsync(requestContext, new[] { source }, schemaProvider, default);
+
+            Assert.NotNull(source.EditToken);
+
+            A.CallTo(() => urlGenerator.Root())
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_also_compute_ui_tokens_for_frontend()
+        {
+            var source = CreateContent();
+
+            await sut.EnrichAsync(new Context(Mocks.FrontendUser(), Mocks.App(appId)), new[] { source }, schemaProvider, default);
 
             Assert.NotNull(source.EditToken);
 

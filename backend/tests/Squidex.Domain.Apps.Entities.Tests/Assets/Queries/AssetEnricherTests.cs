@@ -173,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         }
 
         [Fact]
-        public async Task Should_not_compute_ui_tokens_for_frontend()
+        public async Task Should_also_compute_ui_tokens_for_frontend()
         {
             var source = new AssetEntity
             {
@@ -182,10 +182,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             var result = await sut.EnrichAsync(new[] { source }, new Context(Mocks.FrontendUser(), Mocks.App(appId)), ct);
 
-            Assert.Null(result[0].EditToken);
+            Assert.NotNull(result[0].EditToken);
 
             A.CallTo(() => urlGenerator.Root())
-                .MustNotHaveHappened();
+                .MustHaveHappened();
         }
 
         [Fact]

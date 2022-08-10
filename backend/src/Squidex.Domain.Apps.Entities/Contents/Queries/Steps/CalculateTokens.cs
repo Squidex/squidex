@@ -25,15 +25,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         public Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
             CancellationToken ct)
         {
-            if (context.IsFrontendClient)
-            {
-                return Task.CompletedTask;
-            }
-
             var url = urlGenerator.Root();
 
             foreach (var content in contents)
             {
+                // We have to use these short names here because they are later read like this.
                 var token = new
                 {
                     a = content.AppId.Name,

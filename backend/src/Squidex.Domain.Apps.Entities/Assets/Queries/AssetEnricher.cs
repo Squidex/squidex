@@ -64,23 +64,20 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                     await EnrichTagsAsync(results, ct);
 
                     EnrichWithMetadataText(results);
-
-                    if (!context.IsFrontendClient)
-                    {
-                        ComputeTokens(results);
-                    }
+                    EnrichWithEditTokens(results);
                 }
 
                 return results;
             }
         }
 
-        private void ComputeTokens(IEnumerable<IEnrichedAssetEntity> assets)
+        private void EnrichWithEditTokens(IEnumerable<IEnrichedAssetEntity> assets)
         {
             var url = urlGenerator.Root();
 
             foreach (var asset in assets)
             {
+                // We have to use these short names here because they are later read like this.
                 var token = new
                 {
                     a = asset.AppId.Name,
