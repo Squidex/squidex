@@ -1,12 +1,12 @@
 apiVersion: v2
 type: application
 
-name: squidex
+name: squidex7
 icon: https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-squared.png
-description: Squidex CMS
+description: Squidex CMS v7.0 and newer
 
-version: 1.4.0
-appVersion: "6.13.0"
+version: 1.0.0
+appVersion: "7.0.2"
 
 home: https://squidex.io/
 

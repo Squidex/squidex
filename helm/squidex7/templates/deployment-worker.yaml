@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "squidex.fullname" . }}-worker
+  labels:
+    {{- include "squidex.labels" . | indent 4 }}
+    app.kubernetes.io/role: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "squidex.selectors" . | indent 6 }}
+      app.kubernetes.io/role: worker
+  template:
+    metadata:
+      labels:
+        {{- include "squidex.selectors" . | indent 8 }}
+        app.kubernetes.io/role: worker
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 300
+          readinessProbe:
+            httpGet:
+              path: /readiness
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+          {{- range $key, $val := .Values.env }}
+            {{- if (eq $key "URLS__BASEURL") }}
+            - name: {{ $key | quote }}
+              value: {{ required (printf "The value .Values.env.%s is required" $key) $val | quote }}
+            {{- else }}
+            - name: {{ $key | quote }}
+              value: {{ $val | quote }}
+            {{- end }}
+          {{- end }}
+
+            - name: CLUSTERING__WORKER
+              value: "true"
+          
+          {{- $mongoDefaultConnectionString := printf "mongodb://%s" (include "squidex.mongoDefaultHostname" .) }}
+          {{- if (not .Values.env.EVENTSTORE__MONGODB__CONFIGURATION) }}
+            - name: "EVENTSTORE__MONGODB__CONFIGURATION"
+              value: {{ $mongoDefaultConnectionString | quote }}
+          {{- end }}
+
+          {{- if (not .Values.env.STORE__MONGODB__CONFIGURATION) }}
+            - name: "STORE__MONGODB__CONFIGURATION"
+              value: {{ $mongoDefaultConnectionString | quote }}
+          {{- end }}
+
+          {{- if (not .Values.env.ASSETSTORE__MONGODB__CONFIGURATION) }}
+            - name: "ASSETSTORE__MONGODB__CONFIGURATION"
+              value: {{ $mongoDefaultConnectionString | quote }}
+          {{- end }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- if (.Values.deployment.serviceAccountName) }}
+      serviceAccountName: {{ .Values.deployment.serviceAccountName}}
+      {{- end }}
