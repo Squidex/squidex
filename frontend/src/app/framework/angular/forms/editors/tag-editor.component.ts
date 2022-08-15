@@ -244,12 +244,16 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     public resetSize() {
+        if (!this.inputElement?.nativeElement) {
+            return;
+        }
+
         const textValue = this.inputElement.nativeElement.value;
 
-        const widthText = this.textMeasurer.getTextSize(textValue);
+        const widthTextValue = this.textMeasurer.getTextSize(textValue);
         const widthPlaceholder = this.textMeasurer.getTextSize(this.placeholder);
 
-        const width = Math.max(widthText, widthPlaceholder);
+        const width = Math.max(widthTextValue, widthPlaceholder);
 
         if (width < 0) {
             return;
