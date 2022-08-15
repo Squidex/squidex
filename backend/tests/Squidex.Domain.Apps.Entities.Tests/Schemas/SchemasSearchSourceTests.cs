@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         [Fact]
         public async Task Should_not_add_result_to_contents_if_schema_is_component()
         {
-            var permission = Permissions.ForApp(Permissions.AppContentsReadOwn, appId.Name, "schemaA1");
+            var permission = PermissionIds.ForApp(PermissionIds.AppContentsReadOwn, appId.Name, "schemaA1");
 
             var ctx = ContextWithPermission();
 
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         [Fact]
         public async Task Should_return_result_to_schema_and_contents_if_matching_and_permission_given()
         {
-            var permission = Permissions.ForApp(Permissions.AppContentsReadOwn, appId.Name, "schemaA2");
+            var permission = PermissionIds.ForApp(PermissionIds.AppContentsReadOwn, appId.Name, "schemaA2");
 
             var ctx = ContextWithPermission(permission.Id);
 
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         [Fact]
         public async Task Should_return_result_to_schema_and_contents_if_schema_is_singleton()
         {
-            var permission = Permissions.ForApp(Permissions.AppContentsReadOwn, appId.Name, "schemaA1");
+            var permission = PermissionIds.ForApp(PermissionIds.AppContentsReadOwn, appId.Name, "schemaA1");
 
             var ctx = ContextWithPermission(permission.Id);
 

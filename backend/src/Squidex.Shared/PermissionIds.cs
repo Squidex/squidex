@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Security;
 
 namespace Squidex.Shared
 {
-    public static class Permissions
+    public static class PermissionIds
     {
         public const string All = "squidex.*";
 
@@ -173,9 +173,10 @@ namespace Squidex.Shared
         {
             Guard.NotNull(id);
 
-            return new Permission(id
-                .Replace("{app}", app ?? Permission.Any, StringComparison.Ordinal)
-                .Replace("{schema}", schema ?? Permission.Any, StringComparison.Ordinal));
+            id = id.Replace("{app}", app ?? Permission.Any, StringComparison.Ordinal);
+            id = id.Replace("{schema}", schema ?? Permission.Any, StringComparison.Ordinal);
+
+            return new Permission(id);
         }
     }
 }

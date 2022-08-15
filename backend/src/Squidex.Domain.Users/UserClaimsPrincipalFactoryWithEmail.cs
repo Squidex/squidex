@@ -33,7 +33,7 @@ namespace Squidex.Domain.Users
 
             if (await UserManager.IsInRoleAsync(user, AdministratorRole))
             {
-                identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.Admin));
+                identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, PermissionIds.Admin));
             }
 
             return principal;

@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities
             var claimsIdentity = new ClaimsIdentity();
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.All));
+            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, PermissionIds.All));
 
             return new Context(claimsPrincipal, app);
         }

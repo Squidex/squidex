@@ -17,123 +17,123 @@ namespace Squidex.Web
         private readonly Dictionary<(string Id, string Schema), bool> permissions = new Dictionary<(string, string), bool>();
 
         // Contents
-        public bool CanReadContent(string schema) => Can(Permissions.AppContentsReadOwn, schema);
+        public bool CanReadContent(string schema) => Can(PermissionIds.AppContentsReadOwn, schema);
 
-        public bool CanCreateContent(string schema) => Can(Permissions.AppContentsCreate, schema);
+        public bool CanCreateContent(string schema) => Can(PermissionIds.AppContentsCreate, schema);
 
-        public bool CanCreateContentVersion(string schema) => Can(Permissions.AppContentsVersionCreateOwn, schema);
+        public bool CanCreateContentVersion(string schema) => Can(PermissionIds.AppContentsVersionCreateOwn, schema);
 
-        public bool CanDeleteContent(string schema) => Can(Permissions.AppContentsDeleteOwn, schema);
+        public bool CanDeleteContent(string schema) => Can(PermissionIds.AppContentsDeleteOwn, schema);
 
-        public bool CanDeleteContentVersion(string schema) => Can(Permissions.AppContentsVersionDeleteOwn, schema);
+        public bool CanDeleteContentVersion(string schema) => Can(PermissionIds.AppContentsVersionDeleteOwn, schema);
 
-        public bool CanChangeStatus(string schema) => Can(Permissions.AppContentsChangeStatus, schema);
+        public bool CanChangeStatus(string schema) => Can(PermissionIds.AppContentsChangeStatus, schema);
 
-        public bool CanCancelContentStatus(string schema) => Can(Permissions.AppContentsChangeStatusCancelOwn, schema);
+        public bool CanCancelContentStatus(string schema) => Can(PermissionIds.AppContentsChangeStatusCancelOwn, schema);
 
-        public bool CanUpdateContent(string schema) => Can(Permissions.AppContentsUpdateOwn, schema);
+        public bool CanUpdateContent(string schema) => Can(PermissionIds.AppContentsUpdateOwn, schema);
 
         // Schemas
-        public bool CanUpdateSchema(string schema) => Can(Permissions.AppSchemasDelete, schema);
+        public bool CanUpdateSchema(string schema) => Can(PermissionIds.AppSchemasDelete, schema);
 
-        public bool CanUpdateSchemaScripts(string schema) => Can(Permissions.AppSchemasScripts, schema);
+        public bool CanUpdateSchemaScripts(string schema) => Can(PermissionIds.AppSchemasScripts, schema);
 
-        public bool CanPublishSchema(string schema) => Can(Permissions.AppSchemasPublish, schema);
+        public bool CanPublishSchema(string schema) => Can(PermissionIds.AppSchemasPublish, schema);
 
-        public bool CanDeleteSchema(string schema) => Can(Permissions.AppSchemasDelete, schema);
+        public bool CanDeleteSchema(string schema) => Can(PermissionIds.AppSchemasDelete, schema);
 
-        public bool CanCreateSchema => Can(Permissions.AppSchemasCreate);
+        public bool CanCreateSchema => Can(PermissionIds.AppSchemasCreate);
 
-        public bool CanUpdateSettings => Can(Permissions.AppUpdateSettings);
+        public bool CanUpdateSettings => Can(PermissionIds.AppUpdateSettings);
 
         // Asset Scripts
-        public bool CanUpdateAssetsScripts => Can(Permissions.AppAssetsScriptsUpdate);
+        public bool CanUpdateAssetsScripts => Can(PermissionIds.AppAssetsScriptsUpdate);
 
         // Contributors
-        public bool CanAssignContributor => Can(Permissions.AppContributorsAssign);
+        public bool CanAssignContributor => Can(PermissionIds.AppContributorsAssign);
 
-        public bool CanRevokeContributor => Can(Permissions.AppContributorsRevoke);
+        public bool CanRevokeContributor => Can(PermissionIds.AppContributorsRevoke);
 
         // Workflows
-        public bool CanCreateWorkflow => Can(Permissions.AppWorkflowsCreate);
+        public bool CanCreateWorkflow => Can(PermissionIds.AppWorkflowsCreate);
 
-        public bool CanUpdateWorkflow => Can(Permissions.AppWorkflowsUpdate);
+        public bool CanUpdateWorkflow => Can(PermissionIds.AppWorkflowsUpdate);
 
-        public bool CanDeleteWorkflow => Can(Permissions.AppWorkflowsDelete);
+        public bool CanDeleteWorkflow => Can(PermissionIds.AppWorkflowsDelete);
 
         // Roles
-        public bool CanCreateRole => Can(Permissions.AppRolesCreate);
+        public bool CanCreateRole => Can(PermissionIds.AppRolesCreate);
 
-        public bool CanUpdateRole => Can(Permissions.AppRolesUpdate);
+        public bool CanUpdateRole => Can(PermissionIds.AppRolesUpdate);
 
-        public bool CanDeleteRole => Can(Permissions.AppRolesDelete);
+        public bool CanDeleteRole => Can(PermissionIds.AppRolesDelete);
 
         // Languages
-        public bool CanCreateLanguage => Can(Permissions.AppLanguagesCreate);
+        public bool CanCreateLanguage => Can(PermissionIds.AppLanguagesCreate);
 
-        public bool CanUpdateLanguage => Can(Permissions.AppLanguagesUpdate);
+        public bool CanUpdateLanguage => Can(PermissionIds.AppLanguagesUpdate);
 
-        public bool CanDeleteLanguage => Can(Permissions.AppLanguagesDelete);
+        public bool CanDeleteLanguage => Can(PermissionIds.AppLanguagesDelete);
 
         // Clients
-        public bool CanCreateClient => Can(Permissions.AppClientsCreate);
+        public bool CanCreateClient => Can(PermissionIds.AppClientsCreate);
 
-        public bool CanUpdateClient => Can(Permissions.AppClientsUpdate);
+        public bool CanUpdateClient => Can(PermissionIds.AppClientsUpdate);
 
-        public bool CanDeleteClient => Can(Permissions.AppClientsDelete);
+        public bool CanDeleteClient => Can(PermissionIds.AppClientsDelete);
 
         // Rules
-        public bool CanDisableRule => Can(Permissions.AppRulesDisable);
+        public bool CanDisableRule => Can(PermissionIds.AppRulesDisable);
 
-        public bool CanCreateRule => Can(Permissions.AppRulesCreate);
+        public bool CanCreateRule => Can(PermissionIds.AppRulesCreate);
 
-        public bool CanUpdateRule => Can(Permissions.AppRulesUpdate);
+        public bool CanUpdateRule => Can(PermissionIds.AppRulesUpdate);
 
-        public bool CanDeleteRule => Can(Permissions.AppRulesDelete);
+        public bool CanDeleteRule => Can(PermissionIds.AppRulesDelete);
 
-        public bool CanReadRuleEvents => Can(Permissions.AppRulesEventsRead);
+        public bool CanReadRuleEvents => Can(PermissionIds.AppRulesEventsRead);
 
-        public bool CanUpdateRuleEvents => Can(Permissions.AppRulesEventsUpdate);
+        public bool CanUpdateRuleEvents => Can(PermissionIds.AppRulesEventsUpdate);
 
-        public bool CanRunRuleEvents => Can(Permissions.AppRulesEventsRun);
+        public bool CanRunRuleEvents => Can(PermissionIds.AppRulesEventsRun);
 
-        public bool CanDeleteRuleEvents => Can(Permissions.AppRulesEventsDelete);
+        public bool CanDeleteRuleEvents => Can(PermissionIds.AppRulesEventsDelete);
 
         // Users
-        public bool CanReadUsers => Can(Permissions.AdminUsersRead);
+        public bool CanReadUsers => Can(PermissionIds.AdminUsersRead);
 
-        public bool CanCreateUser => Can(Permissions.AdminUsersCreate);
+        public bool CanCreateUser => Can(PermissionIds.AdminUsersCreate);
 
-        public bool CanLockUser => Can(Permissions.AdminUsersLock);
+        public bool CanLockUser => Can(PermissionIds.AdminUsersLock);
 
-        public bool CanUnlockUser => Can(Permissions.AdminUsersUnlock);
+        public bool CanUnlockUser => Can(PermissionIds.AdminUsersUnlock);
 
-        public bool CanUpdateUser => Can(Permissions.AdminUsersUpdate);
+        public bool CanUpdateUser => Can(PermissionIds.AdminUsersUpdate);
 
         // Assets
-        public bool CanUploadAsset => Can(Permissions.AppAssetsUpload);
+        public bool CanUploadAsset => Can(PermissionIds.AppAssetsUpload);
 
-        public bool CanCreateAsset => Can(Permissions.AppAssetsCreate);
+        public bool CanCreateAsset => Can(PermissionIds.AppAssetsCreate);
 
-        public bool CanDeleteAsset => Can(Permissions.AppAssetsDelete);
+        public bool CanDeleteAsset => Can(PermissionIds.AppAssetsDelete);
 
-        public bool CanUpdateAsset => Can(Permissions.AppAssetsUpdate);
+        public bool CanUpdateAsset => Can(PermissionIds.AppAssetsUpdate);
 
-        public bool CanReadAssets => Can(Permissions.AppAssetsRead);
+        public bool CanReadAssets => Can(PermissionIds.AppAssetsRead);
 
         // Events
-        public bool CanReadEvents => Can(Permissions.AdminEventsRead);
+        public bool CanReadEvents => Can(PermissionIds.AdminEventsRead);
 
-        public bool CanManageEvents => Can(Permissions.AdminEventsManage);
+        public bool CanManageEvents => Can(PermissionIds.AdminEventsManage);
 
         // Backups
-        public bool CanRestoreBackup => Can(Permissions.AdminRestore);
+        public bool CanRestoreBackup => Can(PermissionIds.AdminRestore);
 
-        public bool CanCreateBackup => Can(Permissions.AppBackupsCreate);
+        public bool CanCreateBackup => Can(PermissionIds.AppBackupsCreate);
 
-        public bool CanDeleteBackup => Can(Permissions.AppBackupsDelete);
+        public bool CanDeleteBackup => Can(PermissionIds.AppBackupsDelete);
 
-        public bool CanDownloadBackup => Can(Permissions.AppBackupsDownload);
+        public bool CanDownloadBackup => Can(PermissionIds.AppBackupsDownload);
 
         public Context Context { get; set; }
 
@@ -209,7 +209,7 @@ namespace Squidex.Web
                 }
             }
 
-            var permission = Permissions.ForApp(id, app, schema);
+            var permission = PermissionIds.ForApp(id, app, schema);
 
             return Context.UserPermissions.Allows(permission) || additional?.Allows(permission) == true;
         }

@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_return_assets_results_if_found()
         {
-            var permission = Permissions.ForApp(Permissions.AppAssetsRead, appId.Name);
+            var permission = PermissionIds.ForApp(PermissionIds.AppAssetsRead, appId.Name);
 
             var ctx = ContextWithPermission(permission.Id);
 

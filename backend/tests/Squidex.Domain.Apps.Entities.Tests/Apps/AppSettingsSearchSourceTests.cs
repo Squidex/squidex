@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_return_dashboard_result_if_matching_and_permission_given()
         {
-            var permission = Permissions.ForApp(Permissions.AppUsage, appId.Name);
+            var permission = PermissionIds.ForApp(PermissionIds.AppUsage, appId.Name);
 
             var ctx = ContextWithPermission(permission.Id);
 
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_return_languages_result_if_matching_and_permission_given()
         {
-            var permission = Permissions.ForApp(Permissions.AppLanguagesRead, appId.Name);
+            var permission = PermissionIds.ForApp(PermissionIds.AppLanguagesRead, appId.Name);
 
             var ctx = ContextWithPermission(permission.Id);
 
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_return_schemas_result_if_matching_and_permission_given()
         {
-            var permission = Permissions.ForApp(Permissions.AppSchemasRead, appId.Name);
+            var permission = PermissionIds.ForApp(PermissionIds.AppSchemasRead, appId.Name);
 
             var ctx = ContextWithPermission(permission.Id);
 
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_return_assets_result_if_matching_and_permission_given()
         {
-            var permission = Permissions.ForApp(Permissions.AppAssetsRead, appId.Name);
+            var permission = PermissionIds.ForApp(PermissionIds.AppAssetsRead, appId.Name);
 
             var ctx = ContextWithPermission(permission.Id);
 
@@ -160,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_return_backups_result_if_matching_and_permission_given()
         {
-            var permission = Permissions.ForApp(Permissions.AppBackupsRead, appId.Name);
+            var permission = PermissionIds.ForApp(PermissionIds.AppBackupsRead, appId.Name);
 
             var ctx = ContextWithPermission(permission.Id);
 
@@ -187,7 +187,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_return_clients_result_if_matching_and_permission_given()
         {
-            var permission = Permissions.ForApp(Permissions.AppClientsRead, appId.Name);
+            var permission = PermissionIds.ForApp(PermissionIds.AppClientsRead, appId.Name);
 
             var ctx = ContextWithPermission(permission.Id);
 
@@ -214,7 +214,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_return_contributors_result_if_matching_and_permission_given()
         {
-            var permission = Permissions.ForApp(Permissions.AppContributorsRead, appId.Name);
+            var permission = PermissionIds.ForApp(PermissionIds.AppContributorsRead, appId.Name);
 
             var ctx = ContextWithPermission(permission.Id);
 
@@ -241,7 +241,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_return_subscription_result_if_matching_and_permission_given()
         {
-            var permission = Permissions.ForApp(Permissions.AppPlansRead, appId.Name);
+            var permission = PermissionIds.ForApp(PermissionIds.AppPlansRead, appId.Name);
 
             var ctx = ContextWithPermission(permission.Id);
 
@@ -268,7 +268,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_return_roles_result_if_matching_and_permission_given()
         {
-            var permission = Permissions.ForApp(Permissions.AppRolesRead, appId.Name);
+            var permission = PermissionIds.ForApp(PermissionIds.AppRolesRead, appId.Name);
 
             var ctx = ContextWithPermission(permission.Id);
 
@@ -295,7 +295,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_return_rules_result_if_matching_and_permission_given()
         {
-            var permission = Permissions.ForApp(Permissions.AppRulesRead, appId.Name);
+            var permission = PermissionIds.ForApp(PermissionIds.AppRulesRead, appId.Name);
 
             var ctx = ContextWithPermission(permission.Id);
 
@@ -322,7 +322,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_return_workflows_result_if_matching_and_permission_given()
         {
-            var permission = Permissions.ForApp(Permissions.AppWorkflowsRead, appId.Name);
+            var permission = PermissionIds.ForApp(PermissionIds.AppWorkflowsRead, appId.Name);
 
             var ctx = ContextWithPermission(permission.Id);
 

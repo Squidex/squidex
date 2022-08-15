@@ -39,7 +39,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [HttpGet]
         [Route("apps/restore/")]
         [ProducesResponseType(typeof(RestoreJobDto), StatusCodes.Status200OK)]
-        [ApiPermission(Permissions.AdminRestore)]
+        [ApiPermission(PermissionIds.AdminRestore)]
         public async Task<IActionResult> GetRestoreJob()
         {
             var job = await backupService.GetRestoreAsync(HttpContext.RequestAborted);
@@ -63,7 +63,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         /// </returns>
         [HttpPost]
         [Route("apps/restore/")]
-        [ApiPermission(Permissions.AdminRestore)]
+        [ApiPermission(PermissionIds.AdminRestore)]
         public async Task<IActionResult> PostRestoreJob([FromBody] RestoreRequestDto request)
         {
             await backupService.StartRestoreAsync(User.Token()!, request.Url, request.Name);

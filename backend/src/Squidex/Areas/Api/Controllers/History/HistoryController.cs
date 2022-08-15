@@ -40,7 +40,7 @@ namespace Squidex.Areas.Api.Controllers.History
         [HttpGet]
         [Route("apps/{app}/history/")]
         [ProducesResponseType(typeof(HistoryEventDto[]), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppHistory)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppHistory)]
         [ApiCosts(0.1)]
         public async Task<IActionResult> GetHistory(string app, string channel)
         {

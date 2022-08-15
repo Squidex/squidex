@@ -317,14 +317,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         [Fact]
         public void Should_not_throw_exception_if_content_is_from_another_user_but_user_has_permission()
         {
-            var userPermission = Permissions.ForApp(Permissions.AppContentsDelete, appId.Name, schemaId.Name).Id;
+            var userPermission = PermissionIds.ForApp(PermissionIds.AppContentsDelete, appId.Name, schemaId.Name).Id;
             var userObject = Mocks.FrontendUser(permission: userPermission);
 
             var operation = Operation(CreateContent(Status.Draft), normalSchema, userObject);
 
             ((ContentEntity)operation.Snapshot).CreatedBy = RefToken.User("456");
 
-            operation.MustHavePermission(Permissions.AppContentsDelete);
+            operation.MustHavePermission(PermissionIds.AppContentsDelete);
         }
 
         [Fact]
@@ -334,7 +334,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             ((ContentEntity)operation.Snapshot).CreatedBy = actor;
 
-            operation.MustHavePermission(Permissions.AppContentsDelete);
+            operation.MustHavePermission(PermissionIds.AppContentsDelete);
         }
 
         [Fact]
@@ -344,7 +344,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             ((ContentEntity)operation.Snapshot).CreatedBy = RefToken.User("456");
 
-            operation.MustHavePermission(Permissions.AppContentsDelete);
+            operation.MustHavePermission(PermissionIds.AppContentsDelete);
         }
 
         [Fact]
@@ -354,7 +354,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             ((ContentEntity)operation.Snapshot).CreatedBy = RefToken.User("456");
 
-            Assert.Throws<DomainForbiddenException>(() => operation.MustHavePermission(Permissions.AppContentsDelete));
+            Assert.Throws<DomainForbiddenException>(() => operation.MustHavePermission(PermissionIds.AppContentsDelete));
         }
 
         [Fact]

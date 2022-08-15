@@ -257,7 +257,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task ChangeCore(ChangeContentStatus c, ContentOperation operation)
         {
-            operation.MustHavePermission(Permissions.AppContentsChangeStatus);
+            operation.MustHavePermission(PermissionIds.AppContentsChangeStatus);
             operation.MustNotChangeSingleton(c.Status);
 
             if (c.Status == Snapshot.EditingStatus())
@@ -310,7 +310,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task UpdateCore(UpdateContent c, ContentOperation operation)
         {
-            operation.MustHavePermission(Permissions.AppContentsUpdate);
+            operation.MustHavePermission(PermissionIds.AppContentsUpdate);
             operation.MustHaveData(c.Data);
 
             if (!c.DoNotValidate)
@@ -345,7 +345,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task PatchCore(UpdateContent c, ContentOperation operation)
         {
-            operation.MustHavePermission(Permissions.AppContentsUpdate);
+            operation.MustHavePermission(PermissionIds.AppContentsUpdate);
             operation.MustHaveData(c.Data);
 
             if (!c.DoNotValidate)
@@ -380,7 +380,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private void CancelChangeCore(CancelContentSchedule c, ContentOperation operation)
         {
-            operation.MustHavePermission(Permissions.AppContentsChangeStatusCancel);
+            operation.MustHavePermission(PermissionIds.AppContentsChangeStatusCancel);
 
             if (Snapshot.ScheduleJob != null)
             {
@@ -390,14 +390,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task ValidateCore(ContentOperation operation)
         {
-            operation.MustHavePermission(Permissions.AppContentsRead);
+            operation.MustHavePermission(PermissionIds.AppContentsRead);
 
             await operation.ValidateContentAndInputAsync(Snapshot.Data, false, Snapshot.IsPublished());
         }
 
         private async Task CreateDraftCore(CreateContentDraft c, ContentOperation operation)
         {
-            operation.MustHavePermission(Permissions.AppContentsVersionCreate);
+            operation.MustHavePermission(PermissionIds.AppContentsVersionCreate);
             operation.MustCreateDraft();
 
             var status = await operation.GetInitialStatusAsync();
@@ -407,7 +407,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private void DeleteDraftCore(DeleteContentDraft c, ContentOperation operation)
         {
-            operation.MustHavePermission(Permissions.AppContentsVersionDelete);
+            operation.MustHavePermission(PermissionIds.AppContentsVersionDelete);
             operation.MustDeleteDraft();
 
             DeleteDraft(c);
@@ -415,7 +415,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task DeleteCore(DeleteContent c, ContentOperation operation)
         {
-            operation.MustHavePermission(Permissions.AppContentsDelete);
+            operation.MustHavePermission(PermissionIds.AppContentsDelete);
             operation.MustNotDeleteSingleton();
 
             if (!c.DoNotScript)

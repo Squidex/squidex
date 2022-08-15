@@ -24,33 +24,33 @@ namespace Squidex.Domain.Apps.Core.Apps
             [Role.Owner] =
                 new Role(Role.Owner,
                     new PermissionSet(
-                        WithoutPrefix(Permissions.App)),
+                        WithoutPrefix(PermissionIds.App)),
                     new JsonObject()),
             [Role.Reader] =
                 new Role(Role.Reader,
                     new PermissionSet(
-                        WithoutPrefix(Permissions.AppAssetsRead),
-                        WithoutPrefix(Permissions.AppContentsRead)),
+                        WithoutPrefix(PermissionIds.AppAssetsRead),
+                        WithoutPrefix(PermissionIds.AppContentsRead)),
                     new JsonObject()
                         .Add("ui.api.hide", true)),
             [Role.Editor] =
                 new Role(Role.Editor,
                     new PermissionSet(
-                        WithoutPrefix(Permissions.AppAssets),
-                        WithoutPrefix(Permissions.AppContents),
-                        WithoutPrefix(Permissions.AppRolesRead),
-                        WithoutPrefix(Permissions.AppWorkflowsRead)),
+                        WithoutPrefix(PermissionIds.AppAssets),
+                        WithoutPrefix(PermissionIds.AppContents),
+                        WithoutPrefix(PermissionIds.AppRolesRead),
+                        WithoutPrefix(PermissionIds.AppWorkflowsRead)),
                     new JsonObject()
                         .Add("ui.api.hide", true)),
             [Role.Developer] =
                 new Role(Role.Developer,
                     new PermissionSet(
-                        WithoutPrefix(Permissions.AppAssets),
-                        WithoutPrefix(Permissions.AppContents),
-                        WithoutPrefix(Permissions.AppRolesRead),
-                        WithoutPrefix(Permissions.AppRules),
-                        WithoutPrefix(Permissions.AppSchemas),
-                        WithoutPrefix(Permissions.AppWorkflows)),
+                        WithoutPrefix(PermissionIds.AppAssets),
+                        WithoutPrefix(PermissionIds.AppContents),
+                        WithoutPrefix(PermissionIds.AppRolesRead),
+                        WithoutPrefix(PermissionIds.AppRules),
+                        WithoutPrefix(PermissionIds.AppSchemas),
+                        WithoutPrefix(PermissionIds.AppWorkflows)),
                     new JsonObject())
         };
 
@@ -175,9 +175,9 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         private static string WithoutPrefix(string permission)
         {
-            permission = Permissions.ForApp(permission).Id;
+            permission = PermissionIds.ForApp(permission).Id;
 
-            var prefix = Permissions.ForApp(Permissions.App);
+            var prefix = PermissionIds.ForApp(PermissionIds.App);
 
             if (permission.StartsWith(prefix.Id, StringComparison.OrdinalIgnoreCase))
             {

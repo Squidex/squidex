@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName, ct);
 
-                if (!HasPermission(context, schema, Permissions.AppContentsRead))
+                if (!HasPermission(context, schema, PermissionIds.AppContentsRead))
                 {
                     q = q with { CreatedBy = context.User.Token() };
                 }
@@ -199,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 schema = await appProvider.GetSchemaAsync(context.App.Id, schemaIdOrName, canCache, ct);
             }
 
-            if (schema != null && !HasPermission(context, schema, Permissions.AppContentsReadOwn))
+            if (schema != null && !HasPermission(context, schema, PermissionIds.AppContentsReadOwn))
             {
                 throw new DomainForbiddenException(T.Get("schemas.noPermission"));
             }
@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var schemas = await appProvider.GetSchemasAsync(context.App.Id, ct);
 
-            return schemas.Where(x => IsAccessible(x) && HasPermission(context, x, Permissions.AppContentsReadOwn)).ToList();
+            return schemas.Where(x => IsAccessible(x) && HasPermission(context, x, PermissionIds.AppContentsReadOwn)).ToList();
         }
 
         private async Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, Q q, ISchemaEntity schema,

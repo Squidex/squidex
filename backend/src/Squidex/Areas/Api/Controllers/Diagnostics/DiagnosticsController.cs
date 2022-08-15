@@ -36,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Diagnostics
         /// </returns>
         [HttpGet]
         [Route("diagnostics/dump")]
-        [ApiPermissionOrAnonymous(Permissions.Admin)]
+        [ApiPermissionOrAnonymous(PermissionIds.Admin)]
         public async Task<IActionResult> GetDump()
         {
             var success = await dumper.CreateDumpAsync(HttpContext.RequestAborted);
@@ -58,7 +58,7 @@ namespace Squidex.Areas.Api.Controllers.Diagnostics
         /// </returns>
         [HttpGet]
         [Route("diagnostics/gcdump")]
-        [ApiPermissionOrAnonymous(Permissions.Admin)]
+        [ApiPermissionOrAnonymous(PermissionIds.Admin)]
         public async Task<IActionResult> GetGCDump()
         {
             var success = await dumper.CreateGCDumpAsync(HttpContext.RequestAborted);

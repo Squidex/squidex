@@ -14,7 +14,7 @@ namespace Squidex.Shared
     {
         public static bool Allows(this PermissionSet permissions, string id, string app = Permission.Any, string schema = Permission.Any)
         {
-            var permission = Permissions.ForApp(id, app, schema);
+            var permission = PermissionIds.ForApp(id, app, schema);
 
             return permissions.Allows(permission);
         }

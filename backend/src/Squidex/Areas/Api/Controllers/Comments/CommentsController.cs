@@ -75,7 +75,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [HttpGet]
         [Route("apps/{app}/comments/{commentsId}")]
         [ProducesResponseType(typeof(CommentsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppCommentsRead)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppCommentsRead)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetComments(string app, DomainId commentsId, [FromQuery] long version = EtagVersion.Any)
         {
@@ -105,7 +105,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [HttpPost]
         [Route("apps/{app}/comments/{commentsId}")]
         [ProducesResponseType(typeof(CommentDto), 201)]
-        [ApiPermissionOrAnonymous(Permissions.AppCommentsCreate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppCommentsCreate)]
         [ApiCosts(0)]
         public async Task<IActionResult> PostComment(string app, DomainId commentsId, [FromBody] UpsertCommentDto request)
         {
@@ -132,7 +132,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/comments/{commentsId}/{commentId}")]
-        [ApiPermissionOrAnonymous(Permissions.AppCommentsUpdate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppCommentsUpdate)]
         [ApiCosts(0)]
         public async Task<IActionResult> PutComment(string app, DomainId commentsId, DomainId commentId, [FromBody] UpsertCommentDto request)
         {
@@ -155,7 +155,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/comments/{commentsId}/{commentId}")]
-        [ApiPermissionOrAnonymous(Permissions.AppCommentsDelete)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppCommentsDelete)]
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteComment(string app, DomainId commentsId, DomainId commentId)
         {

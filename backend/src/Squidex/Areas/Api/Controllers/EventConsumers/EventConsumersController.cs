@@ -27,7 +27,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [HttpGet]
         [Route("event-consumers/")]
         [ProducesResponseType(typeof(EventConsumersDto), StatusCodes.Status200OK)]
-        [ApiPermission(Permissions.AdminEventsRead)]
+        [ApiPermission(PermissionIds.AdminEventsRead)]
         public async Task<IActionResult> GetEventConsumers()
         {
             var eventConsumers = await eventConsumerManager.GetConsumersAsync(HttpContext.RequestAborted);
@@ -40,7 +40,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [HttpPut]
         [Route("event-consumers/{consumerName}/start/")]
         [ProducesResponseType(typeof(EventConsumerDto), StatusCodes.Status200OK)]
-        [ApiPermission(Permissions.AdminEventsManage)]
+        [ApiPermission(PermissionIds.AdminEventsManage)]
         public async Task<IActionResult> StartEventConsumer(string consumerName)
         {
             var eventConsumer = await eventConsumerManager.StartAsync(consumerName, HttpContext.RequestAborted);
@@ -53,7 +53,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [HttpPut]
         [Route("event-consumers/{consumerName}/stop/")]
         [ProducesResponseType(typeof(EventConsumerDto), StatusCodes.Status200OK)]
-        [ApiPermission(Permissions.AdminEventsManage)]
+        [ApiPermission(PermissionIds.AdminEventsManage)]
         public async Task<IActionResult> StopEventConsumer(string consumerName)
         {
             var eventConsumer = await eventConsumerManager.StopAsync(consumerName, HttpContext.RequestAborted);
@@ -66,7 +66,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [HttpPut]
         [Route("event-consumers/{consumerName}/reset/")]
         [ProducesResponseType(typeof(EventConsumerDto), StatusCodes.Status200OK)]
-        [ApiPermission(Permissions.AdminEventsManage)]
+        [ApiPermission(PermissionIds.AdminEventsManage)]
         public async Task<IActionResult> ResetEventConsumer(string consumerName)
         {
             var eventConsumer = await eventConsumerManager.ResetAsync(consumerName, HttpContext.RequestAborted);

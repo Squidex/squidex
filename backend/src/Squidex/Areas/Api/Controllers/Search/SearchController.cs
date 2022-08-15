@@ -40,7 +40,7 @@ namespace Squidex.Areas.Api.Controllers.Search
         [HttpGet]
         [Route("apps/{app}/search/")]
         [ProducesResponseType(typeof(SearchResultDto[]), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppSearch)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppSearch)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetSearchResults(string app, [FromQuery] string? query = null)
         {

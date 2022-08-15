@@ -69,7 +69,7 @@ namespace Squidex.Web
 
             SetContext();
 
-            var sut = new ApiPermissionAttribute(Permissions.AppSchemasCreate);
+            var sut = new ApiPermissionAttribute(PermissionIds.AppSchemasCreate);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
@@ -87,7 +87,7 @@ namespace Squidex.Web
 
             SetContext();
 
-            var sut = new ApiPermissionAttribute(Permissions.AppSchemasUpdate);
+            var sut = new ApiPermissionAttribute(PermissionIds.AppSchemasUpdate);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
@@ -104,7 +104,7 @@ namespace Squidex.Web
 
             SetContext();
 
-            var sut = new ApiPermissionAttribute(Permissions.AppSchemasCreate);
+            var sut = new ApiPermissionAttribute(PermissionIds.AppSchemasCreate);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
@@ -119,7 +119,7 @@ namespace Squidex.Web
 
             SetContext();
 
-            var sut = new ApiPermissionAttribute(Permissions.AppSchemasCreate);
+            var sut = new ApiPermissionAttribute(PermissionIds.AppSchemasCreate);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
@@ -132,7 +132,7 @@ namespace Squidex.Web
         {
             SetContext();
 
-            var sut = new ApiPermissionAttribute(Permissions.AppSchemasCreate);
+            var sut = new ApiPermissionAttribute(PermissionIds.AppSchemasCreate);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 

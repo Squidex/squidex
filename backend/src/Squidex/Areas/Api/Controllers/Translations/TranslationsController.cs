@@ -39,7 +39,7 @@ namespace Squidex.Areas.Api.Controllers.Translations
         [HttpPost]
         [Route("apps/{app}/translations/")]
         [ProducesResponseType(typeof(TranslationDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppTranslate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppTranslate)]
         [ApiCosts(0)]
         public async Task<IActionResult> PostTranslation(string app, [FromBody] TranslateDto request)
         {

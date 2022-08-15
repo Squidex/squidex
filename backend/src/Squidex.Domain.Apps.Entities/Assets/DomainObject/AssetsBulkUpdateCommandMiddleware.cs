@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     {
                         var command = new AnnotateAsset();
 
-                        EnrichAndCheckPermission(task, command, Permissions.AppAssetsUpdate);
+                        EnrichAndCheckPermission(task, command, PermissionIds.AppAssetsUpdate);
                         return command;
                     }
 
@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     {
                         var command = new MoveAsset();
 
-                        EnrichAndCheckPermission(task, command, Permissions.AppAssetsUpdate);
+                        EnrichAndCheckPermission(task, command, PermissionIds.AppAssetsUpdate);
                         return command;
                     }
 
@@ -196,7 +196,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     {
                         var command = new DeleteAsset();
 
-                        EnrichAndCheckPermission(task, command, Permissions.AppAssetsDelete);
+                        EnrichAndCheckPermission(task, command, PermissionIds.AppAssetsDelete);
                         return command;
                     }
 

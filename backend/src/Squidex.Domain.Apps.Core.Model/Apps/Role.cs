@@ -9,6 +9,7 @@ using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
+using Squidex.Shared;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
@@ -18,16 +19,16 @@ namespace Squidex.Domain.Apps.Core.Apps
     {
         private static readonly HashSet<string> ExtraPermissions = new HashSet<string>
         {
-            Shared.Permissions.AppComments,
-            Shared.Permissions.AppContributorsRead,
-            Shared.Permissions.AppHistory,
-            Shared.Permissions.AppLanguagesRead,
-            Shared.Permissions.AppPing,
-            Shared.Permissions.AppRolesRead,
-            Shared.Permissions.AppSchemasRead,
-            Shared.Permissions.AppSearch,
-            Shared.Permissions.AppTranslate,
-            Shared.Permissions.AppUsage
+            PermissionIds.AppComments,
+            PermissionIds.AppContributorsRead,
+            PermissionIds.AppHistory,
+            PermissionIds.AppLanguagesRead,
+            PermissionIds.AppPing,
+            PermissionIds.AppRolesRead,
+            PermissionIds.AppSchemasRead,
+            PermissionIds.AppSearch,
+            PermissionIds.AppTranslate,
+            PermissionIds.AppUsage
         };
 
         public const string Editor = "Editor";
@@ -75,7 +76,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             if (Permissions.Any())
             {
-                var prefix = Shared.Permissions.ForApp(Shared.Permissions.App, app).Id;
+                var prefix = PermissionIds.ForApp(PermissionIds.App, app).Id;
 
                 foreach (var permission in Permissions)
                 {
@@ -87,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             {
                 foreach (var extraPermissionId in ExtraPermissions)
                 {
-                    var extraPermission = Shared.Permissions.ForApp(extraPermissionId, app);
+                    var extraPermission = PermissionIds.ForApp(extraPermissionId, app);
 
                     result.Add(extraPermission);
                 }

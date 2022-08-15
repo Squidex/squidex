@@ -273,7 +273,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_query_contents_from_user_if_user_has_only_own_permission()
         {
-            var requestContext = CreateContext(permissionId: Permissions.AppContentsReadOwn);
+            var requestContext = CreateContext(permissionId: PermissionIds.AppContentsReadOwn);
 
             await sut.QueryAsync(requestContext, schemaId.Name, Q.Empty, ct);
 
@@ -286,7 +286,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_query_all_contents_if_user_has_read_permission()
         {
-            var requestContext = CreateContext(permissionId: Permissions.AppContentsRead);
+            var requestContext = CreateContext(permissionId: PermissionIds.AppContentsRead);
 
             await sut.QueryAsync(requestContext, schemaId.Name, Q.Empty, ct);
 
@@ -311,7 +311,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             int isFrontend = 0,
             int isUnpublished = 0,
             bool allowSchema = true,
-            string permissionId = Permissions.AppContentsRead)
+            string permissionId = PermissionIds.AppContentsRead)
         {
             var claimsIdentity = new ClaimsIdentity();
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
@@ -325,7 +325,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             if (allowSchema)
             {
-                var concretePermission = Permissions.ForApp(permissionId, appId.Name, schemaId.Name).Id;
+                var concretePermission = PermissionIds.ForApp(permissionId, appId.Name, schemaId.Name).Id;
 
                 claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, concretePermission));
             }

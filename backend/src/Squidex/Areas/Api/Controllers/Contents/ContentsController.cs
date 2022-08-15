@@ -319,7 +319,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{schema}/{id}/{version}/")]
-        [ApiPermissionOrAnonymous(Permissions.AppContentsReadOwn)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppContentsReadOwn)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentVersion(string app, string schema, DomainId id, int version)
         {
@@ -352,7 +352,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{schema}/")]
         [ProducesResponseType(typeof(ContentsDto), 201)]
-        [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppContentsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string schema, CreateContentDto request)
         {
@@ -380,7 +380,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{schema}/import")]
         [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppContentsCreate)]
         [ApiCosts(5)]
         [Obsolete("Use bulk endpoint now.")]
         public async Task<IActionResult> PostContents(string app, string schema, [FromBody] ImportContentsDto request)
@@ -412,7 +412,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{schema}/bulk")]
         [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppContentsReadOwn)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppContentsReadOwn)]
         [ApiCosts(5)]
         public async Task<IActionResult> BulkUpdateContents(string app, string schema, [FromBody] BulkUpdateContentsDto request)
         {
@@ -444,7 +444,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{schema}/{id}/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppContentsUpsert)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppContentsUpsert)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostUpsertContent(string app, string schema, DomainId id, UpsertContentDto request)
         {
@@ -473,7 +473,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{schema}/{id}/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppContentsUpdateOwn)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppContentsUpdateOwn)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(string app, string schema, DomainId id, [FromBody] ContentData request)
         {
@@ -502,7 +502,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPatch]
         [Route("content/{app}/{schema}/{id}/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppContentsUpdateOwn)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppContentsUpdateOwn)]
         [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(string app, string schema, DomainId id, [FromBody] ContentData request)
         {
@@ -531,7 +531,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{schema}/{id}/status/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppContentsChangeStatusOwn)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppContentsChangeStatusOwn)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutContentStatus(string app, string schema, DomainId id, [FromBody] ChangeStatusDto request)
         {
@@ -559,7 +559,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpDelete]
         [Route("content/{app}/{schema}/{id}/status/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppContentsChangeStatusOwn)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppContentsChangeStatusOwn)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContentStatus(string app, string schema, DomainId id)
         {
@@ -586,7 +586,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{schema}/{id}/draft/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppContentsVersionCreateOwn)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppContentsVersionCreateOwn)]
         [ApiCosts(1)]
         public async Task<IActionResult> CreateDraft(string app, string schema, DomainId id)
         {
@@ -613,7 +613,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpDelete]
         [Route("content/{app}/{schema}/{id}/draft/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppContentsVersionDeleteOwn)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppContentsVersionDeleteOwn)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteVersion(string app, string schema, DomainId id)
         {
@@ -641,7 +641,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpDelete]
         [Route("content/{app}/{schema}/{id}/")]
-        [ApiPermissionOrAnonymous(Permissions.AppContentsDeleteOwn)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppContentsDeleteOwn)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContent(string app, string schema, DomainId id, DeleteContentDto request)
         {

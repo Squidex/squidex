@@ -22,7 +22,7 @@ namespace Squidex.Web.Pipeline
 
             if (string.Equals(identity.FindFirst(identity.RoleClaimType)?.Value, AdministratorRole, StringComparison.OrdinalIgnoreCase))
             {
-                identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.Admin));
+                identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, PermissionIds.Admin));
             }
 
             return Task.FromResult(principal);

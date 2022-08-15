@@ -19,7 +19,7 @@ namespace Squidex.Areas.IdentityServer.Config
     {
         public static OpenIddictApplicationDescriptor SetAdmin(this OpenIddictApplicationDescriptor application)
         {
-            application.Properties[SquidexClaimTypes.Permissions] = CreateParameter(Enumerable.Repeat(Permissions.All, 1));
+            application.Properties[SquidexClaimTypes.Permissions] = CreateParameter(Enumerable.Repeat(PermissionIds.All, 1));
 
             return application;
         }

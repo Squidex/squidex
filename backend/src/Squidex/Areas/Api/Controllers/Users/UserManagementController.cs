@@ -30,7 +30,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [HttpGet]
         [Route("user-management/")]
         [ProducesResponseType(typeof(UsersDto), StatusCodes.Status200OK)]
-        [ApiPermission(Permissions.AdminUsersRead)]
+        [ApiPermission(PermissionIds.AdminUsersRead)]
         public async Task<IActionResult> GetUsers([FromQuery] string? query = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
             var users = await userService.QueryAsync(query, take, skip, HttpContext.RequestAborted);
@@ -43,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [HttpGet]
         [Route("user-management/{id}/")]
         [ProducesResponseType(typeof(UserDto), 201)]
-        [ApiPermission(Permissions.AdminUsersRead)]
+        [ApiPermission(PermissionIds.AdminUsersRead)]
         public async Task<IActionResult> GetUser(string id)
         {
             var user = await userService.FindByIdAsync(id, HttpContext.RequestAborted);
@@ -61,7 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [HttpPost]
         [Route("user-management/")]
         [ProducesResponseType(typeof(UserDto), 201)]
-        [ApiPermission(Permissions.AdminUsersCreate)]
+        [ApiPermission(PermissionIds.AdminUsersCreate)]
         public async Task<IActionResult> PostUser([FromBody] CreateUserDto request)
         {
             var user = await userService.CreateAsync(request.Email, request.ToValues(), ct: HttpContext.RequestAborted);
@@ -74,7 +74,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [HttpPut]
         [Route("user-management/{id}/")]
         [ProducesResponseType(typeof(UserDto), 201)]
-        [ApiPermission(Permissions.AdminUsersUpdate)]
+        [ApiPermission(PermissionIds.AdminUsersUpdate)]
         public async Task<IActionResult> PutUser(string id, [FromBody] UpdateUserDto request)
         {
             var user = await userService.UpdateAsync(id, request.ToValues(), ct: HttpContext.RequestAborted);
@@ -87,7 +87,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [HttpPut]
         [Route("user-management/{id}/lock/")]
         [ProducesResponseType(typeof(UserDto), 201)]
-        [ApiPermission(Permissions.AdminUsersLock)]
+        [ApiPermission(PermissionIds.AdminUsersLock)]
         public async Task<IActionResult> LockUser(string id)
         {
             if (this.IsUser(id))
@@ -105,7 +105,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [HttpPut]
         [Route("user-management/{id}/unlock/")]
         [ProducesResponseType(typeof(UserDto), 201)]
-        [ApiPermission(Permissions.AdminUsersUnlock)]
+        [ApiPermission(PermissionIds.AdminUsersUnlock)]
         public async Task<IActionResult> UnlockUser(string id)
         {
             if (this.IsUser(id))
@@ -123,7 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [HttpDelete]
         [Route("user-management/{id}/")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ApiPermission(Permissions.AdminUsersUnlock)]
+        [ApiPermission(PermissionIds.AdminUsersUnlock)]
         public async Task<IActionResult> DeleteUser(string id)
         {
             if (this.IsUser(id))
