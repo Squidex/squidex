@@ -27,4 +27,4 @@ then
 fi
 docker pull imega/jq > /dev/null 2>&1 #We don't want any docker output
 
-atlas cluster describe homer-squidex-${environment}-${version} --projectId ${project} -o json |  docker run --rm -i imega/jq -r '.connectionStrings.standardSrv'
+atlas cluster describe squidex-${environment}-${version} --projectId ${project} -o json |  docker run --rm -i imega/jq -r '.connectionStrings.standardSrv'
