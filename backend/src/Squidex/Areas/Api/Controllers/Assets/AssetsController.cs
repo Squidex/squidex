@@ -68,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [HttpGet]
         [Route("apps/{app}/assets/tags")]
         [ProducesResponseType(typeof(Dictionary<string, int>), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetTags(string app)
         {
@@ -92,7 +92,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [HttpPut]
         [Route("apps/{app}/assets/tags/{name}")]
         [ProducesResponseType(typeof(Dictionary<string, int>), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutTag(string app, string name, [FromBody] RenameTagDto request)
         {
@@ -118,7 +118,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [HttpGet]
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssets(string app, [FromQuery] DomainId? parentId, [FromQuery] string? ids = null, [FromQuery] string? q = null)
         {
@@ -147,7 +147,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [HttpPost]
         [Route("apps/{app}/assets/query")]
         [ProducesResponseType(typeof(AssetsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssetsPost(string app, [FromBody] QueryDto query)
         {
@@ -173,7 +173,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [HttpGet]
         [Route("apps/{app}/assets/{id}/")]
         [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAsset(string app, DomainId id)
         {
@@ -210,7 +210,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetDto), 201)]
         [AssetRequestSizeLimit]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetsCreate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppAssetsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostAsset(string app, CreateAssetDto request)
         {
@@ -238,7 +238,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/tus/{**fileId}")]
         [ProducesResponseType(typeof(AssetDto), 201)]
         [AssetRequestSizeLimit]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetsCreate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppAssetsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostAssetTus(string app)
         {
@@ -271,7 +271,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [HttpPost]
         [Route("apps/{app}/assets/bulk")]
         [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppAssetsRead)]
         [ApiCosts(5)]
         public async Task<IActionResult> BulkUpdateAssets(string app, [FromBody] BulkUpdateAssetsDto request)
         {
@@ -304,7 +304,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/{id}")]
         [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
         [AssetRequestSizeLimit]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetsCreate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppAssetsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostUpsertAsset(string app, DomainId id, UpsertAssetDto request)
         {
@@ -334,7 +334,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/{id}/content/")]
         [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
         [AssetRequestSizeLimit]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpload)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppAssetsUpload)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutAssetContent(string app, DomainId id, IFormFile file)
         {
@@ -360,7 +360,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/{id}/")]
         [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
         [AssetRequestSizeLimit]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutAsset(string app, DomainId id, [FromBody] AnnotateAssetDto request)
         {
@@ -386,7 +386,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/{id}/parent")]
         [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
         [AssetRequestSizeLimit]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutAssetParent(string app, DomainId id, [FromBody] MoveAssetDto request)
         {
@@ -409,7 +409,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/assets/{id}/")]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetsDelete)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppAssetsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteAsset(string app, DomainId id, DeleteAssetDto request)
         {

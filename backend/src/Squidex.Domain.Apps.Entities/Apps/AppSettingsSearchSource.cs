@@ -42,37 +42,37 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 }
             }
 
-            Search("Assets", Permissions.AppAssetsRead,
+            Search("Assets", PermissionIds.AppAssetsRead,
                 a => urlGenerator.AssetsUI(a), SearchResultType.Asset);
 
-            Search("Backups", Permissions.AppBackupsRead,
+            Search("Backups", PermissionIds.AppBackupsRead,
                 urlGenerator.BackupsUI, SearchResultType.Setting);
 
-            Search("Clients", Permissions.AppClientsRead,
+            Search("Clients", PermissionIds.AppClientsRead,
                 urlGenerator.ClientsUI, SearchResultType.Setting);
 
-            Search("Contributors", Permissions.AppContributorsRead,
+            Search("Contributors", PermissionIds.AppContributorsRead,
                 urlGenerator.ContributorsUI, SearchResultType.Setting);
 
-            Search("Dashboard", Permissions.AppUsage,
+            Search("Dashboard", PermissionIds.AppUsage,
                 urlGenerator.DashboardUI, SearchResultType.Dashboard);
 
-            Search("Languages", Permissions.AppLanguagesRead,
+            Search("Languages", PermissionIds.AppLanguagesRead,
                 urlGenerator.LanguagesUI, SearchResultType.Setting);
 
-            Search("Roles", Permissions.AppRolesRead,
+            Search("Roles", PermissionIds.AppRolesRead,
                 urlGenerator.RolesUI, SearchResultType.Setting);
 
-            Search("Rules", Permissions.AppRulesRead,
+            Search("Rules", PermissionIds.AppRulesRead,
                 urlGenerator.RulesUI, SearchResultType.Rule);
 
-            Search("Schemas", Permissions.AppSchemasRead,
+            Search("Schemas", PermissionIds.AppSchemasRead,
                 urlGenerator.SchemasUI, SearchResultType.Schema);
 
-            Search("Subscription", Permissions.AppPlansRead,
+            Search("Subscription", PermissionIds.AppPlansRead,
                 urlGenerator.PlansUI, SearchResultType.Setting);
 
-            Search("Workflows", Permissions.AppWorkflowsRead,
+            Search("Workflows", PermissionIds.AppWorkflowsRead,
                 urlGenerator.WorkflowsUI, SearchResultType.Setting);
 
             return Task.FromResult(result);

@@ -121,7 +121,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 {
                     [Constants.SecurityDefinition] = new[]
                     {
-                        Permissions.ForApp(permissionId, operations.Parent.AppName, operations.SchemaName).Id
+                        PermissionIds.ForApp(permissionId, operations.Parent.AppName, operations.SchemaName).Id
                     }
                 }
             };

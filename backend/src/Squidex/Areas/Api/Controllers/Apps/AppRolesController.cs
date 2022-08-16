@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/roles/")]
         [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppRolesRead)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppRolesRead)]
         [ApiCosts(0)]
         public IActionResult GetRoles(string app)
         {
@@ -67,7 +67,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/roles/permissions")]
         [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppRolesRead)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppRolesRead)]
         [ApiCosts(0)]
         public IActionResult GetPermissions(string app)
         {
@@ -94,7 +94,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/roles/")]
         [ProducesResponseType(typeof(RolesDto), 201)]
-        [ApiPermissionOrAnonymous(Permissions.AppRolesCreate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppRolesCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostRole(string app, [FromBody] AddRoleDto request)
         {
@@ -119,7 +119,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPut]
         [Route("apps/{app}/roles/{roleName}/")]
         [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppRolesUpdate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppRolesUpdate)]
         [ApiCosts(1)]
         [UrlDecodeRouteParams]
         public async Task<IActionResult> PutRole(string app, string roleName, [FromBody] UpdateRoleDto request)
@@ -144,7 +144,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpDelete]
         [Route("apps/{app}/roles/{roleName}/")]
         [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppRolesDelete)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppRolesDelete)]
         [ApiCosts(1)]
         [UrlDecodeRouteParams]
         public async Task<IActionResult> DeleteRole(string app, string roleName)

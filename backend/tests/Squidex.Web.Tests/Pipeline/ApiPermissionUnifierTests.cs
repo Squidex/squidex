@@ -28,7 +28,7 @@ namespace Squidex.Web.Pipeline
 
             var result = await sut.TransformAsync(userPrincipal);
 
-            Assert.Equal(Permissions.Admin, result.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.Permissions)?.Value);
+            Assert.Equal(PermissionIds.Admin, result.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.Permissions)?.Value);
             Assert.Equal(role, result.Claims.FirstOrDefault(x => x.Type == userIdentity.RoleClaimType)?.Value);
         }
 

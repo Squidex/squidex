@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             var claimsIdentity = new ClaimsIdentity();
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.All));
+            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, PermissionIds.All));
 
             return claimsPrincipal;
         }

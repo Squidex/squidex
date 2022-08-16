@@ -50,7 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/contributors/")]
         [ProducesResponseType(typeof(ContributorsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppContributorsRead)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppContributorsRead)]
         [ApiCosts(0)]
         public IActionResult GetContributors(string app)
         {
@@ -77,7 +77,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/contributors/")]
         [ProducesResponseType(typeof(ContributorsDto), 201)]
-        [ApiPermissionOrAnonymous(Permissions.AppContributorsAssign)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppContributorsAssign)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContributor(string app, [FromBody] AssignContributorDto request)
         {
@@ -122,7 +122,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpDelete]
         [Route("apps/{app}/contributors/{id}/")]
         [ProducesResponseType(typeof(ContributorsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppContributorsRevoke)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppContributorsRevoke)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContributor(string app, string id)
         {

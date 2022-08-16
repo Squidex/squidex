@@ -36,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/assets/scripts")]
         [ProducesResponseType(typeof(AssetScriptsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetSScriptsRead)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppAssetSScriptsRead)]
         [ApiCosts(0)]
         public IActionResult GetAssetScripts(string app)
         {
@@ -61,7 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPut]
         [Route("apps/{app}/assets/scripts")]
         [ProducesResponseType(typeof(AssetScriptsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetsScriptsUpdate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppAssetsScriptsUpdate)]
         [ApiCosts(0)]
         public async Task<IActionResult> PutAssetScripts(string app, [FromBody] UpdateAssetScriptsDto request)
         {

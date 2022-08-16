@@ -21,15 +21,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             this.appProvider = appProvider;
 
-            foreach (var field in typeof(Permissions).GetFields(BindingFlags.Public | BindingFlags.Static))
+            foreach (var field in typeof(PermissionIds).GetFields(BindingFlags.Public | BindingFlags.Static))
             {
                 if (field.IsLiteral && !field.IsInitOnly)
                 {
                     var value = field.GetValue(null) as string;
 
-                    if (value?.StartsWith(Permissions.App, StringComparison.OrdinalIgnoreCase) == true)
+                    if (value?.StartsWith(PermissionIds.App, StringComparison.OrdinalIgnoreCase) == true)
                     {
-                        if (value.IndexOf("{schema}", Permissions.App.Length, StringComparison.OrdinalIgnoreCase) >= 0)
+                        if (value.IndexOf("{schema}", PermissionIds.App.Length, StringComparison.OrdinalIgnoreCase) >= 0)
                         {
                             forAppSchemas.Add(value);
                         }
@@ -50,9 +50,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             foreach (var permission in forAppWithoutSchemas)
             {
-                if (permission.Length > Permissions.App.Length + 1)
+                if (permission.Length > PermissionIds.App.Length + 1)
                 {
-                    var trimmed = permission[(Permissions.App.Length + 1)..];
+                    var trimmed = permission[(PermissionIds.App.Length + 1)..];
 
                     if (trimmed.Length > 0)
                     {
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             foreach (var permission in forAppSchemas)
             {
-                var trimmed = permission[(Permissions.App.Length + 1)..];
+                var trimmed = permission[(PermissionIds.App.Length + 1)..];
 
                 foreach (var schema in schemaNames)
                 {

@@ -95,11 +95,11 @@ namespace Squidex.Areas.IdentityServer.Config
 
         private PermissionSet CreatePermissions(PermissionSet permissions)
         {
-            permissions = permissions.Add(Permissions.Admin);
+            permissions = permissions.Add(PermissionIds.Admin);
 
             foreach (var app in identityOptions.AdminApps.OrEmpty())
             {
-                permissions = permissions.Add(Permissions.ForApp(Permissions.AppAdmin, app));
+                permissions = permissions.Add(PermissionIds.ForApp(PermissionIds.AppAdmin, app));
             }
 
             return permissions;

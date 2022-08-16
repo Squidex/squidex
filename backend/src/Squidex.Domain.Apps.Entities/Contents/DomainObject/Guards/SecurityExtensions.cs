@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
             }
 
-            var permission = Permissions.ForApp(permissionId, context.App.Name, context.Schema.SchemaDef.Name);
+            var permission = PermissionIds.ForApp(permissionId, context.App.Name, context.Schema.SchemaDef.Name);
 
             if (!permissions.Allows(permission))
             {

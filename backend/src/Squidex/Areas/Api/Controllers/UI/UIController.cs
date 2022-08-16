@@ -20,7 +20,7 @@ namespace Squidex.Areas.Api.Controllers.UI
 {
     public sealed class UIController : ApiController
     {
-        private static readonly Permission CreateAppPermission = new Permission(Permissions.AdminAppCreate);
+        private static readonly Permission CreateAppPermission = new Permission(PermissionIds.AdminAppCreate);
         private readonly MyUIOptions uiOptions;
         private readonly IAppUISettings appUISettings;
 

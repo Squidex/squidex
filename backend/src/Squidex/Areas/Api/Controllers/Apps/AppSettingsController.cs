@@ -61,7 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPut]
         [Route("apps/{app}/settings")]
         [ProducesResponseType(typeof(AppSettingsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppUpdateSettings)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppUpdateSettings)]
         [ApiCosts(0)]
         public async Task<IActionResult> PutSettings(string app, [FromBody] UpdateAppSettingsDto request)
         {

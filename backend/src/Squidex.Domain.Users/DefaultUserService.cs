@@ -179,7 +179,7 @@ namespace Squidex.Domain.Users
                 {
                     var permissions = values.Permissions?.ToIds().ToList() ?? new List<string>();
 
-                    permissions.Add(Permissions.Admin);
+                    permissions.Add(PermissionIds.Admin);
 
                     values.Permissions = new PermissionSet(permissions);
                 }

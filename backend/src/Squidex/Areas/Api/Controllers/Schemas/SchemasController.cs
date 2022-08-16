@@ -48,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpGet]
         [Route("apps/{app}/schemas/")]
         [ProducesResponseType(typeof(SchemasDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppSchemasRead)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppSchemasRead)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetSchemas(string app)
         {
@@ -76,7 +76,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpGet]
         [Route("apps/{app}/schemas/{schema}/")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppSchemasRead)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppSchemasRead)]
         [ApiCosts(0)]
         public IActionResult GetSchema(string app, string schema)
         {
@@ -103,7 +103,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPost]
         [Route("apps/{app}/schemas/")]
         [ProducesResponseType(typeof(SchemaDto), 201)]
-        [ApiPermissionOrAnonymous(Permissions.AppSchemasCreate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppSchemasCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostSchema(string app, [FromBody] CreateSchemaDto request)
         {
@@ -128,7 +128,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{schema}/")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutSchema(string app, string schema, [FromBody] UpdateSchemaDto request)
         {
@@ -153,7 +153,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{schema}/sync")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutSchemaSync(string app, string schema, [FromBody] SynchronizeSchemaDto request)
         {
@@ -178,7 +178,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{schema}/category")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutCategory(string app, string schema, [FromBody] ChangeCategoryDto request)
         {
@@ -203,7 +203,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{schema}/preview-urls")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutPreviewUrls(string app, string schema, [FromBody] ConfigurePreviewUrlsDto request)
         {
@@ -228,7 +228,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{schema}/scripts/")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppSchemasScripts)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppSchemasScripts)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutScripts(string app, string schema, [FromBody] SchemaScriptsDto request)
         {
@@ -253,7 +253,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{schema}/rules/")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutRules(string app, string schema, [FromBody] ConfigureFieldRulesDto request)
         {
@@ -276,7 +276,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{schema}/publish/")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppSchemasPublish)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppSchemasPublish)]
         [ApiCosts(1)]
         public async Task<IActionResult> PublishSchema(string app, string schema)
         {
@@ -299,7 +299,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{schema}/unpublish/")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppSchemasPublish)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppSchemasPublish)]
         [ApiCosts(1)]
         public async Task<IActionResult> UnpublishSchema(string app, string schema)
         {
@@ -321,7 +321,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/schemas/{schema}/")]
-        [ApiPermissionOrAnonymous(Permissions.AppSchemasDelete)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppSchemasDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteSchema(string app, string schema)
         {

@@ -226,7 +226,7 @@ namespace Squidex.Domain.Users
 
             await sut.CreateAsync(identity.Email, values);
 
-            A.CallTo(() => userManager.AddClaimsAsync(identity, HasClaim(SquidexClaimTypes.Permissions, Permissions.Admin)))
+            A.CallTo(() => userManager.AddClaimsAsync(identity, HasClaim(SquidexClaimTypes.Permissions, PermissionIds.Admin)))
                 .MustHaveHappened();
         }
 

@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             if (permissionId != null)
             {
-                var permission = Permissions.ForApp(permissionId, TestApp.Default.Name, TestSchemas.DefaultId.Name).Id;
+                var permission = PermissionIds.ForApp(permissionId, TestApp.Default.Name, TestSchemas.DefaultId.Name).Id;
 
                 context = new Context(Mocks.FrontendUser(permission: permission), TestApp.Default);
             }

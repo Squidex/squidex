@@ -135,7 +135,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPut]
         [Route("apps/{app}/")]
         [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppUpdate)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppUpdate)]
         [ApiCosts(0)]
         public async Task<IActionResult> PutApp(string app, [FromBody] UpdateAppDto request)
         {
@@ -157,7 +157,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/image")]
         [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppImageUpload)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppImageUpload)]
         [ApiCosts(0)]
         public async Task<IActionResult> UploadImage(string app, IFormFile file)
         {
@@ -177,7 +177,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpDelete]
         [Route("apps/{app}/image")]
         [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppImageDelete)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppImageDelete)]
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteImage(string app)
         {
@@ -196,7 +196,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/")]
-        [ApiPermission(Permissions.AppDelete)]
+        [ApiPermission(PermissionIds.AppDelete)]
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteApp(string app)
         {

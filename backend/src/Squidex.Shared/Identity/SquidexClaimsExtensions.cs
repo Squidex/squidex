@@ -106,13 +106,32 @@ namespace Squidex.Shared.Identity
 
         public static IEnumerable<(string Name, string Value)> GetCustomProperties(this IEnumerable<Claim> user)
         {
+            var prefix = SquidexClaimTypes.CustomPrefix;
+
             foreach (var claim in user)
             {
                 var type = GetType(claim);
 
-                if (type.StartsWith(SquidexClaimTypes.CustomPrefix, StringComparison.OrdinalIgnoreCase))
+                if (type.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    var name = type[(SquidexClaimTypes.CustomPrefix.Length + 1)..].ToString();
+                    var name = type[(prefix.Length + 1)..].ToString();
+
+                    yield return (name, claim.Value);
+                }
+            }
+        }
+
+        public static IEnumerable<(string Name, string Value)> GetUIProperties(this IEnumerable<Claim> user, string app)
+        {
+            var prefix = $"{SquidexClaimTypes.UIPrefix}:{app}";
+
+            foreach (var claim in user)
+            {
+                var type = GetType(claim);
+
+                if (type.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    var name = type[(prefix.Length + 1)..].ToString();
 
                     yield return (name, claim.Value);
                 }

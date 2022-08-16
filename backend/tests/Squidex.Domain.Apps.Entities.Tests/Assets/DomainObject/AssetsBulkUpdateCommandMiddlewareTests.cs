@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Should_annotate_asset()
         {
-            SetupContext(Permissions.AppAssetsUpdate);
+            SetupContext(PermissionIds.AppAssetsUpdate);
 
             var id = DomainId.NewGuid();
 
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Should_throw_security_exception_if_user_has_no_permission_for_annotating()
         {
-            SetupContext(Permissions.AppAssetsRead);
+            SetupContext(PermissionIds.AppAssetsRead);
 
             var id = DomainId.NewGuid();
 
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Should_move_asset()
         {
-            SetupContext(Permissions.AppAssetsUpdate);
+            SetupContext(PermissionIds.AppAssetsUpdate);
 
             var id = DomainId.NewGuid();
 
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Should_throw_security_exception_if_user_has_no_permission_for_moving()
         {
-            SetupContext(Permissions.AppAssetsRead);
+            SetupContext(PermissionIds.AppAssetsRead);
 
             var id = DomainId.NewGuid();
 
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Should_delete_asset()
         {
-            SetupContext(Permissions.AppAssetsDelete);
+            SetupContext(PermissionIds.AppAssetsDelete);
 
             var id = DomainId.NewGuid();
 
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Should_throw_security_exception_if_user_has_no_permission_for_deletion()
         {
-            SetupContext(Permissions.AppAssetsRead);
+            SetupContext(PermissionIds.AppAssetsRead);
 
             var id = DomainId.NewGuid();
 
@@ -193,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private Context SetupContext(string id)
         {
-            var permission = Permissions.ForApp(id, appId.Name).Id;
+            var permission = PermissionIds.ForApp(id, appId.Name).Id;
 
             var claimsIdentity = new ClaimsIdentity();
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);

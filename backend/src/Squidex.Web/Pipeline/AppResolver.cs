@@ -145,7 +145,7 @@ namespace Squidex.Web.Pipeline
 
         private static bool HasPermission(string appName, Context requestContext)
         {
-            return requestContext.UserPermissions.Includes(Permissions.ForApp(Permissions.App, appName));
+            return requestContext.UserPermissions.Includes(PermissionIds.ForApp(PermissionIds.App, appName));
         }
 
         private static bool AllowAnonymous(ActionExecutingContext context)
@@ -162,9 +162,9 @@ namespace Squidex.Web.Pipeline
                 return default;
             }
 
-            if (app.Clients.TryGetValue(clientId, out var client) && app.Roles.TryGet(app.Name, client.Role, isFrontend, out var role))
+            if (app.TryGetClientRole(clientId, isFrontend, out var role))
             {
-                return (clientId, client.Role, role.Permissions);
+                return (clientId, role.Name, role.Permissions);
             }
 
             return default;
@@ -179,9 +179,9 @@ namespace Squidex.Web.Pipeline
                 return default;
             }
 
-            if (app.Roles.TryGet(app.Name, client.Value.Role, isFrontend, out var role))
+            if (app.TryGetRole(client.Value.Role, isFrontend, out var role))
             {
-                return (client.Key, client.Value.Role, role.Permissions);
+                return (client.Key, role.Name, role.Permissions);
             }
 
             return default;
@@ -196,9 +196,9 @@ namespace Squidex.Web.Pipeline
                 return default;
             }
 
-            if (app.Contributors.TryGetValue(subjectId, out var roleName) && app.Roles.TryGet(app.Name, roleName, isFrontend, out var role))
+            if (app.TryGetContributorRole(subjectId, isFrontend, out var role))
             {
-                return (roleName, role.Permissions);
+                return (role.Name, role.Permissions);
             }
 
             return default;

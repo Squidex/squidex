@@ -226,7 +226,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 };
             }
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsCreate, c =>
+            public static readonly IFieldResolver Resolver = ResolveAsync(PermissionIds.AppContentsCreate, c =>
             {
                 var contentId = c.GetArgument<string?>("id");
                 var contentData = c.GetArgument<ContentData>("data")!;
@@ -297,7 +297,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 };
             }
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsUpsert, c =>
+            public static readonly IFieldResolver Resolver = ResolveAsync(PermissionIds.AppContentsUpsert, c =>
             {
                 var contentId = c.GetArgument<DomainId>("id");
                 var contentData = c.GetArgument<ContentData>("data")!;
@@ -346,7 +346,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 };
             }
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsUpdateOwn, c =>
+            public static readonly IFieldResolver Resolver = ResolveAsync(PermissionIds.AppContentsUpdateOwn, c =>
             {
                 var contentId = c.GetArgument<DomainId>("id");
                 var contentData = c.GetArgument<ContentData>("data")!;
@@ -382,7 +382,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 };
             }
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsUpdateOwn, c =>
+            public static readonly IFieldResolver Resolver = ResolveAsync(PermissionIds.AppContentsUpdateOwn, c =>
             {
                 var contentId = c.GetArgument<DomainId>("id");
                 var contentData = c.GetArgument<ContentData>("data")!;
@@ -421,7 +421,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 }
             };
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsChangeStatusOwn, c =>
+            public static readonly IFieldResolver Resolver = ResolveAsync(PermissionIds.AppContentsChangeStatusOwn, c =>
             {
                 var contentId = c.GetArgument<DomainId>("id");
                 var contentStatus = c.GetArgument<Status>("status");
@@ -449,7 +449,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 }
             };
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsDeleteOwn, c =>
+            public static readonly IFieldResolver Resolver = ResolveAsync(PermissionIds.AppContentsDeleteOwn, c =>
             {
                 var contentId = c.GetArgument<DomainId>("id");
 
