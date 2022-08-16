@@ -36,13 +36,13 @@ export snapshot=`atlas backups snapshots create $cluster --desc test-upgrade-bac
 atlas backups snapshots watch ${snapshot} --clusterName $cluster --projectId ${project} 
 
 #create new cluster
-atlas cluster create homer-squidex-${environment}-${version} --projectId ${project} --provider AWS --region US_EAST_1 --members 3 --tier M10 --mdbVersion ${cluster_version} --diskSizeGB 100
+atlas cluster create squidex-${environment}-${version} --projectId ${project} --provider AWS --region US_EAST_1 --members 3 --tier M10 --mdbVersion ${cluster_version} --diskSizeGB 100
 
 #wait for cluster to be ready
-atlas cluster watch homer-squidex-${environment}-${version} --projectId ${project}
+atlas cluster watch squidex-${environment}-${version} --projectId ${project}
 
 #with the snapshot done, time to create the new database
-atlas backup restore start automated --clusterName ${cluster} --snapshotId ${snapshot} --targetClusterName homer-squidex-${environment}-${version} --targetProjectId ${project} --projectId ${project}
+atlas backup restore start automated --clusterName ${cluster} --snapshotId ${snapshot} --targetClusterName squidex-${environment}-${version} --targetProjectId ${project} --projectId ${project}
 
 #wait for cluster restore to be done
-atlas cluster watch homer-squidex-${environment}-${version} --projectId ${project}
+atlas cluster watch squidex-${environment}-${version} --projectId ${project}
