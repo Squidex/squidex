@@ -20,7 +20,7 @@
     background: $background;
     border-color: $color;
     color: $color;
-    z-index: 1000;
+    z-index: 100;
 }
 
 @mixin build-text-button($color) {

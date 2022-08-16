@@ -48,12 +48,13 @@
                         [formModel]="$any(formModel)"
                         [formContext]="formContext"
                         [isComparing]="isComparing"
+                        [isExpanded]="isExpanded"
                         [language]="language"
                         [languages]="languages">
                     </sqx-array-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Assets'">
-                    <sqx-assets-editor [formControl]="$any(fieldForm)" [folderId]="field.rawProperties.folderId"></sqx-assets-editor>
+                    <sqx-assets-editor [formControl]="$any(fieldForm)" [folderId]="field.rawProperties.folderId" [isExpanded]="isExpanded"></sqx-assets-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Boolean'">
                     <ng-container [ngSwitch]="field.rawProperties.editor">
@@ -88,6 +89,7 @@
                         [formModel]="$any(formModel)"
                         [formContext]="formContext"
                         [isComparing]="isComparing"
+                        [isExpanded]="isExpanded"
                         [language]="language"
                         [languages]="languages">
                     </sqx-array-editor>
@@ -124,9 +126,10 @@
                     <ng-container [ngSwitch]="field.rawProperties.editor">
                         <ng-container *ngSwitchCase="'List'">
                             <sqx-references-editor
-                                [formControl]="$any(fieldForm)" 
                                 [allowDuplicates]="field.rawProperties.allowDuplicated"
                                 [formContext]="formContext"
+                                [formControl]="$any(fieldForm)"
+                                [isExpanded]="isExpanded"
                                 [language]="language"
                                 [languages]="languages"
                                 [schemaIds]="field.rawProperties.schemaIds">

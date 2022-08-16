@@ -1,4 +1,8 @@
-<div class="assets-container" (sqxDropFile)="addFiles($event)" [sqxDropDisabled]="snapshot.isDisabled" tabindex="1000">
+<div class="assets-container"
+    [class.expanded]="isExpanded"
+    (sqxDropFile)="addFiles($event)" 
+    [sqxDropDisabled]="snapshot.isDisabled" 
+    tabindex="1000">
     <div class="header list">
         <div class="row gx-2">
             <div class="col" [class.disabled]="snapshot.isDisabled">
