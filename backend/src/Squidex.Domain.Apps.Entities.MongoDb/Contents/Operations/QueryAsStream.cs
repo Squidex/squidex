@@ -7,7 +7,6 @@
 
 using System.Runtime.CompilerServices;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 

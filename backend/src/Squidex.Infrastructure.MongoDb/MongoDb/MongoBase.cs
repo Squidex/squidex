@@ -7,6 +7,7 @@
 
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Squidex.Infrastructure.Json.Objects;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 
@@ -48,6 +49,7 @@ namespace Squidex.Infrastructure.MongoDb
         {
             BsonDefaultConventions.Register();
             BsonDomainIdSerializer.Register();
+            BsonEscapedDictionarySerializer<JsonValue, JsonObject>.Register();
             BsonInstantSerializer.Register();
             BsonJsonConvention.Register();
             BsonJsonValueSerializer.Register();

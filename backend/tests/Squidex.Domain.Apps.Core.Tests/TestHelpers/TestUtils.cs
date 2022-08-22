@@ -59,9 +59,15 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
         public static void SetupBson()
         {
             BsonDomainIdSerializer.Register();
+            BsonEscapedDictionarySerializer<ContentFieldData, ContentData>.Register();
+            BsonEscapedDictionarySerializer<JsonValue, ContentFieldData>.Register();
+            BsonEscapedDictionarySerializer<JsonValue, JsonObject>.Register();
+            BsonEscapedDictionarySerializer<JsonValue, JsonObject>.Register();
             BsonInstantSerializer.Register();
             BsonJsonConvention.Register(DefaultOptions());
             BsonJsonValueSerializer.Register();
+            BsonStringSerializer<RefToken>.Register();
+            BsonStringSerializer<Status>.Register();
         }
 
         public static IJsonSerializer CreateSerializer(Action<JsonSerializerOptions>? configure = null)
@@ -132,45 +138,41 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
 
         public static T SerializeAndDeserializeBson<T>(this T value)
         {
+            return SerializeAndDeserializeBson<T, T>(value);
+        }
+
+        public static TOut SerializeAndDeserializeBson<TOut, TIn>(this TIn value)
+        {
             using var stream = new MemoryStream();
 
             using (var writer = new BsonBinaryWriter(stream))
             {
-                BsonSerializer.Serialize(writer, new ObjectHolder<T> { Value1 = value, Value2 = value });
+                BsonSerializer.Serialize(writer, new ObjectHolder<TIn> { Value1 = value, Value2 = value });
             }
 
             stream.Position = 0;
 
             using (var reader = new BsonBinaryReader(stream))
             {
-                return BsonSerializer.Deserialize<ObjectHolder<T>>(reader).Value1;
+                return BsonSerializer.Deserialize<ObjectHolder<TOut>>(reader).Value1;
             }
-        }
-
-        public static T SerializeAndDeserialize<T>(this object value)
-        {
-            var json = DefaultSerializer.Serialize(value);
-
-            return DefaultSerializer.Deserialize<T>(json);
         }
 
         public static T SerializeAndDeserialize<T>(this T value)
         {
-            var json = DefaultSerializer.Serialize(new ObjectHolder<T> { Value1 = value, Value2 = value });
+            return SerializeAndDeserialize<T, T>(value);
+        }
 
-            return DefaultSerializer.Deserialize<ObjectHolder<T>>(json).Value1;
+        public static TOut SerializeAndDeserialize<TOut, TIn>(this TIn value)
+        {
+            var json = DefaultSerializer.Serialize(new ObjectHolder<TIn> { Value1 = value, Value2 = value });
+
+            return DefaultSerializer.Deserialize<ObjectHolder<TOut>>(json).Value1;
         }
 
         public static T Deserialize<T>(string value)
         {
             var json = DefaultSerializer.Serialize(new ObjectHolder<string> { Value1 = value, Value2 = value });
-
-            return DefaultSerializer.Deserialize<ObjectHolder<T>>(json).Value1;
-        }
-
-        public static T Deserialize<T>(object value)
-        {
-            var json = DefaultSerializer.Serialize(new ObjectHolder<object> { Value1 = value, Value2 = value });
 
             return DefaultSerializer.Deserialize<ObjectHolder<T>>(json).Value1;
         }

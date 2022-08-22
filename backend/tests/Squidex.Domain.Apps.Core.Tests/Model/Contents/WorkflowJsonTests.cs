@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         {
             var jsonStep = new { noUpdate = true };
 
-            var serialized = jsonStep.SerializeAndDeserialize<WorkflowStep>();
+            var serialized = jsonStep.SerializeAndDeserialize<WorkflowStep, object>();
 
             Assert.Equal(new WorkflowStep(null, null, NoUpdate.Always), serialized);
         }

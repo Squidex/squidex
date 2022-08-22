@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -39,9 +40,11 @@ namespace Squidex.Infrastructure.Json.Objects
         [Fact]
         public void Should_deserialize_integer()
         {
-            var serialized = TestUtils.Deserialize<JsonValue>(123);
+            var value = 123;
 
-            Assert.Equal(JsonValue.Create(123), serialized);
+            var serialized = value.SerializeAndDeserialize<JsonValue, int>();
+
+            Assert.Equal(JsonValue.Create(value), serialized);
         }
 
         [Theory]
@@ -151,6 +154,23 @@ namespace Squidex.Infrastructure.Json.Objects
             var serialized = Serialize(value, mode);
 
             Assert.Equal(value, serialized);
+        }
+
+        [Fact]
+        public void Should_deserialize_from_escaped_dot()
+        {
+            var value = new Dictionary<string, int>
+            {
+                ["key.with.dot".EscapeJson()] = 10
+            };
+
+            var expected =
+                new JsonObject()
+                    .Add("key.with.dot", 10);
+
+            var serialized = TestUtils.SerializeAndDeserializeBson<JsonObject, Dictionary<string, int>>(value);
+
+            Assert.Equal(expected, serialized);
         }
     }
 }

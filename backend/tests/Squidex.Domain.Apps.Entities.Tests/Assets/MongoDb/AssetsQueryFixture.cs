@@ -8,7 +8,6 @@
 using System.Globalization;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.TestHelpers;

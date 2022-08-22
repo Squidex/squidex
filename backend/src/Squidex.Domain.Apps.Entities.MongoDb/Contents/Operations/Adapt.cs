@@ -7,7 +7,6 @@
 
 using MongoDB.Bson.Serialization;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.OData;
 

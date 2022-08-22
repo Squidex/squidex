@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands

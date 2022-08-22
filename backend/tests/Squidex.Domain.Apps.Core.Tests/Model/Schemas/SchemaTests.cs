@@ -487,7 +487,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
                 new Schema("my-schema", type: SchemaType.Singleton)
                     .Publish();
 
-            var schemaTarget = schemaSource.SerializeAndDeserialize<Schema>();
+            var schemaTarget = schemaSource.SerializeAndDeserialize<Schema, object>();
 
             schemaTarget.Should().BeEquivalentTo(expected);
         }

@@ -11,14 +11,13 @@ using MongoDB.Driver;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 using Xunit;
@@ -35,12 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         static ContentQueryTests()
         {
-            BsonDomainIdSerializer.Register();
-
-            BsonStringSerializer<RefToken>.Register();
-            BsonStringSerializer<Status>.Register();
-
-            BsonInstantSerializer.Register();
+            TestUtils.SetupBson();
         }
 
         public ContentQueryTests()
