@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -46,12 +47,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public static IEnumerable<object[]> TestEvents()
         {
-            yield return new object[] { new ContentCreated(), EnrichedContentEventType.Created };
-            yield return new object[] { new ContentUpdated(), EnrichedContentEventType.Updated };
-            yield return new object[] { new ContentDeleted(), EnrichedContentEventType.Deleted };
-            yield return new object[] { new ContentStatusChanged { Change = StatusChange.Change }, EnrichedContentEventType.StatusChanged };
-            yield return new object[] { new ContentStatusChanged { Change = StatusChange.Published }, EnrichedContentEventType.Published };
-            yield return new object[] { new ContentStatusChanged { Change = StatusChange.Unpublished }, EnrichedContentEventType.Unpublished };
+            yield return new object[] { TestUtils.CreateEvent<ContentCreated>(), EnrichedContentEventType.Created };
+            yield return new object[] { TestUtils.CreateEvent<ContentUpdated>(), EnrichedContentEventType.Updated };
+            yield return new object[] { TestUtils.CreateEvent<ContentDeleted>(), EnrichedContentEventType.Deleted };
+            yield return new object[] { TestUtils.CreateEvent<ContentStatusChanged>(x => x.Change = StatusChange.Change), EnrichedContentEventType.StatusChanged };
+            yield return new object[] { TestUtils.CreateEvent<ContentStatusChanged>(x => x.Change = StatusChange.Published), EnrichedContentEventType.Published };
+            yield return new object[] { TestUtils.CreateEvent<ContentStatusChanged>(x => x.Change = StatusChange.Unpublished), EnrichedContentEventType.Unpublished };
         }
 
         [Fact]
@@ -184,13 +185,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
             A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 12))
-                .Returns(new ContentEntity { AppId = ctx.AppId, SchemaId = schemaMatch });
+                .Returns(SimpleMapper.Map(@event, new ContentEntity()));
 
             var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
-            var enrichedEvent = result.Single() as EnrichedContentEvent;
+            var enrichedEvent = (EnrichedContentEvent)result.Single();
 
             Assert.Equal(type, enrichedEvent!.Type);
+            Assert.Equal(@event.Actor, enrichedEvent.Actor);
+            Assert.Equal(@event.AppId, enrichedEvent.AppId);
+            Assert.Equal(@event.AppId.Id, enrichedEvent.AppId.Id);
+            Assert.Equal(@event.SchemaId, enrichedEvent.SchemaId);
+            Assert.Equal(@event.SchemaId.Id, enrichedEvent.SchemaId.Id);
         }
 
         [Fact]

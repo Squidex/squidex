@@ -11,6 +11,8 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Schemas;
@@ -38,11 +40,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public static IEnumerable<object[]> TestEvents()
         {
-            yield return new object[] { new SchemaCreated(), EnrichedSchemaEventType.Created };
-            yield return new object[] { new SchemaUpdated(), EnrichedSchemaEventType.Updated };
-            yield return new object[] { new SchemaDeleted(), EnrichedSchemaEventType.Deleted };
-            yield return new object[] { new SchemaPublished(), EnrichedSchemaEventType.Published };
-            yield return new object[] { new SchemaUnpublished(), EnrichedSchemaEventType.Unpublished };
+            yield return new object[] { TestUtils.CreateEvent<SchemaCreated>(), EnrichedSchemaEventType.Created };
+            yield return new object[] { TestUtils.CreateEvent<SchemaUpdated>(), EnrichedSchemaEventType.Updated };
+            yield return new object[] { TestUtils.CreateEvent<SchemaDeleted>(), EnrichedSchemaEventType.Deleted };
+            yield return new object[] { TestUtils.CreateEvent<SchemaPublished>(), EnrichedSchemaEventType.Published };
+            yield return new object[] { TestUtils.CreateEvent<SchemaUnpublished>(), EnrichedSchemaEventType.Unpublished };
         }
 
         [Fact]
@@ -67,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         [MemberData(nameof(TestEvents))]
         public async Task Should_create_enriched_events(SchemaEvent @event, EnrichedSchemaEventType type)
         {
-            var ctx = Context();
+            var ctx = Context(appId: @event.AppId);
 
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
@@ -76,6 +78,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             var enrichedEvent = result.Single() as EnrichedSchemaEvent;
 
             Assert.Equal(type, enrichedEvent!.Type);
+            Assert.Equal(@event.Actor, enrichedEvent.Actor);
+            Assert.Equal(@event.AppId, enrichedEvent.AppId);
+            Assert.Equal(@event.AppId.Id, enrichedEvent.AppId.Id);
+            Assert.Equal(@event.SchemaId, enrichedEvent.SchemaId);
+            Assert.Equal(@event.SchemaId.Id, enrichedEvent.SchemaId.Id);
         }
 
         [Fact]
@@ -151,13 +158,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             }
         }
 
-        private static RuleContext Context(RuleTrigger? trigger = null)
+        private static RuleContext Context(RuleTrigger? trigger = null, NamedId<DomainId>? appId = null)
         {
             trigger ??= new SchemaChangedTrigger();
 
             return new RuleContext
             {
-                AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
+                AppId = appId ?? NamedId.Of(DomainId.NewGuid(), "my-app"),
                 Rule = new Rule(trigger, A.Fake<RuleAction>()),
                 RuleId = DomainId.NewGuid()
             };

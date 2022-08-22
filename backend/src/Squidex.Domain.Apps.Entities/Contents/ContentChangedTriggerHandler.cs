@@ -90,6 +90,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 SimpleMapper.Map(content, result);
             }
 
+            // Use the concrete event to map properties that are not part of app event.
+            SimpleMapper.Map(contentEvent, result);
+
             switch (@event.Payload)
             {
                 case ContentCreated:

@@ -42,26 +42,31 @@ namespace Squidex.Domain.Apps.Entities.Comments
         {
             var commentCreated = (CommentCreated)@event.Payload;
 
-            if (commentCreated.Mentions?.Length > 0)
+            if (!(commentCreated.Mentions?.Length >= 0))
             {
-                var users = await userResolver.QueryManyAsync(commentCreated.Mentions, ct);
+                yield break;
+            }
 
-                if (users.Count > 0)
+            var users = await userResolver.QueryManyAsync(commentCreated.Mentions, ct);
+
+            if (users.Count <= 0)
+            {
+                yield break;
+            }
+
+            foreach (var user in users.Values)
+            {
+                var enrichedEvent = new EnrichedCommentEvent
                 {
-                    foreach (var user in users.Values)
-                    {
-                        var enrichedEvent = new EnrichedCommentEvent
-                        {
-                            MentionedUser = user
-                        };
+                    MentionedUser = user
+                };
 
-                        enrichedEvent.Name = "UserMentioned";
+                enrichedEvent.Name = "UserMentioned";
 
-                        SimpleMapper.Map(commentCreated, enrichedEvent);
+                // Use the concrete event to map properties that are not part of app event.
+                SimpleMapper.Map(commentCreated, enrichedEvent);
 
-                        yield return enrichedEvent;
-                    }
-                }
+                yield return enrichedEvent;
             }
         }
 

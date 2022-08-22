@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
@@ -41,10 +42,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public static IEnumerable<object[]> TestEvents()
         {
-            yield return new object[] { new AssetCreated(), EnrichedAssetEventType.Created };
-            yield return new object[] { new AssetUpdated(), EnrichedAssetEventType.Updated };
-            yield return new object[] { new AssetAnnotated(), EnrichedAssetEventType.Annotated };
-            yield return new object[] { new AssetDeleted(), EnrichedAssetEventType.Deleted };
+            yield return new object[] { TestUtils.CreateEvent<AssetCreated>(), EnrichedAssetEventType.Created };
+            yield return new object[] { TestUtils.CreateEvent<AssetUpdated>(), EnrichedAssetEventType.Updated };
+            yield return new object[] { TestUtils.CreateEvent<AssetAnnotated>(), EnrichedAssetEventType.Annotated };
+            yield return new object[] { TestUtils.CreateEvent<AssetDeleted>(), EnrichedAssetEventType.Deleted };
         }
 
         [Fact]
@@ -95,9 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [MemberData(nameof(TestEvents))]
         public async Task Should_create_enriched_events(AssetEvent @event, EnrichedAssetEventType type)
         {
-            var ctx = Context();
-
-            @event.AppId = ctx.AppId;
+            var ctx = Context(appId: @event.AppId);
 
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
@@ -106,9 +105,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
-            var enrichedEvent = result.Single() as EnrichedAssetEvent;
+            var enrichedEvent = (EnrichedAssetEvent)result.Single();
 
-            Assert.Equal(type, enrichedEvent!.Type);
+            Assert.Equal(type, enrichedEvent.Type);
+            Assert.Equal(@event.Actor, enrichedEvent.Actor);
+            Assert.Equal(@event.AppId, enrichedEvent.AppId);
+            Assert.Equal(@event.AppId.Id, enrichedEvent.AppId.Id);
         }
 
         [Fact]
@@ -171,13 +173,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        private static RuleContext Context(RuleTrigger? trigger = null)
+        private static RuleContext Context(RuleTrigger? trigger = null, NamedId<DomainId>? appId = null)
         {
             trigger ??= new AssetChangedTriggerV2();
 
             return new RuleContext
             {
-                AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
+                AppId = appId ?? NamedId.Of(DomainId.NewGuid(), "my-app"),
                 Rule = new Rule(trigger, A.Fake<RuleAction>()),
                 RuleId = DomainId.NewGuid()
             };

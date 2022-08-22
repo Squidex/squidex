@@ -38,7 +38,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             var result = new EnrichedSchemaEvent();
 
-            SimpleMapper.Map(@event.Payload, result);
+            // Use the concrete event to map properties that are not part of app event.
+            SimpleMapper.Map((SchemaEvent)@event.Payload, result);
 
             switch (@event.Payload)
             {
