@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.MongoDb
     {
         public InstantSerializerTests()
         {
-            BsonInstantSerializer.Register();
+            TestUtils.SetupBson();
         }
 
         [Fact]

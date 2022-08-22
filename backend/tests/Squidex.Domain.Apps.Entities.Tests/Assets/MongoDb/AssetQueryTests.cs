@@ -9,11 +9,10 @@ using FakeItEasy;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using NodaTime.Text;
-using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Validation;
@@ -29,12 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         static AssetQueryTests()
         {
-            BsonDomainIdSerializer.Register();
-
-            BsonStringSerializer<RefToken>.Register();
-            BsonStringSerializer<Status>.Register();
-
-            BsonInstantSerializer.Register();
+            TestUtils.SetupBson();
         }
 
         [Fact]

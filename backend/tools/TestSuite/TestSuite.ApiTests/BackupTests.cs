@@ -134,7 +134,10 @@ namespace TestSuite.ApiTests
 
             var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(appName, schemaName);
 
-            await contents.CreateAsync(new TestEntityData { Number = 1 });
+            await contents.CreateAsync(new TestEntityData
+            {
+                Number = 1
+            });
 
 
             // Upload a test asset

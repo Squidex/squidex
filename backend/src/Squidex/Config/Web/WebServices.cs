@@ -8,7 +8,6 @@
 using GraphQL;
 using GraphQL.DataLoader;
 using GraphQL.DI;
-using GraphQL.Execution;
 using GraphQL.MicrosoftDI;
 using GraphQL.Server.Transports.AspNetCore;
 using GraphQL.SystemTextJson;

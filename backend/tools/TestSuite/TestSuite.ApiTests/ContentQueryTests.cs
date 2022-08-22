@@ -320,6 +320,55 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_query_json_with_dot()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a content item with a text that caused a bug before.
+                content = await _.Contents.CreateAsync(new TestEntityData
+                {
+                    Json = new JObject
+                    {
+                        ["search.field.with.dot"] = 42
+                    }
+                }, ContentCreateOptions.AsPublish);
+
+
+                // STEP 2: Get the item and ensure that the text is the same.
+                var q = new ContentQuery
+                {
+                    JsonQuery = new
+                    {
+                        filter = new
+                        {
+                            and = new[]
+                            {
+                                new
+                                {
+                                    path = "data.json.iv.search\\.field\\.with\\.dot",
+                                    op = "eq",
+                                    value = 42
+                                }
+                            }
+                        }
+                    }
+                };
+
+                var queried = await _.Contents.GetAsync(q);
+
+                Assert.Equal(42, (int)queried.Items[0].Data.Json["search.field.with.dot"]);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
         public async Task Should_return_items_by_near_geoson_location_with_json()
         {
             var q = new ContentQuery

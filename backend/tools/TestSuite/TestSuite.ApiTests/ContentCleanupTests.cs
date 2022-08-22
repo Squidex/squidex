@@ -35,11 +35,12 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2: Create a content for this schema.
-            var data = new TestEntityData { Number = 12, String = "hello" };
+            var content_1 = await contents.CreateAsync(new TestEntityData
+            {
+                String = "hello"
+            });
 
-            var content_1 = await contents.CreateAsync(data);
-
-            Assert.Equal(data.String, content_1.Data.String);
+            Assert.Equal("hello", content_1.Data.String);
 
 
             // STEP 3: Delete a field from schema.
@@ -66,15 +67,17 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2: Create a referenced content.
-            var dataA = new TestEntityWithReferencesData();
-
-            var contentA_1 = await contents.CreateAsync(dataA);
+            var contentA_1 = await contents.CreateAsync(new TestEntityWithReferencesData
+            {
+                References = null
+            });
 
 
             // STEP 3: Create a content with a reference.
-            var dataB = new TestEntityWithReferencesData { References = new[] { contentA_1.Id } };
-
-            var contentB_1 = await contents.CreateAsync(dataB);
+            var contentB_1 = await contents.CreateAsync(new TestEntityWithReferencesData
+            {
+                References = new[] { contentA_1.Id }
+            });
 
 
             // STEP 3: Delete a reference

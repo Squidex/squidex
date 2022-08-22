@@ -14,7 +14,7 @@ using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public sealed class BsonJsonSerializer<T> : ClassSerializerBase<T?>, IRepresentationConfigurable<BsonJsonSerializer<T>> where T : class
+    public sealed class BsonJsonSerializer<T> : SerializerBase<T?>, IRepresentationConfigurable<BsonJsonSerializer<T>> where T : class
     {
         public BsonType Representation { get; }
 
@@ -134,7 +134,7 @@ namespace Squidex.Infrastructure.MongoDb
                         Read();
                         break;
                     case BsonReaderState.Name:
-                        writer.WritePropertyName(reader.ReadName().UnescapeBson());
+                        writer.WritePropertyName(reader.ReadName().BsonToJsonName());
                         Read();
                         break;
                     case BsonReaderState.Value:
@@ -247,7 +247,7 @@ namespace Squidex.Infrastructure.MongoDb
 
                     foreach (var property in element.EnumerateObject())
                     {
-                        writer.WriteName(property.Name.EscapeJson());
+                        writer.WriteName(property.Name.JsonToBsonName());
 
                         WriteElement(writer, property.Value);
                     }

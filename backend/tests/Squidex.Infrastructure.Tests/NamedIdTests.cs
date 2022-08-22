@@ -126,7 +126,7 @@ namespace Squidex.Infrastructure
         {
             var value = new { id = 42L, name = "my-name" };
 
-            var serialized = value.SerializeAndDeserialize<NamedId<long>>();
+            var serialized = value.SerializeAndDeserialize<NamedId<long>, object>();
 
             Assert.Equal(NamedId.Of(42L, "my-name"), serialized);
         }
@@ -144,7 +144,7 @@ namespace Squidex.Infrastructure
                 Value = NamedId.Of(42L, "my-name")
             };
 
-            var serialized = value.SerializeAndDeserialize<Wrapper>();
+            var serialized = value.SerializeAndDeserialize<Wrapper, object>();
 
             Assert.Equal(expected, serialized);
         }

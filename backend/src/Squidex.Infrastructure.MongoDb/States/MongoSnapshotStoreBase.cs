@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Runtime.CompilerServices;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 

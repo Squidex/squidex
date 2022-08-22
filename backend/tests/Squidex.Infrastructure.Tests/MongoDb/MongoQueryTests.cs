@@ -12,6 +12,7 @@ using NodaTime;
 using NodaTime.Text;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 using ClrFilter = Squidex.Infrastructure.Queries.ClrFilter;
 using SortBuilder = Squidex.Infrastructure.Queries.SortBuilder;
@@ -35,11 +36,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         static MongoQueryTests()
         {
-            BsonDomainIdSerializer.Register();
-
-            BsonStringSerializer<RefToken>.Register();
-
-            BsonInstantSerializer.Register();
+            TestUtils.SetupBson();
         }
 
         [Fact]
