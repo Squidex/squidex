@@ -57,8 +57,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                         new ReferencesFieldProperties())
                     .AddString(8, "dashed-field", Partitioning.Invariant,
                         new StringFieldProperties())
-                    .AddArray(9, "hobbies", Partitioning.Invariant, a => a
-                        .AddString(91, "name"))
+                    .AddJson(9, "json", Partitioning.Invariant,
+                        new JsonFieldProperties())
+                    .AddArray(10, "hobbies", Partitioning.Invariant, a => a
+                        .AddString(101, "name"))
                     .Update(new SchemaProperties());
 
             var schema = A.Dummy<ISchemaEntity>();
@@ -172,6 +174,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var filter = ClrFilter.Eq("data/dashed_field/iv", "Value");
 
             AssertQuery("{ 'do.dashed-field.iv' : 'Value' }", filter);
+        }
+
+        [Fact]
+        public void Should_make_query_with_json_dot_field()
+        {
+            var filter = ClrFilter.Eq("data/json/iv/with\\.dot", "Value");
+
+            AssertQuery("{ 'do.json.iv.with_§§_dot' : 'Value' }", filter);
+        }
+
+        [Fact]
+        public void Should_make_query_with_json_slash_field()
+        {
+            var filter = ClrFilter.Eq("data/json/iv/with\\/slash", "Value");
+
+            AssertQuery("{ 'do.json.iv.with/slash' : 'Value' }", filter);
         }
 
         [Fact]

@@ -12,10 +12,10 @@ namespace Squidex.Infrastructure.MongoDb
         private const string Empty = "§empty";
         private const string TypeBson = "§type";
         private const string TypeJson = "$type";
-        private const string DotSource = ".";
-        private const string DotReplacement = "_§§_";
+        private const string DotBson = "_§§_";
+        private const string DotJson = ".";
 
-        public static string UnescapeBson(this string value)
+        public static string BsonToJsonName(this string value)
         {
             if (value == Empty)
             {
@@ -27,12 +27,12 @@ namespace Squidex.Infrastructure.MongoDb
                 return TypeJson;
             }
 
-            var result = value.ReplaceFirst('§', '$').Replace(DotReplacement, DotSource, StringComparison.Ordinal);
+            var result = value.ReplaceFirst('§', '$').Replace(DotBson, DotJson, StringComparison.Ordinal);
 
             return result;
         }
 
-        public static string EscapeJson(this string value)
+        public static string JsonToBsonName(this string value)
         {
             if (value.Length == 0)
             {
@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.MongoDb
                 return TypeBson;
             }
 
-            var result = value.ReplaceFirst('$', '§').Replace(DotSource, DotReplacement, StringComparison.Ordinal);
+            var result = value.ReplaceFirst('$', '§').Replace(DotJson, DotBson, StringComparison.Ordinal);
 
             return result;
         }

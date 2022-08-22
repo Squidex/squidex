@@ -7,6 +7,7 @@
 
 using MongoDB.Bson.Serialization;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.OData;
 
@@ -67,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             for (var i = 1; i < path.Count; i++)
             {
-                result[i] = result[i].UnescapeEdmField().JsonEscape();
+                result[i] = result[i].UnescapeEdmField().JsonToBsonName().JsonEscape();
             }
 
             return result;

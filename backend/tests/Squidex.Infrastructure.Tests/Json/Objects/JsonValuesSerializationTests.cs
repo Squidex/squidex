@@ -161,7 +161,7 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             var value = new Dictionary<string, int>
             {
-                ["key.with.dot".EscapeJson()] = 10
+                ["key.with.dot".JsonToBsonName()] = 10
             };
 
             var expected =

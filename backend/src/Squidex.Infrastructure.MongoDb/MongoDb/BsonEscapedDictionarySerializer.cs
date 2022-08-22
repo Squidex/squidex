@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure.MongoDb
 
             while (reader.ReadBsonType() != BsonType.EndOfDocument)
             {
-                var key = reader.ReadName().UnescapeBson();
+                var key = reader.ReadName().BsonToJsonName();
 
                 result.Add(key, BsonSerializer.Deserialize<TValue>(reader));
             }
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.MongoDb
 
             foreach (var property in value)
             {
-                writer.WriteName(property.Key.EscapeJson());
+                writer.WriteName(property.Key.JsonToBsonName());
 
                 BsonSerializer.Serialize(writer, property.Value);
             }
