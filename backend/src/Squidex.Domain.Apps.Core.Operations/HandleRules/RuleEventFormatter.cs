@@ -78,10 +78,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.scriptEngine = scriptEngine;
         }
 
-        public virtual string ToPayload<T>(T @event)
+        public virtual string ToPayload<T>(T @event) where T : notnull
         {
             // Just serialize the payload.
-            return serializer.Serialize(@event, true);
+            return serializer.Serialize((object)@event, true);
         }
 
         public virtual string ToEnvelope(EnrichedEvent @event)
