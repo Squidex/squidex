@@ -39,8 +39,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
         public async Task Should_create_event_with_name()
         {
             var @event = TestUtils.CreateEvent<RuleManuallyTriggered>();
+            var envelope = Envelope.Create<AppEvent>(@event);
 
-            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), default, default).ToListAsync();
+            var result = await sut.CreateEnrichedEventsAsync(envelope, default, default).ToListAsync();
 
             var enrichedEvent = (EnrichedManualEvent)result.Single();
 
@@ -55,8 +56,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var actor = RefToken.User("me");
 
             var @event = new RuleManuallyTriggered { Actor = actor };
+            var envelope = Envelope.Create<AppEvent>(@event);
 
-            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), default, default).ToListAsync();
+            var result = await sut.CreateEnrichedEventsAsync(envelope, default, default).ToListAsync();
 
             Assert.Equal(actor, ((EnrichedUserEventBase)result.Single()).Actor);
         }

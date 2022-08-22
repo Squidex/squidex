@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         {
             var commentCreated = (CommentCreated)@event.Payload;
 
-            if (!(commentCreated.Mentions?.Length >= 0))
+            if (!(commentCreated.Mentions?.Length > 0))
             {
                 yield break;
             }
