@@ -14,7 +14,7 @@ using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public sealed class BsonJsonSerializer<T> : ClassSerializerBase<T?>, IRepresentationConfigurable<BsonJsonSerializer<T>> where T : class
+    public sealed class BsonJsonSerializer<T> : SerializerBase<T?>, IRepresentationConfigurable<BsonJsonSerializer<T>> where T : class
     {
         public BsonType Representation { get; }
 

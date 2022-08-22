@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public override TInstance Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+        protected override TInstance DeserializeValue(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
             var reader = context.Reader;
 
@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.MongoDb
             return result;
         }
 
-        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, TInstance value)
+        protected override void SerializeValue(BsonSerializationContext context, BsonSerializationArgs args, TInstance value)
         {
             var writer = context.Writer;
 
