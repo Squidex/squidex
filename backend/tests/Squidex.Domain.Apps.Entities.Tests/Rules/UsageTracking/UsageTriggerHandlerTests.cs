@@ -46,8 +46,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             var ctx = Context();
 
             var @event = new AppUsageExceeded { CallsCurrent = 80, CallsLimit = 120 };
+            var envelope = Envelope.Create<AppEvent>(@event);
 
-            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
+            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
             var enrichedEvent = result.Single() as EnrichedUsageExceededEvent;
 

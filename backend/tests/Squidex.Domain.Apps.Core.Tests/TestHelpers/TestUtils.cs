@@ -24,6 +24,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
+using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
@@ -182,6 +183,30 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
             using var document = JsonDocument.Parse(json);
 
             return DefaultSerializer.Serialize(document, true);
+        }
+
+        public static TEvent CreateEvent<TEvent>(Action<TEvent>? init = null) where TEvent : IEvent, new()
+        {
+            var result = new TEvent();
+
+            if (result is SquidexEvent squidexEvent)
+            {
+                squidexEvent.Actor = new RefToken(RefTokenType.Client, "my-client");
+            }
+
+            if (result is AppEvent appEvent)
+            {
+                appEvent.AppId = NamedId.Of(DomainId.NewGuid(), "my-app");
+            }
+
+            if (result is SchemaEvent schemaEvent)
+            {
+                schemaEvent.SchemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+            }
+
+            init?.Invoke(result);
+
+            return result;
         }
     }
 }

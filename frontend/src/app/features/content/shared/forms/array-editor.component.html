@@ -1,5 +1,5 @@
 <ng-container *ngIf="formModel.itemChanges | async; let items">
-    <div class="array-container" *ngIf="items.length > 0 && items.length <= 20;"
+    <div class="array-container" [class.expanded]="isExpanded" *ngIf="items.length > 0 && items.length <= 20;"
         cdkDropList
         [cdkDropListDisabled]="false"
         [cdkDropListData]="items"
@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    <div class="array-container" *ngIf="items.length > 20">
+    <div class="array-container" [class.expanded]="isExpanded" *ngIf="items.length > 20">
         <virtual-scroller #scroll [items]="$any(items)" [enableUnequalChildrenSizes]="true">
             <div *ngFor="let itemForm of scroll.viewPortItems; index as i" class="item"
                 [class.first]="scroll.viewPortInfo.startIndexWithBuffer + i === 0"
@@ -59,7 +59,7 @@
         </virtual-scroller>
     </div>
 
-    <div class="row g-0 align-items-center">
+    <div class="array-buttons row g-0 align-items-center" [class.expanded]="isExpanded">
         <div class="col-auto">
             <ng-container *ngIf="isArray; else component">
                 <ng-container *ngIf="hasField">

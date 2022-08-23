@@ -30,7 +30,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var result = new EnrichedManualEvent();
 
-            SimpleMapper.Map(@event.Payload, result);
+            // Use the concrete event to map properties that are not part of app event.
+            SimpleMapper.Map((RuleManuallyTriggered)@event.Payload, result);
 
             await Task.Yield();
 

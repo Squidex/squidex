@@ -77,11 +77,12 @@ namespace Squidex.Domain.Apps.Entities.Comments
             var userIds = users.Select(x => x.Id).ToArray();
 
             var @event = new CommentCreated { Mentions = userIds };
+            var envelope = Envelope.Create<AppEvent>(@event);
 
             A.CallTo(() => userResolver.QueryManyAsync(userIds, default))
                 .Returns(users.ToDictionary(x => x.Id));
 
-            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
+            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
             Assert.Equal(2, result.Count);
 
@@ -106,8 +107,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
             var userIds = users.Select(x => x.Id).ToArray();
 
             var @event = new CommentCreated { Mentions = userIds };
+            var envelope = Envelope.Create<AppEvent>(@event);
 
-            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
+            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
             Assert.Empty(result);
         }
@@ -118,8 +120,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
             var ctx = Context();
 
             var @event = new CommentCreated { Mentions = null };
+            var envelope = Envelope.Create<AppEvent>(@event);
 
-            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
+            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
             Assert.Empty(result);
 
@@ -133,8 +136,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
             var ctx = Context();
 
             var @event = new CommentCreated { Mentions = Array.Empty<string>() };
+            var envelope = Envelope.Create<AppEvent>(@event);
 
-            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
+            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
             Assert.Empty(result);
 

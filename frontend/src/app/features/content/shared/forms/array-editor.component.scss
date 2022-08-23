@@ -23,6 +23,24 @@ virtual-scroller {
     background: $color-border-lighter;
     margin: 0;
     margin-bottom: 1rem;
+    overflow-y: auto;
+
+    &.expanded {
+        @include absolute(3rem, 1.25rem, 2.375rem + 1rem + .75rem, 1.25rem);
+        margin: 0;
+
+        virtual-scroller {
+            @include absolute(0, 0, 0, 0);
+            height: 100%;
+        }
+    }
+}
+
+.array-buttons {
+    &.expanded {
+        @include absolute(null, 1.25rem, .75rem, 1.25rem);
+        max-height: none;
+    }
 }
 
 .drag-container {
