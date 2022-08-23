@@ -31,7 +31,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_run_rules()
+        public async Task Should_run_rules_on_content_change()
         {
             // STEP 0: Create app.
             await CreateAppAsync();
@@ -62,6 +62,94 @@ namespace TestSuite.ApiTests
 
             // STEP 3: Create test content
             await CreateContentAsync();
+
+            // Get requests.
+            var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
+
+            Assert.Contains(requests, x => x.Method == "POST" && x.Content.Contains(schemaName, StringComparison.OrdinalIgnoreCase));
+
+
+            // STEP 4: Get events
+            var eventsAll = await _.Rules.GetEventsAsync(appName, rule.Id);
+            var eventsRule = await _.Rules.GetEventsAsync(appName);
+
+            Assert.Single(eventsAll.Items);
+            Assert.Single(eventsRule.Items);
+        }
+
+        [Fact]
+        public async Task Should_run_rules_on_asset_change()
+        {
+            // STEP 0: Create app.
+            await CreateAppAsync();
+
+
+            // STEP 1: Start webhook session
+            var (url, sessionId) = await webhookCatcher.CreateSessionAsync();
+
+
+            // STEP 2: Create rule
+            var createRule = new CreateRuleDto
+            {
+                Action = new WebhookRuleActionDto
+                {
+                    Method = WebhookMethod.POST,
+                    Payload = null,
+                    PayloadType = null,
+                    Url = new Uri(url)
+                },
+                Trigger = new AssetChangedRuleTriggerDto()
+            };
+
+            var rule = await _.Rules.PostRuleAsync(appName, createRule);
+
+
+            // STEP 3: Create test asset
+            await CreateAssetAsync();
+
+            // Get requests.
+            var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
+
+            Assert.Contains(requests, x => x.Method == "POST" && x.Content.Contains("logo-squared", StringComparison.OrdinalIgnoreCase));
+
+
+            // STEP 4: Get events
+            var eventsAll = await _.Rules.GetEventsAsync(appName, rule.Id);
+            var eventsRule = await _.Rules.GetEventsAsync(appName);
+
+            Assert.Single(eventsAll.Items);
+            Assert.Single(eventsRule.Items);
+        }
+
+        [Fact]
+        public async Task Should_run_rules_on_schema_change()
+        {
+            // STEP 0: Create app.
+            await CreateAppAsync();
+
+
+            // STEP 1: Start webhook session
+            var (url, sessionId) = await webhookCatcher.CreateSessionAsync();
+
+
+            // STEP 2: Create rule
+            var createRule = new CreateRuleDto
+            {
+                Action = new WebhookRuleActionDto
+                {
+                    Method = WebhookMethod.POST,
+                    Payload = null,
+                    PayloadType = null,
+                    Url = new Uri(url)
+                },
+                Trigger = new SchemaChangedRuleTriggerDto()
+            };
+
+            var rule = await _.Rules.PostRuleAsync(appName, createRule);
+
+
+            // STEP 3: Create test schema
+            await TestEntity.CreateSchemaAsync(_.Schemas, appName, schemaName);
 
             // Get requests.
             var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
@@ -180,6 +268,19 @@ namespace TestSuite.ApiTests
             {
                 String = contentString
             });
+        }
+
+        private async Task CreateAssetAsync()
+        {
+            // Upload a test asset
+            var fileInfo = new FileInfo("Assets/logo-squared.png");
+
+            await using (var stream = fileInfo.OpenRead())
+            {
+                var upload = new FileParameter(stream, fileInfo.Name, "image/png");
+
+                await _.Assets.PostAssetAsync(appName, file: upload);
+            }
         }
 
         private async Task CreateAppAsync()
