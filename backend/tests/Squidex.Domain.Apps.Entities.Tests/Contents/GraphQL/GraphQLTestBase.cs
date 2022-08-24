@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Text.RegularExpressions;
 using FakeItEasy;
 using GraphQL;
@@ -24,6 +25,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Messaging.Subscriptions;
 using Squidex.Shared;
 using Squidex.Shared.Users;
 using Xunit;
@@ -38,6 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         protected readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         protected readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
+        protected readonly ISubscriptionService subscriptionService = A.Fake<ISubscriptionService>();
         protected readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         protected readonly Context requestContext;
         private CachingGraphQLResolver? sut;
@@ -67,24 +70,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         protected Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
         {
-            var (result, _) = ExecuteCoreAsync(options);
-
-            return result;
+            return ExecuteCoreAsync(options, requestContext);
         }
 
         protected Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, string permissionId)
         {
-            var (result, _) = ExecuteCoreAsync(options, BuildContext(permissionId));
-
-            return result;
+            return ExecuteCoreAsync(options, BuildContext(permissionId));
         }
 
-        protected (Task<ExecutionResult>, GraphQLExecutionContext) ExecuteCoreAsync(ExecutionOptions options)
-        {
-            return ExecuteCoreAsync(options, requestContext);
-        }
-
-        protected (Task<ExecutionResult>, GraphQLExecutionContext) ExecuteCoreAsync(ExecutionOptions options, Context context)
+        protected async Task<ExecutionResult> ExecuteCoreAsync(ExecutionOptions options, Context context)
         {
             // Use a shared instance to test caching.
             sut ??= CreateSut(TestSchemas.Default, TestSchemas.Ref1, TestSchemas.Ref2);
@@ -92,36 +86,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             // Provide the context to the test if services need to be resolved.
             var graphQLContext = ActivatorUtilities.CreateInstance<GraphQLExecutionContext>(sut.Services, context)!;
 
+            options.UserContext = graphQLContext;
+
+            // Register data loader and other listeners.
             foreach (var listener in sut.Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
             {
                 options.Listeners.Add(listener);
             }
 
-            options.UserContext = graphQLContext;
-
-            return (ExecuteOptionsAsync(options), graphQLContext);
-        }
-
-        private async Task<ExecutionResult> ExecuteOptionsAsync(ExecutionOptions options)
-        {
-            await sut!.ExecuteAsync(options, x => Task.FromResult<ExecutionResult>(null!));
+            // Enrich the context with the schema.
+            await sut.ExecuteAsync(options, x => Task.FromResult<ExecutionResult>(null!));
 
             var result = await new DocumentExecuter().ExecuteAsync(options);
 
             if (result.Streams?.Count > 0 && result.Errors?.Any() != true)
             {
+                // Resolve the first stream result with a timeout.
                 var stream = result.Streams.First();
-
-                async Task<ExecutionResult> FirstAsync()
-                {
-                    var result = await stream.Value.FirstOrDefaultAsync();
-
-                    return result;
-                }
 
                 using (var cts = new CancellationTokenSource(5000))
                 {
-                    result = await FirstAsync().WithCancellation(cts.Token);
+                    result = await stream.Value.FirstAsync().ToTask().WithCancellation(cts.Token);
                 }
             }
 
@@ -147,8 +132,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddLogging()
                     .AddMemoryCache()
                     .AddBackgroundCache()
-                    .AddMessaging()
-                    .AddMessagingSubscriptions()
                     .Configure<AssetOptions>(x =>
                     {
                         x.CanCache = true;
@@ -176,6 +159,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddSingleton(assetQuery)
                     .AddSingleton(commandBus)
                     .AddSingleton(contentQuery)
+                    .AddSingleton(subscriptionService)
                     .AddSingleton(userResolver)
                     .BuildServiceProvider();
 
@@ -200,6 +184,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 var data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id);
 
+                // Json is not the same as the input format of graphql, therefore we need to convert it.
                 var dataJson = TestUtils.DefaultSerializer.Serialize(data, true);
 
                 // Use properties without quotes.

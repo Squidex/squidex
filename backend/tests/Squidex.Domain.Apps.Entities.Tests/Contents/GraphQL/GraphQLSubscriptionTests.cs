@@ -5,10 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Reactive.Linq;
+using FakeItEasy;
 using GraphQL;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Infrastructure;
-using Squidex.Messaging.Subscriptions;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
@@ -23,19 +26,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var query = CreateQuery(@"
                 subscription {
                   assetChanges {
-                    id
+                    id,
+                    fileName,
+                    fileSize
                   }
                 }");
 
-            var (resultTask, context) = ExecuteCoreAsync(new ExecutionOptions { Query = query });
+            var stream =
+                Observable.Return<object>(
+                    new EnrichedAssetEvent
+                    {
+                        Id = id,
+                        FileName = "image.png",
+                        FileSize = 1024
+                    });
 
-            await context.Resolve<ISubscriptionService>()
-                .PublishAsync(new EnrichedAssetEvent
-                {
-                    Id = id
-                });
+            A.CallTo(() => subscriptionService.Subscribe<object, AssetSubscription>(A<AssetSubscription>._))
+                .Returns(stream);
 
-            var result = await resultTask;
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -43,7 +52,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 {
                     assetChanges = new
                     {
-                        id
+                        id,
+                        fileName = "image.png",
+                        fileSize = 1024
                     }
                 }
             };
@@ -59,19 +70,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var query = CreateQuery(@"
                 subscription {
                   contentChanges {
-                    id
+                    id,
+                    data
                   }
                 }");
 
-            var (resultTask, context) = ExecuteCoreAsync(new ExecutionOptions { Query = query });
+            var stream =
+                Observable.Return<object>(
+                    new EnrichedContentEvent
+                    {
+                        Id = id,
+                        Data = new ContentData()
+                            .AddField("field",
+                                new ContentFieldData()
+                                    .AddInvariant(42))
+                    });
 
-            await context.Resolve<ISubscriptionService>()
-                .PublishAsync(new EnrichedContentEvent
-                {
-                    Id = id
-                });
+            A.CallTo(() => subscriptionService.Subscribe<object, ContentSubscription>(A<ContentSubscription>._))
+                .Returns(stream);
 
-            var result = await resultTask;
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -79,7 +97,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 {
                     contentChanges = new
                     {
-                        id
+                        id,
+                        data = new
+                        {
+                            field = new
+                            {
+                                iv = 42
+                            }
+                        }
                     }
                 }
             };
