@@ -202,15 +202,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
                 var dataJson = TestUtils.DefaultSerializer.Serialize(data, true);
 
-                // Use Properties without quotes.
-                dataJson = Regex.Replace(dataJson, "\"([^\"]+)\":", x => x.Groups[1].Value + ":");
-
-                // Use pure integer numbers.
-                dataJson = dataJson.Replace(".0", string.Empty, StringComparison.Ordinal);
+                // Use properties without quotes.
+                dataJson = Regex.Replace(dataJson, "\"([^\"]+)\":", x => $"{x.Groups[1].Value}:");
 
                 // Use enum values whithout quotes.
-                dataJson = dataJson.Replace("\"EnumA\"", "EnumA", StringComparison.Ordinal);
-                dataJson = dataJson.Replace("\"EnumB\"", "EnumB", StringComparison.Ordinal);
+                dataJson = Regex.Replace(dataJson, "\"Enum([A-Za-z]+)\"", x => $"Enum{x.Groups[1].Value}");
 
                 query = query.Replace("<DATA>", dataJson, StringComparison.Ordinal);
             }
