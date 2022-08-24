@@ -36,6 +36,9 @@ export class ArrayEditorComponent implements OnChanges {
     public isComparing = false;
 
     @Input()
+    public isExpanded = false;
+
+    @Input()
     public canUnset?: boolean | null;
 
     @Input()

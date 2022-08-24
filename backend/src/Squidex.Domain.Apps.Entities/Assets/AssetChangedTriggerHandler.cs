@@ -86,6 +86,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 result.AssetType = asset.Type;
             }
 
+            // Use the concrete event to map properties that are not part of app event.
+            SimpleMapper.Map(assetEvent, result);
+
             switch (@event.Payload)
             {
                 case AssetCreated:

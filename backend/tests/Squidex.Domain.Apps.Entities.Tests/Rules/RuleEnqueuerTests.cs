@@ -136,6 +136,27 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
+        public async Task Should_update_repository_if_enqueing_broken_job()
+        {
+            var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
+
+            var rule = CreateRule();
+
+            var job = new RuleJob
+            {
+                Created = now
+            };
+
+            A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
+                .Returns(new List<JobResult> { new JobResult { Job = job, SkipReason = SkipReason.Failed } }.ToAsyncEnumerable());
+
+            await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
+
+            A.CallTo(() => ruleEventRepository.EnqueueAsync(job, (Exception?)null, default))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_update_repository_with_jobs_from_service()
         {
             var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });

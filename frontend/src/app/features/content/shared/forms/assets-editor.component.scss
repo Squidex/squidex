@@ -1,19 +1,23 @@
 @import 'mixins';
 @import 'vars';
 
-.disabled {
-    pointer-events: none;
+.assets-container {
+    background: $color-background;
+    max-height: 26.5rem;
+    min-height: 26.5rem;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 1rem;
+    padding-bottom: 0;
+
+    &.expanded {
+        @include absolute(3rem, 1.25rem, .75rem, 1.25rem);
+        max-height: none;
+    }
 }
 
-.assets {
-    &-container {
-        background: $color-background;
-        height: $asset-height + 2rem;
-        overflow-x: hidden;
-        overflow-y: scroll;
-        padding: 1rem;
-        padding-bottom: 0;
-    }
+.disabled {
+    pointer-events: none;
 }
 
 .list-view {
@@ -24,10 +28,6 @@
     margin-bottom: -.25rem;
     margin-top: 1rem;
     min-height: 1px;
-}
-
-.unrow {
-    display: block;
 }
 
 .drop-area {

@@ -45,6 +45,9 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     public formContext!: any;
 
     @Input()
+    public isExpanded = false;
+
+    @Input()
     public allowDuplicates?: boolean | null = true;
 
     @Input()

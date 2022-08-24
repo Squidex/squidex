@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             await foreach (var job in jobs)
             {
                 // We do not want to handle disabled rules in the normal flow.
-                if (job.Job != null && job.SkipReason == SkipReason.None)
+                if (job.Job != null && job.SkipReason is SkipReason.None or SkipReason.Failed)
                 {
                     await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError);
                 }

@@ -5,8 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using FakeItEasy;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
@@ -36,11 +38,16 @@ namespace Squidex.Domain.Apps.Entities.Rules
         [Fact]
         public async Task Should_create_event_with_name()
         {
-            var @event = new RuleManuallyTriggered();
+            var @event = TestUtils.CreateEvent<RuleManuallyTriggered>();
+            var envelope = Envelope.Create<AppEvent>(@event);
 
-            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), default, default).ToListAsync();
+            var result = await sut.CreateEnrichedEventsAsync(envelope, default, default).ToListAsync();
 
-            Assert.NotEmpty(result);
+            var enrichedEvent = (EnrichedManualEvent)result.Single();
+
+            Assert.Equal(@event.Actor, enrichedEvent.Actor);
+            Assert.Equal(@event.AppId, enrichedEvent.AppId);
+            Assert.Equal(@event.AppId.Id, enrichedEvent.AppId.Id);
         }
 
         [Fact]
@@ -49,8 +56,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var actor = RefToken.User("me");
 
             var @event = new RuleManuallyTriggered { Actor = actor };
+            var envelope = Envelope.Create<AppEvent>(@event);
 
-            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), default, default).ToListAsync();
+            var result = await sut.CreateEnrichedEventsAsync(envelope, default, default).ToListAsync();
 
             Assert.Equal(actor, ((EnrichedUserEventBase)result.Single()).Actor);
         }
