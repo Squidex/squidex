@@ -11,7 +11,6 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.MongoDb.Text;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure.MongoDb;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
@@ -22,9 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public AtlasTextIndexFixture()
         {
-            BsonJsonConvention.Register(TestUtils.DefaultOptions());
-
-            BsonDomainIdSerializer.Register();
+            TestUtils.SetupBson();
 
             var mongoClient = new MongoClient(TestConfig.Configuration["atlas:configuration"]);
             var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["atlas:database"]);

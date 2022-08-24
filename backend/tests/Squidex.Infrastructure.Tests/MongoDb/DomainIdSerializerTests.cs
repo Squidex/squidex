@@ -9,6 +9,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.MongoDb
@@ -28,7 +29,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         public DomainIdSerializerTests()
         {
-            BsonDomainIdSerializer.Register();
+            TestUtils.SetupBson();
         }
 
         [Fact]

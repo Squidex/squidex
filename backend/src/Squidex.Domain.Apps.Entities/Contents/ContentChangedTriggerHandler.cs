@@ -78,10 +78,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
             [EnumeratorCancellation] CancellationToken ct)
         {
-            yield return await CreateEnrichedEventsAsync(@event, ct);
+            yield return await CreateEnrichedEventsCoreAsync(@event, ct);
         }
 
-        public async ValueTask<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event,
+        public async ValueTask<EnrichedEvent?> CreateEnrichedEventsAsync(Envelope<AppEvent> @event,
+            CancellationToken ct)
+        {
+            return await CreateEnrichedEventsCoreAsync(@event, ct);
+        }
+
+        private async ValueTask<EnrichedEvent> CreateEnrichedEventsCoreAsync(Envelope<AppEvent> @event,
             CancellationToken ct)
         {
             var contentEvent = (ContentEvent)@event.Payload;

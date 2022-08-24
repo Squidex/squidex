@@ -8,7 +8,7 @@
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure.MongoDb;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         public StatusSerializerTests()
         {
-            BsonStringSerializer<Status>.Register();
+            TestUtils.SetupBson();
         }
 
         [Fact]

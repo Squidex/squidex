@@ -6,9 +6,9 @@
 // ==========================================================================
 
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.MongoDb.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.MongoDb
 {
@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.MongoDb
 
         public SchemasHashFixture()
         {
-            BsonInstantSerializer.Register();
+            TestUtils.SetupBson();
 
             var mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
             var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);

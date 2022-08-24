@@ -43,7 +43,10 @@ namespace TestSuite.ApiTests
             // STEP 2: Create content
             var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(schemaName);
 
-            var content = await contents.CreateAsync(new TestEntityData { Number = 13 });
+            var content = await contents.CreateAsync(new TestEntityData
+            {
+                Number = 13
+            });
 
             Assert.Equal(26, content.Data.Number);
         }
@@ -65,7 +68,10 @@ namespace TestSuite.ApiTests
             // STEP 2: Create content
             var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(schemaName);
 
-            var content = await contents.CreateAsync(new TestEntityData { Number = 13 }, ContentCreateOptions.AsPublish);
+            var content = await contents.CreateAsync(new TestEntityData
+            {
+                Number = 13
+            }, ContentCreateOptions.AsPublish);
 
             Assert.Equal(26, content.Data.Number);
         }
@@ -89,7 +95,10 @@ namespace TestSuite.ApiTests
             // STEP 2: Create content
             var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(schemaName);
 
-            var content = await contents.CreateAsync(new TestEntityData { Number = 99 }, ContentCreateOptions.AsPublish);
+            var content = await contents.CreateAsync(new TestEntityData
+            {
+                Number = 99
+            }, ContentCreateOptions.AsPublish);
 
             Assert.Equal(19, content.Data.Number);
         }

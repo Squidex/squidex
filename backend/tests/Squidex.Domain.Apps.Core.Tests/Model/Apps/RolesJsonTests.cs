@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
                             "Permission1",
                             "Permission2"));
 
-            var roles = source.SerializeAndDeserialize<Roles>();
+            var roles = source.SerializeAndDeserialize<Roles, Dictionary<string, string[]>>();
 
             roles.Should().BeEquivalentTo(expected);
         }

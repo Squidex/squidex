@@ -176,7 +176,10 @@ namespace TestSuite.ApiTests
             // Create a test content.
             var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(appName, schemaName);
 
-            await contents.CreateAsync(new TestEntityData { String = contentString });
+            await contents.CreateAsync(new TestEntityData
+            {
+                String = contentString
+            });
         }
 
         private async Task CreateAppAsync()

@@ -26,15 +26,17 @@ namespace TestSuite.ApiTests
         public async Task Should_not_deliver_unpublished_references()
         {
             // STEP 1: Create a referenced content.
-            var dataA = new TestEntityWithReferencesData();
-
-            var contentA_1 = await _.Contents.CreateAsync(dataA);
+            var contentA_1 = await _.Contents.CreateAsync(new TestEntityWithReferencesData
+            {
+                References = null
+            });
 
 
             // STEP 2: Create a content with a reference.
-            var dataB = new TestEntityWithReferencesData { References = new[] { contentA_1.Id } };
-
-            var contentB_1 = await _.Contents.CreateAsync(dataB, ContentCreateOptions.AsPublish);
+            var contentB_1 = await _.Contents.CreateAsync(new TestEntityWithReferencesData
+            {
+                References = new[] { contentA_1.Id }
+            }, ContentCreateOptions.AsPublish);
 
 
             // STEP 3: Query new item
@@ -60,15 +62,17 @@ namespace TestSuite.ApiTests
         public async Task Should_not_delete_when_referenced()
         {
             // STEP 1: Create a referenced content.
-            var dataA = new TestEntityWithReferencesData();
-
-            var contentA_1 = await _.Contents.CreateAsync(dataA, ContentCreateOptions.AsPublish);
+            var contentA_1 = await _.Contents.CreateAsync(new TestEntityWithReferencesData
+            {
+                References = null
+            }, ContentCreateOptions.AsPublish);
 
 
             // STEP 2: Create a content with a reference.
-            var dataB = new TestEntityWithReferencesData { References = new[] { contentA_1.Id } };
-
-            await _.Contents.CreateAsync(dataB, ContentCreateOptions.AsPublish);
+            await _.Contents.CreateAsync(new TestEntityWithReferencesData
+            {
+                References = new[] { contentA_1.Id }
+            }, ContentCreateOptions.AsPublish);
 
 
             // STEP 3: Try to delete with referrer check.
@@ -88,15 +92,17 @@ namespace TestSuite.ApiTests
         public async Task Should_not_unpublish_when_referenced()
         {
             // STEP 1: Create a published referenced content.
-            var dataA = new TestEntityWithReferencesData();
-
-            var contentA_1 = await _.Contents.CreateAsync(dataA, ContentCreateOptions.AsPublish);
+            var contentA_1 = await _.Contents.CreateAsync(new TestEntityWithReferencesData
+            {
+                References = null
+            }, ContentCreateOptions.AsPublish);
 
 
             // STEP 2: Create a content with a reference.
-            var dataB = new TestEntityWithReferencesData { References = new[] { contentA_1.Id } };
-
-            await _.Contents.CreateAsync(dataB, ContentCreateOptions.AsPublish);
+            await _.Contents.CreateAsync(new TestEntityWithReferencesData
+            {
+                References = new[] { contentA_1.Id }
+            }, ContentCreateOptions.AsPublish);
 
 
             // STEP 3: Try to ThrowsAnyAsync with referrer check.
@@ -124,15 +130,17 @@ namespace TestSuite.ApiTests
         public async Task Should_not_delete_with_bulk_when_referenced()
         {
             // STEP 1: Create a referenced content.
-            var dataA = new TestEntityWithReferencesData();
-
-            var contentA_1 = await _.Contents.CreateAsync(dataA, ContentCreateOptions.AsPublish);
+            var contentA_1 = await _.Contents.CreateAsync(new TestEntityWithReferencesData
+            {
+                References = null
+            }, ContentCreateOptions.AsPublish);
 
 
             // STEP 2: Create a content with a reference.
-            var dataB = new TestEntityWithReferencesData { References = new[] { contentA_1.Id } };
-
-            await _.Contents.CreateAsync(dataB, ContentCreateOptions.AsPublish);
+            await _.Contents.CreateAsync(new TestEntityWithReferencesData
+            {
+                References = new[] { contentA_1.Id }
+            }, ContentCreateOptions.AsPublish);
 
 
             // STEP 3: Try to delete with referrer check.
@@ -175,15 +183,17 @@ namespace TestSuite.ApiTests
         public async Task Should_not_unpublish_with_bulk_when_referenced()
         {
             // STEP 1: Create a published referenced content.
-            var dataA = new TestEntityWithReferencesData();
-
-            var contentA_1 = await _.Contents.CreateAsync(dataA, ContentCreateOptions.AsPublish);
+            var contentA_1 = await _.Contents.CreateAsync(new TestEntityWithReferencesData
+            {
+                References = null
+            }, ContentCreateOptions.AsPublish);
 
 
             // STEP 2: Create a published content with a reference.
-            var dataB = new TestEntityWithReferencesData { References = new[] { contentA_1.Id } };
-
-            await _.Contents.CreateAsync(dataB, ContentCreateOptions.AsPublish);
+            await _.Contents.CreateAsync(new TestEntityWithReferencesData
+            {
+                References = new[] { contentA_1.Id }
+            }, ContentCreateOptions.AsPublish);
 
 
             // STEP 3: Try to delete with referrer check.

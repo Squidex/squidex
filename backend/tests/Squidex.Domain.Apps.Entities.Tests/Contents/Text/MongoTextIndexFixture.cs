@@ -9,7 +9,6 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.MongoDb.Text;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure.MongoDb;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
@@ -20,9 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public MongoTextIndexFixture()
         {
-            BsonJsonConvention.Register(TestUtils.DefaultOptions());
-
-            BsonDomainIdSerializer.Register();
+            TestUtils.SetupBson();
 
             var mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
             var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
