@@ -52,10 +52,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             {
                 var latest = await eventStore.QueryAllReverseAsync(eventConsumer.EventsFilter, default, 1, ct).FirstOrDefaultAsync(ct);
 
-                if (latest != null)
-                {
-                    State = State.Handled(latest.EventPosition);
-                }
+                State = State.Handled(latest?.EventPosition, 0);
             }
         }
 

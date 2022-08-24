@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.Subscriptions
     {
         bool Handles(AppEvent @event);
 
-        ValueTask<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event,
+        ValueTask<EnrichedEvent?> CreateEnrichedEventsAsync(Envelope<AppEvent> @event,
             CancellationToken ct);
     }
 }

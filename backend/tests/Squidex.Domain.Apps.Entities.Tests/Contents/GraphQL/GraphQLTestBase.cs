@@ -18,7 +18,6 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Domain.Apps.Entities.Contents.TestData;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -150,7 +149,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddBackgroundCache()
                     .AddMessaging()
                     .AddMessagingSubscriptions()
-                    .AddTransient<GraphQLExecutionContext>()
                     .Configure<AssetOptions>(x =>
                     {
                         x.CanCache = true;
@@ -159,6 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     {
                         x.CanCache = true;
                     })
+                    .AddSingleton<StringReferenceExtractor>()
                     .AddSingleton<IDocumentExecutionListener,
                         DataLoaderDocumentListener>()
                     .AddSingleton<IDataLoaderContextAccessor,
@@ -178,14 +177,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddSingleton(commandBus)
                     .AddSingleton(contentQuery)
                     .AddSingleton(userResolver)
-                    .AddSingleton<CachingGraphQLResolver>()
-                    .AddSingleton<InstantGraphType>()
-                    .AddSingleton<JsonGraphType>()
-                    .AddSingleton<JsonNoopGraphType>()
-                    .AddSingleton<StringReferenceExtractor>()
                     .BuildServiceProvider();
 
-            return serviceProvider.GetRequiredService<CachingGraphQLResolver>();
+            return ActivatorUtilities.CreateInstance<CachingGraphQLResolver>(serviceProvider);
         }
 
         protected static string CreateQuery(string query, DomainId id = default, IEnrichedContentEntity? content = null)

@@ -12,7 +12,7 @@ using Squidex.Messaging.Subscriptions;
 
 namespace Squidex.Domain.Apps.Core.Subscriptions
 {
-    internal sealed class EventMessageWrapper : IPayloadWrapper<EnrichedEvent>
+    public sealed class EventMessageWrapper : IPayloadWrapper<EnrichedEvent>
     {
         private readonly IEnumerable<ISubscriptionEventCreator> subscriptionEventCreators;
 
