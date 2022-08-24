@@ -227,6 +227,8 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     public selectIndex(suggestedIndex: number, fromUserAction: boolean) {
         const items = this.snapshot.suggestedItems || [];
 
+        const selectedItem = items[suggestedIndex];
+
         if (suggestedIndex < 0) {
             suggestedIndex = 0;
         }
@@ -234,8 +236,6 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
         if (suggestedIndex >= items.length) {
             suggestedIndex = items.length - 1;
         }
-
-        const selectedItem = items[suggestedIndex];
 
         if (fromUserAction) {
             let selectedValue = selectedItem;

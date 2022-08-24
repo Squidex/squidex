@@ -123,6 +123,13 @@ Default.args = {
     model: 'B',
 };
 
+export const WrongModel = Template.bind({});
+
+WrongModel.args = {
+    items: ['A', 'B', 'C'],
+    model: 'D',
+};
+
 export const Empty = Template.bind({});
 
 Empty.args = {

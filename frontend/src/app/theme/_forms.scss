@@ -159,6 +159,8 @@
     }
 
     &-item {
+        transition: background-color .1s ease-in;
+
         & {
             padding: .5rem .75rem;
         }
@@ -172,8 +174,7 @@
         }
 
         &.active,
-        &:active,
-        &:hover {
+        &:active {
             color: $color-white;
 
             .text-muted {
@@ -192,13 +193,21 @@
             &.separated {
                 border-color: $color-theme-brand;
             }
+
+            &:hover {
+                background: $color-theme-brand-dark;
+    
+                &.separated {
+                    border-color: $color-theme-brand-dark;
+                }
+            }
         }
 
         &:hover {
-            background: $color-theme-brand;
+            background: $color-border;
 
             &.separated {
-                border-color: $color-theme-brand;
+                border-color: $color-border;
             }
         }
 
