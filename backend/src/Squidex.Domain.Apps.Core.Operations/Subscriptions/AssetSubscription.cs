@@ -6,30 +6,39 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Infrastructure;
-using Squidex.Messaging.Subscriptions;
+using Squidex.Domain.Apps.Events.Assets;
 
 namespace Squidex.Domain.Apps.Core.Subscriptions
 {
-    public sealed class AssetSubscription : ISubscription
+    public sealed class AssetSubscription : AppSubscription
     {
-        public DomainId AppId { get; set; }
-
         public EnrichedAssetEventType? Type { get; set; }
 
-        public ValueTask<bool> ShouldHandle(object message)
+        public override ValueTask<bool> ShouldHandle(object message)
         {
             return new ValueTask<bool>(ShouldHandleCore(message));
         }
 
         private bool ShouldHandleCore(object message)
         {
-            if (message is not EnrichedAssetEvent @event)
+            if (message is EnrichedAssetEvent)
             {
-                return false;
+                return true;
             }
 
-            return Type == null || @event.Type == Type.Value;
+            switch (Type)
+            {
+                case EnrichedAssetEventType.Created:
+                    return message is AssetCreated;
+                case EnrichedAssetEventType.Deleted:
+                    return message is AssetDeleted;
+                case EnrichedAssetEventType.Annotated:
+                    return message is AssetAnnotated;
+                case EnrichedAssetEventType.Updated:
+                    return message is AssetUpdated;
+                default:
+                    return message is AssetEvent;
+            }
         }
     }
 }

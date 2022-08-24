@@ -10,5 +10,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
     public sealed class GraphQLOptions
     {
         public int CacheDuration { get; set; } = 10 * 60;
+
+        public bool EnableSubscriptions { get; set; } = true;
     }
 }

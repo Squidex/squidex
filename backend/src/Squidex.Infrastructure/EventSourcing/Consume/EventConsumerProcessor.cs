@@ -43,10 +43,20 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
             state = new SimpleState<EventConsumerState>(persistenceFactory, GetType(), eventConsumer.Name);
         }
 
-        public virtual Task InitializeAsync(
+        public virtual async Task InitializeAsync(
             CancellationToken ct)
         {
-            return state.LoadAsync(ct);
+            await state.LoadAsync(ct);
+
+            if (eventConsumer.StartLatest && string.IsNullOrWhiteSpace(State.Position))
+            {
+                var latest = await eventStore.QueryAllReverseAsync(eventConsumer.EventsFilter, default, 1, ct).FirstOrDefaultAsync(ct);
+
+                if (latest != null)
+                {
+                    State = State.Handled(latest.EventPosition);
+                }
+            }
         }
 
         public virtual async Task CompleteAsync()

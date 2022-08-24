@@ -9,6 +9,7 @@ using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.Extensions;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Comments;
@@ -34,13 +35,13 @@ namespace Squidex.Config.Domain
                 .As<IEventEnricher>();
 
             services.AddSingletonAs<AssetChangedTriggerHandler>()
-                .As<IRuleTriggerHandler>();
+                .As<IRuleTriggerHandler>().As<ISubscriptionEventCreator>();
 
             services.AddSingletonAs<CommentTriggerHandler>()
                 .As<IRuleTriggerHandler>();
 
             services.AddSingletonAs<ContentChangedTriggerHandler>()
-                .As<IRuleTriggerHandler>();
+                .As<IRuleTriggerHandler>().As<ISubscriptionEventCreator>();
 
             services.AddSingletonAs<AssetsFluidExtension>()
                 .As<IFluidExtension>();

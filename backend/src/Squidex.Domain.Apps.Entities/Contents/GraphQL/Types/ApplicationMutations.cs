@@ -11,9 +11,9 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    internal sealed class AppMutationsGraphType : ObjectGraphType
+    internal sealed class ApplicationMutations : ObjectGraphType
     {
-        public AppMutationsGraphType(Builder builder, IEnumerable<SchemaInfo> schemas)
+        public ApplicationMutations(Builder builder, IEnumerable<SchemaInfo> schemas)
         {
             foreach (var schemaInfo in schemas.Where(x => x.Fields.Count > 0))
             {

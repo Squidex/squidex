@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using FakeItEasy;
 using GraphQL;
 using NodaTime.Text;
@@ -82,9 +81,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var query = CreateQuery(@"
                 mutation {
                   createMySchemaContent(data: <DATA>, publish: true) {
-                    <FIELDS>
+                    <FIELDS_CONTENT>
                   }
-                }");
+                }", contentId, content);
 
             commandContext.Complete(content);
 
@@ -116,9 +115,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var query = CreateQuery(@"
                 mutation {
                   createMySchemaContent(data: <DATA>, id: '123', publish: true) {
-                    <FIELDS>
+                    <FIELDS_CONTENT>
                   }
-                }");
+                }", contentId, content);
 
             commandContext.Complete(content);
 
@@ -151,9 +150,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var query = CreateQuery(@"
                 mutation OP($data: MySchemaDataInputDto!) {
                   createMySchemaContent(data: $data, publish: true) {
-                    <FIELDS>
+                    <FIELDS_CONTENT>
                   }
-                }");
+                }", contentId, content);
 
             commandContext.Complete(content);
 
@@ -187,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   updateMySchemaContent(id: '<ID>', data: { myNumber: { iv: 42 } }) {
                     id
                   }
-                }");
+                }", contentId, content);
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query }, PermissionIds.AppContentsReadOwn);
 
@@ -227,9 +226,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var query = CreateQuery(@"
                 mutation {
                   updateMySchemaContent(id: '<ID>', data: <DATA>, expectedVersion: 10) {
-                    <FIELDS>
+                    <FIELDS_CONTENT>
                   }
-                }");
+                }", contentId, content);
 
             commandContext.Complete(content);
 
@@ -261,9 +260,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var query = CreateQuery(@"
                 mutation OP($data: MySchemaDataInputDto!) {
                   updateMySchemaContent(id: '<ID>', data: $data, expectedVersion: 10) {
-                    <FIELDS>
+                    <FIELDS_CONTENT>
                   }
-                }");
+                }", contentId, content);
 
             commandContext.Complete(content);
 
@@ -297,7 +296,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   upsertMySchemaContent(id: '<ID>', data: { myNumber: { iv: 42 } }) {
                     id
                   }
-                }");
+                }", contentId, content);
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query }, PermissionIds.AppContentsReadOwn);
 
@@ -337,9 +336,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var query = CreateQuery(@"
                 mutation {
                   upsertMySchemaContent(id: '<ID>', data: <DATA>, publish: true, expectedVersion: 10) {
-                    <FIELDS>
+                    <FIELDS_CONTENT>
                   }
-                }");
+                }", contentId, content);
 
             commandContext.Complete(content);
 
@@ -372,9 +371,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var query = CreateQuery(@"
                 mutation OP($data: MySchemaDataInputDto!) {
                   upsertMySchemaContent(id: '<ID>', data: $data, publish: true, expectedVersion: 10) {
-                    <FIELDS>
+                    <FIELDS_CONTENT>
                   }
-                }");
+                }", contentId, content);
 
             commandContext.Complete(content);
 
@@ -409,7 +408,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   patchMySchemaContent(id: '<ID>', data: { myNumber: { iv: 42 } }) {
                     id
                   }
-                }");
+                }", contentId, content);
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query }, PermissionIds.AppContentsReadOwn);
 
@@ -449,9 +448,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var query = CreateQuery(@"
                 mutation {
                   patchMySchemaContent(id: '<ID>', data: <DATA>, expectedVersion: 10) {
-                    <FIELDS>
+                    <FIELDS_CONTENT>
                   }
-                }");
+                }", contentId, content);
 
             commandContext.Complete(content);
 
@@ -483,9 +482,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var query = CreateQuery(@"
                 mutation OP($data: MySchemaDataInputDto!) {
                   patchMySchemaContent(id: '<ID>', data: $data, expectedVersion: 10) {
-                    <FIELDS>
+                    <FIELDS_CONTENT>
                   }
-                }");
+                }", contentId, content);
 
             commandContext.Complete(content);
 
@@ -519,7 +518,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   changeMySchemaContent(id: '<ID>', status: 'Published') {
                     id
                   }
-                }");
+                }", contentId, content);
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query }, PermissionIds.AppContentsReadOwn);
 
@@ -561,9 +560,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var query = CreateQuery(@"
                 mutation {
                   changeMySchemaContent(id: '<ID>', status: 'Published', dueTime: '2021-12-12T11:10:09Z', expectedVersion: 10) {
-                    <FIELDS>
+                    <FIELDS_CONTENT>
                   }
-                }");
+                }", contentId, content);
 
             commandContext.Complete(content);
 
@@ -596,9 +595,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var query = CreateQuery(@"
                 mutation {
                   changeMySchemaContent(id: '<ID>', status: 'Published', expectedVersion: 10) {
-                    <FIELDS>
+                    <FIELDS_CONTENT>
                   }
-                }");
+                }", contentId, content);
 
             commandContext.Complete(content);
 
@@ -631,9 +630,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var query = CreateQuery(@"
                 mutation {
                   changeMySchemaContent(id: '<ID>', status: 'Published', dueTime: null, expectedVersion: 10) {
-                    <FIELDS>
+                    <FIELDS_CONTENT>
                   }
-                }");
+                }", contentId, content);
 
             commandContext.Complete(content);
 
@@ -668,7 +667,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   deleteMySchemaContent(id: '<ID>') {
                     version
                   }
-                }");
+                }", contentId, content);
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query }, PermissionIds.AppContentsReadOwn);
 
@@ -710,7 +709,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   deleteMySchemaContent(id: '<ID>', expectedVersion: 10) {
                     version 
                   }
-                }");
+                }", contentId, content);
 
             commandContext.Complete(CommandResult.Empty(contentId, 13, 12));
 
@@ -736,36 +735,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         x.SchemaId.Equals(TestSchemas.DefaultId)),
                     A<CancellationToken>._))
                 .MustHaveHappened();
-        }
-
-        private string CreateQuery(string query)
-        {
-            query = query
-                .Replace("'", "\"", StringComparison.Ordinal)
-                .Replace("`", "\"", StringComparison.Ordinal)
-                .Replace("<ID>", contentId.ToString(), StringComparison.Ordinal)
-                .Replace("<FIELDS>", TestContent.AllFields, StringComparison.Ordinal);
-
-            if (query.Contains("<DATA>", StringComparison.Ordinal))
-            {
-                var data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id);
-
-                var dataJson = TestUtils.DefaultSerializer.Serialize(data, true);
-
-                // Use Properties without quotes.
-                dataJson = Regex.Replace(dataJson, "\"([^\"]+)\":", x => x.Groups[1].Value + ":");
-
-                // Use pure integer numbers.
-                dataJson = dataJson.Replace(".0", string.Empty, StringComparison.Ordinal);
-
-                // Use enum values whithout quotes.
-                dataJson = dataJson.Replace("\"EnumA\"", "EnumA", StringComparison.Ordinal);
-                dataJson = dataJson.Replace("\"EnumB\"", "EnumB", StringComparison.Ordinal);
-
-                query = query.Replace("<DATA>", dataJson, StringComparison.Ordinal);
-            }
-
-            return query;
         }
 
         private Inputs GetInput()

@@ -11,10 +11,13 @@ using GraphQL.Types;
 using NodaTime;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Translations;
+using Squidex.Messaging.Subscriptions;
 using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
@@ -483,6 +486,41 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
             }
+        }
+
+        public static class Subscription
+        {
+            public static readonly QueryArguments Arguments = new QueryArguments
+            {
+                new QueryArgument(Scalars.EnrichedContentEventType)
+                {
+                    Name = "type",
+                    Description = FieldDescriptions.EventType,
+                    DefaultValue = null
+                },
+                new QueryArgument(Scalars.String)
+                {
+                    Name = "schemaName",
+                    Description = FieldDescriptions.ContentSchemaName,
+                    DefaultValue = null
+                }
+            };
+
+            public static readonly ISourceStreamResolver Resolver = Resolvers.Stream((fieldContext, context) =>
+            {
+                var type = fieldContext.GetArgument<EnrichedContentEventType?>("type");
+
+                var subscription = new ContentSubscription
+                {
+                    Type = type,
+                    // The app id is taken from the URL so we cannot get events from other apps.
+                    AppId = context.Context.App.Id,
+                    // The name of the schema is used instead of the ID for a simpler API.
+                    SchemaName = fieldContext.GetArgument<string?>("schemaName")
+                };
+
+                return context.Resolve<ISubscriptionService>().Subscribe<object, ContentSubscription>(subscription);
+            });
         }
     }
 }

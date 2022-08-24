@@ -5,17 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure;
+using Squidex.Messaging.Subscriptions;
 
 namespace Squidex.Domain.Apps.Core.Subscriptions
 {
-    public interface ISubscriptionEventCreator
+    public abstract class AppSubscription : ISubscription
     {
-        bool Handles(AppEvent @event);
+        public DomainId AppId { get; set; }
 
-        ValueTask<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event,
-            CancellationToken ct);
+        public abstract ValueTask<bool> ShouldHandle(object message);
     }
 }

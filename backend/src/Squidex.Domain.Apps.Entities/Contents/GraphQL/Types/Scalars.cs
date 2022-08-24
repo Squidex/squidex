@@ -7,6 +7,7 @@
 
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Assets;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
@@ -33,6 +34,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType AssetType = new EnumerationGraphType<AssetType>();
 
+        public static readonly IGraphType EnrichedAssetEventType = new EnumerationGraphType<EnrichedAssetEventType>();
+
+        public static readonly IGraphType EnrichedContentEventType = new EnumerationGraphType<EnrichedContentEventType>();
+
         public static readonly IGraphType NonNullInt = new NonNullGraphType(Int);
 
         public static readonly IGraphType NonNullLong = new NonNullGraphType(Long);
@@ -48,5 +53,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public static readonly IGraphType NonNullDateTime = new NonNullGraphType(DateTime);
 
         public static readonly IGraphType NonNullAssetType = new NonNullGraphType(AssetType);
+
+        public static readonly IGraphType NonNullEnrichedAssetEventType = new NonNullGraphType(EnrichedAssetEventType);
+
+        public static readonly IGraphType NonNullEnrichedContentEventType = new NonNullGraphType(EnrichedContentEventType);
     }
 }

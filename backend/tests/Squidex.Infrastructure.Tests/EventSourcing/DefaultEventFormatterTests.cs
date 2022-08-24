@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using NodaTime;
-using Squidex.Infrastructure.Json.System;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.TestHelpers;

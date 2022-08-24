@@ -1148,34 +1148,5 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             Assert.Contains("\"errors\"", json, StringComparison.Ordinal);
         }
-
-        private static string CreateQuery(string query, DomainId id = default)
-        {
-            return query
-                .Replace("'", "\"", StringComparison.Ordinal)
-                .Replace("`", "\"", StringComparison.Ordinal)
-                .Replace("<ID>", id.ToString(), StringComparison.Ordinal)
-                .Replace("<FIELDS_ASSET>", TestAsset.AllFields, StringComparison.Ordinal)
-                .Replace("<FIELDS_CONTENT>", TestContent.AllFields, StringComparison.Ordinal)
-                .Replace("<FIELDS_CONTENT_FLAT>", TestContent.AllFlatFields, StringComparison.Ordinal);
-        }
-
-        private Context MatchsAssetContext()
-        {
-            return A<Context>.That.Matches(x =>
-                x.App == TestApp.Default &&
-                x.ShouldSkipCleanup() &&
-                x.ShouldSkipContentEnrichment() &&
-                x.User == requestContext.User);
-        }
-
-        private Context MatchsContentContext()
-        {
-            return A<Context>.That.Matches(x =>
-                x.App == TestApp.Default &&
-                x.ShouldSkipCleanup() &&
-                x.ShouldSkipContentEnrichment() &&
-                x.User == requestContext.User);
-        }
     }
 }

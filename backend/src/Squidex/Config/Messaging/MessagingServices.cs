@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Text.Json;
+using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -13,11 +14,13 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Messaging;
 using Squidex.Messaging.Implementation;
 using Squidex.Messaging.Implementation.Null;
 using Squidex.Messaging.Implementation.Scheduler;
+using Squidex.Messaging.Subscriptions;
 
 namespace Squidex.Config.Messaging
 {
@@ -62,11 +65,18 @@ namespace Squidex.Config.Messaging
             services.AddSingleton<ITransportSerializer>(c =>
                 new SystemTextJsonTransportSerializer(c.GetRequiredService<JsonSerializerOptions>()));
 
+            services.AddSingletonAs<SubscriptionPublisher>()
+                .As<IEventConsumer>();
+
+            services.AddSingletonAs<EventMessageEvaluator>()
+                .As<IMessageEvaluator>();
+
             services.AddReplicatedCacheMessaging(isCaching, options =>
             {
                 options.TransportSelector = (transport, _) => transport.First(x => x is NullTransport != isCaching);
             });
 
+            services.AddMessagingSubscriptions();
             services.AddMessagingTransport(config);
             services.AddMessaging(options =>
             {

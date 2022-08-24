@@ -35,6 +35,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return new AsyncResolver<TSource, T>(resolver);
         }
 
+        public static ISourceStreamResolver Stream(Func<IResolveFieldContext, GraphQLExecutionContext, IObservable<object?>> resolver)
+        {
+            return new SyncStreamResolver(resolver);
+        }
+
         private sealed class SyncResolver<TSource, T> : IFieldResolver
         {
             private readonly Func<TSource, IResolveFieldContext, GraphQLExecutionContext, T> resolver;
@@ -106,6 +111,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     logFactory.CreateLogger("GraphQL").LogError(ex, "Failed to resolve field {field}.", context.FieldDefinition.Name);
                     throw;
                 }
+            }
+        }
+
+        private sealed class SyncStreamResolver : ISourceStreamResolver
+        {
+            private readonly Func<IResolveFieldContext, GraphQLExecutionContext, IObservable<object?>> resolver;
+
+            public SyncStreamResolver(Func<IResolveFieldContext, GraphQLExecutionContext, IObservable<object?>> resolver)
+            {
+                this.resolver = resolver;
+            }
+
+            ValueTask<IObservable<object?>> ISourceStreamResolver.ResolveAsync(IResolveFieldContext context)
+            {
+                var executionContext = (GraphQLExecutionContext)context.UserContext!;
+
+                return new ValueTask<IObservable<object?>>(resolver(context, executionContext));
             }
         }
     }

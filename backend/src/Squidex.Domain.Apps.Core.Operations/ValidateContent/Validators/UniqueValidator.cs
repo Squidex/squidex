@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Translations;
 

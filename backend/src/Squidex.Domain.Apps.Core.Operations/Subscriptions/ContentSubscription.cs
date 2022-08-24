@@ -6,31 +6,55 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Infrastructure;
+using Squidex.Domain.Apps.Events.Contents;
 
 namespace Squidex.Domain.Apps.Core.Subscriptions
 {
-    public sealed class ContentSubscription
+    public sealed class ContentSubscription : AppSubscription
     {
-        public DomainId AppId { get; set; }
-
-        public DomainId SchemaId { get; set; }
+        public string? SchemaName { get; set; }
 
         public EnrichedContentEventType? Type { get; set; }
 
-        public ValueTask<bool> ShouldHandle(object message)
+        public override ValueTask<bool> ShouldHandle(object message)
         {
             return new ValueTask<bool>(ShouldHandleCore(message));
         }
 
         private bool ShouldHandleCore(object message)
         {
-            if (message is not EnrichedContentEvent @event)
+            if (message is EnrichedContentEvent)
+            {
+                return true;
+            }
+
+            if (message is not ContentEvent @event)
             {
                 return false;
             }
 
-            return SchemaId == @event.SchemaId.Id && (Type == null || @event.Type == Type.Value);
+            if (!string.IsNullOrWhiteSpace(SchemaName) && @event.SchemaId.Name != SchemaName)
+            {
+                return false;
+            }
+
+            switch (Type)
+            {
+                case EnrichedContentEventType.Created:
+                    return @event is ContentCreated;
+                case EnrichedContentEventType.Deleted:
+                    return @event is ContentDeleted;
+                case EnrichedContentEventType.Published:
+                    return @event is ContentStatusChanged { Change: Contents.StatusChange.Published };
+                case EnrichedContentEventType.Unpublished:
+                    return @event is ContentStatusChanged { Change: Contents.StatusChange.Unpublished };
+                case EnrichedContentEventType.StatusChanged:
+                    return @event is ContentStatusChanged { Change: Contents.StatusChange.Change };
+                case EnrichedContentEventType.Updated:
+                    return @event is ContentUpdated;
+                default:
+                    return true;
+            }
         }
     }
 }

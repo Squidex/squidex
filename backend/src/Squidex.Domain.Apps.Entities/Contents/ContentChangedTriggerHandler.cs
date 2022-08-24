@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
@@ -23,7 +24,7 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler
+    public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscriptionEventCreator
     {
         private readonly IScriptEngine scriptEngine;
         private readonly IContentLoader contentLoader;
@@ -76,6 +77,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
             [EnumeratorCancellation] CancellationToken ct)
+        {
+            yield return await CreateEnrichedEventsAsync(@event, ct);
+        }
+
+        public async ValueTask<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event,
+            CancellationToken ct)
         {
             var contentEvent = (ContentEvent)@event.Payload;
 
@@ -133,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     }
             }
 
-            yield return result;
+            return result;
         }
 
         public string? GetName(AppEvent @event)

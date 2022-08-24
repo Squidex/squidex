@@ -6,12 +6,8 @@
 // ==========================================================================
 
 using GraphQL;
-using GraphQL.DataLoader;
 using GraphQL.DI;
-using GraphQL.Execution;
-using GraphQL.MicrosoftDI;
 using GraphQL.Server.Transports.AspNetCore;
-using GraphQL.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -102,7 +98,7 @@ namespace Squidex.Config.Web
         {
             services.AddGraphQL(builder =>
             {
-                builder.AddApolloTracing();
+                builder.UseApolloTracing();
                 builder.AddSchema<DummySchema>();
                 builder.AddSystemTextJson();
                 builder.AddDataLoader();

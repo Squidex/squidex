@@ -29,6 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         private readonly FieldInputVisitor fieldInputVisitor;
         private readonly PartitionResolver partitionResolver;
         private readonly List<SchemaInfo> allSchemas = new List<SchemaInfo>();
+        private readonly GraphQLOptions options;
 
         static Builder()
         {
@@ -40,12 +41,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public IInterfaceGraphType ComponentInterface { get; } = new ComponentInterfaceGraphType();
 
-        public Builder(IAppEntity app)
+        public Builder(IAppEntity app, GraphQLOptions options)
         {
             partitionResolver = app.PartitionResolver();
 
             fieldVisitor = new FieldVisitor(this);
             fieldInputVisitor = new FieldInputVisitor(this);
+
+            this.options = options;
         }
 
         public GraphQLSchema BuildSchema(IEnumerable<ISchemaEntity> schemas)
@@ -73,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             var newSchema = new GraphQLSchema
             {
-                Query = new AppQueriesGraphType(this, schemaInfos)
+                Query = new ApplicationQueries(this, schemaInfos)
             };
 
             newSchema.RegisterType(ComponentInterface);
@@ -83,12 +86,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             if (schemaInfos.Any())
             {
-                var mutations = new AppMutationsGraphType(this, schemaInfos);
+                var mutations = new ApplicationMutations(this, schemaInfos);
 
                 if (mutations.Fields.Count > 0)
                 {
                     newSchema.Mutation = mutations;
                 }
+            }
+
+            if (options.EnableSubscriptions)
+            {
+                newSchema.Subscription = new ApplicationSubscriptions();
             }
 
             foreach (var (schemaInfo, contentType) in contentTypes)

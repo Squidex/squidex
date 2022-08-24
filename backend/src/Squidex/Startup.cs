@@ -76,6 +76,8 @@ namespace Squidex
 
         public void Configure(IApplicationBuilder app)
         {
+            app.UseWebSockets();
+
             app.UseCookiePolicy();
 
             app.UseDefaultPathBase();

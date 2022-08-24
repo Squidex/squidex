@@ -826,7 +826,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Optional number of contents to skip..
+        ///   Looks up a localized string similar to Optional number of items to skip..
         /// </summary>
         public static string QuerySkip {
             get {
@@ -835,7 +835,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Optional number of contents to take..
+        ///   Looks up a localized string similar to Optional number of items to take..
         /// </summary>
         public static string QueryTop {
             get {

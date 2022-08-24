@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
-    public abstract class QueryExecutionContext : Dictionary<string, object>
+    public abstract class QueryExecutionContext : Dictionary<string, object?>
     {
         private readonly SemaphoreSlim maxRequests = new SemaphoreSlim(10);
 

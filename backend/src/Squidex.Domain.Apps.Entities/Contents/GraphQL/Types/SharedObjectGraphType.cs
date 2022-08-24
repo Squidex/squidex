@@ -5,17 +5,22 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using GraphQL.Types;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public abstract class SchemaUpdateCommand : SchemaCommand, ISchemaCommand
+    internal abstract class SharedObjectGraphType<T> : ObjectGraphType<T>
     {
-        public NamedId<DomainId> SchemaId { get; set; }
-
-        public override DomainId AggregateId
+        public override void Initialize(ISchema schema)
         {
-            get => DomainId.Combine(AppId, SchemaId.Id);
+            try
+            {
+                base.Initialize(schema);
+            }
+            catch (InvalidOperationException)
+            {
+                return;
+            }
         }
     }
 }

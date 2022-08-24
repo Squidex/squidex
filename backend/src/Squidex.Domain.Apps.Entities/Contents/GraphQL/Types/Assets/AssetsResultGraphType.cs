@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
 {
-    internal sealed class AssetsResultGraphType : ObjectGraphType<IResultList<IAssetEntity>>
+    internal sealed class AssetsResultGraphType : SharedObjectGraphType<IResultList<IAssetEntity>>
     {
         public AssetsResultGraphType(IGraphType assetsList)
         {
