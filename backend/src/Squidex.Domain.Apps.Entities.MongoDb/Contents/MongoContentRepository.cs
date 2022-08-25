@@ -26,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     {
         private readonly MongoContentCollection collectionComplete;
         private readonly MongoContentCollection collectionPublished;
+        private readonly ContentOptions options;
         private readonly IMongoDatabase database;
         private readonly IAppProvider appProvider;
 
@@ -42,7 +43,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider,
             IOptions<ContentOptions> options)
         {
+            this.appProvider = appProvider;
             this.database = database;
+            this.options = options.Value;
 
             collectionComplete =
                 new MongoContentCollection("States_Contents_All3", database,
@@ -51,8 +54,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             collectionPublished =
                 new MongoContentCollection("States_Contents_Published3", database,
                     ReadPreference.Secondary, options.Value.OptimizeForSelfHosting);
-
-            this.appProvider = appProvider;
         }
 
         public async Task InitializeAsync(
@@ -64,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             var clusterVersion = await database.GetMajorVersionAsync(ct);
             var clusteredAsReplica = database.Client.Cluster.Description.Type == ClusterType.ReplicaSet;
 
-            CanUseTransactions = clusteredAsReplica && clusterVersion >= 4;
+            CanUseTransactions = clusteredAsReplica && clusterVersion >= 4 && options.UseTransactions;
         }
 
         public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,

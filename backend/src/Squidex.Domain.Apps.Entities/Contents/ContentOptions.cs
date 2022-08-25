@@ -13,6 +13,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public bool OptimizeForSelfHosting { get; set; }
 
+        public bool UseTransactions { get; set; }
+
         public int DefaultPageSize { get; set; } = 200;
 
         public int MaxResults { get; set; } = 200;
