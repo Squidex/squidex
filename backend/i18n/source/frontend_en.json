@@ -84,7 +84,7 @@
   "assets.editor.rotateRight": "Rotate Right",
   "assets.fileTooBig": "Asset is too big.",
   "assets.folderName": "Folder Name",
-  "assets.folderNameHint": "The folder name is used as display name and must not be unique.",
+  "assets.folderNameHint": "The folder name is used as a display name and might not be unique.",
   "assets.insertAssets": "Insert Assets",
   "assets.linkSelected": "Link selected assets ({count})",
   "assets.listPageTitle": "Assets",
