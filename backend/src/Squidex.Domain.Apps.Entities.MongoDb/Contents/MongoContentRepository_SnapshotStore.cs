@@ -106,9 +106,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     // Make an update with full transaction support to be more consistent.
                     await session.WithTransactionAsync(async (session, ct) =>
                     {
-                        await Task.WhenAll(
-                            UpsertVersionedCompleteAsync(session, job, ct),
-                            UpsertVersionedPublishedAsync(session, job, ct));
+                        await UpsertVersionedCompleteAsync(session, job, ct);
+                        await UpsertVersionedPublishedAsync(session, job, ct);
                         return true;
                     }, null, ct);
                 }
