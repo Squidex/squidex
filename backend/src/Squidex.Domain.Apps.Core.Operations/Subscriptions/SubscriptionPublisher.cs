@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Subscriptions
 
             var wrapper = new EventMessageWrapper(@event.To<AppEvent>(), subscriptionEventCreators);
 
-            return subscriptionService.PublishWrapperAsync(wrapper);
+            return subscriptionService.PublishAsync(wrapper);
         }
     }
 }

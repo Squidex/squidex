@@ -519,7 +519,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     SchemaName = fieldContext.GetArgument<string?>("schemaName")
                 };
 
-                return context.Resolve<ISubscriptionService>().Subscribe<object, ContentSubscription>(subscription);
+                return context.Resolve<ISubscriptionService>().Subscribe<object>(subscription);
             });
         }
     }

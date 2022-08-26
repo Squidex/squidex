@@ -62,7 +62,7 @@ namespace Squidex.Config.Messaging
                     .AsSelf().As<IMessageHandler>();
             }
 
-            services.AddSingleton<ITransportSerializer>(c =>
+            services.AddSingleton<IMessagingSerializer>(c =>
                 new SystemTextJsonTransportSerializer(c.GetRequiredService<JsonSerializerOptions>()));
 
             services.AddSingletonAs<SubscriptionPublisher>()
@@ -74,6 +74,11 @@ namespace Squidex.Config.Messaging
             services.AddReplicatedCacheMessaging(isCaching, options =>
             {
                 options.TransportSelector = (transport, _) => transport.First(x => x is NullTransport != isCaching);
+            });
+
+            services.Configure<SubscriptionOptions>(options =>
+            {
+                options.SendMessagesToSelf = false;
             });
 
             services.AddMessagingSubscriptions();

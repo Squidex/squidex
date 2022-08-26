@@ -12,13 +12,13 @@ using Squidex.Messaging.Subscriptions;
 
 namespace Squidex.Domain.Apps.Core.Subscriptions
 {
-    public sealed class EventMessageWrapper : IPayloadWrapper<EnrichedEvent>
+    public sealed class EventMessageWrapper : IPayloadWrapper
     {
         private readonly IEnumerable<ISubscriptionEventCreator> subscriptionEventCreators;
 
         public Envelope<AppEvent> Event { get; }
 
-        object IPayloadWrapper<EnrichedEvent>.Payload => Event.Payload;
+        object IPayloadWrapper.Message => Event.Payload;
 
         public EventMessageWrapper(Envelope<AppEvent> @event, IEnumerable<ISubscriptionEventCreator> subscriptionEventCreators)
         {
@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.Subscriptions
             this.subscriptionEventCreators = subscriptionEventCreators;
         }
 
-        public async ValueTask<EnrichedEvent> CreatePayloadAsync()
+        public async ValueTask<object> CreatePayloadAsync()
         {
             foreach (var creator in subscriptionEventCreators)
             {

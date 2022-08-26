@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                     AppId = context.Context.App.Id
                 };
 
-                return context.Resolve<ISubscriptionService>().Subscribe<object, AssetSubscription>(subscription);
+                return context.Resolve<ISubscriptionService>().Subscribe<object>(subscription);
             });
         }
     }

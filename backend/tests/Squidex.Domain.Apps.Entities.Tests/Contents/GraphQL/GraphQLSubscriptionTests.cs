@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         FileSize = 1024
                     });
 
-            A.CallTo(() => subscriptionService.Subscribe<object, AssetSubscription>(A<AssetSubscription>._))
+            A.CallTo(() => subscriptionService.Subscribe<object>(A<AssetSubscription>._))
                 .Returns(stream);
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                     .AddInvariant(42))
                     });
 
-            A.CallTo(() => subscriptionService.Subscribe<object, ContentSubscription>(A<ContentSubscription>._))
+            A.CallTo(() => subscriptionService.Subscribe<object>(A<ContentSubscription>._))
                 .Returns(stream);
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
