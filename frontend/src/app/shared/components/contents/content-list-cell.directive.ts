@@ -7,7 +7,7 @@
 
 import { Directive, ElementRef, Input, OnChanges, OnDestroy, OnInit, Pipe, PipeTransform, Renderer2 } from '@angular/core';
 import { ResourceOwner } from '@app/framework';
-import { ContentDto, FieldSizes, MetaFields, RootFieldDto, TableField, TableSettings, Types } from '@app/shared/internal';
+import { ContentDto, FieldSizes, MetaFields, TableField, TableSettings } from '@app/shared/internal';
 
 export function getCellWidth(field: TableField, sizes: FieldSizes | undefined | null) {
     const size = sizes?.[field.name] || 0;
@@ -184,7 +184,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
 
     @Input()
     public set field(value: TableField) {
-        this.fieldName = Types.is(value, RootFieldDto) ? value.name : undefined;
+        this.fieldName = value.rootField?.name;
     }
 
     @Input('fields')
