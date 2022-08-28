@@ -12,6 +12,8 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
+using Squidex.Shared;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
@@ -44,7 +46,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => subscriptionService.Subscribe<object>(A<AssetSubscription>._))
                 .Returns(stream);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var permission = PermissionIds.ForApp(PermissionIds.AppAssetsRead, TestApp.Default.Name);
+
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, permission.Id);
 
             var expected = new
             {
@@ -57,6 +61,47 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         fileSize = 1024
                     }
                 }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_return_error_if_user_has_no_permissions_for_assets()
+        {
+            var query = CreateQuery(@"
+                subscription {
+                  assetChanges {
+                    id,
+                    fileName,
+                    fileSize
+                  }
+                }");
+
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+
+            var expected = new
+            {
+                errors = new[]
+                {
+                    new
+                    {
+                        message = "You do not have the necessary permission.",
+                        locations = new[]
+                        {
+                            new
+                            {
+                                line = 3,
+                                column = 19
+                            }
+                        },
+                        path = new[]
+                        {
+                            "assetChanges"
+                        }
+                    }
+                },
+                data = (object?)null
             };
 
             AssertResult(expected, result);
@@ -89,7 +134,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => subscriptionService.Subscribe<object>(A<ContentSubscription>._))
                 .Returns(stream);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var permission = PermissionIds.ForApp(PermissionIds.AppContentsRead, TestApp.Default.Name, "random-schema");
+
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, permission.Id);
 
             var expected = new
             {
@@ -107,6 +154,46 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         }
                     }
                 }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_return_error_if_user_has_no_permissions_for_contents()
+        {
+            var query = CreateQuery(@"
+                subscription {
+                  contentChanges {
+                    id,
+                    data
+                  }
+                }");
+
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+
+            var expected = new
+            {
+                errors = new[]
+                {
+                    new
+                    {
+                        message = "You do not have the necessary permission.",
+                        locations = new[]
+                        {
+                            new
+                            {
+                                line = 3,
+                                column = 19
+                            }
+                        },
+                        path = new[]
+                        {
+                            "contentChanges"
+                        }
+                    }
+                },
+                data = (object?)null
             };
 
             AssertResult(expected, result);

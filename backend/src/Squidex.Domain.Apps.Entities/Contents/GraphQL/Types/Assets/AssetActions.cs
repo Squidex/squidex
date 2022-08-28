@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Messaging.Subscriptions;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
 {
@@ -129,18 +130,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 }
             };
 
-            public static readonly ISourceStreamResolver Resolver = Resolvers.Stream((fieldContext, context) =>
+            public static readonly ISourceStreamResolver Resolver = Resolvers.Stream(PermissionIds.AppAssetsRead, c =>
             {
-                var type = fieldContext.GetArgument<EnrichedAssetEventType?>("type");
-
-                var subscription = new AssetSubscription
+                return new AssetSubscription
                 {
-                    Type = type,
-                    // The app id is taken from the URL so we cannot get events from other apps.
-                    AppId = context.Context.App.Id
+                    // Primary filter for the event types.
+                    Type = c.GetArgument<EnrichedAssetEventType?>("type")
                 };
-
-                return context.Resolve<ISubscriptionService>().Subscribe<object>(subscription);
             });
         }
     }

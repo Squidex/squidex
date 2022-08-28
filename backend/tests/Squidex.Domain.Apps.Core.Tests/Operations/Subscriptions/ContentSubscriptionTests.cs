@@ -10,70 +10,125 @@ using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
+using Squidex.Shared;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.Subscriptions
 {
     public class ContentSubscriptionTests
     {
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+
         [Fact]
         public async Task Should_return_true_for_enriched_content_event()
         {
-            var sut = new ContentSubscription();
+            var sut = WithPermission(new ContentSubscription());
 
-            Assert.True(await sut.ShouldHandle(new EnrichedContentEvent()));
+            var @event = Enrich(new EnrichedContentEvent());
+
+            Assert.True(await sut.ShouldHandle(@event));
         }
 
         [Fact]
         public async Task Should_return_false_for_wrong_event()
         {
-            var sut = new ContentSubscription();
+            var sut = WithPermission(new ContentSubscription());
 
-            Assert.False(await sut.ShouldHandle(new AppCreated()));
+            var @event = new AppCreated { AppId = appId };
+
+            Assert.False(await sut.ShouldHandle(@event));
         }
 
         [Fact]
         public async Task Should_return_true_for_content_event()
         {
-            var sut = new ContentSubscription();
+            var sut = WithPermission(new ContentSubscription());
 
-            Assert.True(await sut.ShouldHandle(new ContentCreated()));
+            var @event = Enrich(new ContentCreated());
+
+            Assert.True(await sut.ShouldHandle(@event));
         }
 
         [Fact]
         public async Task Should_return_true_for_content_event_with_correct_type()
         {
-            var sut = new ContentSubscription { Type = EnrichedContentEventType.Created };
+            var sut = WithPermission(new ContentSubscription { Type = EnrichedContentEventType.Created });
 
-            Assert.True(await sut.ShouldHandle(new ContentCreated()));
+            var @event = Enrich(new ContentCreated());
+
+            Assert.True(await sut.ShouldHandle(@event));
         }
 
         [Fact]
         public async Task Should_return_false_for_content_event_with_wrong_type()
         {
-            var sut = new ContentSubscription { Type = EnrichedContentEventType.Deleted };
+            var sut = WithPermission(new ContentSubscription { Type = EnrichedContentEventType.Deleted });
 
-            Assert.False(await sut.ShouldHandle(new ContentCreated()));
+            var @event = Enrich(new ContentCreated());
+
+            Assert.False(await sut.ShouldHandle(@event));
         }
 
         [Fact]
         public async Task Should_return_true_for_content_event_with_correct_schema()
         {
-            var sut = new ContentSubscription { SchemaName = "my-schema" };
+            var sut = WithPermission(new ContentSubscription { SchemaName = schemaId.Name });
 
-            var schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+            var @event = Enrich(new ContentCreated());
 
-            Assert.True(await sut.ShouldHandle(new ContentCreated { SchemaId = schemaId }));
+            Assert.True(await sut.ShouldHandle(@event));
         }
 
         [Fact]
         public async Task Should_return_false_for_content_event_with_wrong_schema()
         {
-            var sut = new ContentSubscription { SchemaName = "wrong-schema" };
+            var sut = WithPermission(new ContentSubscription { SchemaName = "wrong-schema" });
 
-            var schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+            var @event = Enrich(new ContentCreated());
 
-            Assert.False(await sut.ShouldHandle(new ContentCreated { SchemaId = schemaId }));
+            Assert.False(await sut.ShouldHandle(@event));
+        }
+
+        [Fact]
+        public async Task Should_return_false_for_content_event_invalid_permissions()
+        {
+            var sut = WithPermission(new ContentSubscription(), PermissionIds.AppCommentsCreate);
+
+            var @event = Enrich(new ContentCreated());
+
+            Assert.False(await sut.ShouldHandle(@event));
+        }
+
+        private object Enrich(EnrichedContentEvent source)
+        {
+            source.AppId = appId;
+            source.SchemaId = schemaId;
+
+            return source;
+        }
+
+        private object Enrich(ContentEvent source)
+        {
+            source.AppId = appId;
+            source.SchemaId = schemaId;
+
+            return source;
+        }
+
+        private ContentSubscription WithPermission(ContentSubscription subscription, string? permissionId = null)
+        {
+            subscription.AppId = appId.Id;
+
+            permissionId ??= PermissionIds.AppContentsRead;
+
+            var permission = PermissionIds.ForApp(permissionId, appId.Name, schemaId.Name);
+            var permissions = new PermissionSet(permission);
+
+            subscription.Permissions = permissions;
+
+            return subscription;
         }
     }
 }

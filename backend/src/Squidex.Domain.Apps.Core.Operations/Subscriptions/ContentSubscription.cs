@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Core.Subscriptions
 {
@@ -23,21 +24,43 @@ namespace Squidex.Domain.Apps.Core.Subscriptions
 
         private bool ShouldHandleCore(object message)
         {
-            if (message is EnrichedContentEvent)
+            switch (message)
             {
-                return true;
+                case EnrichedContentEvent enrichedContentEvent:
+                    return ShouldHandle(enrichedContentEvent);
+                case ContentEvent contentEvent:
+                    return ShouldHandle(contentEvent);
+                default:
+                    return false;
             }
+        }
 
-            if (message is not ContentEvent @event)
-            {
-                return false;
-            }
+        private bool ShouldHandle(EnrichedContentEvent @event)
+        {
+            var schemaName = @event.SchemaId.Name;
 
-            if (!string.IsNullOrWhiteSpace(SchemaName) && @event.SchemaId.Name != SchemaName)
-            {
-                return false;
-            }
+            return CheckSchema(schemaName) && CheckType(@event) && CheckPermission(@event.AppId.Name, schemaName);
+        }
 
+        private bool ShouldHandle(ContentEvent @event)
+        {
+            var schemaName = @event.SchemaId.Name;
+
+            return CheckSchema(schemaName) && CheckType(@event) && CheckPermission(@event.AppId.Name, schemaName);
+        }
+
+        private bool CheckSchema(string schemaName)
+        {
+            return string.IsNullOrWhiteSpace(SchemaName) || schemaName == SchemaName;
+        }
+
+        private bool CheckType(EnrichedContentEvent @event)
+        {
+            return Type == null || Type.Value == @event.Type;
+        }
+
+        private bool CheckType(ContentEvent @event)
+        {
             switch (Type)
             {
                 case EnrichedContentEventType.Created:
@@ -55,6 +78,13 @@ namespace Squidex.Domain.Apps.Core.Subscriptions
                 default:
                     return true;
             }
+        }
+
+        private bool CheckPermission(string appName, string schemaName)
+        {
+            var permission = PermissionIds.ForApp(PermissionIds.AppContentsRead, appName, schemaName);
+
+            return Permissions.Allows(permission);
         }
     }
 }
