@@ -451,6 +451,9 @@
   <data name="contents.bulkInsertQueryNotUnique" xml:space="preserve">
     <value>More than one content matches to the query.</value>
   </data>
+  <data name="contents.componentNotCreatable" xml:space="preserve">
+    <value>Component content cannot be created.</value>
+  </data>
   <data name="contents.draftNotCreateForUnpublished" xml:space="preserve">
     <value>You can only create a new version when the content is published.</value>
   </data>

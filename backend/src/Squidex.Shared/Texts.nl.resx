@@ -451,6 +451,9 @@
   <data name="contents.bulkInsertQueryNotUnique" xml:space="preserve">
     <value>Meer dan één inhoud komt overeen met de zoekopdracht.</value>
   </data>
+  <data name="contents.componentNotCreatable" xml:space="preserve">
+    <value>Component content cannot be created.</value>
+  </data>
   <data name="contents.draftNotCreateForUnpublished" xml:space="preserve">
     <value>Je kunt alleen een nieuwe versie maken wanneer de inhoud is gepubliceerd.</value>
   </data>
