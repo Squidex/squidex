@@ -10,9 +10,9 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    internal sealed class AppQueriesGraphType : ObjectGraphType
+    internal sealed class ApplicationQueries : ObjectGraphType
     {
-        public AppQueriesGraphType(Builder builder, IEnumerable<SchemaInfo> schemaInfos)
+        public ApplicationQueries(Builder builder, IEnumerable<SchemaInfo> schemaInfos)
         {
             AddField(SharedTypes.FindAsset);
             AddField(SharedTypes.QueryAssets);

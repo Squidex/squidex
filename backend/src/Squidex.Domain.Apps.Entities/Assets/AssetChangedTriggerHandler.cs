@@ -10,6 +10,7 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
@@ -18,7 +19,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetChangedTriggerHandler : IRuleTriggerHandler
+    public sealed class AssetChangedTriggerHandler : IRuleTriggerHandler, ISubscriptionEventCreator
     {
         private readonly IScriptEngine scriptEngine;
         private readonly IAssetLoader assetLoader;
@@ -67,6 +68,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
             [EnumeratorCancellation] CancellationToken ct)
         {
+            yield return await CreateEnrichedEventsCoreAsync(@event, ct);
+        }
+
+        public async ValueTask<EnrichedEvent?> CreateEnrichedEventsAsync(Envelope<AppEvent> @event,
+            CancellationToken ct)
+        {
+            return await CreateEnrichedEventsCoreAsync(@event, ct);
+        }
+
+        private async ValueTask<EnrichedEvent> CreateEnrichedEventsCoreAsync(Envelope<AppEvent> @event,
+            CancellationToken ct)
+        {
             var assetEvent = (AssetEvent)@event.Payload;
 
             var result = new EnrichedAssetEvent();
@@ -105,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     break;
             }
 
-            yield return result;
+            return result;
         }
 
         public bool Trigger(EnrichedEvent @event, RuleContext context)

@@ -5,12 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
-{
-    public sealed class GraphQLOptions
-    {
-        public int CacheDuration { get; set; } = 10 * 60;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
+using Squidex.Messaging.Subscriptions;
 
-        public bool EnableSubscriptions { get; set; } = true;
+namespace Squidex.Domain.Apps.Core.Subscriptions
+{
+    public abstract class AppSubscription : ISubscription
+    {
+        public DomainId AppId { get; set; }
+
+        public PermissionSet Permissions { get; set; }
+
+        public abstract ValueTask<bool> ShouldHandle(object message);
     }
 }

@@ -5,25 +5,27 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Text.RegularExpressions;
 using FakeItEasy;
 using GraphQL;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
 using GraphQL.SystemTextJson;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Squidex.Caching;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Domain.Apps.Entities.Contents.TestData;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Tasks;
+using Squidex.Messaging.Subscriptions;
 using Squidex.Shared;
 using Squidex.Shared.Users;
 using Xunit;
@@ -32,17 +34,18 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
-    public class GraphQLTestBase : IClassFixture<TranslationsFixture>
+    public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
     {
         protected readonly GraphQLSerializer serializer = new GraphQLSerializer(TestUtils.DefaultOptions());
         protected readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         protected readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
+        protected readonly ISubscriptionService subscriptionService = A.Fake<ISubscriptionService>();
         protected readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         protected readonly Context requestContext;
-        private CachingGraphQLResolver sut;
+        private CachingGraphQLResolver? sut;
 
-        public GraphQLTestBase()
+        protected GraphQLTestBase()
         {
             A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._, default))
                 .ReturnsLazily(x =>
@@ -65,40 +68,60 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             Assert.Equal(isonOutputExpected, jsonOutputResult);
         }
 
-        protected Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, string? permissionId = null)
+        protected Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
         {
-            var context = requestContext;
-
-            if (permissionId != null)
-            {
-                var permission = PermissionIds.ForApp(permissionId, TestApp.Default.Name, TestSchemas.DefaultId.Name).Id;
-
-                context = new Context(Mocks.FrontendUser(permission: permission), TestApp.Default);
-            }
-
-            return ExcecuteAsync(options, context);
+            return ExecuteCoreAsync(options, requestContext);
         }
 
-        private async Task<ExecutionResult> ExcecuteAsync(ExecutionOptions options, Context context)
+        protected Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, string permissionId)
         {
+            return ExecuteCoreAsync(options, BuildContext(permissionId));
+        }
+
+        protected async Task<ExecutionResult> ExecuteCoreAsync(ExecutionOptions options, Context context)
+        {
+            // Use a shared instance to test caching.
             sut ??= CreateSut(TestSchemas.Default, TestSchemas.Ref1, TestSchemas.Ref2);
 
-            options.UserContext = ActivatorUtilities.CreateInstance<GraphQLExecutionContext>(sut.Services, context)!;
+            // Provide the context to the test if services need to be resolved.
+            var graphQLContext = ActivatorUtilities.CreateInstance<GraphQLExecutionContext>(sut.Services, context)!;
 
+            options.UserContext = graphQLContext;
+
+            // Register data loader and other listeners.
             foreach (var listener in sut.Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
             {
                 options.Listeners.Add(listener);
             }
 
+            // Enrich the context with the schema.
             await sut.ExecuteAsync(options, x => Task.FromResult<ExecutionResult>(null!));
 
-            return await new DocumentExecuter().ExecuteAsync(options);
+            var result = await new DocumentExecuter().ExecuteAsync(options);
+
+            if (result.Streams?.Count > 0 && result.Errors?.Any() != true)
+            {
+                // Resolve the first stream result with a timeout.
+                var stream = result.Streams.First();
+
+                using (var cts = new CancellationTokenSource(5000))
+                {
+                    result = await stream.Value.FirstAsync().ToTask().WithCancellation(cts.Token);
+                }
+            }
+
+            return result;
+        }
+
+        private static Context BuildContext(string permissionId)
+        {
+            var permission = PermissionIds.ForApp(permissionId, TestApp.Default.Name, TestSchemas.DefaultId.Name).Id;
+
+            return new Context(Mocks.FrontendUser(permission: permission), TestApp.Default);
         }
 
         protected CachingGraphQLResolver CreateSut(params ISchemaEntity[] schemas)
         {
-            var cache = new BackgroundCache(new MemoryCache(Options.Create(new MemoryCacheOptions())));
-
             var appProvider = A.Fake<IAppProvider>();
 
             A.CallTo(() => appProvider.GetSchemasAsync(TestApp.Default.Id, default))
@@ -106,8 +129,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var serviceProvider =
                 new ServiceCollection()
+                    .AddLogging()
                     .AddMemoryCache()
-                    .AddTransient<GraphQLExecutionContext>()
+                    .AddBackgroundCache()
                     .Configure<AssetOptions>(x =>
                     {
                         x.CanCache = true;
@@ -116,6 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     {
                         x.CanCache = true;
                     })
+                    .AddSingleton<StringReferenceExtractor>()
                     .AddSingleton<IDocumentExecutionListener,
                         DataLoaderDocumentListener>()
                     .AddSingleton<IDataLoaderContextAccessor,
@@ -126,21 +151,70 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         ContentCache>()
                     .AddSingleton<IUrlGenerator,
                         FakeUrlGenerator>()
-                    .AddSingleton(A.Fake<ILoggerFactory>())
+                    .AddSingleton(
+                        A.Fake<ILoggerFactory>())
+                    .AddSingleton(
+                        A.Fake<ISchemasHash>())
                     .AddSingleton(appProvider)
                     .AddSingleton(assetQuery)
                     .AddSingleton(commandBus)
                     .AddSingleton(contentQuery)
+                    .AddSingleton(subscriptionService)
                     .AddSingleton(userResolver)
-                    .AddSingleton<InstantGraphType>()
-                    .AddSingleton<JsonGraphType>()
-                    .AddSingleton<JsonNoopGraphType>()
-                    .AddSingleton<StringReferenceExtractor>()
                     .BuildServiceProvider();
 
-            var schemasHash = A.Fake<ISchemasHash>();
+            return ActivatorUtilities.CreateInstance<CachingGraphQLResolver>(serviceProvider);
+        }
 
-            return new CachingGraphQLResolver(cache, schemasHash, serviceProvider, Options.Create(new GraphQLOptions()));
+        protected static string CreateQuery(string query, DomainId id = default, IEnrichedContentEntity? content = null)
+        {
+            query = query
+                .Replace("'", "\"", StringComparison.Ordinal)
+                .Replace("`", "\"", StringComparison.Ordinal)
+                .Replace("<FIELDS_ASSET>", TestAsset.AllFields, StringComparison.Ordinal)
+                .Replace("<FIELDS_CONTENT>", TestContent.AllFields, StringComparison.Ordinal)
+                .Replace("<FIELDS_CONTENT_FLAT>", TestContent.AllFlatFields, StringComparison.Ordinal);
+
+            if (id != default)
+            {
+                query = query.Replace("<ID>", id.ToString(), StringComparison.Ordinal);
+            }
+
+            if (query.Contains("<DATA>", StringComparison.Ordinal) && content != null)
+            {
+                var data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id);
+
+                // Json is not the same as the input format of graphql, therefore we need to convert it.
+                var dataJson = TestUtils.DefaultSerializer.Serialize(data, true);
+
+                // Use properties without quotes.
+                dataJson = Regex.Replace(dataJson, "\"([^\"]+)\":", x => $"{x.Groups[1].Value}:");
+
+                // Use enum values whithout quotes.
+                dataJson = Regex.Replace(dataJson, "\"Enum([A-Za-z]+)\"", x => $"Enum{x.Groups[1].Value}");
+
+                query = query.Replace("<DATA>", dataJson, StringComparison.Ordinal);
+            }
+
+            return query;
+        }
+
+        protected Context MatchsAssetContext()
+        {
+            return A<Context>.That.Matches(x =>
+                x.App == TestApp.Default &&
+                x.ShouldSkipCleanup() &&
+                x.ShouldSkipContentEnrichment() &&
+                x.User == requestContext.User);
+        }
+
+        protected Context MatchsContentContext()
+        {
+            return A<Context>.That.Matches(x =>
+                x.App == TestApp.Default &&
+                x.ShouldSkipCleanup() &&
+                x.ShouldSkipContentEnrichment() &&
+                x.User == requestContext.User);
         }
     }
 }

@@ -104,9 +104,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<UserFluidExtension>()
                 .As<IFluidExtension>();
-
-            services.AddSingletonAs<SimplePubSub>()
-                .As<IPubSub>();
         }
 
         public static void AddSquidexUsageTracking(this IServiceCollection services, IConfiguration config)

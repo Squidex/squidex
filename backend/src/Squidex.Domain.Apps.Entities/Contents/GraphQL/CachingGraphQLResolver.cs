@@ -33,6 +33,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private sealed record CacheEntry(GraphQLSchema Model, string Hash, Instant Created);
 
+        public float SortOrder => 0;
+
         public IServiceProvider Services
         {
             get => serviceProvider;
@@ -86,11 +88,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private async Task<CacheEntry> CreateModelAsync(IAppEntity app)
         {
-            var schemas = await serviceProvider.GetRequiredService<IAppProvider>().GetSchemasAsync(app.Id);
+            var schemasList = await serviceProvider.GetRequiredService<IAppProvider>().GetSchemasAsync(app.Id);
+            var schemasKey = await schemasHash.ComputeHashAsync(app, schemasList);
 
-            var hash = await schemasHash.ComputeHashAsync(app, schemas);
+            var now = SystemClock.Instance.GetCurrentInstant();
 
-            return new CacheEntry(new Builder(app).BuildSchema(schemas), hash, SystemClock.Instance.GetCurrentInstant());
+            return new CacheEntry(new Builder(app, options).BuildSchema(schemasList), schemasKey, now);
         }
 
         private static object CreateCacheKey(DomainId appId, string etag)

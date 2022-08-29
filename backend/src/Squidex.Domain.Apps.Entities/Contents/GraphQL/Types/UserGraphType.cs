@@ -13,7 +13,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    internal sealed class UserGraphType : ObjectGraphType<IUser>
+    internal sealed class UserGraphType : SharedObjectGraphType<IUser>
     {
         public static readonly IGraphType Nullable = new UserGraphType();
 

@@ -7,6 +7,7 @@
 
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Directives;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
@@ -18,6 +19,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public static readonly IGraphType AssetsList = new ListGraphType(new NonNullGraphType(Asset));
 
         public static readonly IGraphType AssetsResult = new AssetsResultGraphType(AssetsList);
+
+        public static readonly IGraphType EnrichedAssetEvent = new EnrichedAssetEventGraphType();
+
+        public static readonly IGraphType EnrichedContentEvent = new EnrichedContentEventGraphType();
 
         public static readonly CacheDirective MemoryCacheDirective = new CacheDirective();
 

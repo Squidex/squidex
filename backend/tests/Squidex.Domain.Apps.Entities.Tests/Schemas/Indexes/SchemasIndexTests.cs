@@ -7,7 +7,6 @@
 
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -18,6 +17,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.TestHelpers;
 using Squidex.Infrastructure.Validation;
+using Squidex.Messaging;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             ct = cts.Token;
 
             var replicatedCache =
-                new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), new SimplePubSub(A.Fake<ILogger<SimplePubSub>>()),
+                new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), A.Fake<IMessageBus>(),
                     Options.Create(new ReplicatedCacheOptions { Enable = true }));
 
             sut = new SchemasIndex(schemaRepository, replicatedCache, state.PersistenceFactory);

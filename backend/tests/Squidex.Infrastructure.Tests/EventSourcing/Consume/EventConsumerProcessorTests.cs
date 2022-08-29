@@ -100,6 +100,27 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         }
 
         [Fact]
+        public async Task Should_query_position_if_consumer_should_start_from_latest()
+        {
+            state.Snapshot = new EventConsumerState();
+
+            A.CallTo(() => eventConsumer.StartLatest)
+                .Returns(true);
+
+            A.CallTo(() => eventConsumer.EventsFilter)
+                .Returns("my-filter");
+
+            var latestPosition = "LATEST";
+
+            A.CallTo(() => eventStore.QueryAllReverseAsync("my-filter", default, 1, A<CancellationToken>._))
+                .Returns(Enumerable.Repeat(new StoredEvent("Stream", latestPosition, 1, eventData), 1).ToAsyncEnumerable());
+
+            await sut.InitializeAsync(default);
+
+            AssertGrainState(isStopped: false, position: latestPosition);
+        }
+
+        [Fact]
         public async Task Should_not_subscribe_to_event_store_if_stopped_in_db()
         {
             state.Snapshot = state.Snapshot.Stopped();

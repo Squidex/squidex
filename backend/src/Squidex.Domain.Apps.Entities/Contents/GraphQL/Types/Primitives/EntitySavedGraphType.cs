@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
-    internal sealed class EntitySavedGraphType : ObjectGraphType<CommandResult>
+    internal sealed class EntitySavedGraphType : SharedObjectGraphType<CommandResult>
     {
         public static readonly IGraphType Nullable = new EntitySavedGraphType();
 

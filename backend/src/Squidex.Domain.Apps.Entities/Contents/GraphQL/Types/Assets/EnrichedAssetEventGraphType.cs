@@ -10,24 +10,31 @@ using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Assets;
-using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
 {
-    internal sealed class AssetGraphType : SharedObjectGraphType<IEnrichedAssetEntity>
+    internal sealed class EnrichedAssetEventGraphType : SharedObjectGraphType<EnrichedAssetEvent>
     {
-        public AssetGraphType()
+        public EnrichedAssetEventGraphType()
         {
             // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-            Name = "Asset";
+            Name = "EnrichedAssetEvent";
+
+            AddField(new FieldType
+            {
+                Name = "type",
+                ResolvedType = Scalars.EnrichedAssetEventType,
+                Resolver = Resolve(x => x.Type),
+                Description = FieldDescriptions.EventType
+            });
 
             AddField(new FieldType
             {
                 Name = "id",
                 ResolvedType = Scalars.NonNullString,
-                Resolver = EntityResolvers.Id,
+                Resolver = Resolve(x => x.Id.ToString()),
                 Description = FieldDescriptions.EntityId
             });
 
@@ -35,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             {
                 Name = "version",
                 ResolvedType = Scalars.NonNullInt,
-                Resolver = EntityResolvers.Version,
+                Resolver = Resolve(x => x.Version),
                 Description = FieldDescriptions.EntityVersion
             });
 
@@ -43,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             {
                 Name = "created",
                 ResolvedType = Scalars.NonNullDateTime,
-                Resolver = EntityResolvers.Created,
+                Resolver = Resolve(x => x.Created.ToDateTimeUtc()),
                 Description = FieldDescriptions.EntityCreated
             });
 
@@ -51,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             {
                 Name = "createdBy",
                 ResolvedType = Scalars.NonNullString,
-                Resolver = EntityResolvers.CreatedBy,
+                Resolver = Resolve(x => x.CreatedBy.ToString()),
                 Description = FieldDescriptions.EntityCreatedBy
             });
 
@@ -59,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             {
                 Name = "createdByUser",
                 ResolvedType = UserGraphType.NonNull,
-                Resolver = EntityResolvers.CreatedByUser,
+                Resolver = Resolve(x => x.CreatedBy),
                 Description = FieldDescriptions.EntityCreatedBy
             });
 
@@ -67,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             {
                 Name = "lastModified",
                 ResolvedType = Scalars.NonNullDateTime,
-                Resolver = EntityResolvers.LastModified,
+                Resolver = Resolve(x => x.LastModified.ToDateTimeUtc()),
                 Description = FieldDescriptions.EntityLastModified
             });
 
@@ -75,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             {
                 Name = "lastModifiedBy",
                 ResolvedType = Scalars.NonNullString,
-                Resolver = EntityResolvers.LastModifiedBy,
+                Resolver = Resolve(x => x.LastModifiedBy.ToString()),
                 Description = FieldDescriptions.EntityLastModifiedBy
             });
 
@@ -83,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             {
                 Name = "lastModifiedByUser",
                 ResolvedType = UserGraphType.NonNull,
-                Resolver = EntityResolvers.LastModifiedByUser,
+                Resolver = Resolve(x => x.LastModifiedBy),
                 Description = FieldDescriptions.EntityLastModifiedBy
             });
 
@@ -171,9 +178,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             {
                 Name = "isImage",
                 ResolvedType = Scalars.NonNullBoolean,
-                Resolver = Resolve(x => x.Type == AssetType.Image),
+                Resolver = Resolve(x => x.AssetType == AssetType.Image),
                 Description = FieldDescriptions.AssetIsImage,
                 DeprecationReason = "Use 'type' field instead."
+            });
+
+            AddField(new FieldType
+            {
+                Name = "assetType",
+                ResolvedType = Scalars.NonNullAssetType,
+                Resolver = Resolve(x => x.AssetType),
+                Description = FieldDescriptions.AssetType
             });
 
             AddField(new FieldType
@@ -196,43 +211,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
 
             AddField(new FieldType
             {
-                Name = "type",
-                ResolvedType = Scalars.NonNullAssetType,
-                Resolver = Resolve(x => x.Type),
-                Description = FieldDescriptions.AssetType
-            });
-
-            AddField(new FieldType
-            {
-                Name = "metadataText",
-                ResolvedType = Scalars.NonNullString,
-                Resolver = Resolve(x => x.MetadataText),
-                Description = FieldDescriptions.AssetMetadataText
-            });
-
-            AddField(new FieldType
-            {
-                Name = "tags",
-                ResolvedType = Scalars.NonNullStrings,
-                Resolver = Resolve(x => x.TagNames),
-                Description = FieldDescriptions.AssetTags
-            });
-
-            AddField(new FieldType
-            {
                 Name = "metadata",
                 Arguments = AssetActions.Metadata.Arguments,
                 ResolvedType = Scalars.JsonNoop,
                 Resolver = AssetActions.Metadata.Resolver,
                 Description = FieldDescriptions.AssetMetadata
-            });
-
-            AddField(new FieldType
-            {
-                Name = "editToken",
-                ResolvedType = Scalars.String,
-                Resolver = Resolve(x => x.EditToken),
-                Description = FieldDescriptions.EditToken
             });
 
             AddField(new FieldType
@@ -243,7 +226,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Description = FieldDescriptions.AssetSourceUrl
             });
 
-            Description = "An asset";
+            Description = "An asset event";
         }
 
         private static readonly IFieldResolver Url = Resolve((asset, _, context) =>
@@ -264,15 +247,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
         {
             var urlGenerator = context.Resolve<IUrlGenerator>();
 
-            return urlGenerator.AssetThumbnail(asset.AppId, asset.Id.ToString(), asset.Type);
+            return urlGenerator.AssetThumbnail(asset.AppId, asset.Id.ToString(), asset.AssetType);
         });
 
-        private static IFieldResolver Resolve<T>(Func<IEnrichedAssetEntity, IResolveFieldContext, GraphQLExecutionContext, T> resolver)
+        private static IFieldResolver Resolve<T>(Func<EnrichedAssetEvent, IResolveFieldContext, GraphQLExecutionContext, T> resolver)
         {
             return Resolvers.Sync(resolver);
         }
 
-        private static IFieldResolver Resolve<T>(Func<IEnrichedAssetEntity, T> resolver)
+        private static IFieldResolver Resolve<T>(Func<EnrichedAssetEvent, T> resolver)
         {
             return Resolvers.Sync(resolver);
         }

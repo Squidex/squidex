@@ -17,11 +17,11 @@ namespace Squidex.Web.GraphQL
     {
         private readonly ObjectFactory factory = ActivatorUtilities.CreateFactory(typeof(GraphQLExecutionContext), new[] { typeof(Context) });
 
-        public Task<IDictionary<string, object>> BuildUserContext(HttpContext httpContext)
+        public ValueTask<IDictionary<string, object?>?> BuildUserContextAsync(HttpContext context, object? payload)
         {
-            var executionContext = (GraphQLExecutionContext)factory(httpContext.RequestServices, new object[] { httpContext.Context() });
+            var executionContext = (GraphQLExecutionContext)factory(context.RequestServices, new object[] { context.Context() });
 
-            return Task.FromResult<IDictionary<string, object>>(executionContext);
+            return new ValueTask<IDictionary<string, object?>?>(executionContext);
         }
     }
 }

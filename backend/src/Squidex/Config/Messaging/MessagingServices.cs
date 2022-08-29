@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Text.Json;
+using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -13,10 +14,13 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Messaging;
 using Squidex.Messaging.Implementation;
+using Squidex.Messaging.Implementation.Null;
 using Squidex.Messaging.Implementation.Scheduler;
+using Squidex.Messaging.Subscriptions;
 
 namespace Squidex.Config.Messaging
 {
@@ -24,9 +28,14 @@ namespace Squidex.Config.Messaging
     {
         public static void AddSquidexMessaging(this IServiceCollection services, IConfiguration config)
         {
-            var worker = config.GetValue<bool>("clustering:worker");
+            var channelBackupRestore = new ChannelName("backup.restore");
+            var channelBackupStart = new ChannelName("backup.start");
+            var channelFallback = new ChannelName("default");
+            var channelRules = new ChannelName("rules.run");
+            var isCaching = config.GetValue<bool>("caching:replicated:enable");
+            var isWorker = config.GetValue<bool>("clustering:worker");
 
-            if (worker)
+            if (isWorker)
             {
                 services.AddSingletonAs<AssetCleanupProcess>()
                     .AsSelf();
@@ -53,34 +62,51 @@ namespace Squidex.Config.Messaging
                     .AsSelf().As<IMessageHandler>();
             }
 
-            services.AddSingleton<ITransportSerializer>(c =>
+            services.AddSingleton<IMessagingSerializer>(c =>
                 new SystemTextJsonTransportSerializer(c.GetRequiredService<JsonSerializerOptions>()));
 
+            services.AddSingletonAs<SubscriptionPublisher>()
+                .As<IEventConsumer>();
+
+            services.AddSingletonAs<EventMessageEvaluator>()
+                .As<IMessageEvaluator>();
+
+            services.AddReplicatedCacheMessaging(isCaching, options =>
+            {
+                options.TransportSelector = (transport, _) => transport.First(x => x is NullTransport != isCaching);
+            });
+
+            services.Configure<SubscriptionOptions>(options =>
+            {
+                options.SendMessagesToSelf = false;
+            });
+
+            services.AddMessagingSubscriptions();
             services.AddMessagingTransport(config);
             services.AddMessaging(options =>
             {
-                options.Routing.Add(m => m is RuleRunnerRun, "rules.run");
-                options.Routing.Add(m => m is BackupStart, "backup.start");
-                options.Routing.Add(m => m is BackupRestore, "backup.restore");
-                options.Routing.Add(_ => true, "default");
+                options.Routing.Add(m => m is RuleRunnerRun, channelRules);
+                options.Routing.Add(m => m is BackupStart, channelBackupStart);
+                options.Routing.Add(m => m is BackupRestore, channelBackupRestore);
+                options.Routing.AddFallback(channelFallback);
             });
 
-            services.AddMessaging("default", worker, options =>
+            services.AddMessaging(channelFallback, isWorker, options =>
             {
                 options.Scheduler = InlineScheduler.Instance;
             });
 
-            services.AddMessaging("backup.start", worker, options =>
+            services.AddMessaging(channelBackupStart, isWorker, options =>
             {
                 options.Scheduler = new ParallelScheduler(4);
             });
 
-            services.AddMessaging("backup.restore", worker, options =>
+            services.AddMessaging(channelBackupRestore, isWorker, options =>
             {
                 options.Scheduler = InlineScheduler.Instance;
             });
 
-            services.AddMessaging("rules.run", worker, options =>
+            services.AddMessaging(channelRules, isWorker, options =>
             {
                 options.Scheduler = new ParallelScheduler(4);
             });

@@ -11,10 +11,10 @@ using GraphQL.Types;
 using NodaTime;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
@@ -226,22 +226,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 };
             }
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(PermissionIds.AppContentsCreate, c =>
+            public static readonly IFieldResolver Resolver = ContentCommand(PermissionIds.AppContentsCreate, c =>
             {
-                var contentId = c.GetArgument<string?>("id");
-                var contentData = c.GetArgument<ContentData>("data")!;
-                var contentStatus = c.GetArgument<string?>("status");
-
-                var command = new CreateContent { Data = contentData };
-
-                if (!string.IsNullOrWhiteSpace(contentId))
+                var command = new CreateContent
                 {
-                    command.ContentId = DomainId.Create(contentId);
-                }
+                    // The data is converted from input args.
+                    Data = c.GetArgument<ContentData>("data")
+                };
 
-                if (!string.IsNullOrWhiteSpace(contentStatus))
+                var status = c.GetArgument<string?>("status");
+
+                if (!string.IsNullOrWhiteSpace(status))
                 {
-                    command.Status = new Status(contentStatus);
+                    command.Status = new Status(status);
                 }
                 else if (c.GetArgument<bool>("publish"))
                 {
@@ -297,18 +294,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 };
             }
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(PermissionIds.AppContentsUpsert, c =>
+            public static readonly IFieldResolver Resolver = ContentCommand(PermissionIds.AppContentsUpsert, c =>
             {
-                var contentId = c.GetArgument<DomainId>("id");
-                var contentData = c.GetArgument<ContentData>("data")!;
-                var contentStatus = c.GetArgument<string?>("status");
-                var patch = c.GetArgument<bool>("patch");
-
-                var command = new UpsertContent { ContentId = contentId, Data = contentData, Patch = patch };
-
-                if (!string.IsNullOrWhiteSpace(contentStatus))
+                var command = new UpsertContent
                 {
-                    command.Status = new Status(contentStatus);
+                    // The data is converted from input args.
+                    Data = c.GetArgument<ContentData>("data"),
+
+                    // True, to make a path, if the content exits.
+                    Patch = c.GetArgument<bool>("patch"),
+                };
+
+                var status = c.GetArgument<string?>("status");
+
+                if (!string.IsNullOrWhiteSpace(status))
+                {
+                    command.Status = new Status(status);
                 }
                 else if (c.GetArgument<bool>("publish"))
                 {
@@ -346,12 +347,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 };
             }
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(PermissionIds.AppContentsUpdateOwn, c =>
+            public static readonly IFieldResolver Resolver = ContentCommand(PermissionIds.AppContentsUpdateOwn, c =>
             {
-                var contentId = c.GetArgument<DomainId>("id");
-                var contentData = c.GetArgument<ContentData>("data")!;
-
-                return new UpdateContent { ContentId = contentId, Data = contentData };
+                return new PatchContent
+                {
+                    // The data is converted from input args.
+                    Data = c.GetArgument<ContentData>("data")!
+                };
             });
         }
 
@@ -382,12 +384,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 };
             }
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(PermissionIds.AppContentsUpdateOwn, c =>
+            public static readonly IFieldResolver Resolver = ContentCommand(PermissionIds.AppContentsUpdateOwn, c =>
             {
-                var contentId = c.GetArgument<DomainId>("id");
-                var contentData = c.GetArgument<ContentData>("data")!;
-
-                return new PatchContent { ContentId = contentId, Data = contentData };
+                return new PatchContent
+                {
+                    // The data is converted from input args.
+                    Data = c.GetArgument<ContentData>("data")!
+                };
             });
         }
 
@@ -421,13 +424,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 }
             };
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(PermissionIds.AppContentsChangeStatusOwn, c =>
+            public static readonly IFieldResolver Resolver = ContentCommand(PermissionIds.AppContentsChangeStatusOwn, c =>
             {
-                var contentId = c.GetArgument<DomainId>("id");
-                var contentStatus = c.GetArgument<Status>("status");
-                var contentDueTime = c.GetArgument<Instant?>("dueTime");
+                return new ChangeContentStatus
+                {
+                    // Main parameter to set the status.
+                    Status = c.GetArgument<Status>("status"),
 
-                return new ChangeContentStatus { ContentId = contentId, Status = contentStatus, DueTime = contentDueTime };
+                    // This is an optional field to delay the status change.
+                    DueTime = c.GetArgument<Instant?>("dueTime"),
+                };
             });
         }
 
@@ -449,40 +455,59 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 }
             };
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(PermissionIds.AppContentsDeleteOwn, c =>
+            public static readonly IFieldResolver Resolver = ContentCommand(PermissionIds.AppContentsDeleteOwn, c =>
             {
-                var contentId = c.GetArgument<DomainId>("id");
-
-                return new DeleteContent { ContentId = contentId };
+                return new DeleteContent();
             });
         }
 
-        private static IFieldResolver ResolveAsync(string permissionId, Func<IResolveFieldContext, ContentCommand> action)
+        public static class Subscription
         {
-            return Resolvers.Async<object, object>(async (source, fieldContext, context) =>
+            public static readonly QueryArguments Arguments = new QueryArguments
             {
-                var schemaId = fieldContext.FieldDefinition.SchemaNamedId();
+                new QueryArgument(Scalars.EnrichedContentEventType)
+                {
+                    Name = "type",
+                    Description = FieldDescriptions.EventType,
+                    DefaultValue = null
+                },
+                new QueryArgument(Scalars.String)
+                {
+                    Name = "schemaName",
+                    Description = FieldDescriptions.ContentSchemaName,
+                    DefaultValue = null
+                }
+            };
 
-                CheckPermission(permissionId, context, schemaId);
+            public static readonly ISourceStreamResolver Resolver = Resolvers.Stream(PermissionIds.AppContentsRead, c =>
+            {
+                return new ContentSubscription
+                {
+                    // Primary filter for the event types.
+                    Type = c.GetArgument<EnrichedContentEventType?>("type"),
 
-                var contentCommand = action(fieldContext);
-
-                contentCommand.SchemaId = schemaId;
-                contentCommand.ExpectedVersion = fieldContext.GetArgument("expectedVersion", EtagVersion.Any);
-
-                var commandBus = context.Resolve<ICommandBus>();
-                var commandContext = await commandBus.PublishAsync(contentCommand, fieldContext.CancellationToken);
-
-                return commandContext.PlainResult!;
+                    // The name of the schema is used instead of the ID for a simpler API.
+                    SchemaName = c.GetArgument<string?>("schemaName")
+                };
             });
         }
 
-        private static void CheckPermission(string permissionId, GraphQLExecutionContext context, NamedId<DomainId> schemaId)
+        private static IFieldResolver ContentCommand(string permissionId, Func<IResolveFieldContext, ContentCommand> creator)
         {
-            if (!context.Context.Allows(permissionId, schemaId.Name))
+            return Resolvers.Command(permissionId, c =>
             {
-                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
-            }
+                var command = creator(c);
+
+                var contentId = c.GetArgument<string?>("id");
+
+                if (!string.IsNullOrWhiteSpace(contentId))
+                {
+                    // Same parameter for all commands.
+                    command.ContentId = DomainId.Create(contentId);
+                }
+
+                return command;
+            });
         }
     }
 }

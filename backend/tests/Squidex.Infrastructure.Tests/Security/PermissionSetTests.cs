@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.Security
@@ -130,6 +131,16 @@ namespace Squidex.Infrastructure.Security
                     .Add(new Permission("admin.*"));
 
             Assert.True(sut.Includes(new Permission("admin")));
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize()
+        {
+            var permissions = new PermissionSet("a", "b", "c");
+
+            var serialized = permissions.SerializeAndDeserialize();
+
+            Assert.Equal(permissions, serialized);
         }
     }
 }

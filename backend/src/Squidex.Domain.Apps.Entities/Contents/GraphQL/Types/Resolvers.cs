@@ -8,8 +8,14 @@
 using GraphQL;
 using GraphQL.Resolvers;
 using Microsoft.Extensions.Logging;
+using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Messaging.Subscriptions;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
@@ -35,7 +41,36 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return new AsyncResolver<TSource, T>(resolver);
         }
 
-        private sealed class SyncResolver<TSource, T> : IFieldResolver
+        private abstract class BaseResolver<T, TOut> where T : TOut
+        {
+            protected async ValueTask<TOut> ResolveWithErrorHandlingAsync(IResolveFieldContext context)
+            {
+                var executionContext = (GraphQLExecutionContext)context.UserContext!;
+                try
+                {
+                    return await ResolveCoreAsync(context, executionContext);
+                }
+                catch (ValidationException ex)
+                {
+                    throw new ExecutionError(ex.Message);
+                }
+                catch (DomainException ex)
+                {
+                    throw new ExecutionError(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    var logFactory = executionContext.Resolve<ILoggerFactory>();
+
+                    logFactory.CreateLogger("GraphQL").LogError(ex, "Failed to resolve field {field}.", context.FieldDefinition.Name);
+                    throw;
+                }
+            }
+
+            protected abstract ValueTask<T> ResolveCoreAsync(IResolveFieldContext context, GraphQLExecutionContext executionContext);
+        }
+
+        private sealed class SyncResolver<TSource, T> : BaseResolver<T, object?>, IFieldResolver
         {
             private readonly Func<TSource, IResolveFieldContext, GraphQLExecutionContext, T> resolver;
 
@@ -44,35 +79,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 this.resolver = resolver;
             }
 
+            protected override ValueTask<T> ResolveCoreAsync(IResolveFieldContext context, GraphQLExecutionContext executionContext)
+            {
+                return new ValueTask<T>(resolver((TSource)context.Source!, context, executionContext));
+            }
+
             public ValueTask<object?> ResolveAsync(IResolveFieldContext context)
             {
-                var executionContext = (GraphQLExecutionContext)context.UserContext!;
-
-                try
-                {
-                    var result = resolver((TSource)context.Source!, context, executionContext);
-
-                    return new ValueTask<object?>(result);
-                }
-                catch (ValidationException ex)
-                {
-                    throw new ExecutionError(ex.Message);
-                }
-                catch (DomainException ex)
-                {
-                    throw new ExecutionError(ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    var logFactory = executionContext.Resolve<ILoggerFactory>();
-
-                    logFactory.CreateLogger("GraphQL").LogError(ex, "Failed to resolve field {field}.", context.FieldDefinition.Name);
-                    throw;
-                }
+                return ResolveWithErrorHandlingAsync(context);
             }
         }
 
-        private sealed class AsyncResolver<TSource, T> : IFieldResolver
+        private sealed class AsyncResolver<TSource, T> : BaseResolver<T, object?>, IFieldResolver
         {
             private readonly Func<TSource, IResolveFieldContext, GraphQLExecutionContext, Task<T>> resolver;
 
@@ -81,32 +99,85 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 this.resolver = resolver;
             }
 
-            public async ValueTask<object?> ResolveAsync(IResolveFieldContext context)
+            protected override async ValueTask<T> ResolveCoreAsync(IResolveFieldContext context, GraphQLExecutionContext executionContext)
             {
-                var executionContext = (GraphQLExecutionContext)context.UserContext!;
-
-                try
-                {
-                    var result = await resolver((TSource)context.Source!, context, executionContext);
-
-                    return result;
-                }
-                catch (ValidationException ex)
-                {
-                    throw new ExecutionError(ex.Message);
-                }
-                catch (DomainException ex)
-                {
-                    throw new ExecutionError(ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    var logFactory = executionContext.Resolve<ILoggerFactory>();
-
-                    logFactory.CreateLogger("GraphQL").LogError(ex, "Failed to resolve field {field}.", context.FieldDefinition.Name);
-                    throw;
-                }
+                return await resolver((TSource)context.Source!, context, executionContext);
             }
+
+            public ValueTask<object?> ResolveAsync(IResolveFieldContext context)
+            {
+                return ResolveWithErrorHandlingAsync(context);
+            }
+        }
+
+        private sealed class SyncStreamResolver : BaseResolver<IObservable<object?>, IObservable<object?>>, ISourceStreamResolver
+        {
+            private readonly Func<IResolveFieldContext, GraphQLExecutionContext, IObservable<object?>> resolver;
+
+            public SyncStreamResolver(Func<IResolveFieldContext, GraphQLExecutionContext, IObservable<object?>> resolver)
+            {
+                this.resolver = resolver;
+            }
+
+            protected override ValueTask<IObservable<object?>> ResolveCoreAsync(IResolveFieldContext context, GraphQLExecutionContext executionContext)
+            {
+                return new ValueTask<IObservable<object?>>(resolver(context, executionContext));
+            }
+
+            public ValueTask<IObservable<object?>> ResolveAsync(IResolveFieldContext context)
+            {
+                return ResolveWithErrorHandlingAsync(context);
+            }
+        }
+
+        public static IFieldResolver Command(string permissionId, Func<IResolveFieldContext, ICommand> action)
+        {
+            return new AsyncResolver<object, object>(async (source, fieldContext, context) =>
+            {
+                var schemaId = fieldContext.FieldDefinition.SchemaNamedId();
+
+                if (!context.Context.Allows(permissionId, schemaId?.Name ?? Permission.Any))
+                {
+                    throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
+                }
+
+                var command = action(fieldContext);
+
+                // The app identifier is set from the http context.
+                if (command is ISchemaCommand schemaCommand && schemaId != null)
+                {
+                    schemaCommand.SchemaId = schemaId;
+                }
+
+                command.ExpectedVersion = fieldContext.GetArgument("expectedVersion", EtagVersion.Any);
+
+                var commandContext =
+                    await context.Resolve<ICommandBus>()
+                        .PublishAsync(command, fieldContext.CancellationToken);
+
+                return commandContext.PlainResult!;
+            });
+        }
+
+        public static ISourceStreamResolver Stream(string permissionId, Func<IResolveFieldContext, AppSubscription> action)
+        {
+            return new SyncStreamResolver((fieldContext, context) =>
+            {
+                if (!context.Context.UserPermissions.Includes(PermissionIds.ForApp(permissionId, context.Context.App.Name)))
+                {
+                    throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
+                }
+
+                var subscription = action(fieldContext);
+
+                // The app id is taken from the URL so we cannot get events from other apps.
+                subscription.AppId = context.Context.App.Id;
+
+                // We also check the subscriptions on the source server.
+                subscription.Permissions = context.Context.UserPermissions;
+
+                return context.Resolve<ISubscriptionService>().Subscribe<object>(subscription);
+            });
         }
     }
 }

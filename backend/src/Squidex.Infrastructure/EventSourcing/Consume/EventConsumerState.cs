@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
         {
         }
 
-        public EventConsumerState Handled(string position, int offset = 1)
+        public EventConsumerState Handled(string? position, int offset = 1)
         {
             return new EventConsumerState(position, Count + offset);
         }

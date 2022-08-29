@@ -373,10 +373,10 @@
     <value>Optional OData full text search.</value>
   </data>
   <data name="QuerySkip" xml:space="preserve">
-    <value>Optional number of contents to skip.</value>
+    <value>Optional number of items to skip.</value>
   </data>
   <data name="QueryTop" xml:space="preserve">
-    <value>Optional number of contents to take.</value>
+    <value>Optional number of items to take.</value>
   </data>
   <data name="QueryVersion" xml:space="preserve">
     <value>The optional version of the content to retrieve an older instance (not cached).</value>
