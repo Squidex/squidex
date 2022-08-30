@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     if (isValid)
                     {
                         await collectionComplete.AddCollectionsAsync(
-                            await MongoContentEntity.CreateAsync(job, appProvider), add, ct);
+                            await MongoContentEntity.CreateCompleteAsync(job, appProvider), add, ct);
                     }
                 }
 
@@ -191,7 +191,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private async Task UpsertCompleteAsync(SnapshotWriteJob<ContentDomainObject.State> job,
             CancellationToken ct)
         {
-            var entityJob = job.As(await MongoContentEntity.CreateAsync(job, appProvider));
+            var entityJob = job.As(await MongoContentEntity.CreateCompleteAsync(job, appProvider));
 
             await collectionComplete.UpsertAsync(entityJob, ct);
         }
@@ -199,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private async Task UpsertVersionedCompleteAsync(IClientSessionHandle session, SnapshotWriteJob<ContentDomainObject.State> job,
             CancellationToken ct)
         {
-            var entityJob = job.As(await MongoContentEntity.CreateAsync(job, appProvider));
+            var entityJob = job.As(await MongoContentEntity.CreateCompleteAsync(job, appProvider));
 
             await collectionComplete.UpsertVersionedAsync(session, entityJob, ct);
         }

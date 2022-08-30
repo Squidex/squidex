@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 
                 foreach (var id in missingIds)
                 {
-                    var state = fromInner.GetOrDefault(id);
+                    var state = fromInner.GetValueOrDefault(id);
 
                     cache.Set(id, Tuple.Create<TextContentState?>(state));
                 }

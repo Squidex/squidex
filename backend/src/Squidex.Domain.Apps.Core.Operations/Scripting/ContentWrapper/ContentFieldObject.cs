@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 return PropertyDescriptor.Undefined;
             }
 
-            return valueProperties?.GetOrDefault(propertyName) ?? PropertyDescriptor.Undefined;
+            return valueProperties?.GetValueOrDefault(propertyName) ?? PropertyDescriptor.Undefined;
         }
 
         public override IEnumerable<KeyValuePair<JsValue, PropertyDescriptor>> GetOwnProperties()

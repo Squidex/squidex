@@ -230,7 +230,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                 {
                     var fieldPrefix = $"{path}[{fieldIndex}]";
 
-                    var field = schema.FieldsByName.GetOrDefault(fieldName ?? string.Empty);
+                    var field = schema.FieldsByName.GetValueOrDefault(fieldName ?? string.Empty);
 
                     if (string.IsNullOrWhiteSpace(fieldName))
                     {

@@ -393,6 +393,12 @@
   <data name="StringFieldText" xml:space="preserve">
     <value>The text of this field.</value>
   </data>
+  <data name="TranslationStatus" xml:space="preserve">
+    <value>The translation status.</value>
+  </data>
+  <data name="TranslationStatusLanguage" xml:space="preserve">
+    <value>The translation status ({0}).</value>
+  </data>
   <data name="UsageCallsCurrent" xml:space="preserve">
     <value>The current number of calls.</value>
   </data>

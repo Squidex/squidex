@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             Guard.NotNull(typeName);
 
-            return schemas.Value.GetOrDefault(typeName);
+            return schemas.Value.GetValueOrDefault(typeName);
         }
 
         private Dictionary<string, JsonSchema> GenerateSchemas()

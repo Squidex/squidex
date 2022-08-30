@@ -48,20 +48,20 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
             {
                 if (value.Value is JsonObject o)
                 {
-                    return o.GetOrDefault(name);
+                    return o.GetValueOrDefault(name);
                 }
 
                 return null;
             });
 
             memberAccessStrategy.Register<ContentData, object?>(
-                (value, name) => value.GetOrDefault(name));
+                (value, name) => value.GetValueOrDefault(name));
 
             memberAccessStrategy.Register<ContentFieldData, object?>(
-                (value, name) => value.GetOrDefault(name).Value);
+                (value, name) => value.GetValueOrDefault(name).Value);
 
             memberAccessStrategy.Register<JsonObject, object?>(
-                (value, name) => value.GetOrDefault(name).Value);
+                (value, name) => value.GetValueOrDefault(name).Value);
         }
     }
 }

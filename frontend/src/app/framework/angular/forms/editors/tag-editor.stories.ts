@@ -7,6 +7,7 @@
  */
 
 import { Component } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { moduleMetadata } from '@storybook/angular';
 import { Meta, Story } from '@storybook/angular/types-6-0';
 import { LocalizerService, SqxFrameworkModule, TagEditorComponent } from '@app/framework';
@@ -61,6 +62,7 @@ export default {
                 TestComponent,
             ],
             imports: [
+                BrowserAnimationsModule,
                 SqxFrameworkModule,
                 SqxFrameworkModule.forRoot(),
             ],

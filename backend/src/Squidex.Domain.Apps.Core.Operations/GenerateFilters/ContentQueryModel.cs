@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Queries;
@@ -55,6 +56,10 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
                 }
             };
 
+            var translationStatusSchema = BuildTranslationStatus(partitionResolver);
+
+            fields.Add(new FilterField(translationStatusSchema, "translationStatus"));
+
             if (schema != null)
             {
                 var dataSchema = schema.BuildDataSchema(partitionResolver, components);
@@ -71,6 +76,24 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
             };
 
             return new QueryModel { Schema = filterSchema };
+        }
+
+        private static FilterSchema BuildTranslationStatus(PartitionResolver partitionResolver)
+        {
+            var fields = new List<FilterField>();
+
+            foreach (var key in partitionResolver(Partitioning.Language).AllKeys)
+            {
+                fields.Add(new FilterField(FilterSchema.Number, key)
+                {
+                    Description = string.Format(CultureInfo.InvariantCulture, FieldDescriptions.TranslationStatusLanguage, key)
+                });
+            }
+
+            return new FilterSchema(FilterSchemaType.Object)
+            {
+                Fields = fields.ToReadonlyList()
+            };
         }
     }
 }

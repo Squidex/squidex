@@ -6,10 +6,10 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { AppLanguageDto, RootFieldDto } from '@app/shared';
+import { AppLanguageDto, FieldForm } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field-languages[field][language][languages]',
+    selector: 'sqx-field-languages[formModel][language][languages]',
     styleUrls: ['./field-languages.component.scss'],
     templateUrl: './field-languages.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,7 +31,7 @@ export class FieldLanguagesComponent {
     public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()
-    public field!: RootFieldDto;
+    public formModel!: FieldForm;
 
     public toggleShowAllControls() {
         this.showAllControlsChange.emit(!this.showAllControls);

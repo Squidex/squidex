@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                     foreach (var tag in tagIds)
                     {
-                        perApp[tag] = perApp.GetOrDefault(tag) + count;
+                        perApp[tag] = perApp.GetValueOrDefault(tag) + count;
                     }
                 }
             }

@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
     public class DefaultValuesTests
     {
         private readonly Instant now = Instant.FromUtc(2017, 10, 12, 16, 30, 10);
-        private readonly LanguagesConfig languagesConfig = LanguagesConfig.English.Set(Language.DE);
+        private readonly LanguagesConfig languages = LanguagesConfig.English.Set(Language.DE);
         private readonly Language language = Language.DE;
         private readonly Schema schema;
 
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                         new ContentFieldData()
                             .AddInvariant(456));
 
-            data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
+            data.GenerateDefaultValues(schema, languages.ToResolver());
 
             Assert.Equal(456, data["myNumber"]!["iv"].AsNumber);
 
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                         new ContentFieldData()
                             .AddInvariant(456));
 
-            data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
+            data.GenerateDefaultValues(schema, languages.ToResolver());
 
             Assert.Equal(string.Empty, data["myString"]!["de"].AsString);
             Assert.Equal("en-string", data["myString"]!["en"].AsString);

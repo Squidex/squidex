@@ -8,7 +8,7 @@
                     </button>
     
                     <sqx-field-languages 
-                        [field]="formModel.field"
+                        [formModel]="formModel"
                         (languageChange)="languageChange.emit($event)"
                         [language]="language"
                         [languages]="languages"
@@ -62,7 +62,7 @@
             <div class="languages-container">
                 <div class="languages-buttons-compare">
                     <sqx-field-languages
-                        [field]="formModelCompare!.field"
+                        [formModel]="formModelCompare!"
                         (languageChange)="languageChange.emit($event)"
                         [language]="language"
                         [languages]="languages"
