@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             var (app, schema) = await appProvider.GetAppWithSchemaAsync(job.Value.AppId.Id, job.Value.SchemaId.Id, true);
 
-            if (schema != null && app != null)
+            if (schema?.SchemaDef != null && app != null)
             {
                 if (data.CanHaveReference())
                 {
