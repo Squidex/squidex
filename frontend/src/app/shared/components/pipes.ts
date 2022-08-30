@@ -29,7 +29,11 @@ class UserAsyncPipe {
         }
     }
 
-    protected transformInternal(userId: string, transform: (users: UsersProviderService) => Observable<string | null>) {
+    protected transformInternal(userId: string | undefined | null, transform: (users: UsersProviderService, userId: string) => Observable<string | null>) {
+        if (!userId) {
+            return undefined;
+        }
+
         if (this.lastUserId !== userId) {
             this.lastUserId = userId;
 
@@ -37,7 +41,7 @@ class UserAsyncPipe {
                 this.subscription.unsubscribe();
             }
 
-            const pipe = transform(this.users);
+            const pipe = transform(this.users, userId);
 
             this.subscription = pipe.subscribe(value => {
                 this.lastValue = value || undefined;
@@ -67,8 +71,9 @@ export class UserNamePipe extends UserAsyncPipe implements OnDestroy, PipeTransf
         super.destroy();
     }
 
-    public transform(userId: string, placeholder = 'Me') {
-        return super.transformInternal(userId, users => users.getUser(userId, placeholder).pipe(map(u => u.displayName)));
+    public transform(userId: string | undefined | null, placeholder = 'Me') {
+        return super.transformInternal(userId, (users, userId) => 
+            users.getUser(userId, placeholder).pipe(map(u => u.displayName)));
     }
 }
 
@@ -85,8 +90,8 @@ export class UserNameRefPipe extends UserAsyncPipe implements OnDestroy, PipeTra
         super.destroy();
     }
 
-    public transform(userId: string, placeholder: string | null = 'Me') {
-        return super.transformInternal(userId, users => {
+    public transform(userId: string | undefined | null, placeholder: string | null = 'Me') {
+        return super.transformInternal(userId, (users, userId) => {
             const { type, id } = split(userId);
 
             if (type === 'subject') {
@@ -145,8 +150,9 @@ export class UserPicturePipe extends UserAsyncPipe implements OnDestroy, PipeTra
         super.destroy();
     }
 
-    public transform(userId: string) {
-        return super.transformInternal(userId, users => users.getUser(userId).pipe(map(u => this.apiUrl.buildUrl(`api/users/${u.id}/picture`))));
+    public transform(userId: string | undefined | null) {
+        return super.transformInternal(userId, (users, userId) =>
+            users.getUser(userId).pipe(map(u => this.apiUrl.buildUrl(`api/users/${u.id}/picture`))));
     }
 }
 
@@ -165,8 +171,8 @@ export class UserPictureRefPipe extends UserAsyncPipe implements OnDestroy, Pipe
         super.destroy();
     }
 
-    public transform(userId: string) {
-        return super.transformInternal(userId, users => {
+    public transform(userId: string | undefined | null) {
+        return super.transformInternal(userId, (users, userId) => {
             const { type, id } = split(userId);
 
             if (type === 'subject') {

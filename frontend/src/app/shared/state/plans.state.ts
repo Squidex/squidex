@@ -31,6 +31,9 @@ interface Snapshot {
     // Indicates if the user is the plan owner.
     isOwner?: boolean;
 
+    // The user, who owns the plan.
+    planOwner?: string;
+
     // Indicates if the plans are loaded.
     isLoaded?: boolean;
 
@@ -48,6 +51,9 @@ interface Snapshot {
 export class PlansState extends State<Snapshot> {
     public plans =
         this.project(x => x.plans);
+
+    public planOwner =
+        this.project(x => x.planOwner);
 
     public isOwner =
         this.project(x => x.isOwner === true);
@@ -108,6 +114,7 @@ export class PlansState extends State<Snapshot> {
                     isLoaded: true,
                     isLoading: false,
                     isOwner: !payload.planOwner || payload.planOwner === this.userId,
+                    planOwner: payload.planOwner,
                     plans,
                     version,
                 }, 'Loading Success');

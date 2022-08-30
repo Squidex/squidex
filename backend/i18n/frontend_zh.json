@@ -627,6 +627,7 @@
   "plans.notPlanOwner": "您尚未创建订阅。因此您无法更改计划。",
   "plans.perMonth": "每月",
   "plans.perYear": "每年",
+  "plans.planOwner": "Owner",
   "plans.refreshTooltip": "刷新计划",
   "plans.reloaded": "计划重新加载。",
   "plans.selected": "已选择",

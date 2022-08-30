@@ -627,6 +627,7 @@
   "plans.notPlanOwner": "Je hebt geen abonnement aangemaakt. Daarom kun je het plan niet wijzigen.",
   "plans.perMonth": "Per maand",
   "plans.perYear": "Per jaar",
+  "plans.planOwner": "Owner",
   "plans.refreshTooltip": "Plannen vernieuwen",
   "plans.reloaded": "Plans reloaded.",
   "plans.selected": "Geselecteerd",

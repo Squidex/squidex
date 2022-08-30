@@ -627,6 +627,7 @@
   "plans.notPlanOwner": "Non hai creato nessun abbonamento, pertanto non è possibile cambiare il piano.",
   "plans.perMonth": "Al mese",
   "plans.perYear": "all'anno",
+  "plans.planOwner": "Owner",
   "plans.refreshTooltip": "Aggiorna i piani",
   "plans.reloaded": "Piano aggiornati.",
   "plans.selected": "Selezionato",
