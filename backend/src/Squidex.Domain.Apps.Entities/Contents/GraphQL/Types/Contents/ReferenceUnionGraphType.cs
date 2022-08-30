@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 {
                     if (value is IContentEntity content)
                     {
-                        return types.GetOrDefault(content.SchemaId.Id);
+                        return types.GetValueOrDefault(content.SchemaId.Id);
                     }
 
                     return null;

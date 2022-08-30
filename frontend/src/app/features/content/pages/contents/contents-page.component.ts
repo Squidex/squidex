@@ -10,7 +10,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { distinctUntilChanged, map, switchMap, take, tap } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, defined, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, Settings, switchSafe, TableSettings, TempService, UIState } from '@app/shared';
+import { AppLanguageDto, AppsState, contentsTranslationStatus, ContentDto, ContentsState, ContributorsState, defined, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, Settings, switchSafe, TableSettings, TempService, TranslationStatus, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
@@ -40,6 +40,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public language!: AppLanguageDto;
     public languages!: ReadonlyArray<AppLanguageDto>;
+
+    public translationStatus?: TranslationStatus;
 
     public get disableScheduler() {
         return this.appsState.snapshot.selectedSettings?.hideScheduler === true;
@@ -115,8 +117,10 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
         this.own(
             this.contentsState.contents
-                .subscribe(() => {
+                .subscribe(contents => {
                     this.updateSelectionSummary();
+                    
+                    this.translationStatus = contentsTranslationStatus(contents.map(x => x.data), this.schema, this.languages);
                 }));
     }
 

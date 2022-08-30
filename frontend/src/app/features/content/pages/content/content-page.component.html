@@ -55,13 +55,12 @@
 
                     <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.name}}/contents/{{content.id}}"></sqx-notifo>
         
-                    <ng-container *ngIf="languages.length > 1">
-                        <sqx-language-selector class="languages-buttons" 
-                            (languageChange)="changeLanguage($event)"
-                            [language]="language" 
-                            [languages]="languages">
-                        </sqx-language-selector>
-                    </ng-container>
+                    <sqx-language-selector class="languages-buttons" 
+                        (languageChange)="changeLanguage($event)"
+                        [language]="language" 
+                        [languages]="languages"
+                        [percents]="contentForm.translationStatus | async">
+                    </sqx-language-selector>
 
                     <ng-container *ngIf="content?.canDelete">
                         <button type="button" class="btn btn-outline-secondary ms-2" (click)="dropdown.toggle()" #buttonOptions>
@@ -97,6 +96,13 @@
                 </ng-container>
 
                 <ng-template #noContentMenu>
+                    <sqx-language-selector class="languages-buttons" 
+                        (languageChange)="changeLanguage($event)"
+                        [language]="language" 
+                        [languages]="languages"
+                        [percents]="contentForm.translationStatus | async">
+                    </sqx-language-selector>
+
                     <button type="button" class="btn btn-primary ms-2" (click)="save()" *ngIf="contentsState.canCreate | async">
                         {{ 'common.save' | sqxTranslate }}
                     </button>

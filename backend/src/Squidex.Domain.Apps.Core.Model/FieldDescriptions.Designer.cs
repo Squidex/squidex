@@ -889,6 +889,24 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The translation status..
+        /// </summary>
+        public static string TranslationStatus {
+            get {
+                return ResourceManager.GetString("TranslationStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The translation status ({0})..
+        /// </summary>
+        public static string TranslationStatusLanguage {
+            get {
+                return ResourceManager.GetString("TranslationStatusLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The current number of calls..
         /// </summary>
         public static string UsageCallsCurrent {

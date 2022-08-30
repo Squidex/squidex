@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 {
                     if (value is JsonObject json && Component.IsValid(json, out var schemaId))
                     {
-                        return types.GetOrDefault(schemaId);
+                        return types.GetValueOrDefault(schemaId);
                     }
 
                     return null;

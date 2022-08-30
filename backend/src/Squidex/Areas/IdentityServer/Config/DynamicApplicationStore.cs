@@ -67,7 +67,7 @@ namespace Squidex.Areas.IdentityServer.Config
             {
                 var app = await appProvider.GetAppAsync(appName, true);
 
-                var appClient = app?.Clients.GetOrDefault(appClientId);
+                var appClient = app?.Clients.GetValueOrDefault(appClientId);
 
                 if (appClient != null)
                 {

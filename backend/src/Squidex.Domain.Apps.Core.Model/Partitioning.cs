@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core
 {
     public delegate IFieldPartitioning PartitionResolver(Partitioning key);
 
-    public sealed class Partitioning : IEquatable<Partitioning>
+    public sealed record Partitioning
     {
         public static readonly Partitioning Invariant = new Partitioning("invariant");
         public static readonly Partitioning Language = new Partitioning("language");
@@ -25,21 +25,6 @@ namespace Squidex.Domain.Apps.Core
             Guard.NotNullOrEmpty(key);
 
             Key = key;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return Equals(obj as Partitioning);
-        }
-
-        public bool Equals(Partitioning? other)
-        {
-            return string.Equals(other?.Key, Key, StringComparison.OrdinalIgnoreCase);
-        }
-
-        public override int GetHashCode()
-        {
-            return Key.GetHashCode(StringComparison.Ordinal);
         }
 
         public override string ToString()

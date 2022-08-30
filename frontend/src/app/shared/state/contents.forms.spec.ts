@@ -13,13 +13,166 @@ import { AppLanguageDto, createProperties, EditContentForm, getContentValue, Htm
 import { FieldRule, SchemaDto } from './../services/schemas.service';
 import { TestValues } from './_test-helpers';
 import { ComponentForm, FieldArrayForm } from './contents.forms';
-import { PartitionConfig } from './contents.forms-helpers';
+import { contentsTranslationStatus, contentTranslationStatus, fieldTranslationStatus, PartitionConfig } from './contents.forms-helpers';
 
 const {
     createField,
     createNestedField,
     createSchema,
 } = TestValues;
+
+describe('TranslationStatus', () => {
+    const languages = [
+        { iso2Code: 'en' },
+        { iso2Code: 'de' },
+        { iso2Code: 'it' },
+    ];
+
+    it('should create field status', () => {
+        const data = {
+            en: '',
+            de: 'field2',
+            it: true,
+            es: null,
+        };
+
+        const result = fieldTranslationStatus(data);
+
+        expect(result).toEqual({
+            en: true,
+            de: true,
+            it: true,
+            es: false,
+        });
+    });
+
+    it('should create content status for empty schema', () => {
+        const schema = {
+            fields: [],
+        } as any;
+
+        const result = contentTranslationStatus({}, schema, languages as any);
+
+        expect(result).toEqual({
+            en: 100,
+            de: 100,
+            it: 100,
+        });
+    });
+
+    it('should create content status for schema without localized field', () => {
+        const schema = {
+            fields: [{
+                isLocalizable: false,
+            }],
+        } as any;
+
+        const result = contentTranslationStatus({}, schema, languages as any);
+
+        expect(result).toEqual({
+            en: 100,
+            de: 100,
+            it: 100,
+        });
+    });
+
+    it('should create content status for schema with localized field', () => {
+        const schema = {
+            fields: [{
+                isLocalizable: true,
+            }],
+        } as any;
+
+        const result = contentTranslationStatus({}, schema, languages as any);
+
+        expect(result).toEqual({
+            en: 0,
+            de: 0,
+            it: 0,
+        });
+    });
+
+    it('should create content status for schema with mixed fields', () => {
+        const schema = {
+            fields: [{
+                name: 'field1', isLocalizable: true,
+            }, {
+                name: 'field2', isLocalizable: true,
+            }, {
+                name: 'field3', isLocalizable: true,
+            }, {
+                name: 'field4',
+            }],
+        } as any;
+
+        const data = {
+            field1: {
+                en: 'en',
+                de: 'de',
+            }, 
+            field2: {
+                en: 'en',
+                de: 'de',
+            }, 
+            field3: {
+                en: 'en',
+            }, 
+        };
+
+        const result = contentTranslationStatus(data, schema, languages as any);
+
+        expect(result).toEqual({
+            en: 100,
+            de: 67,
+            it: 0,
+        });
+    });
+
+    it('should create contents status', () => {
+        const schema = {
+            fields: [{
+                name: 'field1', isLocalizable: true,
+            }, {
+                name: 'field2', isLocalizable: true,
+            }, {
+                name: 'field3', isLocalizable: true,
+            }, {
+                name: 'field4',
+            }],
+        } as any;
+
+        const data1 = {
+            field1: {
+                en: 'en',
+                de: 'de',
+            }, 
+            field2: {
+                en: 'en',
+                de: 'de',
+            }, 
+            field3: {
+                en: 'en',
+            }, 
+        };
+
+        const data2 = {
+            field1: {
+                de: 'de',
+            }, 
+            field3: {
+                en: 'en',
+            }, 
+        };
+
+        const result = contentsTranslationStatus([data1, data2], schema, languages as any);
+
+        expect(result).toEqual({
+            en: 67,
+            de: 50,
+            it: 0,
+        });
+    });
+});
 
 describe('GetContentValue', () => {
     const language = new LanguageDto('en', 'English');

@@ -63,21 +63,6 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void GetOrDefault_should_return_value_if_key_exists()
-        {
-            valueDictionary[12] = 34;
-
-            Assert.Equal(34, valueDictionary.GetOrDefault(12));
-        }
-
-        [Fact]
-        public void GetOrDefault_should_return_default_and_not_add_it_if_key_not_exists()
-        {
-            Assert.Equal(0, valueDictionary.GetOrDefault(12));
-            Assert.False(valueDictionary.ContainsKey(12));
-        }
-
-        [Fact]
         public void GetOrAddDefault_should_return_value_if_key_exists()
         {
             valueDictionary[12] = 34;

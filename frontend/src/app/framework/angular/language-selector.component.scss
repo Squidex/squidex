@@ -3,6 +3,7 @@
 
 .dropdown-menu {
     max-height: 20rem;
+    min-width: auto;
     overflow-x: inherit;
     overflow-y: auto;
 }
@@ -23,6 +24,22 @@ tr {
     color: $color-text;
 }
 
-.iso-code {
-    font-family: monospace;
+.missing {
+    &:not(.active) {
+        td {
+            opacity: .6;
+        }
+
+        span {
+            opacity: .6;
+        }
+    }
+}
+
+.text-language {
+    font-weight: bold;
+}
+
+.text-right {
+    text-align: right;
 }

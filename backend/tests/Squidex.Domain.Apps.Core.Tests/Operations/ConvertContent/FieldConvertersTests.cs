@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 {
     public class FieldConvertersTests
     {
-        private readonly LanguagesConfig languagesConfig = LanguagesConfig.English.Set(Language.DE);
+        private readonly LanguagesConfig languages = LanguagesConfig.English.Set(Language.DE);
 
         private static IEnumerable<object?[]> InvalidValues()
         {
@@ -181,7 +181,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var result =
                 new ContentConverter(ResolvedComponents.Empty, schema)
-                    .Add(new ResolveLanguages(languagesConfig))
+                    .Add(new ResolveLanguages(languages))
                     .Convert(source);
 
             var expected =
@@ -213,7 +213,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var result =
                 new ContentConverter(ResolvedComponents.Empty, schema)
-                    .Add(new ResolveLanguages(languagesConfig, true, new[] { Language.DE }))
+                    .Add(new ResolveLanguages(languages, true, new[] { Language.DE }))
                     .Convert(source);
 
             var expected =
@@ -249,7 +249,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var result =
                 new ContentConverter(ResolvedComponents.Empty, schema)
-                    .Add(new ResolveLanguages(languagesConfig))
+                    .Add(new ResolveLanguages(languages))
                     .Convert(source);
 
             var expected =
@@ -285,7 +285,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var result =
                 new ContentConverter(ResolvedComponents.Empty, schema)
-                    .Add(new ResolveLanguages(languagesConfig))
+                    .Add(new ResolveLanguages(languages))
                     .Convert(source);
 
             var expected =
@@ -318,7 +318,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var result =
                 new ContentConverter(ResolvedComponents.Empty, schema)
-                    .Add(new ResolveLanguages(languagesConfig))
+                    .Add(new ResolveLanguages(languages))
                     .Convert(source);
 
             var expected = source;
@@ -350,7 +350,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var result =
                 new ContentConverter(ResolvedComponents.Empty, schema)
-                    .Add(new ResolveInvariant(languagesConfig))
+                    .Add(new ResolveInvariant(languages))
                     .Convert(source);
 
             var expected =
@@ -386,7 +386,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var result =
                 new ContentConverter(ResolvedComponents.Empty, schema)
-                    .Add(new ResolveInvariant(languagesConfig))
+                    .Add(new ResolveInvariant(languages))
                     .Convert(source);
 
             var expected =
@@ -414,7 +414,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var result =
                 new ContentConverter(ResolvedComponents.Empty, schema)
-                    .Add(new ResolveLanguages(languagesConfig))
+                    .Add(new ResolveLanguages(languages))
                     .Convert(source);
 
             var expected = source;
@@ -485,7 +485,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var result =
                 new ContentConverter(ResolvedComponents.Empty, schema)
-                    .Add(new ResolveLanguages(languagesConfig, true, Language.IT))
+                    .Add(new ResolveLanguages(languages, true, Language.IT))
                     .Convert(source);
 
             var expected =
@@ -505,7 +505,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var source = new ContentFieldData();
 
             var result =
-                new ResolveLanguages(languagesConfig)
+                new ResolveLanguages(languages)
                     .ConvertFieldAfter(field, source);
 
             Assert.Same(source, result);
@@ -519,7 +519,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var source = new ContentFieldData();
 
             var result =
-                new ResolveLanguages(languagesConfig, true, Array.Empty<Language>())
+                new ResolveLanguages(languages, true, Array.Empty<Language>())
                     .ConvertFieldAfter(field, source);
 
             Assert.Same(source, result);
@@ -533,7 +533,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var source = new ContentFieldData();
 
             var result =
-                new ResolveLanguages(languagesConfig)
+                new ResolveLanguages(languages)
                     .ConvertFieldAfter(field, source);
 
             Assert.Same(source, result);

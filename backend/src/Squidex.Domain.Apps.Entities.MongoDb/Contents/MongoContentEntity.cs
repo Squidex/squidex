@@ -100,6 +100,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonElement("mb")]
         public RefToken LastModifiedBy { get; set; }
 
+        [BsonIgnoreIfNull]
+        [BsonElement("ts")]
+        public TranslationStatus? TranslationStatus { get; set; }
+
         public DomainId UniqueId
         {
             get => DocumentId;
@@ -134,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return entity;
         }
 
-        public static async Task<MongoContentEntity> CreateAsync(SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider)
+        public static async Task<MongoContentEntity> CreateCompleteAsync(SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider)
         {
             var entity = await CreateContentAsync(job.Value.Data, job, appProvider);
 
@@ -158,16 +162,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             entity.ReferencedIds ??= new HashSet<DomainId>();
             entity.Version = job.NewVersion;
 
-            if (data.CanHaveReference())
-            {
-                var schema = await appProvider.GetSchemaAsync(job.Value.AppId.Id, job.Value.SchemaId.Id, true);
+            var (app, schema) = await appProvider.GetAppWithSchemaAsync(job.Value.AppId.Id, job.Value.SchemaId.Id, true);
 
-                if (schema != null)
+            if (schema != null && app != null)
+            {
+                if (data.CanHaveReference())
                 {
                     var components = await appProvider.GetComponentsAsync(schema);
 
                     entity.Data.AddReferencedIds(schema.SchemaDef, entity.ReferencedIds, components);
                 }
+
+                entity.TranslationStatus = TranslationStatus.Create(data, schema.SchemaDef, app.Languages);
             }
 
             return entity;

@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             var fieldName = fieldContext.FieldDefinition.SourceName();
 
-            return content?.GetOrDefault(fieldName);
+            return content?.GetValueOrDefault(fieldName);
         });
 
         public static readonly IFieldResolver Url = Resolve((content, _, context) =>

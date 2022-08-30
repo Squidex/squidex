@@ -7,7 +7,7 @@
 
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import { debounceTimeSafe, ExtendedFormGroup, Form, FormArrayTemplate, TemplatedFormArray, Types, value$ } from '@app/framework';
 import { FormGroupTemplate, TemplatedFormGroup } from '@app/framework/angular/forms/templated-form-group';
 import { AppLanguageDto } from './../services/app-languages.service';
@@ -15,7 +15,7 @@ import { LanguageDto } from './../services/languages.service';
 import { FieldDto, RootFieldDto, SchemaDto, TableField } from './../services/schemas.service';
 import { ComponentFieldPropertiesDto, fieldInvariant } from './../services/schemas.types';
 import { ComponentRulesProvider, RootRulesProvider, RulesProvider } from './contents.form-rules';
-import { AbstractContentForm, AbstractContentFormState, FieldSection, FormGlobals, groupFields, PartitionConfig } from './contents.forms-helpers';
+import { AbstractContentForm, AbstractContentFormState, contentTranslationStatus, FieldSection, fieldTranslationStatus, FormGlobals, groupFields, PartitionConfig } from './contents.forms-helpers';
 import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
 
 type SaveQueryFormType = { name: string; user: boolean };
@@ -88,6 +88,9 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
     public get value() {
         return this.valueChange$.value;
     }
+
+    public readonly translationStatus =
+        this.valueChange$.pipe(map(x => contentTranslationStatus(x, this.schema, this.languages)));
 
     constructor(
         public readonly languages: ReadonlyArray<AppLanguageDto>,
@@ -202,6 +205,9 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
 export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
     private readonly partitions: { [partition: string]: FieldItemForm } = {};
     private isRequired: boolean;
+
+    public readonly translationStatus =
+        value$(this.form).pipe(map(x => fieldTranslationStatus(x)));
 
     constructor(
         globals: FormGlobals,

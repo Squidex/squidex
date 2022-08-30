@@ -755,12 +755,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
         private IField GetField(int id)
         {
-            return sut.Snapshot.SchemaDef.FieldsById.GetOrDefault(id);
+            return sut.Snapshot.SchemaDef.FieldsById.GetValueOrDefault(id)!;
         }
 
         private IField GetNestedField(int parentId, int childId)
         {
-            return ((IArrayField)sut.Snapshot.SchemaDef.FieldsById[parentId]).FieldsById.GetOrDefault(childId);
+            return ((IArrayField)sut.Snapshot.SchemaDef.FieldsById[parentId]).FieldsById.GetValueOrDefault(childId)!;
         }
 
         private static StringFieldProperties ValidProperties()

@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import { ModalModel } from '@app/framework/internal';
+import { ModalModel, RelativePosition } from '@app/framework/internal';
 
 export interface Language { iso2Code: string; englishName: string; isMasterLanguage?: boolean }
 
@@ -27,17 +27,18 @@ export class LanguageSelectorComponent implements OnChanges, OnInit {
     public languages: ReadonlyArray<Language> = [];
 
     @Input()
+    public exists?: { [language: string]: boolean } | null;
+
+    @Input()
+    public percents?: { [language: string]: number } | null;
+
+    @Input()
+    public dropdownPosition: RelativePosition = 'bottom-right';
+
+    @Input()
     public size: 'sm' | 'md' | 'lg' = 'md';
 
     public dropdown = new ModalModel();
-
-    public get isSmallMode(): boolean {
-        return this.languages && this.languages.length > 0 && this.languages.length <= 3;
-    }
-
-    public get isLargeMode(): boolean {
-        return this.languages && this.languages.length > 3;
-    }
 
     public ngOnChanges() {
         this.update();

@@ -73,7 +73,7 @@ namespace Squidex.Web
                 error.StatusCode = 500;
             }
 
-            error.Type = Links.GetOrDefault(error.StatusCode);
+            error.Type = Links.GetValueOrDefault(error.StatusCode);
         }
 
         private static (ErrorDto Error, Exception? Unhandled) CreateError(Exception exception)

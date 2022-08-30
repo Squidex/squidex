@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public IObjectGraphType GetContentResultType(SchemaInfo schemaId)
         {
-            return contentResultTypes.GetOrDefault(schemaId);
+            return contentResultTypes.GetValueOrDefault(schemaId)!;
         }
 
         public IObjectGraphType? GetContentType(DomainId schemaId)
@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public IObjectGraphType GetContentType(SchemaInfo schemaId)
         {
-            return contentTypes.GetOrDefault(schemaId);
+            return contentTypes.GetValueOrDefault(schemaId)!;
         }
 
         public IObjectGraphType? GetComponentType(DomainId schemaId)
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 return null;
             }
 
-            return componentTypes.GetOrDefault(schema);
+            return componentTypes.GetValueOrDefault(schema);
         }
 
         public EmbeddableStringGraphType GetEmbeddableString(FieldInfo fieldInfo, StringFieldProperties properties)

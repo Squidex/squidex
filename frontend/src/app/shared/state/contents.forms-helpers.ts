@@ -11,10 +11,71 @@
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { isValidValue, Language } from './../internal';
 import { AppLanguageDto } from './../services/app-languages.service';
 import { FieldDto, RootFieldDto, SchemaDto } from './../services/schemas.service';
 import { fieldInvariant } from './../services/schemas.types';
 import { CompiledRules, RuleContext, RulesProvider } from './contents.form-rules';
+
+export type TranslationStatus = { [language: string]: number };
+
+export function contentsTranslationStatus(datas: any[], schema: SchemaDto, languages: ReadonlyArray<Language>) {
+    const result: TranslationStatus = {};
+
+    for (const data of datas) {
+        const status = contentTranslationStatus(data, schema, languages);
+
+        for (const language of languages) {
+            const iso2Code = language.iso2Code;
+
+            result[iso2Code] = (result[iso2Code] || 0) + status[iso2Code];
+        }
+    }
+
+    for (const language of languages) {
+        const iso2Code = language.iso2Code;
+
+        result[iso2Code] = Math.round(100 * result[iso2Code] / datas.length) / 100;
+    }
+
+    return result;
+}
+
+export function contentTranslationStatus(data: any, schema: SchemaDto, languages: ReadonlyArray<Language>) {
+    const result: TranslationStatus = {};
+
+    const localizedFields = schema.fields.filter(x => x.isLocalizable);
+
+    for (const language of languages) {
+        let percent = 0;
+
+        for (const field of localizedFields) {
+            if (isValidValue(data?.[field.name]?.[language.iso2Code])) {
+                percent++;
+            }
+        }
+
+        if (localizedFields.length > 0) {
+            percent = Math.round(100 * percent / localizedFields.length);
+        } else {
+            percent = 100;
+        }
+
+        result[language.iso2Code] = percent;
+    }
+
+    return result;
+}
+
+export function fieldTranslationStatus(data: any) {
+    const result: { [field: string]: boolean } = {};
+
+    for (const [key, value] of Object.entries(data)) {
+        result[key] = isValidValue(value);
+    }
+    
+    return result;
+}
 
 export abstract class Hidden {
     private readonly hidden$ = new BehaviorSubject<boolean>(false);

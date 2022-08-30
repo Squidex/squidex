@@ -115,28 +115,24 @@ namespace Squidex.Infrastructure.Reflection
             return GetName(typeof(T));
         }
 
-        public string GetNameOrNull<T>()
+        public string? GetNameOrNull<T>()
         {
             return GetNameOrNull(typeof(T));
         }
 
-        public string GetNameOrNull(Type type)
+        public string? GetNameOrNull(Type type)
         {
-            var result = namesByType.GetOrDefault(type);
-
-            return result;
+            return namesByType.GetValueOrDefault(type);
         }
 
         public Type? GetTypeOrNull(string name)
         {
-            var result = typesByName.GetOrDefault(name);
-
-            return result;
+            return typesByName.GetValueOrDefault(name);
         }
 
         public string GetName(Type type)
         {
-            var result = namesByType.GetOrDefault(type);
+            var result = namesByType.GetValueOrDefault(type);
 
             if (result == null)
             {
@@ -148,7 +144,7 @@ namespace Squidex.Infrastructure.Reflection
 
         public Type GetType(string name)
         {
-            var result = typesByName.GetOrDefault(name);
+            var result = typesByName.GetValueOrDefault(name);
 
             if (result == null)
             {

@@ -317,11 +317,6 @@ namespace Squidex.Infrastructure
             return dictionary.ToDictionary(x => x.Key, x => x.Value);
         }
 
-        public static TValue GetOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key) where TKey : notnull
-        {
-            return dictionary.GetOrCreate(key, _ => default!);
-        }
-
         public static TValue GetOrAddDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key) where TKey : notnull
         {
             return dictionary.GetOrAdd(key, _ => default!);

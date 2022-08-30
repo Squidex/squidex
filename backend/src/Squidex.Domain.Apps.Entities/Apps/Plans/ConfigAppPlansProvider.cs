@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public IAppLimitsPlan? GetPlan(string? planId)
         {
-            return plansById.GetOrDefault(planId ?? string.Empty);
+            return plansById.GetValueOrDefault(planId ?? string.Empty);
         }
 
         public IAppLimitsPlan GetFreePlan()
@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         private ConfigAppLimitsPlan GetPlanCore(string? planId)
         {
-            return plansById.GetOrDefault(planId ?? string.Empty) ?? freePlan;
+            return plansById.GetValueOrDefault(planId ?? string.Empty) ?? freePlan;
         }
     }
 }

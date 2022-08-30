@@ -37,12 +37,12 @@ namespace Squidex.Infrastructure
 
         public string EnglishName
         {
-            get => NamesEnglish.GetOrDefault(Iso2Code) ?? string.Empty;
+            get => NamesEnglish.GetValueOrDefault(Iso2Code) ?? string.Empty;
         }
 
         public string NativeName
         {
-            get => NamesNative.GetOrDefault(Iso2Code) ?? string.Empty;
+            get => NamesNative.GetValueOrDefault(Iso2Code) ?? string.Empty;
         }
 
         private Language(string iso2Code)

@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
     {
         private readonly DomainId appId = DomainId.NewGuid();
         private readonly Schema schemaDef;
-        private readonly LanguagesConfig languagesConfig = LanguagesConfig.English.Set(Language.DE);
+        private readonly LanguagesConfig languages = LanguagesConfig.English.Set(Language.DE);
 
         static ContentQueryTests()
         {
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var app = A.Dummy<IAppEntity>();
             A.CallTo(() => app.Id).Returns(DomainId.NewGuid());
             A.CallTo(() => app.Version).Returns(3);
-            A.CallTo(() => app.Languages).Returns(languagesConfig);
+            A.CallTo(() => app.Languages).Returns(languages);
         }
 
         [Fact]
