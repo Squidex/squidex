@@ -35,7 +35,7 @@ export function contentsTranslationStatus(datas: any[], schema: SchemaDto, langu
     for (const language of languages) {
         const iso2Code = language.iso2Code;
 
-        result[iso2Code] = Math.round(100 * result[iso2Code] / datas.length) / 100;
+        result[iso2Code] = Math.round(result[iso2Code] / datas.length);
     }
 
     return result;
