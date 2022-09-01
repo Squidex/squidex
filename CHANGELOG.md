@@ -1,7 +1,34 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [7.1.0] - 2022-09-01
+
+### Fixed
+
+* **Assets**: Fixes to UI texts.
+* **Contents**: Do not make writes in parallel when running inside a transaction.
+* **Contents**: Fixes the resize functionality of table columns.
+* **Rules**: Fixes serialization of rule events inside rule events.
+* **Rules**: Fixes the schema triggers for rules.
+* **UI**: Do now show the first value in dropdowns when the current value is not valid.
+* **UI**: Fixes the tag editor, which was measuring uninitialized content elements.
+
+### Changed
+
+* **Assets**: Also provide the edit token in the frontend GraphQL interface.
+* **Contents**: Also provide the edit token in the frontend GraphQL interface.
+* **Subscriptions**: Show the username of the current provider in the subscription settings.
+
+### Added
+
+* **Assets**: Subscribe to asset changes in GraphQL.
+* **Contents**: Provide translation status in the UI
+* **Contents**: Query contents by translation status.
+* **Contents**: Subscribe to content changes in GraphQL.
+* **UI**: Support custom role properties for UI over claims that start with `urn:squidex:custom:{APPNAME}`.
 
 ## [7.0.3] - 2022-08-15
 
