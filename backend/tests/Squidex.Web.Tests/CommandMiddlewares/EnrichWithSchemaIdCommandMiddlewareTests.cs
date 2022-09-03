@@ -43,7 +43,7 @@ namespace Squidex.Web.CommandMiddlewares
         }
 
         [Fact]
-        public async Task Should_assign_schema_id_and_name_to_app_command()
+        public async Task Should_assign_schema_id_and_name_to_schema_command()
         {
             httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Mocks.Schema(appId, schemaId)));
 

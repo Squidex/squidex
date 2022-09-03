@@ -27,10 +27,10 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppContributorsController : ApiController
     {
-        private readonly IAppUsageTracker appUsageTracker;
+        private readonly IAppUsageGate appUsageTracker;
         private readonly IUserResolver userResolver;
 
-        public AppContributorsController(ICommandBus commandBus, IAppUsageTracker appUsageTracker, IUserResolver userResolver)
+        public AppContributorsController(ICommandBus commandBus, IAppUsageGate appUsageTracker, IUserResolver userResolver)
             : base(commandBus)
         {
             this.appUsageTracker = appUsageTracker;

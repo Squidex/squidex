@@ -123,14 +123,27 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
             });
         }
 
-        public static async Task CanTransfer(TransferToTeam command, IAppProvider appProvider, CancellationToken ct)
+        public static Task CanTransfer(TransferToTeam command, IAppEntity app, IAppProvider appProvider, CancellationToken ct)
         {
             Guard.NotNull(command);
 
-            if (await appProvider.GetTeamAsync(command.TeamId, ct) == null)
+            return Validate.It(async e =>
             {
-                throw new DomainObjectNotFoundException(command.TeamId.ToString());
-            }
+                if (command.TeamId == null)
+                {
+                    return;
+                }
+
+                if (await appProvider.GetTeamAsync(command.TeamId.Value, ct) == null)
+                {
+                    e(T.Get("apps.transfer.teamNotFound"));
+                }
+
+                if (app.Plan != null)
+                {
+                    e(T.Get("apps.transfer.planAssigned"));
+                }
+            });
         }
 
         public static void CanChangePlan(ChangePlan command, IAppEntity app, IBillingPlans plans)
@@ -148,6 +161,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                 if (plans.GetPlan(command.PlanId) == null)
                 {
                     e(T.Get("apps.plans.notFound"), nameof(command.PlanId));
+                }
+
+                if (app.TeamId != null)
+                {
+                    e(T.Get("apps.plans.assignedToTeam"));
                 }
 
                 var plan = app.Plan;

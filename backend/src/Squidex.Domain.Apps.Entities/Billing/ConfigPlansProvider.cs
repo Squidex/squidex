@@ -20,10 +20,13 @@ namespace Squidex.Domain.Apps.Entities.Billing
         };
 
         private readonly Dictionary<string, Plan> plansById = new Dictionary<string, Plan>(StringComparer.OrdinalIgnoreCase);
+        private readonly List<Plan> plans = new List<Plan>();
         private readonly Plan freePlan;
 
         public ConfigPlansProvider(IEnumerable<Plan> config)
         {
+            plans.AddRange(config.OrderBy(x => x.MaxApiCalls));
+
             foreach (var plan in config.OrderBy(x => x.MaxApiCalls))
             {
                 plansById[plan.Id] = plan;
@@ -39,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
 
         public IEnumerable<Plan> GetAvailablePlans()
         {
-            return plansById.Values.OrderBy(x => x.MaxApiCalls);
+            return plans;
         }
 
         public bool IsConfiguredPlan(string? planId)

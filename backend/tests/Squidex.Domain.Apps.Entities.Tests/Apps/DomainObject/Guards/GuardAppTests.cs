@@ -6,10 +6,12 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
@@ -22,9 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
     public class GuardAppTests : IClassFixture<TranslationsFixture>
     {
         private readonly IUserResolver users = A.Fake<IUserResolver>();
-        private readonly IAppPlansProvider appPlans = A.Fake<IAppPlansProvider>();
-        private readonly IAppLimitsPlan basicPlan = A.Fake<IAppLimitsPlan>();
-        private readonly IAppLimitsPlan freePlan = A.Fake<IAppLimitsPlan>();
+        private readonly IBillingPlans appPlans = A.Fake<IBillingPlans>();
+        private readonly Plan planBasic = new Plan();
+        private readonly Plan planFree = new Plan();
 
         public GuardAppTests()
         {
@@ -35,10 +37,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                 .Returns(null!);
 
             A.CallTo(() => appPlans.GetPlan("basic"))
-                .Returns(basicPlan);
+                .Returns(planBasic);
 
             A.CallTo(() => appPlans.GetPlan("free"))
-                .Returns(freePlan);
+                .Returns(planFree);
         }
 
         [Fact]
@@ -248,11 +250,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
             GuardApp.CanUpdateSettings(command);
         }
 
-        private static IAppEntity App(AssignedPlan? plan)
+        private static IAppEntity App(AssignedPlan? plan, DomainId? teamId = null)
         {
             var app = A.Fake<IAppEntity>();
 
-            A.CallTo(() => app.Plan).Returns(plan);
+            A.CallTo(() => app.Plan)
+                .Returns(plan);
+
+            A.CallTo(() => app.TeamId)
+                .Returns(teamId);
 
             return app;
         }

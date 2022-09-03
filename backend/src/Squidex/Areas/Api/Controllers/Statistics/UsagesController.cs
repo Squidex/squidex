@@ -28,7 +28,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
     {
         private readonly IApiUsageTracker usageTracker;
         private readonly IAppLogStore appLogStore;
-        private readonly IAppUsageTracker appUsageTracker;
+        private readonly IAppUsageGate appUsageGate;
         private readonly IAssetUsageTracker assetStatsRepository;
         private readonly IDataProtector dataProtector;
         private readonly IUrlGenerator urlGenerator;
@@ -38,7 +38,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             IDataProtectionProvider dataProtection,
             IApiUsageTracker usageTracker,
             IAppLogStore appLogStore,
-            IAppUsageTracker appUsageTracker,
+            IAppUsageGate appUsageGate,
             IAssetUsageTracker assetStatsRepository,
             IUrlGenerator urlGenerator)
             : base(commandBus)
@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             this.usageTracker = usageTracker;
 
             this.appLogStore = appLogStore;
-            this.appUsageTracker = appUsageTracker;
+            this.appUsageGate = appUsageGate;
             this.assetStatsRepository = assetStatsRepository;
             this.urlGenerator = urlGenerator;
 
@@ -105,7 +105,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             var (summary, details) = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date, HttpContext.RequestAborted);
 
             // Use the current app plan to show the limits to the user.
-            var (plan, _, _) = await appUsageTracker.GetPlanForAppAsync(App, HttpContext.RequestAborted);
+            var (plan, _, _) = await appUsageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
 
             var response = CallsUsageDtoDto.FromDomain(plan, summary, details);
 
@@ -130,7 +130,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             var size = await assetStatsRepository.GetTotalSizeByAppAsync(AppId, HttpContext.RequestAborted);
 
             // Use the current app plan to show the limits to the user.
-            var (plan, _, _) = await appUsageTracker.GetPlanForAppAsync(App, HttpContext.RequestAborted);
+            var (plan, _, _) = await appUsageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
 
             var response = new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize };
 

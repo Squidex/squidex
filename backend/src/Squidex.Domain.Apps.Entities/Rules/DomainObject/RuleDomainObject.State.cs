@@ -45,7 +45,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                             RuleDef = RuleDef.Rename(e.Name);
 
                             AppId = e.AppId;
-
                             return true;
                         }
 
@@ -81,21 +80,18 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                     case RuleEnabled:
                         {
                             RuleDef = RuleDef.Enable();
-
                             break;
                         }
 
                     case RuleDisabled:
                         {
                             RuleDef = RuleDef.Disable();
-
                             break;
                         }
 
                     case RuleDeleted:
                         {
                             IsDeleted = true;
-
                             return true;
                         }
                 }

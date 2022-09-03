@@ -40,14 +40,12 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
                             Id = e.TeamId;
 
                             SimpleMapper.Map(e, this);
-
                             return true;
                         }
 
                     case TeamUpdated e when Is.Change(Name, e.Name):
                         {
                             SimpleMapper.Map(e, this);
-
                             return true;
                         }
 

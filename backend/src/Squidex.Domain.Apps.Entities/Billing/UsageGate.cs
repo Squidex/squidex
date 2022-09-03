@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -15,7 +16,7 @@ using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Billing
 {
-    public class UsageGate : IAppUsageTracker, IAssetUsageTracker
+    public class UsageGate : IAppUsageGate, IAssetUsageTracker
     {
         private const string CounterTotalCount = "TotalAssets";
         private const string CounterTotalSize = "TotalSize";
@@ -23,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
         private readonly IBillingPlans billingPlans;
         private readonly IAppProvider appProvider;
         private readonly IApiUsageTracker apiUsageTracker;
-        private readonly IMemoryCache memoryCache;
+        private readonly IMemoryCache memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly IMessageBus messaging;
         private readonly IUsageTracker usageTracker;
 
@@ -31,14 +32,12 @@ namespace Squidex.Domain.Apps.Entities.Billing
             IAppProvider appProvider,
             IApiUsageTracker apiUsageTracker,
             IBillingPlans billingPlans,
-            IMemoryCache memoryCache,
             IMessageBus messaging,
             IUsageTracker usageTracker)
         {
             this.appProvider = appProvider;
             this.apiUsageTracker = apiUsageTracker;
             this.billingPlans = billingPlans;
-            this.memoryCache = memoryCache;
             this.messaging = messaging;
             this.usageTracker = usageTracker;
         }
@@ -100,11 +99,6 @@ namespace Squidex.Domain.Apps.Entities.Billing
             {
                 AddCounters(enriched, byCategory1);
             }
-            else if (usages.TryGetValue("Default", out var byCategory2))
-            {
-                // Fallback for older versions where default was uses as tracking category.
-                AddCounters(enriched, byCategory2);
-            }
 
             return enriched;
         }
@@ -144,14 +138,13 @@ namespace Squidex.Domain.Apps.Entities.Billing
             var appId = app.Id;
             var blocking = false;
             var blockLimit = plan.MaxApiCalls;
-
             var referenceId = teamId ?? app.Id;
 
             if (blockLimit > 0 || plan.BlockingApiCalls > 0)
             {
                 var usage = await apiUsageTracker.GetMonthCallsAsync(referenceId.ToString(), date, null, ct);
 
-                if (IsOver10Percent(blockLimit, usage) && IsAboutToBeLocked(date, blockLimit, usage) && !HasNotifiedBefore(app.Id))
+                if (IsOver10Percent(blockLimit, usage) && IsAboutToBeLocked(date, blockLimit, usage) && !HasNotifiedBefore(appId))
                 {
                     var notification = new UsageTrackingCheck
                     {
@@ -174,7 +167,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
             {
                 if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && client.ApiCallsLimit > 0)
                 {
-                    var usage = await apiUsageTracker.GetMonthCallsAsync(referenceId.ToString(), date, clientId, ct);
+                    var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), date, clientId, ct);
 
                     blocking = usage >= client.ApiCallsLimit;
                 }
@@ -229,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
                 usageTracker.TrackAsync(SummaryDate, appKey, null, counters, ct)
             };
 
-            var (_, _, teamId) = await GetPlanForAppAsync(appId, default);
+            var (_, _, teamId) = await GetPlanForAppAsync(appId, ct);
 
             if (teamId != null)
             {
@@ -277,7 +270,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
         private async Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanCoreAsync(DomainId appId,
             CancellationToken ct)
         {
-            var app = await appProvider.GetAppAsync(appId, false, ct);
+            var app = await appProvider.GetAppAsync(appId, true, ct);
 
             if (app == null)
             {
@@ -292,13 +285,13 @@ namespace Squidex.Domain.Apps.Entities.Billing
         private async Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanCoreAsync(IAppEntity app,
             CancellationToken ct)
         {
-            var team = await appProvider.GetTeamAsync(app.Id, ct);
-
-            if (team != null)
+            if (app.TeamId != null)
             {
-                var (plan, planId) = billingPlans.GetActualPlan(team.Plan?.PlanId);
+                var team = await appProvider.GetTeamAsync(app.TeamId.Value, ct);
 
-                return (plan, planId, team.Id);
+                var (plan, planId) = billingPlans.GetActualPlan(team?.Plan?.PlanId ?? app.Plan?.PlanId);
+
+                return (plan, planId, team?.Id);
             }
             else
             {

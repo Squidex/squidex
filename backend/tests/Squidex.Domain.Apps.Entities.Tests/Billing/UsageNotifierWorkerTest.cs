@@ -13,7 +13,7 @@ using Squidex.Infrastructure.TestHelpers;
 using Squidex.Shared.Users;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Plans
+namespace Squidex.Domain.Apps.Entities.Billing
 {
     public class UsageNotifierWorkerTest
     {

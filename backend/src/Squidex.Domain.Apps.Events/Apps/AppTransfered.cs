@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Events.Apps
     [EventType(nameof(AppDeleted))]
     public sealed class AppTransfered : AppEvent
     {
-        public DomainId TeamId { get; set; }
+        public DomainId? TeamId { get; set; }
     }
 }

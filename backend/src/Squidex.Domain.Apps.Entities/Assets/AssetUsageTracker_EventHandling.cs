@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await store.ClearAsync();
 
-            await usageTracker.DeleteAssetsUsageAsync();
+            await appUsageGate.DeleteAssetsUsageAsync();
         }
 
         public async Task On(IEnumerable<Envelope<IEvent>> events)
@@ -185,13 +185,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             switch (@event.Payload)
             {
                 case AssetCreated assetCreated:
-                    return usageTracker.TrackAssetAsync(assetCreated.AppId.Id, GetDate(@event), assetCreated.FileSize, 1);
+                    return appUsageGate.TrackAssetAsync(assetCreated.AppId.Id, GetDate(@event), assetCreated.FileSize, 1);
 
                 case AssetUpdated assetUpdated:
-                    return usageTracker.TrackAssetAsync(assetUpdated.AppId.Id, GetDate(@event), assetUpdated.FileSize, 0);
+                    return appUsageGate.TrackAssetAsync(assetUpdated.AppId.Id, GetDate(@event), assetUpdated.FileSize, 0);
 
                 case AssetDeleted assetDeleted:
-                    return usageTracker.TrackAssetAsync(assetDeleted.AppId.Id, GetDate(@event), -assetDeleted.DeletedSize, -1);
+                    return appUsageGate.TrackAssetAsync(assetDeleted.AppId.Id, GetDate(@event), -assetDeleted.DeletedSize, -1);
             }
 
             return Task.CompletedTask;

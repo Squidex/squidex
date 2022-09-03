@@ -67,14 +67,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                             Id = e.AppId.Id;
 
                             SimpleMapper.Map(e, this);
-
                             return true;
                         }
 
                     case AppUpdated e when Is.Change(Label, e.Label) || Is.Change(Description, e.Description):
                         {
                             SimpleMapper.Map(e, this);
+                            return true;
+                        }
 
+                    case AppTransfered e when Is.Change(TeamId, e.TeamId):
+                        {
+                            SimpleMapper.Map(e, this);
                             return true;
                         }
 
@@ -153,7 +157,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                             Plan = null;
 
                             IsDeleted = true;
-
                             return true;
                         }
                 }

@@ -5,13 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Plans
+namespace Squidex.Domain.Apps.Entities.Billing
 {
-    public class NoopAppPlanBillingManagerTests
+    public class NoopBillingManagerTests
     {
-        private readonly NoopAppPlanBillingManager sut = new NoopAppPlanBillingManager();
+        private readonly NoopBillingManager sut = new NoopBillingManager();
 
         [Fact]
         public void Should_not_have_portal()
@@ -26,9 +27,21 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         }
 
         [Fact]
+        public async Task Should_do_nothing_if_subscribing_to_team()
+        {
+            await sut.SubscribeAsync(null!, default(DomainId), null!);
+        }
+
+        [Fact]
         public async Task Should_do_nothing_if_unsubscribing()
         {
             await sut.UnsubscribeAsync(null!, null!);
+        }
+
+        [Fact]
+        public async Task Should_do_nothing_if_unsubscribing_from_team()
+        {
+            await sut.UnsubscribeAsync(null!, default(DomainId));
         }
 
         [Fact]
@@ -43,6 +56,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         public async Task Should_do_nothing_if_checking_for_redirect()
         {
             var result = await sut.MustRedirectToPortalAsync(null!, null!, null);
+
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task Should_do_nothing_if_checking_for_redirect_for_team()
+        {
+            var result = await sut.MustRedirectToPortalAsync(null!, default(DomainId), null);
 
             Assert.Null(result);
         }

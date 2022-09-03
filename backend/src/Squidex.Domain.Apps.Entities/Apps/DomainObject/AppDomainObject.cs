@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 case TransferToTeam transfer:
                     return UpdateReturnAsync(transfer, async (c, ct) =>
                     {
-                        await GuardApp.CanTransfer(c, AppProvider(), ct);
+                        await GuardApp.CanTransfer(c, Snapshot, AppProvider(), ct);
 
                         Transfer(c);
 

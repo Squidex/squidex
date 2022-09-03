@@ -8,6 +8,7 @@
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -48,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
             await sut.HandleAsync(context, ct);
 
-            Assert.Same(context.Result<InvitedResult>().App, app);
+            Assert.Same(context.Result<InvitedResult<IAppEntity>>().Entity, app);
             Assert.Equal(user.Id, command.ContributorId);
 
             A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, ct))

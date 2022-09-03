@@ -16,7 +16,7 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Shared.Users;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Invitation
+namespace Squidex.Domain.Apps.Entities.Invitation
 {
     public class InvitationEventConsumerTests
     {

@@ -41,28 +41,24 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                             Id = e.AssetFolderId;
 
                             SimpleMapper.Map(e, this);
-
                             return true;
                         }
 
                     case AssetFolderRenamed e when Is.OptionalChange(FolderName, e.FolderName):
                         {
                             FolderName = e.FolderName;
-
                             return true;
                         }
 
                     case AssetFolderMoved e when Is.Change(ParentId, e.ParentId):
                         {
                             ParentId = e.ParentId;
-
                             return true;
                         }
 
                     case AssetFolderDeleted:
                         {
                             IsDeleted = true;
-
                             return true;
                         }
                 }

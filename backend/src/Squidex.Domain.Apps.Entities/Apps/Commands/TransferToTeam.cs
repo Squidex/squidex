@@ -11,6 +11,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
     public sealed class TransferToTeam : AppUpdateCommand
     {
-        public DomainId TeamId { get; set; }
+        public DomainId? TeamId { get; set; }
     }
 }

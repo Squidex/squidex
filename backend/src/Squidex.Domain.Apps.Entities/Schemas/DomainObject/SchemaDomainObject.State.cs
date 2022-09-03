@@ -48,7 +48,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                             SchemaFieldsTotal = e.Schema.MaxId();
 
                             AppId = e.AppId;
-
                             return true;
                         }
 
@@ -71,7 +70,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                             }
 
                             SchemaFieldsTotal = Math.Max(SchemaFieldsTotal, e.FieldId.Id);
-
                             break;
                         }
 
@@ -93,112 +91,96 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                     case SchemaCategoryChanged e:
                         {
                             SchemaDef = SchemaDef.ChangeCategory(e.Name);
-
                             break;
                         }
 
                     case SchemaPreviewUrlsConfigured e:
                         {
                             SchemaDef = SchemaDef.SetPreviewUrls(e.PreviewUrls);
-
                             break;
                         }
 
                     case SchemaScriptsConfigured e:
                         {
                             SchemaDef = SchemaDef.SetScripts(e.Scripts);
-
                             break;
                         }
 
                     case SchemaFieldRulesConfigured e:
                         {
                             SchemaDef = SchemaDef.SetFieldRules(e.FieldRules);
-
                             break;
                         }
 
                     case SchemaPublished:
                         {
                             SchemaDef = SchemaDef.Publish();
-
                             break;
                         }
 
                     case SchemaUnpublished:
                         {
                             SchemaDef = SchemaDef.Unpublish();
-
                             break;
                         }
 
                     case SchemaUpdated e:
                         {
                             SchemaDef = SchemaDef.Update(e.Properties);
-
                             break;
                         }
 
                     case SchemaFieldsReordered e:
                         {
                             SchemaDef = SchemaDef.ReorderFields(e.FieldIds.ToList(), e.ParentFieldId?.Id);
-
                             break;
                         }
 
                     case FieldUpdated e:
                         {
                             SchemaDef = SchemaDef.UpdateField(e.FieldId.Id, e.Properties, e.ParentFieldId?.Id);
-
                             break;
                         }
 
                     case FieldLocked e:
                         {
                             SchemaDef = SchemaDef.LockField(e.FieldId.Id, e.ParentFieldId?.Id);
-
                             break;
                         }
 
                     case FieldDisabled e:
                         {
                             SchemaDef = SchemaDef.DisableField(e.FieldId.Id, e.ParentFieldId?.Id);
-
                             break;
                         }
 
                     case FieldEnabled e:
                         {
                             SchemaDef = SchemaDef.EnableField(e.FieldId.Id, e.ParentFieldId?.Id);
-
                             break;
                         }
 
                     case FieldHidden e:
                         {
                             SchemaDef = SchemaDef.HideField(e.FieldId.Id, e.ParentFieldId?.Id);
-
                             break;
                         }
 
                     case FieldShown e:
                         {
                             SchemaDef = SchemaDef.ShowField(e.FieldId.Id, e.ParentFieldId?.Id);
-
                             break;
                         }
 
                     case FieldDeleted e:
                         {
                             SchemaDef = SchemaDef.DeleteField(e.FieldId.Id, e.ParentFieldId?.Id);
-
                             break;
                         }
 
                     case SchemaDeleted:
                         {
                             IsDeleted = true;
-
                             return true;
                         }
                 }

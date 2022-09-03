@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
+using Squidex.Domain.Apps.Entities.Teams.Indexes;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
@@ -27,6 +28,7 @@ namespace Squidex.Domain.Apps.Entities
         private readonly IAppsIndex indexForApps = A.Fake<IAppsIndex>();
         private readonly IRulesIndex indexForRules = A.Fake<IRulesIndex>();
         private readonly ISchemasIndex indexForSchemas = A.Fake<ISchemasIndex>();
+        private readonly ITeamsIndex indexForTeams = A.Fake<ITeamsIndex>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly IAppEntity app;
@@ -38,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities
 
             app = Mocks.App(appId);
 
-            sut = new AppProvider(indexForApps, indexForRules, indexForSchemas, new AsyncLocalCache());
+            sut = new AppProvider(indexForApps, indexForRules, indexForSchemas, indexForTeams, new AsyncLocalCache());
         }
 
         [Fact]
