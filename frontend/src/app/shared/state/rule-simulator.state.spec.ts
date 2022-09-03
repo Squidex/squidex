@@ -9,7 +9,6 @@ import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService, RulesService } from '@app/shared/internal';
-import { SimulatedRuleEventsDto } from '../services/rules.service';
 import { createSimulatedRuleEvent } from './../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
 import { RuleSimulatorState } from './rule-simulator.state';
@@ -39,7 +38,7 @@ describe('RuleSimulatorState', () => {
 
     it('should load simulated rule events', () => {
         rulesService.setup(x => x.getSimulatedEvents(app, '12'))
-            .returns(() => of(new SimulatedRuleEventsDto(200, oldSimulatedRuleEvents)));
+            .returns(() => of({ items: oldSimulatedRuleEvents, total: 200 }));
 
         ruleSimulatorState.selectRule('12');
         ruleSimulatorState.load().subscribe();
@@ -54,7 +53,7 @@ describe('RuleSimulatorState', () => {
 
     it('should load simulated rule events by action and trigger', () => {
         rulesService.setup(x => x.postSimulatedEvents(app, It.isAny(), It.isAny()))
-            .returns(() => of(new SimulatedRuleEventsDto(200, oldSimulatedRuleEvents)));
+            .returns(() => of({ items: oldSimulatedRuleEvents, total: 200 }));
 
         ruleSimulatorState.setRule({}, {});
         ruleSimulatorState.load().subscribe();

@@ -8,8 +8,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { AnalyticsService, ApiUrlConfig, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, Version, Versioned } from '@app/framework';
+import { ApiUrlConfig, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, Version, Versioned } from '@app/framework';
 
 export class RoleDto {
     public readonly _links: ResourceLinks;
@@ -17,8 +16,7 @@ export class RoleDto {
     public readonly canDelete: boolean;
     public readonly canUpdate: boolean;
 
-    constructor(
-        links: ResourceLinks,
+    constructor(links: ResourceLinks,
         public readonly name: string,
         public readonly numClients: number,
         public readonly numContributors: number,
@@ -33,26 +31,34 @@ export class RoleDto {
     }
 }
 
-type Permissions = readonly string[];
+export type RolesDto = Versioned<RolesPayload>;
 
-export type RolesDto =
-    Versioned<RolesPayload>;
+export type RolesPayload = Readonly<{
+    // The list of roles.
+    items: ReadonlyArray<RoleDto>;
 
-export type RolesPayload =
-    Readonly<{ items: ReadonlyArray<RoleDto>; canCreate: boolean } & Resource>;
+    // True, if the user has permissions to create a new role.
+    canCreate?: boolean;
+}>;
 
-export type CreateRoleDto =
-    Readonly<{ name: string }>;
+export type CreateRoleDto = Readonly<{
+    // The name of the role, cannot be changed later.
+    name: string;
+}>;
 
-export type UpdateRoleDto =
-    Readonly<{ permissions: Permissions; properties: {} }>;
+export type UpdateRoleDto = Readonly<{
+    // The permissions in dot notation.
+    permissions: ReadonlyArray<string>;
+
+    // The UI properties.
+    properties: {};
+}>;
 
 @Injectable()
 export class RolesService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -73,9 +79,6 @@ export class RolesService {
             mapVersioned(({ body }) => {
                 return parseRoles(body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Role', 'Created', appName);
-            }),
             pretifyError('i18n:roles.addFailed'));
     }
 
@@ -87,9 +90,6 @@ export class RolesService {
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             mapVersioned(({ body }) => {
                 return parseRoles(body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Role', 'Updated', appName);
             }),
             pretifyError('i18n:roles.updateFailed'));
     }
@@ -103,9 +103,6 @@ export class RolesService {
             mapVersioned(({ body }) => {
                 return parseRoles(body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Role', 'Deleted', appName);
-            }),
             pretifyError('i18n:roles.revokeFailed'));
     }
 
@@ -117,19 +114,21 @@ export class RolesService {
     }
 }
 
-export function parseRoles(response: any) {
-    const raw: any[] = response.items;
+function parseRoles(response: { items: any } & Resource): RolesPayload {
+    const { items: list, _links } = response;
+    const items = list.map(parseRole);
 
-    const items = raw.map(item =>
-        new RoleDto(item._links,
-            item.name,
-            item.numClients,
-            item.numContributors,
-            item.permissions,
-            item.properties,
-            item.isDefaultRole));
+    const canCreate = hasAnyLink(_links, 'create');
 
-    const { _links } = response;
+    return { items, canCreate };
+}
 
-    return { items, _links, canCreate: hasAnyLink(_links, 'create') };
+function parseRole(response: any) {
+    return new RoleDto(response._links,
+        response.name,
+        response.numClients,
+        response.numContributors,
+        response.permissions,
+        response.properties,
+        response.isDefaultRole);
 }

@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AccessTokenDto, AnalyticsService, ApiUrlConfig, ClientDto, ClientsDto, ClientsPayload, ClientsService, Resource, ResourceLinks, Version } from '@app/shared/internal';
+import { AccessTokenDto, ApiUrlConfig, ClientDto, ClientsDto, ClientsPayload, ClientsService, Resource, ResourceLinks, Version } from '@app/shared/internal';
 
 describe('ClientsService', () => {
     const version = new Version('1');
@@ -20,7 +20,6 @@ describe('ClientsService', () => {
             providers: [
                 ClientsService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() },
             ],
         });
     });
@@ -177,9 +176,6 @@ describe('ClientsService', () => {
 export function createClients(...ids: ReadonlyArray<number>): ClientsPayload {
     return {
         items: ids.map(createClient),
-        _links: {
-            create: { method: 'POST', href: '/clients' },
-        },
         canCreate: true,
     };
 }

@@ -72,7 +72,7 @@ export class UserNamePipe extends UserAsyncPipe implements OnDestroy, PipeTransf
     }
 
     public transform(userId: string | undefined | null, placeholder = 'Me') {
-        return super.transformInternal(userId, (users, userId) => 
+        return super.transformInternal(userId, (users, userId) =>
             users.getUser(userId, placeholder).pipe(map(u => u.displayName)));
     }
 }

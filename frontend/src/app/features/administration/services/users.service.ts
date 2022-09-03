@@ -9,21 +9,15 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, hasAnyLink, pretifyError, Resource, ResourceLinks, ResultSet } from '@app/shared';
+import { ApiUrlConfig, hasAnyLink, pretifyError, Resource, ResourceLinks } from '@app/shared';
 
-export class UsersDto extends ResultSet<UserDto> {
-    public get canCreate() {
-        return hasAnyLink(this._links, 'create');
-    }
-}
-
-export class UserDto {
+export class UserDto implements Resource {
     public readonly _links: ResourceLinks;
 
+    public readonly canDelete: boolean;
     public readonly canLock: boolean;
     public readonly canUnlock: boolean;
     public readonly canUpdate: boolean;
-    public readonly canDelete: boolean;
 
     constructor(links: ResourceLinks,
         public readonly id: string,
@@ -34,20 +28,37 @@ export class UserDto {
     ) {
         this._links = links;
 
+        this.canDelete = hasAnyLink(links, 'delete');
         this.canLock = hasAnyLink(links, 'lock');
         this.canUnlock = hasAnyLink(links, 'unlock');
         this.canUpdate = hasAnyLink(links, 'update');
-        this.canDelete = hasAnyLink(links, 'delete');
     }
 }
 
-type Permissions = readonly string[];
+export type UsersDto = Readonly<{
+    // The list of users.
+    items: ReadonlyArray<UserDto>;
 
-export type CreateUserDto =
-    Readonly<{ email: string; displayName: string; permissions: Permissions; password: string }>;
+    // The number of users.
+    total: number;
 
-export type UpdateUserDto =
-    Partial<CreateUserDto>;
+    // True, if the user has permissions to create a user.
+    canCreate?: boolean;
+}>;
+
+export type UpsertUserDto = Readonly<{
+    // The email address of the user.
+    email: string;
+
+    // The display name.
+    displayName: string;
+
+    // The permissions as in the dot-notation.
+    permissions:  string[];
+
+    // The password (confirm is only used in the UI).
+    password: string;
+}>;
 
 @Injectable()
 export class UsersService {
@@ -77,7 +88,7 @@ export class UsersService {
             pretifyError('i18n:users.loadUserFailed'));
     }
 
-    public postUser(dto: CreateUserDto): Observable<UserDto> {
+    public postUser(dto: UpsertUserDto): Observable<UserDto> {
         const url = this.apiUrl.buildUrl('api/user-management');
 
         return this.http.post(url, dto).pipe(
@@ -87,7 +98,7 @@ export class UsersService {
             pretifyError('i18n:users.createFailed'));
     }
 
-    public putUser(user: Resource, dto: UpdateUserDto): Observable<UserDto> {
+    public putUser(user: Resource, dto: Partial<UpsertUserDto>): Observable<UserDto> {
         const link = user._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
@@ -133,10 +144,13 @@ export class UsersService {
     }
 }
 
-function parseUsers(response: { items: any[]; total: number } & Resource) {
-    const items = response.items.map(parseUser);
+function parseUsers(response: { items: any[]; total: number } & Resource): UsersDto {
+    const { items: list, total, _links } = response;
+    const items = list.map(parseUser);
 
-    return new UsersDto(response.total, items, response._links);
+    const canCreate = hasAnyLink(_links, 'create');
+
+    return { items, total, canCreate };
 }
 
 function parseUser(response: any) {

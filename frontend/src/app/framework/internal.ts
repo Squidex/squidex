@@ -10,7 +10,6 @@ export * from './angular/drag-helper';
 export * from './angular/routers/router-utils';
 export * from './angular/stateful.component';
 export * from './configurations';
-export * from './services/analytics.service';
 export * from './services/clipboard.service';
 export * from './services/dialog.service';
 export * from './services/loading.service';

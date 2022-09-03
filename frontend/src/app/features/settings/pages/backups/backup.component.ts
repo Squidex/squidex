@@ -21,7 +21,7 @@ export class BackupComponent implements OnChanges {
     public duration = '';
 
     constructor(
-        public readonly apiUrl: ApiUrlConfig, 
+        public readonly apiUrl: ApiUrlConfig,
         private readonly backupsState: BackupsState,
     ) {
     }

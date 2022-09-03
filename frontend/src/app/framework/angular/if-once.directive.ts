@@ -17,7 +17,7 @@ export class IfOnceDirective {
     public set condition(value: boolean) {
         if (value && !this.hasView) {
             this.viewContainer.createEmbeddedView(this.templateRef);
-    
+
             this.hasView = true;
         }
     }

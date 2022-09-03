@@ -7,7 +7,7 @@
 
 import { Directive, ElementRef, Input, OnChanges, OnDestroy, OnInit, Pipe, PipeTransform, Renderer2 } from '@angular/core';
 import { ResourceOwner } from '@app/framework';
-import { ContentDto, FieldSizes, MetaFields, TableField, TableSettings } from '@app/shared/internal';
+import { ContentDto, FieldSizes, META_FIELDS, TableField, TableSettings } from '@app/shared/internal';
 
 export function getCellWidth(field: TableField, sizes: FieldSizes | undefined | null) {
     const size = sizes?.[field.name] || 0;
@@ -17,27 +17,27 @@ export function getCellWidth(field: TableField, sizes: FieldSizes | undefined | 
     }
 
     switch (field) {
-        case MetaFields.id:
+        case META_FIELDS.id:
             return 280;
-        case MetaFields.created:
+        case META_FIELDS.created:
             return 150;
-        case MetaFields.createdByAvatar:
+        case META_FIELDS.createdByAvatar:
             return 55;
-        case MetaFields.createdByName:
+        case META_FIELDS.createdByName:
             return 150;
-        case MetaFields.lastModified:
+        case META_FIELDS.lastModified:
             return 150;
-        case MetaFields.lastModifiedByAvatar:
+        case META_FIELDS.lastModifiedByAvatar:
             return 55;
-        case MetaFields.lastModifiedByName:
+        case META_FIELDS.lastModifiedByName:
             return 150;
-        case MetaFields.status:
+        case META_FIELDS.status:
             return 200;
-        case MetaFields.statusNext:
+        case META_FIELDS.statusNext:
             return 240;
-        case MetaFields.statusColor:
+        case META_FIELDS.statusColor:
             return 50;
-        case MetaFields.version:
+        case META_FIELDS.version:
             return 80;
         default:
             return 200;
@@ -96,7 +96,7 @@ export class ContentListWidthDirective extends ResourceOwner implements OnChange
         if (!this.fields) {
             return;
         }
-    
+
         let size = 100;
 
         for (const field of this.fields) {
@@ -106,7 +106,7 @@ export class ContentListWidthDirective extends ResourceOwner implements OnChange
         if (size === this.size) {
             return;
         }
-    
+
         const width = `${size}px`;
 
         this.renderer.setStyle(this.element.nativeElement, 'min-width', width);
@@ -151,13 +151,13 @@ export class ContentListCellDirective extends ResourceOwner implements OnChanges
         if (!this.field.name) {
             return;
         }
-    
+
         const size = getCellWidth(this.field, this.sizes);
 
         if (size === this.size) {
             return;
         }
-    
+
         const width = `${size}px`;
 
         this.renderer.setStyle(this.element.nativeElement, 'min-width', width);
@@ -204,11 +204,11 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
         this.mouseDown = undefined;
         this.mouseBlur?.();
         this.mouseBlur = undefined;
-        
+
         this.resetMovement();
     }
-  
-    public ngOnInit() {  
+
+    public ngOnInit() {
         if (!this.tableFields || !this.fieldName) {
             return;
         }
@@ -221,7 +221,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
         this.mouseDown = this.renderer.listen(this.resizer, 'mousedown', this.onMouseDown);
         this.mouseBlur = this.renderer.listen(this.resizer, 'blur', this.onMouseUp);
     }
-  
+
     private onMouseDown = (event: MouseEvent) => {
         if (!this.tableFields || !this.fieldName) {
             return;
@@ -236,7 +236,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
         this.startOffset = event.pageX;
         this.startWidth = this.element.nativeElement.offsetWidth;
     };
-  
+
     private onMouseMove = (event: MouseEvent) => {
         if (!this.mouseMove || !this.tableFields || !this.fieldName) {
             return;
@@ -248,7 +248,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
             this.resetMovement();
         }
     };
-  
+
     private onMouseUp = (event: MouseEvent) => {
         if (!this.mouseMove || !this.tableFields || !this.fieldName) {
             return;
@@ -271,7 +271,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
         if (width < this.minimumWidth) {
             width = this.minimumWidth;
         }
-  
+
         this.tableFields!.updateSize(this.fieldName!, width, save);
     }
 

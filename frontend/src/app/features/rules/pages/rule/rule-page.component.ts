@@ -183,7 +183,7 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
             return;
         }
 
-        if (!this.currentAction.form.form.valid || !this.currentTrigger.form.form.valid) {  
+        if (!this.currentAction.form.form.valid || !this.currentTrigger.form.form.valid) {
             return;
         }
 

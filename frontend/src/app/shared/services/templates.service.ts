@@ -9,14 +9,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, pretifyError, Resource, ResourceLinks, ResultSet } from '@app/framework';
-
-export class TemplatesDto extends ResultSet<TemplateDto> {
-}
+import { ApiUrlConfig, pretifyError, Resource, ResourceLinks } from '@app/framework';
 
 export class TemplateDto {
     public readonly _links: ResourceLinks;
-    
+
     constructor(links: ResourceLinks,
         public readonly name: string,
         public readonly title: string,
@@ -36,6 +33,11 @@ export class TemplateDetailsDto {
         this._links = links;
     }
 }
+
+export type TemplatesDto = Readonly<{
+    // The list of templates.
+    items: ReadonlyArray<TemplateDto>;
+}>;
 
 @Injectable()
 export class TemplatesService {
@@ -68,15 +70,19 @@ export class TemplatesService {
     }
 }
 
-function parseTemplates(response: { items: any[] } & Resource) {
-    const items = response.items.map(item => 
-        new TemplateDto(item._links,
-            item.name,
-            item.title,
-            item.description,
-            item.isStarter));
+function parseTemplates(response: { items: any[] } & Resource): TemplatesDto {
+    const { items: list } = response;
+    const items = list.map(parseTemplate);
 
-    return new TemplatesDto(items.length, items, response._links);
+    return { items };
+}
+
+function parseTemplate(response: any & Resource) {
+    return new TemplateDto(response._links,
+        response.name,
+        response.title,
+        response.description,
+        response.isStarter);
 }
 
 function parseTemplateDetails(response: any & Resource) {

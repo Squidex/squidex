@@ -8,8 +8,8 @@
 import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { catchError, filter, map, tap } from 'rxjs/operators';
-import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, StringHelper, Types, Version, Versioned } from '@app/framework';
+import { catchError, filter, map } from 'rxjs/operators';
+import { ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, StringHelper, Types, Version, Versioned } from '@app/framework';
 
 export class AppDto {
     public readonly _links: ResourceLinks;
@@ -31,6 +31,7 @@ export class AppDto {
     public readonly canUpdateGeneral: boolean;
     public readonly canUpdateImage: boolean;
     public readonly canUploadAssets: boolean;
+
     public readonly image: string;
 
     public readonly displayName: string;
@@ -111,30 +112,47 @@ export class EditorDto {
     }
 }
 
-export type AssetScriptsDto =
-    Versioned<AssetScriptsPayload>;
+export type AssetScripts = Readonly<{ [name: string]: string | null }>;
 
-export type AssetScriptsPayload =
-    Readonly<{ scripts: AssetScripts; canUpdate: boolean } & Resource>;
+export type AssetScriptsDto = Versioned<AssetScriptsPayload>;
 
-export type UpdateAppSettingsDto =
-    Readonly<{ patterns: ReadonlyArray<PatternDto>; editors: ReadonlyArray<EditorDto>; hideScheduler?: boolean }>;
+export type AssetScriptsPayload = Readonly<{
+    // The actual asset scripts.
+    scripts: AssetScripts;
 
-export type AssetScripts =
-    Readonly<{ [name: string]: string | null }>;
+    // True, if the user has permissions to update the scripts.
+    canUpdate?: boolean;
+}> & Resource;
 
-export type CreateAppDto =
-    Readonly<{ name: string }>;
+export type UpdateAppSettingsDto = Readonly<{
+    // The regex patterns for scehams.
+    patterns: ReadonlyArray<PatternDto>;
 
-export type UpdateAppDto =
-    Readonly<{ label?: string; description?: string }>;
+    // The registered editors for schemas.
+    editors: ReadonlyArray<EditorDto>;
+
+    // True if the scheduler should be hidden.
+    hideScheduler?: boolean;
+}>;
+
+export type CreateAppDto = Readonly<{
+    // The new name of the app. Must be unique.
+    name: string;
+}>;
+
+export type UpdateAppDto = Readonly<{
+    // The label, which is like a display name.
+    label?: string;
+
+    // The description of the app.
+    description?: string;
+}>;
 
 @Injectable()
 export class AppsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -169,9 +187,6 @@ export class AppsService {
             map(body => {
                 return parseApp(body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('App', 'Created', dto.name);
-            }),
             pretifyError('i18n:apps.createFailed'));
     }
 
@@ -183,9 +198,6 @@ export class AppsService {
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             map(({ payload }) => {
                 return parseApp(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('App', 'Updated', appName);
             }),
             pretifyError('i18n:apps.updateFailed'));
     }
@@ -209,9 +221,6 @@ export class AppsService {
             map(({ payload }) => {
                 return parseAppSettings(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('App', 'Updated', appName);
-            }),
             pretifyError('i18n:apps.updateSettingsFailed'));
     }
 
@@ -233,9 +242,6 @@ export class AppsService {
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             mapVersioned(({ body }) => {
                 return parseAssetScripts(body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('App', 'Updated', appName);
             }),
             pretifyError('i18n:apps.updateAssetScriptsFailed'));
     }
@@ -267,11 +273,6 @@ export class AppsService {
                     return throwError(() => error);
                 }
             }),
-            tap(value => {
-                if (!Types.isNumber(value)) {
-                    this.analytics.trackEvent('AppImage', 'Uploaded', appName);
-                }
-            }),
             pretifyError('i18n:apps.uploadImageFailed'));
     }
 
@@ -284,9 +285,6 @@ export class AppsService {
             map(({ payload }) => {
                 return parseApp(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('AppImage', 'Removed', appName);
-            }),
             pretifyError('i18n:apps.removeImageFailed'));
     }
 
@@ -296,9 +294,6 @@ export class AppsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return this.http.request(link.method, url).pipe(
-            tap(() => {
-                this.analytics.trackEvent('App', 'Left', appName);
-            }),
             pretifyError('i18n:apps.leaveFailed'));
     }
 
@@ -308,9 +303,6 @@ export class AppsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return this.http.request(link.method, url).pipe(
-            tap(() => {
-                this.analytics.trackEvent('App', 'Archived', appName);
-            }),
             pretifyError('i18n:apps.archiveFailed'));
     }
 }
@@ -343,8 +335,10 @@ function parseAppSettings(response: any & Resource) {
         new Version(response.version.toString()));
 }
 
-function parseAssetScripts(response: any) {
+function parseAssetScripts(response: any): AssetScriptsPayload {
     const { _links, ...scripts } = response;
 
-    return { scripts, _links, canUpdate: hasAnyLink(_links, 'update') };
+    const canUpdate = hasAnyLink(_links, 'update');
+
+    return { scripts, canUpdate, _links };
 }

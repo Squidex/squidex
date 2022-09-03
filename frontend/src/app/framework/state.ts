@@ -7,7 +7,6 @@
 
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
-import { ResourceLinks } from './utils/hateos';
 import { Types } from './utils/types';
 
 export type Mutable<T> = {
@@ -41,18 +40,6 @@ export class Model<T> {
         }
 
         return clone;
-    }
-}
-
-export class ResultSet<T> {
-    public readonly _links: ResourceLinks;
-
-    constructor(
-        public readonly total: number,
-        public readonly items: ReadonlyArray<T>,
-        links?: ResourceLinks,
-    ) {
-        this._links = links || {};
     }
 }
 
@@ -101,7 +88,7 @@ const devToolsExtension = window['__REDUX_DEVTOOLS_EXTENSION__'];
 export class State<T extends {}> {
     private readonly state: BehaviorSubject<Readonly<T>>;
     private readonly devTools?: any;
-    
+
     public get changes(): Observable<Readonly<T>> {
         return this.state;
     }
@@ -135,8 +122,8 @@ export class State<T extends {}> {
             const name = `[Squidex] ${debugName}`;
 
             this.devTools = devToolsExtension.connect({ name, features: { jump: true } });
-            this.devTools.init(initialState); 
-            
+            this.devTools.init(initialState);
+
             this.devTools.subscribe((message: any) => {
                 if (message.type === 'DISPATCH' && message.payload.type === 'JUMP_TO_ACTION') {
                     this.state.next(JSON.parse(message.state));

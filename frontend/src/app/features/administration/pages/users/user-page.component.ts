@@ -7,7 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CreateUserDto, UserDto, UserForm, UsersState } from '@app/features/administration/internal';
+import { UpsertUserDto, UserDto, UserForm, UsersState } from '@app/features/administration/internal';
 import { ResourceOwner } from '@app/shared';
 
 @Component({
@@ -63,7 +63,7 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
                         },
                     });
             } else {
-                this.usersState.create(<CreateUserDto>value)
+                this.usersState.create(<UpsertUserDto>value)
                     .subscribe({
                         next: () => {
                             this.back();

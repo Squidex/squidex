@@ -8,7 +8,7 @@
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { UsersDto, UsersService } from '@app/features/administration/internal';
+import { UpsertUserDto, UsersService } from '@app/features/administration/internal';
 import { DialogService } from '@app/shared';
 import { createUser } from './../services/users.service.spec';
 import { UsersState } from './users.state';
@@ -16,8 +16,6 @@ import { UsersState } from './users.state';
 describe('UsersState', () => {
     const user1 = createUser(1);
     const user2 = createUser(2);
-
-    const oldUsers = new UsersDto(200, [user1, user2]);
 
     const newUser = createUser(3);
 
@@ -39,7 +37,7 @@ describe('UsersState', () => {
     describe('Loading', () => {
         it('should load users', () => {
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(oldUsers)).verifiable();
+                .returns(() => of({ items: [user1, user2], total: 200 })).verifiable();
 
             usersState.load().subscribe();
 
@@ -62,7 +60,7 @@ describe('UsersState', () => {
 
         it('should show notification on load if reload is true', () => {
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(oldUsers)).verifiable();
+                .returns(() => of({ items: [user1, user2], total: 200 })).verifiable();
 
             usersState.load(true).subscribe();
 
@@ -73,7 +71,7 @@ describe('UsersState', () => {
 
         it('should load with new pagination if paging', () => {
             usersService.setup(x => x.getUsers(10, 10, undefined))
-                .returns(() => of(new UsersDto(200, []))).verifiable();
+                .returns(() => of({ items: [], total: 200 })).verifiable();
 
             usersState.page({ page: 1, pageSize: 10 }).subscribe();
 
@@ -82,7 +80,7 @@ describe('UsersState', () => {
 
         it('should load with query if searching', () => {
             usersService.setup(x => x.getUsers(10, 0, 'my-query'))
-                .returns(() => of(new UsersDto(0, []))).verifiable();
+            .returns(() => of({ items: [], total: 0 })).verifiable();
 
             usersState.search('my-query').subscribe();
 
@@ -93,7 +91,7 @@ describe('UsersState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(oldUsers)).verifiable();
+                .returns(() => of({ items: [user1, user2], total: 200 })).verifiable();
 
             usersState.load().subscribe();
         });
@@ -133,7 +131,7 @@ describe('UsersState', () => {
         });
 
         it('should add user to snapshot if created', () => {
-            const request = { ...newUser, password: 'password' };
+            const request: UpsertUserDto = { ...newUser, password: 'password' } as any;
 
             usersService.setup(x => x.postUser(request))
                 .returns(() => of(newUser)).verifiable();
@@ -145,7 +143,7 @@ describe('UsersState', () => {
         });
 
         it('should update user if updated', () => {
-            const request = {};
+            const request: Partial<UpsertUserDto> = {};
 
             const updated = createUser(2, '_new');
 
@@ -190,10 +188,10 @@ describe('UsersState', () => {
         });
 
         it('should truncate users if page size reached', () => {
-            const request = { ...newUser, password: 'password' };
+            const request: UpsertUserDto = { ...newUser, password: 'password' } as any;
 
             usersService.setup(x => x.getUsers(2, 0, undefined))
-                .returns(() => of(new UsersDto(200, [user1, user2]))).verifiable();
+                .returns(() => of({ items: [user1, user2], total: 200 })).verifiable();
 
             usersService.setup(x => x.postUser(request))
                 .returns(() => of(newUser)).verifiable();
@@ -209,7 +207,7 @@ describe('UsersState', () => {
     describe('Selection', () => {
         beforeEach(() => {
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(oldUsers)).verifiable(Times.atLeastOnce());
+                .returns(() => of({ items: [user1, user2], total: 200 })).verifiable(Times.atLeastOnce());
 
             usersState.load().subscribe();
             usersState.select(user2.id).subscribe();
@@ -222,7 +220,7 @@ describe('UsersState', () => {
             ];
 
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(new UsersDto(2, newUsers)));
+                .returns(() => of({ items: newUsers, total: 200 }));
 
             usersState.load().subscribe();
 

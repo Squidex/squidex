@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, FeatureDto, FeaturesDto, NewsService } from '@app/shared/internal';
+import { ApiUrlConfig, FeaturesDto, NewsService } from '@app/shared/internal';
 
 describe('NewsService', () => {
     beforeEach(() => {
@@ -40,7 +40,6 @@ describe('NewsService', () => {
             expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
-                version: 13,
                 features: [{
                     name: 'Feature1',
                     text: 'Feature Text1',
@@ -48,12 +47,18 @@ describe('NewsService', () => {
                     name: 'Feature2',
                     text: 'Feature Text2',
                 }],
+                version: 13,
             });
 
-            expect(features!).toEqual(
-                new FeaturesDto([
-                    new FeatureDto('Feature1', 'Feature Text1'),
-                    new FeatureDto('Feature2', 'Feature Text2'),
-                ], 13));
+            expect(features!).toEqual({
+                features: [{
+                    name: 'Feature1',
+                    text: 'Feature Text1',
+                }, {
+                    name: 'Feature2',
+                    text: 'Feature Text2',
+                }],
+                version: 13,
+            });
         }));
 });

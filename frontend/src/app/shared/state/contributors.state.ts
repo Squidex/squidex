@@ -139,7 +139,7 @@ export class ContributorsState extends State<Snapshot> {
             tap(({ version, payload }) => {
                 this.replaceContributors(version, payload);
             }),
-            shareMapSubscribed(this.dialogs, x => x.payload._meta && x.payload._meta['isInvited'] === '1', options));
+            shareMapSubscribed(this.dialogs, x => x.payload.isInvited, options));
     }
 
     private replaceContributors(version: Version, { canCreate, items, maxContributors }: ContributorsPayload) {

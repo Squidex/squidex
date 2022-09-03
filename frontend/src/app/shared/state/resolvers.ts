@@ -129,8 +129,8 @@ export class ResolveContents extends ResolverBase<ContentDto, ContentsDto> {
         return result;
     }
 
-    protected createResult(items: ContentDto[]) {
-        return new ContentsDto([], items.length, items);
+    protected createResult(items: ContentDto[]): ContentsDto {
+        return { items, total: items.length } as any;
     }
 
     protected loadMany(ids: string[]) {
@@ -151,8 +151,8 @@ export class ResolveAssets extends ResolverBase<AssetDto, AssetsDto> {
         super();
     }
 
-    protected createResult(items: AssetDto[]) {
-        return new AssetsDto(items.length, items);
+    protected createResult(items: AssetDto[]): AssetsDto {
+        return { items, total: items.length } as any;
     }
 
     protected loadMany(ids: string[]) {

@@ -16,7 +16,7 @@ export class CompensateScrollbarDirective extends ResourceOwner implements Resiz
 
     @Input('sqxCompensateScrollbar')
     public enabled?: string | boolean | null = true;
-    
+
     constructor(
         private readonly renderer: Renderer2,
         private readonly element: ElementRef<HTMLElement>,

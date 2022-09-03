@@ -73,7 +73,7 @@ export function fieldTranslationStatus(data: any) {
     for (const [key, value] of Object.entries(data)) {
         result[key] = isValidValue(value);
     }
-    
+
     return result;
 }
 

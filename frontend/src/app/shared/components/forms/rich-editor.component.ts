@@ -335,7 +335,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
                 .defined()
                 .join(', ')
             || 'content';
-            
+
         return `<a href="${this.apiUrl.buildUrl(content._links['self'].href)}" alt="${name}">${name}</a>`;
     }
 

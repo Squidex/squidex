@@ -7,7 +7,7 @@
 
 import { of } from 'rxjs';
 import { IMock, Mock } from 'typemoq';
-import { ResourceLinks, ResourcesDto, UIService, UIState, UsersService } from '@app/shared/internal';
+import { ResourceLinks, UIService, UIState, UsersService } from '@app/shared/internal';
 import { TestValues } from './_test-helpers';
 
 describe('UIState', () => {
@@ -65,7 +65,7 @@ describe('UIState', () => {
         usersService = Mock.ofType<UsersService>();
 
         usersService.setup(x => x.getResources())
-            .returns(() => of(new ResourcesDto(resources)));
+            .returns(() => of({ _links: resources }));
 
         uiState = new UIState(appsState.object, uiService.object, usersService.object);
     });

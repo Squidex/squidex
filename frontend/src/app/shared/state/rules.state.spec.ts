@@ -8,7 +8,7 @@
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, RulesDto, RulesService, versioned } from '@app/shared/internal';
+import { DialogService, RulesService, versioned } from '@app/shared/internal';
 import { RuleDto } from './../services/rules.service';
 import { createRule } from './../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
@@ -44,7 +44,7 @@ describe('RulesState', () => {
     describe('Loading', () => {
         it('should load rules', () => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto([rule1, rule2], {}, rule1.id))).verifiable();
+                .returns(() => of({ items: [rule1, rule2], runningRuleId: rule1.id })).verifiable();
 
             rulesState.load().subscribe();
 
@@ -75,7 +75,7 @@ describe('RulesState', () => {
 
         it('should show notification on load if reload is true', () => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto([rule1, rule2]))).verifiable();
+                .returns(() => of({ items: [rule1, rule2] })).verifiable();
 
             rulesState.load(true).subscribe();
 
@@ -88,7 +88,7 @@ describe('RulesState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto([rule1, rule2]))).verifiable();
+                .returns(() => of({ items: [rule1, rule2] })).verifiable();
 
             rulesState.load().subscribe();
         });
@@ -180,7 +180,7 @@ describe('RulesState', () => {
     describe('Selection', () => {
         beforeEach(() => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto([rule1, rule2]))).verifiable(Times.atLeastOnce());
+                .returns(() => of({ items: [rule1, rule2] })).verifiable(Times.atLeastOnce());
 
             rulesState.load().subscribe();
             rulesState.select(rule2.id).subscribe();
@@ -193,7 +193,7 @@ describe('RulesState', () => {
             ];
 
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto(newRules)));
+                .returns(() => of({ items: newRules }));
 
             rulesState.load().subscribe();
 

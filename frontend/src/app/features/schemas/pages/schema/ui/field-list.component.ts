@@ -7,9 +7,9 @@
 
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { MetaFields, SchemaDto, TableField } from '@app/shared';
+import { META_FIELDS, SchemaDto, TableField } from '@app/shared';
 
-const META_FIELD_NAMES = Object.values(MetaFields).filter(x => x !== MetaFields.empty);
+const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELDS.empty);
 
 @Component({
     selector: 'sqx-field-list[fieldNames][schema]',

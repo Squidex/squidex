@@ -8,7 +8,7 @@
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, RuleEventsDto, RuleEventsState, RulesService } from '@app/shared/internal';
+import { DialogService, RuleEventsState, RulesService } from '@app/shared/internal';
 import { createRuleEvent } from './../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -32,7 +32,7 @@ describe('RuleEventsState', () => {
 
         rulesService = Mock.ofType<RulesService>();
         rulesService.setup(x => x.getEvents(app, 30, 0, undefined))
-            .returns(() => of(new RuleEventsDto(200, oldRuleEvents)));
+            .returns(() => of({ items: oldRuleEvents, total: 200 } as any));
 
         ruleEventsState = new RuleEventsState(appsState.object, dialogs.object, rulesService.object);
         ruleEventsState.load().subscribe();
@@ -66,7 +66,7 @@ describe('RuleEventsState', () => {
 
     it('should load with new pagination if paging', () => {
         rulesService.setup(x => x.getEvents(app, 30, 30, undefined))
-            .returns(() => of(new RuleEventsDto(200, [])));
+            .returns(() => of({ items: [], total: 0 }));
 
         ruleEventsState.page({ page: 1, pageSize: 30 }).subscribe();
 
@@ -78,7 +78,7 @@ describe('RuleEventsState', () => {
 
     it('should load with rule id if filtered', () => {
         rulesService.setup(x => x.getEvents(app, 30, 0, '12'))
-            .returns(() => of(new RuleEventsDto(200, [])));
+        .returns(() => of({ items: [], total: 200 }));
 
         ruleEventsState.filterByRule('12').subscribe();
 
@@ -89,7 +89,7 @@ describe('RuleEventsState', () => {
 
     it('should not load again if rule id has not changed', () => {
         rulesService.setup(x => x.getEvents(app, 30, 0, '12'))
-            .returns(() => of(new RuleEventsDto(200, [])));
+        .returns(() => of({ items: [], total: 200 }));
 
         ruleEventsState.filterByRule('12').subscribe();
         ruleEventsState.filterByRule('12').subscribe();

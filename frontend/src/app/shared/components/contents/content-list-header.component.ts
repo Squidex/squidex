@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { LanguageDto, MetaFields, Query, SortMode, TableField } from '@app/shared/internal';
+import { LanguageDto, META_FIELDS, Query, SortMode, TableField } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-content-list-header[field][language]',
@@ -15,7 +15,7 @@ import { LanguageDto, MetaFields, Query, SortMode, TableField } from '@app/share
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentListHeaderComponent implements OnChanges {
-    public readonly metaFields = MetaFields;
+    public readonly metaFields = META_FIELDS;
 
     @Input()
     public field!: TableField;
@@ -35,9 +35,9 @@ export class ContentListHeaderComponent implements OnChanges {
     public ngOnChanges() {
         const { field, language } = this;
 
-        if (field === MetaFields.created) {
+        if (field === META_FIELDS.created) {
             this.sortPath = 'created';
-        } else if (field === MetaFields.lastModified) {
+        } else if (field === META_FIELDS.lastModified) {
             this.sortPath = 'lastModified';
         } else if (field.rootField?.properties.isSortable !== true) {
             this.sortPath = undefined;
@@ -47,7 +47,7 @@ export class ContentListHeaderComponent implements OnChanges {
             this.sortPath = `data.${field.name}.iv`;
         }
 
-        if (field === MetaFields.lastModified) {
+        if (field === META_FIELDS.lastModified) {
             this.sortDefault = 'descending';
         }
     }

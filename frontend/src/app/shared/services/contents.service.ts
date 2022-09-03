@@ -8,8 +8,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, ResultSet, Version, Versioned } from '@app/framework';
+import { map } from 'rxjs/operators';
+import { ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, Version, Versioned } from '@app/framework';
 import { StatusInfo } from './../state/contents.state';
 import { Query, sanitize } from './query';
 import { parseField, RootFieldDto } from './schemas.service';
@@ -21,25 +21,6 @@ export class ScheduleDto {
         public readonly color: string,
         public readonly dueTime: DateTime,
     ) {
-    }
-}
-
-export class ContentsDto extends ResultSet<ContentDto> {
-    constructor(
-        public readonly statuses: ReadonlyArray<StatusInfo>,
-        total: number,
-        items: ReadonlyArray<ContentDto>,
-        links?: ResourceLinks,
-    ) {
-        super(total, items, links);
-    }
-
-    public get canCreate() {
-        return hasAnyLink(this._links, 'create');
-    }
-
-    public get canCreateAndPublish() {
-        return hasAnyLink(this._links, 'create/publish');
     }
 }
 
@@ -104,47 +85,114 @@ export class BulkResultDto {
     }
 }
 
-export type BulkUpdateType = 'Upsert' | 'ChangeStatus' | 'Delete' | 'Validate';
+export type ContentsDto = Readonly<{
+    // The list of content items.
+    items: ReadonlyArray<ContentDto>;
 
-export type ContentReferencesValue =
-    Readonly<{ [partition: string]: string }> | string;
+    // The total number of content items.
+    total: number;
 
-export type ContentReferences =
-    Readonly<{ [fieldName: string ]: ContentFieldData<ContentReferencesValue> }>;
+    // The statuses.
+    statuses: ReadonlyArray<StatusInfo>;
 
-export type ContentFieldData<T = any> =
-    Readonly<{ [partition: string]: T }>;
+    // True, if the user has permissions to create a content item.
+    canCreate?: boolean;
 
-export type ContentData =
-    Readonly<{ [fieldName: string ]: ContentFieldData }>;
+    // True, if the user has permissions to create and publish a content item.
+    canCreateAndPublish?: boolean;
+}>;
 
-export type BulkStatusDto =
-    Readonly<{ status?: string; dueTime?: string | null }>;
+export type ContentReferencesValue = Readonly<{
+    // The references by partition.
+    [partition: string]: string;
+}> | string;
 
-export type BulkUpdateDto =
-    Readonly<{ jobs: ReadonlyArray<BulkUpdateJobDto>; doNotScript?: boolean; checkReferrers?: boolean }>;
+export type ContentReferences = Readonly<{
+    // The reference values by field name.
+    [fieldName: string ]: ContentFieldData<ContentReferencesValue>;
+}>;
 
-export type BulkUpdateJobDto =
-    Readonly<{ id: string; type: BulkUpdateType; schema?: string; expectedVersion?: number }> & BulkStatusDto;
+export type ContentFieldData<T = any> = Readonly<{
+    // The data by partition.
+    [partition: string]: T;
+}>;
 
-export type ContentsQuery =
-    Readonly<{ noTotal?: boolean; noSlowTotal?: boolean  }>;
+export type ContentData = Readonly<{
+    // The content data by field name.
+    [fieldName: string ]: ContentFieldData;
+}>;
 
-export type ContentsByIds =
-    Readonly<{ ids: ReadonlyArray<string> }> & ContentsQuery;
+export type BulkStatusDto = Readonly<{
+}>;
 
-export type ContentsBySchedule =
-    Readonly<{ scheduledFrom: string | null; scheduledTo: string | null }> & ContentsQuery;
+export type BulkUpdateDto = Readonly<{
+    // The list of bulk update jobs.
+    jobs: ReadonlyArray<BulkUpdateJobDto>;
 
-type ContentsByQuery =
-    Readonly<{ query?: Query; skip?: number; take?: number }> & ContentsQuery;
+    // True, if scripts should not be executed.
+    doNotScript?: boolean;
+
+    // True, if referrers should be checked.
+    checkReferrers?: boolean;
+}>;
+
+export type BulkUpdateJobDto = Readonly<{
+    // The ID of the content to update.
+    id: string;
+
+    // The type of the bulk update job.
+    type: 'Upsert' | 'ChangeStatus' | 'Delete' | 'Validate';
+
+    // The schema of the content item.
+    schema?: string;
+
+    // The new status.
+    status?: string;
+
+    // The due time of the new status.
+    dueTime?: string | null;
+
+    // The expected version of the content.
+    expectedVersion?: number;
+}>;
+
+export type ContentsQuery = Readonly<{
+    // True, to not return the total number of items.
+    noTotal?: boolean;
+
+    // True, to not return the total number of items, if the query would be slow.
+    noSlowTotal?: boolean;
+}>;
+
+export type ContentsByIds = Readonly<{
+    // The Ids of the contents to query.
+    ids: ReadonlyArray<string>;
+}> & ContentsQuery;
+
+export type ContentsBySchedule = Readonly<{
+    // The start of the time frame for scheduled content items.
+    scheduledFrom: string | null;
+
+    // The end of the time frame for scheduled content items.
+    scheduledTo: string | null;
+}> & ContentsQuery;
+
+export type ContentsByQuery = Readonly<{
+    // The JSON query.
+    query?: Query;
+
+    // The number of items to skip.
+    skip?: number;
+
+    // The number of items to take.
+    take?: number;
+}> & ContentsQuery;
 
 @Injectable()
 export class ContentsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -230,9 +278,6 @@ export class ContentsService {
             map(({ payload }) => {
                 return parseContent(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Content', 'Created', appName);
-            }),
             pretifyError('i18n:contents.createFailed'));
     }
 
@@ -244,9 +289,6 @@ export class ContentsService {
         return HTTP.putVersioned(this.http, url, dto, version).pipe(
             map(({ payload }) => {
                 return parseContent(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Content', 'Updated', appName);
             }),
             pretifyError('i18n:contents.updateFailed'));
     }
@@ -260,9 +302,6 @@ export class ContentsService {
             map(({ payload }) => {
                 return parseContent(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Content', 'Updated', appName);
-            }),
             pretifyError('i18n:contents.updateFailed'));
     }
 
@@ -274,9 +313,6 @@ export class ContentsService {
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
             map(({ payload }) => {
                 return parseContent(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Content', 'VersioNCreated', appName);
             }),
             pretifyError('i18n:contents.loadVersionFailed'));
     }
@@ -290,9 +326,6 @@ export class ContentsService {
             map(({ payload }) => {
                 return parseContent(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Content', 'Cancelled', appName);
-            }),
             pretifyError('i18n:contents.updateFailed'));
     }
 
@@ -305,9 +338,6 @@ export class ContentsService {
             map(({ payload }) => {
                 return parseContent(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Content', 'VersionDeleted', appName);
-            }),
             pretifyError('i18n:contents.deleteVersionFailed'));
     }
 
@@ -317,9 +347,6 @@ export class ContentsService {
         return this.http.post<any[]>(url, dto).pipe(
             map(body => {
                 return body.map(x => new BulkResultDto(x.contentId, parseError(x.error)));
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Content', 'Deleted', appName);
             }),
             pretifyError('i18n:contents.bulkFailed'));
     }
@@ -377,13 +404,17 @@ function buildQuery(q?: ContentsByQuery) {
     return body;
 }
 
-function parseContents(response: { items: any[]; total: number; statuses: any } & Resource) {
-    const items = response.items.map(parseContent);
+function parseContents(response: { items: any[]; total: number; statuses: any } & Resource): ContentsDto {
+    const { items: list, total, statuses, _links } = response;
+    const items = list.map(parseContent);
 
-    return new ContentsDto(response.statuses, response.total, items, response._links);
+    const canCreate = hasAnyLink(_links, 'create');
+    const canCreateAndPublish = hasAnyLink(_links, 'create/publish');
+
+    return { items, total, statuses, canCreate, canCreateAndPublish };
 }
 
-function parseContent(response: any & Resource) {
+function parseContent(response: any) {
     return new ContentDto(response._links,
         response.id,
         DateTime.parseISO(response.created), response.createdBy,

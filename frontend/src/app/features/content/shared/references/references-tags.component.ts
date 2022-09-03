@@ -170,7 +170,7 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
 
             this.next({ converter });
         }
-        
+
         this.next({ isLoading: false });
     }
 }
