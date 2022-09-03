@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
@@ -123,7 +123,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
             });
         }
 
-        public static void CanChangePlan(ChangePlan command, IAppEntity app, IAppPlansProvider appPlans)
+        public static async Task CanTransfer(TransferToTeam command, IAppProvider appProvider, CancellationToken ct)
+        {
+            Guard.NotNull(command);
+
+            if (await appProvider.GetTeamAsync(command.TeamId, ct) == null)
+            {
+                throw new DomainObjectNotFoundException(command.TeamId.ToString());
+            }
+        }
+
+        public static void CanChangePlan(ChangePlan command, IAppEntity app, IBillingPlans plans)
         {
             Guard.NotNull(command);
 
@@ -135,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                     return;
                 }
 
-                if (appPlans.GetPlan(command.PlanId) == null)
+                if (plans.GetPlan(command.PlanId) == null)
                 {
                     e(T.Get("apps.plans.notFound"), nameof(command.PlanId));
                 }

@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         private readonly string roleName = "Role1";
         private readonly Roles roles_0 = Roles.Empty;
         private readonly AppClients clients = AppClients.Empty.Add("client", "secret", "clientRole");
-        private readonly AppContributors contributors = AppContributors.Empty.Assign("contributor", "contributorRole");
+        private readonly Contributors contributors = Contributors.Empty.Assign("contributor", "contributorRole");
 
         [Fact]
         public void CanAdd_should_throw_exception_if_name_empty()

@@ -24,6 +24,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         public string[] IndexedUserIds { get; set; }
 
         [BsonRequired]
+        [BsonElement("_ti")]
+        public DomainId? IndexedTeamId { get; set; }
+
+        [BsonRequired]
         [BsonElement("_dl")]
         public bool IndexedDeleted { get; set; }
 
@@ -44,6 +48,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             IndexedUserIds = users.ToArray();
             IndexedCreated = Document.Created;
             IndexedDeleted = Document.IsDeleted;
+            IndexedTeamId = Document.TeamId;
             IndexedName = Document.Name;
         }
     }

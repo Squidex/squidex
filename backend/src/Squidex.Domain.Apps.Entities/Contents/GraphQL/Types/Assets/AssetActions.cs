@@ -13,7 +13,6 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
-using Squidex.Messaging.Subscriptions;
 using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets

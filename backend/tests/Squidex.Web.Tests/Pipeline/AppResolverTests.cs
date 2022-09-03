@@ -300,7 +300,7 @@ namespace Squidex.Web.Pipeline
         {
             var app = A.Fake<IAppEntity>();
 
-            var contributors = AppContributors.Empty;
+            var contributors = Contributors.Empty;
 
             if (appUser != null)
             {

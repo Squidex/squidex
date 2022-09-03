@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
@@ -71,6 +71,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         GuardApp.CanUpdate(c);
 
                         Update(c);
+
+                        return Snapshot;
+                    }, ct);
+
+                case TransferToTeam transfer:
+                    return UpdateReturnAsync(transfer, async (c, ct) =>
+                    {
+                        await GuardApp.CanTransfer(c, AppProvider(), ct);
+
+                        Transfer(c);
 
                         return Snapshot;
                     }, ct);
@@ -359,6 +369,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             Raise(command, new AppUpdated());
         }
 
+        private void Transfer(TransferToTeam command)
+        {
+            Raise(command, new AppTransfered());
+        }
+
         private void UpdateSettings(UpdateAppSettings command)
         {
             Raise(command, new AppSettingsUpdated());
@@ -478,14 +493,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return new AppSettingsUpdated { Settings = serviceProvider.GetRequiredService<InitialSettings>().Settings };
         }
 
-        private IAppPlansProvider Plans()
+        private IAppProvider AppProvider()
         {
-            return serviceProvider.GetRequiredService<IAppPlansProvider>();
+            return serviceProvider.GetRequiredService<IAppProvider>();
         }
 
-        private IAppPlanBillingManager Billing()
+        private IBillingPlans Plans()
         {
-            return serviceProvider.GetRequiredService<IAppPlanBillingManager>();
+            return serviceProvider.GetRequiredService<IBillingPlans>();
+        }
+
+        private IBillingManager Billing()
+        {
+            return serviceProvider.GetRequiredService<IBillingManager>();
         }
 
         private IUserResolver Users()
@@ -493,14 +513,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return serviceProvider.GetRequiredService<IUserResolver>();
         }
 
-        private IAppLimitsPlan GetFreePlan()
+        private Plan GetFreePlan()
         {
             return Plans().GetFreePlan();
         }
 
-        private IAppLimitsPlan GetPlan()
+        private Plan GetPlan()
         {
-            return Plans().GetPlanForApp(Snapshot).Plan;
+            return Plans().GetActualPlan(Snapshot.Plan?.PlanId).Plan;
         }
     }
 }

@@ -8,16 +8,16 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 
 namespace Squidex.Web.Pipeline
 {
     public sealed class ApiCostsFilter : IAsyncActionFilter, IFilterContainer
     {
-        private readonly UsageGate usageGate;
+        private readonly IAppUsageTracker usageGate;
 
-        public ApiCostsFilter(UsageGate usageGate)
+        public ApiCostsFilter(IAppUsageTracker usageGate)
         {
             this.usageGate = usageGate;
         }

@@ -8,7 +8,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Plans.Models;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
@@ -21,16 +21,16 @@ namespace Squidex.Areas.Api.Controllers.Plans
     [ApiExplorerSettings(GroupName = nameof(Plans))]
     public sealed class AppPlansController : ApiController
     {
-        private readonly IAppPlansProvider appPlansProvider;
-        private readonly IAppPlanBillingManager appPlansBillingManager;
+        private readonly IBillingPlans billingPlans;
+        private readonly IBillingManager billingManager;
 
         public AppPlansController(ICommandBus commandBus,
-            IAppPlansProvider appPlansProvider,
-            IAppPlanBillingManager appPlansBillingManager)
+            IBillingPlans billingPlans,
+            IBillingManager billingManager)
             : base(commandBus)
         {
-            this.appPlansProvider = appPlansProvider;
-            this.appPlansBillingManager = appPlansBillingManager;
+            this.billingPlans = billingPlans;
+            this.billingManager = billingManager;
         }
 
         /// <summary>
@@ -48,11 +48,11 @@ namespace Squidex.Areas.Api.Controllers.Plans
         [ApiCosts(0)]
         public IActionResult GetPlans(string app)
         {
-            var hasPortal = appPlansBillingManager.HasPortal;
+            var hasPortal = billingManager.HasPortal;
 
             var response = Deferred.Response(() =>
             {
-                return AppPlansDto.FromDomain(App, appPlansProvider, hasPortal);
+                return AppPlansDto.FromDomain(App, billingPlans, hasPortal);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();

@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Options;
-using Squidex.Domain.Apps.Entities.Apps.Invitation;
+using Squidex.Domain.Apps.Entities.Invitation;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Infrastructure.Email;
 using Squidex.Infrastructure.EventSourcing;

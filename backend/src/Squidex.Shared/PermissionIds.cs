@@ -36,6 +36,13 @@ namespace Squidex.Shared
         public const string AdminUsersUnlock = "squidex.admin.users.unlock";
         public const string AdminUsersLock = "squidex.admin.users.lock";
 
+        // Team
+        public const string Team = "squidex.apps.{team}";
+
+        // Team General
+        public const string TeamAdmin = "squidex.teams.{team}.*";
+
+        // App
         public const string App = "squidex.apps.{app}";
 
         // App General
@@ -169,12 +176,13 @@ namespace Squidex.Shared
         public const string AppContentsDelete = "squidex.apps.{app}.contents.{schema}.delete";
         public const string AppContentsDeleteOwn = "squidex.apps.{app}.contents.{schema}.delete.own";
 
-        public static Permission ForApp(string id, string app = Permission.Any, string schema = Permission.Any)
+        public static Permission ForApp(string id, string app = Permission.Any, string schema = Permission.Any, string team = Permission.Any)
         {
             Guard.NotNull(id);
 
             id = id.Replace("{app}", app ?? Permission.Any, StringComparison.Ordinal);
             id = id.Replace("{schema}", schema ?? Permission.Any, StringComparison.Ordinal);
+            id = id.Replace("{team}", team ?? Permission.Any, StringComparison.Ordinal);
 
             return new Permission(id);
         }

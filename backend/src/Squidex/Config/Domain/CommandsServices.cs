@@ -76,7 +76,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RestrictAppsCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<InviteUserCommandMiddleware>()
+            services.AddSingletonAs<AppInviteUserCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<AppsIndex>()

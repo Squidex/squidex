@@ -13,7 +13,6 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.InMemory;
 using Squidex.Hosting;
-using Squidex.Infrastructure;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Squidex.Web;

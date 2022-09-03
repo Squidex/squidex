@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Tasks;
 using Squidex.Messaging;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Plans
+namespace Squidex.Domain.Apps.Entities.Billing
 {
     public sealed class UsageNotifierWorker : IMessageHandler<UsageTrackingCheck>
     {

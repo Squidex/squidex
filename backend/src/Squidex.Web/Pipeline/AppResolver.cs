@@ -7,7 +7,6 @@
 
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -91,7 +90,7 @@ namespace Squidex.Web.Pipeline
                     }
                 }
 
-                var requestContext = SetContext(context.HttpContext, app);
+                var requestContext = context.HttpContext.Features.Get<Context>()!;
 
                 if (!AllowAnonymous(context) && !HasPermission(appName, requestContext))
                 {
@@ -116,31 +115,8 @@ namespace Squidex.Web.Pipeline
                 context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app));
                 context.HttpContext.Response.Headers.Add("X-AppId", app.Id.ToString());
             }
-            else
-            {
-                SetContext(context.HttpContext, null!);
-            }
 
             await next();
-        }
-
-        private static Context SetContext(HttpContext httpContext, IAppEntity app)
-        {
-            var requestContext =
-                new Context(httpContext.User, app).Clone(builder =>
-                {
-                    foreach (var (key, value) in httpContext.Request.Headers)
-                    {
-                        if (key.StartsWith("X-", StringComparison.OrdinalIgnoreCase))
-                        {
-                            builder.SetHeader(key, value.ToString());
-                        }
-                    }
-                });
-
-            httpContext.Features.Set(requestContext);
-
-            return requestContext;
         }
 
         private static bool HasPermission(string appName, Context requestContext)

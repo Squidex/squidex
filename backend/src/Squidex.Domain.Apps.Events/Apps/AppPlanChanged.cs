@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Apps
@@ -15,9 +15,9 @@ namespace Squidex.Domain.Apps.Events.Apps
     {
         public string PlanId { get; set; }
 
-        public AppPlan ToPlan()
+        public AssignedPlan ToPlan()
         {
-            return new AppPlan(Actor, PlanId);
+            return new AssignedPlan(Actor, PlanId);
         }
     }
 }

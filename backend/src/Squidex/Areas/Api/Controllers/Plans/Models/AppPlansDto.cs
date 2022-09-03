@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Plans.Models
@@ -34,9 +34,9 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// </summary>
         public bool HasPortal { get; set; }
 
-        public static AppPlansDto FromDomain(IAppEntity app, IAppPlansProvider plans, bool hasPortal)
+        public static AppPlansDto FromDomain(IAppEntity app, IBillingPlans plans, bool hasPortal)
         {
-            var (_, planId) = plans.GetPlanForApp(app);
+            var (_, planId) = plans.GetActualPlan(app.Plan?.PlanId);
 
             var result = new AppPlansDto
             {

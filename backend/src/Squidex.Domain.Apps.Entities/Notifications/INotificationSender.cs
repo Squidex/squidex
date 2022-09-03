@@ -16,5 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
         Task SendUsageAsync(IUser user, string appName, long usage, long usageLimit);
 
         Task SendInviteAsync(IUser assigner, IUser user, string appName);
+
+        Task SendTeamInviteAsync(IUser assigner, IUser user, string teamName);
     }
 }

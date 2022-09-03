@@ -28,7 +28,8 @@ namespace Squidex.Config.Authentication
             {
                 var permissions = options.OidcRoleMapping
                     .Where(r => identity.HasClaim(options.OidcRoleClaimType, r.Key))
-                    .SelectMany(r => r.Value)
+                    .Select(r => r.Value)
+                    .SelectMany(r => r)
                     .Distinct();
 
                 foreach (var permission in permissions)

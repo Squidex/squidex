@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             var command = new ChangePlan { Actor = RefToken.User("me") };
 
-            AppPlan? plan = null;
+            AssignedPlan? plan = null;
 
             ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App(plan), appPlans),
                 new ValidationError("Plan ID is required.", "PlanId"));
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             var command = new ChangePlan { PlanId = "notfound", Actor = RefToken.User("me") };
 
-            AppPlan? plan = null;
+            AssignedPlan? plan = null;
 
             ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App(plan), appPlans),
                 new ValidationError("A plan with this id does not exist.", "PlanId"));
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             var command = new ChangePlan { PlanId = "basic", Actor = RefToken.User("me") };
 
-            var plan = new AppPlan(RefToken.User("other"), "premium");
+            var plan = new AssignedPlan(RefToken.User("other"), "premium");
 
             ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App(plan), appPlans),
                 new ValidationError("Plan can only changed from the user who configured the plan initially."));
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             var command = new ChangePlan { PlanId = "basic", Actor = RefToken.User("me") };
 
-            var plan = new AppPlan(command.Actor, "basic");
+            var plan = new AssignedPlan(command.Actor, "basic");
 
             GuardApp.CanChangePlan(command, App(plan), appPlans);
         }
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             var command = new ChangePlan { PlanId = "basic", Actor = RefToken.User("me") };
 
-            var plan = new AppPlan(command.Actor, "premium");
+            var plan = new AssignedPlan(command.Actor, "premium");
 
             GuardApp.CanChangePlan(command, App(plan), appPlans);
         }
@@ -248,7 +248,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
             GuardApp.CanUpdateSettings(command);
         }
 
-        private static IAppEntity App(AppPlan? plan)
+        private static IAppEntity App(AssignedPlan? plan)
         {
             var app = A.Fake<IAppEntity>();
 

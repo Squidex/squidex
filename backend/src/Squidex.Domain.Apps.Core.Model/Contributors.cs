@@ -9,23 +9,23 @@ using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Core.Apps
+namespace Squidex.Domain.Apps.Core
 {
-    public sealed class AppContributors : ReadonlyDictionary<string, string>
+    public sealed class Contributors : ReadonlyDictionary<string, string>
     {
-        public static readonly AppContributors Empty = new AppContributors();
+        public static readonly Contributors Empty = new Contributors();
 
-        private AppContributors()
+        private Contributors()
         {
         }
 
-        public AppContributors(IDictionary<string, string> inner)
+        public Contributors(IDictionary<string, string> inner)
             : base(inner)
         {
         }
 
         [Pure]
-        public AppContributors Assign(string contributorId, string role)
+        public Contributors Assign(string contributorId, string role)
         {
             Guard.NotNullOrEmpty(contributorId);
             Guard.NotNullOrEmpty(role);
@@ -35,11 +35,11 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return new AppContributors(updated);
+            return new Contributors(updated);
         }
 
         [Pure]
-        public AppContributors Remove(string contributorId)
+        public Contributors Remove(string contributorId)
         {
             Guard.NotNullOrEmpty(contributorId);
 
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return new AppContributors(updated);
+            return new Contributors(updated);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         private readonly IUser user3 = UserMocks.User("3");
         private readonly IUserResolver users = A.Fake<IUserResolver>();
         private readonly IAppLimitsPlan appPlan = A.Fake<IAppLimitsPlan>();
-        private readonly AppContributors contributors_0 = AppContributors.Empty;
+        private readonly Contributors contributors_0 = Contributors.Empty;
         private readonly Roles roles = Roles.Empty;
 
         public GuardAppContributorsTests()
@@ -229,7 +229,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
             GuardAppContributors.CanRemove(command, App(contributors_2));
         }
 
-        private IAppEntity App(AppContributors contributors)
+        private IAppEntity App(Contributors contributors)
         {
             var app = A.Fake<IAppEntity>();
 

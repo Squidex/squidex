@@ -128,7 +128,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11, default))
+            A.CallTo(() => usageTracker.rTrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11, default))
                 .MustHaveHappened();
         }
 

@@ -5,16 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
-
-#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
-
-namespace Squidex.Domain.Apps.Core.Apps
+namespace Squidex.Domain.Apps.Entities.Billing
 {
-    public sealed record AppPlan(RefToken Owner, string PlanId)
+    public sealed class InvitedResult<T>
     {
-        public RefToken Owner { get; } = Guard.NotNull(Owner);
-
-        public string PlanId { get; } = Guard.NotNullOrEmpty(PlanId);
+        public T Entity { get; set; }
     }
 }

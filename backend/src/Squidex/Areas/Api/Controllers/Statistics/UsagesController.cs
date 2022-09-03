@@ -9,8 +9,8 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Statistics.Models;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -28,7 +28,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
     {
         private readonly IApiUsageTracker usageTracker;
         private readonly IAppLogStore appLogStore;
-        private readonly IAppPlansProvider appPlansProvider;
+        private readonly IAppUsageTracker appUsageTracker;
         private readonly IAssetUsageTracker assetStatsRepository;
         private readonly IDataProtector dataProtector;
         private readonly IUrlGenerator urlGenerator;
@@ -38,7 +38,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             IDataProtectionProvider dataProtection,
             IApiUsageTracker usageTracker,
             IAppLogStore appLogStore,
-            IAppPlansProvider appPlansProvider,
+            IAppUsageTracker appUsageTracker,
             IAssetUsageTracker assetStatsRepository,
             IUrlGenerator urlGenerator)
             : base(commandBus)
@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             this.usageTracker = usageTracker;
 
             this.appLogStore = appLogStore;
-            this.appPlansProvider = appPlansProvider;
+            this.appUsageTracker = appUsageTracker;
             this.assetStatsRepository = assetStatsRepository;
             this.urlGenerator = urlGenerator;
 
@@ -105,7 +105,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             var (summary, details) = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date, HttpContext.RequestAborted);
 
             // Use the current app plan to show the limits to the user.
-            var (plan, _) = appPlansProvider.GetPlanForApp(App);
+            var (plan, _, _) = await appUsageTracker.GetPlanForAppAsync(App, HttpContext.RequestAborted);
 
             var response = CallsUsageDtoDto.FromDomain(plan, summary, details);
 
@@ -127,10 +127,10 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [ApiCosts(0)]
         public async Task<IActionResult> GetCurrentStorageSize(string app)
         {
-            var size = await assetStatsRepository.GetTotalSizeAsync(AppId);
+            var size = await assetStatsRepository.GetTotalSizeByAppAsync(AppId, HttpContext.RequestAborted);
 
             // Use the current app plan to show the limits to the user.
-            var (plan, _) = appPlansProvider.GetPlanForApp(App);
+            var (plan, _, _) = await appUsageTracker.GetPlanForAppAsync(App, HttpContext.RequestAborted);
 
             var response = new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize };
 
@@ -160,7 +160,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
                 return BadRequest();
             }
 
-            var usages = await assetStatsRepository.QueryAsync(AppId, fromDate.Date, toDate.Date);
+            var usages = await assetStatsRepository.QueryByAppAsync(AppId, fromDate.Date, toDate.Date, HttpContext.RequestAborted);
 
             var models = usages.Select(StorageUsagePerDateDto.FromDomain).ToArray();
 

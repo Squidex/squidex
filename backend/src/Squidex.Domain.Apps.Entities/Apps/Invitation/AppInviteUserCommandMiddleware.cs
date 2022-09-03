@@ -6,17 +6,18 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 {
-    public sealed class InviteUserCommandMiddleware : ICommandMiddleware
+    public sealed class AppInviteUserCommandMiddleware : ICommandMiddleware
     {
         private readonly IUserResolver userResolver;
 
-        public InviteUserCommandMiddleware(IUserResolver userResolver)
+        public AppInviteUserCommandMiddleware(IUserResolver userResolver)
         {
             this.userResolver = userResolver;
         }
@@ -48,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
                 if (created && context.PlainResult is IAppEntity app)
                 {
-                    context.Complete(new InvitedResult { App = app });
+                    context.Complete(new InvitedResult<IAppEntity> { Entity = app });
                 }
             }
             else

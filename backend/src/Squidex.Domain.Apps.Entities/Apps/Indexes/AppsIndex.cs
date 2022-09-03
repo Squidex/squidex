@@ -74,6 +74,22 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
+        public async Task<List<IAppEntity>> GetAppsForTeamAsync(DomainId teamId,
+            CancellationToken ct = default)
+        {
+            using (Telemetry.Activities.StartActivity("AppsIndex/GetAppsForTeamAsync"))
+            {
+                var apps = await appRepository.QueryAllAsync(teamId, ct);
+
+                foreach (var app in apps.Where(IsValid))
+                {
+                    await CacheItAsync(app);
+                }
+
+                return apps.Where(IsValid).ToList();
+            }
+        }
+
         public async Task<IAppEntity?> GetAppAsync(string name, bool canCache = false,
             CancellationToken ct = default)
         {

@@ -7,20 +7,15 @@
 
 using Squidex.Infrastructure;
 
-#pragma warning disable MA0048 // File name must match type name
-
-namespace Squidex.Domain.Apps.Entities.Apps.Plans
+namespace Squidex.Domain.Apps.Entities.Teams.Commands
 {
-    public sealed record UsageTrackingCheck
+    public abstract class TeamUpdateCommand : TeamCommand, ITeamCommand
     {
-        public DomainId AppId { get; init; }
+        public DomainId TeamId { get; set; }
 
-        public string AppName { get; init; }
-
-        public long Usage { get; init; }
-
-        public long UsageLimit { get; init; }
-
-        public string[] Users { get; init; }
+        public override DomainId AggregateId
+        {
+            get => TeamId;
+        }
     }
 }

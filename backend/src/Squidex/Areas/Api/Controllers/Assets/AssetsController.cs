@@ -14,9 +14,9 @@ using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Translations;
@@ -32,24 +32,24 @@ namespace Squidex.Areas.Api.Controllers.Assets
     [ApiExplorerSettings(GroupName = nameof(Assets))]
     public sealed class AssetsController : ApiController
     {
+        private readonly IAppUsageTracker appUsageTracker;
         private readonly IAssetQueryService assetQuery;
-        private readonly IAssetUsageTracker assetStatsRepository;
-        private readonly IAppPlansProvider appPlansProvider;
+        private readonly IAssetUsageTracker assetUsageTracker;
         private readonly ITagService tagService;
         private readonly AssetTusRunner assetTusRunner;
 
         public AssetsController(
             ICommandBus commandBus,
+            IAppUsageTracker appUsageTracker,
             IAssetQueryService assetQuery,
-            IAssetUsageTracker assetStatsRepository,
-            IAppPlansProvider appPlansProvider,
+            IAssetUsageTracker assetUsageTracker,
             ITagService tagService,
             AssetTusRunner assetTusRunner)
             : base(commandBus)
         {
-            this.appPlansProvider = appPlansProvider;
+            this.appUsageTracker = appUsageTracker;
             this.assetQuery = assetQuery;
-            this.assetStatsRepository = assetStatsRepository;
+            this.assetUsageTracker = assetUsageTracker;
             this.assetTusRunner = assetTusRunner;
             this.tagService = tagService;
         }
@@ -469,9 +469,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 throw new ValidationException(error);
             }
 
-            var (plan, _) = appPlansProvider.GetPlanForApp(App);
+            var (plan, _, _) = await appUsageTracker.GetPlanForAppAsync(App, HttpContext.RequestAborted);
 
-            var currentSize = await assetStatsRepository.GetTotalSizeAsync(AppId);
+            var currentSize = await assetUsageTracker.GetTotalSizeByAppAsync(AppId, HttpContext.RequestAborted);
 
             if (plan.MaxAssetSize > 0 && plan.MaxAssetSize < currentSize + file.Length)
             {

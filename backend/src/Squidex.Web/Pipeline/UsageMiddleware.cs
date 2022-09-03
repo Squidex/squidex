@@ -9,20 +9,20 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
-using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Web.Pipeline
 {
     public sealed class UsageMiddleware : IMiddleware
     {
         private readonly IAppLogStore usageLog;
-        private readonly IApiUsageTracker usageTracker;
+        private readonly IAppUsageTracker usageTracker;
 
         public IClock Clock { get; set; } = SystemClock.Instance;
 
-        public UsageMiddleware(IAppLogStore usageLog, IApiUsageTracker usageTracker )
+        public UsageMiddleware(IAppLogStore usageLog, IAppUsageTracker usageTracker )
         {
             this.usageLog = usageLog;
             this.usageTracker = usageTracker;
@@ -41,9 +41,9 @@ namespace Squidex.Web.Pipeline
             {
                 if (context.Response.StatusCode != StatusCodes.Status429TooManyRequests)
                 {
-                    var appId = context.Features.Get<IAppFeature>()?.App.Id;
+                    var app = context.Features.Get<IAppFeature>()?.App;
 
-                    if (appId != null)
+                    if (app != null)
                     {
                         var bytes = usageBody.BytesWritten;
 
@@ -69,14 +69,13 @@ namespace Squidex.Web.Pipeline
                         request.UserClientId = clientId;
 
                         // Do not flow cancellation token because it is too important.
-                        await usageLog.LogAsync(appId.Value, request, default);
+                        await usageLog.LogAsync(app.Id, request, default);
 
                         if (request.Costs > 0)
                         {
                             var date = request.Timestamp.ToDateTimeUtc().Date;
 
-                            await usageTracker.TrackAsync(date, appId.Value.ToString(),
-                                request.UserClientId,
+                            await usageTracker.TrackRequestAsync(app, request.UserClientId, date,
                                 request.Costs,
                                 request.ElapsedMs,
                                 request.Bytes,

@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_serialize_and_deserialize()
         {
-            var contributors = AppContributors.Empty;
+            var contributors = Contributors.Empty;
 
             contributors = contributors.Assign("1", Role.Developer);
             contributors = contributors.Assign("2", Role.Editor);

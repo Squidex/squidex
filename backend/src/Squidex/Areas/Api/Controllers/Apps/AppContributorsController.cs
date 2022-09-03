@@ -10,8 +10,7 @@ using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Invitation;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
@@ -28,14 +27,13 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppContributorsController : ApiController
     {
-        private readonly IAppPlansProvider appPlansProvider;
+        private readonly IAppUsageTracker appUsageTracker;
         private readonly IUserResolver userResolver;
 
-        public AppContributorsController(ICommandBus commandBus, IAppPlansProvider appPlansProvider, IUserResolver userResolver)
+        public AppContributorsController(ICommandBus commandBus, IAppUsageTracker appUsageTracker, IUserResolver userResolver)
             : base(commandBus)
         {
-            this.appPlansProvider = appPlansProvider;
-
+            this.appUsageTracker = appUsageTracker;
             this.userResolver = userResolver;
         }
 
@@ -137,9 +135,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-            if (context.PlainResult is InvitedResult invited)
+            if (context.PlainResult is InvitedResult<IAppEntity> invited)
             {
-                return await GetResponseAsync(invited.App, true);
+                return await GetResponseAsync(invited.Entity, true);
             }
             else
             {
@@ -159,9 +157,11 @@ namespace Squidex.Areas.Api.Controllers.Apps
             return subject;
         }
 
-        private Task<ContributorsDto> GetResponseAsync(IAppEntity app, bool invited)
+        private async Task<ContributorsDto> GetResponseAsync(IAppEntity app, bool invited)
         {
-            return ContributorsDto.FromAppAsync(app, Resources, userResolver, appPlansProvider, invited);
+            var (plan, _, _) = await appUsageTracker.GetPlanForAppAsync(app, HttpContext.RequestAborted);
+
+            return await ContributorsDto.FromAppAsync(app, Resources, userResolver, plan, invited);
         }
     }
 }

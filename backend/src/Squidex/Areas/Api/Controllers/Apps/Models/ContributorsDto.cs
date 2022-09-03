@@ -7,7 +7,7 @@
 
 using System.Text.Json.Serialization;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 using Squidex.Web;
@@ -25,7 +25,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The maximum number of allowed contributors.
         /// </summary>
-        public int MaxContributors { get; set; }
+        public long MaxContributors { get; set; }
 
         /// <summary>
         /// The metadata to provide information about this request.
@@ -33,7 +33,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [JsonPropertyName("_meta")]
         public ContributorsMetadata? Metadata { get; set; }
 
-        public static async Task<ContributorsDto> FromAppAsync(IAppEntity app, Resources resources, IUserResolver userResolver, IAppPlansProvider plans, bool invited)
+        public static async Task<ContributorsDto> FromAppAsync(IAppEntity app, Resources resources, IUserResolver userResolver, Plan plan, bool invited)
         {
             var users = await userResolver.QueryManyAsync(app.Contributors.Keys.ToArray());
 
@@ -48,14 +48,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             };
 
             result.CreateInvited(invited);
-            result.CreatePlan(app, plans);
+            result.CreatePlan(plan);
 
             return result.CreateLinks(resources);
         }
 
-        private void CreatePlan(IAppEntity app, IAppPlansProvider plans)
+        private void CreatePlan(Plan plan)
         {
-            MaxContributors = plans.GetPlanForApp(app).Plan.MaxContributors;
+            MaxContributors = plan.MaxContributors;
         }
 
         private void CreateInvited(bool isInvited)

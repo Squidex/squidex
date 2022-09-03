@@ -7,9 +7,9 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Plans
+namespace Squidex.Domain.Apps.Entities.Billing
 {
-    public sealed class NoopAppPlanBillingManager : IAppPlanBillingManager
+    public sealed class NoopBillingManager : IBillingManager
     {
         public bool HasPortal
         {
@@ -28,13 +28,31 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             return Task.FromResult<Uri?>(null);
         }
 
+        public Task<Uri?> MustRedirectToPortalAsync(string userId, DomainId teamId, string? planId,
+            CancellationToken ct = default)
+        {
+            return Task.FromResult<Uri?>(null);
+        }
+
         public Task SubscribeAsync(string userId, NamedId<DomainId> appId, string planId,
             CancellationToken ct = default)
         {
             return Task.CompletedTask;
         }
 
+        public Task SubscribeAsync(string userId, DomainId teamId, string planId,
+            CancellationToken ct = default)
+        {
+            return Task.CompletedTask;
+        }
+
         public Task UnsubscribeAsync(string userId, NamedId<DomainId> appId,
+            CancellationToken ct = default)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task UnsubscribeAsync(string userId, DomainId teamId,
             CancellationToken ct = default)
         {
             return Task.CompletedTask;

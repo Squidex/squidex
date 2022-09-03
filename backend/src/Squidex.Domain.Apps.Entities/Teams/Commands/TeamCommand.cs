@@ -5,11 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Plans
+namespace Squidex.Domain.Apps.Entities.Teams.Commands
 {
-    public sealed record PlanChangedResult(string PlanId, bool Unsubscribed = false, Uri? RedirectUri = null)
+    public abstract class TeamCommand : SquidexCommand, IAggregateCommand
     {
+        public abstract DomainId AggregateId { get; }
     }
 }

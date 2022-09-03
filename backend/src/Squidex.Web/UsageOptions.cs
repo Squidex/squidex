@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 
 namespace Squidex.Web
 {
     public sealed class UsageOptions
     {
-        public ConfigAppLimitsPlan[] Plans { get; set; }
+        public Plan[] Plans { get; set; }
     }
 }

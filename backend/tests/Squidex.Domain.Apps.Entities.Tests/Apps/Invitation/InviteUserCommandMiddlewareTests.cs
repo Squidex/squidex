@@ -23,13 +23,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly IAppEntity app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-        private readonly InviteUserCommandMiddleware sut;
+        private readonly AppInviteUserCommandMiddleware sut;
 
         public InviteUserCommandMiddlewareTests()
         {
             ct = cts.Token;
 
-            sut = new InviteUserCommandMiddleware(userResolver);
+            sut = new AppInviteUserCommandMiddleware(userResolver);
         }
 
         [Fact]

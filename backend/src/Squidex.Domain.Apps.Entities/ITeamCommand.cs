@@ -5,10 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Invitation
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
+
+namespace Squidex.Domain.Apps.Entities
 {
-    public sealed class InvitedResult
+    public interface ITeamCommand : ICommand
     {
-        public IAppEntity App { get; set; }
+        DomainId TeamId { get; set; }
     }
 }
