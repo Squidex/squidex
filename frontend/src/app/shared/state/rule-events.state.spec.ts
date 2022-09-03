@@ -66,7 +66,7 @@ describe('RuleEventsState', () => {
 
     it('should load with new pagination if paging', () => {
         rulesService.setup(x => x.getEvents(app, 30, 30, undefined))
-            .returns(() => of({ items: [], total: 0 }));
+            .returns(() => of({ items: [], total: 0, _links: {} }));
 
         ruleEventsState.page({ page: 1, pageSize: 30 }).subscribe();
 
@@ -78,7 +78,7 @@ describe('RuleEventsState', () => {
 
     it('should load with rule id if filtered', () => {
         rulesService.setup(x => x.getEvents(app, 30, 0, '12'))
-        .returns(() => of({ items: [], total: 200 }));
+        .returns(() => of({ items: [], total: 200, _links: {} }));
 
         ruleEventsState.filterByRule('12').subscribe();
 
@@ -89,7 +89,7 @@ describe('RuleEventsState', () => {
 
     it('should not load again if rule id has not changed', () => {
         rulesService.setup(x => x.getEvents(app, 30, 0, '12'))
-        .returns(() => of({ items: [], total: 200 }));
+        .returns(() => of({ items: [], total: 200, _links: {} }));
 
         ruleEventsState.filterByRule('12').subscribe();
         ruleEventsState.filterByRule('12').subscribe();

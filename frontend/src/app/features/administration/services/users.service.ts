@@ -51,13 +51,13 @@ export type UpsertUserDto = Readonly<{
     email: string;
 
     // The display name.
-    displayName: string;
+    displayName?: string;
 
     // The permissions as in the dot-notation.
-    permissions:  string[];
+    permissions?: ReadonlyArray<string>;
 
     // The password (confirm is only used in the UI).
-    password: string;
+    password?: string;
 }>;
 
 @Injectable()
