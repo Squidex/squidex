@@ -9,8 +9,9 @@ using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Domain.Apps.Entities.Teams.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Teams.Commands.Guards
+namespace Squidex.Domain.Apps.Entities.Teams.DomainObject.Guards
 {
     public static class GuardTeam
     {
@@ -40,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Teams.Commands.Guards
             });
         }
 
-        public static void CanChangePlan(ChangePlan command, IBillingPlans plans)
+        public static void CanChangePlan(ChangePlan command, IBillingPlans billingPlans)
         {
             Guard.NotNull(command);
 
@@ -52,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Teams.Commands.Guards
                     return;
                 }
 
-                if (plans.GetPlan(command.PlanId) == null)
+                if (billingPlans.GetPlan(command.PlanId) == null)
                 {
                     e(T.Get("apps.plans.notFound"), nameof(command.PlanId));
                 }

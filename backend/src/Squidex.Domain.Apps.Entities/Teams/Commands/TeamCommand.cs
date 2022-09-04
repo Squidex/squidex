@@ -12,6 +12,11 @@ namespace Squidex.Domain.Apps.Entities.Teams.Commands
 {
     public abstract class TeamCommand : SquidexCommand, IAggregateCommand
     {
-        public abstract DomainId AggregateId { get; }
+        public DomainId TeamId { get; set; }
+
+        public DomainId AggregateId
+        {
+            get => TeamId;
+        }
     }
 }

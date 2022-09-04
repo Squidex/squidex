@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
         public async Task Should_get_paid_plan_for_app()
         {
             A.CallTo(() => appWithoutTeam.Plan)
-                .Returns(new AssignedPlan(new RefToken(RefTokenType.Subject, "1"), planPaid.Id));
+                .Returns(new AssignedPlan(RefToken.User("1"), planPaid.Id));
 
             var plan = await sut.GetPlanForAppAsync(appWithoutTeam, ct);
 
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
                 .Returns(appWithoutTeam);
 
             A.CallTo(() => appWithoutTeam.Plan)
-                .Returns(new AssignedPlan(new RefToken(RefTokenType.Subject, "1"), planPaid.Id));
+                .Returns(new AssignedPlan(RefToken.User("1"), planPaid.Id));
 
             var plan = await sut.GetPlanForAppAsync(appWithoutTeam.Id, ct);
 
@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
                 .Returns(teamId);
 
             A.CallTo(() => team.Plan)
-                .Returns(new AssignedPlan(new RefToken(RefTokenType.Subject, "1"), planPaid.Id));
+                .Returns(new AssignedPlan(RefToken.User("1"), planPaid.Id));
 
             var plan = await sut.GetPlanForAppAsync(appWithTeam, ct);
 

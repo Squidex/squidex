@@ -10,8 +10,8 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Billing;
+using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
@@ -23,24 +23,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 {
     public class GuardAppTests : IClassFixture<TranslationsFixture>
     {
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IUserResolver users = A.Fake<IUserResolver>();
-        private readonly IBillingPlans appPlans = A.Fake<IBillingPlans>();
-        private readonly Plan planBasic = new Plan();
-        private readonly Plan planFree = new Plan();
+        private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
 
         public GuardAppTests()
         {
             A.CallTo(() => users.FindByIdOrEmailAsync(A<string>._, default))
                 .Returns(A.Dummy<IUser>());
 
-            A.CallTo(() => appPlans.GetPlan("notfound"))
+            A.CallTo(() => billingPlans.GetPlan("notfound"))
                 .Returns(null!);
 
-            A.CallTo(() => appPlans.GetPlan("basic"))
-                .Returns(planBasic);
-
-            A.CallTo(() => appPlans.GetPlan("free"))
-                .Returns(planFree);
+            A.CallTo(() => billingPlans.GetPlan("basic"))
+                .Returns(new Plan());
         }
 
         [Fact]
@@ -84,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
             AssignedPlan? plan = null;
 
-            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App(plan), appPlans),
+            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App(plan), billingPlans),
                 new ValidationError("Plan ID is required.", "PlanId"));
         }
 
@@ -95,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
             AssignedPlan? plan = null;
 
-            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App(plan), appPlans),
+            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App(plan), billingPlans),
                 new ValidationError("A plan with this id does not exist.", "PlanId"));
         }
 
@@ -106,8 +102,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
             var plan = new AssignedPlan(RefToken.User("other"), "premium");
 
-            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App(plan), appPlans),
+            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App(plan), billingPlans),
                 new ValidationError("Plan can only changed from the user who configured the plan initially."));
+        }
+
+        [Fact]
+        public void CanChangePlan_should_throw_exception_if_assigned_to_team()
+        {
+            var command = new ChangePlan { PlanId = "basic", Actor = RefToken.User("me") };
+
+            var teamId = DomainId.NewGuid();
+
+            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App(null, teamId), billingPlans),
+                new ValidationError("Plan is managed by the team."));
         }
 
         [Fact]
@@ -117,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
             var plan = new AssignedPlan(command.Actor, "basic");
 
-            GuardApp.CanChangePlan(command, App(plan), appPlans);
+            GuardApp.CanChangePlan(command, App(plan), billingPlans);
         }
 
         [Fact]
@@ -127,7 +134,50 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
             var plan = new AssignedPlan(command.Actor, "premium");
 
-            GuardApp.CanChangePlan(command, App(plan), appPlans);
+            GuardApp.CanChangePlan(command, App(plan), billingPlans);
+        }
+
+        [Fact]
+        public async Task CanTransfer_should_not_throw_exception_if_team_exists()
+        {
+            var team = Mocks.Team(DomainId.NewGuid());
+
+            A.CallTo(() => appProvider.GetTeamAsync(team.Id, default))
+                .Returns(team);
+
+            var command = new TransferToTeam { TeamId = team.Id };
+
+            await GuardApp.CanTransfer(command, App(null), appProvider, default);
+        }
+
+        [Fact]
+        public async Task CanTransfer_should_throw_exception_if_team_does_not_exist()
+        {
+            var team = Mocks.Team(DomainId.NewGuid());
+
+            A.CallTo(() => appProvider.GetTeamAsync(team.Id, default))
+                .Returns(Task.FromResult<ITeamEntity?>(null));
+
+            var command = new TransferToTeam { TeamId = team.Id };
+
+            await ValidationAssert.ThrowsAsync(() => GuardApp.CanTransfer(command, App(null), appProvider, default),
+                new ValidationError("The team does not exist."));
+        }
+
+        [Fact]
+        public async Task CanTransfer_should_throw_exception_if_app_has_plan()
+        {
+            var team = Mocks.Team(DomainId.NewGuid());
+
+            A.CallTo(() => appProvider.GetTeamAsync(team.Id, default))
+                .Returns(team);
+
+            var command = new TransferToTeam { TeamId = team.Id };
+
+            var plan = new AssignedPlan(RefToken.User("me"), "premium");
+
+            await ValidationAssert.ThrowsAsync(() => GuardApp.CanTransfer(command, App(plan), appProvider, default),
+                new ValidationError("Subscription must be cancelled first before a team is assigned."));
         }
 
         [Fact]

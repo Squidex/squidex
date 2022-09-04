@@ -142,6 +142,9 @@
   <data name="apps.notImage" xml:space="preserve">
     <value>文件不是图像</value>
   </data>
+  <data name="apps.plans.assignedToTeam" xml:space="preserve">
+    <value>Plan is managed by the team.</value>
+  </data>
   <data name="apps.plans.notFound" xml:space="preserve">
     <value>不存在具有此 ID 的计划。</value>
   </data>
@@ -162,6 +165,12 @@
   </data>
   <data name="apps.roles.usedRoleByContributorsNotRemovable" xml:space="preserve">
     <value>当分配了贡献者时无法删除角色。</value>
+  </data>
+  <data name="apps.transfer.planAssigned" xml:space="preserve">
+    <value>Subscription must be cancelled first before a team is assigned.</value>
+  </data>
+  <data name="apps.transfer.teamNotFound" xml:space="preserve">
+    <value>The team does not exist.</value>
   </data>
   <data name="assets.folderNotFound" xml:space="preserve">
     <value>资源文件夹不存在。</value>

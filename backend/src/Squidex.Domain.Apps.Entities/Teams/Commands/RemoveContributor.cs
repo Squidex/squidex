@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Teams.Commands
 {
-    public sealed class RemoveContributor : TeamUpdateCommand
+    public sealed class RemoveContributor : TeamCommand
     {
         public string ContributorId { get; set; }
     }

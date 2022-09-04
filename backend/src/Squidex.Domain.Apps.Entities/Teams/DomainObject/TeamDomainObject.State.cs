@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
         {
             public string Name { get; set; }
 
-            public Contributors Contributors { get; set; }
+            public Contributors Contributors { get; set; } = Contributors.Empty;
 
             public AssignedPlan? Plan { get; set; }
 

@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
-            var user = new RefToken(RefTokenType.Subject, "1");
+            var user = RefToken.User("1");
 
             foreach (var appId in AppIds)
             {

@@ -191,7 +191,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
 
             if (result is SquidexEvent squidexEvent)
             {
-                squidexEvent.Actor = new RefToken(RefTokenType.Client, "my-client");
+                squidexEvent.Actor = RefToken.Client("my-client");
             }
 
             if (result is AppEvent appEvent)

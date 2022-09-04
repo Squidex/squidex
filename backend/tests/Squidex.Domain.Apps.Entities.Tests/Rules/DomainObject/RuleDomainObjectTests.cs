@@ -238,20 +238,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             return PublishAsync(new DeleteRule());
         }
 
-        private T CreateRuleEvent<T>(T @event) where T : RuleEvent
-        {
-            @event.RuleId = ruleId;
-
-            return CreateEvent(@event);
-        }
-
-        private T CreateRuleCommand<T>(T command) where T : RuleCommand
-        {
-            command.RuleId = ruleId;
-
-            return CreateCommand(command);
-        }
-
         private static CreateRule MakeCreateCommand()
         {
             return new CreateRule
@@ -281,6 +267,20 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                     Value = 456
                 }
             };
+        }
+
+        private T CreateRuleEvent<T>(T @event) where T : RuleEvent
+        {
+            @event.RuleId = ruleId;
+
+            return CreateEvent(@event);
+        }
+
+        private T CreateRuleCommand<T>(T command) where T : RuleCommand
+        {
+            command.RuleId = ruleId;
+
+            return CreateCommand(command);
         }
 
         private Task<object> PublishIdempotentAsync(RuleCommand command)

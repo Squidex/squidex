@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
+using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Indexes;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -60,6 +61,19 @@ namespace Squidex.Domain.Apps.Entities
         }
 
         [Fact]
+        public async Task Should_get_team_apps_from_index()
+        {
+            var team = Mocks.Team(DomainId.NewGuid());
+
+            A.CallTo(() => indexForApps.GetAppsForTeamAsync(team.Id, ct))
+                .Returns(new List<IAppEntity> { app });
+
+            var result = await sut.GetTeamAppsAsync(team.Id, ct);
+
+            Assert.Equal(app, result.Single());
+        }
+
+        [Fact]
         public async Task Should_get_apps_from_index()
         {
             var permissions = new PermissionSet("*");
@@ -92,6 +106,32 @@ namespace Squidex.Domain.Apps.Entities
             var result = await sut.GetAppAsync(app.Name, false, ct);
 
             Assert.Equal(app, result);
+        }
+
+        [Fact]
+        public async Task Should_get_team_from_index()
+        {
+            var team = Mocks.Team(DomainId.NewGuid());
+
+            A.CallTo(() => indexForTeams.GetTeamAsync(team.Id, ct))
+                .Returns(team);
+
+            var result = await sut.GetTeamAsync(team.Id, ct);
+
+            Assert.Equal(team, result);
+        }
+
+        [Fact]
+        public async Task Should_get_teams_from_index()
+        {
+            var team = Mocks.Team(DomainId.NewGuid());
+
+            A.CallTo(() => indexForTeams.GetTeamsAsync("user1", ct))
+                .Returns(new List<ITeamEntity> { team });
+
+            var result = await sut.GetUserTeamsAsync("user1", ct);
+
+            Assert.Equal(team, result.Single());
         }
 
         [Fact]

@@ -150,6 +150,21 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
+        public async Task Should_resolve_all_apps_from_team()
+        {
+            var teamId = DomainId.NewGuid();
+
+            var expected = CreateApp();
+
+            A.CallTo(() => appRepository.QueryAllAsync(teamId, ct))
+                .Returns(new List<IAppEntity> { expected });
+
+            var actual = await sut.GetAppsForTeamAsync(teamId, ct);
+
+            Assert.Same(expected, actual[0]);
+        }
+
+        [Fact]
         public async Task Should_return_empty_apps_if_app_not_created()
         {
             var expected = CreateApp(EtagVersion.Empty);

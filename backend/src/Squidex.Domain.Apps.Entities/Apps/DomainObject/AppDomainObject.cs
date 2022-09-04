@@ -268,7 +268,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 case DeleteApp delete:
                     return UpdateAsync(delete, async (c, ct) =>
                     {
-                        await Billing().UnsubscribeAsync(c.Actor.Identifier, Snapshot.NamedId(), default);
+                        await BillingManager().UnsubscribeAsync(c.Actor.Identifier, Snapshot.NamedId(), default);
 
                         DeleteApp(c);
                     }, ct);
@@ -289,7 +289,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             var result = await UpdateReturnAsync(changePlan, async (c, ct) =>
             {
-                GuardApp.CanChangePlan(c, Snapshot, Plans());
+                GuardApp.CanChangePlan(c, Snapshot, BillingPlans());
 
                 if (string.Equals(GetFreePlan()?.Id, c.PlanId, StringComparison.Ordinal))
                 {
@@ -300,7 +300,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
                 if (!c.FromCallback)
                 {
-                    var redirectUri = await Billing().MustRedirectToPortalAsync(userId, Snapshot.NamedId(), c.PlanId, ct);
+                    var redirectUri = await BillingManager().MustRedirectToPortalAsync(userId, Snapshot.NamedId(), c.PlanId, ct);
 
                     if (redirectUri != null)
                     {
@@ -320,11 +320,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             if (result.Payload is PlanChangedResult { Unsubscribed: true, RedirectUri: null })
             {
-                await Billing().UnsubscribeAsync(userId, Snapshot.NamedId(), default);
+                await BillingManager().UnsubscribeAsync(userId, Snapshot.NamedId(), default);
             }
             else if (result.Payload is PlanChangedResult { RedirectUri: null })
             {
-                await Billing().SubscribeAsync(userId, Snapshot.NamedId(), changePlan.PlanId, default);
+                await BillingManager().SubscribeAsync(userId, Snapshot.NamedId(), changePlan.PlanId, default);
             }
 
             return result;
@@ -498,12 +498,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return serviceProvider.GetRequiredService<IAppProvider>();
         }
 
-        private IBillingPlans Plans()
+        private IBillingPlans BillingPlans()
         {
             return serviceProvider.GetRequiredService<IBillingPlans>();
         }
 
-        private IBillingManager Billing()
+        private IBillingManager BillingManager()
         {
             return serviceProvider.GetRequiredService<IBillingManager>();
         }
@@ -515,12 +515,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         private Plan GetFreePlan()
         {
-            return Plans().GetFreePlan();
+            return BillingPlans().GetFreePlan();
         }
 
         private Plan GetPlan()
         {
-            return Plans().GetActualPlan(Snapshot.Plan?.PlanId).Plan;
+            return BillingPlans().GetActualPlan(Snapshot.Plan?.PlanId).Plan;
         }
     }
 }

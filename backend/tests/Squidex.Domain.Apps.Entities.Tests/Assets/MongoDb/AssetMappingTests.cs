@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_map_asset()
         {
-            var user = new RefToken(RefTokenType.Subject, "1");
+            var user = RefToken.User("1");
 
             var time = SystemClock.Instance.GetCurrentInstant();
 
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_map_asset_folder()
         {
-            var user = new RefToken(RefTokenType.Subject, "1");
+            var user = RefToken.User("1");
 
             var time = SystemClock.Instance.GetCurrentInstant();
 

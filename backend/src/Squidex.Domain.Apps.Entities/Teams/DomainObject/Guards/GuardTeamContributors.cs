@@ -16,11 +16,11 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject.Guards
 {
     public static class GuardTeamContributors
     {
-        public static Task CanAssign(AssignContributor command, ITeamEntity app, IUserResolver users)
+        public static Task CanAssign(AssignContributor command, ITeamEntity team, IUserResolver users)
         {
             Guard.NotNull(command);
 
-            var contributors = app.Contributors;
+            var contributors = team.Contributors;
 
             return Validate.It(async e =>
             {
@@ -50,11 +50,11 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject.Guards
             });
         }
 
-        public static void CanRemove(RemoveContributor command, ITeamEntity app)
+        public static void CanRemove(RemoveContributor command, ITeamEntity team)
         {
             Guard.NotNull(command);
 
-            var contributors = app.Contributors;
+            var contributors = team.Contributors;
 
             Validate.It(e =>
             {

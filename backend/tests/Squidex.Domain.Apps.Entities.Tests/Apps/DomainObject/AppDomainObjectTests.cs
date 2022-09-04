@@ -35,10 +35,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private readonly string roleName = "My Role";
         private readonly string planIdPaid = "premium";
         private readonly string planIdFree = "free";
-        private readonly AppDomainObject sut;
+        private readonly InitialSettings initialSettings;
         private readonly DomainId teamId = DomainId.NewGuid();
         private readonly DomainId workflowId = DomainId.NewGuid();
-        private readonly InitialSettings initialSettings;
+        private readonly AppDomainObject sut;
 
         protected override DomainId Id
         {
@@ -149,8 +149,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal("my-label", sut.Snapshot.Label);
-            Assert.Equal("my-description", sut.Snapshot.Description);
+            Assert.Equal(command.Label, sut.Snapshot.Label);
+            Assert.Equal(command.Description, sut.Snapshot.Description);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -193,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal("image/png", sut.Snapshot.Image!.MimeType);
+            Assert.Equal(command.File.MimeType, sut.Snapshot.Image!.MimeType);
 
             LastEvents
                 .ShouldHaveSameEvents(

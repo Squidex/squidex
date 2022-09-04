@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         private static ContentDomainObject.State CreateContentWithoutNewVersion()
         {
-            var user = new RefToken(RefTokenType.Subject, "1");
+            var user = RefToken.User("1");
 
             var data =
                 new ContentData()
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         private static ContentDomainObject.State CreateContentWithNewVersion()
         {
-            var user = new RefToken(RefTokenType.Subject, "1");
+            var user = RefToken.User("1");
 
             var data =
                 new ContentData()

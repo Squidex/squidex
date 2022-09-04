@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Teams.Commands
 {
-    public sealed class ChangePlan : TeamUpdateCommand
+    public sealed class ChangePlan : TeamCommand
     {
         public bool FromCallback { get; set; }
 

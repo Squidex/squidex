@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
-using Squidex.Domain.Apps.Entities.Teams.Commands.Guards;
 using Squidex.Domain.Apps.Entities.Teams.DomainObject.Guards;
 using Squidex.Domain.Apps.Events.Teams;
 using Squidex.Infrastructure;
@@ -111,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
             var result = await UpdateReturnAsync(changePlan, async (c, ct) =>
             {
-                GuardTeam.CanChangePlan(c, Plans());
+                GuardTeam.CanChangePlan(c, BillingPlans());
 
                 if (string.Equals(GetFreePlan()?.Id, c.PlanId, StringComparison.Ordinal))
                 {
@@ -122,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
                 if (!c.FromCallback)
                 {
-                    var redirectUri = await Billing().MustRedirectToPortalAsync(userId, UniqueId, c.PlanId, ct);
+                    var redirectUri = await BillingManager().MustRedirectToPortalAsync(userId, UniqueId, c.PlanId, ct);
 
                     if (redirectUri != null)
                     {
@@ -142,11 +141,11 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
             if (result.Payload is PlanChangedResult { Unsubscribed: true, RedirectUri: null })
             {
-                await Billing().UnsubscribeAsync(userId, UniqueId, default);
+                await BillingManager().UnsubscribeAsync(userId, UniqueId, default);
             }
             else if (result.Payload is PlanChangedResult { RedirectUri: null })
             {
-                await Billing().SubscribeAsync(userId, UniqueId, changePlan.PlanId, default);
+                await BillingManager().SubscribeAsync(userId, UniqueId, changePlan.PlanId, default);
             }
 
             return result;
@@ -216,12 +215,12 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
             return new TeamContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner, TeamName = name };
         }
 
-        private IBillingPlans Plans()
+        private IBillingPlans BillingPlans()
         {
             return serviceProvider.GetRequiredService<IBillingPlans>();
         }
 
-        private IBillingManager Billing()
+        private IBillingManager BillingManager()
         {
             return serviceProvider.GetRequiredService<IBillingManager>();
         }
@@ -233,7 +232,7 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
         private Plan GetFreePlan()
         {
-            return Plans().GetFreePlan();
+            return BillingPlans().GetFreePlan();
         }
     }
 }

@@ -11,14 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Teams.Commands
 {
     public sealed class CreateTeam : TeamCommand
     {
-        public DomainId TeamId { get; set; }
-
         public string Name { get; set; }
-
-        public override DomainId AggregateId
-        {
-            get => TeamId;
-        }
 
         public CreateTeam()
         {

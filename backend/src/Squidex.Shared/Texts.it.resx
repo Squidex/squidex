@@ -142,6 +142,9 @@
   <data name="apps.notImage" xml:space="preserve">
     <value>Il file non è una immagine</value>
   </data>
+  <data name="apps.plans.assignedToTeam" xml:space="preserve">
+    <value>Plan is managed by the team.</value>
+  </data>
   <data name="apps.plans.notFound" xml:space="preserve">
     <value>Non esiste un piano con questo id.</value>
   </data>
@@ -162,6 +165,12 @@
   </data>
   <data name="apps.roles.usedRoleByContributorsNotRemovable" xml:space="preserve">
     <value>Non è possibile rimuovere un ruolo quando questo è assegnato ad un collaboratore.</value>
+  </data>
+  <data name="apps.transfer.planAssigned" xml:space="preserve">
+    <value>Subscription must be cancelled first before a team is assigned.</value>
+  </data>
+  <data name="apps.transfer.teamNotFound" xml:space="preserve">
+    <value>The team does not exist.</value>
   </data>
   <data name="assets.folderNotFound" xml:space="preserve">
     <value>La cartella delle risorse non esiste.</value>
