@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         protected async Task<object> PublishIdempotentAsync<T>(DomainObject<T> domainObject, IAggregateCommand command,
             CancellationToken ct = default) where T : class, IDomainState<T>, new()
         {
-            var result = await domainObject.ExecuteAsync(command, default);
+            var actual = await domainObject.ExecuteAsync(command, default);
 
             var previousSnapshot = domainObject.Snapshot;
             var previousVersion = domainObject.Snapshot.Version;
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             Assert.Same(previousSnapshot, domainObject.Snapshot);
             Assert.Equal(previousVersion, domainObject.Snapshot.Version);
 
-            return result.Payload;
+            return actual.Payload;
         }
 
         protected TCommand CreateCommand<TCommand>(TCommand command) where TCommand : SquidexCommand

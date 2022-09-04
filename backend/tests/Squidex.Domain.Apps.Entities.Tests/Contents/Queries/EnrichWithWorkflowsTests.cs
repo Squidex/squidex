@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            A.CallTo(() => workflow.GetNextAsync(content, content.Status, requestContext.User))
+            A.CallTo(() => workflow.GetNextAsync(content, content.Status, requestContext.UserPrincipal))
                 .Returns(nexts);
 
             await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Equal(Status.Published, content.NextStatuses?.Single().Status);
 
-            A.CallTo(() => workflow.GetNextAsync(content, A<Status>._, requestContext.User))
+            A.CallTo(() => workflow.GetNextAsync(content, A<Status>._, requestContext.UserPrincipal))
                 .MustNotHaveHappened();
         }
 
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Empty(content.NextStatuses);
 
-            A.CallTo(() => workflow.GetNextAsync(content, A<Status>._, requestContext.User))
+            A.CallTo(() => workflow.GetNextAsync(content, A<Status>._, requestContext.UserPrincipal))
                 .MustNotHaveHappened();
         }
 
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var content = new ContentEntity { SchemaId = schemaId };
 
-            A.CallTo(() => workflow.CanUpdateAsync(content, content.Status, requestContext.User))
+            A.CallTo(() => workflow.CanUpdateAsync(content, content.Status, requestContext.UserPrincipal))
                 .Returns(true);
 
             var ctx = requestContext.Clone(b => b.WithResolveFlow(false));
@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.False(content.CanUpdate);
 
-            A.CallTo(() => workflow.CanUpdateAsync(content, A<Status>._, requestContext.User))
+            A.CallTo(() => workflow.CanUpdateAsync(content, A<Status>._, requestContext.UserPrincipal))
                 .MustNotHaveHappened();
         }
     }

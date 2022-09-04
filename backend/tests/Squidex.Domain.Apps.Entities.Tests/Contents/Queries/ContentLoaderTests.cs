@@ -81,9 +81,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => domainObject.GetSnapshotAsync(EtagVersion.Any, ct))
                 .Returns(content);
 
-            var result = await sut.GetAsync(appId, id, EtagVersion.Any, ct);
+            var actual = await sut.GetAsync(appId, id, EtagVersion.Any, ct);
 
-            Assert.Same(content, result);
+            Assert.Same(content, actual);
         }
 
         [Fact]
@@ -94,9 +94,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
                 .Returns(content);
 
-            var result = await sut.GetAsync(appId, id, 10, ct);
+            var actual = await sut.GetAsync(appId, id, 10, ct);
 
-            Assert.Same(content, result);
+            Assert.Same(content, actual);
         }
 
         [Fact]
@@ -107,9 +107,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => domainObjectCache.GetAsync<ContentDomainObject.State>(DomainId.Combine(appId, id), 10, ct))
                 .Returns(content);
 
-            var result = await sut.GetAsync(appId, id, 10, ct);
+            var actual = await sut.GetAsync(appId, id, 10, ct);
 
-            Assert.Same(content, result);
+            Assert.Same(content, actual);
 
             A.CallTo(() => domainObjectFactory.Create<ContentDomainObject>(unqiueId))
                 .MustNotHaveHappened();

@@ -31,20 +31,20 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Should_return_empty_results_if_user_has_no_permission()
+        public async Task Should_return_empty_actuals_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("logo", ctx, default);
+            var actual = await sut.SearchAsync("logo", ctx, default);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
 
             A.CallTo(() => assetQuery.QueryAsync(A<Context>._, A<DomainId?>._, A<Q>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task Should_return_assets_results_if_found()
+        public async Task Should_return_assets_actuals_if_found()
         {
             var permission = PermissionIds.ForApp(PermissionIds.AppAssetsRead, appId.Name);
 
@@ -62,9 +62,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => assetQuery.QueryAsync(ctx, null, A<Q>.That.HasQuery("Filter: contains(fileName, 'logo'); Take: 5"), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(2, asset1, asset2));
 
-            var result = await sut.SearchAsync("logo", ctx, default);
+            var actual = await sut.SearchAsync("logo", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("logo1.png", SearchResultType.Asset, "assets-url1")
                     .Add("logo2.png", SearchResultType.Asset, "assets-url2"));

@@ -39,9 +39,9 @@ namespace Squidex.Infrastructure.MongoDb
 
             var source = new IdEntity<string> { Id = id.ToString() };
 
-            var result = SerializeAndDeserializeBson<IdEntity<string>, IdEntity<DomainId>>(source);
+            var actual = SerializeAndDeserializeBson<IdEntity<string>, IdEntity<DomainId>>(source);
 
-            Assert.Equal(result.Id.ToString(), id.ToString());
+            Assert.Equal(actual.Id.ToString(), id.ToString());
         }
 
         [Fact]
@@ -51,9 +51,9 @@ namespace Squidex.Infrastructure.MongoDb
 
             var source = new StringEntity<Guid> { Id = id };
 
-            var result = SerializeAndDeserializeBson<StringEntity<Guid>, IdEntity<DomainId>>(source);
+            var actual = SerializeAndDeserializeBson<StringEntity<Guid>, IdEntity<DomainId>>(source);
 
-            Assert.Equal(result.Id.ToString(), id.ToString());
+            Assert.Equal(actual.Id.ToString(), id.ToString());
         }
 
         [Fact]
@@ -63,9 +63,9 @@ namespace Squidex.Infrastructure.MongoDb
 
             var source = new IdEntity<Guid> { Id = id };
 
-            var result = SerializeAndDeserializeBson<IdEntity<Guid>, IdEntity<DomainId>>(source);
+            var actual = SerializeAndDeserializeBson<IdEntity<Guid>, IdEntity<DomainId>>(source);
 
-            Assert.Equal(result.Id.ToString(), id.ToString());
+            Assert.Equal(actual.Id.ToString(), id.ToString());
         }
 
         private static TOut SerializeAndDeserializeBson<TIn, TOut>(TIn source)

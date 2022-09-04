@@ -8,19 +8,27 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public abstract class AssetCommand : SquidexCommand, IAppCommand, IAggregateCommand
+    public abstract class AssetCommand : AssetCommandBase
     {
-        public NamedId<DomainId> AppId { get; set; }
-
         public DomainId AssetId { get; set; }
 
         public bool DoNotScript { get; set; }
 
-        public DomainId AggregateId
+        public override DomainId AggregateId
         {
             get => DomainId.Combine(AppId, AssetId);
         }
+    }
+
+    // This command is needed as marker for middlewares.
+    public abstract class AssetCommandBase : SquidexCommand, IAppCommand, IAggregateCommand
+    {
+        public NamedId<DomainId> AppId { get; set; }
+
+        public abstract DomainId AggregateId { get; }
     }
 }

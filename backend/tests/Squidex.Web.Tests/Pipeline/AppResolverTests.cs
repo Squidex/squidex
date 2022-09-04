@@ -62,7 +62,7 @@ namespace Squidex.Web.Pipeline
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public async Task Should_return_not_found_if_app_name_is_null(string? app)
+        public async Task Should_return_404_if_app_name_is_null(string? app)
         {
             SetupUser();
 
@@ -78,7 +78,7 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_return_not_found_if_app_not_found()
+        public async Task Should_return_404_if_app_not_found()
         {
             SetupUser();
 
@@ -115,7 +115,7 @@ namespace Squidex.Web.Pipeline
             var app = CreateApp(appName);
 
             user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
-            user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
+            user.AddClaim(new Claim(SquidexClaimTypes.Permissions, $"squidex.apps.{appName}"));
 
             A.CallTo(() => appProvider.GetAppAsync(appName, true, httpContext.RequestAborted))
                 .Returns(app);
@@ -127,7 +127,7 @@ namespace Squidex.Web.Pipeline
             Assert.Same(app, httpContext.Context().App);
             Assert.True(user.Claims.Any());
             Assert.True(permissions.Count < 3);
-            Assert.True(permissions.All(x => x.Value.StartsWith("squidex.apps.my-app", StringComparison.OrdinalIgnoreCase)));
+            Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.apps.{appName}", StringComparison.OrdinalIgnoreCase)));
             Assert.True(isNextCalled);
         }
 
@@ -136,7 +136,7 @@ namespace Squidex.Web.Pipeline
         {
             var user = SetupUser();
 
-            var app = CreateApp(appName, appUser: "user1");
+            var app = CreateApp(appName, user: "user1");
 
             user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
 
@@ -150,7 +150,7 @@ namespace Squidex.Web.Pipeline
             Assert.Same(app, httpContext.Context().App);
             Assert.True(user.Claims.Count() > 2);
             Assert.True(permissions.Count < 3);
-            Assert.True(permissions.All(x => x.Value.StartsWith("squidex.apps.my-app", StringComparison.OrdinalIgnoreCase)));
+            Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.apps.{appName}", StringComparison.OrdinalIgnoreCase)));
             Assert.True(isNextCalled);
         }
 
@@ -159,7 +159,7 @@ namespace Squidex.Web.Pipeline
         {
             var user = SetupUser();
 
-            var app = CreateApp(appName, appUser: "user1");
+            var app = CreateApp(appName, user: "user1");
 
             user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
             user.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
@@ -174,7 +174,7 @@ namespace Squidex.Web.Pipeline
             Assert.Same(app, httpContext.Context().App);
             Assert.True(user.Claims.Count() > 2);
             Assert.True(permissions.Count > 10);
-            Assert.True(permissions.All(x => x.Value.StartsWith("squidex.apps.my-app", StringComparison.OrdinalIgnoreCase)));
+            Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.apps.{appName}", StringComparison.OrdinalIgnoreCase)));
             Assert.True(isNextCalled);
         }
 
@@ -185,7 +185,7 @@ namespace Squidex.Web.Pipeline
 
             user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
 
-            var app = CreateApp(appName, appClient: "client1");
+            var app = CreateApp(appName, client: "client1");
 
             A.CallTo(() => appProvider.GetAppAsync(appName, true, httpContext.RequestAborted))
                 .Returns(app);
@@ -202,7 +202,7 @@ namespace Squidex.Web.Pipeline
         {
             var user = SetupUser();
 
-            var app = CreateApp(appName, appClient: "client1", allowAnonymous: true);
+            var app = CreateApp(appName, client: "client1", allowAnonymous: true);
 
             A.CallTo(() => appProvider.GetAppAsync(appName, true, httpContext.RequestAborted))
                 .Returns(app);
@@ -238,7 +238,7 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_return_not_found_if_user_has_no_permissions()
+        public async Task Should_return_404_if_user_has_no_permissions()
         {
             var user = SetupUser();
 
@@ -257,13 +257,13 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_return_not_found_if_client_is_from_another_app()
+        public async Task Should_return_404_if_client_is_from_another_app()
         {
             var user = SetupUser();
 
             user.AddClaim(new Claim(OpenIdClaims.ClientId, "other:client1"));
 
-            var app = CreateApp(appName, appClient: "client1");
+            var app = CreateApp(appName, client: "client1");
 
             A.CallTo(() => appProvider.GetAppAsync(appName, false, httpContext.RequestAborted))
                 .Returns(app);
@@ -297,22 +297,22 @@ namespace Squidex.Web.Pipeline
             return userIdentity;
         }
 
-        private static IAppEntity CreateApp(string name, string? appUser = null, string? appClient = null, long? apiCallsLimit = null, bool? allowAnonymous = null)
+        private static IAppEntity CreateApp(string name, string? user = null, string? client = null, bool? allowAnonymous = null)
         {
             var app = A.Fake<IAppEntity>();
 
             var contributors = Contributors.Empty;
 
-            if (appUser != null)
+            if (user != null)
             {
-                contributors = contributors.Assign(appUser, Role.Reader);
+                contributors = contributors.Assign(user, Role.Reader);
             }
 
             var clients = AppClients.Empty;
 
-            if (appClient != null)
+            if (client != null)
             {
-                clients = clients.Add(appClient, "secret").Update(appClient, apiCallsLimit: apiCallsLimit, allowAnonymous: allowAnonymous);
+                clients = clients.Add(client, "secret").Update(client, allowAnonymous: allowAnonymous);
             }
 
             A.CallTo(() => app.Contributors).Returns(contributors);

@@ -25,11 +25,11 @@ namespace Squidex.Domain.Apps.Entities
 
         public ClaimsPermissions UserPermissions { get; }
 
-        public ClaimsPrincipal User { get; }
+        public ClaimsPrincipal UserPrincipal { get; }
 
         public IAppEntity App { get; set; }
 
-        public bool IsFrontendClient => User.IsInClient(DefaultClients.Frontend);
+        public bool IsFrontendClient => UserPrincipal.IsInClient(DefaultClients.Frontend);
 
         public Context(ClaimsPrincipal user, IAppEntity app)
             : this(app, user, user.Claims.Permissions(), EmptyHeaders)
@@ -37,11 +37,15 @@ namespace Squidex.Domain.Apps.Entities
             Guard.NotNull(user);
         }
 
-        private Context(IAppEntity app, ClaimsPrincipal user, ClaimsPermissions userPermissions, IReadOnlyDictionary<string, string> headers)
+        private Context(
+            IAppEntity app,
+            ClaimsPrincipal userPrincipal,
+            ClaimsPermissions userPermissions,
+            IReadOnlyDictionary<string, string> headers)
         {
             App = app;
 
-            User = user;
+            UserPrincipal = userPrincipal;
             UserPermissions = userPermissions;
 
             Headers = headers;
@@ -84,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities
             {
                 if (headers != null)
                 {
-                    return new Context(context.App!, context.User, context.UserPermissions, headers);
+                    return new Context(context.App!, context.UserPrincipal, context.UserPermissions, headers);
                 }
 
                 return context;

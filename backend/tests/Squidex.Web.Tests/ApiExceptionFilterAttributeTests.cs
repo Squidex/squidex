@@ -45,10 +45,10 @@ namespace Squidex.Web
 
             sut.OnException(context);
 
-            var result = (ObjectResult)context.Result!;
+            var actual = (ObjectResult)context.Result!;
 
-            Assert.Equal(400, result.StatusCode);
-            Assert.Equal(400, (result.Value as ErrorDto)?.StatusCode);
+            Assert.Equal(400, actual.StatusCode);
+            Assert.Equal(400, (actual.Value as ErrorDto)?.StatusCode);
 
             Assert.Equal(new[]
             {
@@ -57,7 +57,7 @@ namespace Squidex.Web
                 "property1, property2: Error3",
                 "property3.property4: Error4",
                 "property5[0].property6: Error5"
-            }, ((ErrorDto)result.Value!).Details);
+            }, ((ErrorDto)actual.Value!).Details);
 
             A.CallTo(log)
                 .MustNotHaveHappened();
@@ -210,18 +210,18 @@ namespace Squidex.Web
         {
             var actionContext = ActionContext();
 
-            var result = context.Result;
+            var actual = context.Result;
 
-            return new ResultExecutedContext(actionContext, new List<IFilterMetadata>(), result, context.Controller);
+            return new ResultExecutedContext(actionContext, new List<IFilterMetadata>(), actual, context.Controller);
         }
 
         private ResultExecutingContext Problem(ProblemDetails problem)
         {
             var actionContext = ActionContext();
 
-            var result = new ObjectResult(problem) { StatusCode = problem.Status };
+            var actual = new ObjectResult(problem) { StatusCode = problem.Status };
 
-            return new ResultExecutingContext(actionContext, new List<IFilterMetadata>(), result, null!);
+            return new ResultExecutingContext(actionContext, new List<IFilterMetadata>(), actual, null!);
         }
 
         private ExceptionContext Error(Exception exception)
@@ -256,13 +256,13 @@ namespace Squidex.Web
 
         private static void Validate(int statusCode, IActionResult? actionResult, Exception? exception, string? errorCode = null)
         {
-            var result = actionResult as ObjectResult;
+            var actual = actionResult as ObjectResult;
 
-            var error = result?.Value as ErrorDto;
+            var error = actual?.Value as ErrorDto;
 
             Assert.NotNull(error?.Type);
 
-            Assert.Equal(statusCode, result?.StatusCode);
+            Assert.Equal(statusCode, actual?.StatusCode);
             Assert.Equal(statusCode, error?.StatusCode);
             Assert.Equal(errorCode, error?.ErrorCode);
 

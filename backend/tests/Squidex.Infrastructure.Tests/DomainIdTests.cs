@@ -61,9 +61,9 @@ namespace Squidex.Infrastructure
         {
             var text = "123";
 
-            var result = typeConverter.ConvertFromString(text);
+            var actual = typeConverter.ConvertFromString(text);
 
-            Assert.Equal(DomainId.Create(text), result);
+            Assert.Equal(DomainId.Create(text), actual);
         }
 
         [Fact]
@@ -71,9 +71,9 @@ namespace Squidex.Infrastructure
         {
             var guid = Guid.NewGuid();
 
-            var result = typeConverter.ConvertFrom(guid);
+            var actual = typeConverter.ConvertFrom(guid);
 
-            Assert.Equal(guid.ToString(), result?.ToString());
+            Assert.Equal(guid.ToString(), actual?.ToString());
         }
 
         [Fact]
@@ -81,9 +81,9 @@ namespace Squidex.Infrastructure
         {
             var text = "123";
 
-            var result = typeConverter.ConvertToString(DomainId.Create(text));
+            var actual = typeConverter.ConvertToString(DomainId.Create(text));
 
-            Assert.Equal(text, result);
+            Assert.Equal(text, actual);
         }
 
         [Fact]

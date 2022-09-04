@@ -190,12 +190,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                                                     .Add("nestedAssets", JsonValue.Array(id2))))
                                         .Add(Component.Discriminator, DomainId.Empty))));
 
-            var result =
+            var actual =
                 new ContentConverter(components, schema)
                     .Add(new ValueReferencesConverter(new HashSet<DomainId> { id2 }))
                     .Convert(source);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -203,9 +203,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         {
             var sut = Fields.String(1, "myString", Partitioning.Invariant);
 
-            var result = sut.GetReferencedIds(JsonValue.Create("invalid"), components).ToArray();
+            var actual = sut.GetReferencedIds(JsonValue.Create("invalid"), components).ToArray();
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Theory]
@@ -222,45 +222,45 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                     new JsonObject()
                         .Add(field.Name, CreateValue(id1, id2)));
 
-            var result = arrayField.GetReferencedIds(value, components).ToArray();
+            var actual = arrayField.GetReferencedIds(value, components).ToArray();
 
-            Assert.Equal(new[] { id1, id2 }, result);
+            Assert.Equal(new[] { id1, id2 }, actual);
         }
 
         [Theory]
         [MemberData(nameof(ReferencingFields))]
         public void Should_return_empty_list_from_field_if_value_item_is_invalid(IField field)
         {
-            var result = field.GetReferencedIds(JsonValue.Array(1), components).ToArray();
+            var actual = field.GetReferencedIds(JsonValue.Array(1), components).ToArray();
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Theory]
         [MemberData(nameof(ReferencingFields))]
         public void Should_return_empty_list_from_field_if_value_is_empty(IField field)
         {
-            var result = field.GetReferencedIds(new JsonArray(), components).ToArray();
+            var actual = field.GetReferencedIds(new JsonArray(), components).ToArray();
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Theory]
         [MemberData(nameof(ReferencingFields))]
         public void Should_return_empty_list_from_field_if_value_is_json_null(IField field)
         {
-            var result = field.GetReferencedIds(default, components).ToArray();
+            var actual = field.GetReferencedIds(default, components).ToArray();
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Theory]
         [MemberData(nameof(ReferencingFields))]
         public void Should_return_empty_list_from_field_if_value_is_null(IField field)
         {
-            var result = field.GetReferencedIds(default, components).ToArray();
+            var actual = field.GetReferencedIds(default, components).ToArray();
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Theory]
@@ -272,18 +272,18 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
             var value = CreateValue(id1, id2);
 
-            var result = field.GetReferencedIds(value, components);
+            var actual = field.GetReferencedIds(value, components);
 
-            Assert.Equal(new HashSet<DomainId> { id1, id2 }, result);
+            Assert.Equal(new HashSet<DomainId> { id1, id2 }, actual);
         }
 
         [Theory]
         [MemberData(nameof(ReferencingFields))]
         public void Should_return_same_value_from_field_if_value_is_json_null(IField field)
         {
-            var (_, result) = new ValueReferencesConverter(RandomIds()).ConvertValue(field, JsonValue.Null, null);
+            var (_, actual) = new ValueReferencesConverter(RandomIds()).ConvertValue(field, JsonValue.Null, null);
 
-            Assert.Equal(JsonValue.Null, result);
+            Assert.Equal(JsonValue.Null, actual);
         }
 
         [Theory]
@@ -295,9 +295,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
             var value = CreateValue(id1, id2);
 
-            var (_, result) = new ValueReferencesConverter(HashSet.Of(id1)).ConvertValue(field, value, null);
+            var (_, actual) = new ValueReferencesConverter(HashSet.Of(id1)).ConvertValue(field, value, null);
 
-            Assert.Equal(CreateValue(id1), result);
+            Assert.Equal(CreateValue(id1), actual);
         }
 
         public static IEnumerable<object[]> ReferencingNestedFields()

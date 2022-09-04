@@ -9,7 +9,6 @@ using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
-using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -29,6 +28,7 @@ namespace Squidex.Web.CommandMiddlewares
         public EnrichWithSchemaIdCommandMiddlewareTests()
         {
             httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
+            httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Mocks.Schema(appId, schemaId)));
 
             A.CallTo(() => httpContextAccessor.HttpContext)
                 .Returns(httpContext);
@@ -39,46 +39,22 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_throw_exception_if_schema_not_found()
         {
+            httpContext.Features.Set<ISchemaFeature>(null);
+
             await Assert.ThrowsAsync<InvalidOperationException>(() => HandleAsync(new CreateContent()));
         }
 
         [Fact]
-        public async Task Should_assign_schema_id_and_name_to_schema_command()
+        public async Task Should_assign_named_id_to_command()
         {
-            httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Mocks.Schema(appId, schemaId)));
-
             var context = await HandleAsync(new CreateContent());
 
             Assert.Equal(schemaId, ((ISchemaCommand)context.Command).SchemaId);
         }
 
         [Fact]
-        public async Task Should_assign_schema_id_from_id()
+        public async Task Should_not_override_existing_named_id()
         {
-            httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Mocks.Schema(appId, schemaId)));
-
-            var context = await HandleAsync(new UpdateSchema());
-
-            Assert.Equal(schemaId, ((ISchemaCommand)context.Command).SchemaId);
-        }
-
-        [Fact]
-        public async Task Should_not_override_schema_id()
-        {
-            httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Mocks.Schema(appId, schemaId)));
-
-            var customId = DomainId.NewGuid();
-
-            var context = await HandleAsync(new CreateSchema { SchemaId = customId });
-
-            Assert.Equal(customId, ((CreateSchema)context.Command).SchemaId);
-        }
-
-        [Fact]
-        public async Task Should_not_override_schema_id_and_name()
-        {
-            httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Mocks.Schema(appId, schemaId)));
-
             var customId = NamedId.Of(DomainId.NewGuid(), "other-app");
 
             var context = await HandleAsync(new CreateContent { SchemaId = customId });

@@ -34,13 +34,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("xyz", ctx, default);
+            var actual = await sut.SearchAsync("xyz", ctx, default);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
-        public async Task Should_return_dashboard_result_if_matching_and_permission_given()
+        public async Task Should_return_dashboard_actual_if_matching_and_permission_given()
         {
             var permission = PermissionIds.ForApp(PermissionIds.AppUsage, appId.Name);
 
@@ -49,25 +49,25 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.DashboardUI(appId))
                 .Returns("dashboard-url");
 
-            var result = await sut.SearchAsync("dashboard", ctx, default);
+            var actual = await sut.SearchAsync("dashboard", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("Dashboard", SearchResultType.Dashboard, "dashboard-url"));
         }
 
         [Fact]
-        public async Task Should_not_return_dashboard_result_if_user_has_no_permission()
+        public async Task Should_not_return_dashboard_actual_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("assets", ctx, default);
+            var actual = await sut.SearchAsync("assets", ctx, default);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
-        public async Task Should_return_languages_result_if_matching_and_permission_given()
+        public async Task Should_return_languages_actual_if_matching_and_permission_given()
         {
             var permission = PermissionIds.ForApp(PermissionIds.AppLanguagesRead, appId.Name);
 
@@ -76,35 +76,35 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.LanguagesUI(appId))
                 .Returns("languages-url");
 
-            var result = await sut.SearchAsync("languages", ctx, default);
+            var actual = await sut.SearchAsync("languages", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("Languages", SearchResultType.Setting, "languages-url"));
         }
 
         [Fact]
-        public async Task Should_not_return_languages_result_if_user_has_no_permission()
+        public async Task Should_not_return_languages_actual_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("assets", ctx, default);
+            var actual = await sut.SearchAsync("assets", ctx, default);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
-        public async Task Should_not_return_patterns_result_if_user_has_no_permission()
+        public async Task Should_not_return_patterns_actual_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("patterns", ctx, default);
+            var actual = await sut.SearchAsync("patterns", ctx, default);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
-        public async Task Should_return_schemas_result_if_matching_and_permission_given()
+        public async Task Should_return_schemas_actual_if_matching_and_permission_given()
         {
             var permission = PermissionIds.ForApp(PermissionIds.AppSchemasRead, appId.Name);
 
@@ -113,25 +113,25 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.SchemasUI(appId))
                 .Returns("schemas-url");
 
-            var result = await sut.SearchAsync("schemas", ctx, default);
+            var actual = await sut.SearchAsync("schemas", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("Schemas", SearchResultType.Schema, "schemas-url"));
         }
 
         [Fact]
-        public async Task Should_not_return_schemas_result_if_user_has_no_permission()
+        public async Task Should_not_return_schemas_actual_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("schemas", ctx, default);
+            var actual = await sut.SearchAsync("schemas", ctx, default);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
-        public async Task Should_return_assets_result_if_matching_and_permission_given()
+        public async Task Should_return_assets_actual_if_matching_and_permission_given()
         {
             var permission = PermissionIds.ForApp(PermissionIds.AppAssetsRead, appId.Name);
 
@@ -140,25 +140,25 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.AssetsUI(appId, A<string?>._))
                 .Returns("assets-url");
 
-            var result = await sut.SearchAsync("assets", ctx, default);
+            var actual = await sut.SearchAsync("assets", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("Assets", SearchResultType.Asset, "assets-url"));
         }
 
         [Fact]
-        public async Task Should_not_return_assets_result_if_user_has_no_permission()
+        public async Task Should_not_return_assets_actual_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("assets", ctx, default);
+            var actual = await sut.SearchAsync("assets", ctx, default);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
-        public async Task Should_return_backups_result_if_matching_and_permission_given()
+        public async Task Should_return_backups_actual_if_matching_and_permission_given()
         {
             var permission = PermissionIds.ForApp(PermissionIds.AppBackupsRead, appId.Name);
 
@@ -167,25 +167,25 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.BackupsUI(appId))
                 .Returns("backups-url");
 
-            var result = await sut.SearchAsync("backups", ctx, default);
+            var actual = await sut.SearchAsync("backups", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("Backups", SearchResultType.Setting, "backups-url"));
         }
 
         [Fact]
-        public async Task Should_not_return_backups_result_if_user_has_no_permission()
+        public async Task Should_not_return_backups_actual_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("backups", ctx, default);
+            var actual = await sut.SearchAsync("backups", ctx, default);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
-        public async Task Should_return_clients_result_if_matching_and_permission_given()
+        public async Task Should_return_clients_actual_if_matching_and_permission_given()
         {
             var permission = PermissionIds.ForApp(PermissionIds.AppClientsRead, appId.Name);
 
@@ -194,25 +194,25 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.ClientsUI(appId))
                 .Returns("clients-url");
 
-            var result = await sut.SearchAsync("clients", ctx, default);
+            var actual = await sut.SearchAsync("clients", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("Clients", SearchResultType.Setting, "clients-url"));
         }
 
         [Fact]
-        public async Task Should_not_return_clients_result_if_user_has_no_permission()
+        public async Task Should_not_return_clients_actual_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("clients", ctx, default);
+            var actual = await sut.SearchAsync("clients", ctx, default);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
-        public async Task Should_return_contributors_result_if_matching_and_permission_given()
+        public async Task Should_return_contributors_actual_if_matching_and_permission_given()
         {
             var permission = PermissionIds.ForApp(PermissionIds.AppContributorsRead, appId.Name);
 
@@ -221,25 +221,25 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.ContributorsUI(appId))
                 .Returns("contributors-url");
 
-            var result = await sut.SearchAsync("contributors", ctx, default);
+            var actual = await sut.SearchAsync("contributors", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("Contributors", SearchResultType.Setting, "contributors-url"));
         }
 
         [Fact]
-        public async Task Should_not_contributors_clients_result_if_user_has_no_permission()
+        public async Task Should_not_contributors_clients_actual_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("contributors", ctx, default);
+            var actual = await sut.SearchAsync("contributors", ctx, default);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
-        public async Task Should_return_subscription_result_if_matching_and_permission_given()
+        public async Task Should_return_subscription_actual_if_matching_and_permission_given()
         {
             var permission = PermissionIds.ForApp(PermissionIds.AppPlansRead, appId.Name);
 
@@ -248,25 +248,25 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.PlansUI(appId))
                 .Returns("subscription-url");
 
-            var result = await sut.SearchAsync("subscription", ctx, default);
+            var actual = await sut.SearchAsync("subscription", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("Subscription", SearchResultType.Setting, "subscription-url"));
         }
 
         [Fact]
-        public async Task Should_not_subscription_clients_result_if_user_has_no_permission()
+        public async Task Should_not_subscription_clients_actual_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("subscription", ctx, default);
+            var actual = await sut.SearchAsync("subscription", ctx, default);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
-        public async Task Should_return_roles_result_if_matching_and_permission_given()
+        public async Task Should_return_roles_actual_if_matching_and_permission_given()
         {
             var permission = PermissionIds.ForApp(PermissionIds.AppRolesRead, appId.Name);
 
@@ -275,25 +275,25 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.RolesUI(appId))
                 .Returns("roles-url");
 
-            var result = await sut.SearchAsync("roles", ctx, default);
+            var actual = await sut.SearchAsync("roles", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("Roles", SearchResultType.Setting, "roles-url"));
         }
 
         [Fact]
-        public async Task Should_not_roles_clients_result_if_user_has_no_permission()
+        public async Task Should_not_roles_clients_actual_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("roles", ctx, default);
+            var actual = await sut.SearchAsync("roles", ctx, default);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
-        public async Task Should_return_rules_result_if_matching_and_permission_given()
+        public async Task Should_return_rules_actual_if_matching_and_permission_given()
         {
             var permission = PermissionIds.ForApp(PermissionIds.AppRulesRead, appId.Name);
 
@@ -302,25 +302,25 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.RulesUI(appId))
                 .Returns("rules-url");
 
-            var result = await sut.SearchAsync("rules", ctx, default);
+            var actual = await sut.SearchAsync("rules", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("Rules", SearchResultType.Rule, "rules-url"));
         }
 
         [Fact]
-        public async Task Should_not_return_rules_result_if_user_has_no_permission()
+        public async Task Should_not_return_rules_actual_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("assets", ctx, default);
+            var actual = await sut.SearchAsync("assets", ctx, default);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
-        public async Task Should_return_workflows_result_if_matching_and_permission_given()
+        public async Task Should_return_workflows_actual_if_matching_and_permission_given()
         {
             var permission = PermissionIds.ForApp(PermissionIds.AppWorkflowsRead, appId.Name);
 
@@ -329,21 +329,21 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.WorkflowsUI(appId))
                 .Returns("workflows-url");
 
-            var result = await sut.SearchAsync("workflows", ctx, default);
+            var actual = await sut.SearchAsync("workflows", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("Workflows", SearchResultType.Setting, "workflows-url"));
         }
 
         [Fact]
-        public async Task Should_not_return_workflows_result_if_user_has_no_permission()
+        public async Task Should_not_return_workflows_actual_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("workflows", ctx, default);
+            var actual = await sut.SearchAsync("workflows", ctx, default);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         private Context ContextWithPermission(string? permission = null)

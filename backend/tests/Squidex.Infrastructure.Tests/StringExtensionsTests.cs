@@ -46,9 +46,9 @@ namespace Squidex.Infrastructure
         [InlineData("http://squidex.io/base/", "/path/to/res", true, "http://squidex.io/base/path/to/res/")]
         public void Should_provide_full_url_without_query_or_fragment(string baseUrl, string path, bool trailingSlash, string output)
         {
-            var result = baseUrl.BuildFullUrl(path, trailingSlash);
+            var actual = baseUrl.BuildFullUrl(path, trailingSlash);
 
-            Assert.Equal(output, result);
+            Assert.Equal(output, actual);
         }
 
         [Theory]
@@ -57,49 +57,49 @@ namespace Squidex.Infrastructure
         [InlineData("http://squidex.io/base/", "path/to/res;query=1", true, "http://squidex.io/base/path/to/res;query=1")]
         public void Should_provide_full_url_wit_query_or_fragment(string baseUrl, string path, bool trailingSlash, string output)
         {
-            var result = baseUrl.BuildFullUrl(path, trailingSlash);
+            var actual = baseUrl.BuildFullUrl(path, trailingSlash);
 
-            Assert.Equal(output, result);
+            Assert.Equal(output, actual);
         }
 
         [Fact]
         public void Should_join_non_empty_if_all_are_valid()
         {
-            var result = StringExtensions.JoinNonEmpty("_", "1", "2", "3");
+            var actual = StringExtensions.JoinNonEmpty("_", "1", "2", "3");
 
-            Assert.Equal("1_2_3", result);
+            Assert.Equal("1_2_3", actual);
         }
 
         [Fact]
         public void Should_join_non_empty_if_first_invalid()
         {
-            var result = StringExtensions.JoinNonEmpty("_", null, "2", "3");
+            var actual = StringExtensions.JoinNonEmpty("_", null, "2", "3");
 
-            Assert.Equal("2_3", result);
+            Assert.Equal("2_3", actual);
         }
 
         [Fact]
         public void Should_join_non_empty_if_middle_invalid()
         {
-            var result = StringExtensions.JoinNonEmpty("_", "1", null, "3");
+            var actual = StringExtensions.JoinNonEmpty("_", "1", null, "3");
 
-            Assert.Equal("1_3", result);
+            Assert.Equal("1_3", actual);
         }
 
         [Fact]
         public void Should_join_non_empty_if_last_invalid()
         {
-            var result = StringExtensions.JoinNonEmpty("_", "1", "2", null);
+            var actual = StringExtensions.JoinNonEmpty("_", "1", "2", null);
 
-            Assert.Equal("1_2", result);
+            Assert.Equal("1_2", actual);
         }
 
         [Fact]
         public void Should_escape_json()
         {
-            var result = StringExtensions.JsonEscape("Hello \"World\"");
+            var actual = StringExtensions.JsonEscape("Hello \"World\"");
 
-            Assert.Equal("Hello \\\"World\\\"", result);
+            Assert.Equal("Hello \\\"World\\\"", actual);
         }
     }
 }

@@ -125,25 +125,25 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_return_draft_as_initial_status()
         {
-            var result = await sut.GetInitialStatusAsync(Mocks.Schema(appId, schemaId));
+            var actual = await sut.GetInitialStatusAsync(Mocks.Schema(appId, schemaId));
 
-            Assert.Equal(Status.Draft, result);
+            Assert.Equal(Status.Draft, actual);
         }
 
         [Fact]
         public async Task Should_allow_publish_on_create()
         {
-            var result = await sut.CanPublishInitialAsync(Mocks.Schema(appId, schemaId), Mocks.FrontendUser("Editor"));
+            var actual = await sut.CanPublishInitialAsync(Mocks.Schema(appId, schemaId), Mocks.FrontendUser("Editor"));
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
         public async Task Should_not_allow_publish_on_create_if_role_not_allowed()
         {
-            var result = await sut.CanPublishInitialAsync(Mocks.Schema(appId, schemaId), Mocks.FrontendUser("Developer"));
+            var actual = await sut.CanPublishInitialAsync(Mocks.Schema(appId, schemaId), Mocks.FrontendUser("Developer"));
 
-            Assert.False(result);
+            Assert.False(actual);
         }
 
         [Fact]
@@ -151,9 +151,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 2);
 
-            var result = await sut.CanMoveToAsync(Mocks.Schema(appId, schemaId), content.Status, Status.Published, content.Data, Mocks.FrontendUser("Editor"));
+            var actual = await sut.CanMoveToAsync(Mocks.Schema(appId, schemaId), content.Status, Status.Published, content.Data, Mocks.FrontendUser("Editor"));
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -161,9 +161,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 2);
 
-            var result = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Editor"));
+            var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Editor"));
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -171,9 +171,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 2);
 
-            var result = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Developer"));
+            var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Developer"));
 
-            Assert.False(result);
+            Assert.False(actual);
         }
 
         [Fact]
@@ -181,9 +181,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 2);
 
-            var result = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Editor"));
+            var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Editor"));
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -191,9 +191,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 4);
 
-            var result = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Editor"));
+            var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Editor"));
 
-            Assert.False(result);
+            Assert.False(actual);
         }
 
         [Fact]
@@ -201,9 +201,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Published, 2);
 
-            var result = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Developer"));
+            var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Developer"));
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -211,9 +211,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Published, 2);
 
-            var result = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Developer"));
+            var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Developer"));
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -221,9 +221,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Archived, 2);
 
-            var result = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Developer"));
+            var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Developer"));
 
-            Assert.False(result);
+            Assert.False(actual);
         }
 
         [Fact]
@@ -231,9 +231,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Published, 2);
 
-            var result = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Owner"));
+            var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Owner"));
 
-            Assert.False(result);
+            Assert.False(actual);
         }
 
         [Fact]
@@ -241,9 +241,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Published, 1);
 
-            var result = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Owner"));
+            var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Owner"));
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -251,9 +251,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Published, 2);
 
-            var result = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Editor"));
+            var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Editor"));
 
-            Assert.False(result);
+            Assert.False(actual);
         }
 
         [Fact]
@@ -261,9 +261,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Published, 1);
 
-            var result = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Owner"));
+            var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Owner"));
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -276,9 +276,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Archived, StatusColors.Archived)
             };
 
-            var result = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser("Developer"));
+            var actual = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser("Developer"));
 
-            result.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -291,9 +291,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Archived, StatusColors.Archived)
             };
 
-            var result = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser("Editor"));
+            var actual = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser("Editor"));
 
-            result.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -307,9 +307,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            var result = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser("Editor"));
+            var actual = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser("Editor"));
 
-            result.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -322,9 +322,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Draft, StatusColors.Draft)
             };
 
-            var result = await sut.GetNextAsync(content, content.Status, null!);
+            var actual = await sut.GetNextAsync(content, content.Status, null!);
 
-            result.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -338,9 +338,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Draft, StatusColors.Draft)
             };
 
-            var result = await sut.GetNextAsync(content, content.Status, null!);
+            var actual = await sut.GetNextAsync(content, content.Status, null!);
 
-            result.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -353,9 +353,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            var result = await sut.GetAllAsync(Mocks.Schema(appId, schemaId));
+            var actual = await sut.GetAllAsync(Mocks.Schema(appId, schemaId));
 
-            result.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -367,9 +367,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            var result = await sut.GetAllAsync(Mocks.Schema(appId, simpleSchemaId));
+            var actual = await sut.GetAllAsync(Mocks.Schema(appId, simpleSchemaId));
 
-            result.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -384,41 +384,41 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            var result = await sut.GetAllAsync(Mocks.Schema(appId, simpleSchemaId));
+            var actual = await sut.GetAllAsync(Mocks.Schema(appId, simpleSchemaId));
 
-            result.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
         public async Task Should_not_validate_when_not_publishing()
         {
-            var result = await sut.ShouldValidateAsync(Mocks.Schema(appId, schemaId), Status.Draft);
+            var actual = await sut.ShouldValidateAsync(Mocks.Schema(appId, schemaId), Status.Draft);
 
-            Assert.False(result);
+            Assert.False(actual);
         }
 
         [Fact]
         public async Task Should_not_validate_when_publishing_but_not_enabled()
         {
-            var result = await sut.ShouldValidateAsync(CreateSchema(false), Status.Published);
+            var actual = await sut.ShouldValidateAsync(CreateSchema(false), Status.Published);
 
-            Assert.False(result);
+            Assert.False(actual);
         }
 
         [Fact]
         public async Task Should_validate_when_publishing_and_enabled()
         {
-            var result = await sut.ShouldValidateAsync(CreateSchema(true), Status.Published);
+            var actual = await sut.ShouldValidateAsync(CreateSchema(true), Status.Published);
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
         public async Task Should_validate_when_enabled_in_step()
         {
-            var result = await sut.ShouldValidateAsync(Mocks.Schema(appId, schemaId), Status.Archived);
+            var actual = await sut.ShouldValidateAsync(Mocks.Schema(appId, schemaId), Status.Archived);
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         private ISchemaEntity CreateSchema(bool validateOnPublish)

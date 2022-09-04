@@ -69,9 +69,9 @@ namespace Squidex.Infrastructure.UsageTracking
             A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date, category, ct))
                 .Returns(counters);
 
-            var result = await sut.GetMonthCallsAsync(key, date, category, ct);
+            var actual = await sut.GetMonthCallsAsync(key, date, category, ct);
 
-            Assert.Equal(4, result);
+            Assert.Equal(4, actual);
         }
 
         [Fact]
@@ -85,9 +85,9 @@ namespace Squidex.Infrastructure.UsageTracking
             A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date, category, ct))
                 .Returns(counters);
 
-            var result = await sut.GetMonthBytesAsync(key, date, category, ct);
+            var actual = await sut.GetMonthBytesAsync(key, date, category, ct);
 
-            Assert.Equal(14, result);
+            Assert.Equal(14, actual);
         }
 
         [Fact]

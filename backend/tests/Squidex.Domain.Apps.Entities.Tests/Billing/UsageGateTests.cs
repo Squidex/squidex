@@ -328,9 +328,9 @@ namespace Squidex.Domain.Apps.Entities.Billing
         {
             SetupAssetQuery($"{appId.Id}_Assets");
 
-            var result = await sut.QueryByAppAsync(appId.Id, today, today.AddDays(3), ct);
+            var actual = await sut.QueryByAppAsync(appId.Id, today, today.AddDays(3), ct);
 
-            result.Should().BeEquivalentTo(new List<AssetStats>
+            actual.Should().BeEquivalentTo(new List<AssetStats>
             {
                 new AssetStats(today.AddDays(0), 2, 128),
                 new AssetStats(today.AddDays(1), 3, 256),
@@ -343,9 +343,9 @@ namespace Squidex.Domain.Apps.Entities.Billing
         {
             SetupAssetQuery($"{appId.Id}_TeamAssets");
 
-            var result = await sut.QueryByTeamAsync(appId.Id, today, today.AddDays(3), ct);
+            var actual = await sut.QueryByTeamAsync(appId.Id, today, today.AddDays(3), ct);
 
-            result.Should().BeEquivalentTo(new List<AssetStats>
+            actual.Should().BeEquivalentTo(new List<AssetStats>
             {
                 new AssetStats(today.AddDays(0), 2, 128),
                 new AssetStats(today.AddDays(1), 3, 256),

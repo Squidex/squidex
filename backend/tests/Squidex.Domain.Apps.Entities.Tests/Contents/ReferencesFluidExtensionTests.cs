@@ -86,9 +86,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 Text: Hello 2 World 2 {referenceId2}
             ";
 
-            var result = await sut.RenderAsync(template, vars);
+            var actual = await sut.RenderAsync(template, vars);
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         [Fact]
@@ -132,9 +132,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 Text: Hello 2 World 2 {referenceId2}
             ";
 
-            var result = await sut.RenderAsync(template, vars);
+            var actual = await sut.RenderAsync(template, vars);
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         private static IEnrichedContentEntity CreateReference(DomainId referenceId, int index)

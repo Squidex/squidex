@@ -23,25 +23,25 @@ namespace Squidex.Infrastructure.Collections
         [Fact]
         public void Should_return_empty_instance_for_empty_source()
         {
-            var result = new Dictionary<int, int>().ToReadonlyDictionary();
+            var actual = new Dictionary<int, int>().ToReadonlyDictionary();
 
-            Assert.Same(ReadonlyDictionary.Empty<int, int>(), result);
+            Assert.Same(ReadonlyDictionary.Empty<int, int>(), actual);
         }
 
         [Fact]
         public void Should_return_empty_instance_for_empty_source_and_key_selector()
         {
-            var result = Enumerable.Empty<int>().ToReadonlyDictionary(x => x);
+            var actual = Enumerable.Empty<int>().ToReadonlyDictionary(x => x);
 
-            Assert.Same(ReadonlyDictionary.Empty<int, int>(), result);
+            Assert.Same(ReadonlyDictionary.Empty<int, int>(), actual);
         }
 
         [Fact]
         public void Should_return_empty_instance_for_empty_source_and_value_selector()
         {
-            var result = Enumerable.Empty<int>().ToReadonlyDictionary(x => x, x => x);
+            var actual = Enumerable.Empty<int>().ToReadonlyDictionary(x => x, x => x);
 
-            Assert.Same(ReadonlyDictionary.Empty<int, int>(), result);
+            Assert.Same(ReadonlyDictionary.Empty<int, int>(), actual);
         }
 
         [Fact]

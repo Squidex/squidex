@@ -16,12 +16,12 @@ namespace Squidex.Infrastructure.EventSourcing
         public void Should_serialize_and_deserialize()
         {
             var source = new WrongEventVersionException(100, 200);
-            var result = source.SerializeAndDeserializeBinary();
+            var actual = source.SerializeAndDeserializeBinary();
 
-            Assert.Equal(result.ExpectedVersion, source.ExpectedVersion);
-            Assert.Equal(result.CurrentVersion, source.CurrentVersion);
+            Assert.Equal(actual.ExpectedVersion, source.ExpectedVersion);
+            Assert.Equal(actual.CurrentVersion, source.CurrentVersion);
 
-            Assert.Equal(result.Message, source.Message);
+            Assert.Equal(actual.Message, source.Message);
         }
     }
 }

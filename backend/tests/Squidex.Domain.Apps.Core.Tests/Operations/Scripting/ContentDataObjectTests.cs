@@ -31,9 +31,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 data.number = { iv: 1 }
             ";
 
-            var result = ExecuteScript(original, script);
+            var actual = ExecuteScript(original, script);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -51,9 +51,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 data.number.iv = 1
             ";
 
-            var result = ExecuteScript(original, script);
+            var actual = ExecuteScript(original, script);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -71,9 +71,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 Object.defineProperty(data, 'number', { value: { iv: 1 } })
             ";
 
-            var result = ExecuteScript(original, script);
+            var actual = ExecuteScript(original, script);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -103,9 +103,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 delete data.number
             ";
 
-            var result = ExecuteScript(original, script);
+            var actual = ExecuteScript(original, script);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -127,9 +127,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 data.string.iv = data.string.iv + 'new'
             ";
 
-            var result = ExecuteScript(original, script);
+            var actual = ExecuteScript(original, script);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -151,9 +151,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 data.number.iv = data.number.iv + 2
             ";
 
-            var result = ExecuteScript(original, script);
+            var actual = ExecuteScript(original, script);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -175,9 +175,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 data.boolean.iv = !data.boolean.iv
             ";
 
-            var result = ExecuteScript(original, script);
+            var actual = ExecuteScript(original, script);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -199,9 +199,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 data.number.iv = [data.number.iv[0], data.number.iv[1] + 2, 5]
             ";
 
-            var result = ExecuteScript(original, script);
+            var actual = ExecuteScript(original, script);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -223,9 +223,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 data.geo.iv = { lat: data.geo.iv.lat, lon: data.geo.iv.lat + 3 }
             ";
 
-            var result = ExecuteScript(original, script);
+            var actual = ExecuteScript(original, script);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -250,9 +250,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 data.geo.iv = nested
             ";
 
-            var result = ExecuteScript(original, script);
+            var actual = ExecuteScript(original, script);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -271,9 +271,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 data.geo.iv = nested
             ";
 
-            var result = ExecuteScript(original, script);
+            var actual = ExecuteScript(original, script);
 
-            Assert.Same(original, result);
+            Assert.Same(original, actual);
         }
 
         [Fact]
@@ -294,9 +294,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 Object.defineProperty(data.number, 'iv', { value: 1 })
             ";
 
-            var result = ExecuteScript(original, script);
+            var actual = ExecuteScript(original, script);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -317,9 +317,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 delete data.string.iv
             ";
 
-            var result = ExecuteScript(original, script);
+            var actual = ExecuteScript(original, script);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -341,20 +341,20 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             engine.SetValue("data", new ContentDataObject(engine, content));
 
             const string script = @"
-                var result = [];
+                var actual = [];
                 for (var x in data) {
                     var field = data[x];
 
                     for (var y in field) {
-                        result.push(field[y]);
+                        actual.push(field[y]);
                     }
                 }
-                result;
+                actual;
             ";
 
-            var result = engine.Evaluate(script).ToObject();
+            var actual = engine.Evaluate(script).ToObject();
 
-            Assert.Equal(new[] { "1", "2", "3", "4" }, result);
+            Assert.Equal(new[] { "1", "2", "3", "4" }, actual);
         }
 
         [Fact]
@@ -395,9 +395,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 data.number.iv = {input};
             ";
 
-            var result = ExecuteScript(original, script);
+            var actual = ExecuteScript(original, script);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -419,9 +419,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             engine.SetValue("data", value);
             engine.Execute(script);
 
-            value.TryUpdate(out var result);
+            value.TryUpdate(out var actual);
 
-            return result;
+            return actual;
         }
     }
 }

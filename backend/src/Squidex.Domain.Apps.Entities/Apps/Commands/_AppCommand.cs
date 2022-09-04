@@ -8,21 +8,23 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Comments.Commands
-{
-    public abstract class CommentsCommand : SquidexCommand, IAppCommand, IAggregateCommand
-    {
-        public static readonly NamedId<DomainId> NoApp = NamedId.Of(DomainId.NewGuid(), "none");
+#pragma warning disable MA0048 // File name must match type name
 
+namespace Squidex.Domain.Apps.Entities.Apps.Commands
+{
+    public abstract class AppCommand : AppCommandBase, IAppCommand
+    {
         public NamedId<DomainId> AppId { get; set; }
 
-        public DomainId CommentsId { get; set; }
-
-        public DomainId CommentId { get; set; }
-
-        DomainId IAggregateCommand.AggregateId
+        public override DomainId AggregateId
         {
-            get => AppId.Id != default ? DomainId.Combine(AppId.Id, CommentsId) : CommentsId;
+            get => AppId.Id;
         }
+    }
+
+    // This command is needed as marker for middlewares.
+    public abstract class AppCommandBase : SquidexCommand, IAggregateCommand
+    {
+        public abstract DomainId AggregateId { get; }
     }
 }

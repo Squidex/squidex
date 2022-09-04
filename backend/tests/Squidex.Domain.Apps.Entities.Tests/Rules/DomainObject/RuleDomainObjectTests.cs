@@ -65,9 +65,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         {
             var command = MakeCreateCommand();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(AppId, sut.Snapshot.AppId.Id);
 
@@ -87,9 +87,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.True(sut.Snapshot.RuleDef.IsEnabled);
 
@@ -112,9 +112,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             await ExecuteCreateAsync();
             await ExecuteDisableAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.True(sut.Snapshot.RuleDef.IsEnabled);
 
@@ -135,9 +135,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             await ExecuteCreateAsync();
             await ExecuteDisableAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.True(sut.Snapshot.RuleDef.IsEnabled);
 
@@ -154,9 +154,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.False(sut.Snapshot.RuleDef.IsEnabled);
 
@@ -176,9 +176,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.False(sut.Snapshot.RuleDef.IsEnabled);
 
@@ -195,9 +195,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(None.Value);
+            actual.ShouldBeEquivalent(None.Value);
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -290,9 +290,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
         private async Task<object?> PublishAsync(RuleCommand command)
         {
-            var result = await sut.ExecuteAsync(CreateRuleCommand(command), default);
+            var actual = await sut.ExecuteAsync(CreateRuleCommand(command), default);
 
-            return result.Payload;
+            return actual.Payload;
         }
     }
 }

@@ -54,11 +54,11 @@ namespace Squidex.Infrastructure
             };
 
             var source = new ValidationException(errors);
-            var result = source.SerializeAndDeserializeBinary();
+            var actual = source.SerializeAndDeserializeBinary();
 
-            result.Errors.Should().BeEquivalentTo(source.Errors);
+            actual.Errors.Should().BeEquivalentTo(source.Errors);
 
-            Assert.Equal(source.Message, result.Message);
+            Assert.Equal(source.Message, actual.Message);
         }
     }
 }

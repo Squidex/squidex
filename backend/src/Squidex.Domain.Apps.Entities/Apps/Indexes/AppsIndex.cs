@@ -181,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                     case DeleteApp delete:
                         await OnDeleteAsync(delete);
                         break;
-                    case AppUpdateCommand update:
+                    case AppCommand update:
                         await OnUpdateAsync(update);
                         break;
                 }
@@ -211,7 +211,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             await InvalidateItAsync(delete.AppId.Id, delete.AppId.Name);
         }
 
-        private async Task OnUpdateAsync(AppUpdateCommand update)
+        private async Task OnUpdateAsync(AppCommand update)
         {
             await InvalidateItAsync(update.AppId.Id, update.AppId.Name);
         }

@@ -147,9 +147,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var context = RuleInvalidTrigger();
 
-            var result = sut.CanCreateSnapshotEvents(context);
+            var actual = sut.CanCreateSnapshotEvents(context);
 
-            Assert.False(result);
+            Assert.False(actual);
         }
 
         [Fact]
@@ -160,9 +160,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
                 .Returns(false);
 
-            var result = sut.CanCreateSnapshotEvents(context);
+            var actual = sut.CanCreateSnapshotEvents(context);
 
-            Assert.False(result);
+            Assert.False(actual);
         }
 
         [Fact]
@@ -173,9 +173,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
                 .Returns(true);
 
-            var result = sut.CanCreateSnapshotEvents(context);
+            var actual = sut.CanCreateSnapshotEvents(context);
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -320,9 +320,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var eventEnvelope = CreateEnvelope(new InvalidEvent());
 
-            var result = await sut.CreateJobsAsync(eventEnvelope, context).SingleAsync();
+            var actual = await sut.CreateJobsAsync(eventEnvelope, context).SingleAsync();
 
-            Assert.Equal(SkipReason.WrongEvent, result.SkipReason);
+            Assert.Equal(SkipReason.WrongEvent, actual.SkipReason);
 
             A.CallTo(() => ruleTriggerHandler.Trigger(A<Envelope<AppEvent>>._, A<RuleContext>._))
                 .MustNotHaveHappened();
@@ -389,9 +389,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var eventEnvelope = CreateEnvelope(new ContentCreated());
 
-            var result = await sut.CreateJobsAsync(eventEnvelope, context).SingleAsync();
+            var actual = await sut.CreateJobsAsync(eventEnvelope, context).SingleAsync();
 
-            Assert.Equal(SkipReason.Disabled, result.SkipReason);
+            Assert.Equal(SkipReason.Disabled, actual.SkipReason);
 
             A.CallTo(() => ruleTriggerHandler.Trigger(A<Envelope<AppEvent>>._, A<RuleContext>._))
                 .MustNotHaveHappened();
@@ -405,9 +405,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var eventEnvelope = CreateEnvelope(new ContentCreated());
             var eventEnriched = SetupFullFlow(context, eventEnvelope);
 
-            var result = await sut.CreateJobsAsync(eventEnvelope, context).SingleAsync();
+            var actual = await sut.CreateJobsAsync(eventEnvelope, context).SingleAsync();
 
-            AssertJob(eventEnriched, result, SkipReason.Disabled);
+            AssertJob(eventEnriched, actual, SkipReason.Disabled);
         }
 
         [Fact]
@@ -440,9 +440,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     .SetTimestamp(clock.GetCurrentInstant().Minus(Duration.FromDays(3)));
             var eventEnriched = SetupFullFlow(context, eventEnvelope);
 
-            var result = await sut.CreateJobsAsync(eventEnvelope, context).SingleAsync();
+            var actual = await sut.CreateJobsAsync(eventEnvelope, context).SingleAsync();
 
-            AssertJob(eventEnriched, result, SkipReason.None);
+            AssertJob(eventEnriched, actual, SkipReason.None);
         }
 
         [Fact]
@@ -455,9 +455,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     .SetTimestamp(clock.GetCurrentInstant().Minus(Duration.FromDays(3)));
             var eventEnriched = SetupFullFlow(context, eventEnvelope);
 
-            var result = await sut.CreateJobsAsync(eventEnvelope, context).SingleAsync();
+            var actual = await sut.CreateJobsAsync(eventEnvelope, context).SingleAsync();
 
-            AssertJob(eventEnriched, result, SkipReason.TooOld);
+            AssertJob(eventEnriched, actual, SkipReason.TooOld);
         }
 
         [Fact]
@@ -486,9 +486,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var eventEnvelope = CreateEnvelope(new ContentCreated { FromRule = true });
             var eventEnriched = SetupFullFlow(context, eventEnvelope);
 
-            var result = await sut.CreateJobsAsync(eventEnvelope, context).SingleAsync();
+            var actual = await sut.CreateJobsAsync(eventEnvelope, context).SingleAsync();
 
-            AssertJob(eventEnriched, result, SkipReason.FromRule);
+            AssertJob(eventEnriched, actual, SkipReason.FromRule);
         }
 
         [Fact]
@@ -526,9 +526,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.Trigger(MatchPayload(eventEnvelope), context))
                 .Returns(false);
 
-            var result = await sut.CreateJobsAsync(eventEnvelope, context).SingleAsync();
+            var actual = await sut.CreateJobsAsync(eventEnvelope, context).SingleAsync();
 
-            AssertJob(eventEnriched, result, SkipReason.ConditionPrecheckDoesNotMatch);
+            AssertJob(eventEnriched, actual, SkipReason.ConditionPrecheckDoesNotMatch);
         }
 
         [Fact]
@@ -719,12 +719,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
                 .Returns(Result.Success(actionDump));
 
-            var result = await sut.InvokeAsync(actionName, actionData);
+            var actual = await sut.InvokeAsync(actionName, actionData);
 
-            Assert.Equal(RuleResult.Success, result.Result.Status);
+            Assert.Equal(RuleResult.Success, actual.Result.Status);
 
-            Assert.True(result.Elapsed >= TimeSpan.Zero);
-            Assert.True(result.Result.Dump?.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
+            Assert.True(actual.Elapsed >= TimeSpan.Zero);
+            Assert.True(actual.Result.Dump?.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
         }
 
         [Fact]
@@ -733,12 +733,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
                 .Returns(Result.Failed(new InvalidOperationException(), actionDump));
 
-            var result = await sut.InvokeAsync(actionName, actionData);
+            var actual = await sut.InvokeAsync(actionName, actionData);
 
-            Assert.Equal(RuleResult.Failed, result.Result.Status);
+            Assert.Equal(RuleResult.Failed, actual.Result.Status);
 
-            Assert.True(result.Elapsed >= TimeSpan.Zero);
-            Assert.True(result.Result.Dump?.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
+            Assert.True(actual.Elapsed >= TimeSpan.Zero);
+            Assert.True(actual.Result.Dump?.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
         }
 
         [Fact]
@@ -747,14 +747,14 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
                 .Returns(Result.Failed(new TimeoutException(), actionDump));
 
-            var result = await sut.InvokeAsync(actionName, actionData);
+            var actual = await sut.InvokeAsync(actionName, actionData);
 
-            Assert.Equal(RuleResult.Timeout, result.Result.Status);
+            Assert.Equal(RuleResult.Timeout, actual.Result.Status);
 
-            Assert.True(result.Elapsed >= TimeSpan.Zero);
-            Assert.True(result.Result.Dump?.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
+            Assert.True(actual.Elapsed >= TimeSpan.Zero);
+            Assert.True(actual.Result.Dump?.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
 
-            Assert.True(result.Result.Dump?.IndexOf("Action timed out.", StringComparison.OrdinalIgnoreCase) >= 0);
+            Assert.True(actual.Result.Dump?.IndexOf("Action timed out.", StringComparison.OrdinalIgnoreCase) >= 0);
         }
 
         [Fact]
@@ -765,9 +765,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
                 .Throws(ex);
 
-            var result = await sut.InvokeAsync(actionName, actionData);
+            var actual = await sut.InvokeAsync(actionName, actionData);
 
-            Assert.Equal(ex, result.Result.Exception);
+            Assert.Equal(ex, actual.Result.Exception);
         }
 
         private EnrichedContentEvent SetupFullFlow<T>(RuleContext context, Envelope<T> eventEnvelope) where T : AppEvent
@@ -843,15 +843,15 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             return A<Envelope<AppEvent>>.That.Matches(x => x.Payload == eventEnvelope.Payload);
         }
 
-        private void AssertJob(EnrichedContentEvent eventEnriched, JobResult result, SkipReason skipped)
+        private void AssertJob(EnrichedContentEvent eventEnriched, JobResult actual, SkipReason skipped)
         {
             var now = clock.GetCurrentInstant();
 
-            var job = result.Job!;
+            var job = actual.Job!;
 
-            Assert.Equal(skipped, result.SkipReason);
+            Assert.Equal(skipped, actual.SkipReason);
 
-            Assert.Equal(eventEnriched, result.EnrichedEvent);
+            Assert.Equal(eventEnriched, actual.EnrichedEvent);
             Assert.Equal(eventEnriched.AppId.Id, job.AppId);
 
             Assert.Equal(actionData, job.ActionData);

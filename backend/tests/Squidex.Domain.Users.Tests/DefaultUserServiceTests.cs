@@ -46,9 +46,9 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userFactory.IsId(invalidId))
                 .Returns(false);
 
-            var result = await sut.FindByIdAsync(invalidId);
+            var actual = await sut.FindByIdAsync(invalidId);
 
-            Assert.Null(result);
+            Assert.Null(actual);
 
             A.CallTo(() => userManager.FindByIdAsync(invalidId))
                 .MustNotHaveHappened();
@@ -59,9 +59,9 @@ namespace Squidex.Domain.Users
         {
             var identity = CreateIdentity(found: true);
 
-            var result = await sut.FindByIdAsync(identity.Id);
+            var actual = await sut.FindByIdAsync(identity.Id);
 
-            Assert.Same(identity, result?.Identity);
+            Assert.Same(identity, actual?.Identity);
         }
 
         [Fact]
@@ -69,9 +69,9 @@ namespace Squidex.Domain.Users
         {
             var identity = CreateIdentity(found: false);
 
-            var result = await sut.FindByIdAsync(identity.Id);
+            var actual = await sut.FindByIdAsync(identity.Id);
 
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
@@ -79,9 +79,9 @@ namespace Squidex.Domain.Users
         {
             var identity = CreateIdentity(found: true);
 
-            var result = await sut.FindByEmailAsync(identity.Email);
+            var actual = await sut.FindByEmailAsync(identity.Email);
 
-            Assert.Same(identity, result?.Identity);
+            Assert.Same(identity, actual?.Identity);
         }
 
         [Fact]
@@ -89,9 +89,9 @@ namespace Squidex.Domain.Users
         {
             var identity = CreateIdentity(found: false);
 
-            var result = await sut.FindByEmailAsync(identity.Email);
+            var actual = await sut.FindByEmailAsync(identity.Email);
 
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
@@ -105,9 +105,9 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userManager.FindByLoginAsync(provider, providerKey))
                 .Returns(identity);
 
-            var result = await sut.FindByLoginAsync(provider, providerKey);
+            var actual = await sut.FindByLoginAsync(provider, providerKey);
 
-            Assert.Same(identity, result?.Identity);
+            Assert.Same(identity, actual?.Identity);
         }
 
         [Fact]
@@ -121,9 +121,9 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userManager.FindByLoginAsync(provider, providerKey))
                 .Returns(Task.FromResult<IdentityUser>(null!));
 
-            var result = await sut.FindByLoginAsync(provider, providerKey);
+            var actual = await sut.FindByLoginAsync(provider, providerKey);
 
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
@@ -139,9 +139,9 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userManager.HasPasswordAsync(identity))
                 .Returns(true);
 
-            var result = await sut.HasPasswordAsync(user);
+            var actual = await sut.HasPasswordAsync(user);
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -159,9 +159,9 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userManager.GetLoginsAsync(identity))
                 .Returns(logins);
 
-            var result = await sut.GetLoginsAsync(user);
+            var actual = await sut.GetLoginsAsync(user);
 
-            Assert.Same(logins, result);
+            Assert.Same(logins, actual);
         }
 
         [Fact]

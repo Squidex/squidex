@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         }
 
         [Fact]
-        public async Task Should_invite_user_and_change_result_and_update_command()
+        public async Task Should_invite_user_and_change_actual_and_update_command()
         {
             var command = new AssignContributor { ContributorId = "me@email.com", Invite = true };
 
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         }
 
         [Fact]
-        public async Task Should_invite_user_and_not_change_result_if_not_added()
+        public async Task Should_invite_user_and_not_change_actual_if_not_added()
         {
             var command = new AssignContributor { ContributorId = "me@email.com", Invite = true };
 

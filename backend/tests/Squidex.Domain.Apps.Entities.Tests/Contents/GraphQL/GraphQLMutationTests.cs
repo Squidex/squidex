@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }";
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 data = (object?)null
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var permission = PermissionIds.AppContentsCreate;
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
 
             var expected = new
             {
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<CreateContent>.That.Matches(x =>
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var permission = PermissionIds.AppContentsCreate;
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
 
             var expected = new
             {
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<CreateContent>.That.Matches(x =>
@@ -162,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var permission = PermissionIds.AppContentsCreate;
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, permission);
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, permission);
 
             var expected = new
             {
@@ -172,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<CreateContent>.That.Matches(x =>
@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentId, content);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -220,7 +220,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 data = (object?)null
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -240,7 +240,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var permission = PermissionIds.AppContentsUpdateOwn;
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
 
             var expected = new
             {
@@ -250,7 +250,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpdateContent>.That.Matches(x =>
@@ -276,7 +276,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var permission = PermissionIds.AppContentsUpdateOwn;
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, permission);
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, permission);
 
             var expected = new
             {
@@ -286,7 +286,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpdateContent>.That.Matches(x =>
@@ -308,7 +308,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentId, content);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -334,7 +334,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 data = (object?)null
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -354,7 +354,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var permission = PermissionIds.AppContentsUpsert;
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
 
             var expected = new
             {
@@ -364,7 +364,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x =>
@@ -391,7 +391,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var permission = PermissionIds.AppContentsUpsert;
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, permission);
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, permission);
 
             var expected = new
             {
@@ -401,7 +401,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x =>
@@ -424,7 +424,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentId, content);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -450,7 +450,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 data = (object?)null
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -470,7 +470,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var permission = PermissionIds.AppContentsUpdateOwn;
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
 
             var expected = new
             {
@@ -480,7 +480,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<PatchContent>.That.Matches(x =>
@@ -506,7 +506,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var permission = PermissionIds.AppContentsUpdateOwn;
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, permission);
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, permission);
 
             var expected = new
             {
@@ -516,7 +516,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<PatchContent>.That.Matches(x =>
@@ -538,7 +538,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentId, content);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -564,7 +564,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 data = (object?)null
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -586,7 +586,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var permission = PermissionIds.AppContentsChangeStatusOwn;
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
 
             var expected = new
             {
@@ -596,7 +596,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<ChangeContentStatus>.That.Matches(x =>
@@ -623,7 +623,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var permission = PermissionIds.AppContentsChangeStatusOwn;
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
 
             var expected = new
             {
@@ -633,7 +633,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<ChangeContentStatus>.That.Matches(x =>
@@ -660,7 +660,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var permission = PermissionIds.AppContentsChangeStatusOwn;
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
 
             var expected = new
             {
@@ -670,7 +670,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<ChangeContentStatus>.That.Matches(x =>
@@ -693,7 +693,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentId, content);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -719,7 +719,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 data = (object?)null
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -739,7 +739,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var permission = PermissionIds.AppContentsDeleteOwn;
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query }, permission);
 
             var expected = new
             {
@@ -752,7 +752,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<DeleteContent>.That.Matches(x =>

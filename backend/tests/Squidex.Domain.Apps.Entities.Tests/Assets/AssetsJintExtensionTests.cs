@@ -94,14 +94,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var script = @"
                 getAsset(data.assets.iv[0], function (assets) {
-                    var result1 = `Text: ${assets[0].fileName} ${assets[0].id}`;
+                    var actual1 = `Text: ${assets[0].fileName} ${assets[0].id}`;
 
-                    complete(`${result1}`);
+                    complete(`${actual1}`);
                 });";
 
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+            var actual = (await sut.ExecuteAsync(vars, script)).ToString();
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         [Fact]
@@ -116,15 +116,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var script = @"
                 getAssets(data.assets.iv, function (assets) {
-                    var result1 = `Text: ${assets[0].fileName} ${assets[0].id}`;
-                    var result2 = `Text: ${assets[1].fileName} ${assets[1].id}`;
+                    var actual1 = `Text: ${assets[0].fileName} ${assets[0].id}`;
+                    var actual2 = `Text: ${assets[1].fileName} ${assets[1].id}`;
 
-                    complete(`${result1}\n${result2}`);
+                    complete(`${actual1}\n${actual2}`);
                 });";
 
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+            var actual = (await sut.ExecuteAsync(vars, script)).ToString();
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         [Theory]
@@ -142,15 +142,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var script = $@"
                 getAssets(data.assets.iv, function (assets) {{
                     getAssetText(assets[0], function (text) {{
-                        var result = `Text: ${{text}}`;
+                        var actual = `Text: ${{text}}`;
 
-                        complete(result);
+                        complete(actual);
                     }}, '{encoding}');
                 }});";
 
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+            var actual = (await sut.ExecuteAsync(vars, script)).ToString();
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         [Fact]
@@ -165,15 +165,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var script = @"
                 getAssets(data.assets.iv, function (assets) {
                     getAssetText(assets[0], function (text) {
-                        var result = `Text: ${text}`;
+                        var actual = `Text: ${text}`;
 
-                        complete(result);
+                        complete(actual);
                     });
                 });";
 
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+            var actual = (await sut.ExecuteAsync(vars, script)).ToString();
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
 
             A.CallTo(() => assetFileStore.DownloadAsync(A<DomainId>._, A<DomainId>._, A<long>._, null, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -204,14 +204,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var script = $@"
                 getAssetText(event, function (text) {{
-                    var result = `Text: ${{text}}`;
+                    var actual = `Text: ${{text}}`;
 
-                    complete(result);
+                    complete(actual);
                 }}, '{encoding}');";
 
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+            var actual = (await sut.ExecuteAsync(vars, script)).ToString();
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         [Fact]
@@ -228,15 +228,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var script = @"
                 getAssets(data.assets.iv, function (assets) {
                     getAssetBlurHash(assets[0], function (text) {
-                        var result = `Hash: ${text}`;
+                        var actual = `Hash: ${text}`;
 
-                        complete(result);
+                        complete(actual);
                     });
                 });";
 
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+            var actual = (await sut.ExecuteAsync(vars, script)).ToString();
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         [Fact]
@@ -253,15 +253,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var script = @"
                 getAssets(data.assets.iv, function (assets) {
                     getAssetBlurHash(assets[0], function (text) {
-                        var result = `Hash: ${text}`;
+                        var actual = `Hash: ${text}`;
 
-                        complete(result);
+                        complete(actual);
                     });
                 });";
 
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+            var actual = (await sut.ExecuteAsync(vars, script)).ToString();
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         [Fact]
@@ -278,15 +278,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var script = @"
                 getAssets(data.assets.iv, function (assets) {
                     getAssetBlurHash(assets[0], function (text) {
-                        var result = `Hash: ${text}`;
+                        var actual = `Hash: ${text}`;
 
-                        complete(result);
+                        complete(actual);
                     });
                 });";
 
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+            var actual = (await sut.ExecuteAsync(vars, script)).ToString();
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         [Fact]
@@ -314,14 +314,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var script = @"
                 getAssetBlurHash(event, function (text) {
-                    var result = `Text: ${text}`;
+                    var actual = `Text: ${text}`;
 
-                    complete(result);
+                    complete(actual);
                 });";
 
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+            var actual = (await sut.ExecuteAsync(vars, script)).ToString();
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         private void SetupBlurHash(AssetRef asset, string hash)
@@ -350,7 +350,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                             .AddInvariant(JsonValue.Array(assetIds)));
 
             A.CallTo(() => assetQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetIds), A<CancellationToken>._))
+                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.UserPrincipal == user), null, A<Q>.That.HasIds(assetIds), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(2, assets));
 
             var vars = new ScriptVars

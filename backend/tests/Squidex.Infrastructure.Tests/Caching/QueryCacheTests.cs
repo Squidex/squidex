@@ -27,10 +27,10 @@ namespace Squidex.Infrastructure.Caching
         {
             var sut = new QueryCache<int, CachedEntry>();
 
-            var (queried, result) = await ConfigureAsync(sut, 1, 2);
+            var (queried, actual) = await ConfigureAsync(sut, 1, 2);
 
             Assert.Equal(new[] { 1, 2 }, queried);
-            Assert.Equal(new[] { 1, 2 }, result);
+            Assert.Equal(new[] { 1, 2 }, actual);
         }
 
         [Fact]
@@ -38,14 +38,14 @@ namespace Squidex.Infrastructure.Caching
         {
             var sut = new QueryCache<int, CachedEntry>();
 
-            var (queried1, result1) = await ConfigureAsync(sut, 1, 2);
-            var (queried2, result2) = await ConfigureAsync(sut, 1, 2, 3, 4);
+            var (queried1, actual1) = await ConfigureAsync(sut, 1, 2);
+            var (queried2, actual2) = await ConfigureAsync(sut, 1, 2, 3, 4);
 
             Assert.Equal(new[] { 1, 2 }, queried1.ToArray());
             Assert.Equal(new[] { 3, 4 }, queried2.ToArray());
 
-            Assert.Equal(new[] { 1, 2 }, result1.ToArray());
-            Assert.Equal(new[] { 1, 2, 3, 4 }, result2.ToArray());
+            Assert.Equal(new[] { 1, 2 }, actual1.ToArray());
+            Assert.Equal(new[] { 1, 2, 3, 4 }, actual2.ToArray());
         }
 
         [Fact]
@@ -55,10 +55,10 @@ namespace Squidex.Infrastructure.Caching
 
             sut.SetMany(new[] { (1, null), (2, new CachedEntry(2)) });
 
-            var (queried, result) = await ConfigureAsync(sut, 1, 2, 3, 4);
+            var (queried, actual) = await ConfigureAsync(sut, 1, 2, 3, 4);
 
             Assert.Equal(new[] { 3, 4 }, queried);
-            Assert.Equal(new[] { 2, 3, 4 }, result);
+            Assert.Equal(new[] { 2, 3, 4 }, actual);
         }
 
         [Fact]
@@ -71,10 +71,10 @@ namespace Squidex.Infrastructure.Caching
 
             sut1.SetMany(new[] { (1, null), (2, new CachedEntry(2)) }, cacheDuration);
 
-            var (queried, result) = await ConfigureAsync(sut2, x => true, cacheDuration, 1, 2, 3, 4);
+            var (queried, actual) = await ConfigureAsync(sut2, x => true, cacheDuration, 1, 2, 3, 4);
 
             Assert.Equal(new[] { 3, 4 }, queried);
-            Assert.Equal(new[] { 2, 3, 4 }, result);
+            Assert.Equal(new[] { 2, 3, 4 }, actual);
         }
 
         [Fact]
@@ -85,10 +85,10 @@ namespace Squidex.Infrastructure.Caching
 
             sut1.SetMany(new[] { (1, null), (2, new CachedEntry(2)) });
 
-            var (queried, result) = await ConfigureAsync(sut2, 1, 2, 3, 4);
+            var (queried, actual) = await ConfigureAsync(sut2, 1, 2, 3, 4);
 
             Assert.Equal(new[] { 1, 2, 3, 4 }, queried);
-            Assert.Equal(new[] { 1, 2, 3, 4 }, result);
+            Assert.Equal(new[] { 1, 2, 3, 4 }, actual);
         }
 
         [Fact]
@@ -101,10 +101,10 @@ namespace Squidex.Infrastructure.Caching
 
             sut1.SetMany(new[] { (1, null), (2, new CachedEntry(2)) }, cacheDuration);
 
-            var (queried, result) = await ConfigureAsync(sut2, 1, 2, 3, 4);
+            var (queried, actual) = await ConfigureAsync(sut2, 1, 2, 3, 4);
 
             Assert.Equal(new[] { 1, 2, 3, 4 }, queried);
-            Assert.Equal(new[] { 1, 2, 3, 4 }, result);
+            Assert.Equal(new[] { 1, 2, 3, 4 }, actual);
         }
 
         [Fact]
@@ -112,14 +112,14 @@ namespace Squidex.Infrastructure.Caching
         {
             var sut = new QueryCache<int, CachedEntry>();
 
-            var (queried1, result1) = await ConfigureAsync(sut, x => x > 1, default, 1, 2);
-            var (queried2, result2) = await ConfigureAsync(sut, 1, 2, 3, 4);
+            var (queried1, actual1) = await ConfigureAsync(sut, x => x > 1, default, 1, 2);
+            var (queried2, actual2) = await ConfigureAsync(sut, 1, 2, 3, 4);
 
             Assert.Equal(new[] { 1, 2 }, queried1.ToArray());
             Assert.Equal(new[] { 3, 4 }, queried2.ToArray());
 
-            Assert.Equal(new[] { 2 }, result1.ToArray());
-            Assert.Equal(new[] { 2, 3, 4 }, result2.ToArray());
+            Assert.Equal(new[] { 2 }, actual1.ToArray());
+            Assert.Equal(new[] { 2, 3, 4 }, actual2.ToArray());
         }
 
         [Fact]
@@ -130,14 +130,14 @@ namespace Squidex.Infrastructure.Caching
 
             var cacheDuration = TimeSpan.FromSeconds(10);
 
-            var (queried1, result1) = await ConfigureAsync(sut1, x => true, cacheDuration, 1, 2);
-            var (queried2, result2) = await ConfigureAsync(sut2, x => true, cacheDuration, 1, 2, 3, 4);
+            var (queried1, actual1) = await ConfigureAsync(sut1, x => true, cacheDuration, 1, 2);
+            var (queried2, actual2) = await ConfigureAsync(sut2, x => true, cacheDuration, 1, 2, 3, 4);
 
             Assert.Equal(new[] { 1, 2 }, queried1.ToArray());
             Assert.Equal(new[] { 3, 4 }, queried2.ToArray());
 
-            Assert.Equal(new[] { 1, 2 }, result1.ToArray());
-            Assert.Equal(new[] { 1, 2, 3, 4 }, result2.ToArray());
+            Assert.Equal(new[] { 1, 2 }, actual1.ToArray());
+            Assert.Equal(new[] { 1, 2, 3, 4 }, actual2.ToArray());
         }
 
         [Fact]
@@ -146,14 +146,14 @@ namespace Squidex.Infrastructure.Caching
             var sut1 = new QueryCache<int, CachedEntry>(memoryCache);
             var sut2 = new QueryCache<int, CachedEntry>(memoryCache);
 
-            var (queried1, result1) = await ConfigureAsync(sut1, x => true, null, 1, 2);
-            var (queried2, result2) = await ConfigureAsync(sut2, x => true, null, 1, 2, 3, 4);
+            var (queried1, actual1) = await ConfigureAsync(sut1, x => true, null, 1, 2);
+            var (queried2, actual2) = await ConfigureAsync(sut2, x => true, null, 1, 2, 3, 4);
 
             Assert.Equal(new[] { 1, 2 }, queried1.ToArray());
             Assert.Equal(new[] { 1, 2, 3, 4 }, queried2.ToArray());
 
-            Assert.Equal(new[] { 1, 2 }, result1.ToArray());
-            Assert.Equal(new[] { 1, 2, 3, 4 }, result2.ToArray());
+            Assert.Equal(new[] { 1, 2 }, actual1.ToArray());
+            Assert.Equal(new[] { 1, 2, 3, 4 }, actual2.ToArray());
         }
 
         private static Task<(int[], int[])> ConfigureAsync(IQueryCache<int, CachedEntry> sut, params int[] ids)
@@ -165,7 +165,7 @@ namespace Squidex.Infrastructure.Caching
         {
             var queried = new HashSet<int>();
 
-            var result = await sut.CacheOrQueryAsync(ids, async pending =>
+            var actual = await sut.CacheOrQueryAsync(ids, async pending =>
             {
                 queried.AddRange(pending);
 
@@ -174,7 +174,7 @@ namespace Squidex.Infrastructure.Caching
                 return pending.Where(predicate).Select(x => new CachedEntry(x));
             }, cacheDuration);
 
-            return (queried.ToArray(), result.Select(x => x.Value).ToArray());
+            return (queried.ToArray(), actual.Select(x => x.Value).ToArray());
         }
     }
 }

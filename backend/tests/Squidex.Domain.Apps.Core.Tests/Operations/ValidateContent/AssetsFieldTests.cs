@@ -31,9 +31,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 {
                     yield return new AssetsValidator(assets.Properties.IsRequired, assets.Properties, ids =>
                     {
-                        var result = ids.Select(TestAssets.Document).ToList();
+                        var actual = ids.Select(TestAssets.Document).ToList();
 
-                        return Task.FromResult<IReadOnlyList<IAssetInfo>>(result);
+                        return Task.FromResult<IReadOnlyList<IAssetInfo>>(actual);
                     });
                 }
             }

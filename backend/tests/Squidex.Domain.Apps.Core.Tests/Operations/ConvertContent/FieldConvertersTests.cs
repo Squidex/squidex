@@ -47,14 +47,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                             .AddLocalized("en", JsonValue.Null)
                             .AddLocalized("de", 1));
 
-            var result =
+            var actual =
                 new ContentConverter(ResolvedComponents.Empty, schema)
                     .Add(new ExcludeChangedTypes(TestUtils.DefaultSerializer))
                     .Convert(source);
 
             var expected = source;
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                             .AddLocalized("en", "2")
                             .AddLocalized("de", 2));
 
-            var result =
+            var actual =
                 new ContentConverter(ResolvedComponents.Empty, schema)
                     .Add(new ExcludeChangedTypes(TestUtils.DefaultSerializer))
                     .Convert(source);
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         new ContentFieldData()
                             .AddLocalized("en", 1));
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                             .AddLocalized("en", JsonValue.Null)
                             .AddLocalized("de", 1));
 
-            var result =
+            var actual =
                 new ContentConverter(ResolvedComponents.Empty, schema)
                     .Add(ExcludeHidden.Instance)
                     .Convert(source);
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         new ContentFieldData()
                             .AddLocalized("en", 1));
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -148,7 +148,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         new ContentFieldData()
                             .AddLocalized("en", "2"));
 
-            var result =
+            var actual =
                 new ContentConverter(ResolvedComponents.Empty, schema)
                     .Add(new ExcludeChangedTypes(TestUtils.DefaultSerializer))
                     .Convert(source);
@@ -159,7 +159,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         new ContentFieldData()
                             .AddLocalized("en", 1));
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                             .AddLocalized("de", "DE")
                             .AddLocalized("it", "IT"));
 
-            var result =
+            var actual =
                 new ContentConverter(ResolvedComponents.Empty, schema)
                     .Add(new ResolveLanguages(languages))
                     .Convert(source);
@@ -191,7 +191,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                             .AddLocalized("en", "EN")
                             .AddLocalized("de", "DE"));
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -211,7 +211,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                             .AddLocalized("de", "DE")
                             .AddLocalized("it", "IT"));
 
-            var result =
+            var actual =
                 new ContentConverter(ResolvedComponents.Empty, schema)
                     .Add(new ResolveLanguages(languages, true, new[] { Language.DE }))
                     .Convert(source);
@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         new ContentFieldData()
                             .AddLocalized("de", "DE"));
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -247,7 +247,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 source[field1.Name]!["en"] = value!;
             }
 
-            var result =
+            var actual =
                 new ContentConverter(ResolvedComponents.Empty, schema)
                     .Add(new ResolveLanguages(languages))
                     .Convert(source);
@@ -258,7 +258,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         new ContentFieldData()
                             .AddLocalized("en", "A"));
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -283,7 +283,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 source[field1.Name]!["en"] = value;
             }
 
-            var result =
+            var actual =
                 new ContentConverter(ResolvedComponents.Empty, schema)
                     .Add(new ResolveLanguages(languages))
                     .Convert(source);
@@ -298,7 +298,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 expected[field1.Name]!["en"] = value;
             }
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -316,14 +316,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         new ContentFieldData()
                             .AddInvariant("A"));
 
-            var result =
+            var actual =
                 new ContentConverter(ResolvedComponents.Empty, schema)
                     .Add(new ResolveLanguages(languages))
                     .Convert(source);
 
             var expected = source;
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -348,7 +348,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 source[field1.Name]![InvariantPartitioning.Key] = value;
             }
 
-            var result =
+            var actual =
                 new ContentConverter(ResolvedComponents.Empty, schema)
                     .Add(new ResolveInvariant(languages))
                     .Convert(source);
@@ -359,7 +359,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         new ContentFieldData()
                             .AddInvariant("EN"));
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -384,7 +384,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 source[field1.Name]![InvariantPartitioning.Key] = value;
             }
 
-            var result =
+            var actual =
                 new ContentConverter(ResolvedComponents.Empty, schema)
                     .Add(new ResolveInvariant(languages))
                     .Convert(source);
@@ -395,7 +395,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         new ContentFieldData()
                             .AddInvariant("DE"));
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -412,14 +412,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     .AddField(field1.Name,
                         new ContentFieldData());
 
-            var result =
+            var actual =
                 new ContentConverter(ResolvedComponents.Empty, schema)
                     .Add(new ResolveLanguages(languages))
                     .Convert(source);
 
             var expected = source;
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -450,7 +450,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 source[field1.Name]!["de"] = value!;
             }
 
-            var result =
+            var actual =
                 new ContentConverter(ResolvedComponents.Empty, schema)
                     .Add(new ResolveLanguages(config))
                     .Convert(source);
@@ -464,7 +464,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                             .AddLocalized("es", "IT")
                             .AddLocalized("de", "EN"));
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -483,7 +483,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                             .AddLocalized("en", "EN")
                             .AddLocalized("de", "DE"));
 
-            var result =
+            var actual =
                 new ContentConverter(ResolvedComponents.Empty, schema)
                     .Add(new ResolveLanguages(languages, true, Language.IT))
                     .Convert(source);
@@ -494,7 +494,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         new ContentFieldData()
                             .AddLocalized("en", "EN"));
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -504,11 +504,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source = new ContentFieldData();
 
-            var result =
+            var actual =
                 new ResolveLanguages(languages)
                     .ConvertFieldAfter(field, source);
 
-            Assert.Same(source, result);
+            Assert.Same(source, actual);
         }
 
         [Fact]
@@ -518,11 +518,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source = new ContentFieldData();
 
-            var result =
+            var actual =
                 new ResolveLanguages(languages, true, Array.Empty<Language>())
                     .ConvertFieldAfter(field, source);
 
-            Assert.Same(source, result);
+            Assert.Same(source, actual);
         }
 
         [Fact]
@@ -532,11 +532,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source = new ContentFieldData();
 
-            var result =
+            var actual =
                 new ResolveLanguages(languages)
                     .ConvertFieldAfter(field, source);
 
-            Assert.Same(source, result);
+            Assert.Same(source, actual);
         }
 
         /*
@@ -565,11 +565,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                             .Add(Component.Discriminator, componentId)
                             .Add("schemaName", component.Name));
 
-            var result = FieldConverters.AddSchemaName(components)(data, field);
+            var actual = FieldConverters.AddSchemaName(components)(data, field);
 
             var expected = new ContentFieldData();
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }*/
     }
 }

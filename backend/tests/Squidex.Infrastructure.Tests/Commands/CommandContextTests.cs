@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public void Should_provide_result_if_succeeded_with_value()
+        public void Should_provide_actual_if_succeeded_with_value()
         {
             sut.Complete("RESULT");
 
@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public void Should_provide_plain_result_if_succeeded_with_value()
+        public void Should_provide_plain_actual_if_succeeded_with_value()
         {
             sut.Complete("RESULT");
 

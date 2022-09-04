@@ -12,7 +12,7 @@ using SchemaField = Squidex.Domain.Apps.Entities.Schemas.Commands.UpsertSchemaFi
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class SynchronizeSchema : SchemaUpdateCommand, IUpsertCommand, IAggregateCommand, ISchemaCommand
+    public sealed class SynchronizeSchema : SchemaCommand, IUpsertCommand, IAggregateCommand, ISchemaCommand
     {
         public bool NoFieldDeletion { get; set; }
 

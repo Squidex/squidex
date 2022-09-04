@@ -51,9 +51,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
                 ["appId"] = appId
             };
 
-            var result = sut.Execute(vars, script).ToString();
+            var actual = sut.Execute(vars, script).ToString();
 
-            Assert.Equal("3", result);
+            Assert.Equal("3", actual);
         }
 
         [Fact]
@@ -65,8 +65,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
                 .Returns(3);
 
             const string script = @"
-                resetCounterV2('my', function(result) {
-                    complete(result);
+                resetCounterV2('my', function(actual) {
+                    complete(actual);
                 }, 4);
             ";
 
@@ -75,9 +75,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
                 ["appId"] = appId
             };
 
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+            var actual = (await sut.ExecuteAsync(vars, script)).ToString();
 
-            Assert.Equal("3", result);
+            Assert.Equal("3", actual);
         }
 
         [Fact]
@@ -97,9 +97,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
                 ["appId"] = appId
             };
 
-            var result = sut.Execute(vars, script).ToString();
+            var actual = sut.Execute(vars, script).ToString();
 
-            Assert.Equal("3", result);
+            Assert.Equal("3", actual);
         }
 
         [Fact]
@@ -111,8 +111,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
                 .Returns(3);
 
             const string script = @"
-                incrementCounter('my', function (result) {
-                    complete(result);
+                incrementCounter('my', function (actual) {
+                    complete(actual);
                 });
             ";
 
@@ -121,9 +121,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
                 ["appId"] = appId
             };
 
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+            var actual = (await sut.ExecuteAsync(vars, script)).ToString();
 
-            Assert.Equal("3", result);
+            Assert.Equal("3", actual);
         }
     }
 }

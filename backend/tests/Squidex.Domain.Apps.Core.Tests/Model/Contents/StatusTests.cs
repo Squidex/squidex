@@ -19,17 +19,17 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         [Fact]
         public void Should_convert_from_string()
         {
-            var result = typeConverter.ConvertFromString("Draft");
+            var actual = typeConverter.ConvertFromString("Draft");
 
-            Assert.Equal(Status.Draft, result);
+            Assert.Equal(Status.Draft, actual);
         }
 
         [Fact]
         public void Should_convert_to_string()
         {
-            var result = typeConverter.ConvertToString(Status.Draft);
+            var actual = typeConverter.ConvertToString(Status.Draft);
 
-            Assert.Equal("Draft", result);
+            Assert.Equal("Draft", actual);
         }
 
         [Fact]

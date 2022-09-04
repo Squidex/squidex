@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                     AppName = schema.AppId.Name,
                     SchemaId = schema.Id,
                     SchemaName = schema.SchemaDef.Name,
-                    User = context.User
+                    User = context.UserPrincipal
                 };
 
                 var preScript = schema.SchemaDef.Scripts.QueryPre;

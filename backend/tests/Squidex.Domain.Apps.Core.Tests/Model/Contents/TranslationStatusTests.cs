@@ -22,14 +22,14 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         {
             var schema = new Schema("my-schema");
 
-            var result = TranslationStatus.Create(new ContentData(), schema, languages);
+            var actual = TranslationStatus.Create(new ContentData(), schema, languages);
 
             Assert.Equal(new TranslationStatus
             {
                 [Language.EN] = 100,
                 [Language.DE] = 100,
                 [Language.IT] = 100
-            }, result);
+            }, actual);
         }
 
         [Fact]
@@ -39,14 +39,14 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                 new Schema("my-schema")
                     .AddString(1, "field1", Partitioning.Invariant);
 
-            var result = TranslationStatus.Create(new ContentData(), schema, languages);
+            var actual = TranslationStatus.Create(new ContentData(), schema, languages);
 
             Assert.Equal(new TranslationStatus
             {
                 [Language.EN] = 100,
                 [Language.DE] = 100,
                 [Language.IT] = 100
-            }, result);
+            }, actual);
         }
 
         [Fact]
@@ -56,14 +56,14 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                 new Schema("my-schema")
                     .AddString(1, "field1", Partitioning.Language);
 
-            var result = TranslationStatus.Create(new ContentData(), schema, languages);
+            var actual = TranslationStatus.Create(new ContentData(), schema, languages);
 
             Assert.Equal(new TranslationStatus
             {
                 [Language.EN] = 0,
                 [Language.DE] = 0,
                 [Language.IT] = 0
-            }, result);
+            }, actual);
         }
 
         [Fact]
@@ -90,14 +90,14 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                         new ContentFieldData()
                             .AddLocalized(Language.EN, "en"));
 
-            var result = TranslationStatus.Create(data, schema, languages);
+            var actual = TranslationStatus.Create(data, schema, languages);
 
             Assert.Equal(new TranslationStatus
             {
                 [Language.EN] = 100,
                 [Language.DE] = 67,
                 [Language.IT] = 0
-            }, result);
+            }, actual);
         }
     }
 }

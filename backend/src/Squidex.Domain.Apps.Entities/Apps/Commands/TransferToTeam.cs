@@ -9,7 +9,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class TransferToTeam : AppUpdateCommand
+    public sealed class TransferToTeam : AppCommand
     {
         public DomainId? TeamId { get; set; }
     }

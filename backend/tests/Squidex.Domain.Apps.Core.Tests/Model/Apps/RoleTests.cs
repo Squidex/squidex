@@ -33,9 +33,9 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var role = new Role("Name");
 
-            var result = role.ForApp("my-app").Permissions.ToIds();
+            var actual = role.ForApp("my-app").Permissions.ToIds();
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -43,9 +43,9 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var role = Role.WithPermissions("Name", "common", "common", "common");
 
-            var result = role.ForApp("my-app").Permissions.ToIds();
+            var actual = role.ForApp("my-app").Permissions.ToIds();
 
-            Assert.Single(result);
+            Assert.Single(actual);
         }
 
         [Fact]
@@ -53,9 +53,9 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var role = Role.WithPermissions("Name", "clients.read");
 
-            var result = role.ForApp("my-app").Permissions.ToIds();
+            var actual = role.ForApp("my-app").Permissions.ToIds();
 
-            Assert.Equal("squidex.apps.my-app.clients.read", result.ElementAt(0));
+            Assert.Equal("squidex.apps.my-app.clients.read", actual.ElementAt(0));
         }
 
         [Fact]

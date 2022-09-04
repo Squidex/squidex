@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class RemoveAppImage : AppUpdateCommand
+    public sealed class RemoveAppImage : AppCommand
     {
     }
 }

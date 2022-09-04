@@ -9,7 +9,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class UpdateRole : AppUpdateCommand
+    public sealed class UpdateRole : AppCommand
     {
         public string Name { get; set; }
 

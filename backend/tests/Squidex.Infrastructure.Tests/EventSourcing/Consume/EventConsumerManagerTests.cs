@@ -64,9 +64,9 @@ namespace Squidex.Infrastructure.EventSourcing.Consume
                         }, 2)
                 }.ToAsyncEnumerable());
 
-            var result = await sut.GetConsumersAsync(default);
+            var actual = await sut.GetConsumersAsync(default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new List<EventConsumerInfo>
                 {
                     new EventConsumerInfo { Name = consumerName1, Position = "1" },

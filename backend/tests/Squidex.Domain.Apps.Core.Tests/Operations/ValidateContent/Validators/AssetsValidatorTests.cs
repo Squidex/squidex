@@ -261,9 +261,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             return ids =>
             {
-                var result = new List<IAssetInfo> { Document, Image1, Image2, ImageSvg, Video };
+                var actual = new List<IAssetInfo> { Document, Image1, Image2, ImageSvg, Video };
 
-                return Task.FromResult<IReadOnlyList<IAssetInfo>>(result);
+                return Task.FromResult<IReadOnlyList<IAssetInfo>>(actual);
             };
         }
     }

@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Xunit;
 
@@ -48,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var permission = PermissionIds.ForApp(PermissionIds.AppAssetsRead, TestApp.Default.Name);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, permission.Id);
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query }, permission.Id);
 
             var expected = new
             {
@@ -63,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -78,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }");
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -104,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 data = (object?)null
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -136,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var permission = PermissionIds.ForApp(PermissionIds.AppContentsRead, TestApp.Default.Name, "random-schema");
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, permission.Id);
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query }, permission.Id);
 
             var expected = new
             {
@@ -156,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -170,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }");
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -196,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 data = (object?)null
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
     }
 }

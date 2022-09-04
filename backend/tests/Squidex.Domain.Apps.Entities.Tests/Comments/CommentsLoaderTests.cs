@@ -41,9 +41,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
             A.CallTo(() => domainObject.GetComments(11))
                 .Returns(comments);
 
-            var result = await sut.GetCommentsAsync(commentsId, 11, ct);
+            var actual = await sut.GetCommentsAsync(commentsId, 11, ct);
 
-            Assert.Same(comments, result);
+            Assert.Same(comments, actual);
 
             A.CallTo(() => domainObject.LoadAsync(ct))
                 .MustHaveHappened();

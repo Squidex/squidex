@@ -16,9 +16,9 @@ namespace Squidex.Infrastructure.Queries
         {
             var source = ClrFilter.Or(ClrFilter.Eq("path", 2), ClrFilter.Eq("path", 3));
 
-            var result = Optimizer<ClrValue>.Optimize(source);
+            var actual = Optimizer<ClrValue>.Optimize(source);
 
-            Assert.Equal("(path == 2 || path == 3)", result!.ToString());
+            Assert.Equal("(path == 2 || path == 3)", actual!.ToString());
         }
 
         [Fact]
@@ -26,9 +26,9 @@ namespace Squidex.Infrastructure.Queries
         {
             var source = ClrFilter.And(ClrFilter.Eq("path", 1), ClrFilter.Or());
 
-            var result = Optimizer<ClrValue>.Optimize(source);
+            var actual = Optimizer<ClrValue>.Optimize(source);
 
-            Assert.Equal("path == 1", result!.ToString());
+            Assert.Equal("path == 1", actual!.ToString());
         }
 
         [Fact]
@@ -36,9 +36,9 @@ namespace Squidex.Infrastructure.Queries
         {
             var source = ClrFilter.And(ClrFilter.And());
 
-            var result = Optimizer<ClrValue>.Optimize(source);
+            var actual = Optimizer<ClrValue>.Optimize(source);
 
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
@@ -46,9 +46,9 @@ namespace Squidex.Infrastructure.Queries
         {
             var source = ClrFilter.And();
 
-            var result = Optimizer<ClrValue>.Optimize(source);
+            var actual = Optimizer<ClrValue>.Optimize(source);
 
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
@@ -56,9 +56,9 @@ namespace Squidex.Infrastructure.Queries
         {
             var source = ClrFilter.Not(ClrFilter.And());
 
-            var result = Optimizer<ClrValue>.Optimize(source);
+            var actual = Optimizer<ClrValue>.Optimize(source);
 
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
@@ -66,9 +66,9 @@ namespace Squidex.Infrastructure.Queries
         {
             var source = ClrFilter.Not(ClrFilter.Eq("path", 1));
 
-            var result = Optimizer<ClrValue>.Optimize(source);
+            var actual = Optimizer<ClrValue>.Optimize(source);
 
-            Assert.Equal("path != 1", result!.ToString());
+            Assert.Equal("path != 1", actual!.ToString());
         }
 
         [Fact]
@@ -76,9 +76,9 @@ namespace Squidex.Infrastructure.Queries
         {
             var source = ClrFilter.Not(ClrFilter.Ne("path", 1));
 
-            var result = Optimizer<ClrValue>.Optimize(source);
+            var actual = Optimizer<ClrValue>.Optimize(source);
 
-            Assert.Equal("path == 1", result!.ToString());
+            Assert.Equal("path == 1", actual!.ToString());
         }
 
         [Fact]
@@ -86,9 +86,9 @@ namespace Squidex.Infrastructure.Queries
         {
             var source = ClrFilter.Not(ClrFilter.Lt("path", 1));
 
-            var result = Optimizer<ClrValue>.Optimize(source);
+            var actual = Optimizer<ClrValue>.Optimize(source);
 
-            Assert.Equal("!(path < 1)", result!.ToString());
+            Assert.Equal("!(path < 1)", actual!.ToString());
         }
     }
 }

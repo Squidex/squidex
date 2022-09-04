@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_only_invoke_pre_enrich_for_empty_results()
+        public async Task Should_only_invoke_pre_enrich_for_empty_actuals()
         {
             var source = Array.Empty<IContentEntity>();
 
@@ -126,9 +126,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), appProvider);
 
-            var result = await sut.EnrichAsync(source, true, requestContext, ct);
+            var actual = await sut.EnrichAsync(source, true, requestContext, ct);
 
-            Assert.NotSame(source.Data, result.Data);
+            Assert.NotSame(source.Data, actual.Data);
         }
 
         [Fact]
@@ -138,9 +138,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), appProvider);
 
-            var result = await sut.EnrichAsync(source, false, requestContext, ct);
+            var actual = await sut.EnrichAsync(source, false, requestContext, ct);
 
-            Assert.Same(source.Data, result.Data);
+            Assert.Same(source.Data, actual.Data);
         }
 
         private ContentEntity CreateContent(ContentData? data = null)

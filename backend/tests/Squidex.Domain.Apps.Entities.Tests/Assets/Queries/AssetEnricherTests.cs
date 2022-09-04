@@ -51,9 +51,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var source = new AssetEntity { AppId = appId };
 
-            var result = await sut.EnrichAsync(source, requestContext, ct);
+            var actual = await sut.EnrichAsync(source, requestContext, ct);
 
-            Assert.Empty(result.TagNames);
+            Assert.Empty(actual.TagNames);
         }
 
         [Fact]
@@ -61,9 +61,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var source = new AssetEntity { AppId = appId, Id = DomainId.NewGuid(), Version = 13 };
 
-            var result = await sut.EnrichAsync(source, requestContext, ct);
+            var actual = await sut.EnrichAsync(source, requestContext, ct);
 
-            A.CallTo(() => requestCache.AddDependency(result.UniqueId, result.Version))
+            A.CallTo(() => requestCache.AddDependency(actual.UniqueId, actual.Version))
                 .MustHaveHappened();
         }
 
@@ -87,9 +87,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                     ["id2"] = "name2"
                 });
 
-            var result = await sut.EnrichAsync(source, requestContext, ct);
+            var actual = await sut.EnrichAsync(source, requestContext, ct);
 
-            Assert.Equal(new HashSet<string> { "name1", "name2" }, result.TagNames);
+            Assert.Equal(new HashSet<string> { "name1", "name2" }, actual.TagNames);
         }
 
         [Fact]
@@ -105,9 +105,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 AppId = appId
             };
 
-            var result = await sut.EnrichAsync(source, requestContext.Clone(b => b.WithoutAssetEnrichment()), ct);
+            var actual = await sut.EnrichAsync(source, requestContext.Clone(b => b.WithoutAssetEnrichment()), ct);
 
-            Assert.Null(result.TagNames);
+            Assert.Null(actual.TagNames);
         }
 
         [Fact]
@@ -130,9 +130,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetMetadataSource2.Format(A<IAssetEntity>._))
                 .Returns(new[] { "metadata2", "metadata3" });
 
-            var result = await sut.EnrichAsync(source, requestContext, ct);
+            var actual = await sut.EnrichAsync(source, requestContext, ct);
 
-            Assert.Equal("metadata1, metadata2, metadata3, 2 kB", result.MetadataText);
+            Assert.Equal("metadata1, metadata2, metadata3, 2 kB", actual.MetadataText);
         }
 
         [Fact]
@@ -166,10 +166,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                     ["id3"] = "name3"
                 });
 
-            var result = await sut.EnrichAsync(new[] { source1, source2 }, requestContext, ct);
+            var actual = await sut.EnrichAsync(new[] { source1, source2 }, requestContext, ct);
 
-            Assert.Equal(new HashSet<string> { "name1", "name2" }, result[0].TagNames);
-            Assert.Equal(new HashSet<string> { "name2", "name3" }, result[1].TagNames);
+            Assert.Equal(new HashSet<string> { "name1", "name2" }, actual[0].TagNames);
+            Assert.Equal(new HashSet<string> { "name2", "name3" }, actual[1].TagNames);
         }
 
         [Fact]
@@ -180,9 +180,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 AppId = appId
             };
 
-            var result = await sut.EnrichAsync(new[] { source }, new Context(Mocks.FrontendUser(), Mocks.App(appId)), ct);
+            var actual = await sut.EnrichAsync(new[] { source }, new Context(Mocks.FrontendUser(), Mocks.App(appId)), ct);
 
-            Assert.NotNull(result[0].EditToken);
+            Assert.NotNull(actual[0].EditToken);
 
             A.CallTo(() => urlGenerator.Root())
                 .MustHaveHappened();
@@ -196,9 +196,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 AppId = appId
             };
 
-            var result = await sut.EnrichAsync(new[] { source }, requestContext, ct);
+            var actual = await sut.EnrichAsync(new[] { source }, requestContext, ct);
 
-            Assert.NotNull(result[0].EditToken);
+            Assert.NotNull(actual[0].EditToken);
 
             A.CallTo(() => urlGenerator.Root())
                 .MustHaveHappened();

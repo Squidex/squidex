@@ -123,7 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 result.RoleProperties = new JsonObject();
             }
 
-            foreach (var (key, value) in resources.Context.User.Claims.GetUIProperties(app.Name))
+            foreach (var (key, value) in resources.Context.UserPrincipal.Claims.GetUIProperties(app.Name))
             {
                 result.RoleProperties[key] = JsonValue.Create(value);
             }

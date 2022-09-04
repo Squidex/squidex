@@ -55,9 +55,9 @@ namespace Squidex.Domain.Apps.Entities
             A.CallTo(() => indexForSchemas.GetSchemaAsync(app.Id, schema.Id, false, ct))
                 .Returns(schema);
 
-            var result = await sut.GetAppWithSchemaAsync(app.Id, schemaId.Id, false, ct);
+            var actual = await sut.GetAppWithSchemaAsync(app.Id, schemaId.Id, false, ct);
 
-            Assert.Equal(schema, result.Item2);
+            Assert.Equal(schema, actual.Item2);
         }
 
         [Fact]
@@ -68,9 +68,9 @@ namespace Squidex.Domain.Apps.Entities
             A.CallTo(() => indexForApps.GetAppsForTeamAsync(team.Id, ct))
                 .Returns(new List<IAppEntity> { app });
 
-            var result = await sut.GetTeamAppsAsync(team.Id, ct);
+            var actual = await sut.GetTeamAppsAsync(team.Id, ct);
 
-            Assert.Equal(app, result.Single());
+            Assert.Equal(app, actual.Single());
         }
 
         [Fact]
@@ -81,9 +81,9 @@ namespace Squidex.Domain.Apps.Entities
             A.CallTo(() => indexForApps.GetAppsForUserAsync("user1", permissions, ct))
                 .Returns(new List<IAppEntity> { app });
 
-            var result = await sut.GetUserAppsAsync("user1", permissions, ct);
+            var actual = await sut.GetUserAppsAsync("user1", permissions, ct);
 
-            Assert.Equal(app, result.Single());
+            Assert.Equal(app, actual.Single());
         }
 
         [Fact]
@@ -92,9 +92,9 @@ namespace Squidex.Domain.Apps.Entities
             A.CallTo(() => indexForApps.GetAppAsync(app.Id, false, ct))
                 .Returns(app);
 
-            var result = await sut.GetAppAsync(app.Id, false, ct);
+            var actual = await sut.GetAppAsync(app.Id, false, ct);
 
-            Assert.Equal(app, result);
+            Assert.Equal(app, actual);
         }
 
         [Fact]
@@ -103,9 +103,9 @@ namespace Squidex.Domain.Apps.Entities
             A.CallTo(() => indexForApps.GetAppAsync(app.Name, false, ct))
                 .Returns(app);
 
-            var result = await sut.GetAppAsync(app.Name, false, ct);
+            var actual = await sut.GetAppAsync(app.Name, false, ct);
 
-            Assert.Equal(app, result);
+            Assert.Equal(app, actual);
         }
 
         [Fact]
@@ -116,9 +116,9 @@ namespace Squidex.Domain.Apps.Entities
             A.CallTo(() => indexForTeams.GetTeamAsync(team.Id, ct))
                 .Returns(team);
 
-            var result = await sut.GetTeamAsync(team.Id, ct);
+            var actual = await sut.GetTeamAsync(team.Id, ct);
 
-            Assert.Equal(team, result);
+            Assert.Equal(team, actual);
         }
 
         [Fact]
@@ -129,9 +129,9 @@ namespace Squidex.Domain.Apps.Entities
             A.CallTo(() => indexForTeams.GetTeamsAsync("user1", ct))
                 .Returns(new List<ITeamEntity> { team });
 
-            var result = await sut.GetUserTeamsAsync("user1", ct);
+            var actual = await sut.GetUserTeamsAsync("user1", ct);
 
-            Assert.Equal(team, result.Single());
+            Assert.Equal(team, actual.Single());
         }
 
         [Fact]
@@ -142,9 +142,9 @@ namespace Squidex.Domain.Apps.Entities
             A.CallTo(() => indexForSchemas.GetSchemaAsync(app.Id, schema.Id, false, ct))
                 .Returns(schema);
 
-            var result = await sut.GetSchemaAsync(app.Id, schema.Id, false, ct);
+            var actual = await sut.GetSchemaAsync(app.Id, schema.Id, false, ct);
 
-            Assert.Equal(schema, result);
+            Assert.Equal(schema, actual);
         }
 
         [Fact]
@@ -155,9 +155,9 @@ namespace Squidex.Domain.Apps.Entities
             A.CallTo(() => indexForSchemas.GetSchemaAsync(app.Id, schemaId.Name, false, ct))
                 .Returns(schema);
 
-            var result = await sut.GetSchemaAsync(app.Id, schemaId.Name, false, ct);
+            var actual = await sut.GetSchemaAsync(app.Id, schemaId.Name, false, ct);
 
-            Assert.Equal(schema, result);
+            Assert.Equal(schema, actual);
         }
 
         [Fact]
@@ -168,9 +168,9 @@ namespace Squidex.Domain.Apps.Entities
             A.CallTo(() => indexForSchemas.GetSchemasAsync(app.Id, ct))
                 .Returns(new List<ISchemaEntity> { schema });
 
-            var result = await sut.GetSchemasAsync(app.Id, ct);
+            var actual = await sut.GetSchemasAsync(app.Id, ct);
 
-            Assert.Equal(schema, result.Single());
+            Assert.Equal(schema, actual.Single());
         }
 
         [Fact]
@@ -181,9 +181,9 @@ namespace Squidex.Domain.Apps.Entities
             A.CallTo(() => indexForRules.GetRulesAsync(app.Id, ct))
                 .Returns(new List<IRuleEntity> { rule });
 
-            var result = await sut.GetRulesAsync(app.Id, ct);
+            var actual = await sut.GetRulesAsync(app.Id, ct);
 
-            Assert.Equal(rule, result.Single());
+            Assert.Equal(rule, actual.Single());
         }
 
         [Fact]
@@ -194,9 +194,9 @@ namespace Squidex.Domain.Apps.Entities
             A.CallTo(() => indexForRules.GetRulesAsync(app.Id, ct))
                 .Returns(new List<IRuleEntity> { rule });
 
-            var result = await sut.GetRuleAsync(app.Id, rule.Id, ct);
+            var actual = await sut.GetRuleAsync(app.Id, rule.Id, ct);
 
-            Assert.Equal(rule, result);
+            Assert.Equal(rule, actual);
         }
     }
 }

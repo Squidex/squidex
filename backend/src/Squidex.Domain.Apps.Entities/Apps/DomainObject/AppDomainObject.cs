@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         protected override bool CanAccept(ICommand command)
         {
-            return command is AppUpdateCommand update && Equals(update?.AppId?.Id, Snapshot.Id);
+            return command is AppCommand update && Equals(update?.AppId?.Id, Snapshot.Id);
         }
 
         public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,

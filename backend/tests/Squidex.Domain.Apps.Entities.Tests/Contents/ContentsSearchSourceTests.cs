@@ -157,9 +157,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var ctx = ContextWithPermissions();
 
-            var result = await sut.SearchAsync("query", ctx, ct);
+            var actual = await sut.SearchAsync("query", ctx, ct);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
 
             A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>._, A<SearchScope>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -173,9 +173,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>.That.Matches(x => x.Text == "query~"), ctx.Scope(), ct))
                 .Returns(new List<DomainId>());
 
-            var result = await sut.SearchAsync("query", ctx, ct);
+            var actual = await sut.SearchAsync("query", ctx, ct);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
 
             A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -198,9 +198,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => urlGenerator.ContentUI(appId, schemaId1, content.Id))
                 .Returns("content-url");
 
-            var result = await sut.SearchAsync("query", ctx, ct);
+            var actual = await sut.SearchAsync("query", ctx, ct);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add(expectedName, SearchResultType.Content, "content-url"));
         }

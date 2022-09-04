@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 if (!HasPermission(context, schema, PermissionIds.AppContentsRead))
                 {
-                    q = q with { CreatedBy = context.User.Token() };
+                    q = q with { CreatedBy = context.UserPrincipal.Token() };
                 }
 
                 q = await queryParser.ParseAsync(context, q, schema);

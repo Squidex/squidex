@@ -137,9 +137,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     new ContentEntity { SchemaId = schemaNonMatch }
                 }.ToAsyncEnumerable());
 
-            var result = await sut.CreateSnapshotEventsAsync(ctx, ct).ToListAsync(ct);
+            var actual = await sut.CreateSnapshotEventsAsync(ctx, ct).ToListAsync(ct);
 
-            var typed = result.OfType<EnrichedContentEvent>().ToList();
+            var typed = actual.OfType<EnrichedContentEvent>().ToList();
 
             Assert.Equal(2, typed.Count);
             Assert.Equal(2, typed.Count(x => x.Type == EnrichedContentEventType.Created));
@@ -169,9 +169,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     new ContentEntity { SchemaId = schemaMatch }
                 }.ToAsyncEnumerable());
 
-            var result = await sut.CreateSnapshotEventsAsync(ctx, ct).ToListAsync(ct);
+            var actual = await sut.CreateSnapshotEventsAsync(ctx, ct).ToListAsync(ct);
 
-            var typed = result.OfType<EnrichedContentEvent>().ToList();
+            var typed = actual.OfType<EnrichedContentEvent>().ToList();
 
             Assert.Equal(2, typed.Count);
             Assert.Equal(2, typed.Count(x => x.Type == EnrichedContentEventType.Created));
@@ -191,9 +191,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 12, ct))
                 .Returns(SimpleMapper.Map(@event, new ContentEntity()));
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, ct).ToListAsync(ct);
+            var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, ct).ToListAsync(ct);
 
-            var enrichedEvent = (EnrichedContentEvent)result.Single();
+            var enrichedEvent = (EnrichedContentEvent)actual.Single();
 
             Assert.Equal(type, enrichedEvent!.Type);
             Assert.Equal(@event.Actor, enrichedEvent.Actor);
@@ -221,9 +221,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 11, ct))
                 .Returns(new ContentEntity { AppId = ctx.AppId, SchemaId = schemaMatch, Version = 11, Data = dataOld });
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, ct).ToListAsync(ct);
+            var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, ct).ToListAsync(ct);
 
-            var enrichedEvent = result.Single() as EnrichedContentEvent;
+            var enrichedEvent = actual.Single() as EnrichedContentEvent;
 
             Assert.Same(dataNow, enrichedEvent!.Data);
             Assert.Same(dataOld, enrichedEvent!.DataOld);
@@ -236,9 +236,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var @event = new ContentCreated { SchemaId = schemaMatch };
 
-                var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+                var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
-                Assert.False(result);
+                Assert.False(actual);
             });
         }
 
@@ -249,9 +249,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var @event = new ContentCreated { SchemaId = schemaMatch };
 
-                var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+                var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
-                Assert.True(result);
+                Assert.True(actual);
             });
         }
 
@@ -262,9 +262,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var @event = new ContentCreated { SchemaId = schemaMatch };
 
-                var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+                var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
-                Assert.True(result);
+                Assert.True(actual);
             });
         }
 
@@ -275,9 +275,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var @event = new ContentCreated { SchemaId = schemaMatch };
 
-                var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+                var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
-                Assert.False(result);
+                Assert.False(actual);
             });
         }
 
@@ -288,9 +288,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var @event = new EnrichedContentEvent { SchemaId = schemaMatch };
 
-                var result = sut.Trigger(@event, ctx);
+                var actual = sut.Trigger(@event, ctx);
 
-                Assert.False(result);
+                Assert.False(actual);
             });
         }
 
@@ -301,9 +301,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var @event = new EnrichedContentEvent { SchemaId = schemaMatch };
 
-                var result = sut.Trigger(@event, ctx);
+                var actual = sut.Trigger(@event, ctx);
 
-                Assert.True(result);
+                Assert.True(actual);
             });
         }
 
@@ -314,9 +314,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var @event = new EnrichedContentEvent { SchemaId = schemaMatch };
 
-                var result = sut.Trigger(@event, ctx);
+                var actual = sut.Trigger(@event, ctx);
 
-                Assert.True(result);
+                Assert.True(actual);
             });
         }
 
@@ -327,9 +327,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var @event = new EnrichedContentEvent { SchemaId = schemaMatch };
 
-                var result = sut.Trigger(@event, ctx);
+                var actual = sut.Trigger(@event, ctx);
 
-                Assert.True(result);
+                Assert.True(actual);
             });
         }
 
@@ -340,9 +340,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var @event = new EnrichedContentEvent { SchemaId = schemaMatch };
 
-                var result = sut.Trigger(@event, ctx);
+                var actual = sut.Trigger(@event, ctx);
 
-                Assert.False(result);
+                Assert.False(actual);
             });
         }
 
@@ -353,9 +353,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var @event = new EnrichedContentEvent { SchemaId = schemaMatch };
 
-                var result = sut.Trigger(@event, ctx);
+                var actual = sut.Trigger(@event, ctx);
 
-                Assert.False(result);
+                Assert.False(actual);
             });
         }
 

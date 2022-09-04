@@ -58,9 +58,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetBySlugAsync(appId.Id, "slug", A<CancellationToken>._))
                 .Returns(asset);
 
-            var result = await sut.FindBySlugAsync(requestContext, "slug", ct);
+            var actual = await sut.FindBySlugAsync(requestContext, "slug", ct);
 
-            AssertAsset(asset, result);
+            AssertAsset(asset, actual);
         }
 
         [Fact]
@@ -71,9 +71,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetBySlugAsync(appId.Id, "slug", A<CancellationToken>._))
                 .Returns(Task.FromResult<IAssetEntity?>(null));
 
-            var result = await sut.FindBySlugAsync(requestContext, "slug", ct);
+            var actual = await sut.FindBySlugAsync(requestContext, "slug", ct);
 
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
@@ -84,9 +84,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetAsync(appId.Id, asset.Id, A<CancellationToken>._))
                 .Returns(asset);
 
-            var result = await sut.FindAsync(requestContext, asset.Id, ct: ct);
+            var actual = await sut.FindAsync(requestContext, asset.Id, ct: ct);
 
-            AssertAsset(asset, result);
+            AssertAsset(asset, actual);
         }
 
         [Fact]
@@ -97,9 +97,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetAsync(appId.Id, asset.Id, A<CancellationToken>._))
                 .Returns(Task.FromResult<IAssetEntity?>(null));
 
-            var result = await sut.FindAsync(requestContext, asset.Id, ct: ct);
+            var actual = await sut.FindAsync(requestContext, asset.Id, ct: ct);
 
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
@@ -110,9 +110,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetLoader.GetAsync(appId.Id, asset.Id, 2, A<CancellationToken>._))
                 .Returns(asset);
 
-            var result = await sut.FindAsync(requestContext, asset.Id, 2, ct);
+            var actual = await sut.FindAsync(requestContext, asset.Id, 2, ct);
 
-            AssertAsset(asset, result);
+            AssertAsset(asset, actual);
         }
 
         [Fact]
@@ -123,9 +123,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetLoader.GetAsync(appId.Id, asset.Id, 2, A<CancellationToken>._))
                 .Returns(Task.FromResult<IAssetEntity?>(null));
 
-            var result = await sut.FindAsync(requestContext, asset.Id, 2, ct);
+            var actual = await sut.FindAsync(requestContext, asset.Id, 2, ct);
 
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
@@ -136,9 +136,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetAsync(asset.Id, A<CancellationToken>._))
                 .Returns(asset);
 
-            var result = await sut.FindGlobalAsync(requestContext, asset.Id, ct);
+            var actual = await sut.FindGlobalAsync(requestContext, asset.Id, ct);
 
-            AssertAsset(asset, result);
+            AssertAsset(asset, actual);
         }
 
         [Fact]
@@ -149,9 +149,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetAsync(asset.Id, A<CancellationToken>._))
                 .Returns(Task.FromResult<IAssetEntity?>(null));
 
-            var result = await sut.FindGlobalAsync(requestContext, asset.Id, ct);
+            var actual = await sut.FindGlobalAsync(requestContext, asset.Id, ct);
 
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
@@ -162,9 +162,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetByHashAsync(appId.Id, "hash", "name", 123, A<CancellationToken>._))
                 .Returns(asset);
 
-            var result = await sut.FindByHashAsync(requestContext, "hash", "name", 123, ct);
+            var actual = await sut.FindByHashAsync(requestContext, "hash", "name", 123, ct);
 
-            AssertAsset(asset, result);
+            AssertAsset(asset, actual);
         }
 
         [Fact]
@@ -175,9 +175,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.FindAssetByHashAsync(appId.Id, "hash", "name", 123, A<CancellationToken>._))
                 .Returns(Task.FromResult<IAssetEntity?>(null));
 
-            var result = await sut.FindByHashAsync(requestContext, "hash", "name", 123, ct);
+            var actual = await sut.FindByHashAsync(requestContext, "hash", "name", 123, ct);
 
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
@@ -193,12 +193,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetRepository.QueryAsync(appId.Id, parentId, q, A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(8, asset1, asset2));
 
-            var result = await sut.QueryAsync(requestContext, parentId, q, ct);
+            var actual = await sut.QueryAsync(requestContext, parentId, q, ct);
 
-            Assert.Equal(8, result.Total);
+            Assert.Equal(8, actual.Total);
 
-            AssertAsset(asset1, result[0]);
-            AssertAsset(asset2, result[1]);
+            AssertAsset(asset1, actual[0]);
+            AssertAsset(asset2, actual[1]);
         }
 
         [Fact]
@@ -211,9 +211,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetFolderRepository.QueryAsync(appId.Id, parentId, A<CancellationToken>._))
                 .Returns(assetFolders);
 
-            var result = await sut.QueryAssetFoldersAsync(requestContext, parentId, ct);
+            var actual = await sut.QueryAssetFoldersAsync(requestContext, parentId, ct);
 
-            Assert.Same(assetFolders, result);
+            Assert.Same(assetFolders, actual);
         }
 
         [Fact]
@@ -226,9 +226,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetFolderRepository.QueryAsync(appId.Id, parentId, A<CancellationToken>._))
                 .Returns(assetFolders);
 
-            var result = await sut.QueryAssetFoldersAsync(appId.Id, parentId, ct);
+            var actual = await sut.QueryAssetFoldersAsync(appId.Id, parentId, ct);
 
-            Assert.Same(assetFolders, result);
+            Assert.Same(assetFolders, actual);
         }
 
         [Fact]
@@ -240,9 +240,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId1, A<CancellationToken>._))
                 .Returns(folder1);
 
-            var result = await sut.FindAssetFolderAsync(appId.Id, folderId1, ct);
+            var actual = await sut.FindAssetFolderAsync(appId.Id, folderId1, ct);
 
-            Assert.Equal(result, new[] { folder1 });
+            Assert.Equal(actual, new[] { folder1 });
         }
 
         [Fact]
@@ -265,9 +265,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId3, A<CancellationToken>._))
                 .Returns(folder3);
 
-            var result = await sut.FindAssetFolderAsync(appId.Id, folderId3, ct);
+            var actual = await sut.FindAssetFolderAsync(appId.Id, folderId3, ct);
 
-            Assert.Equal(result, new[] { folder1, folder2, folder3 });
+            Assert.Equal(actual, new[] { folder1, folder2, folder3 });
         }
 
         [Fact]
@@ -278,9 +278,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId1, A<CancellationToken>._))
                 .Returns(Task.FromResult<IAssetFolderEntity?>(null));
 
-            var result = await sut.FindAssetFolderAsync(appId.Id, folderId1, ct);
+            var actual = await sut.FindAssetFolderAsync(appId.Id, folderId1, ct);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -298,9 +298,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId2, A<CancellationToken>._))
                 .Returns(folder2);
 
-            var result = await sut.FindAssetFolderAsync(appId.Id, folderId2, ct);
+            var actual = await sut.FindAssetFolderAsync(appId.Id, folderId2, ct);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -318,16 +318,16 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId2, A<CancellationToken>._))
                 .Returns(folder2);
 
-            var result = await sut.FindAssetFolderAsync(appId.Id, folderId2, ct);
+            var actual = await sut.FindAssetFolderAsync(appId.Id, folderId2, ct);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
-        private static void AssertAsset(IAssetEntity source, IEnrichedAssetEntity? result)
+        private static void AssertAsset(IAssetEntity source, IEnrichedAssetEntity? actual)
         {
-            Assert.NotNull(result);
-            Assert.NotSame(source, result);
-            Assert.Equal(source.AssetId, result?.AssetId);
+            Assert.NotNull(actual);
+            Assert.NotSame(source, actual);
+            Assert.Equal(source.AssetId, actual?.AssetId);
         }
 
         private static IAssetFolderEntity CreateFolder(DomainId id, DomainId parentId = default)

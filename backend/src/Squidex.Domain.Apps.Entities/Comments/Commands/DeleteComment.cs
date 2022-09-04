@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Comments.Commands
 {
-    public sealed class DeleteComment : CommentsCommand
+    public sealed class DeleteComment : CommentCommand
     {
     }
 }

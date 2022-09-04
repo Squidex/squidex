@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class ChangeCategory : SchemaUpdateCommand
+    public sealed class ChangeCategory : SchemaCommand
     {
         public string? Name { get; set; }
     }

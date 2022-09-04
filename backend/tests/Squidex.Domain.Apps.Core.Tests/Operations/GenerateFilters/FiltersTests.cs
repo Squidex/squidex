@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateFilters
 
         private static HashSet<string> AllPropertyNames(FilterSchema schema)
         {
-            var result = new HashSet<string>();
+            var actual = new HashSet<string>();
 
             void AddProperties(FilterSchema current)
             {
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateFilters
 
                 foreach (var field in current.Fields.OrEmpty())
                 {
-                    result.Add(field.Path);
+                    actual.Add(field.Path);
 
                     AddProperties(field.Schema);
                 }
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateFilters
 
             AddProperties(schema);
 
-            return result;
+            return actual;
         }
     }
 }

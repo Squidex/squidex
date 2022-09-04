@@ -66,9 +66,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             using (var reader = new BsonBinaryReader(stream))
             {
-                var result = BsonSerializer.Deserialize<T>(reader);
+                var actual = BsonSerializer.Deserialize<T>(reader);
 
-                return result;
+                return actual;
             }
         }
     }

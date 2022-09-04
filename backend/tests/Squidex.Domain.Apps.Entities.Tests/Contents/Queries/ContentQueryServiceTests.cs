@@ -80,9 +80,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, true, ct))
                 .Returns(schema);
 
-            var result = await sut.GetSchemaOrThrowAsync(requestContext, input, ct);
+            var actual = await sut.GetSchemaOrThrowAsync(requestContext, input, ct);
 
-            Assert.Equal(schema, result);
+            Assert.Equal(schema, actual);
         }
 
         [Fact]
@@ -95,9 +95,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, true, ct))
                 .Returns(schema);
 
-            var result = await sut.GetSchemaOrThrowAsync(requestContext, input, ct);
+            var actual = await sut.GetSchemaOrThrowAsync(requestContext, input, ct);
 
-            Assert.Equal(schema, result);
+            Assert.Equal(schema, actual);
         }
 
         [Fact]
@@ -134,9 +134,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentRepository.FindContentAsync(requestContext.App, schema, content.Id, A<SearchScope>._, A<CancellationToken>._))
                 .Returns<IContentEntity?>(null);
 
-            var result = await sut.FindAsync(requestContext, schemaId.Name, content.Id, ct: ct);
+            var actual = await sut.FindAsync(requestContext, schemaId.Name, content.Id, ct: ct);
 
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
@@ -149,9 +149,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentRepository.FindContentAsync(requestContext.App, schema, schema.Id, SearchScope.Published, A<CancellationToken>._))
                 .Returns(content);
 
-            var result = await sut.FindAsync(requestContext, schemaId.Name, DomainId.Create("_schemaId_"), ct: ct);
+            var actual = await sut.FindAsync(requestContext, schemaId.Name, DomainId.Create("_schemaId_"), ct: ct);
 
-            AssertContent(content, result);
+            AssertContent(content, actual);
         }
 
         [Theory]
@@ -168,9 +168,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentRepository.FindContentAsync(requestContext.App, schema, content.Id, scope, A<CancellationToken>._))
                 .Returns(content);
 
-            var result = await sut.FindAsync(requestContext, schemaId.Name, content.Id, ct: ct);
+            var actual = await sut.FindAsync(requestContext, schemaId.Name, content.Id, ct: ct);
 
-            AssertContent(content, result);
+            AssertContent(content, actual);
         }
 
         [Fact]
@@ -183,9 +183,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentVersionLoader.GetAsync(appId.Id, content.Id, 13, A<CancellationToken>._))
                 .Returns(content);
 
-            var result = await sut.FindAsync(requestContext, schemaId.Name, content.Id, 13, ct);
+            var actual = await sut.FindAsync(requestContext, schemaId.Name, content.Id, 13, ct);
 
-            AssertContent(content, result);
+            AssertContent(content, actual);
         }
 
         [Fact]
@@ -213,12 +213,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentRepository.QueryAsync(requestContext.App, schema, q, scope, A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(5, content1, content2));
 
-            var result = await sut.QueryAsync(requestContext, schemaId.Name, q, ct);
+            var actual = await sut.QueryAsync(requestContext, schemaId.Name, q, ct);
 
-            Assert.Equal(5, result.Total);
+            Assert.Equal(5, actual.Total);
 
-            AssertContent(content1, result[0]);
-            AssertContent(content2, result[1]);
+            AssertContent(content1, actual[0]);
+            AssertContent(content2, actual[1]);
         }
 
         [Theory]
@@ -241,13 +241,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     A<CancellationToken>._))
                 .Returns(ResultList.Create(5, contents));
 
-            var result = await sut.QueryAsync(requestContext, q, ct);
+            var actual = await sut.QueryAsync(requestContext, q, ct);
 
-            Assert.Equal(5, result.Total);
+            Assert.Equal(5, actual.Total);
 
             for (var i = 0; i < contents.Count; i++)
             {
-                AssertContent(contents[i], result[i]);
+                AssertContent(contents[i], actual[i]);
             }
         }
 
@@ -265,9 +265,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     A<CancellationToken>._))
                 .Returns(ResultList.Create(0, ids.Select(CreateContent)));
 
-            var result = await sut.QueryAsync(requestContext, q, ct);
+            var actual = await sut.QueryAsync(requestContext, q, ct);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -278,7 +278,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             await sut.QueryAsync(requestContext, schemaId.Name, Q.Empty, ct);
 
             A.CallTo(() => contentRepository.QueryAsync(requestContext.App, schema,
-                    A<Q>.That.Matches(x => Equals(x.CreatedBy, requestContext.User.Token())), SearchScope.Published, A
+                    A<Q>.That.Matches(x => Equals(x.CreatedBy, requestContext.UserPrincipal.Token())), SearchScope.Published, A
                     <CancellationToken>._))
                 .MustHaveHappened();
         }
@@ -333,12 +333,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return new Context(claimsPrincipal, Mocks.App(appId)).Clone(b => b.WithUnpublished(isUnpublished == 1));
         }
 
-        private static void AssertContent(IContentEntity source, IEnrichedContentEntity? result)
+        private static void AssertContent(IContentEntity source, IEnrichedContentEntity? actual)
         {
-            Assert.NotNull(result);
-            Assert.NotSame(source, result);
-            Assert.Same(source.Data, result?.Data);
-            Assert.Equal(source.Id, result?.Id);
+            Assert.NotNull(actual);
+            Assert.NotSame(source, actual);
+            Assert.Same(source.Data, actual?.Data);
+            Assert.Equal(source.Id, actual?.Id);
         }
 
         private IContentEntity CreateContent(DomainId id)

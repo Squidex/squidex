@@ -332,8 +332,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             Assert.Equal(new HashSet<DomainId>
             {
-                DomainId.Combine(appId.Id, assetId1),
-                DomainId.Combine(appId.Id, assetId2)
+                DomainId.Combine(appId, assetId1),
+                DomainId.Combine(appId, assetId2)
             }, rebuildAssets);
         }
 
@@ -369,8 +369,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             Assert.Equal(new HashSet<DomainId>
             {
-                DomainId.Combine(appId.Id, assetFolderId1),
-                DomainId.Combine(appId.Id, assetFolderId2)
+                DomainId.Combine(appId, assetFolderId1),
+                DomainId.Combine(appId, assetFolderId2)
             }, rebuildAssetFolders);
         }
 
@@ -388,14 +388,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             @event.AppId = appId;
 
-            return Envelope.Create(@event).SetAggregateId(DomainId.Combine(appId.Id, @event.AssetId));
+            return Envelope.Create(@event).SetAggregateId(DomainId.Combine(appId, @event.AssetId));
         }
 
         private Envelope<AssetFolderEvent> AppEvent(AssetFolderEvent @event)
         {
             @event.AppId = appId;
 
-            return Envelope.Create(@event).SetAggregateId(DomainId.Combine(appId.Id, @event.AssetFolderId));
+            return Envelope.Create(@event).SetAggregateId(DomainId.Combine(appId, @event.AssetFolderId));
         }
 
         private IUserMapping CreateUserMapping()

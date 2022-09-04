@@ -187,26 +187,26 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
 
         public static TEvent CreateEvent<TEvent>(Action<TEvent>? init = null) where TEvent : IEvent, new()
         {
-            var result = new TEvent();
+            var actual = new TEvent();
 
-            if (result is SquidexEvent squidexEvent)
+            if (actual is SquidexEvent squidexEvent)
             {
                 squidexEvent.Actor = RefToken.Client("my-client");
             }
 
-            if (result is AppEvent appEvent)
+            if (actual is AppEvent appEvent)
             {
                 appEvent.AppId = NamedId.Of(DomainId.NewGuid(), "my-app");
             }
 
-            if (result is SchemaEvent schemaEvent)
+            if (actual is SchemaEvent schemaEvent)
             {
                 schemaEvent.SchemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
             }
 
-            init?.Invoke(result);
+            init?.Invoke(actual);
 
-            return result;
+            return actual;
         }
     }
 }

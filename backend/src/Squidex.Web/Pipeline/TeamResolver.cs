@@ -64,7 +64,7 @@ namespace Squidex.Web.Pipeline
                     identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, PermissionIds.ForApp(PermissionIds.TeamAdmin, team: team.Id.ToString()).Id));
                 }
 
-                var requestContext = context.HttpContext.Features.Get<Context>()!;
+                var requestContext = new Context(context.HttpContext.User, null!).WithHeaders(context.HttpContext);
 
                 if (!AllowAnonymous(context) && !HasPermission(team.Id, requestContext))
                 {
@@ -84,6 +84,7 @@ namespace Squidex.Web.Pipeline
                     return;
                 }
 
+                context.HttpContext.Features.Set(requestContext);
                 context.HttpContext.Features.Set<ITeamFeature>(new TeamFeature(team));
                 context.HttpContext.Response.Headers.Add("X-TeamId", team.Id.ToString());
             }

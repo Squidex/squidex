@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Should_not_invoke_enricher_for_other_result()
+        public async Task Should_not_invoke_enricher_for_other_actual()
         {
             await HandleAsync(new CreateContent(), 12);
 
@@ -60,36 +60,36 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         [Fact]
         public async Task Should_not_invoke_enricher_if_already_enriched()
         {
-            var result = new ContentEntity();
+            var actual = new ContentEntity();
 
             var context =
                 await HandleAsync(new CreateContent(),
-                    result);
+                    actual);
 
-            Assert.Same(result, context.Result<IEnrichedContentEntity>());
+            Assert.Same(actual, context.Result<IEnrichedContentEntity>());
 
             A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, A<bool>._, requestContext, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task Should_enrich_content_result()
+        public async Task Should_enrich_content_actual()
         {
-            var result = A.Fake<IContentEntity>();
+            var actual = A.Fake<IContentEntity>();
 
             var enriched = new ContentEntity();
 
-            A.CallTo(() => contentEnricher.EnrichAsync(result, true, requestContext, A<CancellationToken>._))
+            A.CallTo(() => contentEnricher.EnrichAsync(actual, true, requestContext, A<CancellationToken>._))
                 .Returns(enriched);
 
             var context =
                 await HandleAsync(new CreateContent(),
-                    result);
+                    actual);
 
             Assert.Same(enriched, context.Result<IEnrichedContentEntity>());
         }
 
-        private Task<CommandContext> HandleAsync(ContentCommand command, object result)
+        private Task<CommandContext> HandleAsync(ContentCommand command, object actual)
         {
             command.ContentId = contentId;
 
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             var domainObject = A.Fake<ContentDomainObject>();
 
             A.CallTo(() => domainObject.ExecuteAsync(A<IAggregateCommand>._, A<CancellationToken>._))
-                .Returns(new CommandResult(command.AggregateId, 1, 0, result));
+                .Returns(new CommandResult(command.AggregateId, 1, 0, actual));
 
             A.CallTo(() => domainObjectFactory.Create<ContentDomainObject>(command.AggregateId))
                 .Returns(domainObject);

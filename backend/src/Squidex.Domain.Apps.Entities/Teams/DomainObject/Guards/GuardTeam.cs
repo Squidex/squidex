@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Billing;
+using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
-using Squidex.Domain.Apps.Entities.Teams.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Teams.DomainObject.Guards
 {

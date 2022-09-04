@@ -47,25 +47,25 @@ namespace Squidex.Domain.Apps.Entities.Billing
         [Fact]
         public async Task Should_not_return_portal_link()
         {
-            var result = await sut.GetPortalLinkAsync(null!);
+            var actual = await sut.GetPortalLinkAsync(null!);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
         public async Task Should_do_nothing_if_checking_for_redirect()
         {
-            var result = await sut.MustRedirectToPortalAsync(null!, null!, null);
+            var actual = await sut.MustRedirectToPortalAsync(null!, null!, null);
 
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
         public async Task Should_do_nothing_if_checking_for_redirect_for_team()
         {
-            var result = await sut.MustRedirectToPortalAsync(null!, default(DomainId), null);
+            var actual = await sut.MustRedirectToPortalAsync(null!, default(DomainId), null);
 
-            Assert.Null(result);
+            Assert.Null(actual);
         }
     }
 }

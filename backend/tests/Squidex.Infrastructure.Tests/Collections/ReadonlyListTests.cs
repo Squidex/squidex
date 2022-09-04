@@ -23,25 +23,25 @@ namespace Squidex.Infrastructure.Collections
         [Fact]
         public void Should_return_empty_instance_for_empty_array()
         {
-            var result = ReadonlyList.Create<int>();
+            var actual = ReadonlyList.Create<int>();
 
-            Assert.Same(ReadonlyList.Empty<int>(), result);
+            Assert.Same(ReadonlyList.Empty<int>(), actual);
         }
 
         [Fact]
         public void Should_return_empty_instance_for_null_array()
         {
-            var result = ReadonlyList.Create((int[]?)null);
+            var actual = ReadonlyList.Create((int[]?)null);
 
-            Assert.Same(ReadonlyList.Empty<int>(), result);
+            Assert.Same(ReadonlyList.Empty<int>(), actual);
         }
 
         [Fact]
         public void Should_return_empty_instance_for_empty_enumerable()
         {
-            var result = Enumerable.Empty<int>().ToReadonlyList();
+            var actual = Enumerable.Empty<int>().ToReadonlyList();
 
-            Assert.Same(ReadonlyList.Empty<int>(), result);
+            Assert.Same(ReadonlyList.Empty<int>(), actual);
         }
 
         [Fact]

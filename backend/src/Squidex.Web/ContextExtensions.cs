@@ -18,12 +18,26 @@ namespace Squidex.Web
 
             if (context == null)
             {
-                context = RequestContext.Anonymous(null!);
+                context = new RequestContext(httpContext.User, null).WithHeaders(httpContext);
 
                 httpContext.Features.Set(context);
             }
 
             return context;
+        }
+
+        public static RequestContext WithHeaders(this RequestContext context, HttpContext httpContext)
+        {
+            return context.Clone(builder =>
+            {
+                foreach (var (key, value) in httpContext.Request.Headers)
+                {
+                    if (key.StartsWith("X-", StringComparison.OrdinalIgnoreCase))
+                    {
+                        builder.SetHeader(key, value.ToString());
+                    }
+                }
+            });
         }
     }
 }

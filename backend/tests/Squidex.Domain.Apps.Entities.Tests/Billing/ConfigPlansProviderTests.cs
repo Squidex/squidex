@@ -63,9 +63,9 @@ namespace Squidex.Domain.Apps.Entities.Billing
         {
             var sut = new ConfigPlansProvider(Enumerable.Empty<Plan>());
 
-            var result = sut.GetActualPlan(planId);
+            var actual = sut.GetActualPlan(planId);
 
-            result.Should().BeEquivalentTo((InfinitePlan, "infinite"));
+            actual.Should().BeEquivalentTo((InfinitePlan, "infinite"));
         }
 
         [Fact]
@@ -93,9 +93,9 @@ namespace Squidex.Domain.Apps.Entities.Billing
         {
             var sut = new ConfigPlansProvider(Plans);
 
-            var result = sut.GetActualPlan("basic");
+            var actual = sut.GetActualPlan("basic");
 
-            result.Should().BeEquivalentTo((BasicPlan, "basic"));
+            actual.Should().BeEquivalentTo((BasicPlan, "basic"));
         }
 
         [Fact]
@@ -103,9 +103,9 @@ namespace Squidex.Domain.Apps.Entities.Billing
         {
             var sut = new ConfigPlansProvider(Plans);
 
-            var result = sut.GetActualPlan("basic_yearly");
+            var actual = sut.GetActualPlan("basic_yearly");
 
-            result.Should().BeEquivalentTo((BasicPlan, "basic_yearly"));
+            actual.Should().BeEquivalentTo((BasicPlan, "basic_yearly"));
         }
 
         [Fact]
@@ -113,9 +113,9 @@ namespace Squidex.Domain.Apps.Entities.Billing
         {
             var sut = new ConfigPlansProvider(Plans);
 
-            var result = sut.GetActualPlan("enterprise");
+            var actual = sut.GetActualPlan("enterprise");
 
-            result.Should().BeEquivalentTo((FreePlan, "free"));
+            actual.Should().BeEquivalentTo((FreePlan, "free"));
         }
 
         [Fact]

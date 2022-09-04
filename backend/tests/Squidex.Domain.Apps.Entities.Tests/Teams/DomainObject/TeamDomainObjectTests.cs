@@ -76,9 +76,9 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
         {
             var command = new CreateTeam { Name = name };
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(name, sut.Snapshot.Name);
 
@@ -94,9 +94,9 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
         {
             var command = new CreateTeam { Name = name, Actor = ActorClient };
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(name, sut.Snapshot.Name);
 
@@ -113,9 +113,9 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.Name, sut.Snapshot.Name);
 
@@ -135,9 +135,9 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id));
+            actual.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id));
 
             Assert.Equal(planPaid.Id, sut.Snapshot.Plan!.PlanId);
 
@@ -160,9 +160,9 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id));
+            actual.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id));
 
             Assert.Equal(planPaid.Id, sut.Snapshot.Plan!.PlanId);
 
@@ -186,9 +186,9 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
             await ExecuteCreateAsync();
             await ExecuteChangePlanAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planFree.Id, true));
+            actual.ShouldBeEquivalent(new PlanChangedResult(planFree.Id, true));
 
             Assert.Null(sut.Snapshot.Plan);
 
@@ -212,9 +212,9 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
             await ExecuteCreateAsync();
             await ExecuteChangePlanAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planFree.Id, true));
+            actual.ShouldBeEquivalent(new PlanChangedResult(planFree.Id, true));
 
             Assert.Null(sut.Snapshot.Plan);
 
@@ -231,7 +231,7 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
         }
 
         [Fact]
-        public async Task ChangePlan_should_not_make_update_for_redirect_result()
+        public async Task ChangePlan_should_not_make_update_for_redirect_actual()
         {
             var command = new ChangePlan { PlanId = planPaid.Id };
 
@@ -240,9 +240,9 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id, false, new Uri("http://squidex.io")));
+            actual.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id, false, new Uri("http://squidex.io")));
 
             Assert.Null(sut.Snapshot.Plan);
         }
@@ -254,9 +254,9 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id));
+            actual.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id));
 
             Assert.Equal(planPaid.Id, sut.Snapshot.Plan?.PlanId);
 
@@ -274,9 +274,9 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.Role, sut.Snapshot.Contributors[contributorId]);
 
@@ -294,9 +294,9 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
             await ExecuteCreateAsync();
             await ExecuteAssignContributorAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.False(sut.Snapshot.Contributors.ContainsKey(contributorId));
 
@@ -342,9 +342,9 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
         private async Task<object> PublishAsync(TeamCommand command)
         {
-            var result = await sut.ExecuteAsync(CreateTeamCommand(command), default);
+            var actual = await sut.ExecuteAsync(CreateTeamCommand(command), default);
 
-            return result.Payload;
+            return actual.Payload;
         }
     }
 }

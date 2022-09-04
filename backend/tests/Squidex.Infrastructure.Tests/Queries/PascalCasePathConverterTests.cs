@@ -15,18 +15,18 @@ namespace Squidex.Infrastructure.Queries
         public void Should_convert_property()
         {
             var source = ClrFilter.Eq("property", 1);
-            var result = PascalCasePathConverter<ClrValue>.Transform(source);
+            var actual = PascalCasePathConverter<ClrValue>.Transform(source);
 
-            Assert.Equal("Property == 1", result!.ToString());
+            Assert.Equal("Property == 1", actual!.ToString());
         }
 
         [Fact]
         public void Should_convert_properties()
         {
             var source = ClrFilter.Eq("root.child", 1);
-            var result = PascalCasePathConverter<ClrValue>.Transform(source);
+            var actual = PascalCasePathConverter<ClrValue>.Transform(source);
 
-            Assert.Equal("Root.Child == 1", result!.ToString());
+            Assert.Equal("Root.Child == 1", actual!.ToString());
         }
     }
 }

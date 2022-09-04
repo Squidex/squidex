@@ -40,9 +40,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 {
                     yield return new ReferencesValidator(references.Properties.IsRequired, references.Properties, ids =>
                     {
-                        var result = ids.Select(x => new ContentIdStatus(schemaId, x, Status.Published)).ToList();
+                        var actual = ids.Select(x => new ContentIdStatus(schemaId, x, Status.Published)).ToList();
 
-                        return Task.FromResult<IReadOnlyList<ContentIdStatus>>(result);
+                        return Task.FromResult<IReadOnlyList<ContentIdStatus>>(actual);
                     });
                 }
             }

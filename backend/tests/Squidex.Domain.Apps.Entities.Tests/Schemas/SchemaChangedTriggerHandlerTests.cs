@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Schemas;
@@ -73,9 +72,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+            var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
-            var enrichedEvent = result.Single() as EnrichedSchemaEvent;
+            var enrichedEvent = actual.Single() as EnrichedSchemaEvent;
 
             Assert.Equal(type, enrichedEvent!.Type);
             Assert.Equal(@event.Actor, enrichedEvent.Actor);
@@ -92,9 +91,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             {
                 var @event = new SchemaCreated();
 
-                var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+                var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
-                Assert.True(result);
+                Assert.True(actual);
             });
         }
 
@@ -105,9 +104,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             {
                 var @event = new EnrichedSchemaEvent();
 
-                var result = sut.Trigger(@event, ctx);
+                var actual = sut.Trigger(@event, ctx);
 
-                Assert.True(result);
+                Assert.True(actual);
             });
         }
 
@@ -118,9 +117,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             {
                 var @event = new EnrichedSchemaEvent();
 
-                var result = sut.Trigger(@event, ctx);
+                var actual = sut.Trigger(@event, ctx);
 
-                Assert.True(result);
+                Assert.True(actual);
             });
         }
 
@@ -131,9 +130,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             {
                 var @event = new EnrichedSchemaEvent();
 
-                var result = sut.Trigger(@event, ctx);
+                var actual = sut.Trigger(@event, ctx);
 
-                Assert.False(result);
+                Assert.False(actual);
             });
         }
 

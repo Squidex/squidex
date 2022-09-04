@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await _.ContentRepository.QueryIdsAsync(_.RandomAppId(), _.RandomSchemaId(), filter);
 
-            // We have a concrete query, so we expect an result.
+            // We have a concrete query, so we expect an actual.
             Assert.NotEmpty(contents);
         }
 
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(_.ContentRepository, query, 1000, 0);
 
-            // We have a concrete query, so we expect an result.
+            // We have a concrete query, so we expect an actual.
             Assert.NotEmpty(contents);
         }
 
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(_.ContentRepository, query);
 
-            // We have a concrete query, so we expect an result.
+            // We have a concrete query, so we expect an actual.
             Assert.NotEmpty(contents);
         }
 
@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(_.ContentRepository, query, 1000, 9000);
 
-            // We have a concrete query, so we expect an result.
+            // We have a concrete query, so we expect an actual.
             Assert.NotEmpty(contents);
         }
 
@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(_.ContentRepository, query);
 
-            // The full text is resolved by another system, so we cannot verify the result.
+            // The full text is resolved by another system, so we cannot verify the actual.
             Assert.NotNull(contents);
         }
 
@@ -182,7 +182,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(_.ContentRepository, query, 1000, 0);
 
-            // We have a concrete query, so we expect an result.
+            // We have a concrete query, so we expect an actual.
             Assert.NotEmpty(contents);
         }
 
@@ -196,7 +196,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var contents = await QueryAsync(_.ContentRepository, query, 1000, 0, reference: DomainId.NewGuid());
 
-            // We do not insert test entities with references, so we cannot verify the result.
+            // We do not insert test entities with references, so we cannot verify the actual.
             Assert.Empty(contents);
         }
 

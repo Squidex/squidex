@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class ConfigureScripts : SchemaUpdateCommand
+    public sealed class ConfigureScripts : SchemaCommand
     {
         public SchemaScripts? Scripts { get; set; }
     }

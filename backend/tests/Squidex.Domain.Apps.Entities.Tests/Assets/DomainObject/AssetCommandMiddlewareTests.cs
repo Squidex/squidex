@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
-        public async Task Should_not_invoke_enricher_for_other_result()
+        public async Task Should_not_invoke_enricher_for_other_actual()
         {
             await HandleAsync(new AnnotateAsset(), 12);
 
@@ -75,29 +75,29 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Should_not_invoke_enricher_if_already_enriched()
         {
-            var result = new AssetEntity();
+            var actual = new AssetEntity();
 
             var context =
                 await HandleAsync(new AnnotateAsset(),
-                    result);
+                    actual);
 
             A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>._, requestContext, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task Should_enrich_asset_result()
+        public async Task Should_enrich_asset_actual()
         {
-            var result = A.Fake<IAssetEntity>();
+            var actual = A.Fake<IAssetEntity>();
 
             var enriched = new AssetEntity();
 
-            A.CallTo(() => assetEnricher.EnrichAsync(result, requestContext, ct))
+            A.CallTo(() => assetEnricher.EnrichAsync(actual, requestContext, ct))
                 .Returns(enriched);
 
             var context =
                 await HandleAsync(new AnnotateAsset(),
-                    result);
+                    actual);
 
             Assert.Same(enriched, context.Result<IEnrichedAssetEntity>());
         }
@@ -105,13 +105,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Create_should_upload_file()
         {
-            var result = CreateAsset();
+            var actual = CreateAsset();
 
             var context =
                 await HandleAsync(new CreateAsset { File = file },
-                    result);
+                    actual);
 
-            Assert.Same(result, context.Result<IEnrichedAssetEntity>());
+            Assert.Same(actual, context.Result<IEnrichedAssetEntity>());
 
             AssertAssetHasBeenUploaded(0);
             AssertMetadataEnriched();
@@ -128,21 +128,21 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
-        public async Task Create_should_not_return_duplicate_result_if_file_with_same_hash_found_but_duplicate_allowed()
+        public async Task Create_should_not_return_duplicate_actual_if_file_with_same_hash_found_but_duplicate_allowed()
         {
-            var result = CreateAsset();
+            var actual = CreateAsset();
 
             SetupSameHashAsset(file.FileName, file.FileSize, out _);
 
             var context =
                 await HandleAsync(new CreateAsset { File = file, Duplicate = true },
-                    result);
+                    actual);
 
-            Assert.Same(result, context.Result<IEnrichedAssetEntity>());
+            Assert.Same(actual, context.Result<IEnrichedAssetEntity>());
         }
 
         [Fact]
-        public async Task Create_should_return_duplicate_result_if_file_with_same_hash_found()
+        public async Task Create_should_return_duplicate_actual_if_file_with_same_hash_found()
         {
             SetupSameHashAsset(file.FileName, file.FileSize, out var duplicate);
 
@@ -182,21 +182,21 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
-        public async Task Upsert_should_not_return_duplicate_result_if_file_with_same_hash_found_but_duplicate_allowed()
+        public async Task Upsert_should_not_return_duplicate_actual_if_file_with_same_hash_found_but_duplicate_allowed()
         {
-            var result = CreateAsset();
+            var actual = CreateAsset();
 
             SetupSameHashAsset(file.FileName, file.FileSize, out _);
 
             var context =
                 await HandleAsync(new UpsertAsset { File = file },
-                    result);
+                    actual);
 
-            Assert.Same(result, context.Result<IEnrichedAssetEntity>());
+            Assert.Same(actual, context.Result<IEnrichedAssetEntity>());
         }
 
         [Fact]
-        public async Task Upsert_should_return_duplicate_result_if_file_with_same_hash_found()
+        public async Task Upsert_should_return_duplicate_actual_if_file_with_same_hash_found()
         {
             SetupSameHashAsset(file.FileName, file.FileSize, out var duplicate);
 
@@ -247,7 +247,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 .MustHaveHappened();
         }
 
-        private Task<CommandContext> HandleAsync(AssetCommand command, object result)
+        private Task<CommandContext> HandleAsync(AssetCommand command, object actual)
         {
             command.AssetId = assetId;
 
@@ -256,7 +256,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             var domainObject = A.Fake<AssetDomainObject>();
 
             A.CallTo(() => domainObject.ExecuteAsync(A<IAggregateCommand>._, ct))
-                .Returns(new CommandResult(command.AggregateId, 1, 0, result));
+                .Returns(new CommandResult(command.AggregateId, 1, 0, actual));
 
             A.CallTo(() => domainObjectFactory.Create<AssetDomainObject>(command.AggregateId))
                 .Returns(domainObject);

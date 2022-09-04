@@ -51,9 +51,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
             A.CallTo(() => ruleEnricher.EnrichAsync(original, requestContext, ct))
                 .Returns(enriched);
 
-            var result = await sut.QueryAsync(requestContext, ct);
+            var actual = await sut.QueryAsync(requestContext, ct);
 
-            Assert.Same(enriched, result);
+            Assert.Same(enriched, actual);
         }
     }
 }

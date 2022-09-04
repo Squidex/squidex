@@ -97,9 +97,9 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_write_state_on_update_and_return_when_callback_returns_true()
         {
-            var result = await sut.UpdateAsync(x => (true, 42), ct: ct);
+            var actual = await sut.UpdateAsync(x => (true, 42), ct: ct);
 
-            Assert.Equal(42, result);
+            Assert.Equal(42, actual);
 
             A.CallTo(() => testState.Persistence.WriteSnapshotAsync(sut.Value, ct))
                 .MustHaveHappened();
@@ -108,9 +108,9 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_not_write_state_on_update_and_return_when_callback_returns_false()
         {
-            var result = await sut.UpdateAsync(x => (false, 42), ct: ct);
+            var actual = await sut.UpdateAsync(x => (false, 42), ct: ct);
 
-            Assert.Equal(42, result);
+            Assert.Equal(42, actual);
 
             A.CallTo(() => testState.Persistence.WriteSnapshotAsync(sut.Value, ct))
                 .MustNotHaveHappened();

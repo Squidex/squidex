@@ -48,9 +48,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_describe_content_script()
         {
-            var result = sut.ContentScript(dataSchema);
+            var actual = sut.ContentScript(dataSchema);
 
-            AssertCompletion(result,
+            AssertCompletion(actual,
                 PresetUser("ctx.user"),
                 new[]
                 {
@@ -81,9 +81,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_describe_asset_script()
         {
-            var result = sut.AssetScript();
+            var actual = sut.AssetScript();
 
-            AssertCompletion(result,
+            AssertCompletion(actual,
                 PresetUser("ctx.user"),
                 new[]
                 {
@@ -124,22 +124,22 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_describe_content_trigger()
         {
-            var result = sut.ContentTrigger(dataSchema);
+            var actual = sut.ContentTrigger(dataSchema);
 
-            AssertContentTrigger(result);
+            AssertContentTrigger(actual);
         }
 
         [Fact]
         public void Should_describe_dynamic_content_trigger()
         {
-            var result = sut.Trigger("ContentChanged");
+            var actual = sut.Trigger("ContentChanged");
 
-            AssertContentTrigger(result);
+            AssertContentTrigger(actual);
         }
 
-        private static void AssertContentTrigger(IReadOnlyList<ScriptingValue> result)
+        private static void AssertContentTrigger(IReadOnlyList<ScriptingValue> actual)
         {
-            AssertCompletion(result,
+            AssertCompletion(actual,
                 PresetActor("event.actor"),
                 PresetUser("event.user"),
                 new[]
@@ -178,22 +178,22 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_describe_asset_trigger()
         {
-            var result = sut.AssetTrigger();
+            var actual = sut.AssetTrigger();
 
-            AssertAssetTrigger(result);
+            AssertAssetTrigger(actual);
         }
 
         [Fact]
         public void Should_describe_dynamicasset_trigger()
         {
-            var result = sut.Trigger("AssetChanged");
+            var actual = sut.Trigger("AssetChanged");
 
-            AssertAssetTrigger(result);
+            AssertAssetTrigger(actual);
         }
 
-        private static void AssertAssetTrigger(IReadOnlyList<ScriptingValue> result)
+        private static void AssertAssetTrigger(IReadOnlyList<ScriptingValue> actual)
         {
-            AssertCompletion(result,
+            AssertCompletion(actual,
                 PresetActor("event.actor"),
                 PresetUser("event.user"),
                 new[]
@@ -235,22 +235,22 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_describe_comment_trigger()
         {
-            var result = sut.CommentTrigger();
+            var actual = sut.CommentTrigger();
 
-            AssertCommentTrigger(result);
+            AssertCommentTrigger(actual);
         }
 
         [Fact]
         public void Should_describe_dynamic_comment_trigger()
         {
-            var result = sut.Trigger("Comment");
+            var actual = sut.Trigger("Comment");
 
-            AssertCommentTrigger(result);
+            AssertCommentTrigger(actual);
         }
 
-        private static void AssertCommentTrigger(IReadOnlyList<ScriptingValue> result)
+        private static void AssertCommentTrigger(IReadOnlyList<ScriptingValue> actual)
         {
-            AssertCompletion(result,
+            AssertCompletion(actual,
                 PresetActor("event.actor"),
                 PresetUser("event.user"),
                 PresetUser("event.mentionedUser"),
@@ -270,22 +270,22 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_describe_schema_trigger()
         {
-            var result = sut.SchemaTrigger();
+            var actual = sut.SchemaTrigger();
 
-            AssertSchemaTrigger(result);
+            AssertSchemaTrigger(actual);
         }
 
         [Fact]
         public void Should_describe_dynamic_schema_trigger()
         {
-            var result = sut.Trigger("SchemaChanged");
+            var actual = sut.Trigger("SchemaChanged");
 
-            AssertSchemaTrigger(result);
+            AssertSchemaTrigger(actual);
         }
 
-        private static void AssertSchemaTrigger(IReadOnlyList<ScriptingValue> result)
+        private static void AssertSchemaTrigger(IReadOnlyList<ScriptingValue> actual)
         {
-            AssertCompletion(result,
+            AssertCompletion(actual,
                 PresetActor("event.actor"),
                 PresetUser("event.user"),
                 new[]
@@ -307,22 +307,22 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_describe_usage_trigger()
         {
-            var result = sut.UsageTrigger();
+            var actual = sut.UsageTrigger();
 
-            AssertUsageTrigger(result);
+            AssertUsageTrigger(actual);
         }
 
         [Fact]
         public void Should_describe_dynamic_usage_trigger()
         {
-            var result = sut.Trigger("Usage");
+            var actual = sut.Trigger("Usage");
 
-            AssertUsageTrigger(result);
+            AssertUsageTrigger(actual);
         }
 
-        private static void AssertUsageTrigger(IReadOnlyList<ScriptingValue> result)
+        private static void AssertUsageTrigger(IReadOnlyList<ScriptingValue> actual)
         {
-            AssertCompletion(result,
+            AssertCompletion(actual,
                 new[]
                 {
                     "event",
@@ -337,11 +337,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 });
         }
 
-        private static void AssertCompletion(IReadOnlyList<ScriptingValue> result, params string[][] expected)
+        private static void AssertCompletion(IReadOnlyList<ScriptingValue> actual, params string[][] expected)
         {
             var allExpected = expected.SelectMany(x => x).ToArray();
 
-            var paths = result.Select(x => x.Path).ToArray();
+            var paths = actual.Select(x => x.Path).ToArray();
 
             foreach (var value in paths)
             {

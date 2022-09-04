@@ -200,8 +200,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             Assert.Equal(new HashSet<DomainId>
             {
-                DomainId.Combine(appId.Id, contentId1),
-                DomainId.Combine(appId.Id, contentId2)
+                DomainId.Combine(appId, contentId1),
+                DomainId.Combine(appId, contentId2)
             }, rebuildContents);
         }
 
@@ -209,7 +209,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             @event.AppId = appId;
 
-            return Envelope.Create(@event).SetAggregateId(DomainId.Combine(appId.Id, @event.ContentId));
+            return Envelope.Create(@event).SetAggregateId(DomainId.Combine(appId, @event.ContentId));
         }
     }
 }

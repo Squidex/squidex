@@ -125,9 +125,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 }
             };
 
-            var result = await sut.GetRestoreAsync();
+            var actual = await sut.GetRestoreAsync();
 
-            result.Should().BeEquivalentTo(stateRestore.Snapshot.Job);
+            actual.Should().BeEquivalentTo(stateRestore.Snapshot.Job);
         }
 
         [Fact]
@@ -142,9 +142,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             stateBackup.Snapshot.Jobs.Add(job);
 
-            var result = await sut.GetBackupsAsync(appId);
+            var actual = await sut.GetBackupsAsync(appId);
 
-            result.Should().BeEquivalentTo(stateBackup.Snapshot.Jobs);
+            actual.Should().BeEquivalentTo(stateBackup.Snapshot.Jobs);
         }
 
         [Fact]
@@ -159,9 +159,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             stateBackup.Snapshot.Jobs.Add(job);
 
-            var result = await sut.GetBackupAsync(appId, backupId);
+            var actual = await sut.GetBackupAsync(appId, backupId);
 
-            result.Should().BeEquivalentTo(job);
+            actual.Should().BeEquivalentTo(job);
         }
     }
 }

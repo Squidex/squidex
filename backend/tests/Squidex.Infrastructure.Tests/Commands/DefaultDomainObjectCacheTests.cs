@@ -66,9 +66,9 @@ namespace Squidex.Infrastructure.Commands
                 .Returns(true)
                 .AssignsOutAndRefParameters(20);
 
-            var result = await sut.GetAsync<int>(id, 10, ct);
+            var actual = await sut.GetAsync<int>(id, 10, ct);
 
-            Assert.Equal(20, result);
+            Assert.Equal(20, actual);
         }
 
         [Fact]
@@ -77,9 +77,9 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => serializer.Deserialize<int>(A<Stream>._, null, false))
                 .Returns(20);
 
-            var result = await sut.GetAsync<int>(id, 10, ct);
+            var actual = await sut.GetAsync<int>(id, 10, ct);
 
-            Assert.Equal(20, result);
+            Assert.Equal(20, actual);
 
             A.CallTo(() => distributedCache.GetAsync($"{id}_10", ct))
                 .MustHaveHappened();

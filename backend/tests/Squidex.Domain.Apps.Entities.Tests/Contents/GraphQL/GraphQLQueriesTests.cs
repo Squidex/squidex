@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [InlineData(" ")]
         public async Task Should_return_error_empty_query(string query)
         {
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5&$filter=my-query" && x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, asset));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5&$filter=my-query" && !x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(10, asset));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.HasIdsWithoutTotal(assetId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom<IEnrichedAssetEntity>(1));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -163,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.HasIdsWithoutTotal(assetId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, asset));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -173,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -193,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, content));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -206,7 +206,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -226,7 +226,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, content));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -239,7 +239,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -262,7 +262,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && !x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(10, content));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -279,7 +279,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -298,7 +298,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom<IEnrichedContentEntity>(1));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -308,7 +308,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -328,7 +328,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(10, content));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -338,7 +338,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -358,7 +358,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -368,7 +368,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -387,7 +387,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => contentQuery.FindAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(), contentId, 3, A<CancellationToken>._))
                 .Returns(content);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -397,7 +397,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -443,7 +443,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -480,7 +480,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -519,7 +519,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -552,7 +552,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -584,7 +584,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -607,7 +607,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -639,8 +639,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
-            var result1 = await ExecuteAsync(new ExecutionOptions { Query = query });
-            var result2 = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual1 = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual2 = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -663,8 +663,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result1);
-            AssertResult(expected, result2);
+            AssertResult(expected, actual1);
+            AssertResult(expected, actual2);
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                     A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
@@ -703,7 +703,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Reference == contentRefId && x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -730,7 +730,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -768,7 +768,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Reference == contentRefId && !x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(10, content));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -799,7 +799,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -829,7 +829,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Referencing == contentId && x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, contentRef));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -849,7 +849,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -882,7 +882,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Referencing == contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(10, contentRef));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -906,7 +906,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -950,7 +950,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -984,7 +984,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -1021,7 +1021,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.HasIdsWithoutTotal(assetRefId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, assetRef));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -1051,7 +1051,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -1085,7 +1085,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.HasIdsWithoutTotal(assetRefId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, assetRef));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
             var expected = new
             {
@@ -1111,7 +1111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            AssertResult(expected, result);
+            AssertResult(expected, actual);
         }
 
         [Fact]
@@ -1142,9 +1142,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
 
-            var json = serializer.Serialize(result);
+            var json = serializer.Serialize(actual);
 
             Assert.Contains("\"errors\"", json, StringComparison.Ordinal);
         }

@@ -54,9 +54,9 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userService.CreateAsync(email, A<UserValues>.That.Matches(x => x.Invited == true), false, ct))
                 .Returns(user);
 
-            var result = await sut.CreateUserIfNotExistsAsync(email, true, ct);
+            var actual = await sut.CreateUserIfNotExistsAsync(email, true, ct);
 
-            Assert.Equal((user, true), result);
+            Assert.Equal((user, true), actual);
         }
 
         [Fact]
@@ -72,9 +72,9 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userService.FindByEmailAsync(email, ct))
                 .Returns(user);
 
-            var result = await sut.CreateUserIfNotExistsAsync(email, true, ct);
+            var actual = await sut.CreateUserIfNotExistsAsync(email, true, ct);
 
-            Assert.Equal((user, false), result);
+            Assert.Equal((user, false), actual);
         }
 
         [Fact]
@@ -111,9 +111,9 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userService.FindByEmailAsync(id, ct))
                 .Returns(user);
 
-            var result = await sut.FindByIdOrEmailAsync(id, ct);
+            var actual = await sut.FindByIdOrEmailAsync(id, ct);
 
-            Assert.Equal(user, result);
+            Assert.Equal(user, actual);
         }
 
         [Fact]
@@ -126,9 +126,9 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userService.FindByIdAsync(id, ct))
                 .Returns(user);
 
-            var result = await sut.FindByIdOrEmailAsync(id, ct);
+            var actual = await sut.FindByIdOrEmailAsync(id, ct);
 
-            Assert.Equal(user, result);
+            Assert.Equal(user, actual);
         }
 
         [Fact]
@@ -141,9 +141,9 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userService.FindByIdAsync(id, ct))
                 .Returns(user);
 
-            var result = await sut.FindByIdOrEmailAsync(id, ct);
+            var actual = await sut.FindByIdOrEmailAsync(id, ct);
 
-            Assert.Equal(user, result);
+            Assert.Equal(user, actual);
         }
 
         [Fact]
@@ -156,9 +156,9 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userService.QueryAsync(email, 10, 0, ct))
                 .Returns(users);
 
-            var result = await sut.QueryByEmailAsync(email, ct);
+            var actual = await sut.QueryByEmailAsync(email, ct);
 
-            Assert.Single(result);
+            Assert.Single(actual);
         }
 
         [Fact]
@@ -171,9 +171,9 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userService.QueryAsync(ids, ct))
                 .Returns(users);
 
-            var result = await sut.QueryManyAsync(ids, ct);
+            var actual = await sut.QueryManyAsync(ids, ct);
 
-            Assert.Single(result);
+            Assert.Single(actual);
         }
 
         [Fact]
@@ -184,9 +184,9 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userService.QueryAsync(null, int.MaxValue, 0, ct))
                 .Returns(users);
 
-            var result = await sut.QueryAllAsync(ct);
+            var actual = await sut.QueryAllAsync(ct);
 
-            Assert.Single(result);
+            Assert.Single(actual);
         }
     }
 }

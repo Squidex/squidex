@@ -90,7 +90,7 @@ namespace Squidex.Web.Pipeline
                     }
                 }
 
-                var requestContext = context.HttpContext.Features.Get<Context>()!;
+                var requestContext = new Context(context.HttpContext.User, app).WithHeaders(context.HttpContext);
 
                 if (!AllowAnonymous(context) && !HasPermission(appName, requestContext))
                 {
@@ -112,6 +112,7 @@ namespace Squidex.Web.Pipeline
                     return;
                 }
 
+                context.HttpContext.Features.Set(requestContext);
                 context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app));
                 context.HttpContext.Response.Headers.Add("X-AppId", app.Id.ToString());
             }
