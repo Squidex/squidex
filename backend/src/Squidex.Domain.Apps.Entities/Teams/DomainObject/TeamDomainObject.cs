@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
         protected override bool CanAccept(ICommand command)
         {
-            return command is TeamUpdateCommand update && Equals(update?.TeamId, Snapshot.Id);
+            return command is TeamCommand update && Equals(update?.TeamId, Snapshot.Id);
         }
 
         public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
@@ -153,21 +153,18 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
         private void Create(CreateTeam command)
         {
-            var events = new List<TeamEvent>
+            void RaiseInitial<T>(T @event) where T : TeamEvent
             {
-                CreateInitalEvent(command.Name)
-            };
-
-            if (command.Actor.IsUser)
-            {
-                events.Add(CreateInitialOwner(command.Actor, command.Name));
+                Raise(command, @event, command.TeamId);
             }
 
-            foreach (var @event in events)
-            {
-                @event.TeamId = command.TeamId;
+            RaiseInitial(new TeamCreated());
 
-                Raise(command, @event);
+            var actor = command.Actor;
+
+            if (actor.IsUser)
+            {
+                RaiseInitial(new TeamContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner });
             }
         }
 
@@ -188,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
         private void AssignContributor(AssignContributor command, bool isAdded)
         {
-            Raise(command, new TeamContributorAssigned { IsAdded = isAdded, TeamName = Snapshot.Name });
+            Raise(command, new TeamContributorAssigned { IsAdded = isAdded });
         }
 
         private void RemoveContributor(RemoveContributor command)
@@ -196,23 +193,13 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
             Raise(command, new TeamContributorRemoved());
         }
 
-        private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : TeamEvent
+        private void Raise<T, TEvent>(T command, TEvent @event, DomainId? id = null) where T : class where TEvent : TeamEvent
         {
             SimpleMapper.Map(command, @event);
 
-            @event.TeamId = Snapshot.Id;
+            @event.TeamId = id ?? Snapshot.Id;
 
             RaiseEvent(Envelope.Create(@event));
-        }
-
-        private static TeamCreated CreateInitalEvent(string name)
-        {
-            return new TeamCreated { Name = name };
-        }
-
-        private static TeamContributorAssigned CreateInitialOwner(RefToken actor, string name)
-        {
-            return new TeamContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner, TeamName = name };
         }
 
         private IBillingPlans BillingPlans()

@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Teams.Commands
 {
-    public sealed class UpdateTeam : TeamUpdateCommand
+    public sealed class UpdateTeam : TeamCommand
     {
         public string Name { get; set; }
     }

@@ -122,9 +122,9 @@ namespace Squidex.Domain.Apps.Entities.Invitation
                             return;
                         }
 
-                        var appName = teamContributorAssigned.TeamName;
+                        // var appName = teamContributorAssigned.TeamName;
 
-                        await emailSender.SendTeamInviteAsync(assigner, assignee, appName);
+                        // await emailSender.SendTeamInviteAsync(assigner, assignee, appName);
                         break;
                     }
             }

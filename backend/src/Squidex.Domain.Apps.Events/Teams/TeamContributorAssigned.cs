@@ -16,8 +16,6 @@ namespace Squidex.Domain.Apps.Events.Teams
 
         public string Role { get; set; }
 
-        public string TeamName { get; set; }
-
         public bool IsCreated { get; set; }
 
         public bool IsAdded { get; set; }

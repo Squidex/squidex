@@ -26,10 +26,10 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
         private readonly IBillingManager billingManager = A.Fake<IBillingManager>();
         private readonly IUser user;
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
+        private readonly Plan planPaid = new Plan { Id = "premium" };
+        private readonly Plan planFree = new Plan { Id = "free" };
         private readonly string contributorId = DomainId.NewGuid().ToString();
-        private readonly string planIdPaid = "premium";
-        private readonly string planIdFree = "free";
-        private readonly string teamName = "My Team";
+        private readonly string name = "My Team";
         private readonly DomainId teamId = DomainId.NewGuid();
         private readonly TeamDomainObject sut;
 
@@ -46,13 +46,13 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
                 .Returns(user);
 
             A.CallTo(() => billingPlans.GetFreePlan())
-                .Returns(new Plan { Id = planIdFree, MaxContributors = 10 });
+                .Returns(planFree);
 
-            A.CallTo(() => billingPlans.GetPlan(planIdFree))
-                .Returns(new Plan { Id = planIdFree, MaxContributors = 10 });
+            A.CallTo(() => billingPlans.GetPlan(planFree.Id))
+                .Returns(planFree);
 
-            A.CallTo(() => billingPlans.GetPlan(planIdPaid))
-                .Returns(new Plan { Id = planIdPaid, MaxContributors = 30 });
+            A.CallTo(() => billingPlans.GetPlan(planPaid.Id))
+                .Returns(planPaid);
 
             A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, teamId, A<string>._, default))
                 .Returns(Task.FromResult<Uri?>(null));
@@ -74,17 +74,17 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
         [Fact]
         public async Task Create_should_create_events_and_set_intitial_state()
         {
-            var command = new CreateTeam { Name = teamName, TeamId = teamId };
+            var command = new CreateTeam { Name = name };
 
             var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal(teamName, sut.Snapshot.Name);
+            Assert.Equal(name, sut.Snapshot.Name);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateTeamEvent(new TeamCreated { Name = teamName }),
+                    CreateTeamEvent(new TeamCreated { Name = name }),
                     CreateTeamEvent(new TeamContributorAssigned { ContributorId = Actor.Identifier, Role = Role.Owner })
                 );
         }
@@ -92,17 +92,17 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
         [Fact]
         public async Task Create_should_not_assign_client_as_contributor()
         {
-            var command = new CreateTeam { Name = teamName, Actor = ActorClient, TeamId = teamId };
+            var command = new CreateTeam { Name = name, Actor = ActorClient };
 
             var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal(teamName, sut.Snapshot.Name);
+            Assert.Equal(name, sut.Snapshot.Name);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateTeamEvent(new TeamCreated { Name = teamName }, true) // Must be with client actor.
+                    CreateTeamEvent(new TeamCreated { Name = name }, true) // Must be with client actor.
                 );
         }
 
@@ -128,67 +128,67 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
         [Fact]
         public async Task ChangePlan_should_create_events_and_update_plan()
         {
-            var command = new ChangePlan { PlanId = planIdPaid };
+            var command = new ChangePlan { PlanId = planPaid.Id };
 
-            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, teamId, planIdPaid, default))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, teamId, planPaid.Id, default))
                 .Returns(Task.FromResult<Uri?>(null));
 
             await ExecuteCreateAsync();
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planIdPaid));
+            result.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id));
 
-            Assert.Equal(planIdPaid, sut.Snapshot.Plan!.PlanId);
+            Assert.Equal(planPaid.Id, sut.Snapshot.Plan!.PlanId);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateTeamEvent(new TeamPlanChanged { PlanId = planIdPaid })
+                    CreateTeamEvent(new TeamPlanChanged { PlanId = planPaid.Id })
                 );
 
-            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, teamId, planIdPaid, default))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, teamId, planPaid.Id, default))
                 .MustHaveHappened();
 
-            A.CallTo(() => billingManager.SubscribeAsync(Actor.Identifier, teamId, planIdPaid, default))
+            A.CallTo(() => billingManager.SubscribeAsync(Actor.Identifier, teamId, planPaid.Id, default))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task ChangePlan_from_callback_should_create_events_and_update_plan()
         {
-            var command = new ChangePlan { PlanId = planIdPaid, FromCallback = true };
+            var command = new ChangePlan { PlanId = planPaid.Id, FromCallback = true };
 
             await ExecuteCreateAsync();
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planIdPaid));
+            result.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id));
 
-            Assert.Equal(planIdPaid, sut.Snapshot.Plan!.PlanId);
+            Assert.Equal(planPaid.Id, sut.Snapshot.Plan!.PlanId);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateTeamEvent(new TeamPlanChanged { PlanId = planIdPaid })
+                    CreateTeamEvent(new TeamPlanChanged { PlanId = planPaid.Id })
                 );
 
             A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<DomainId>._, A<string?>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => billingManager.SubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
+            A.CallTo(() => billingManager.SubscribeAsync(A<string>._, A<DomainId>._, A<string?>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
         [Fact]
         public async Task ChangePlan_from_callback_should_reset_plan_for_free_plan()
         {
-            var command = new ChangePlan { PlanId = planIdFree, FromCallback = true };
+            var command = new ChangePlan { PlanId = planFree.Id, FromCallback = true };
 
             await ExecuteCreateAsync();
             await ExecuteChangePlanAsync();
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planIdFree, true));
+            result.ShouldBeEquivalent(new PlanChangedResult(planFree.Id, true));
 
             Assert.Null(sut.Snapshot.Plan);
 
@@ -197,24 +197,24 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
                     CreateTeamEvent(new TeamPlanReset())
                 );
 
-            A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, teamId, A<string?>._, A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<CancellationToken>._))
+            A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, A<DomainId>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
         [Fact]
         public async Task ChangePlan_should_reset_plan_for_free_plan()
         {
-            var command = new ChangePlan { PlanId = planIdFree };
+            var command = new ChangePlan { PlanId = planFree.Id };
 
             await ExecuteCreateAsync();
             await ExecuteChangePlanAsync();
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planIdFree, true));
+            result.ShouldBeEquivalent(new PlanChangedResult(planFree.Id, true));
 
             Assert.Null(sut.Snapshot.Plan);
 
@@ -223,26 +223,26 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
                     CreateTeamEvent(new TeamPlanReset())
                 );
 
-            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, teamId, planIdPaid, default))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, teamId, planPaid.Id, default))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<CancellationToken>._))
+            A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, teamId, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task ChangePlan_should_not_make_update_for_redirect_result()
         {
-            var command = new ChangePlan { PlanId = planIdPaid };
+            var command = new ChangePlan { PlanId = planPaid.Id };
 
-            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, teamId, planIdPaid, default))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, teamId, planPaid.Id, default))
                 .Returns(new Uri("http://squidex.io"));
 
             await ExecuteCreateAsync();
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planIdPaid, false, new Uri("http://squidex.io")));
+            result.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id, false, new Uri("http://squidex.io")));
 
             Assert.Null(sut.Snapshot.Plan);
         }
@@ -250,27 +250,27 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
         [Fact]
         public async Task ChangePlan_should_not_call_billing_manager_for_callback()
         {
-            var command = new ChangePlan { PlanId = planIdPaid, FromCallback = true };
+            var command = new ChangePlan { PlanId = planPaid.Id, FromCallback = true };
 
             await ExecuteCreateAsync();
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planIdPaid));
+            result.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id));
 
-            Assert.Equal(planIdPaid, sut.Snapshot.Plan?.PlanId);
+            Assert.Equal(planPaid.Id, sut.Snapshot.Plan?.PlanId);
 
-            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, teamId, planIdPaid, A<CancellationToken>._))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, teamId, planPaid.Id, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => billingManager.SubscribeAsync(Actor.Identifier, teamId, planIdPaid, A<CancellationToken>._))
+            A.CallTo(() => billingManager.SubscribeAsync(Actor.Identifier, teamId, planPaid.Id, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
         [Fact]
         public async Task AssignContributor_should_create_events_and_add_contributor()
         {
-            var command = new AssignContributor { ContributorId = contributorId, Role = Role.Editor };
+            var command = new AssignContributor { ContributorId = contributorId };
 
             await ExecuteCreateAsync();
 
@@ -278,31 +278,11 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal(Role.Editor, sut.Snapshot.Contributors[contributorId]);
+            Assert.Equal(command.Role, sut.Snapshot.Contributors[contributorId]);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateTeamEvent(new TeamContributorAssigned { ContributorId = contributorId, Role = Role.Editor, IsAdded = true })
-                );
-        }
-
-        [Fact]
-        public async Task AssignContributor_should_create_update_events_and_update_contributor()
-        {
-            var command = new AssignContributor { ContributorId = contributorId, Role = Role.Owner };
-
-            await ExecuteCreateAsync();
-            await ExecuteAssignContributorAsync();
-
-            var result = await PublishIdempotentAsync(command);
-
-            result.ShouldBeEquivalent(sut.Snapshot);
-
-            Assert.Equal(Role.Owner, sut.Snapshot.Contributors[contributorId]);
-
-            LastEvents
-                .ShouldHaveSameEvents(
-                    CreateTeamEvent(new TeamContributorAssigned { ContributorId = contributorId, Role = Role.Owner })
+                    CreateTeamEvent(new TeamContributorAssigned { ContributorId = contributorId, Role = command.Role, IsAdded = true })
                 );
         }
 
@@ -328,24 +308,24 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
         private Task ExecuteCreateAsync()
         {
-            return PublishAsync(new CreateTeam { Name = teamName, TeamId = teamId });
+            return PublishAsync(new CreateTeam { Name = name });
         }
 
         private Task ExecuteAssignContributorAsync()
         {
-            return PublishAsync(new AssignContributor { ContributorId = contributorId, Role = Role.Editor });
+            return PublishAsync(new AssignContributor { ContributorId = contributorId });
         }
 
         private Task ExecuteChangePlanAsync()
         {
-            return PublishAsync(new ChangePlan { PlanId = planIdPaid });
+            return PublishAsync(new ChangePlan { PlanId = planPaid.Id });
         }
 
-        private T CreateTeamEvent<T>(T @event) where T : TeamEvent
+        private T CreateTeamEvent<T>(T @event, bool fromClient = false) where T : TeamEvent
         {
             @event.TeamId = teamId;
 
-            return CreateEvent(@event);
+            return CreateEvent(@event, fromClient);
         }
 
         private T CreateTeamCommand<T>(T command) where T : TeamCommand

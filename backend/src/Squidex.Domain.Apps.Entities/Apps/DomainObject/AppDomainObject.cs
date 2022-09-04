@@ -334,23 +334,25 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var appId = NamedId.Of(command.AppId, command.Name);
 
-            var events = new List<AppEvent>
+            void RaiseInitial<T>(T @event) where T : AppEvent
             {
-                CreateInitalEvent(command.Name)
-            };
-
-            if (command.Actor.IsUser)
-            {
-                events.Add(CreateInitialOwner(command.Actor));
+                Raise(command, @event, appId);
             }
 
-            events.Add(CreateInitialSettings());
+            RaiseInitial(new AppCreated());
 
-            foreach (var @event in events)
+            var actor = command.Actor;
+
+            if (actor.IsUser)
             {
-                @event.AppId = appId;
+                RaiseInitial(new AppContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner });
+            }
 
-                Raise(command, @event);
+            var settings = serviceProvider.GetService<InitialSettings>()?.Settings;
+
+            if (settings != null)
+            {
+                RaiseInitial(new AppSettingsUpdated { Settings = settings });
             }
         }
 
@@ -469,28 +471,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             Raise(command, new AppDeleted());
         }
 
-        private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
+        private void Raise<T, TEvent>(T command, TEvent @event, NamedId<DomainId>? id = null) where T : class where TEvent : AppEvent
         {
             SimpleMapper.Map(command, @event);
 
-            @event.AppId ??= Snapshot.NamedId();
+            @event.AppId ??= id ?? Snapshot.NamedId();
 
             RaiseEvent(Envelope.Create(@event));
-        }
-
-        private static AppCreated CreateInitalEvent(string name)
-        {
-            return new AppCreated { Name = name };
-        }
-
-        private static AppContributorAssigned CreateInitialOwner(RefToken actor)
-        {
-            return new AppContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner };
-        }
-
-        private AppSettingsUpdated CreateInitialSettings()
-        {
-            return new AppSettingsUpdated { Settings = serviceProvider.GetRequiredService<InitialSettings>().Settings };
         }
 
         private IAppProvider AppProvider()
