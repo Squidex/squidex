@@ -74,6 +74,7 @@
                             <tbody *ngFor="let content of contents; trackBy: trackByContent"
                                 [sqxContentSelectorItem]="content"
                                 [language]="language"
+                                [languages]="languages"
                                 [schema]="schema"
                                 [selectable]="!isItemAlreadySelected(content)"
                                 [selected]="isItemSelected(content)"

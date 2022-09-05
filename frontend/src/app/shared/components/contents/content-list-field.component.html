@@ -20,6 +20,22 @@
     <ng-container *ngSwitchCase="metaFields.lastModifiedByName">
         <small class="truncate">{{content.lastModifiedBy | sqxUserNameRef}}</small>
     </ng-container>
+    <ng-container *ngSwitchCase="metaFields.translationStatus">
+        <sqx-translation-status
+            [data]="content.data"
+            [language]="language"
+            [languages]="languages"
+            [schema]="schema">
+        </sqx-translation-status>
+    </ng-container>
+    <ng-container *ngSwitchCase="metaFields.translationStatusAverage">
+        <sqx-translation-status
+            [data]="content.data"
+            [language]="undefined"
+            [languages]="languages"
+            [schema]="schema">
+        </sqx-translation-status>
+    </ng-container>
     <ng-container *ngSwitchCase="metaFields.status">
         <ng-container *ngIf="content.newStatus; else singleStatus">
             <div class="row g-0 status-grid">

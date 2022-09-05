@@ -6,12 +6,12 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, ModalModel, PatchContentForm, TableField, TableSettings } from '@app/shared';
+import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, ModalModel, PatchContentForm, SchemaDto, TableField, TableSettings } from '@app/shared';
 
 /* tslint:disable: component-selector */
 
 @Component({
-    selector: '[sqxContent][language][tableFields][tableSettings]',
+    selector: '[sqxContent][language][languages][tableFields][schema][tableSettings]',
     styleUrls: ['./content.component.scss'],
     templateUrl: './content.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,6 +34,12 @@ export class ContentComponent implements OnChanges {
 
     @Input()
     public language!: AppLanguageDto;
+
+    @Input()
+    public languages!: ReadonlyArray<AppLanguageDto>;
+
+    @Input()
+    public schema?: SchemaDto;
 
     @Input()
     public tableFields!: ReadonlyArray<TableField>;

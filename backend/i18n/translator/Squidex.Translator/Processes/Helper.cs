@@ -26,9 +26,9 @@ namespace Squidex.Translator.Processes
                 Console.WriteLine("----- CHECKING <{0}> -----", locale);
 
                 var notTranslated = mainTranslations.Keys.Except(texts.Keys).ToList();
-                var notUsed = texts.Keys.Except(mainTranslations.Keys).ToList();
+                var notUsing = texts.Keys.Except(mainTranslations.Keys).ToList();
 
-                if (notTranslated.Count > 0 || notUsed.Count > 0)
+                if (notTranslated.Count > 0 || notUsing.Count > 0)
                 {
                     if (notTranslated.Count > 0)
                     {
@@ -42,12 +42,12 @@ namespace Squidex.Translator.Processes
                         }
                     }
 
-                    if (notUsed.Count > 0)
+                    if (notUsing.Count > 0)
                     {
                         Console.WriteLine();
                         Console.WriteLine("Translations not used:");
 
-                        foreach (var key in notUsed.OrderBy(x => x))
+                        foreach (var key in notUsing.OrderBy(x => x))
                         {
                             Console.Write(" * ");
                             Console.WriteLine(key);
@@ -90,24 +90,25 @@ namespace Squidex.Translator.Processes
 
         public static void CheckUnused(TranslationService service, HashSet<string> translations)
         {
-            var notUsed = new SortedSet<string>();
+            var notUsing = new SortedSet<string>();
 
             foreach (var key in service.MainTranslations.Keys)
             {
                 if (!translations.Contains(key) &&
                     !key.StartsWith("common.", StringComparison.OrdinalIgnoreCase) &&
                     !key.StartsWith("dotnet_", StringComparison.OrdinalIgnoreCase) &&
-                    !key.StartsWith("validation.", StringComparison.OrdinalIgnoreCase))
+                    !key.StartsWith("validation.", StringComparison.OrdinalIgnoreCase) &&
+                    !key.StartsWith("rules.simulation.error", StringComparison.OrdinalIgnoreCase))
                 {
-                    notUsed.Add(key);
+                    notUsing.Add(key);
                 }
             }
 
-            if (notUsed.Count > 0)
+            if (notUsing.Count > 0)
             {
                 Console.WriteLine("Translations not used:");
 
-                foreach (var key in notUsed)
+                foreach (var key in notUsing)
                 {
                     Console.Write(" * ");
                     Console.WriteLine(key);

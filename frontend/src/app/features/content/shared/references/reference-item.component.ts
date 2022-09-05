@@ -8,10 +8,10 @@
 /* tslint:disable: component-selector */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { AppLanguageDto, ContentDto, getContentValue, META_FIELDS } from '@app/shared';
+import { ContentDto, getContentValue, LanguageDto, META_FIELDS } from '@app/shared';
 
 @Component({
-    selector: '[sqxReferenceItem][language]',
+    selector: '[sqxReferenceItem][language][languages]',
     styleUrls: ['./reference-item.component.scss'],
     templateUrl: './reference-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,7 +26,10 @@ export class ReferenceItemComponent implements OnChanges {
     public clone = new EventEmitter();
 
     @Input()
-    public language!: AppLanguageDto;
+    public language!: LanguageDto;
+
+    @Input()
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public canRemove?: boolean | null = true;
