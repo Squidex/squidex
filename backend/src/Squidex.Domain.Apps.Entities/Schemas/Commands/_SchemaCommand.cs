@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public abstract class SchemaCommand : SchemaCommandBase
+    public abstract class SchemaCommand : SchemaCommandBase, ISchemaCommand
     {
         public NamedId<DomainId> SchemaId { get; set; }
 

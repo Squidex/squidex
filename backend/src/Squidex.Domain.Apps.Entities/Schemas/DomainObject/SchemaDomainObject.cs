@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
         protected override bool CanAcceptCreation(ICommand command)
         {
-            return command is SchemaCommand;
+            return command is SchemaCommandBase;
         }
 
         protected override bool CanAccept(ICommand command)

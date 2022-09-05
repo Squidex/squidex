@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
         protected override bool CanAcceptCreation(ICommand command)
         {
-            return command is CreateTeam;
+            return command is TeamCommandBase;
         }
 
         protected override bool CanAccept(ICommand command)

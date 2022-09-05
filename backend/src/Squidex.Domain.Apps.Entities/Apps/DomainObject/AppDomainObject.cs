@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         protected override bool CanAcceptCreation(ICommand command)
         {
-            return command is CreateApp;
+            return command is AppCommandBase;
         }
 
         protected override bool CanAccept(ICommand command)
