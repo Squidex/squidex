@@ -35,7 +35,7 @@ export class TextMeasurer {
             }
 
             const style = window.getComputedStyle(currentElement);
-    
+
             const fontSize = style.getPropertyValue('font-size');
             const fontFamily = style.getPropertyValue('font-family');
 
@@ -45,7 +45,7 @@ export class TextMeasurer {
 
             this.font = `${fontSize} ${fontFamily}`;
         }
-        
+
         if (!this.font) {
             return -1000;
         }

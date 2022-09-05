@@ -113,7 +113,7 @@ export class ContentFieldComponent implements OnChanges {
         if (!master) {
             return;
         }
-        
+
         const masterCode = master.iso2Code;
         const masterValue = this.formModel.get(masterCode)!.form.value;
 

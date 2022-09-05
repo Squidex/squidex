@@ -8,7 +8,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ErrorDto } from '@app/framework';
-import { AnalyticsService, ApiUrlConfig, ContentDto, ContentsDto, ContentsService, DateTime, Resource, ResourceLinks, ScheduleDto, Version, Versioned } from '@app/shared/internal';
+import { ApiUrlConfig, ContentDto, ContentsDto, ContentsService, DateTime, Resource, ResourceLinks, ScheduleDto, Version, Versioned } from '@app/shared/internal';
 import { BulkResultDto, BulkUpdateDto } from './contents.service';
 import { sanitize } from './query';
 
@@ -23,7 +23,6 @@ describe('ContentsService', () => {
             providers: [
                 ContentsService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() },
             ],
         });
     });
@@ -63,11 +62,18 @@ describe('ContentsService', () => {
                 }],
             });
 
-            expect(contents!).toEqual(
-                new ContentsDto([{ status: 'Draft', color: 'Gray' }], 10, [
+            expect(contents!).toEqual({
+                items: [
                     createContent(12),
                     createContent(13),
-                ]));
+                ],
+                total: 10,
+                statuses: [
+                    { status: 'Draft', color: 'Gray' },
+                ],
+                canCreate: false,
+                canCreateAndPublish: false,
+            });
         }));
 
     it('should make post request to get contents with odata filter',

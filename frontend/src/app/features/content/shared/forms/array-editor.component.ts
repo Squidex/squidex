@@ -49,7 +49,7 @@ export class ArrayEditorComponent implements OnChanges {
 
     @ViewChildren(ArrayItemComponent)
     public children!: QueryList<ArrayItemComponent>;
-    
+
     @ViewChildren(VirtualScrollerComponent)
     public scroller?: QueryList<VirtualScrollerComponent>;
 

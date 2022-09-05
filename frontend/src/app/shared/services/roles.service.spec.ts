@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AnalyticsService, ApiUrlConfig, Resource, ResourceLinks, RoleDto, RolesDto, RolesPayload, RolesService, Version } from '@app/shared/internal';
+import { ApiUrlConfig, Resource, ResourceLinks, RoleDto, RolesDto, RolesPayload, RolesService, Version } from '@app/shared/internal';
 
 describe('RolesService', () => {
     const version = new Version('1');
@@ -20,7 +20,6 @@ describe('RolesService', () => {
             providers: [
                 RolesService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() },
             ],
         });
     });
@@ -174,9 +173,6 @@ describe('RolesService', () => {
 export function createRoles(...ids: ReadonlyArray<number>): RolesPayload {
     return {
         items: ids.map(createRole),
-        _links: {
-            create: { method: 'POST', href: '/roles' },
-        },
         canCreate: true,
     };
 }

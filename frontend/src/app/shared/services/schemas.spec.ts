@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { createProperties, MetaFields, SchemaPropertiesDto } from '@app/shared/internal';
+import { createProperties, META_FIELDS, SchemaPropertiesDto } from '@app/shared/internal';
 import { TestValues } from './../state/_test-helpers';
 
 const {
@@ -58,10 +58,10 @@ describe('SchemaDto', () => {
         const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3] });
 
         expect(schema.defaultListFields.map(x => x.name)).toEqual([
-            MetaFields.lastModifiedByAvatar.name,
+            META_FIELDS.lastModifiedByAvatar.name,
             field1.name,
-            MetaFields.statusColor.name,
-            MetaFields.lastModified.name,
+            META_FIELDS.statusColor.name,
+            META_FIELDS.lastModified.name,
         ]);
     });
 
@@ -69,10 +69,10 @@ describe('SchemaDto', () => {
         const schema = createSchema({ properties: new SchemaPropertiesDto() });
 
         expect(schema.defaultListFields.map(x => x.name)).toEqual([
-            MetaFields.lastModifiedByAvatar.name,
-            MetaFields.empty.name,
-            MetaFields.statusColor.name,
-            MetaFields.lastModified.name,
+            META_FIELDS.lastModifiedByAvatar.name,
+            META_FIELDS.empty.name,
+            META_FIELDS.statusColor.name,
+            META_FIELDS.lastModified.name,
         ]);
     });
 
@@ -88,7 +88,7 @@ describe('SchemaDto', () => {
         const schema = createSchema({ properties: new SchemaPropertiesDto() });
 
         expect(schema.defaultReferenceFields.map(x => x.name)).toEqual([
-            MetaFields.empty.name,
+            META_FIELDS.empty.name,
         ]);
     });
 });

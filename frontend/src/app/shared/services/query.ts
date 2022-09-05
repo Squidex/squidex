@@ -31,7 +31,7 @@ export type FilterFieldUI =
     'Status' |
     'Unsupported' |
     'User';
-    
+
 export function getFilterUI(comparison: FilterComparison, field: FilterableField): FilterFieldUI {
     if (!field || !comparison) {
         return 'None';

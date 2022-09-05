@@ -352,7 +352,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                             s.selectedContent :
                             content;
                     }
-        
+
                     return { ...s, contents, selectedContent };
                 });
             }),

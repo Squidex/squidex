@@ -19,8 +19,16 @@ export class TranslationDto {
     }
 }
 
-export type TranslateDto =
-    Readonly<{ text: string; sourceLanguage: string; targetLanguage: string }>;
+export type TranslateDto = Readonly<{
+    // The text to translate.
+    text: string;
+
+    // The source language.
+    sourceLanguage: string;
+
+    // The target language.
+    targetLanguage: string;
+ }>;
 
 @Injectable()
 export class TranslationsService {

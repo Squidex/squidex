@@ -99,7 +99,7 @@ export class CommentsState extends State<Snapshot> {
 
     public update(comment: CommentDto, text: string, now?: DateTime): Observable<CommentDto> {
         return this.commentsService.putComment(this.commentsUrl, comment.id, { text }).pipe(
-            map(() => update(comment, text, now || DateTime.now())),
+            map(() => update(comment, text, now)),
             tap(updated => {
                 this.next(s => {
                     const comments = s.comments.replacedBy('id', updated);
@@ -115,5 +115,10 @@ export class CommentsState extends State<Snapshot> {
     }
 }
 
-const update = (comment: CommentDto, text: string, time: DateTime) =>
-    comment.with({ text, time });
+const update = (comment: CommentDto, text: string, time?: DateTime) =>
+    new CommentDto(
+        comment.id,
+        time || DateTime.now(),
+        text,
+        comment.url,
+        comment.user);

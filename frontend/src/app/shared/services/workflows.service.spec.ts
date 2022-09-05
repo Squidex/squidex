@@ -9,7 +9,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AnalyticsService, ApiUrlConfig, Resource, Version, WorkflowDto, WorkflowsDto, WorkflowsPayload, WorkflowsService } from '@app/shared/internal';
+import { ApiUrlConfig, Resource, Version, WorkflowDto, WorkflowsDto, WorkflowsPayload, WorkflowsService } from '@app/shared/internal';
 
 describe('WorkflowsService', () => {
     const version = new Version('1');
@@ -22,7 +22,6 @@ describe('WorkflowsService', () => {
             providers: [
                 WorkflowsService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() },
             ],
         });
     });
@@ -178,14 +177,11 @@ describe('WorkflowsService', () => {
 
 export function createWorkflows(...names: ReadonlyArray<string>): WorkflowsPayload {
     return {
+        items: names.map(createWorkflow),
         errors: [
             'Error1',
             'Error2',
         ],
-        items: names.map(createWorkflow),
-        _links: {
-            create: { method: 'POST', href: '/workflows' },
-        },
         canCreate: true,
     };
 }
@@ -510,7 +506,7 @@ describe('Workflow', () => {
     it('should rename workflow', () => {
         const workflow =
             new WorkflowDto({}, 'id')
-                .rename('name');
+                .changeName('name');
 
         expect(workflow.serialize()).toEqual({ name: 'name', schemaIds: [], steps: {}, initial: null });
     });

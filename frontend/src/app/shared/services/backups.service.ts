@@ -8,14 +8,8 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
-import { AnalyticsService, ApiUrlConfig, DateTime, hasAnyLink, pretifyError, Resource, ResourceLinks, ResultSet, Types } from '@app/framework';
-
-export class BackupsDto extends ResultSet<BackupDto> {
-    public get canCreate() {
-        return hasAnyLink(this._links, 'create');
-    }
-}
+import { catchError, map } from 'rxjs/operators';
+import { ApiUrlConfig, DateTime, hasAnyLink, pretifyError, Resource, ResourceLinks, Types } from '@app/framework';
 
 export class BackupDto {
     public readonly _links: ResourceLinks;
@@ -29,8 +23,7 @@ export class BackupDto {
         return this.status === 'Failed';
     }
 
-    constructor(
-        links: ResourceLinks,
+    constructor(links: ResourceLinks,
         public readonly id: string,
         public readonly started: DateTime,
         public readonly stopped: DateTime | null,
@@ -58,15 +51,27 @@ export class RestoreDto {
     }
 }
 
-export type StartRestoreDto =
-    Readonly<{ url: string; newAppName?: string }>;
+export type BackupsDto = Readonly<{
+    // The list of backups.
+    items: ReadonlyArray<BackupDto>;
+
+    // True, if the user has permissions to create a backup.
+    canCreate?: boolean;
+}>;
+
+export type StartRestoreDto = Readonly<{
+    // The url of the backup file.
+    url: string;
+
+    // The optional app name tro use.
+    newAppName?: string;
+}>;
 
 @Injectable()
 export class BackupsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -103,9 +108,6 @@ export class BackupsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/backups`);
 
         return this.http.post(url, {}).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Backup', 'Started', appName);
-            }),
             pretifyError('i18n:backups.startFailed'));
     }
 
@@ -113,9 +115,6 @@ export class BackupsService {
         const url = this.apiUrl.buildUrl('api/apps/restore');
 
         return this.http.post(url, dto).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Restore', 'Started');
-            }),
             pretifyError('i18n:backups.restoreFailed'));
     }
 
@@ -125,17 +124,17 @@ export class BackupsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return this.http.request(link.method, url).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Backup', 'Deleted', appName);
-            }),
             pretifyError('i18n:backups.deleteFailed'));
     }
 }
 
-function parseBackups(response: { items: any[] } & Resource) {
-    const items = response.items.map(parseBackup);
+function parseBackups(response: { items: any[] } & Resource): BackupsDto {
+    const { items: list, _links } = response;
+    const items = list.map(parseBackup);
 
-    return new BackupsDto(items.length, items, response._links);
+    const canCreate = hasAnyLink(_links, 'create');
+
+    return { items, canCreate };
 }
 
 function parseRestore(response: any) {

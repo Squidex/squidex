@@ -107,6 +107,7 @@ module.exports = {
         "no-plusplus": "off",
         "no-prototype-builtins": "off",
         "no-restricted-syntax": "off",
+        "no-trailing-spaces": "error",
         "no-underscore-dangle": "off",
         "object-curly-newline": [
             "error",

@@ -13,7 +13,7 @@ export type AnchorX =
     'left-to-left' |
     'right-to-left' |
     'right-to-right';
-    
+
 export type AnchorY =
     'bottom-to-bottom' |
     'bottom-to-top' |

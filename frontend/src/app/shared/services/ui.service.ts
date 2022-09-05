@@ -11,8 +11,10 @@ import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ApiUrlConfig } from '@app/framework';
 
-export type UISettingsDto =
-    Readonly<{ canCreateApps: boolean }>;
+export type UISettingsDto = Readonly<{
+    // True, if the user has the permissions to create a new app.
+    canCreateApps?: boolean;
+}>;
 
 @Injectable()
 export class UIService {

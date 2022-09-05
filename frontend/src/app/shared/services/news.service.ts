@@ -8,24 +8,23 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { ApiUrlConfig, pretifyError } from '@app/framework';
 
-export class FeatureDto {
-    constructor(
-        public readonly name: string,
-        public readonly text: string,
-    ) {
-    }
-}
+export type FeatureDto = Readonly<{
+    // The name of the feature.
+    name: string;
 
-export class FeaturesDto {
-    constructor(
-        public readonly features: ReadonlyArray<FeatureDto>,
-        public readonly version: number,
-    ) {
-    }
-}
+    // The feature description.
+    text: string;
+}>;
+
+export type FeaturesDto = Readonly<{
+    // The list of features.
+    features: ReadonlyArray<FeatureDto>;
+
+    // The latest version.
+    version: number;
+}>;
 
 @Injectable()
 export class NewsService {
@@ -38,20 +37,7 @@ export class NewsService {
     public getFeatures(version: number): Observable<FeaturesDto> {
         const url = this.apiUrl.buildUrl(`api/news/features?version=${version}`);
 
-        return this.http.get<any>(url).pipe(
-            map(body => {
-                return parseFeatures(body);
-            }),
+        return this.http.get<FeaturesDto>(url).pipe(
             pretifyError('i18n:features.loadFailed'));
     }
-}
-
-function parseFeatures(body: { features: any[]; version: number }) {
-    return new FeaturesDto(
-        body.features.map(item => 
-            new FeatureDto(
-                item.name,
-                item.text),
-        ),
-        body.version);
 }

@@ -8,19 +8,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { AnalyticsService, ApiUrlConfig, compareStrings, hasAnyLink, HTTP, mapVersioned, Model, pretifyError, Resource, ResourceLinks, StringHelper, Version, Versioned } from '@app/framework';
+import { ApiUrlConfig, compareStrings, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, StringHelper, Version, Versioned } from '@app/framework';
 
-export class WorkflowDto extends Model<WorkflowDto> {
+export class WorkflowDto {
     public readonly _links: ResourceLinks;
 
-    public readonly canUpdate: boolean;
     public readonly canDelete: boolean;
+    public readonly canUpdate: boolean;
 
     public readonly displayName: string;
 
-    constructor(
-        links: ResourceLinks,
+    constructor(links: ResourceLinks,
         public readonly id: string,
         public readonly name: string | null = null,
         public readonly initial: string | null = null,
@@ -28,22 +26,22 @@ export class WorkflowDto extends Model<WorkflowDto> {
         public readonly steps: WorkflowStep[] = [],
         public readonly transitions: WorkflowTransition[] = [],
     ) {
-        super();
-
-        this.onCloned();
-
         this._links = links;
 
-        this.canUpdate = hasAnyLink(links, 'update');
         this.canDelete = hasAnyLink(links, 'delete');
+        this.canUpdate = hasAnyLink(links, 'update');
 
         this.displayName = StringHelper.firstNonEmpty(name, 'i18n:workflows.notNamed');
     }
 
     protected onCloned() {
-        this.steps.sort((a, b) => compareStrings(a.name, b.name));
+        this.steps.sort((a, b) => {
+            return compareStrings(a.name, b.name);
+        });
 
-        this.transitions.sort((a, b) => compareStrings(a.to, b.to));
+        this.transitions.sort((a, b) => {
+            return compareStrings(a.to, b.to);
+        });
     }
 
     public getOpenSteps(step: WorkflowStep) {
@@ -116,7 +114,7 @@ export class WorkflowDto extends Model<WorkflowDto> {
         return this.with({ schemaIds });
     }
 
-    public rename(name: string) {
+    public changeName(name: string) {
         return this.with({ name });
     }
 
@@ -173,7 +171,6 @@ export class WorkflowDto extends Model<WorkflowDto> {
             const s = { ...values, transitions: {} };
 
             for (const transition of this.getTransitions(step)) {
-                // eslint-disable-next-line @typescript-eslint/naming-convention
                 const { to, step: _, from: __, ...t } = transition;
 
                 s.transitions[to] = t;
@@ -184,38 +181,85 @@ export class WorkflowDto extends Model<WorkflowDto> {
 
         return result;
     }
+
+    private with(update: Partial<WorkflowDto>) {
+        const clone = Object.assign(Object.assign(Object.create(Object.getPrototypeOf(this)), this), update);
+
+        clone.onCloned();
+
+        return clone;
+    }
 }
 
-export type WorkflowStepValues =
-    Readonly<{ color?: string; isLocked?: boolean; validate?: boolean; noUpdate?: boolean; noUpdateExpression?: string; noUpdateRoles?: ReadonlyArray<string> }>;
+export type WorkflowsDto = Versioned<WorkflowsPayload>;
 
-export type WorkflowStep =
-    Readonly<{ name: string } & WorkflowStepValues>;
+export type WorkflowsPayload = Readonly<{
+    // The list of workflows.
+    items: WorkflowDto[];
 
-export type WorkflowTransitionValues =
-    Readonly<{ expression?: string; roles?: string[] }>;
+    // The validations errors.
+    errors: string[];
 
-export type WorkflowTransition =
-    Readonly<{ from: string; to: string } & WorkflowTransitionValues>;
+    // True, if the user has permissions to create a new workflow.
+    canCreate?: boolean;
+}>;
 
-export type WorkflowTransitionView =
-    Readonly<{ step: WorkflowStep } & WorkflowTransition>;
+export type WorkflowStepValues = Readonly<{
+    // The color of the step.
+    color?: string;
 
-export type WorkflowsDto =
-    Versioned<WorkflowsPayload>;
+    // True, if the step cannot be removed.
+    isLocked?: boolean;
 
-export type WorkflowsPayload =
-    Readonly<{ items: WorkflowDto[]; errors: string[]; canCreate: boolean } & Resource>;
+    // True, if the content should be validated on this step.
+    validate?: boolean;
 
-export type CreateWorkflowDto =
-    Readonly<{ name: string }>;
+    // True, when the step has an update restriction.
+    noUpdate?: boolean;
+
+    // The expression when updates are not allowed.
+    noUpdateExpression?: string;
+
+    // The user roles which cannot update a content.
+    noUpdateRoles?: ReadonlyArray<string>;
+}>;
+
+export type WorkflowStep = Readonly<{
+    // The name of the workflow.
+    name: string;
+} & WorkflowStepValues>;
+
+export type WorkflowTransitionValues = Readonly<{
+    // The expression when a transition is possible.
+    expression?: string;
+
+    // The user roles which can transition to this step.
+    roles?: string[];
+}>;
+
+export type WorkflowTransition = Readonly<{
+    // The source step name.
+    from: string;
+
+    // The target step name.
+    to: string;
+} & WorkflowTransitionValues>;
+
+export type WorkflowTransitionView = Readonly<{
+    // The actual workflow step.
+    step: WorkflowStep;
+} & WorkflowTransition>;
+
+export type CreateWorkflowDto = Readonly<{
+    // The name of the workflow.
+    name: string;
+}>;
 
 @Injectable()
 export class WorkflowsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -236,9 +280,6 @@ export class WorkflowsService {
             mapVersioned(({ body }) => {
                 return parseWorkflows(body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Workflow', 'Created', appName);
-            }),
             pretifyError('i18n:workflows.createFailed'));
     }
 
@@ -250,9 +291,6 @@ export class WorkflowsService {
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             mapVersioned(({ body }) => {
                 return parseWorkflows(body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Workflow', 'Updated', appName);
             }),
             pretifyError('i18n:workflows.updateFailed'));
     }
@@ -266,19 +304,17 @@ export class WorkflowsService {
             mapVersioned(({ body }) => {
                 return parseWorkflows(body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Workflow', 'Deleted', appName);
-            }),
             pretifyError('i18n:workflows.deleteFailed'));
     }
 }
 
 function parseWorkflows(response: { items: any[]; errors: string[] } & Resource) {
-    const items = response.items.map(parseWorkflow);
+    const { items: list, errors, _links } = response;
+    const items = list.map(parseWorkflow);
 
-    const { errors, _links } = response;
+    const canCreate = hasAnyLink(_links, 'create');
 
-    return { errors, items, _links, canCreate: hasAnyLink(_links, 'create') };
+    return { items, errors, canCreate };
 }
 
 function parseWorkflow(workflow: any) {

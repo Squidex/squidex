@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AnalyticsService, ApiUrlConfig, AssetCompletions, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsDto, AssetsService, DateTime, ErrorDto, MathHelper, Resource, ResourceLinks, sanitize, Version } from '@app/shared/internal';
+import { ApiUrlConfig, AssetCompletions, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsDto, AssetsService, DateTime, ErrorDto, MathHelper, Resource, ResourceLinks, sanitize, Version } from '@app/shared/internal';
 
 describe('AssetsService', () => {
     const version = new Version('1');
@@ -20,7 +20,6 @@ describe('AssetsService', () => {
             providers: [
                 AssetsService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() },
             ],
         });
     });
@@ -110,11 +109,15 @@ describe('AssetsService', () => {
                 ],
             });
 
-            expect(assets!).toEqual(
-                new AssetsDto(10, [
+            expect(assets!).toEqual({
+                items: [
                     createAsset(12),
                     createAsset(13),
-                ]));
+                ],
+                total: 10,
+                canCreate: false,
+                canRenameTag: false,
+            });
         }));
 
     it('should make get request to get asset folders',
@@ -141,13 +144,16 @@ describe('AssetsService', () => {
                 ],
             });
 
-            expect(assetFolders!).toEqual(
-                new AssetFoldersDto(10, [
+            expect(assetFolders!).toEqual({
+                items: [
                     createAssetFolder(22),
                     createAssetFolder(23),
-                ], [
+                ],
+                path: [
                     createAssetFolder(44),
-                ]));
+                ],
+                canCreate: false,
+            });
         }));
 
     it('should make get request to get asset',

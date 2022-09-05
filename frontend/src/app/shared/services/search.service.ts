@@ -46,13 +46,15 @@ export class SearchService {
     }
 }
 
-function parseResults(body: any[]) {
-    const results = body.map(item => new SearchResultDto(
-        item._links,
-        item.name,
-        item.type,
-        item.label));
+function parseResults(response: any[]) {
+    return response.map(parseResult);
+}
 
-    return results;
+function parseResult(response: any) {
+    return new SearchResultDto(
+        response._links,
+        response.name,
+        response.type,
+        response.label);
 }
 

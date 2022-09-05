@@ -8,7 +8,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
-import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, MetaFields, Query, ResourceOwner, SchemaDto, SchemasService, SchemasState } from '@app/shared/internal';
+import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, META_FIELDS, Query, ResourceOwner, SchemaDto, SchemasService, SchemasState } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-content-selector[language][languages]',
@@ -19,8 +19,8 @@ import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDt
     ],
 })
 export class ContentSelectorComponent extends ResourceOwner implements OnInit {
-    public readonly metaFields = MetaFields;
-    
+    public readonly metaFields = META_FIELDS;
+
     @Output()
     public select = new EventEmitter<ReadonlyArray<ContentDto>>();
 

@@ -9,21 +9,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, pretifyError, ResourceLinks } from '@app/framework';
+import { ApiUrlConfig, pretifyError, Resource } from '@app/framework';
 
 export class UserDto {
     constructor(
         public readonly id: string,
         public readonly displayName: string,
     ) {
-    }
-}
-
-export class ResourcesDto {
-    public readonly _links: ResourceLinks;
-
-    constructor(links: ResourceLinks) {
-        this._links = links;
     }
 }
 
@@ -55,13 +47,10 @@ export class UsersService {
             pretifyError('i18n:users.loadUserFailed'));
     }
 
-    public getResources(): Observable<ResourcesDto> {
+    public getResources(): Observable<Resource> {
         const url = this.apiUrl.buildUrl('api');
 
-        return this.http.get<{ _links: {} }>(url).pipe(
-            map(({ _links }) => {
-                return new ResourcesDto(_links);
-            }),
+        return this.http.get<Resource>(url).pipe(
             pretifyError('i18n:users.loadUserFailed'));
     }
 }

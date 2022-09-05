@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AnalyticsService, ApiUrlConfig, BackupDto, BackupsDto, BackupsService, DateTime, Resource, ResourceLinks, RestoreDto } from '@app/shared/internal';
+import { ApiUrlConfig, BackupDto, BackupsDto, BackupsService, DateTime, Resource, ResourceLinks, RestoreDto } from '@app/shared/internal';
 
 describe('BackupsService', () => {
     beforeEach(() => {
@@ -18,7 +18,6 @@ describe('BackupsService', () => {
             providers: [
                 BackupsService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() },
             ],
         });
     });
@@ -47,11 +46,13 @@ describe('BackupsService', () => {
                 ],
             });
 
-            expect(backups!).toEqual(
-                new BackupsDto(2, [
+            expect(backups!).toEqual({
+                items: [
                     createBackup(12),
                     createBackup(13),
-                ], {}));
+                ],
+                canCreate: false,
+            });
         }));
 
     it('should make get request to get restore',

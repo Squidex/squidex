@@ -8,7 +8,7 @@
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { BackupsDto, BackupsService, BackupsState, DialogService } from '@app/shared/internal';
+import { BackupsService, BackupsState, DialogService } from '@app/shared/internal';
 import { createBackup } from './../services/backups.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -39,7 +39,7 @@ describe('BackupsState', () => {
     describe('Loading', () => {
         it('should load backups', () => {
             backupsService.setup(x => x.getBackups(app))
-                .returns(() => of(new BackupsDto(2, [backup1, backup2], {}))).verifiable();
+                .returns(() => of({ items: [backup1, backup2] } as any)).verifiable();
 
             backupsState.load().subscribe();
 
@@ -61,7 +61,7 @@ describe('BackupsState', () => {
 
         it('should show notification on load if reload is true', () => {
             backupsService.setup(x => x.getBackups(app))
-                .returns(() => of(new BackupsDto(2, [backup1, backup2], {}))).verifiable();
+                .returns(() => of({ items: [backup1, backup2] } as any)).verifiable();
 
             backupsState.load(true, false).subscribe();
 
@@ -96,7 +96,7 @@ describe('BackupsState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             backupsService.setup(x => x.getBackups(app))
-                .returns(() => of(new BackupsDto(2, [backup1, backup2], {}))).verifiable();
+                .returns(() => of({ items: [backup1, backup2] } as any)).verifiable();
 
             backupsState.load().subscribe();
         });

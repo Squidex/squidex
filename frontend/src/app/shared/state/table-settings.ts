@@ -7,10 +7,10 @@
 
 import { take } from 'rxjs/operators';
 import { State, Types } from '@app/framework';
-import { MetaFields, SchemaDto, TableField } from './../services/schemas.service';
+import { META_FIELDS, SchemaDto, TableField } from './../services/schemas.service';
 import { UIState } from './ui.state';
 
-const META_FIELD_NAMES = Object.values(MetaFields).filter(x => x !== MetaFields.empty);
+const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELDS.empty);
 
 export type FieldSizes = { [name: string]: number };
 export type FieldWrappings = { [name: string]: boolean };
@@ -37,7 +37,7 @@ export class TableSettings extends State<Snapshot> {
 
     public fieldWrappings =
         this.project(x => x.wrappings);
-        
+
     public fields =
         this.project(x => x.fields);
 
@@ -82,10 +82,10 @@ export class TableSettings extends State<Snapshot> {
     }
 
     public updateSize(field: string, size: number, save = true) {
-        this.next(s => ({ 
+        this.next(s => ({
             ...s,
-            sizes: { 
-                ...s.sizes, 
+            sizes: {
+                ...s.sizes,
                 [field]: size,
             },
         }));
@@ -96,10 +96,10 @@ export class TableSettings extends State<Snapshot> {
     }
 
     public toggleWrapping(field: string, save = true) {
-        this.next(s => ({ 
+        this.next(s => ({
             ...s,
-            wrappings: { 
-                ...s.wrappings, 
+            wrappings: {
+                ...s.wrappings,
                 [field]: !s.wrappings[field],
             },
         }));
@@ -118,11 +118,11 @@ export class TableSettings extends State<Snapshot> {
     }
 
     private publishSizes(sizes: FieldSizes) {
-        this.next({ sizes });    
+        this.next({ sizes });
     }
 
     private publishWrappings(wrappings: FieldWrappings) {
-        this.next({ wrappings });    
+        this.next({ wrappings });
     }
 
     private publishFields(names: ReadonlyArray<string>) {
@@ -135,7 +135,7 @@ export class TableSettings extends State<Snapshot> {
         const { sizes, fields, wrappings } = this.snapshot;
 
         if (Object.keys(sizes).length === 0 && Object.keys(wrappings).length === 0 && fields.length === 0) {
-            this.uiState.removeUser(this.settingsKey);                
+            this.uiState.removeUser(this.settingsKey);
         } else {
             const update = { sizes, wrappings, fields: fields.map(x => x.name) };
 

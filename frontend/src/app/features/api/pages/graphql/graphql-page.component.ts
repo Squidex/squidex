@@ -31,7 +31,7 @@ export class GraphQLPageComponent implements AfterViewInit {
     public ngAfterViewInit() {
         const url = this.apiUrl.buildUrl(`api/content/${this.appsState.appName}/graphql`);
 
-        const subscriptionUrl = 
+        const subscriptionUrl =
             url
                 .replace('http://', 'ws://')
                 .replace('https://', 'wss://') +

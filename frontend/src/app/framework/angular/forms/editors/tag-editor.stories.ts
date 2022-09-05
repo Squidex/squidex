@@ -110,7 +110,7 @@ Suggestions.args = {
 export const SuggestionsEmpty = Template.bind({});
 
 SuggestionsEmpty.args = {
-    suggestions: [], 
+    suggestions: [],
     allowOpen: true,
 };
 

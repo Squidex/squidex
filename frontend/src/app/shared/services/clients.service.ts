@@ -8,17 +8,16 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { AnalyticsService, ApiUrlConfig, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, Version, Versioned } from '@app/framework';
+import { map } from 'rxjs/operators';
+import { ApiUrlConfig, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, Version, Versioned } from '@app/framework';
 
 export class ClientDto {
     public readonly _links: ResourceLinks;
 
-    public readonly canUpdate: boolean;
     public readonly canRevoke: boolean;
+    public readonly canUpdate: boolean;
 
-    constructor(
-        links: ResourceLinks,
+    constructor(links: ResourceLinks,
         public readonly id: string,
         public readonly name: string,
         public readonly secret: string,
@@ -29,8 +28,8 @@ export class ClientDto {
     ) {
         this._links = links;
 
-        this.canUpdate = hasAnyLink(links, 'update');
         this.canRevoke = hasAnyLink(links, 'delete');
+        this.canUpdate = hasAnyLink(links, 'update');
     }
 }
 
@@ -42,24 +41,40 @@ export class AccessTokenDto {
     }
 }
 
-export type ClientsDto =
-    Versioned<ClientsPayload>;
+export type ClientsDto = Versioned<ClientsPayload>;
 
-export type ClientsPayload =
-    Readonly<{ items: ReadonlyArray<ClientDto>; canCreate: boolean } & Resource>;
+export type ClientsPayload = Readonly<{
+    // The list of clients.
+    items: ReadonlyArray<ClientDto>;
 
-export type CreateClientDto =
-    Readonly<{ id: string }>;
+    // True if the user has permissions to create a client.
+    canCreate?: boolean;
+}>;
 
-export type UpdateClientDto =
-    Readonly<{ name?: string; role?: string; allowAnonymous?: boolean; apiCallsLimit?: number }>;
+export type CreateClientDto = Readonly<{
+    // The new client ID.
+    id: string;
+ }>;
+
+export type UpdateClientDto = Readonly<{
+    // The optional client name.
+    name?: string;
+
+    // The role for the client to define the permissions.
+    role?: string;
+
+    // True if the client can be used for anonymous access.
+    allowAnonymous?: boolean;
+
+    // The allowed api calls.
+    apiCallsLimit?: number;
+}>;
 
 @Injectable()
 export class ClientsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -80,9 +95,6 @@ export class ClientsService {
             mapVersioned(({ body }) => {
                 return parseClients(body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Client', 'Created', appName);
-            }),
             pretifyError('i18n:clients.addFailed'));
     }
 
@@ -95,9 +107,6 @@ export class ClientsService {
             mapVersioned(({ body }) => {
                 return parseClients(body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Client', 'Updated', appName);
-            }),
             pretifyError('i18n:clients.revokeFailed'));
     }
 
@@ -109,9 +118,6 @@ export class ClientsService {
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
             mapVersioned(({ body }) => {
                 return parseClients(body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Client', 'Deleted', appName);
             }),
             pretifyError('i18n:clients.revokeFailed'));
     }
@@ -136,17 +142,21 @@ export class ClientsService {
 }
 
 function parseClients(response: { items: any[] } & Resource): ClientsPayload {
-    const items = response.items.map(item =>
-        new ClientDto(item._links,
-            item.id,
-            item.name || item.id,
-            item.secret,
-            item.role,
-            item.apiCallsLimit,
-            item.apiTrafficLimit,
-            item.allowAnonymous));
+    const { items: list, _links } = response;
+    const items = list.map(parseClient);
 
-    const { _links } = response;
+    const canCreate = hasAnyLink(_links, 'create');
 
-    return { items, _links, canCreate: hasAnyLink(_links, 'create') };
+    return { items, canCreate };
+}
+
+function parseClient(response: any) {
+    return new ClientDto(response._links,
+        response.id,
+        response.name || response.id,
+        response.secret,
+        response.role,
+        response.apiCallsLimit,
+        response.apiTrafficLimit,
+        response.allowAnonymous);
 }

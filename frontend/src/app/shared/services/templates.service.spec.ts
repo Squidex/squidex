@@ -46,11 +46,12 @@ describe('TemplatesService', () => {
                 ],
             });
 
-            expect(templates!).toEqual(
-                new TemplatesDto(2, [
+            expect(templates!).toEqual({
+                items: [
                     createTemplate(1),
                     createTemplate(2),
-                ], {}));
+                ],
+            });
         }));
 
     it('should make get request to get template',

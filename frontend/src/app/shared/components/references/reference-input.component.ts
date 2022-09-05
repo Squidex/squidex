@@ -106,7 +106,7 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
         if (this.snapshot.isDisabled) {
             return;
         }
-        
+
         const id = selectedContent?.id;
 
         if (id) {

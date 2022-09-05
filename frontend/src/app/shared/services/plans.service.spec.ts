@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AnalyticsService, ApiUrlConfig, PlanChangedDto, PlanDto, PlansDto, PlansService, Version } from '@app/shared/internal';
+import { ApiUrlConfig, PlanChangedDto, PlanDto, PlansDto, PlansService, Version } from '@app/shared/internal';
 
 describe('PlansService', () => {
     const version = new Version('1');
@@ -20,7 +20,6 @@ describe('PlansService', () => {
             providers: [
                 PlansService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() },
             ],
         });
     });

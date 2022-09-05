@@ -20,7 +20,7 @@ export class TemplateComponent implements OnChanges {
     public template!: TemplateDto;
 
     public isExpanded = false;
-    
+
     public details?: Observable<string>;
 
     constructor(
@@ -44,14 +44,14 @@ export class TemplateComponent implements OnChanges {
         let details = dto.details.replace(/<APP>/g, app);
 
         const client = this.clientsState.snapshot.clients[0];
-    
+
         if (client) {
             const clientId = `${app}:${client.id}`;
-    
+
             details = details.replace(/\<CLIENT_ID>/g, clientId);
             details = details.replace(/\<CLIENT_SECRET>/g, client.secret);
         }
-    
+
         return details;
     }
 }

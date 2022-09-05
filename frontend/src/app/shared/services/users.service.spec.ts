@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, ResourcesDto, UserDto, UsersService } from '@app/shared/internal';
+import { ApiUrlConfig, Resource, UserDto, UsersService } from '@app/shared/internal';
 
 describe('UsersService', () => {
     beforeEach(() => {
@@ -108,7 +108,7 @@ describe('UsersService', () => {
 
     it('should make get request to get resources',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
-            let resources: ResourcesDto;
+            let resources: Resource;
 
             usersService.getResources().subscribe(result => {
                 resources = result;
@@ -125,10 +125,10 @@ describe('UsersService', () => {
                 },
             });
 
-            const expected = new ResourcesDto({
-                schemas: { method: 'GET', href: '/api/schemas' },
+            expect(resources!).toEqual({
+                _links: {
+                    schemas: { method: 'GET', href: '/api/schemas' },
+                },
             });
-
-            expect(resources!).toEqual(expected);
         }));
 });

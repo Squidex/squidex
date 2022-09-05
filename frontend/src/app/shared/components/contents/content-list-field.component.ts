@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ContentDto, FieldValue, getContentValue, LanguageDto, MetaFields, StatefulComponent, TableField, TableSettings } from '@app/shared/internal';
+import { ContentDto, FieldValue, getContentValue, LanguageDto, META_FIELDS, StatefulComponent, TableField, TableSettings } from '@app/shared/internal';
 
 interface State {
     // The formatted value.
@@ -21,7 +21,7 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentListFieldComponent extends StatefulComponent<State> implements OnChanges {
-    public readonly metaFields = MetaFields;
+    public readonly metaFields = META_FIELDS;
 
     @Input()
     public field!: TableField;

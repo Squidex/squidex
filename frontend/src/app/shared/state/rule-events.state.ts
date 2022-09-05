@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, getPagingInfo, hasAnyLink, ListState, ResourceLinks, shareSubscribed, State } from '@app/framework';
+import { DialogService, getPagingInfo, ListState, Resource, shareSubscribed, State } from '@app/framework';
 import { RuleEventDto, RulesService } from './../services/rules.service';
 import { AppsState } from './apps.state';
 
@@ -19,8 +19,11 @@ interface Snapshot extends ListState {
     // The current rule id.
     ruleId?: string;
 
-    // The resource links.
-    links: ResourceLinks;
+    // True, if the user has permissions to cancel all rule events.
+    canCancelAll?: boolean;
+
+    // The resource.
+    resource: Resource;
 }
 
 @Injectable()
@@ -41,7 +44,7 @@ export class RuleEventsState extends State<Snapshot> {
         this.project(x => x.isLoading === true);
 
     public canCancelAll =
-        this.project(x => hasAnyLink(x.links, 'cancel'));
+        this.project(x => x.canCancelAll === true);
 
     public get appId() {
         return this.appsState.appId;
@@ -57,7 +60,7 @@ export class RuleEventsState extends State<Snapshot> {
         private readonly rulesService: RulesService,
     ) {
         super({
-            links: {},
+            resource: { _links: {} },
             ruleEvents: [],
             page: 0,
             pageSize: 30,
@@ -84,15 +87,18 @@ export class RuleEventsState extends State<Snapshot> {
                 pageSize,
                 pageSize * page,
                 ruleId).pipe(
-            tap(({ total, items: ruleEvents, _links: links }) => {
+            tap(payload => {
+                const { total, items: ruleEvents, canCancelAll } = payload;
+
                 if (isReload) {
                     this.dialogs.notifyInfo('i18n:rules.ruleEvents.reloaded');
                 }
 
                 return this.next({
+                    canCancelAll,
                     isLoaded: true,
                     isLoading: false,
-                    links,
+                    resource: payload,
                     ruleEvents,
                     total,
                 }, 'Loading Success');
@@ -112,7 +118,7 @@ export class RuleEventsState extends State<Snapshot> {
     }
 
     public cancelAll(): Observable<any> {
-        return this.rulesService.cancelEvents(this.appsState.appName, { _links: this.snapshot.links }).pipe(
+        return this.rulesService.cancelEvents(this.appsState.appName, this.snapshot.resource).pipe(
             tap(() => {
                 return this.next(s => {
                     const ruleEvents = s.ruleEvents.map(x => setCancelled(x));
@@ -153,4 +159,14 @@ export class RuleEventsState extends State<Snapshot> {
 }
 
 const setCancelled = (event: RuleEventDto) =>
-    event.with({ nextAttempt: null, jobResult: 'Cancelled' });
+    new RuleEventDto(
+        event._links,
+        event.id,
+        event.created,
+        null,
+        event.eventName,
+        event.description,
+        event.lastDump,
+        event.result,
+        'Cancelled',
+        event.numCalls);
