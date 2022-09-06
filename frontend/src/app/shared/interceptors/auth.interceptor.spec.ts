@@ -7,6 +7,7 @@
 
 /* eslint-disable deprecation/deprecation */
 
+import { Location } from '@angular/common';
 import { HTTP_INTERCEPTORS, HttpClient, HttpHeaders } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
@@ -19,9 +20,15 @@ import { AuthInterceptor } from './auth.interceptor';
 
 describe('AuthInterceptor', () => {
     let authService: IMock<AuthService>;
+    let location: IMock<Location>;
     let router: IMock<Router>;
 
     beforeEach(() => {
+        location = Mock.ofType<Location>();
+
+        location.setup(x => x.path())
+            .returns(() => '/my-path');
+
         authService = Mock.ofType(AuthService);
 
         router = Mock.ofType<Router>();
@@ -32,6 +39,7 @@ describe('AuthInterceptor', () => {
             ],
             providers: [
                 { provide: Router, useFactory: () => router.object },
+                { provide: Location, useFactory: () => location.object },
                 { provide: AuthService, useValue: authService.object },
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
                 {
@@ -100,7 +108,7 @@ describe('AuthInterceptor', () => {
 
             expect().nothing();
 
-            authService.verify(x => x.logoutRedirect(), Times.once());
+            authService.verify(x => x.logoutRedirect('/my-path'), Times.once());
         }));
 
     const AUTH_ERRORS = [403];
@@ -137,7 +145,7 @@ describe('AuthInterceptor', () => {
 
                 expect().nothing();
 
-                authService.verify(x => x.logoutRedirect(), Times.never());
+                authService.verify(x => x.logoutRedirect('/my-path'), Times.never());
             }));
     });
 });

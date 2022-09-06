@@ -5,8 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { Location } from '@angular/common';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@app/shared';
 
 @Component({
@@ -19,18 +20,26 @@ export class HomePageComponent {
 
     constructor(
         private readonly authService: AuthService,
+        private readonly location: Location,
+        private readonly route: ActivatedRoute,
         private readonly router: Router,
     ) {
     }
 
     public login() {
+        const redirectPath =
+            this.route.snapshot.queryParams.redirectPath ||
+            this.location.path();
+
         if (this.isIE()) {
-            this.authService.loginRedirect();
+            this.authService.loginRedirect(redirectPath);
         } else {
-            this.authService.loginPopup()
+            this.authService.loginPopup(redirectPath)
                 .subscribe({
-                    next: () => {
-                        this.router.navigate(['/app']);
+                    next: path => {
+                        path ||= '/app';
+
+                        this.router.navigateByUrl(path);
                     },
                     error: () => {
                         this.showLoginError = true;
@@ -40,8 +49,6 @@ export class HomePageComponent {
     }
 
     public isIE() {
-        const isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
-
-        return isIE;
+        return !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
     }
 }
