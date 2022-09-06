@@ -19,13 +19,11 @@ describe('AppMustExistGuard', () => {
     };
 
     let router: IMock<Router>;
-
     let appsState: IMock<AppsState>;
     let appGuard: AppMustExistGuard;
 
     beforeEach(() => {
         router = Mock.ofType<Router>();
-
         appsState = Mock.ofType<AppsState>();
         appGuard = new AppMustExistGuard(appsState.object, router.object);
     });

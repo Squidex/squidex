@@ -21,13 +21,14 @@ describe('MustBeAuthenticatedGuard', () => {
     const uiOptions = new UIOptions({});
 
     beforeEach(() => {
+        uiOptions.value.redirectToLogin = false;
+
         location = Mock.ofType<Location>();
 
         location.setup(x => x.path(true))
             .returns(() => '/my-path');
 
         router = Mock.ofType<Router>();
-
         authService = Mock.ofType<AuthService>();
         authGuard = new MustBeAuthenticatedGuard(authService.object, location.object, router.object, uiOptions);
     });
