@@ -61,12 +61,14 @@
         [fields]="tableSettings"
         [sqxStopClick]="shouldStop(field)">
         <sqx-content-list-field
+            [content]="content"
             [field]="field"
             [fields]="tableSettings"
-            [patchForm]="patchForm?.form"
+            [language]="language"
+            [languages]="languages"
             [patchAllowed]="patchAllowed"
-            [content]="content"
-            [language]="language">
+            [patchForm]="patchForm?.form"
+            [schema]="schema">
         </sqx-content-list-field>
     </td>
 

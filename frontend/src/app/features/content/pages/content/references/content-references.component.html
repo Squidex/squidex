@@ -7,9 +7,10 @@
                 [columns]="contents | sqxContentsColumns"
                 [isCompact]="false"
                 [isDisabled]="false"
+                [language]="language"
+                [languages]="languages"
                 [validations]="(contentsState.validationResults | async)!"
-                [validityVisible]="true"
-                [language]="language">
+                [validityVisible]="true">
             </tbody>
 
             <tbody *ngIf="(contentsState.isLoaded | async) && contents.length === 0">
