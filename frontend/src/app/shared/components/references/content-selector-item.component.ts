@@ -11,7 +11,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { ContentDto, LanguageDto, META_FIELDS, SchemaDto } from '@app/shared/internal';
 
 @Component({
-    selector: '[sqxContentSelectorItem][language][schema]',
+    selector: '[sqxContentSelectorItem][language][languages][schema]',
     styleUrls: ['./content-selector-item.component.scss'],
     templateUrl: './content-selector-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,6 +30,9 @@ export class ContentSelectorItemComponent {
 
     @Input()
     public language!: LanguageDto;
+
+    @Input()
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public schema!: SchemaDto;

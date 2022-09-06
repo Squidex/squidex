@@ -50,7 +50,7 @@ export class ContentDto {
         public readonly statusColor: string,
         public readonly newStatus: string | undefined,
         public readonly newStatusColor: string | undefined,
-        public readonly scheduleJob: ScheduleDto | null,
+        public readonly scheduleJob: ScheduleDto | null | undefined,
         public readonly data: ContentData,
         public readonly schemaName: string,
         public readonly schemaDisplayName: string,

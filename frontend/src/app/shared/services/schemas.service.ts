@@ -25,47 +25,55 @@ export const META_FIELDS = {
     },
     id: {
         name: 'meta.id',
-        label: 'i18n:contents.tableHeaders.id',
+        label: 'i18n:schemas.tableHeaders.id',
     },
     created: {
         name: 'meta.created',
-        label: 'i18n:contents.tableHeaders.created',
+        label: 'i18n:schemas.tableHeaders.created',
     },
     createdByAvatar: {
         name: 'meta.createdBy.avatar',
-        label: 'i18n:contents.tableHeaders.createdByShort',
+        label: 'i18n:schemas.tableHeaders.createdByShort',
     },
     createdByName: {
         name: 'meta.createdBy.name',
-        label: 'i18n:contents.tableHeaders.createdBy',
+        label: 'i18n:schemas.tableHeaders.createdBy',
     },
     lastModified: {
         name: 'meta.lastModified',
-        label: 'i18n:contents.tableHeaders.lastModified',
+        label: 'i18n:schemas.tableHeaders.lastModified',
     },
     lastModifiedByAvatar: {
         name: 'meta.lastModifiedBy.avatar',
-        label: 'i18n:contents.tableHeaders.lastModifiedByShort',
+        label: 'i18n:schemas.tableHeaders.lastModifiedByShort',
     },
     lastModifiedByName: {
         name: 'meta.lastModifiedBy.name',
-        label: 'i18n:contents.tableHeaders.lastModifiedBy',
+        label: 'i18n:schemas.tableHeaders.lastModifiedBy',
     },
     status: {
         name: 'meta.status',
-        label: 'i18n:contents.tableHeaders.status',
+        label: 'i18n:schemas.tableHeaders.status',
     },
     statusColor: {
         name: 'meta.status.color',
-        label: 'i18n:contents.tableHeaders.status',
+        label: 'i18n:schemas.tableHeaders.status',
     },
     statusNext: {
         name: 'meta.status.next',
-        label: 'i18n:contents.tableHeaders.nextStatus',
+        label: 'i18n:schemas.tableHeaders.nextStatus',
     },
     version: {
         name: 'meta.version',
-        label: 'i18n:contents.tableHeaders.version',
+        label: 'i18n:schemas.tableHeaders.version',
+    },
+    translationStatus: {
+        name: 'meta.translationStatus',
+        label: 'i18n:schemas.tableHeaders.translationStatus',
+    },
+    translationStatusAverage: {
+        name: 'meta.translationStatusAverage',
+        label: 'i18n:schemas.tableHeaders.translationStatusAverage',
     },
 };
 
