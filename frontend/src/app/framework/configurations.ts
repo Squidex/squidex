@@ -7,7 +7,7 @@
 
 export class UIOptions {
     constructor(
-        private readonly value: any,
+        public readonly value: any,
     ) {
     }
 

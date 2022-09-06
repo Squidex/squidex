@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
@@ -13,19 +14,25 @@ import { MustBeNotAuthenticatedGuard } from './must-be-not-authenticated.guard';
 
 describe('MustBeNotAuthenticatedGuard', () => {
     let router: IMock<Router>;
+    let location: IMock<Location>;
     let authService: IMock<AuthService>;
-    const uiOptions = new UIOptions({ map: { type: 'OSM' } });
-    const uiOptionsRedirect = new UIOptions({ map: { type: 'OSM' }, redirectToLogin: true });
+    let authGuard: MustBeNotAuthenticatedGuard;
+
+    const uiOptions = new UIOptions({});
 
     beforeEach(() => {
+        location = Mock.ofType<Location>();
+
+        location.setup(x => x.path(true))
+            .returns(() => '/my-path');
+
         router = Mock.ofType<Router>();
 
         authService = Mock.ofType<AuthService>();
+        authGuard = new MustBeNotAuthenticatedGuard(authService.object, location.object, router.object, uiOptions);
     });
 
     it('should navigate to app page if authenticated', async () => {
-        const authGuard = new MustBeNotAuthenticatedGuard(uiOptions, authService.object, router.object);
-
         authService.setup(x => x.userChanges)
             .returns(() => of(<any>{}));
 
@@ -33,12 +40,10 @@ describe('MustBeNotAuthenticatedGuard', () => {
 
         expect(result!).toBeFalsy();
 
-        router.verify(x => x.navigate(['app']), Times.once());
+        router.verify(x => x.navigate(['app'], { queryParams: { redirectPath: '/my-path' } }), Times.once());
     });
 
     it('should return true if not authenticated', async () => {
-        const authGuard = new MustBeNotAuthenticatedGuard(uiOptions, authService.object, router.object);
-
         authService.setup(x => x.userChanges)
             .returns(() => of(null));
 
@@ -50,7 +55,7 @@ describe('MustBeNotAuthenticatedGuard', () => {
     });
 
     it('should login redirect and return false if redirect enabled', async () => {
-        const authGuard = new MustBeNotAuthenticatedGuard(uiOptionsRedirect, authService.object, router.object);
+        uiOptions.value.redirectToLogin = true;
 
         authService.setup(x => x.userChanges)
             .returns(() => of(null));
@@ -59,6 +64,6 @@ describe('MustBeNotAuthenticatedGuard', () => {
 
         expect(result).toBeFalsy();
 
-        authService.verify(x => x.loginRedirect(), Times.once());
+        authService.verify(x => x.loginRedirect('/my-path'), Times.once());
     });
 });
