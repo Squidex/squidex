@@ -17,7 +17,7 @@ using Squidex.Web;
 namespace Squidex.Areas.Api.Controllers.Users
 {
     /// <summary>
-    /// Readonly API to retrieve information about squidex users.
+    /// Update and query users.
     /// </summary>
     [ApiExplorerSettings(GroupName = nameof(Users))]
     public sealed class UsersController : ApiController

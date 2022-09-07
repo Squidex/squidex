@@ -21,7 +21,7 @@ using Squidex.Web;
 namespace Squidex.Areas.Api.Controllers.Comments
 {
     /// <summary>
-    /// Manages comments for any kind of app resource.
+    /// Update and query comments for any kind of app resource.
     /// </summary>
     [ApiExplorerSettings(GroupName = nameof(Comments))]
     public sealed class CommentsController : ApiController

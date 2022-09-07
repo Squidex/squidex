@@ -23,7 +23,7 @@ using Squidex.Web;
 namespace Squidex.Areas.Api.Controllers.Apps
 {
     /// <summary>
-    /// Manages and configures apps.
+    /// Update and query apps.
     /// </summary>
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppContributorsController : ApiController
@@ -76,7 +76,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/contributors/")]
-        [ProducesResponseType(typeof(ContributorsDto), 201)]
+        [ProducesResponseType(typeof(ContributorsDto), StatusCodes.Status201Created)]
         [ApiPermissionOrAnonymous(PermissionIds.AppContributorsAssign)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContributor(string app, [FromBody] AssignContributorDto request)

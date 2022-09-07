@@ -16,7 +16,7 @@ using Squidex.Web;
 namespace Squidex.Areas.Api.Controllers.Plans
 {
     /// <summary>
-    /// Manages and configures plans.
+    /// Update and query plans.
     /// </summary>
     [ApiExplorerSettings(GroupName = nameof(Plans))]
     public sealed class AppPlansController : ApiController

@@ -16,7 +16,7 @@ using Squidex.Web;
 namespace Squidex.Areas.Api.Controllers.Backups
 {
     /// <summary>
-    /// Manages backups for apps.
+    /// Update and query backups for apps.
     /// </summary>
     [ApiExplorerSettings(GroupName = nameof(Backups))]
     [ApiModelValidation(true)]

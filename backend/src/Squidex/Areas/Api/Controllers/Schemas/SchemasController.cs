@@ -24,7 +24,7 @@ using Squidex.Web;
 namespace Squidex.Areas.Api.Controllers.Schemas
 {
     /// <summary>
-    /// Manages and retrieves information about schemas.
+    /// Update and query information about schemas.
     /// </summary>
     [ApiExplorerSettings(GroupName = nameof(Schemas))]
     public sealed class SchemasController : ApiController

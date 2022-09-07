@@ -20,7 +20,7 @@ using Squidex.Web;
 namespace Squidex.Areas.Api.Controllers.Comments.Notifications
 {
     /// <summary>
-    /// Manages user notifications.
+    /// Update and query user notifications.
     /// </summary>
     [ApiExplorerSettings(GroupName = nameof(Notifications))]
     public sealed class UserNotificationsController : ApiController
