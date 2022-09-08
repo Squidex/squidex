@@ -20,7 +20,7 @@ pipeline {
     disableConcurrentBuilds()
   }
   parameters {
-    booleanParam(name: 'create_db', defaultValue: false, description: 'Create New MongoDB Environment')
+    booleanParam(name: 'create_db', defaultValue: true, description: 'Create New MongoDB Environment')
     string(name: 'tag', description: 'The tag to deploy: ex. 6.7.0', defaultValue: 'latest')
     string(name: 'dbname', description: 'The current mongodb to use (like: homer-squidex-staging or homer-squidex-staging-v2upgrade)', defaultValue: 'none')
     choice(name: 'cluster', choices: ['staging', 'production'], description: 'The Kubernetes Cluster to deploy to')
