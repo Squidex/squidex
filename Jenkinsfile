@@ -4,7 +4,7 @@ import groovy.time.*
 def aws_region = 'us-east-1'
 def app = '' /* the docker app build gets stored here */
 def upstream_image_name = "squidex/squidex"
-def create_db = false
+def create_db = true
 def full_image_name = null
 def cluster = null
 def dbname = null
