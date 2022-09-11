@@ -109,14 +109,14 @@ describe('TranslationStatus', () => {
             field1: {
                 en: 'en',
                 de: 'de',
-            }, 
+            },
             field2: {
                 en: 'en',
                 de: 'de',
-            }, 
+            },
             field3: {
                 en: 'en',
-            }, 
+            },
         };
 
         const result = contentTranslationStatus(data, schema, languages as any);
@@ -145,23 +145,23 @@ describe('TranslationStatus', () => {
             field1: {
                 en: 'en',
                 de: 'de',
-            }, 
+            },
             field2: {
                 en: 'en',
                 de: 'de',
-            }, 
+            },
             field3: {
                 en: 'en',
-            }, 
+            },
         };
 
         const data2 = {
             field1: {
                 de: 'de',
-            }, 
+            },
             field3: {
                 en: 'en',
-            }, 
+            },
         };
 
         const result = contentsTranslationStatus([data1, data2], schema, languages as any);

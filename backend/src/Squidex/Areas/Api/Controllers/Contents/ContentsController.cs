@@ -351,7 +351,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/{schema}/")]
-        [ProducesResponseType(typeof(ContentsDto), 201)]
+        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status201Created)]
         [ApiPermissionOrAnonymous(PermissionIds.AppContentsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string schema, CreateContentDto request)

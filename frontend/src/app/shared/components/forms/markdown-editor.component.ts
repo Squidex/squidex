@@ -347,7 +347,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
                 .defined()
                 .join(', ')
             || 'content';
-            
+
         return `[${name}](${this.apiUrl.buildUrl(content._links['self'].href)})`;
     }
 

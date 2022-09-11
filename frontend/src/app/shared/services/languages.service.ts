@@ -39,7 +39,11 @@ export class LanguagesService {
 }
 
 function parseLanguages(response: any[]) {
-    return response.map(item => new LanguageDto(
-        item.iso2Code,
-        item.englishName));
+    return response.map(parseLanguage);
+}
+
+function parseLanguage(response: any) {
+    return new LanguageDto(
+        response.iso2Code,
+        response.englishName);
 }

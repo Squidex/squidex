@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AnalyticsService, ApiUrlConfig, DateTime, Resource, ResourceLinks, RuleDto, RuleElementDto, RuleElementPropertyDto, RuleEventDto, RuleEventsDto, RulesDto, RulesService, Version } from '@app/shared/internal';
+import { ApiUrlConfig, DateTime, Resource, ResourceLinks, RuleDto, RuleElementDto, RuleElementPropertyDto, RuleEventDto, RuleEventsDto, RulesDto, RulesService, Version } from '@app/shared/internal';
 import { RuleCompletions } from '..';
 import { SimulatedRuleEventDto, SimulatedRuleEventsDto } from './rules.service';
 
@@ -22,7 +22,6 @@ describe('RulesService', () => {
             providers: [
                 RulesService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() },
             ],
         });
     });
@@ -117,11 +116,16 @@ describe('RulesService', () => {
                 runningRuleId: '12',
             });
 
-            expect(rules!).toEqual(
-                new RulesDto([
+            expect(rules!).toEqual({
+                items: [
                     createRule(12),
                     createRule(13),
-                ], {}, '12'));
+                ],
+                runningRuleId: '12',
+                canCancelRun: false,
+                canCreate: false,
+                canReadEvents: false,
+            });
         }));
 
     it('should make post request to create rule',
@@ -290,13 +294,22 @@ describe('RulesService', () => {
                     ruleEventResponse(1),
                     ruleEventResponse(2),
                 ],
+                _links: {
+                    cancel: { method: 'DELETE', href: '/rules/events' },
+                },
             });
 
-            expect(rules!).toEqual(
-                new RuleEventsDto(20, [
+            expect(rules!).toEqual({
+                items: [
                     createRuleEvent(1),
                     createRuleEvent(2),
-                ]));
+                ],
+                _links: {
+                    cancel: { method: 'DELETE', href: '/rules/events' },
+                },
+                total: 20,
+                canCancelAll: false,
+            });
         }));
 
     it('should make get request to get simulated rule events',
@@ -319,11 +332,13 @@ describe('RulesService', () => {
                 ],
             });
 
-            expect(rules!).toEqual(
-                new SimulatedRuleEventsDto(20, [
+            expect(rules!).toEqual({
+                items: [
                     createSimulatedRuleEvent(1),
                     createSimulatedRuleEvent(2),
-                ]));
+                ],
+                total: 20,
+            });
         }));
 
     it('should make post request to get simulated rule events with action and trigger',
@@ -346,11 +361,13 @@ describe('RulesService', () => {
                 ],
             });
 
-            expect(rules!).toEqual(
-                new SimulatedRuleEventsDto(20, [
+            expect(rules!).toEqual({
+                items: [
                     createSimulatedRuleEvent(1),
                     createSimulatedRuleEvent(2),
-                ]));
+                ],
+                total: 20,
+            });
         }));
 
     it('should make put request to enqueue rule event',

@@ -47,11 +47,12 @@ describe('EventConsumersService', () => {
                 ],
             });
 
-            expect(eventConsumers!).toEqual(
-                new EventConsumersDto(2, [
+            expect(eventConsumers!).toEqual({
+                items: [
                     createEventConsumer(12),
                     createEventConsumer(13),
-                ]));
+                ],
+            });
         }));
 
     it('should make put request to start event consumer',

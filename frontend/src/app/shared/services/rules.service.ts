@@ -8,8 +8,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { AnalyticsService, ApiUrlConfig, DateTime, hasAnyLink, HTTP, Model, pretifyError, Resource, ResourceLinks, ResultSet, Version } from '@app/framework';
+import { map } from 'rxjs/operators';
+import { ApiUrlConfig, DateTime, hasAnyLink, HTTP, Model, pretifyError, Resource, ResourceLinks, Version } from '@app/framework';
 
 export type RuleElementMetadataDto = Readonly<{
     description: string;
@@ -101,26 +101,6 @@ export class RuleElementPropertyDto {
     }
 }
 
-export class RulesDto extends ResultSet<RuleDto> {
-    public get canCreate() {
-        return hasAnyLink(this._links, 'create');
-    }
-
-    public get canReadEvents() {
-        return hasAnyLink(this._links, 'events');
-    }
-
-    public get canCancelRun() {
-        return hasAnyLink(this._links, 'run/cancel');
-    }
-
-    constructor(items: ReadonlyArray<RuleDto>, links?: {},
-        public readonly runningRuleId?: string,
-    ) {
-        super(items.length, items, links);
-    }
-}
-
 export class RuleDto {
     public readonly _links: ResourceLinks;
 
@@ -133,8 +113,7 @@ export class RuleDto {
     public readonly canTrigger: boolean;
     public readonly canUpdate: boolean;
 
-    constructor(
-        links: ResourceLinks,
+    constructor(links: ResourceLinks,
         public readonly id: string,
         public readonly created: DateTime,
         public readonly createdBy: string,
@@ -164,9 +143,6 @@ export class RuleDto {
     }
 }
 
-export class RuleEventsDto extends ResultSet<RuleEventDto> {
-}
-
 export class RuleEventDto extends Model<RuleEventDto> {
     public readonly _links: ResourceLinks;
 
@@ -193,9 +169,6 @@ export class RuleEventDto extends Model<RuleEventDto> {
     }
 }
 
-export class SimulatedRuleEventsDto extends ResultSet<SimulatedRuleEventDto> {
-}
-
 export class SimulatedRuleEventDto {
     public readonly _links: ResourceLinks;
 
@@ -213,27 +186,93 @@ export class SimulatedRuleEventDto {
     }
 }
 
-export type RuleCompletions =
-    ReadonlyArray<{ path: string; description: string; type: string }>;
+export type RuleCompletions = ReadonlyArray<Readonly<{
+    // The autocompletion path.
+    path: string;
 
-export type ActionsDto =
-    Readonly<{ [name: string]: RuleElementDto }>;
+    // The description of the autocompletion field.
+    description: string;
 
-export type UpsertRuleDto =
-    Readonly<{ trigger?: RuleTrigger; action?: RuleAction; name?: string; isEnabled?: boolean }>;
+    // The type of the autocompletion field.
+    type: string;
+}>>;
 
-export type RuleAction =
-    Readonly<{ actionType: string; [key: string]: any }>;
+export type RulesDto = Readonly<{
+    // The list of rules.
+    items: ReadonlyArray<RuleDto>;
 
-export type RuleTrigger =
-    Readonly<{ triggerType: string; [key: string]: any }>;
+    // The id of the rule that is currently running.
+    runningRuleId?: string;
+
+    // True, if the user has permission to create a rule.
+    canCreate?: boolean;
+
+    // True, if the user has permission to read events.
+    canReadEvents?: boolean;
+
+    // True, if the user has permission to cancel an event.
+    canCancelRun?: boolean;
+}>;
+
+export type RuleEventsDto = Readonly<{
+    // The list of rule events.
+    items: ReadonlyArray<RuleEventDto>;
+
+    // The total number of rule events.
+    total: number;
+
+    // True, if the user has permissions to cancel all rule events.
+    canCancelAll?: boolean;
+}> & Resource;
+
+export type SimulatedRuleEventsDto = Readonly<{
+    // The list of simulated rule events.
+    items: ReadonlyArray<SimulatedRuleEventDto>;
+
+    // The total number of simulated rule events.
+    total: number;
+}>;
+
+export type ActionsDto = Readonly<{
+    // The rule elements by name.
+    [name: string]: RuleElementDto;
+}>;
+
+export type UpsertRuleDto = Readonly<{
+    // The optional trigger to update.
+    trigger?: RuleTrigger;
+
+    // The optional action to update.
+    action?: RuleAction;
+
+    // The optional rule name.
+    name?: string;
+
+    // True, if the rule is enabled.
+    isEnabled?: boolean;
+}>;
+
+export type RuleAction = Readonly<{
+    // The type of the action.
+    actionType: string;
+
+    // The additional properties.
+    [key: string]: any;
+ }>;
+
+export type RuleTrigger = Readonly<{
+    // The type of the trigger.
+    triggerType: string;
+
+    // The additional properties.
+    [key: string]: any;
+}>;
 
 @Injectable()
 export class RulesService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -264,9 +303,6 @@ export class RulesService {
             map(({ payload }) => {
                 return parseRule(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Rule', 'Created', appName);
-            }),
             pretifyError('i18n:rules.createFailed'));
     }
 
@@ -279,9 +315,6 @@ export class RulesService {
             map(({ payload }) => {
                 return parseRule(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Rule', 'Updated', appName);
-            }),
             pretifyError('i18n:rules.updateFailed'));
     }
 
@@ -291,9 +324,6 @@ export class RulesService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Rule', 'Deleted', appName);
-            }),
             pretifyError('i18n:rules.deleteFailed'));
     }
 
@@ -303,9 +333,6 @@ export class RulesService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return this.http.request(link.method, url, {}).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Rule', 'Run', appName);
-            }),
             pretifyError('i18n:rules.runFailed'));
     }
 
@@ -315,9 +342,6 @@ export class RulesService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return this.http.request(link.method, url, {}).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Rule', 'Run', appName);
-            }),
             pretifyError('i18n:rules.runFailed'));
     }
 
@@ -325,9 +349,6 @@ export class RulesService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/run`);
 
         return this.http.delete(url).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Rule', 'RunCancel', appName);
-            }),
             pretifyError('i18n:rules.cancelFailed'));
     }
 
@@ -337,9 +358,6 @@ export class RulesService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return this.http.request(link.method, url, {}).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Rule', 'Triggered', appName);
-            }),
             pretifyError('i18n:rules.triggerFailed'));
     }
 
@@ -379,9 +397,6 @@ export class RulesService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Rule', 'EventEnqueued', appName);
-            }),
             pretifyError('i18n:rules.ruleEvents.enqueueFailed'));
     }
 
@@ -391,9 +406,6 @@ export class RulesService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Rule', 'EventsCancelled', appName);
-            }),
             pretifyError('i18n:rules.ruleEvents.cancelFailed'));
     }
 
@@ -404,22 +416,31 @@ export class RulesService {
     }
 }
 
-function parseSimulatedEvents(response: { items: any[]; total: number } & Resource) {
-    const simulatedRuleEvents = response.items.map(parseSimulatedRuleEvent);
+function parseSimulatedEvents(response: { items: any[]; total: number } & Resource): SimulatedRuleEventsDto {
+    const { items: list, total } = response;
+    const items = list.map(parseSimulatedRuleEvent);
 
-    return new SimulatedRuleEventsDto(response.total, simulatedRuleEvents, response._links);
+    return { items, total };
 }
 
-function parseEvents(response: { items: any[]; total: number } & Resource) {
-    const ruleEvents = response.items.map(parseRuleEvent);
+function parseEvents(response: { items: any[]; total: number } & Resource): RuleEventsDto {
+    const { items: list, total, _links } = response;
+    const items = list.map(parseRuleEvent);
 
-    return new RuleEventsDto(response.total, ruleEvents, response._links);
+    const canCancelAll = hasAnyLink(_links, 'create');
+
+    return { items, total, canCancelAll, _links };
 }
 
-function parseRules(response: { items: any[]; runningRuleId?: string } & Resource) {
-    const rules = response.items.map(parseRule);
+function parseRules(response: { items: any[]; runningRuleId?: string } & Resource): RulesDto {
+    const { items: list, runningRuleId, _links } = response;
+    const items = list.map(parseRule);
 
-    return new RulesDto(rules, response._links, response.runningRuleId);
+    const canCreate = hasAnyLink(_links, 'create');
+    const canReadEvents = hasAnyLink(_links, 'events');
+    const canCancelRun = hasAnyLink(_links, 'run/cancel');
+
+    return { items, runningRuleId, canCreate, canCancelRun, canReadEvents };
 }
 
 function parseActions(response: any) {

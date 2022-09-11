@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AnalyticsService, ApiUrlConfig, createProperties, DateTime, FieldRule, NestedFieldDto, Resource, ResourceLinks, RootFieldDto, SchemaDto, SchemaPropertiesDto, SchemasDto, SchemasService, Version } from '@app/shared/internal';
+import { ApiUrlConfig, createProperties, DateTime, FieldRule, NestedFieldDto, Resource, ResourceLinks, RootFieldDto, SchemaDto, SchemaPropertiesDto, SchemasDto, SchemasService, Version } from '@app/shared/internal';
 import { SchemaCompletions } from '..';
 
 describe('SchemasService', () => {
@@ -21,7 +21,6 @@ describe('SchemasService', () => {
             providers: [
                 SchemasService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() },
             ],
         });
     });
@@ -60,14 +59,11 @@ describe('SchemasService', () => {
             });
 
             expect(schemas!).toEqual({
-                canCreate: true,
                 items: [
                     createSchema(12),
                     createSchema(13),
                 ],
-                _links: {
-                    create: { method: 'POST', href: '/schemas' },
-                },
+                canCreate: true,
             });
         }));
 

@@ -8,17 +8,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { AnalyticsService, ApiUrlConfig, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, Version, Versioned } from '@app/framework';
+import { ApiUrlConfig, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, Version, Versioned } from '@app/framework';
 
 export class AppLanguageDto {
     public readonly _links: ResourceLinks;
 
-    public readonly canUpdate: boolean;
     public readonly canDelete: boolean;
+    public readonly canUpdate: boolean;
 
-    constructor(
-        links: ResourceLinks,
+    constructor(links: ResourceLinks,
         public readonly iso2Code: string,
         public readonly englishName: string,
         public readonly isMaster: boolean,
@@ -27,29 +25,42 @@ export class AppLanguageDto {
     ) {
         this._links = links;
 
-        this.canUpdate = hasAnyLink(links, 'update');
         this.canDelete = hasAnyLink(links, 'delete');
+        this.canUpdate = hasAnyLink(links, 'update');
     }
 }
 
-export type AppLanguagesDto =
-    Versioned<AppLanguagesPayload>;
+export type AppLanguagesDto = Versioned<AppLanguagesPayload>;
 
-export type AppLanguagesPayload =
-    Readonly<{ items: ReadonlyArray<AppLanguageDto>; canCreate: boolean } & Resource>;
+export type AppLanguagesPayload = Readonly<{
+    // The app languages.
+    items: ReadonlyArray<AppLanguageDto>;
 
-export type AddAppLanguageDto =
-    Readonly<{ language: string }>;
+    // The if the user can create a new language.
+    canCreate?: boolean;
+}>;
 
-export type UpdateAppLanguageDto =
-    Readonly<{ isMaster?: boolean; isOptional?: boolean; falback?: ReadonlyArray<string> }>;
+export type AddAppLanguageDto = Readonly<{
+    // The language code to add.
+    language: string;
+}>;
+
+export type UpdateAppLanguageDto = Readonly<{
+    // Indicates if the language is the master language.
+    isMaster?: boolean;
+
+    // Indicates if the langauge is optional (cannot be master language).
+    isOptional?: boolean;
+
+    // The fallback language codes.
+    falback?: ReadonlyArray<string>;
+}>;
 
 @Injectable()
 export class AppLanguagesService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -70,9 +81,6 @@ export class AppLanguagesService {
             mapVersioned(({ body }) => {
                 return parseLanguages(body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Language', 'Added', appName);
-            }),
             pretifyError('i18n:languages.addFailed'));
     }
 
@@ -84,9 +92,6 @@ export class AppLanguagesService {
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             mapVersioned(({ body }) => {
                 return parseLanguages(body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Language', 'Updated', appName);
             }),
             pretifyError('i18n:languages.updateFailed'));
     }
@@ -100,23 +105,24 @@ export class AppLanguagesService {
             mapVersioned(({ body }) => {
                 return parseLanguages(body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Language', 'Deleted', appName);
-            }),
             pretifyError('i18n:languages.deleteFailed'));
     }
 }
 
-function parseLanguages(response: { items: any[] } & Resource) {
-    const items = response.items.map(item =>
-        new AppLanguageDto(item._links,
-            item.iso2Code,
-            item.englishName,
-            item.isMaster,
-            item.isOptional,
-            item.fallback || []));
+function parseLanguages(response: { items: any[] } & Resource): AppLanguagesPayload {
+    const { items: list, _links } = response;
+    const items = list.map(parseLanguage);
 
-    const { _links } = response;
+    const canCreate = hasAnyLink(_links, 'create');
 
-    return { items, _links, canCreate: hasAnyLink(_links, 'create') };
+    return { items, canCreate };
+}
+
+function parseLanguage(response: any) {
+    return new AppLanguageDto(response._links,
+        response.iso2Code,
+        response.englishName,
+        response.isMaster,
+        response.isOptional,
+        response.fallback || []);
 }

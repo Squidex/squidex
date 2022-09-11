@@ -14,6 +14,10 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.EventConsumers
 {
+    /// <summary>
+    /// Update and query event consumers.
+    /// </summary>
+    [ApiExplorerSettings(GroupName = nameof(EventConsumers))]
     public sealed class EventConsumersController : ApiController
     {
         private readonly IEventConsumerManager eventConsumerManager;
@@ -24,6 +28,12 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
             this.eventConsumerManager = eventConsumerManager;
         }
 
+        /// <summary>
+        /// Get event consumers.
+        /// </summary>
+        /// <returns>
+        /// 200 => Event consumers returned.
+        /// </returns>
         [HttpGet]
         [Route("event-consumers/")]
         [ProducesResponseType(typeof(EventConsumersDto), StatusCodes.Status200OK)]
@@ -37,6 +47,14 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Start an event consumer.
+        /// </summary>
+        /// <param name="consumerName">The name of the event consumer.</param>
+        /// <returns>
+        /// 200 => Event consumer started asynchronously.
+        /// 404 => Event consumer not found.
+        /// </returns>
         [HttpPut]
         [Route("event-consumers/{consumerName}/start/")]
         [ProducesResponseType(typeof(EventConsumerDto), StatusCodes.Status200OK)]
@@ -50,6 +68,14 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Stop an event consumer.
+        /// </summary>
+        /// <param name="consumerName">The name of the event consumer.</param>
+        /// <returns>
+        /// 200 => Event consumer stopped asynchronously.
+        /// 404 => Event consumer not found.
+        /// </returns>
         [HttpPut]
         [Route("event-consumers/{consumerName}/stop/")]
         [ProducesResponseType(typeof(EventConsumerDto), StatusCodes.Status200OK)]
@@ -63,6 +89,14 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Reset an event consumer.
+        /// </summary>
+        /// <param name="consumerName">The name of the event consumer.</param>
+        /// <returns>
+        /// 200 => Event consumer resetted asynchronously.
+        /// 404 => Event consumer not found.
+        /// </returns>
         [HttpPut]
         [Route("event-consumers/{consumerName}/reset/")]
         [ProducesResponseType(typeof(EventConsumerDto), StatusCodes.Status200OK)]

@@ -20,9 +20,6 @@ namespace Squidex.Areas.Api.Controllers.UI
         [JsonPropertyName("map")]
         public MapOptions Map { get; set; }
 
-        [JsonPropertyName("google")]
-        public GoogleOptions Google { get; set; }
-
         [JsonPropertyName("referencesDropdownItemCount")]
         public int ReferencesDropdownItemCount { get; set; } = 100;
 
@@ -63,12 +60,6 @@ namespace Squidex.Areas.Api.Controllers.UI
         {
             [JsonPropertyName("key")]
             public string Key { get; set; }
-        }
-
-        public sealed class GoogleOptions
-        {
-            [JsonPropertyName("analyticsId")]
-            public string AnalyticsId { get; set; }
         }
     }
 }

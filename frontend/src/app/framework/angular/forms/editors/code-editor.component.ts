@@ -107,7 +107,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
         } catch {
             this.value = '';
         }
-    
+
         if (this.aceEditor) {
             this.setValue(this.value);
         }

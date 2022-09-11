@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ContentDto, FieldValue, getContentValue, LanguageDto, MetaFields, StatefulComponent, TableField, TableSettings } from '@app/shared/internal';
+import { ContentDto, FieldValue, getContentValue, LanguageDto, META_FIELDS, SchemaDto, StatefulComponent, TableField, TableSettings } from '@app/shared/internal';
 
 interface State {
     // The formatted value.
@@ -15,13 +15,13 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-content-list-field[content][field][language]',
+    selector: 'sqx-content-list-field[content][field][language][languages][schema]',
     styleUrls: ['./content-list-field.component.scss'],
     templateUrl: './content-list-field.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentListFieldComponent extends StatefulComponent<State> implements OnChanges {
-    public readonly metaFields = MetaFields;
+    public readonly metaFields = META_FIELDS;
 
     @Input()
     public field!: TableField;
@@ -39,7 +39,13 @@ export class ContentListFieldComponent extends StatefulComponent<State> implemen
     public patchForm?: FormGroup | null;
 
     @Input()
+    public schema?: SchemaDto;
+
+    @Input()
     public language!: LanguageDto;
+
+    @Input()
+    public languages!: ReadonlyArray<LanguageDto>;
 
     public get isInlineEditable() {
         return this.field.rootField?.isInlineEditable === true;

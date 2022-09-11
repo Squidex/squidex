@@ -48,11 +48,14 @@ describe('UsersService', () => {
                 ],
             });
 
-            expect(users!).toEqual(
-                new UsersDto(100, [
+            expect(users!).toEqual({
+                total: 100,
+                items: [
                     createUser(12),
                     createUser(13),
-                ]));
+                ],
+                canCreate: false,
+            });
         }));
 
     it('should make get request with query to get many users',
@@ -76,11 +79,14 @@ describe('UsersService', () => {
                 ],
             });
 
-            expect(users!).toEqual(
-                new UsersDto(100, [
+            expect(users!).toEqual({
+                total: 100,
+                items: [
                     createUser(12),
                     createUser(13),
-                ]));
+                ],
+                canCreate: false,
+            });
         }));
 
     it('should make get request to get single user',

@@ -93,6 +93,6 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
     }
 
     public logout() {
-        this.authService.logoutRedirect();
+        this.authService.logoutRedirect('/');
     }
 }

@@ -15,7 +15,7 @@ using Squidex.Web;
 namespace Squidex.Areas.Api.Controllers.Apps
 {
     /// <summary>
-    /// Manages and configures apps.
+    /// Update and query apps.
     /// </summary>
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppSettingsController : ApiController

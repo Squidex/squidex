@@ -8,73 +8,88 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { AnalyticsService, ApiUrlConfig, DateTime, hasAnyLink, HTTP, pretifyError, Resource, ResourceLinks, StringHelper, Types, Version, Versioned } from '@app/framework';
+import { map } from 'rxjs/operators';
+import { ApiUrlConfig, DateTime, hasAnyLink, HTTP, pretifyError, Resource, ResourceLinks, StringHelper, Types, Version, Versioned } from '@app/framework';
 import { QueryModel } from './query';
 import { createProperties, FieldPropertiesDto } from './schemas.types';
 
-export const MetaFields = {
+export type FieldRuleAction = 'Disable' | 'Hide' | 'Require';
+export type SchemaType = 'Default' | 'Singleton' | 'Component';
+export type SchemaScripts = Record<string, string | null>;
+export type PreviewUrls = Record<string, string>;
+
+export const META_FIELDS = {
     empty: {
         name: '',
         label: '',
     },
     id: {
         name: 'meta.id',
-        label: 'i18n:contents.tableHeaders.id',
+        label: 'i18n:schemas.tableHeaders.id',
     },
     created: {
         name: 'meta.created',
-        label: 'i18n:contents.tableHeaders.created',
+        label: 'i18n:schemas.tableHeaders.created',
     },
     createdByAvatar: {
         name: 'meta.createdBy.avatar',
-        label: 'i18n:contents.tableHeaders.createdByShort',
+        label: 'i18n:schemas.tableHeaders.createdByShort',
     },
     createdByName: {
         name: 'meta.createdBy.name',
-        label: 'i18n:contents.tableHeaders.createdBy',
+        label: 'i18n:schemas.tableHeaders.createdBy',
     },
     lastModified: {
         name: 'meta.lastModified',
-        label: 'i18n:contents.tableHeaders.lastModified',
+        label: 'i18n:schemas.tableHeaders.lastModified',
     },
     lastModifiedByAvatar: {
         name: 'meta.lastModifiedBy.avatar',
-        label: 'i18n:contents.tableHeaders.lastModifiedByShort',
+        label: 'i18n:schemas.tableHeaders.lastModifiedByShort',
     },
     lastModifiedByName: {
         name: 'meta.lastModifiedBy.name',
-        label: 'i18n:contents.tableHeaders.lastModifiedBy',
+        label: 'i18n:schemas.tableHeaders.lastModifiedBy',
     },
     status: {
         name: 'meta.status',
-        label: 'i18n:contents.tableHeaders.status',
+        label: 'i18n:schemas.tableHeaders.status',
     },
     statusColor: {
         name: 'meta.status.color',
-        label: 'i18n:contents.tableHeaders.status',
+        label: 'i18n:schemas.tableHeaders.status',
     },
     statusNext: {
         name: 'meta.status.next',
-        label: 'i18n:contents.tableHeaders.nextStatus',
+        label: 'i18n:schemas.tableHeaders.nextStatus',
     },
     version: {
         name: 'meta.version',
-        label: 'i18n:contents.tableHeaders.version',
+        label: 'i18n:schemas.tableHeaders.version',
+    },
+    translationStatus: {
+        name: 'meta.translationStatus',
+        label: 'i18n:schemas.tableHeaders.translationStatus',
+    },
+    translationStatusAverage: {
+        name: 'meta.translationStatusAverage',
+        label: 'i18n:schemas.tableHeaders.translationStatusAverage',
     },
 };
 
-export type SchemaType = 'Default' | 'Singleton' | 'Component';
-export type SchemaScripts = Record<string, string | null>;
-export type PreviewUrls = Record<string, string>;
+export const FIELD_RULE_ACTIONS: ReadonlyArray<FieldRuleAction> = [
+    'Disable',
+    'Hide',
+    'Require',
+];
 
 export class SchemaDto {
     public readonly _links: ResourceLinks;
 
     public readonly canAddField: boolean;
-    public readonly canContentsRead: boolean;
     public readonly canContentsCreate: boolean;
     public readonly canContentsCreateAndPublish: boolean;
+    public readonly canContentsRead: boolean;
     public readonly canDelete: boolean;
     public readonly canOrderFields: boolean;
     public readonly canPublish: boolean;
@@ -83,10 +98,10 @@ export class SchemaDto {
     public readonly canUnpublish: boolean;
     public readonly canUpdate: boolean;
     public readonly canUpdateCategory: boolean;
+    public readonly canUpdateRules: boolean;
     public readonly canUpdateScripts: boolean;
     public readonly canUpdateUIFields: boolean;
     public readonly canUpdateUrls: boolean;
-    public readonly canUpdateRules: boolean;
 
     public readonly displayName: string;
 
@@ -108,8 +123,8 @@ export class SchemaDto {
         public readonly isPublished: boolean,
         public readonly properties: SchemaPropertiesDto,
         public readonly fields: ReadonlyArray<RootFieldDto> = [],
-        public readonly fieldsInLists: Tags = [],
-        public readonly fieldsInReferences: Tags = [],
+        public readonly fieldsInLists: ReadonlyArray<string> = [],
+        public readonly fieldsInReferences: ReadonlyArray<string> = [],
         public readonly fieldRules: ReadonlyArray<FieldRule> = [],
         public readonly previewUrls: PreviewUrls = {},
         public readonly scripts: SchemaScripts = {},
@@ -117,9 +132,9 @@ export class SchemaDto {
         this._links = links;
 
         this.canAddField = hasAnyLink(links, 'fields/add');
-        this.canContentsRead = hasAnyLink(links, 'contents');
         this.canContentsCreate = hasAnyLink(links, 'contents/create');
         this.canContentsCreateAndPublish = hasAnyLink(links, 'contents/create/publish');
+        this.canContentsRead = hasAnyLink(links, 'contents');
         this.canDelete = hasAnyLink(links, 'delete');
         this.canOrderFields = hasAnyLink(links, 'fields/order');
         this.canPublish = hasAnyLink(links, 'publish');
@@ -128,49 +143,53 @@ export class SchemaDto {
         this.canUnpublish = hasAnyLink(links, 'unpublish');
         this.canUpdate = hasAnyLink(links, 'update');
         this.canUpdateCategory = hasAnyLink(links, 'update/category');
+        this.canUpdateRules = hasAnyLink(links, 'update/rules');
         this.canUpdateScripts = hasAnyLink(links, 'update/scripts');
         this.canUpdateUIFields = hasAnyLink(links, 'fields/ui');
         this.canUpdateUrls = hasAnyLink(links, 'update/urls');
-        this.canUpdateRules = hasAnyLink(links, 'update/rules');
 
         this.displayName = StringHelper.firstNonEmpty(this.properties.label, this.name);
+
+        function tableField(rootField: RootFieldDto) {
+            return { name: rootField.name, label: rootField.displayName, rootField };
+        }
 
         if (fields) {
             this.contentFields = fields.filter(x => x.properties.isContentField).map(tableField);
 
             function tableFields(names: ReadonlyArray<string>, fields: ReadonlyArray<RootFieldDto>): TableField[] {
                 const result: TableField[] = [];
-            
+
                 for (const name of names) {
-                    const metaField = MetaFields[name];
-            
+                    const metaField = META_FIELDS[name];
+
                     if (metaField) {
                         result.push(metaField);
                     } else {
                         const field = fields.find(x => x.name === name && x.properties.isContentField);
-            
+
                         if (field) {
                             result.push(tableField(field));
                         }
                     }
                 }
-            
+
                 return result;
             }
 
             const listFields = tableFields(fieldsInLists, fields);
 
             if (listFields.length === 0) {
-                listFields.push(MetaFields.lastModifiedByAvatar);
+                listFields.push(META_FIELDS.lastModifiedByAvatar);
 
                 if (fields.length > 0) {
                     listFields.push(tableField(this.fields[0]));
                 } else {
-                    listFields.push(MetaFields.empty);
+                    listFields.push(META_FIELDS.empty);
                 }
 
-                listFields.push(MetaFields.statusColor);
-                listFields.push(MetaFields.lastModified);
+                listFields.push(META_FIELDS.statusColor);
+                listFields.push(META_FIELDS.lastModified);
             }
 
             this.defaultListFields = listFields;
@@ -181,7 +200,7 @@ export class SchemaDto {
                 if (fields.length > 0) {
                     referenceFields.push(tableField(this.fields[0]));
                 } else {
-                    referenceFields.push(MetaFields.empty);
+                    referenceFields.push(META_FIELDS.empty);
                 }
             }
 
@@ -244,10 +263,6 @@ export class SchemaDto {
 
         return result;
     }
-}
-
-export function tableField(rootField: RootFieldDto) {
-    return { name: rootField.name, label: rootField.displayName, rootField };
 }
 
 export class FieldDto {
@@ -341,52 +356,135 @@ export class SchemaPropertiesDto {
     }
 }
 
-export const FIELD_RULE_ACTIONS: ReadonlyArray<FieldRuleAction> = [
-    'Disable',
-    'Hide',
-    'Require',
-];
+export type TableField = Readonly<{
+    // The name of the table field.
+    name: string;
 
-type Tags = readonly string[];
+    // The label for the table header.
+    label: string;
 
-export type TableField = { name: string; label: string; rootField?: RootFieldDto };
+    // The reference to the root field.
+    rootField?: RootFieldDto;
+}>;
 
-export type FieldRuleAction = 'Disable' | 'Hide' | 'Require';
-export type FieldRule = { field: string; action: FieldRuleAction; condition: string };
+export type FieldRule = Readonly<{
+    // The path to the field to update when the rule is valid.
+    field: string;
 
-export type SchemaCompletions =
-    ReadonlyArray<{ path: string; description: string; type: string }>;
+    // The action to invoke.
+    action: FieldRuleAction;
 
-export type SchemasDto =
-    Readonly<{ items: ReadonlyArray<SchemaDto>; canCreate: boolean } & Resource>;
+    //The condition as javascript expression.
+    condition: string;
+}>;
 
-export type AddFieldDto =
-    Readonly<{ name: string; partitioning?: string; properties: FieldPropertiesDto }>;
+export type SchemaCompletions = ReadonlyArray<{
+    // The autocompletion path.
+    path: string;
 
-export type UpdateUIFields =
-    Readonly<{ fieldsInLists?: Tags; fieldsInReferences?: Tags }>;
+    // The description of the autocompletion field.
+    description: string;
 
-export type CreateSchemaDto =
-    Readonly<{ name: string; fields?: ReadonlyArray<RootFieldDto>; category?: string; type?: string; isPublished?: boolean; properties?: SchemaPropertiesDto }>;
+    // The type of the autocompletion field.
+    type: string;
+ }>;
 
-export type UpdateSchemaCategoryDto =
-    Readonly<{ name?: string }>;
+export type SchemasDto = Readonly<{
+    // The list of schemas.
+    items: ReadonlyArray<SchemaDto>;
 
-export type UpdateFieldDto =
-    Readonly<{ properties: FieldPropertiesDto }>;
+    // True, if the user has permissions to create a new schema.
+    canCreate?: boolean;
+}>;
 
-export type SynchronizeSchemaDto =
-    Readonly<{ noFieldDeletiong?: boolean; noFieldRecreation?: boolean; [key: string]: any }>;
+export type AddFieldDto = Readonly<{
+    // The name of the field.
+    name: string;
 
-export type UpdateSchemaDto =
-    Readonly<{ label?: string; hints?: string; contentsSidebarUrl?: string; contentSidebarUrl?: string; contentEditorUrl?: string; validateOnPublish?: boolean; tags?: Tags }>;
+    // The partitioning of the field.
+    partitioning?: string;
+
+    // The field properties.
+    properties: FieldPropertiesDto;
+}>;
+
+export type UpdateUIFields = Readonly<{
+    // The names of all fields that should be shown in the list.
+    fieldsInLists?: ReadonlyArray<string>;
+
+    // The names of all fields that should be shown in the reference list.
+    fieldsInReferences?: ReadonlyArray<string>;
+}>;
+
+export type CreateSchemaDto = Readonly<{
+    // The name of the schema.
+    name: string;
+
+    // The initial fields of the schema.
+    fields?: ReadonlyArray<RootFieldDto>;
+
+    // The category name.
+    category?: string;
+
+    // The type of the schema.
+    type?: string;
+
+    // The initial published state.
+    isPublished?: boolean;
+
+    // The initial schema properties.
+    properties?: SchemaPropertiesDto;
+}>;
+
+export type UpdateSchemaCategoryDto = Readonly<{
+    // The name of the category.
+    name?: string;
+}>;
+
+export type UpdateFieldDto = Readonly<{
+    // The field properties.
+    properties: FieldPropertiesDto;
+}>;
+
+export type SynchronizeSchemaDto = Readonly<{
+    // True, to not delete fields when synchronizing.
+    noFieldDeletiong?: boolean;
+
+    // True, to not recreate fields when synchronizing.
+    noFieldRecreation?: boolean;
+
+    // The additional properties.
+    [key: string]: any;
+}>;
+
+export type UpdateSchemaDto = Readonly<{
+    // The label of the schema.
+    label?: string;
+
+    // The hints to explain the schema.
+    hints?: string;
+
+    // The URL to the contents sidebar plugin.
+    contentsSidebarUrl?: string;
+
+    // The URL to the content sidebar plugin.
+    contentSidebarUrl?: string;
+
+    // The URL to an editor to replace the editor.
+    contentEditorUrl?: string;
+
+    // True, if the content should be validated on publishing.
+    validateOnPublish?: boolean;
+
+    // The tags.
+    tags?: ReadonlyArray<string>;
+}>;
 
 @Injectable()
 export class SchemasService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -417,9 +515,6 @@ export class SchemasService {
             map(({ payload }) => {
                 return parseSchema(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'Created', appName);
-            }),
             pretifyError('i18n:schemas.createFailed'));
     }
 
@@ -431,9 +526,6 @@ export class SchemasService {
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             map(({ payload }) => {
                 return parseSchema(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'ScriptsConfigured', appName);
             }),
             pretifyError('i18n:schemas.updateScriptsFailed'));
     }
@@ -447,9 +539,6 @@ export class SchemasService {
             map(({ payload }) => {
                 return parseSchema(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'RulesConfigured', appName);
-            }),
             pretifyError('i18n:schemas.updateRulesFailed'));
     }
 
@@ -461,9 +550,6 @@ export class SchemasService {
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             map(({ payload }) => {
                 return parseSchema(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'Updated', appName);
             }),
             pretifyError('i18n:schemas.synchronizeFailed'));
     }
@@ -477,9 +563,6 @@ export class SchemasService {
             map(({ payload }) => {
                 return parseSchema(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'Updated', appName);
-            }),
             pretifyError('i18n:schemas.updateFailed'));
     }
 
@@ -491,9 +574,6 @@ export class SchemasService {
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             map(({ payload }) => {
                 return parseSchema(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'CategoryChanged', appName);
             }),
             pretifyError('i18n:schemas.changeCategoryFailed'));
     }
@@ -507,9 +587,6 @@ export class SchemasService {
             map(({ payload }) => {
                 return parseSchema(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'PreviewUrlsConfigured', appName);
-            }),
             pretifyError('i18n:schemas.updatePreviewUrlsFailed'));
     }
 
@@ -521,9 +598,6 @@ export class SchemasService {
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
             map(({ payload }) => {
                 return parseSchema(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'Published', appName);
             }),
             pretifyError('i18n:schemas.publishFailed'));
     }
@@ -537,9 +611,6 @@ export class SchemasService {
             map(({ payload }) => {
                 return parseSchema(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'Unpublished', appName);
-            }),
             pretifyError('i18n:schemas.unpublishFailed'));
     }
 
@@ -551,9 +622,6 @@ export class SchemasService {
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             map(({ payload }) => {
                 return parseSchema(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'FieldCreated', appName);
             }),
             pretifyError('i18n:schemas.addFieldFailed'));
     }
@@ -567,9 +635,6 @@ export class SchemasService {
             map(({ payload }) => {
                 return parseSchema(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'UIFieldsConfigured', appName);
-            }),
             pretifyError('i18n:schemas.updateUIFieldsFailed'));
     }
 
@@ -581,9 +646,6 @@ export class SchemasService {
         return HTTP.requestVersioned(this.http, link.method, url, version, { fieldIds: dto }).pipe(
             map(({ payload }) => {
                 return parseSchema(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'FieldsReordered', appName);
             }),
             pretifyError('i18n:schemas.reorderFieldsFailed'));
     }
@@ -597,9 +659,6 @@ export class SchemasService {
             map(({ payload }) => {
                 return parseSchema(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'FieldUpdated', appName);
-            }),
             pretifyError('i18n:schemas.updateFieldFailed'));
     }
 
@@ -611,9 +670,6 @@ export class SchemasService {
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
             map(({ payload }) => {
                 return parseSchema(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'FieldLocked', appName);
             }),
             pretifyError('i18n:schemas.lockFieldFailed'));
     }
@@ -627,9 +683,6 @@ export class SchemasService {
             map(({ payload }) => {
                 return parseSchema(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'FieldEnabled', appName);
-            }),
             pretifyError('i18n:schemas.enableFieldFailed'));
     }
 
@@ -641,9 +694,6 @@ export class SchemasService {
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
             map(({ payload }) => {
                 return parseSchema(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'FieldDisabled', appName);
             }),
             pretifyError('i18n:schemas.disableFieldFailed'));
     }
@@ -657,9 +707,6 @@ export class SchemasService {
             map(({ payload }) => {
                 return parseSchema(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'FieldShown', appName);
-            }),
             pretifyError('i18n:schemas.showFieldFailed'));
     }
 
@@ -671,9 +718,6 @@ export class SchemasService {
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
             map(({ payload }) => {
                 return parseSchema(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'FieldHidden', appName);
             }),
             pretifyError('i18n:schemas.hideFieldFailed'));
     }
@@ -687,9 +731,6 @@ export class SchemasService {
             map(({ payload }) => {
                 return parseSchema(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'FieldDeleted', appName);
-            }),
             pretifyError('i18n:schemas.deleteFieldFailed'));
     }
 
@@ -699,9 +740,6 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'Deleted', appName);
-            }),
             pretifyError('i18n:schemas.deleteFailed'));
     }
 
@@ -719,11 +757,12 @@ export class SchemasService {
 }
 
 function parseSchemas(response: { items: any[] } & Resource) {
-    const items = response.items.map(parseSchema);
+    const { items: list, _links } = response;
+    const items = list.map(parseSchema);
 
-    const _links = response._links;
+    const canCreate = hasAnyLink(_links, 'create');
 
-    return { items, _links, canCreate: hasAnyLink(_links, 'create') };
+    return { items, canCreate };
 }
 
 function parseSchema(response: any) {

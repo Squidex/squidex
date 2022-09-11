@@ -79,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/assets/folders", Order = -1)]
-        [ProducesResponseType(typeof(AssetFolderDto), 201)]
+        [ProducesResponseType(typeof(AssetFolderDto), StatusCodes.Status201Created)]
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(PermissionIds.AppAssetsUpdate)]
         [ApiCosts(1)]

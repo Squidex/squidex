@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Log, User, UserManager, WebStorageStateStore } from 'oidc-client';
-import { concat, Observable, Observer, of, ReplaySubject, throwError, TimeoutError } from 'rxjs';
+import { concat, Observable, of, ReplaySubject, throwError, TimeoutError } from 'rxjs';
 import { delay, mergeMap, retryWhen, take, timeout } from 'rxjs/operators';
 import { ApiUrlConfig, Types } from '@app/framework';
 
@@ -124,19 +124,19 @@ export class AuthService {
         this.checkState(this.userManager.getUser());
     }
 
-    public logoutRedirect() {
-        this.userManager.signoutRedirect();
+    public logoutRedirect(redirectPath: string) {
+        this.userManager.signoutRedirect({ state: { redirectPath } });
     }
 
-    public loginRedirect() {
-        this.userManager.signinRedirect();
+    public loginRedirect(redirectPath: string) {
+        this.userManager.signinRedirect({ state: { redirectPath } });
     }
 
-    public logoutRedirectComplete(): Observable<any> {
-        return new Observable((observer: Observer<any>) => {
+    public logoutRedirectComplete(): Observable<string | undefined> {
+        return new Observable<string | undefined>(observer => {
             this.userManager.signoutRedirectCallback()
                 .then(x => {
-                    observer.next(x);
+                    observer.next(x.state?.redirectPath);
                     observer.complete();
                 }, err => {
                     observer.error(err);
@@ -145,11 +145,11 @@ export class AuthService {
         });
     }
 
-    public loginPopup(): Observable<Profile> {
-        return new Observable<Profile>(observer => {
-            this.userManager.signinPopup()
+    public loginPopup(redirectPath: string): Observable<string | undefined> {
+        return new Observable<string | undefined>(observer => {
+            this.userManager.signinPopup({ state: { redirectPath } })
                 .then(x => {
-                    observer.next(AuthService.createProfile(x));
+                    observer.next(x.state?.redirectPath);
                     observer.complete();
                 }, err => {
                     observer.error(err);
@@ -158,11 +158,11 @@ export class AuthService {
         });
     }
 
-    public loginRedirectComplete(): Observable<Profile> {
-        return new Observable<Profile>(observer => {
+    public loginRedirectComplete(): Observable<string | undefined> {
+        return new Observable<string | undefined>(observer => {
             this.userManager.signinRedirectCallback()
                 .then(x => {
-                    observer.next(AuthService.createProfile(x));
+                    observer.next(x.state?.redirectPath);
                     observer.complete();
                 }, err => {
                     observer.error(err);

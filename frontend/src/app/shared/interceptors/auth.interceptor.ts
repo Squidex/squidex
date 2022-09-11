@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { Location } from '@angular/common';
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
@@ -19,6 +20,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
     constructor(apiUrlConfig: ApiUrlConfig,
         private readonly authService: AuthService,
+        private readonly location: Location,
         private readonly router: Router,
     ) {
         this.baseUrl = apiUrlConfig.buildUrl('');
@@ -50,7 +52,7 @@ export class AuthInterceptor implements HttpInterceptor {
                 if (error.status === 401 && renew) {
                     return this.authService.loginSilent().pipe(
                         catchError(() => {
-                            this.authService.logoutRedirect();
+                            this.authService.logoutRedirect(this.location.path());
 
                             return EMPTY;
                         }),
@@ -58,7 +60,7 @@ export class AuthInterceptor implements HttpInterceptor {
                 } else if (error.status === 401 || error.status === 403) {
                     if (req.method === 'GET') {
                         if (error.status === 401) {
-                            this.authService.logoutRedirect();
+                            this.authService.logoutRedirect(this.location.path());
                         } else {
                             this.router.navigate(['/forbidden'], { replaceUrl: true });
                         }

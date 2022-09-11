@@ -37,12 +37,15 @@ export class StockPhotoService {
             catchError(() => of([])));
     }
 }
-function parseImages(body: any[]) {
-    return body.map(x => new StockPhotoDto(
-        x.url,
-        x.thumbUrl,
-        x.user,
-        x.userProfileUrl,
-    ));
+function parseImages(response: any[]) {
+    return response.map(parseImage);
+}
+
+function parseImage(response: any) {
+    return new StockPhotoDto(
+        response.url,
+        response.thumbUrl,
+        response.user,
+        response.userProfileUrl);
 }
 

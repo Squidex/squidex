@@ -58,7 +58,7 @@ export class ComponentComponent extends ResourceOwner implements OnChanges {
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['formModel']) {
             this.unsubscribeAll();
-            
+
             this.isDisabled = disabled$(this.formModel.form);
 
             this.own(

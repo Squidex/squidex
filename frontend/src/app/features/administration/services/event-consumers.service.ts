@@ -9,17 +9,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, hasAnyLink, pretifyError, Resource, ResourceLinks, ResultSet } from '@app/shared';
+import { ApiUrlConfig, hasAnyLink, pretifyError, Resource, ResourceLinks } from '@app/shared';
 
-export class EventConsumersDto extends ResultSet<EventConsumerDto> {
-}
-
-export class EventConsumerDto {
+export class EventConsumerDto implements Resource {
     public readonly _links: ResourceLinks;
 
-    public readonly canStop: boolean;
-    public readonly canStart: boolean;
     public readonly canReset: boolean;
+    public readonly canStart: boolean;
+    public readonly canStop: boolean;
 
     constructor(links: ResourceLinks,
         public readonly name: string,
@@ -31,11 +28,16 @@ export class EventConsumerDto {
     ) {
         this._links = links;
 
-        this.canStop = hasAnyLink(links, 'stop');
-        this.canStart = hasAnyLink(links, 'start');
         this.canReset = hasAnyLink(links, 'reset');
+        this.canStart = hasAnyLink(links, 'start');
+        this.canStop = hasAnyLink(links, 'stop');
     }
 }
+
+export type EventConsumersDto = Readonly<{
+    // The list of event consumers.
+    items: ReadonlyArray<EventConsumerDto>;
+}>;
 
 @Injectable()
 export class EventConsumersService {
@@ -92,10 +94,11 @@ export class EventConsumersService {
     }
 }
 
-function parseEventConsumers(response: { items: any[] } & Resource) {
-    const items = response.items.map(parseEventConsumer);
+function parseEventConsumers(response: { items: any[] } & Resource): EventConsumersDto {
+    const { items: list } = response;
+    const items = list.map(parseEventConsumer);
 
-    return new EventConsumersDto(items.length, items, response._links);
+    return { items };
 }
 
 function parseEventConsumer(response: any): EventConsumerDto {

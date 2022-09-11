@@ -16,7 +16,11 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Users
 {
+    /// <summary>
+    /// Retrieve and manage users.
+    /// </summary>
     [ApiModelValidation(true)]
+    [ApiExplorerSettings(GroupName = "UserManagement")]
     public sealed class UserManagementController : ApiController
     {
         private readonly IUserService userService;
@@ -27,6 +31,15 @@ namespace Squidex.Areas.Api.Controllers.Users
             this.userService = userService;
         }
 
+        /// <summary>
+        /// Get users by query.
+        /// </summary>
+        /// <param name="query">Optional query to search by email address or username.</param>
+        /// <param name="skip">The number of users to skip.</param>
+        /// <param name="take">The number of users to return.</param>
+        /// <returns>
+        /// 200 => Users returned.
+        /// </returns>
         [HttpGet]
         [Route("user-management/")]
         [ProducesResponseType(typeof(UsersDto), StatusCodes.Status200OK)]
@@ -40,9 +53,17 @@ namespace Squidex.Areas.Api.Controllers.Users
             return Ok(response);
         }
 
+        /// <summary>
+        /// Get a user by ID.
+        /// </summary>
+        /// <param name="id">The ID of the user.</param>
+        /// <returns>
+        /// 200 => User returned.
+        /// 404 => User not found.
+        /// </returns>
         [HttpGet]
         [Route("user-management/{id}/")]
-        [ProducesResponseType(typeof(UserDto), 201)]
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ApiPermission(PermissionIds.AdminUsersRead)]
         public async Task<IActionResult> GetUser(string id)
         {
@@ -58,9 +79,17 @@ namespace Squidex.Areas.Api.Controllers.Users
             return Ok(response);
         }
 
+        /// <summary>
+        /// Create a new user.
+        /// </summary>
+        /// <param name="request">The user object that needs to be added.</param>
+        /// <returns>
+        /// 201 => User created.
+        /// 400 => User request not valid.
+        /// </returns>
         [HttpPost]
         [Route("user-management/")]
-        [ProducesResponseType(typeof(UserDto), 201)]
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
         [ApiPermission(PermissionIds.AdminUsersCreate)]
         public async Task<IActionResult> PostUser([FromBody] CreateUserDto request)
         {
@@ -68,12 +97,22 @@ namespace Squidex.Areas.Api.Controllers.Users
 
             var response = UserDto.FromDomain(user, Resources);
 
-            return Ok(response);
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, response);
         }
 
+        /// <summary>
+        /// Update a user.
+        /// </summary>
+        /// <param name="id">The ID of the user.</param>
+        /// <param name="request">The user object that needs to be updated.</param>
+        /// <returns>
+        /// 200 => User created.
+        /// 400 => User request not valid.
+        /// 404 => User not found.
+        /// </returns>
         [HttpPut]
         [Route("user-management/{id}/")]
-        [ProducesResponseType(typeof(UserDto), 201)]
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ApiPermission(PermissionIds.AdminUsersUpdate)]
         public async Task<IActionResult> PutUser(string id, [FromBody] UpdateUserDto request)
         {
@@ -84,9 +123,18 @@ namespace Squidex.Areas.Api.Controllers.Users
             return Ok(response);
         }
 
+        /// <summary>
+        /// Lock a user.
+        /// </summary>
+        /// <param name="id">The ID of the user to lock.</param>
+        /// <returns>
+        /// 200 => User locked.
+        /// 403 => User is the current user.
+        /// 404 => User not found.
+        /// </returns>
         [HttpPut]
         [Route("user-management/{id}/lock/")]
-        [ProducesResponseType(typeof(UserDto), 201)]
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ApiPermission(PermissionIds.AdminUsersLock)]
         public async Task<IActionResult> LockUser(string id)
         {
@@ -102,9 +150,18 @@ namespace Squidex.Areas.Api.Controllers.Users
             return Ok(response);
         }
 
+        /// <summary>
+        /// Unlock a user.
+        /// </summary>
+        /// <param name="id">The ID of the user to unlock.</param>
+        /// <returns>
+        /// 200 => User unlocked.
+        /// 403 => User is the current user.
+        /// 404 => User not found.
+        /// </returns>
         [HttpPut]
         [Route("user-management/{id}/unlock/")]
-        [ProducesResponseType(typeof(UserDto), 201)]
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ApiPermission(PermissionIds.AdminUsersUnlock)]
         public async Task<IActionResult> UnlockUser(string id)
         {
@@ -120,6 +177,15 @@ namespace Squidex.Areas.Api.Controllers.Users
             return Ok(response);
         }
 
+        /// <summary>
+        /// Delete a User.
+        /// </summary>
+        /// <param name="id">The ID of the user to delete.</param>
+        /// <returns>
+        /// 204 => User deleted.
+        /// 403 => User is the current user.
+        /// 404 => User not found.
+        /// </returns>
         [HttpDelete]
         [Route("user-management/{id}/")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

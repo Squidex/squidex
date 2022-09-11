@@ -8,7 +8,7 @@
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, TemplatesDto, TemplatesService, TemplatesState } from '@app/shared/internal';
+import { DialogService, TemplatesService, TemplatesState } from '@app/shared/internal';
 import { createTemplate } from './../services/templates.service.spec';
 
 describe('TemplatesState', () => {
@@ -33,7 +33,7 @@ describe('TemplatesState', () => {
     describe('Loading', () => {
         it('should load templates', () => {
             templatesService.setup(x => x.getTemplates())
-                .returns(() => of(new TemplatesDto(2, [template1, template2], {}))).verifiable();
+                .returns(() => of({ items: [template1, template2] })).verifiable();
 
             templatesState.load().subscribe();
 
@@ -55,7 +55,7 @@ describe('TemplatesState', () => {
 
         it('should show notification on load if reload is true', () => {
             templatesService.setup(x => x.getTemplates())
-                .returns(() => of(new TemplatesDto(2, [template1, template2], {}))).verifiable();
+                .returns(() => of({ items: [template1, template2] })).verifiable();
 
             templatesState.load(true).subscribe();
 

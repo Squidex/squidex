@@ -65,7 +65,7 @@ export class Tooltip {
     public get offsetX() {
         return this.isHorizontal ? 6 : 0;
     }
-    
+
     public get offsetY() {
         return this.isHorizontal ? 0 : 6;
     }

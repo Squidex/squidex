@@ -58,7 +58,7 @@ export class WorkflowComponent implements OnChanges {
             .subscribe({
                 next: () => {
                     this.error = null;
-                }, 
+                },
                 error: (error: ErrorDto) => {
                     this.error = error;
                 },
@@ -79,7 +79,7 @@ export class WorkflowComponent implements OnChanges {
     }
 
     public rename(name: string) {
-        this.workflow = this.workflow.rename(name);
+        this.workflow = this.workflow.changeName(name);
     }
 
     public changeSchemaIds(schemaIds: string[]) {

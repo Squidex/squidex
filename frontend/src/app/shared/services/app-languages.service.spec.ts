@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AnalyticsService, ApiUrlConfig, AppLanguageDto, AppLanguagesDto, AppLanguagesPayload, AppLanguagesService, Resource, ResourceLinks, Version } from '@app/shared/internal';
+import { ApiUrlConfig, AppLanguageDto, AppLanguagesDto, AppLanguagesPayload, AppLanguagesService, Resource, ResourceLinks, Version } from '@app/shared/internal';
 
 describe('AppLanguagesService', () => {
     const version = new Version('1');
@@ -20,7 +20,6 @@ describe('AppLanguagesService', () => {
             providers: [
                 AppLanguagesService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() },
             ],
         });
     });
@@ -155,9 +154,6 @@ describe('AppLanguagesService', () => {
 export function createLanguages(...codes: ReadonlyArray<string>): AppLanguagesPayload {
     return {
         items: codes.map((code, i) => createLanguage(code, codes, i)),
-        _links: {
-            create: { method: 'POST', href: '/languages' },
-        },
         canCreate: true,
     };
 }

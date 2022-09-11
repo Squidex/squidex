@@ -201,7 +201,7 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
 
             this.next({ contentNames });
         }
-    
+
         this.next({ isLoading: false });
     }
 }

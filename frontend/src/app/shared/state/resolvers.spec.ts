@@ -8,7 +8,7 @@
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { UIOptions } from '@app/framework';
-import { ContentsDto, ContentsService } from '../services/contents.service';
+import { ContentsService } from '../services/contents.service';
 import { createContent } from '../services/contents.service.spec';
 import { TestValues } from './_test-helpers';
 import { ResolveContents } from './resolvers';
@@ -42,7 +42,7 @@ describe('ResolveContents', () => {
         const ids = ['id1', 'id2'];
 
         contentsService.setup(x => x.getAllContents(app, { ids }))
-            .returns(() => of(new ContentsDto([], 2, [contents[0], contents[1]])));
+            .returns(() => of({ items: [contents[0], contents[1]] } as any));
 
         return expectAsync(firstValueFrom(contentsResolver.resolveMany(ids))).toBePending();
     });
@@ -51,7 +51,7 @@ describe('ResolveContents', () => {
         const ids = ['id1', 'id2'];
 
         contentsService.setup(x => x.getAllContents(app, { ids }))
-            .returns(() => of(new ContentsDto([], 2, [contents[0], contents[1]])));
+            .returns(() => of({ items: [contents[0], contents[1]] } as any));
 
         const result = await firstValueFrom(contentsResolver.resolveMany(ids));
 
@@ -65,7 +65,7 @@ describe('ResolveContents', () => {
         const ids = ['id1', 'id2'];
 
         contentsService.setup(x => x.getAllContents(app, { ids }))
-            .returns(() => of(new ContentsDto([], 2, [contents[0]])));
+            .returns(() => of({ items: [contents[0]] } as any));
 
         const result = await firstValueFrom(contentsResolver.resolveMany(ids));
 
@@ -90,7 +90,7 @@ describe('ResolveContents', () => {
         const ids = ['id1', 'id2', 'id3'];
 
         contentsService.setup(x => x.getAllContents(app, { ids }))
-            .returns(() => of(new ContentsDto([], 2, [contents[0], contents[1], contents[2]])));
+            .returns(() => of({ items: [contents[0], contents[1], contents[2]] } as any));
 
         const result1Promise = firstValueFrom(contentsResolver.resolveMany(ids1));
         const result2Promise = firstValueFrom(contentsResolver.resolveMany(ids2));
@@ -114,7 +114,7 @@ describe('ResolveContents', () => {
         const ids = ['id1', 'id2'];
 
         contentsService.setup(x => x.getAllContents(app, { ids }))
-            .returns(() => of(new ContentsDto([], 2, [contents[0], contents[1]])));
+            .returns(() => of({ items: [contents[0], contents[1]] } as any));
 
         const result1Promise = firstValueFrom(contentsResolver.resolveMany(ids));
         const result2Promise = firstValueFrom(contentsResolver.resolveMany(ids));
@@ -138,7 +138,7 @@ describe('ResolveContents', () => {
         const ids = ['id1', 'id2'];
 
         contentsService.setup(x => x.getAllContents(app, { ids }))
-            .returns(() => of(new ContentsDto([], 2, [contents[0], contents[1]])));
+            .returns(() => of({ items: [contents[0], contents[1]] } as any));
 
         const result1 = await firstValueFrom(contentsResolver.resolveMany(ids));
         const result2 = await firstValueFrom(contentsResolver.resolveMany(ids));
@@ -160,7 +160,7 @@ describe('ResolveContents', () => {
         const schema = 'schema1';
 
         contentsService.setup(x => x.getContents(app, schema, { take: 100 }))
-            .returns(() => of(new ContentsDto([], 2, [contents[0]])));
+            .returns(() => of({ items: [contents[0]] } as any));
 
         const result = await firstValueFrom(contentsResolver.resolveAll('schema1'));
 
@@ -173,7 +173,7 @@ describe('ResolveContents', () => {
         const schema = 'schema1';
 
         contentsService.setup(x => x.getContents(app, schema, { take: 100 }))
-            .returns(() => of(new ContentsDto([], 2, [contents[0]])));
+            .returns(() => of({ items: [contents[0]] } as any));
 
         const result1Promise = await firstValueFrom(contentsResolver.resolveAll('schema1'));
         const result2Promise = await firstValueFrom(contentsResolver.resolveAll('schema1'));
@@ -193,7 +193,7 @@ describe('ResolveContents', () => {
         const schema = 'schema1';
 
         contentsService.setup(x => x.getContents(app, schema, { take: 100 }))
-            .returns(() => of(new ContentsDto([], 2, [contents[0]])));
+            .returns(() => of({ items: [contents[0]] } as any));
 
         const result1 = await firstValueFrom(contentsResolver.resolveAll('schema1'));
         const result2 = await firstValueFrom(contentsResolver.resolveAll('schema1'));

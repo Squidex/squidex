@@ -23,8 +23,10 @@ export class LoginPageComponent implements OnInit {
     public ngOnInit() {
         this.authService.loginRedirectComplete()
             .subscribe({
-                next: () => {
-                    this.router.navigate(['/app'], { replaceUrl: true });
+                next: path => {
+                    path ||= '/app';
+
+                    this.router.navigateByUrl(path, { replaceUrl: true });
                 },
                 error: () => {
                     this.router.navigate(['/'], { replaceUrl: true });

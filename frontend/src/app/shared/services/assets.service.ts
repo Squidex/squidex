@@ -8,8 +8,8 @@
 import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { catchError, filter, map, tap } from 'rxjs/operators';
-import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, Metadata, pretifyError, Resource, ResourceLinks, ResultSet, StringHelper, Types, Version, Versioned } from '@app/framework';
+import { catchError, filter, map } from 'rxjs/operators';
+import { ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, Metadata, pretifyError, Resource, ResourceLinks, StringHelper, Types, Version, Versioned } from '@app/framework';
 import { AuthService } from './auth.service';
 import { Query, sanitize } from './query';
 
@@ -18,15 +18,7 @@ const SVG_PREVIEW_LIMIT = 10 * 1024;
 const MIME_TIFF = 'image/tiff';
 const MIME_SVG = 'image/svg+xml';
 
-export class AssetsDto extends ResultSet<AssetDto> {
-    public get canCreate() {
-        return hasAnyLink(this._links, 'create');
-    }
-
-    public get canRenameTag() {
-        return hasAnyLink(this._links, 'tags/rename');
-    }
-}
+type AssetFolderScope = 'PathAndItems' | 'Path' | 'Items';
 
 export class AssetDto {
     public readonly _meta: Metadata = {};
@@ -103,19 +95,6 @@ export class AssetDto {
     }
 }
 
-export class AssetFoldersDto extends ResultSet<AssetFolderDto> {
-    constructor(total: number, items: ReadonlyArray<AssetFolderDto>,
-        public readonly path: ReadonlyArray<AssetFolderDto>,
-        links?: ResourceLinks,
-    ) {
-        super(total, items, links);
-    }
-
-    public get canCreate() {
-        return hasAnyLink(this._links, 'create');
-    }
-}
-
 export class AssetFolderDto {
     public readonly _links: ResourceLinks;
 
@@ -137,47 +116,119 @@ export class AssetFolderDto {
     }
 }
 
-type Tags = readonly string[];
+export type AssetsDto = Readonly<{
+    // The list of assets.
+    items: ReadonlyArray<AssetDto>;
 
-type AssetFolderScope = 'PathAndItems' | 'Path' | 'Items';
-type AssetMetadata = { [key: string]: any };
+    // The total number of assets.
+    total: number;
 
-export type AssetCompletions =
-    ReadonlyArray<{ path: string; description: string; type: string }>;
+    // True, if the user has permissions to create an asset.
+    canCreate?: boolean;
 
-export type AnnotateAssetDto =
-    Readonly<{ fileName?: string; isProtected?: boolean; slug?: string; tags?: Tags; metadata?: AssetMetadata }>;
+    // True, if the user has permissions to rename a tag.
+    canRenameTag?: boolean;
+}>;
 
-export type CreateAssetFolderDto =
-    Readonly<{ folderName: string } & MoveAssetItemDto>;
+export type AssetFoldersDto = Readonly<{
+    // The list of asset folders.
+    items: ReadonlyArray<AssetFolderDto>;
 
-export type RenameAssetFolderDto =
-    Readonly<{ folderName: string }>;
+    // The path to the asset folders.
+    path: ReadonlyArray<AssetFolderDto>;
 
-export type RenameAssetTagDto =
-    Readonly<{ tagName: string }>;
+    // True, if the user has permissions to create an asset folder.
+    canCreate?: boolean;
+}>;
 
-export type MoveAssetItemDto =
-    Readonly<{ parentId?: string }>;
+export type AssetCompletions = ReadonlyArray<{
+    // The autocompletion path.
+    path: string;
 
-export type AssetsQuery =
-    Readonly<{ noTotal?: boolean; noSlowTotal?: boolean }>;
+    // The description of the autocompletion field.
+    description: string;
 
-export type AssetsByRef =
-    Readonly<{ ref: string }>;
+    // The type of the autocompletion field.
+    type: string;
+ }>;
 
-export type AssetsByIds =
-    Readonly<{ ids: ReadonlyArray<string> }>;
+export type AnnotateAssetDto = Readonly<{
+    // The optional file name.
+    fileName?: string;
 
-export type AssetsByQuery =
-    Readonly<{ query?: Query; skip?: number; tags?: Tags; take?: number; parentId?: string }>;
+    // The optional flag, if an asset is protected.
+    isProtected?: boolean;
+
+    // The optiona slug.
+    slug?: string;
+
+    // The optional tags.
+    tags?: ReadonlyArray<string>;
+
+    // The optional metadata.
+    metadata?: { [key: string]: any };
+}>;
+
+export type CreateAssetFolderDto = Readonly<{
+    // The name of the folder.
+    folderName: string;
+} & MoveAssetItemDto>;
+
+export type RenameAssetFolderDto = Readonly<{
+    // The name of the folder.
+    folderName: string;
+}>;
+
+export type RenameAssetTagDto = Readonly<{
+    // The name of the tag.
+    tagName: string;
+}>;
+
+export type MoveAssetItemDto = Readonly<{
+    // The new ID to the asset folder.
+    parentId?: string;
+}>;
+
+export type AssetsQuery = Readonly<{
+    // True, to not return the total number of items.
+    noTotal?: boolean;
+
+    // True, to not return the total number of items, if the query would be slow.
+    noSlowTotal?: boolean;
+}>;
+
+export type AssetsByRef = Readonly<{
+    // The reference.
+    ref: string;
+}>;
+
+export type AssetsByIds = Readonly<{
+    // The IDs of the assets.
+    ids: ReadonlyArray<string>;
+}>;
+
+export type AssetsByQuery = Readonly<{
+    // The JSON query.
+    query?: Query;
+
+    // The number of items to skip.
+    skip?: number;
+
+    // The number of items to take.
+    take?: number;
+
+    // The tags to filter.
+    tags?: ReadonlyArray<string>;
+
+    // The ID of the asset folder.
+    parentId?: string;
+}>;
 
 @Injectable()
 export class AssetsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -256,11 +307,6 @@ export class AssetsService {
                     return throwError(() => error);
                 }
             }),
-            tap(value => {
-                if (!Types.isNumber(value)) {
-                    this.analytics.trackEvent('Asset', 'Uploaded', appName);
-                }
-            }),
             pretifyError('i18n:assets.uploadFailed'));
     }
 
@@ -291,11 +337,6 @@ export class AssetsService {
                     return throwError(() => error);
                 }
             }),
-            tap(value => {
-                if (!Types.isNumber(value)) {
-                    this.analytics.trackEvent('Asset', 'Replaced', appName);
-                }
-            }),
             pretifyError('i18n:assets.replaceFailed'));
     }
 
@@ -305,9 +346,6 @@ export class AssetsService {
         return HTTP.postVersioned(this.http, url, dto).pipe(
             map(({ payload }) => {
                 return parseAssetFolder(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('AssetFolder', 'Updated', appName);
             }),
             pretifyError('i18n:assets.createFolderFailed'));
     }
@@ -321,9 +359,6 @@ export class AssetsService {
             map(({ payload }) => {
                 return parseAsset(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('Asset', 'Updated', appName);
-            }),
             pretifyError('i18n:assets.updateFailed'));
     }
 
@@ -336,9 +371,6 @@ export class AssetsService {
             map(({ payload }) => {
                 return parseAssetFolder(payload.body);
             }),
-            tap(() => {
-                this.analytics.trackEvent('AssetFolder', 'Updated', appName);
-            }),
             pretifyError('i18n:assets.updateFolderFailed'));
     }
 
@@ -348,9 +380,6 @@ export class AssetsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Asset', 'Moved', appName);
-            }),
             pretifyError('i18n:assets.moveFailed'));
     }
 
@@ -360,9 +389,6 @@ export class AssetsService {
         const url = `${this.apiUrl.buildUrl(link.href)}?checkReferrers=${checkReferrers}`;
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Asset', 'Deleted', appName);
-            }),
             pretifyError('i18n:assets.deleteFailed'));
     }
 
@@ -452,10 +478,14 @@ function buildQuery(q?: AssetsQuery & AssetsByQuery & AssetsByIds & AssetsByRef)
     return body;
 }
 
-function parseAssets(response: { items: any[]; total: number } & Resource) {
-    const items = response.items.map(parseAsset);
+function parseAssets(response: { items: any[]; total: number } & Resource): AssetsDto {
+    const { items: list, total, _links } = response;
+    const items = list.map(parseAsset);
 
-    return new AssetsDto(response.total, items, response._links);
+    const canCreate = hasAnyLink(_links, 'create');
+    const canRenameTag = hasAnyLink(_links, 'tags/rename');
+
+    return { items, total, canCreate, canRenameTag };
 }
 
 function parseAsset(response: any) {
@@ -479,11 +509,13 @@ function parseAsset(response: any) {
         response.tags || []);
 }
 
-function parseAssetFolders(response: { items: any[]; path: any[]; total: number } & Resource) {
-    const assetFolders = response.items.map(parseAssetFolder);
-    const assetPath = response.path.map(parseAssetFolder);
+function parseAssetFolders(response: { items: any[]; path: any[]; total: number } & Resource): AssetFoldersDto {
+    const { items: list, _links } = response;
+    const items = list.map(parseAssetFolder);
 
-    return new AssetFoldersDto(response.total, assetFolders, assetPath, response._links);
+    const canCreate = hasAnyLink(_links, 'create');
+
+    return { items, canCreate, path: response.path.map(parseAssetFolder) };
 }
 
 function parseAssetFolder(response: any) {

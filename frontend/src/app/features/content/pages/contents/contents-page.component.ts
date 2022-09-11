@@ -10,7 +10,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { distinctUntilChanged, map, switchMap, take, tap } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, contentsTranslationStatus, ContentDto, ContentsState, ContributorsState, defined, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, Settings, switchSafe, TableSettings, TempService, TranslationStatus, UIState } from '@app/shared';
+import { AppLanguageDto, AppsState, ContentDto, ContentsState, contentsTranslationStatus, ContributorsState, defined, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, Settings, switchSafe, TableSettings, TempService, TranslationStatus, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
@@ -119,7 +119,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             this.contentsState.contents
                 .subscribe(contents => {
                     this.updateSelectionSummary();
-                    
+
                     this.translationStatus = contentsTranslationStatus(contents.map(x => x.data), this.schema, this.languages);
                 }));
     }

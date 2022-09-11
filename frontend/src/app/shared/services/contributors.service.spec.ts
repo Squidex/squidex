@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AnalyticsService, ApiUrlConfig, ContributorDto, ContributorsDto, ContributorsPayload, ContributorsService, Resource, ResourceLinks, Version } from '@app/shared/internal';
+import { ApiUrlConfig, ContributorDto, ContributorsDto, ContributorsPayload, ContributorsService, Resource, ResourceLinks, Version } from '@app/shared/internal';
 
 describe('ContributorsService', () => {
     const version = new Version('1');
@@ -20,7 +20,6 @@ describe('ContributorsService', () => {
             providers: [
                 ContributorsService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() },
             ],
         });
     });
@@ -127,14 +126,9 @@ describe('ContributorsService', () => {
 
 export function createContributors(...ids: ReadonlyArray<number>): ContributorsPayload {
     return {
-        items: ids.map(createContributor),
         maxContributors: ids.length * 13,
-        _links: {
-            create: { method: 'POST', href: '/contributors' },
-        },
-        _meta: {
-            isInvited: 'true',
-        },
+        items: ids.map(createContributor),
+        isInvited: false,
         canCreate: true,
     };
 }

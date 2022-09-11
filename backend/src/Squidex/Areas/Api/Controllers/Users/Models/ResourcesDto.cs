@@ -20,28 +20,28 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
             var result = new ResourcesDto();
 
             result.AddGetLink("ping",
-    resources.Url<PingController>(x => nameof(x.GetPing)));
+                resources.Url<PingController>(x => nameof(x.GetPing)));
 
             if (resources.CanReadEvents)
             {
                 result.AddGetLink("admin/events",
-    resources.Url<EventConsumersController>(x => nameof(x.GetEventConsumers)));
+                    resources.Url<EventConsumersController>(x => nameof(x.GetEventConsumers)));
             }
 
             if (resources.CanRestoreBackup)
             {
                 result.AddGetLink("admin/restore",
-    resources.Url<RestoreController>(x => nameof(x.GetRestoreJob)));
+                    resources.Url<RestoreController>(x => nameof(x.GetRestoreJob)));
             }
 
             if (resources.CanReadUsers)
             {
                 result.AddGetLink("admin/users",
-    resources.Url<UserManagementController>(x => nameof(x.GetUsers)));
+                    resources.Url<UserManagementController>(x => nameof(x.GetUsers)));
             }
 
             result.AddGetLink("languages",
-    resources.Url<LanguagesController>(x => nameof(x.GetLanguages)));
+                resources.Url<LanguagesController>(x => nameof(x.GetLanguages)));
 
             return result;
         }

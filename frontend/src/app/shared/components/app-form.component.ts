@@ -38,7 +38,7 @@ export class AppFormComponent {
 
         if (value) {
             const request = { ...value, template: this.template?.name };
-    
+
             this.appsStore.create(request)
                 .subscribe({
                     next: () => {

@@ -8,7 +8,7 @@
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DateTime, Version } from '@app/framework';
-import { createProperties, FieldSizes, MetaFields, RootFieldDto, SchemaDto, TableSettings, UIState } from '@app/shared/internal';
+import { createProperties, FieldSizes, META_FIELDS, RootFieldDto, SchemaDto, TableSettings, UIState } from '@app/shared/internal';
 import { FieldWrappings } from '..';
 
 describe('TableSettings', () => {
@@ -77,18 +77,18 @@ describe('TableSettings', () => {
             });
 
             expect(listFields!).toEqual([
-                MetaFields.lastModifiedByAvatar.name,
+                META_FIELDS.lastModifiedByAvatar.name,
                 schema.fields[0].name,
-                MetaFields.statusColor.name,
-                MetaFields.lastModified.name,
+                META_FIELDS.statusColor.name,
+                META_FIELDS.lastModified.name,
             ]);
 
-            expect(fieldSizes!).toEqual({ 
+            expect(fieldSizes!).toEqual({
                 field1: 100,
                 field2: 200,
             });
-        
-            expect(fieldWrappings!).toEqual({ 
+
+            expect(fieldWrappings!).toEqual({
                 field3: true,
                 field4: false,
             });
@@ -114,7 +114,7 @@ describe('TableSettings', () => {
         let listFields: ReadonlyArray<string>;
 
         uiState.setup(x => x.getUser<any>('schemas.my-schema.config', {}))
-            .returns(() => of(({ fields: ['invalid', MetaFields.version.name] })));
+            .returns(() => of(({ fields: ['invalid', META_FIELDS.version.name] })));
 
         const tableSettings = new TableSettings(uiState.object, schema);
 
@@ -123,7 +123,7 @@ describe('TableSettings', () => {
         });
 
         expect(listFields!).toEqual([
-            MetaFields.version.name,
+            META_FIELDS.version.name,
         ]);
     });
 
@@ -133,11 +133,11 @@ describe('TableSettings', () => {
 
         const tableSettings = new TableSettings(uiState.object, schema);
 
-        const config = [INVALID_FIELD, MetaFields.version];
+        const config = [INVALID_FIELD, META_FIELDS.version];
 
         tableSettings.updateFields(config, true);
 
-        uiState.verify(x => x.set('schemas.my-schema.config', { ...EMPTY, fields: [MetaFields.version.name] }, true), Times.once());
+        uiState.verify(x => x.set('schemas.my-schema.config', { ...EMPTY, fields: [META_FIELDS.version.name] }, true), Times.once());
 
         expect().nothing();
     });
@@ -161,7 +161,7 @@ describe('TableSettings', () => {
 
         const tableSettings = new TableSettings(uiState.object, schema);
 
-        const config = [INVALID_FIELD, MetaFields.version];
+        const config = [INVALID_FIELD, META_FIELDS.version];
 
         tableSettings.updateFields(config, false);
 
@@ -182,11 +182,11 @@ describe('TableSettings', () => {
             fieldSizes = result;
         });
 
-        tableSettings.updateSize(MetaFields.version.name, 100, true);
+        tableSettings.updateSize(META_FIELDS.version.name, 100, true);
 
-        uiState.verify(x => x.set('schemas.my-schema.config', { ...EMPTY, sizes: { [MetaFields.version.name]: 100 } }, true), Times.once());
+        uiState.verify(x => x.set('schemas.my-schema.config', { ...EMPTY, sizes: { [META_FIELDS.version.name]: 100 } }, true), Times.once());
 
-        expect(fieldSizes!).toEqual({ [MetaFields.version.name]: 100 });
+        expect(fieldSizes!).toEqual({ [META_FIELDS.version.name]: 100 });
     });
 
     it('should update config if sizes are only updated', () => {
@@ -201,11 +201,11 @@ describe('TableSettings', () => {
             fieldSizes = result;
         });
 
-        tableSettings.updateSize(MetaFields.version.name, 100, false);
+        tableSettings.updateSize(META_FIELDS.version.name, 100, false);
 
         uiState.verify(x => x.set('schemas.my-schema.config', It.isAny(), true), Times.never());
 
-        expect(fieldSizes!).toEqual({ [MetaFields.version.name]: 100 });
+        expect(fieldSizes!).toEqual({ [META_FIELDS.version.name]: 100 });
     });
 
     it('should update config if wrapping is toggled', () => {
@@ -220,11 +220,11 @@ describe('TableSettings', () => {
             fieldWrappings = result;
         });
 
-        tableSettings.toggleWrapping(MetaFields.version.name, true);
+        tableSettings.toggleWrapping(META_FIELDS.version.name, true);
 
-        uiState.verify(x => x.set('schemas.my-schema.config', { ...EMPTY, wrappings: { [MetaFields.version.name]: true } }, true), Times.once());
+        uiState.verify(x => x.set('schemas.my-schema.config', { ...EMPTY, wrappings: { [META_FIELDS.version.name]: true } }, true), Times.once());
 
-        expect(fieldWrappings!).toEqual({ [MetaFields.version.name]: true });
+        expect(fieldWrappings!).toEqual({ [META_FIELDS.version.name]: true });
     });
 
     it('should update config if wrapping is toggled and only updated', () => {
@@ -239,11 +239,11 @@ describe('TableSettings', () => {
             fieldWrappings = result;
         });
 
-        tableSettings.toggleWrapping(MetaFields.version.name, false);
+        tableSettings.toggleWrapping(META_FIELDS.version.name, false);
 
         uiState.verify(x => x.set('schemas.my-schema.config', It.isAny(), true), Times.never());
 
-        expect(fieldWrappings!).toEqual({ [MetaFields.version.name]: true });
+        expect(fieldWrappings!).toEqual({ [META_FIELDS.version.name]: true });
     });
 
     it('should provide default fields if reset', () => {
@@ -253,7 +253,7 @@ describe('TableSettings', () => {
 
         const config = {
             fields: [
-                MetaFields.version.name,
+                META_FIELDS.version.name,
             ],
             sizes: {
                 field1: 100,
@@ -285,10 +285,10 @@ describe('TableSettings', () => {
         tableSettings.reset();
 
         expect(listFields!).toEqual([
-            MetaFields.lastModifiedByAvatar.name,
+            META_FIELDS.lastModifiedByAvatar.name,
             schema.fields[0].name,
-            MetaFields.statusColor.name,
-            MetaFields.lastModified.name,
+            META_FIELDS.statusColor.name,
+            META_FIELDS.lastModified.name,
         ]);
 
         expect(fieldSizes!).toEqual({});

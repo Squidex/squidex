@@ -104,7 +104,7 @@ export class AssetUploaderState extends State<Snapshot> {
                 } else {
                     return event;
                 }
-            }), shareReplay());        
+            }), shareReplay());
 
         stream.subscribe({
             next: event => {

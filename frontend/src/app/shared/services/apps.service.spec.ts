@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AnalyticsService, ApiUrlConfig, AppDto, AppsService, DateTime, ErrorDto, Resource, ResourceLinks, Version } from '@app/shared/internal';
+import { ApiUrlConfig, AppDto, AppsService, DateTime, ErrorDto, Resource, ResourceLinks, Version } from '@app/shared/internal';
 import { AppSettingsDto, AssetScriptsDto, AssetScriptsPayload, EditorDto, PatternDto } from './apps.service';
 
 describe('AppsService', () => {
@@ -21,7 +21,6 @@ describe('AppsService', () => {
             providers: [
                 AppsService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() },
             ],
         });
     });
@@ -326,11 +325,11 @@ describe('AppsService', () => {
             lastModifiedBy: `modifier${id}`,
             version: key,
             name: `app-name${key}`,
-            label: `app-label${key}`,
-            description: `app-description${key}`,
-            permissions: ['Owner'],
             canAccessApi: id % 2 === 0,
             canAccessContent: id % 2 === 0,
+            description: `app-description${key}`,
+            label: `app-label${key}`,
+            permissions: ['Owner'],
             roleName: `Role${id}`,
             roleProperties: createProperties(id),
             _links: {
@@ -418,12 +417,8 @@ export function createAppSettings(id: number, suffix = '') {
 }
 
 export function createAssetScripts(id: number, suffix = ''): AssetScriptsPayload {
-    const key = `${id}${suffix}`;
-
     return {
-        scripts: {
-            update: key,
-        },
+        scripts: { update: `${id}${suffix}` },
         _links: {
             update: { method: 'PUT', href: `apps/${id}/assets/scripts` },
         },

@@ -208,7 +208,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </remarks>
         [HttpPost]
         [Route("apps/{app}/assets/")]
-        [ProducesResponseType(typeof(AssetDto), 201)]
+        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status201Created)]
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(PermissionIds.AppAssetsCreate)]
         [ApiCosts(1)]
@@ -236,7 +236,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </remarks>
         [OpenApiIgnore]
         [Route("apps/{app}/assets/tus/{**fileId}")]
-        [ProducesResponseType(typeof(AssetDto), 201)]
+        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status201Created)]
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(PermissionIds.AppAssetsCreate)]
         [ApiCosts(1)]
