@@ -29,6 +29,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
     public sealed class AppDto : Resource
     {
         /// <summary>
+        /// The ID ofthe app.
+        /// </summary>
+        public DomainId Id { get; set; }
+
+        /// <summary>
         /// The name of the app.
         /// </summary>
         [LocalizedRequired]
@@ -49,11 +54,6 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// The version of the app.
         /// </summary>
         public long Version { get; set; }
-
-        /// <summary>
-        /// The id of the app.
-        /// </summary>
-        public DomainId Id { get; set; }
 
         /// <summary>
         /// The timestamp when the app has been created.

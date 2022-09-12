@@ -15,7 +15,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
     public class BulkUpdateAssetsJobDto
     {
         /// <summary>
-        /// An optional id of the asset to update.
+        /// An optional ID ofthe asset to update.
         /// </summary>
         public DomainId Id { get; set; }
 

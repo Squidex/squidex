@@ -14,7 +14,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
     public sealed class ContentChangedRuleTriggerSchemaDto
     {
         /// <summary>
-        /// The id of the schema.
+        /// The ID ofthe schema.
         /// </summary>
         public DomainId SchemaId { get; set; }
 

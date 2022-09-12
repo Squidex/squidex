@@ -7,8 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, AppDto, AppsService, DateTime, ErrorDto, Resource, ResourceLinks, Version } from '@app/shared/internal';
-import { AppSettingsDto, AssetScriptsDto, AssetScriptsPayload, EditorDto, PatternDto } from './apps.service';
+import { ApiUrlConfig, AppDto, AppSettingsDto, AppsService, AssetScriptsDto, AssetScriptsPayload, DateTime, EditorDto, ErrorDto, PatternDto, Resource, ResourceLinks, Version } from '@app/shared/internal';
 
 describe('AppsService', () => {
     const version = new Version('1');
@@ -286,7 +285,7 @@ describe('AppsService', () => {
                 },
             };
 
-            appsService.deleteApp('my-app', resource).subscribe();
+            appsService.leaveApp('my-app', resource).subscribe();
 
             const req = httpMock.expectOne('http://service/p/api/apps/my-app/contributors/me');
 

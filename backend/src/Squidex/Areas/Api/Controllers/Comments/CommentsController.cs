@@ -63,7 +63,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// Get all comments.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="commentsId">The id of the comments.</param>
+        /// <param name="commentsId">The ID ofthe comments.</param>
         /// <param name="version">The current version.</param>
         /// <remarks>
         /// When passing in a version you can retrieve all updates since then.
@@ -95,7 +95,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// Create a new comment.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="commentsId">The id of the comments.</param>
+        /// <param name="commentsId">The ID ofthe comments.</param>
         /// <param name="request">The comment object that needs to created.</param>
         /// <returns>
         /// 201 => Comment created.
@@ -122,8 +122,8 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// Update a comment.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="commentsId">The id of the comments.</param>
-        /// <param name="commentId">The id of the comment.</param>
+        /// <param name="commentsId">The ID ofthe comments.</param>
+        /// <param name="commentId">The ID ofthe comment.</param>
         /// <param name="request">The comment object that needs to updated.</param>
         /// <returns>
         /// 204 => Comment updated.
@@ -147,8 +147,8 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// Delete a comment.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="commentsId">The id of the comments.</param>
-        /// <param name="commentId">The id of the comment.</param>
+        /// <param name="commentsId">The ID ofthe comments.</param>
+        /// <param name="commentId">The ID ofthe comment.</param>
         /// <returns>
         /// 204 => Comment deleted.
         /// 404 => Comment or app not found.

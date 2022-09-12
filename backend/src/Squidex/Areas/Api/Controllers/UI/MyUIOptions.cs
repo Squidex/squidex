@@ -47,6 +47,9 @@ namespace Squidex.Areas.Api.Controllers.UI
         [JsonPropertyName("onlyAdminsCanCreateApps")]
         public bool OnlyAdminsCanCreateApps { get; set; }
 
+        [JsonPropertyName("onlyAdminsCanCreateTeams")]
+        public bool OnlyAdminsCanCreateTeams { get; set; }
+
         public sealed class MapOptions
         {
             [JsonPropertyName("type")]

@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         [BsonElement("_ui")]
         public string[] IndexedUserIds { get; set; }
 
-        [BsonRequired]
+        [BsonIgnoreIfDefault]
         [BsonElement("_ti")]
         public DomainId? IndexedTeamId { get; set; }
 

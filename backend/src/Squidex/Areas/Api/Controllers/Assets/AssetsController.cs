@@ -165,7 +165,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Get an asset by id.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset to retrieve.</param>
+        /// <param name="id">The ID ofthe asset to retrieve.</param>
         /// <returns>
         /// 200 => Asset found.
         /// 404 => Asset or app not found.
@@ -319,7 +319,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Replace asset content.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset.</param>
+        /// <param name="id">The ID ofthe asset.</param>
         /// <param name="file">The file to upload.</param>
         /// <returns>
         /// 200 => Asset updated.
@@ -349,7 +349,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Update an asset.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset.</param>
+        /// <param name="id">The ID ofthe asset.</param>
         /// <param name="request">The asset object that needs to updated.</param>
         /// <returns>
         /// 200 => Asset updated.
@@ -375,7 +375,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Moves the asset.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset.</param>
+        /// <param name="id">The ID ofthe asset.</param>
         /// <param name="request">The asset object that needs to updated.</param>
         /// <returns>
         /// 200 => Asset moved.
@@ -401,7 +401,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Delete an asset.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset to delete.</param>
+        /// <param name="id">The ID ofthe asset to delete.</param>
         /// <param name="request">The request parameters.</param>
         /// <returns>
         /// 204 => Asset deleted.

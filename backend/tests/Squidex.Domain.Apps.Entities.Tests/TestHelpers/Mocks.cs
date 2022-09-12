@@ -54,12 +54,13 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return schema;
         }
 
-        public static ITeamEntity Team(DomainId teamId)
+        public static ITeamEntity Team(DomainId teamId, string teamName = "my-team")
         {
             var team = A.Fake<ITeamEntity>();
 
             A.CallTo(() => team.Id).Returns(teamId);
             A.CallTo(() => team.UniqueId).Returns(teamId);
+            A.CallTo(() => team.Name).Returns(teamName);
 
             return team;
         }

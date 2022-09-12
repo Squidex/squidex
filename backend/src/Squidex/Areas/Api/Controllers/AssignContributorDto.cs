@@ -5,12 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 using Roles = Squidex.Domain.Apps.Core.Apps.Role;
 
-namespace Squidex.Areas.Api.Controllers.Apps.Models
+namespace Squidex.Areas.Api.Controllers
 {
     public sealed class AssignContributorDto
     {
@@ -29,10 +27,5 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// Set to true to invite the user if he does not exist.
         /// </summary>
         public bool Invite { get; set; }
-
-        public AssignContributor ToCommand()
-        {
-            return SimpleMapper.Map(this, new AssignContributor());
-        }
     }
 }

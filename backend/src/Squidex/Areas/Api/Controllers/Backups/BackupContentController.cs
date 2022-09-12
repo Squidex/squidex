@@ -36,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         /// Get the backup content.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the backup.</param>
+        /// <param name="id">The ID ofthe backup.</param>
         /// <returns>
         /// 200 => Backup found and content returned.
         /// 404 => Backup or app not found.
@@ -55,8 +55,8 @@ namespace Squidex.Areas.Api.Controllers.Backups
         /// <summary>
         /// Get the backup content.
         /// </summary>
-        /// <param name="id">The id of the backup.</param>
-        /// <param name="appId">The id of the app.</param>
+        /// <param name="id">The ID ofthe backup.</param>
+        /// <param name="appId">The ID ofthe app.</param>
         /// <param name="app">The name of the app.</param>
         /// <returns>
         /// 200 => Backup found and content returned.

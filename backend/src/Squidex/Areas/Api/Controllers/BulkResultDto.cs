@@ -25,12 +25,12 @@ namespace Squidex.Areas.Api.Controllers
         public int JobIndex { get; set; }
 
         /// <summary>
-        /// The id of the entity that has been handled successfully or not.
+        /// The ID ofthe entity that has been handled successfully or not.
         /// </summary>
         public DomainId? Id { get; set; }
 
         /// <summary>
-        /// The id of the entity that has been handled successfully or not.
+        /// The ID ofthe entity that has been handled successfully or not.
         /// </summary>
         [Obsolete("Use 'id' field now.")]
         public DomainId? ContentId => Id;

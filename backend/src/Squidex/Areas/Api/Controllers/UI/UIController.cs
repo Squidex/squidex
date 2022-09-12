@@ -21,6 +21,7 @@ namespace Squidex.Areas.Api.Controllers.UI
     public sealed class UIController : ApiController
     {
         private static readonly Permission CreateAppPermission = new Permission(PermissionIds.AdminAppCreate);
+        private static readonly Permission CreateTeamPermission = new Permission(PermissionIds.AdminTeamCreate);
         private readonly MyUIOptions uiOptions;
         private readonly IAppUISettings appUISettings;
 
@@ -46,7 +47,8 @@ namespace Squidex.Areas.Api.Controllers.UI
         {
             var result = new UISettingsDto
             {
-                CanCreateApps = !uiOptions.OnlyAdminsCanCreateApps || Context.UserPermissions.Includes(CreateAppPermission)
+                CanCreateApps = !uiOptions.OnlyAdminsCanCreateApps || Context.UserPermissions.Includes(CreateAppPermission),
+                CanCreateTeams = !uiOptions.OnlyAdminsCanCreateApps || Context.UserPermissions.Includes(CreateTeamPermission),
             };
 
             return Ok(result);

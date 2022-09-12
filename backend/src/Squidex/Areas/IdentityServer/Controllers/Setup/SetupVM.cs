@@ -25,6 +25,8 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
 
         public bool EverybodyCanCreateApps { get; set; }
 
+        public bool EverybodyCanCreateTeams { get; set; }
+
         public bool HasExternalLogin { get; set; }
 
         public bool HasPasswordAuth { get; set; }

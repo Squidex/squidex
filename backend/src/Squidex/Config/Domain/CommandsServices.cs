@@ -22,6 +22,9 @@ using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
+using Squidex.Domain.Apps.Entities.Teams.Commands;
+using Squidex.Domain.Apps.Entities.Teams.DomainObject;
+using Squidex.Domain.Apps.Entities.Teams.Indexes;
 using Squidex.Infrastructure.Commands;
 using Squidex.Web.CommandMiddlewares;
 
@@ -58,6 +61,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<EnrichWithAppIdCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<EnrichWithTeamIdCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<EnrichWithSchemaIdCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
@@ -88,6 +94,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<SchemasIndex>()
                 .As<ICommandMiddleware>().As<ISchemasIndex>();
 
+            services.AddSingletonAs<TeamsIndex>()
+                .As<ITeamsIndex>();
+
             services.AddSingletonAs<AppCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
@@ -95,6 +104,9 @@ namespace Squidex.Config.Domain
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<AssetCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
+            services.AddSingletonAs<CommentsCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<ContentsBulkUpdateCommandMiddleware>()
@@ -106,13 +118,13 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RuleCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<CommentsCommandMiddleware>()
-                .As<ICommandMiddleware>();
-
             services.AddSingletonAs<AggregateCommandMiddleware<AssetFolderCommandBase, AssetFolderDomainObject>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<AggregateCommandMiddleware<SchemaCommandBase, SchemaDomainObject>>()
+                .As<ICommandMiddleware>();
+
+            services.AddSingletonAs<AggregateCommandMiddleware<TeamCommandBase, TeamDomainObject>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<SingletonCommandMiddleware>()

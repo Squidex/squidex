@@ -55,7 +55,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public ReferencesFieldEditor Editor { get; set; }
 
         /// <summary>
-        /// The id of the referenced schemas.
+        /// The ID ofthe referenced schemas.
         /// </summary>
         public ReadonlyList<DomainId>? SchemaIds { get; set; }
 

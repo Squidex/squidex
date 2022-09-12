@@ -46,6 +46,9 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<SchemaResolver>()
                 .AsSelf();
 
+            services.AddSingletonAs<TeamResolver>()
+                .AsSelf();
+
             services.AddSingletonAs<UsageMiddleware>()
                 .AsSelf();
 
@@ -77,7 +80,9 @@ namespace Squidex.Config.Web
                 // Never change this order here.
                 options.Filters.Add<CachingFilter>();
                 options.Filters.Add<DeferredActionFilter>();
+                options.Filters.Add<ContextFilter>();
                 options.Filters.Add<AppResolver>();
+                options.Filters.Add<TeamResolver>();
                 options.Filters.Add<SchemaResolver>();
                 options.Filters.Add<MeasureResultFilter>();
 

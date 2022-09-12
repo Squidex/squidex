@@ -77,7 +77,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         /// Delete a backup.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the backup to delete.</param>
+        /// <param name="id">The ID ofthe backup to delete.</param>
         /// <returns>
         /// 204 => Backup deleted.
         /// 404 => Backup or app not found.

@@ -7,11 +7,12 @@
 
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Billing;
+using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Plans.Models
 {
-    public sealed class AppPlansDto
+    public sealed class PlansDto
     {
         /// <summary>
         /// The available plans.
@@ -34,15 +35,30 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// </summary>
         public bool HasPortal { get; set; }
 
-        public static AppPlansDto FromDomain(IAppEntity app, IBillingPlans plans, bool hasPortal)
+        public static PlansDto FromDomain(IAppEntity app, IBillingPlans plans, bool hasPortal)
         {
             var (_, planId) = plans.GetActualPlan(app.Plan?.PlanId);
 
-            var result = new AppPlansDto
+            var result = new PlansDto
             {
                 CurrentPlanId = planId,
                 Plans = plans.GetAvailablePlans().Select(PlanDto.FromDomain).ToArray(),
                 PlanOwner = app.Plan?.Owner.Identifier,
+                HasPortal = hasPortal
+            };
+
+            return result;
+        }
+
+        public static PlansDto FromDomain(ITeamEntity team, IBillingPlans plans, bool hasPortal)
+        {
+            var (_, planId) = plans.GetActualPlan(team.Plan?.PlanId);
+
+            var result = new PlansDto
+            {
+                CurrentPlanId = planId,
+                Plans = plans.GetAvailablePlans().Select(PlanDto.FromDomain).ToArray(),
+                PlanOwner = team.Plan?.Owner.Identifier,
                 HasPortal = hasPortal
             };
 

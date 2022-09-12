@@ -5,18 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Areas.Api.Controllers.Apps;
+using Squidex.Areas.Api.Controllers.Teams;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Apps.Models
+namespace Squidex.Areas.Api.Controllers
 {
     public sealed class ContributorDto : Resource
     {
         /// <summary>
-        /// The id of the user that contributes to the app.
+        /// The ID ofthe user that contributes to the app.
         /// </summary>
         [LocalizedRequired]
         public string ContributorId { get; set; }
@@ -60,27 +62,57 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return this;
         }
 
-        public ContributorDto CreateLinks(Resources resources)
+        public ContributorDto CreateAppLinks(Resources resources)
         {
-            if (!resources.IsUser(ContributorId))
+            if (resources.IsUser(ContributorId))
             {
-                var app = resources.App;
+                return this;
+            }
 
-                if (resources.CanAssignContributor)
-                {
-                    var values = new { app };
+            var app = resources.App;
 
-                    AddPostLink("update",
-                        resources.Url<AppContributorsController>(x => nameof(x.PostContributor), values));
-                }
+            if (resources.CanAssignContributor)
+            {
+                var values = new { app };
 
-                if (resources.CanRevokeContributor)
-                {
-                    var values = new { app, id = ContributorId };
+                AddPostLink("update",
+                    resources.Url<AppContributorsController>(x => nameof(x.PostContributor), values));
+            }
 
-                    AddDeleteLink("delete",
-                        resources.Url<AppContributorsController>(x => nameof(x.DeleteContributor), values));
-                }
+            if (resources.CanRevokeContributor)
+            {
+                var values = new { app, id = ContributorId };
+
+                AddDeleteLink("delete",
+                    resources.Url<AppContributorsController>(x => nameof(x.DeleteContributor), values));
+            }
+
+            return this;
+        }
+
+        public ContributorDto CreateTeamLinks(Resources resources)
+        {
+            if (resources.IsUser(ContributorId))
+            {
+                return this;
+            }
+
+            var app = resources.App;
+
+            if (resources.CanAssignContributor)
+            {
+                var values = new { app };
+
+                AddPostLink("update",
+                    resources.Url<TeamContributorsController>(x => nameof(x.PostContributor), values));
+            }
+
+            if (resources.CanRevokeContributor)
+            {
+                var values = new { app, id = ContributorId };
+
+                AddDeleteLink("delete",
+                    resources.Url<TeamContributorsController>(x => nameof(x.DeleteContributor), values));
             }
 
             return this;

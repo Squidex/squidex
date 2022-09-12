@@ -153,7 +153,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// Update a rule.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the rule to update.</param>
+        /// <param name="id">The ID ofthe rule to update.</param>
         /// <param name="request">The rule object that needs to be added to the app.</param>
         /// <returns>
         /// 200 => Rule updated.
@@ -178,7 +178,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// Enable a rule.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the rule to enable.</param>
+        /// <param name="id">The ID ofthe rule to enable.</param>
         /// <returns>
         /// 200 => Rule enabled.
         /// 404 => Rule or app not found.
@@ -201,7 +201,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// Disable a rule.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the rule to disable.</param>
+        /// <param name="id">The ID ofthe rule to disable.</param>
         /// <returns>
         /// 200 => Rule disabled.
         /// 404 => Rule or app not found.
@@ -224,7 +224,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// Trigger a rule.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the rule to disable.</param>
+        /// <param name="id">The ID ofthe rule to disable.</param>
         /// <returns>
         /// 204 => Rule triggered.
         /// 404 => Rule or app not found.
@@ -246,7 +246,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// Run a rule.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the rule to run.</param>
+        /// <param name="id">The ID ofthe rule to run.</param>
         /// <param name="fromSnapshots">Runs the rule from snapeshots if possible.</param>
         /// <returns>
         /// 204 => Rule started.
@@ -267,7 +267,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// Cancels all rule events.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the rule to cancel.</param>
+        /// <param name="id">The ID ofthe rule to cancel.</param>
         /// <returns>
         /// 204 => Rule events cancelled.
         /// </returns>
@@ -312,7 +312,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// Simulate a rule.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the rule to simulate.</param>
+        /// <param name="id">The ID ofthe rule to simulate.</param>
         /// <returns>
         /// 200 => Rule simulated.
         /// 404 => Rule or app not found.
@@ -342,7 +342,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// Delete a rule.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the rule to delete.</param>
+        /// <param name="id">The ID ofthe rule to delete.</param>
         /// <returns>
         /// 204 => Rule deleted.
         /// 404 => Rule or app not found.

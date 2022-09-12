@@ -6,13 +6,16 @@
 // ==========================================================================
 
 using System.Text.Json.Serialization;
+using Squidex.Areas.Api.Controllers.Apps;
+using Squidex.Areas.Api.Controllers.Teams;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Billing;
+using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Apps.Models
+namespace Squidex.Areas.Api.Controllers
 {
     public sealed class ContributorsDto : Resource
     {
@@ -33,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [JsonPropertyName("_meta")]
         public ContributorsMetadata? Metadata { get; set; }
 
-        public static async Task<ContributorsDto> FromAppAsync(IAppEntity app, Resources resources, IUserResolver userResolver, Plan plan, bool invited)
+        public static async Task<ContributorsDto> FromDomainAsync(IAppEntity app, Resources resources, IUserResolver userResolver, Plan plan, bool invited)
         {
             var users = await userResolver.QueryManyAsync(app.Contributors.Keys.ToArray());
 
@@ -42,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 Items = app.Contributors
                     .Select(x => ContributorDto.FromDomain(x.Key, x.Value))
                     .Select(x => x.CreateUser(users))
-                    .Select(x => x.CreateLinks(resources))
+                    .Select(x => x.CreateAppLinks(resources))
                     .OrderBy(x => x.ContributorName)
                     .ToArray()
             };
@@ -50,7 +53,26 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             result.CreateInvited(invited);
             result.CreatePlan(plan);
 
-            return result.CreateLinks(resources);
+            return result.CreateAppLinks(resources);
+        }
+
+        public static async Task<ContributorsDto> FromDomainAsync(ITeamEntity team, Resources resources, IUserResolver userResolver, bool invited)
+        {
+            var users = await userResolver.QueryManyAsync(team.Contributors.Keys.ToArray());
+
+            var result = new ContributorsDto
+            {
+                Items = team.Contributors
+                    .Select(x => ContributorDto.FromDomain(x.Key, x.Value))
+                    .Select(x => x.CreateUser(users))
+                    .Select(x => x.CreateAppLinks(resources))
+                    .OrderBy(x => x.ContributorName)
+                    .ToArray()
+            };
+
+            result.CreateInvited(invited);
+
+            return result.CreateTeamLinks(resources);
         }
 
         private void CreatePlan(Plan plan)
@@ -69,7 +91,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             }
         }
 
-        private ContributorsDto CreateLinks(Resources resources)
+        private ContributorsDto CreateAppLinks(Resources resources)
         {
             var values = new { app = resources.App };
 
@@ -79,6 +101,21 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 AddPostLink("create",
                     resources.Url<AppContributorsController>(x => nameof(x.PostContributor), values));
+            }
+
+            return this;
+        }
+
+        private ContributorsDto CreateTeamLinks(Resources resources)
+        {
+            var values = new { app = resources.App };
+
+            AddSelfLink(resources.Url<TeamContributorsController>(x => nameof(x.GetContributors), values));
+
+            if (resources.CanAssignContributor)
+            {
+                AddPostLink("create",
+                    resources.Url<TeamContributorsController>(x => nameof(x.PostContributor), values));
             }
 
             return this;

@@ -16,7 +16,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
     public sealed class FieldDto : Resource
     {
         /// <summary>
-        /// The id of the field.
+        /// The ID ofthe field.
         /// </summary>
         public long FieldId { get; set; }
 

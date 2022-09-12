@@ -103,6 +103,15 @@
         RenderRuleAsWarning(T.Get("setup.ruleAppCreation.warningAll"));
     }
 
+    @if (Model!.EverybodyCanCreateTeams)
+    {
+        RenderRuleAsWarning(T.Get("setup.ruleTeamCreation.warningAdmins"));
+    }
+    else
+    {
+        RenderRuleAsWarning(T.Get("setup.ruleTeamCreation.warningAll"));
+    }
+
     @if (Model!.IsAssetStoreFtp)
     {
         RenderRuleAsWarning(T.Get("setup.ruleFtp.warning"));

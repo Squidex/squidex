@@ -19,12 +19,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
     public sealed class AssetDto : Resource
     {
         /// <summary>
-        /// The id of the asset.
+        /// The ID ofthe asset.
         /// </summary>
         public DomainId Id { get; set; }
 
         /// <summary>
-        /// The id of the parent folder. Empty for files without parent.
+        /// The ID ofthe parent folder. Empty for files without parent.
         /// </summary>
         public DomainId ParentId { get; set; }
 

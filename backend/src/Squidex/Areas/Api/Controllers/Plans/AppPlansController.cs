@@ -8,8 +8,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Plans.Models;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -43,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/plans/")]
-        [ProducesResponseType(typeof(AppPlansDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PlansDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(PermissionIds.AppPlansRead)]
         [ApiCosts(0)]
         public IActionResult GetPlans(string app)
@@ -52,7 +54,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
 
             var response = Deferred.Response(() =>
             {
-                return AppPlansDto.FromDomain(App, billingPlans, hasPortal);
+                return PlansDto.FromDomain(App, billingPlans, hasPortal);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
@@ -77,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
         [ApiCosts(0)]
         public async Task<IActionResult> PutPlan(string app, [FromBody] ChangePlanDto request)
         {
-            var context = await CommandBus.PublishAsync(request.ToCommand(), HttpContext.RequestAborted);
+            var context = await CommandBus.PublishAsync(SimpleMapper.Map(this, new ChangePlan()), HttpContext.RequestAborted);
 
             string? redirectUri = null;
 

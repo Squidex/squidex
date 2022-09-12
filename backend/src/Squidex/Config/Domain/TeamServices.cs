@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Areas.Api.Controllers.Apps.Models
+namespace Squidex.Config.Domain
 {
-    public sealed class ContributorsMetadata
+    public static class TeamServices
     {
-        /// <summary>
-        /// Indicates whether the user has been invited.
-        /// </summary>
-        public string IsInvited { get; set; }
+        public static void AddSquidexTeams(this IServiceCollection services)
+        {
+        }
     }
 }

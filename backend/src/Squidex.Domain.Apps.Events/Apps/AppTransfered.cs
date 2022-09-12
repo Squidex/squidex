@@ -10,7 +10,7 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Apps
 {
-    [EventType(nameof(AppDeleted))]
+    [EventType(nameof(AppTransfered))]
     public sealed class AppTransfered : AppEvent
     {
         public DomainId? TeamId { get; set; }

@@ -20,6 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Invitation
         private static readonly Duration MaxAge = Duration.FromDays(2);
         private readonly INotificationSender emailSender;
         private readonly IUserResolver userResolver;
+        private readonly IAppProvider appProvider;
         private readonly ILogger<InvitationEventConsumer> log;
 
         public string Name
@@ -29,15 +30,15 @@ namespace Squidex.Domain.Apps.Entities.Invitation
 
         public string EventsFilter
         {
-            get { return "^app-"; }
+            get { return "^app-|^app-"; }
         }
 
-        public InvitationEventConsumer(INotificationSender emailSender, IUserResolver userResolver,
+        public InvitationEventConsumer(INotificationSender emailSender, IUserResolver userResolver, IAppProvider appProvider,
             ILogger<InvitationEventConsumer> log)
         {
             this.emailSender = emailSender;
             this.userResolver = userResolver;
-
+            this.appProvider = appProvider;
             this.log = log;
         }
 
@@ -122,9 +123,14 @@ namespace Squidex.Domain.Apps.Entities.Invitation
                             return;
                         }
 
-                        // var appName = teamContributorAssigned.TeamName;
+                        var team = await appProvider.GetTeamAsync(teamContributorAssigned.TeamId);
 
-                        // await emailSender.SendTeamInviteAsync(assigner, assignee, appName);
+                        if (team == null)
+                        {
+                            return;
+                        }
+
+                        await emailSender.SendTeamInviteAsync(assigner, assignee, team.Name);
                         break;
                     }
             }

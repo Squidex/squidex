@@ -10,7 +10,10 @@ using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Notifications;
+using Squidex.Domain.Apps.Entities.Teams;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
+using Squidex.Domain.Apps.Events.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Shared.Users;
@@ -20,6 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Invitation
 {
     public class InvitationEventConsumerTests
     {
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly INotificationSender notificatíonSender = A.Fake<INotificationSender>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly IUser assigner = UserMocks.User("1");
@@ -28,6 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Invitation
         private readonly string assignerId = DomainId.NewGuid().ToString();
         private readonly string assigneeId = DomainId.NewGuid().ToString();
         private readonly string appName = "my-app";
+        private readonly string teamName = "my-team";
         private readonly InvitationEventConsumer sut;
 
         public InvitationEventConsumerTests()
@@ -41,13 +46,16 @@ namespace Squidex.Domain.Apps.Entities.Invitation
             A.CallTo(() => userResolver.FindByIdAsync(assigneeId, default))
                 .Returns(assignee);
 
-            sut = new InvitationEventConsumer(notificatíonSender, userResolver, log);
+            A.CallTo(() => appProvider.GetTeamAsync(A<DomainId>._, default))
+                .Returns(Mocks.Team(DomainId.NewGuid(), teamName));
+
+            sut = new InvitationEventConsumer(notificatíonSender, userResolver, appProvider, log);
         }
 
         [Fact]
-        public async Task Should_not_send_email_if_contributors_assigned_by_clients()
+        public async Task Should_not_send_app_email_if_contributors_assigned_by_clients()
         {
-            var @event = CreateEvent(RefTokenType.Client, true);
+            var @event = CreateAppEvent(RefTokenType.Client, true);
 
             await sut.On(@event);
 
@@ -56,9 +64,9 @@ namespace Squidex.Domain.Apps.Entities.Invitation
         }
 
         [Fact]
-        public async Task Should_not_send_email_for_initial_owner()
+        public async Task Should_not_send_app_email_for_initial_owner()
         {
-            var @event = CreateEvent(RefTokenType.Subject, false, streamNumber: 1);
+            var @event = CreateAppEvent(RefTokenType.Subject, false, streamNumber: 1);
 
             await sut.On(@event);
 
@@ -66,11 +74,21 @@ namespace Squidex.Domain.Apps.Entities.Invitation
         }
 
         [Fact]
-        public async Task Should_not_send_email_for_old_events()
+        public async Task Should_not_send_team_email_for_initial_owner()
+        {
+            var @event = CreateTeamEvent(false, streamNumber: 1);
+
+            await sut.On(@event);
+
+            MustNotSendEmail();
+        }
+
+        [Fact]
+        public async Task Should_not_send_app_email_for_old_events()
         {
             var created = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(50));
 
-            var @event = CreateEvent(RefTokenType.Subject, true, instant: created);
+            var @event = CreateAppEvent(RefTokenType.Subject, true, instant: created);
 
             await sut.On(@event);
 
@@ -79,9 +97,11 @@ namespace Squidex.Domain.Apps.Entities.Invitation
         }
 
         [Fact]
-        public async Task Should_not_send_email_for_old_contributor()
+        public async Task Should_not_send_team_email_for_old_events()
         {
-            var @event = CreateEvent(RefTokenType.Subject, true, isNewContributor: false);
+            var created = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(50));
+
+            var @event = CreateTeamEvent(true, instant: created);
 
             await sut.On(@event);
 
@@ -90,9 +110,31 @@ namespace Squidex.Domain.Apps.Entities.Invitation
         }
 
         [Fact]
-        public async Task Should_not_send_email_if_sender_not_active()
+        public async Task Should_not_send_app_email_for_old_contributor()
         {
-            var @event = CreateEvent(RefTokenType.Subject, true);
+            var @event = CreateAppEvent(RefTokenType.Subject, true, isNewContributor: false);
+
+            await sut.On(@event);
+
+            MustNotResolveUser();
+            MustNotSendEmail();
+        }
+
+        [Fact]
+        public async Task Should_not_send_team_email_for_old_contributor()
+        {
+            var @event = CreateTeamEvent(true, isNewContributor: false);
+
+            await sut.On(@event);
+
+            MustNotResolveUser();
+            MustNotSendEmail();
+        }
+
+        [Fact]
+        public async Task Should_not_send_app_email_if_sender_not_active()
+        {
+            var @event = CreateAppEvent(RefTokenType.Subject, true);
 
             A.CallTo(() => notificatíonSender.IsActive)
                 .Returns(false);
@@ -104,9 +146,23 @@ namespace Squidex.Domain.Apps.Entities.Invitation
         }
 
         [Fact]
-        public async Task Should_not_send_email_if_assigner_not_found()
+        public async Task Should_not_send_team_email_if_sender_not_active()
         {
-            var @event = CreateEvent(RefTokenType.Subject, true);
+            var @event = CreateTeamEvent(true);
+
+            A.CallTo(() => notificatíonSender.IsActive)
+                .Returns(false);
+
+            await sut.On(@event);
+
+            MustNotResolveUser();
+            MustNotSendEmail();
+        }
+
+        [Fact]
+        public async Task Should_not_send_app_email_if_assigner_not_found()
+        {
+            var @event = CreateAppEvent(RefTokenType.Subject, true);
 
             A.CallTo(() => userResolver.FindByIdAsync(assignerId, default))
                 .Returns(Task.FromResult<IUser?>(null));
@@ -118,9 +174,23 @@ namespace Squidex.Domain.Apps.Entities.Invitation
         }
 
         [Fact]
-        public async Task Should_not_send_email_if_assignee_not_found()
+        public async Task Should_not_send_team_email_if_assigner_not_found()
         {
-            var @event = CreateEvent(RefTokenType.Subject, true);
+            var @event = CreateTeamEvent(true);
+
+            A.CallTo(() => userResolver.FindByIdAsync(assignerId, default))
+                .Returns(Task.FromResult<IUser?>(null));
+
+            await sut.On(@event);
+
+            MustNotSendEmail();
+            MustLogWarning();
+        }
+
+        [Fact]
+        public async Task Should_not_send_app_email_if_assignee_not_found()
+        {
+            var @event = CreateAppEvent(RefTokenType.Subject, true);
 
             A.CallTo(() => userResolver.FindByIdAsync(assigneeId, default))
                 .Returns(Task.FromResult<IUser?>(null));
@@ -132,9 +202,23 @@ namespace Squidex.Domain.Apps.Entities.Invitation
         }
 
         [Fact]
-        public async Task Should_send_email_for_new_user()
+        public async Task Should_not_send_team_email_if_assignee_not_found()
         {
-            var @event = CreateEvent(RefTokenType.Subject, true);
+            var @event = CreateTeamEvent(true);
+
+            A.CallTo(() => userResolver.FindByIdAsync(assigneeId, default))
+                .Returns(Task.FromResult<IUser?>(null));
+
+            await sut.On(@event);
+
+            MustNotSendEmail();
+            MustLogWarning();
+        }
+
+        [Fact]
+        public async Task Should_send_app_email_for_new_user()
+        {
+            var @event = CreateAppEvent(RefTokenType.Subject, true);
 
             await sut.On(@event);
 
@@ -143,14 +227,49 @@ namespace Squidex.Domain.Apps.Entities.Invitation
         }
 
         [Fact]
-        public async Task Should_send_email_for_existing_user()
+        public async Task Should_send_team_email_for_new_user()
         {
-            var @event = CreateEvent(RefTokenType.Subject, false);
+            var @event = CreateTeamEvent(true);
+
+            await sut.On(@event);
+
+            A.CallTo(() => notificatíonSender.SendTeamInviteAsync(assigner, assignee, teamName))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_send_app_email_for_existing_user()
+        {
+            var @event = CreateAppEvent(RefTokenType.Subject, false);
 
             await sut.On(@event);
 
             A.CallTo(() => notificatíonSender.SendInviteAsync(assigner, assignee, appName))
                 .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_send_team_email_for_existing_user()
+        {
+            var @event = CreateTeamEvent(false);
+
+            await sut.On(@event);
+
+            A.CallTo(() => notificatíonSender.SendTeamInviteAsync(assigner, assignee, teamName))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_send_team_email_if_team_not_found()
+        {
+            var @event = CreateTeamEvent(true);
+
+            A.CallTo(() => appProvider.GetTeamAsync(A<DomainId>._, default))
+                .Returns(Task.FromResult<ITeamEntity?>(null));
+
+            await sut.On(@event);
+
+            MustNotSendEmail();
         }
 
         private void MustLogWarning()
@@ -169,9 +288,12 @@ namespace Squidex.Domain.Apps.Entities.Invitation
         {
             A.CallTo(() => notificatíonSender.SendInviteAsync(A<IUser>._, A<IUser>._, A<string>._))
                 .MustNotHaveHappened();
+
+            A.CallTo(() => notificatíonSender.SendTeamInviteAsync(A<IUser>._, A<IUser>._, A<string>._))
+                .MustNotHaveHappened();
         }
 
-        private Envelope<IEvent> CreateEvent(RefTokenType assignerType, bool isNewUser, bool isNewContributor = true, Instant? instant = null, int streamNumber = 2)
+        private Envelope<IEvent> CreateAppEvent(RefTokenType assignerType, bool isNewUser, bool isNewContributor = true, Instant? instant = null, int streamNumber = 2)
         {
             var @event = new AppContributorAssigned
             {
@@ -180,6 +302,25 @@ namespace Squidex.Domain.Apps.Entities.Invitation
                 ContributorId = assigneeId,
                 IsCreated = isNewUser,
                 IsAdded = isNewContributor
+            };
+
+            var envelope = Envelope.Create(@event);
+
+            envelope.SetTimestamp(instant ?? SystemClock.Instance.GetCurrentInstant());
+            envelope.SetEventStreamNumber(streamNumber);
+
+            return envelope;
+        }
+
+        private Envelope<IEvent> CreateTeamEvent(bool isNewUser, bool isNewContributor = true, Instant? instant = null, int streamNumber = 2)
+        {
+            var @event = new TeamContributorAssigned
+            {
+                Actor = new RefToken(RefTokenType.Subject, assignerId),
+                ContributorId = assigneeId,
+                IsCreated = isNewUser,
+                IsAdded = isNewContributor,
+                TeamId = DomainId.NewGuid()
             };
 
             var envelope = Envelope.Create(@event);

@@ -1,0 +1,29 @@
+<div class="card card-href card-team" [routerLink]="['/app/teams', team.id]">
+    <div class="card-body">
+        <div class="row g-0">
+            <div class="col col-12">
+                <h3 class="card-title">{{team.name}}</h3>
+
+                <div class="card-text card-links truncate">
+                    <a [routerLink]="['/app/teams', team.id]" sqxStopClick>{{ 'common.edit' | sqxTranslate }}</a>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-sm btn-text-secondary" (click)="dropdown.toggle()" sqxStopClick #buttonOptions>
+            <i class="icon-dots"></i>
+        </button>
+
+        <ng-container *sqxModal="dropdown;closeAlways:true">
+            <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
+                <a class="dropdown-item dropdown-item-delete"
+                    (sqxConfirmClick)="leave.emit(team)"
+                    confirmTitle="i18n:teams.leaveConfirmTitle"
+                    confirmText="i18n:teams.leaveConfirmText"
+                    confirmRememberKey="leaveApp">
+                    {{ 'teams.leave' | sqxTranslate }}
+                </a>
+            </sqx-dropdown-menu>
+        </ng-container>
+    </div>
+</div>

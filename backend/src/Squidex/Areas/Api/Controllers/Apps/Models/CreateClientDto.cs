@@ -14,7 +14,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
     public sealed class CreateClientDto
     {
         /// <summary>
-        /// The id of the client.
+        /// The ID ofthe client.
         /// </summary>
         [LocalizedRequired]
         [LocalizedRegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]

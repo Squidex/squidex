@@ -18,7 +18,7 @@ namespace Squidex.Web
 
             if (context == null)
             {
-                context = new RequestContext(httpContext.User, null).WithHeaders(httpContext);
+                context = new RequestContext(httpContext.User, null!).WithHeaders(httpContext);
 
                 httpContext.Features.Set(context);
             }

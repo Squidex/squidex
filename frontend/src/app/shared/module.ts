@@ -12,7 +12,7 @@ import { RouterModule } from '@angular/router';
 import { MentionModule } from 'angular-mentions';
 import { NgxDocViewerModule } from 'ngx-doc-viewer';
 import { SqxFrameworkModule } from '@app/framework';
-import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, AppsState, AssetComponent, AssetDialogComponent, AssetFolderComponent, AssetFolderDialogComponent, AssetFolderDropdownComponent, AssetFolderDropdownItemComponent, AssetHistoryComponent, AssetPathComponent, AssetPreviewUrlPipe, AssetScriptsState, AssetsListComponent, AssetsSelectorComponent, AssetsService, AssetsState, AssetTextEditorComponent, AssetUploaderComponent, AssetUploaderState, AssetUrlPipe, AuthInterceptor, AuthService, AutoSaveService, BackupsService, BackupsState, ClientsService, ClientsState, CommentComponent, CommentsComponent, CommentsService, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentListHeaderComponent, ContentListWidthDirective, ContentMustExistGuard, ContentsColumnsPipe, ContentSelectorComponent, ContentSelectorItemComponent, ContentsService, ContentsState, ContentStatusComponent, ContentValueComponent, ContentValueEditorComponent, ContributorsService, ContributorsState, FileIconPipe, FilterComparisonComponent, FilterLogicalComponent, FilterNodeComponent, FilterOperatorPipe, GeolocationEditorComponent, HelpComponent, HelpMarkdownPipe, HelpService, HistoryComponent, HistoryListComponent, HistoryMessagePipe, HistoryService, ImageCropperComponent, ImageFocusPointComponent, LanguagesService, LanguagesState, LoadAppsGuard, LoadLanguagesGuard, LoadSchemasGuard, MarkdownEditorComponent, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, NewsService, NotifoComponent, PlansService, PlansState, PreviewableType, QueryComponent, QueryListComponent, QueryPathComponent, ReferenceInputComponent, RichEditorComponent, RolesService, RolesState, RuleEventsState, RuleMustExistGuard, RuleSimulatorState, RulesService, RulesState, SavedQueriesComponent, SchemaCategoryComponent, SchemaMustExistGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SchemasService, SchemasState, SchemaTagSource, SearchFormComponent, SearchService, SortingComponent, StockPhotoService, TableHeaderComponent, TemplatesService, TemplatesState, TranslationsService, TranslationStatusComponent, UIService, UIState, UnsetAppGuard, UsagesService, UserDtoPicture, UserIdPicturePipe, UserNamePipe, UserNameRefPipe, UserPicturePipe, UserPictureRefPipe, UsersProviderService, UsersService, WatchingUsersComponent, WorkflowsService, WorkflowsState } from './declarations';
+import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, AppsState, AssetComponent, AssetDialogComponent, AssetFolderComponent, AssetFolderDialogComponent, AssetFolderDropdownComponent, AssetFolderDropdownItemComponent, AssetHistoryComponent, AssetPathComponent, AssetPreviewUrlPipe, AssetScriptsState, AssetsListComponent, AssetsSelectorComponent, AssetsService, AssetsState, AssetTextEditorComponent, AssetUploaderComponent, AssetUploaderState, AssetUrlPipe, AuthInterceptor, AuthService, AutoSaveService, BackupsService, BackupsState, ClientsService, ClientsState, CommentComponent, CommentsComponent, CommentsService, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentListHeaderComponent, ContentListWidthDirective, ContentMustExistGuard, ContentsColumnsPipe, ContentSelectorComponent, ContentSelectorItemComponent, ContentsService, ContentsState, ContentStatusComponent, ContentValueComponent, ContentValueEditorComponent, ContributorsService, ContributorsState, FileIconPipe, FilterComparisonComponent, FilterLogicalComponent, FilterNodeComponent, FilterOperatorPipe, GeolocationEditorComponent, HelpComponent, HelpMarkdownPipe, HelpService, HistoryComponent, HistoryListComponent, HistoryMessagePipe, HistoryService, ImageCropperComponent, ImageFocusPointComponent, LanguagesService, LanguagesState, LoadAppsGuard, LoadLanguagesGuard, LoadSchemasGuard, LoadTeamsGuard, MarkdownEditorComponent, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, NewsService, NotifoComponent, PlansService, PlansState, PreviewableType, QueryComponent, QueryListComponent, QueryPathComponent, ReferenceInputComponent, RichEditorComponent, RolesService, RolesState, RuleEventsState, RuleMustExistGuard, RuleSimulatorState, RulesService, RulesState, SavedQueriesComponent, SchemaCategoryComponent, SchemaMustExistGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SchemasService, SchemasState, SchemaTagSource, SearchFormComponent, SearchService, SortingComponent, StockPhotoService, TableHeaderComponent, TeamFormComponent, TeamMustExistGuard, TeamsService, TeamsState, TemplatesService, TemplatesState, TranslationsService, TranslationStatusComponent, UIService, UIState, UnsetAppGuard, UnsetTeamGuard, UsagesService, UserDtoPicture, UserIdPicturePipe, UserNamePipe, UserNameRefPipe, UserPicturePipe, UserPictureRefPipe, UsersProviderService, UsersService, WatchingUsersComponent, WorkflowsService, WorkflowsState } from './declarations';
 
 @NgModule({
     imports: [
@@ -77,6 +77,7 @@ import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, 
         SearchFormComponent,
         SortingComponent,
         TableHeaderComponent,
+        TeamFormComponent,
         TranslationStatusComponent,
         UserDtoPicture,
         UserIdPicturePipe,
@@ -131,6 +132,7 @@ import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, 
         SchemaCategoryComponent,
         SearchFormComponent,
         TableHeaderComponent,
+        TeamFormComponent,
         TranslationStatusComponent,
         UserDtoPicture,
         UserIdPicturePipe,
@@ -173,6 +175,7 @@ export class SqxSharedModule {
                 LoadAppsGuard,
                 LoadLanguagesGuard,
                 LoadSchemasGuard,
+                LoadTeamsGuard,
                 MustBeAuthenticatedGuard,
                 MustBeNotAuthenticatedGuard,
                 NewsService,
@@ -193,12 +196,16 @@ export class SqxSharedModule {
                 SchemaTagSource,
                 SearchService,
                 StockPhotoService,
+                TeamMustExistGuard,
                 TemplatesService,
                 TemplatesState,
+                TeamsState,
+                TeamsService,
                 TranslationsService,
                 UIService,
                 UIState,
                 UnsetAppGuard,
+                UnsetTeamGuard,
                 UsagesService,
                 UsersProviderService,
                 UsersService,

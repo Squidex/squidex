@@ -7,8 +7,8 @@
 
 import { ModuleWithProviders } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AppMustExistGuard, LoadAppsGuard, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, UnsetAppGuard } from './shared';
-import { AppAreaComponent, ForbiddenPageComponent, HomePageComponent, InternalAreaComponent, LoginPageComponent, LogoutPageComponent, NotFoundPageComponent } from './shell';
+import { AppMustExistGuard, LoadAppsGuard, LoadTeamsGuard, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, TeamMustExistGuard, UnsetAppGuard, UnsetTeamGuard } from './shared';
+import { AppAreaComponent, ForbiddenPageComponent, HomePageComponent, InternalAreaComponent, LoginPageComponent, LogoutPageComponent, NotFoundPageComponent, TeamsAreaComponent } from './shell';
 
 const routes: Routes = [
     {
@@ -19,17 +19,29 @@ const routes: Routes = [
     {
         path: 'app',
         component: InternalAreaComponent,
-        canActivate: [MustBeAuthenticatedGuard, LoadAppsGuard],
+        canActivate: [MustBeAuthenticatedGuard, LoadAppsGuard, LoadTeamsGuard],
         children: [
             {
                 path: '',
                 loadChildren: () => import('./features/apps/module').then(m => m.SqxFeatureAppsModule),
-                canActivate: [UnsetAppGuard],
+                canActivate: [UnsetAppGuard, UnsetTeamGuard],
             },
             {
                 path: 'administration',
                 loadChildren: () => import('./features/administration/module').then(m => m.SqxFeatureAdministrationModule),
-                canActivate: [UnsetAppGuard],
+                canActivate: [UnsetAppGuard, UnsetTeamGuard],
+            },
+            {
+                path: 'teams',
+                component: TeamsAreaComponent,
+                canActivate: [UnsetAppGuard, UnsetTeamGuard],
+                children: [
+                    {
+                        path: ':teamName',
+                        canActivate: [TeamMustExistGuard],
+                        loadChildren: () => import('./features/teams/module').then(m => m.SqxFeatureTeamsModule),
+                    },
+                ],
             },
             {
                 path: ':appName',

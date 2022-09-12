@@ -21,7 +21,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public QueryJsonDto? Query { get; set; }
 
         /// <summary>
-        /// An optional id of the content to update.
+        /// An optional ID ofthe content to update.
         /// </summary>
         public DomainId? Id { get; set; }
 

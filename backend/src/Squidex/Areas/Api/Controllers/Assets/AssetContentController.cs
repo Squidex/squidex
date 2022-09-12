@@ -79,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <summary>
         /// Get the asset content.
         /// </summary>
-        /// <param name="id">The id of the asset.</param>
+        /// <param name="id">The ID ofthe asset.</param>
         /// <param name="request">The request parameters.</param>
         /// <returns>
         /// 200 => Asset found and content or (resized) image returned.

@@ -7,12 +7,12 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
@@ -27,13 +27,13 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppContributorsController : ApiController
     {
-        private readonly IAppUsageGate appUsageTracker;
+        private readonly IAppUsageGate usageTracker;
         private readonly IUserResolver userResolver;
 
-        public AppContributorsController(ICommandBus commandBus, IAppUsageGate appUsageTracker, IUserResolver userResolver)
+        public AppContributorsController(ICommandBus commandBus, IAppUsageGate usageTracker, IUserResolver userResolver)
             : base(commandBus)
         {
-            this.appUsageTracker = appUsageTracker;
+            this.usageTracker = usageTracker;
             this.userResolver = userResolver;
         }
 
@@ -79,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> PostContributor(string app, [FromBody] AssignContributorDto request)
         {
-            var command = request.ToCommand();
+            var command = SimpleMapper.Map(request, new AssignContributor());
 
             var response = await InvokeCommandAsync(command);
 
@@ -112,7 +112,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// Remove contributor.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the contributor.</param>
+        /// <param name="id">The ID of the contributor.</param>
         /// <returns>
         /// 200 => Contributor removed.
         /// 404 => Contributor or app not found.
@@ -159,9 +159,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private async Task<ContributorsDto> GetResponseAsync(IAppEntity app, bool invited)
         {
-            var (plan, _, _) = await appUsageTracker.GetPlanForAppAsync(app, HttpContext.RequestAborted);
+            var (plan, _, _) = await usageTracker.GetPlanForAppAsync(app, HttpContext.RequestAborted);
 
-            return await ContributorsDto.FromAppAsync(app, Resources, userResolver, plan, invited);
+            return await ContributorsDto.FromDomainAsync(app, Resources, userResolver, plan, invited);
         }
     }
 }

@@ -14,10 +14,22 @@
             <div class="empty" *ngIf="apps.length === 0">
                 <h3 class="empty-headline">{{ 'apps.empty' | sqxTranslate }}</h3>
             </div>
+            
+            <h3 *ngIf="apps.length > 0">{{ 'common.apps' | sqxTranslate }}</h3>
 
             <sqx-app *ngFor="let app of apps; trackBy: trackByApp"
-                [app]="app" (leave)="leave($event)">
+                [app]="app" (leave)="leaveApp($event)">
             </sqx-app>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="teamsState.teams | async; let teams">
+        <div class="teams-section">
+            <h3 *ngIf="teams.length > 0">{{ 'common.teams' | sqxTranslate }}</h3>
+
+            <sqx-team *ngFor="let team of teams; trackBy: trackByTeam"
+                [team]="team" (leave)="leaveTeam($event)">
+            </sqx-team>
         </div>
     </ng-container>
 

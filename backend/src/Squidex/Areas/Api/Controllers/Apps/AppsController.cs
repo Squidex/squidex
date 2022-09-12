@@ -51,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public async Task<IActionResult> GetApps()
         {
-            var userOrClientId = HttpContext.User.UserOrClientId()!;
+            var userOrClientId = UserOrClientId!;
             var userPermissions = Resources.Context.UserPermissions;
 
             var apps = await appProvider.GetUserAppsAsync(userOrClientId, userPermissions, HttpContext.RequestAborted);
@@ -85,11 +85,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var response = Deferred.Response(() =>
             {
-                var userOrClientId = HttpContext.User.UserOrClientId()!;
-
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
-                return AppDto.FromDomain(App, userOrClientId, isFrontend, Resources);
+                return AppDto.FromDomain(App, UserOrClientId, isFrontend, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
@@ -211,11 +209,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             return InvokeCommandAsync(command, x =>
             {
-                var userOrClientId = HttpContext.User.UserOrClientId()!;
-
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
-                return AppDto.FromDomain(x, userOrClientId, isFrontend, Resources);
+                return AppDto.FromDomain(x, UserOrClientId, isFrontend, Resources);
             });
         }
 

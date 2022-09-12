@@ -103,6 +103,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
                 BaseUrlCurrent = GetCurrentUrl(),
                 ErrorMessage = errorMessage,
                 EverybodyCanCreateApps = !uiOptions.OnlyAdminsCanCreateApps,
+                EverybodyCanCreateTeams = !uiOptions.OnlyAdminsCanCreateTeams,
                 IsValidHttps = HttpContext.Request.IsHttps,
                 IsAssetStoreFile = assetStore is FolderAssetStore,
                 IsAssetStoreFtp = assetStore is FTPAssetStore,

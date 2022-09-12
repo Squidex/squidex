@@ -1,0 +1,24 @@
+<ul class="nav nav-light flex-column">
+    <li class="nav-item nav-heading" *ngIf="team.canReadContributors">
+        {{ 'common.security' | sqxTranslate }}
+    </li>
+    <li class="nav-item" *ngIf="team.canReadContributors">
+        <a class="nav-link" routerLink="contributors" routerLinkActive="active">
+            <i class="icon-contributors"></i> {{ 'common.contributors' | sqxTranslate }}
+        </a>
+    </li>
+
+    <li class="nav-item nav-heading">
+        {{ 'common.more' | sqxTranslate }}
+    </li>
+    <li class="nav-item" *ngIf="team.canReadPlans">
+        <a class="nav-link" routerLink="plans" routerLinkActive="active">
+            <i class="icon-subscription"></i> {{ 'common.subscription' | sqxTranslate }}
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" routerLink="more" routerLinkActive="active">
+            <i class="icon-settings"></i> {{ 'common.settings' | sqxTranslate }}
+        </a>
+    </li>
+</ul>

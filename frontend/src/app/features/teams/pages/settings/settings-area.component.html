@@ -1,0 +1,9 @@
+<sqx-title message="i18n:common.settings"></sqx-title>
+
+<sqx-layout layout="left" titleText="i18n:common.settings" titleIcon="settings" [width]="16" [white]="true" [overflow]="true" [padding]="true">
+    <ng-container>
+        <sqx-settings-menu *ngIf="selectedTeam | async; let team" [team]="team"></sqx-settings-menu>
+    </ng-container>
+</sqx-layout>
+
+<router-outlet></router-outlet>
