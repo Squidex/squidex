@@ -6,19 +6,15 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { AppDto, CallsUsageDto } from '@app/shared';
-import { ChartHelpers, ChartOptions } from './shared';
+import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-api-traffic-card[app][usage]',
+    selector: 'sqx-api-traffic-card[usage]',
     styleUrls: ['./api-traffic-card.component.scss'],
     templateUrl: './api-traffic-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApiTrafficCardComponent implements OnChanges {
-    @Input()
-    public app!: AppDto;
-
     @Input()
     public usage?: CallsUsageDto;
 

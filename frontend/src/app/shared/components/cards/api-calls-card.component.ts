@@ -5,34 +5,28 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { AppDto, CallsUsageDto } from '@app/shared';
-import { ChartHelpers, ChartOptions } from './shared';
+import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
+import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-api-performance-card[app][usage]',
-    styleUrls: ['./api-performance-card.component.scss'],
-    templateUrl: './api-performance-card.component.html',
+    selector: 'sqx-api-calls-card[usage]',
+    styleUrls: ['./api-calls-card.component.scss'],
+    templateUrl: './api-calls-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ApiPerformanceCardComponent implements OnChanges {
+export class ApiCallsCardComponent implements OnChanges {
     @Input()
-    public app!: AppDto;
+    public app: AppDto | undefined | null;
 
     @Input()
     public usage?: CallsUsageDto;
 
-    @Input()
-    public isStacked?: boolean | null;
-
-    @Output()
-    public isStackedChange = new EventEmitter<boolean>();
-
+    public chartOptions = ChartOptions.Stacked;
     public chartData: any;
-    public chartSummary = 0;
 
-    public get chartOptions() {
-        return this.isStacked ? ChartOptions.Stacked : ChartOptions.Default;
+    constructor(
+        private readonly usagesService: UsagesService,
+    ) {
     }
 
     public ngOnChanges() {
@@ -47,11 +41,16 @@ export class ApiPerformanceCardComponent implements OnChanges {
                         backgroundColor: ChartHelpers.getBackgroundColor(i),
                         borderColor: ChartHelpers.getBorderColor(i),
                         borderWidth: 1,
-                        data: value.map(x => x.averageElapsedMs),
+                        data: value.map(x => x.totalCalls),
                     })),
             };
-
-            this.chartSummary = this.usage.averageElapsedMs;
         }
+    }
+
+    public downloadLog(app: AppDto) {
+        this.usagesService.getLog(app.name)
+            .subscribe(url => {
+                window.open(url, '_blank');
+            });
     }
 }

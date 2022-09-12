@@ -1,0 +1,31 @@
+<sqx-layout layout="main" titleText="i18n:common.settings" titleIcon="settings" [innerWidth]="55" [hideSidebar]="true">
+    <ng-container>
+        <sqx-list-view innerWidth="55rem">
+            <ng-container content>
+                <form [formGroup]="updateForm.form" (ngSubmit)="save()">
+                    <h5>{{ 'apps.generalSettings' | sqxTranslate }}</h5>
+
+                    <div class="card mb-4">        
+                        <div class="card-body">
+                            <sqx-form-error [error]="updateForm.error | async"></sqx-form-error>
+        
+                            <div class="form-group">
+                                <label for="name">{{ 'common.name' | sqxTranslate }}</label>
+                
+                                <sqx-control-errors for="name"></sqx-control-errors>
+                
+                                <input type="text" class="form-control" id="name" maxlength="100" formControlName="name">
+                            </div>
+                        </div>
+        
+                        <div class="card-footer">
+                            <button type="submit" class="float-end btn btn-primary" [disabled]="!isEditable">
+                                {{ 'common.save' | sqxTranslate }}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </ng-container>
+        </sqx-list-view>
+    </ng-container>
+</sqx-layout>

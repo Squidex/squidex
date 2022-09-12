@@ -21,7 +21,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public string FolderName { get; set; }
 
         /// <summary>
-        /// The ID ofthe parent folder.
+        /// The ID of the parent folder.
         /// </summary>
         public DomainId ParentId { get; set; }
 

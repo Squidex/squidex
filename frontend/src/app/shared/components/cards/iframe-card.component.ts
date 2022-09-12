@@ -6,18 +6,14 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { AppDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-iframe-card[app]',
+    selector: 'sqx-iframe-card',
     styleUrls: ['./iframe-card.component.scss'],
     templateUrl: './iframe-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IFrameCardComponent implements AfterViewInit {
-    @Input()
-    public app!: AppDto;
-
     @Input()
     public options: any;
 

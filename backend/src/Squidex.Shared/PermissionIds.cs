@@ -57,6 +57,9 @@ namespace Squidex.Shared
         public const string TeamPlansRead = "squidex.teams.{team}.plans.read";
         public const string TeamPlansChange = "squidex.teams.{team}.plans.change";
 
+        // Team Usage
+        public const string TeamUsage = "squidex.teams.{team}.usage";
+
         // App
         public const string App = "squidex.apps.{app}";
 

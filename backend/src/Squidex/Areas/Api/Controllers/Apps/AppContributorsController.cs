@@ -101,7 +101,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteMyself(string app)
         {
-            var command = new RemoveContributor { ContributorId = UserId() };
+            var command = new RemoveContributor { ContributorId = UserId };
 
             var response = await InvokeCommandAsync(command);
 
@@ -143,18 +143,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
             {
                 return await GetResponseAsync(context.Result<IAppEntity>(), false);
             }
-        }
-
-        private string UserId()
-        {
-            var subject = User.OpenIdSubject();
-
-            if (string.IsNullOrWhiteSpace(subject))
-            {
-                throw new DomainForbiddenException(T.Get("common.httpOnlyAsUser"));
-            }
-
-            return subject;
         }
 
         private async Task<ContributorsDto> GetResponseAsync(IAppEntity app, bool invited)

@@ -32,6 +32,8 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
     public callsUsage?: CallsUsageDto;
 
     public gridConfig?: GridsterItem[];
+    public gridConfigAvailable = [...DEFAULT_CELLS, ...ADDITIONAL_CELLS];
+    public gridConfigDefaults = DEFAULT_CELLS;
     public gridOptions = DEFAULT_OPTIONS;
 
     public extendedHeight: string = '';
@@ -106,6 +108,37 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
         this.grid?.updateGrid();
     }
 }
+
+const DEFAULT_CELLS: GridsterItem[] = [
+    // Row 1
+    { cols: 1, rows: 1, x: 0, y: 0, name: 'i18n:dashboard.schemasCard', type: 'schemas' },
+    { cols: 1, rows: 1, x: 1, y: 0, name: 'i18n:dashboard.apiDocumentationCard', type: 'api' },
+    { cols: 1, rows: 1, x: 2, y: 0, name: 'i18n:dashboard.supportCard', type: 'support' },
+    { cols: 1, rows: 1, x: 3, y: 0, name: 'i18n:dashboard.githubCard', type: 'github' },
+
+    // Row 2
+    { cols: 2, rows: 1, x: 0, y: 1, name: 'i18n:dashboard.apiCallsChart', type: 'api-calls' },
+    { cols: 2, rows: 1, x: 2, y: 1, name: 'i18n:dashboard.apiPerformanceChart', type: 'api-performance' },
+
+    // Row 3
+    { cols: 1, rows: 1, x: 0, y: 2, name: 'i18n:dashboard.apiCallsSummaryCard', type: 'api-calls-summary' },
+    { cols: 2, rows: 1, x: 1, y: 2, name: 'i18n:dashboard.assetUpdloadsCountChart', type: 'asset-uploads-count' },
+    { cols: 1, rows: 1, x: 2, y: 2, name: 'i18n:dashboard.assetUploadsSizeChart', type: 'asset-uploads-size-summary' },
+
+    // Row 4
+    { cols: 2, rows: 1, x: 0, y: 3, name: 'i18n:dashboard.assetTotalSize', type: 'asset-uploads-size' },
+    { cols: 2, rows: 1, x: 2, y: 3, name: 'i18n:dashboard.trafficChart', type: 'api-traffic' },
+
+    // Row 5
+    { cols: 1, rows: 1, x: 0, y: 4, name: 'i18n:dashboard.trafficSummaryCard', type: 'api-traffic-summary' },
+    { cols: 2, rows: 1, x: 1, y: 4, name: 'i18n:dashboard.historyCard', type: 'history' },
+];
+
+const ADDITIONAL_CELLS = [
+    { cols: 1, rows: 1, x: 0, y: 0, name: 'i18n:dashboard.randomCatCard', type: 'random-cat' },
+    { cols: 1, rows: 1, x: 0, y: 0, name: 'i18n:dashboard.randomDogCard', type: 'random-dog' },
+    { cols: 1, rows: 1, x: 0, y: 0, name: 'i18n:dashboard.contentSummaryCard', type: 'content-summary' },
+];
 
 const DEFAULT_OPTIONS: GridsterConfig = {
     displayGrid: 'onDrag&Resize',

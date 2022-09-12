@@ -77,7 +77,7 @@ namespace Squidex.Areas.Api.Controllers.Teams
         [ApiCosts(1)]
         public async Task<IActionResult> PostContributor(string team, [FromBody] AssignContributorDto request)
         {
-            var command = SimpleMapper.Map(this, new AssignContributor());
+            var command = SimpleMapper.Map(request, new AssignContributor());
 
             var response = await InvokeCommandAsync(command);
 
@@ -99,7 +99,7 @@ namespace Squidex.Areas.Api.Controllers.Teams
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteMyself(string team)
         {
-            var command = new RemoveContributor { ContributorId = UserId() };
+            var command = new RemoveContributor { ContributorId = UserId };
 
             var response = await InvokeCommandAsync(command);
 
@@ -110,7 +110,7 @@ namespace Squidex.Areas.Api.Controllers.Teams
         /// Remove contributor.
         /// </summary>
         /// <param name="team">The ID of the team.</param>
-        /// <param name="id">The ID ofthe contributor.</param>
+        /// <param name="id">The ID of the contributor.</param>
         /// <returns>
         /// 200 => Contributor removed.
         /// 404 => Contributor or team not found.
@@ -141,18 +141,6 @@ namespace Squidex.Areas.Api.Controllers.Teams
             {
                 return await GetResponseAsync(context.Result<ITeamEntity>(), false);
             }
-        }
-
-        private string UserId()
-        {
-            var subject = User.OpenIdSubject();
-
-            if (string.IsNullOrWhiteSpace(subject))
-            {
-                throw new DomainForbiddenException(T.Get("common.httpOnlyAsUser"));
-            }
-
-            return subject;
         }
 
         private async Task<ContributorsDto> GetResponseAsync(ITeamEntity team, bool invited)

@@ -17,7 +17,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Models
     public sealed class CommentDto
     {
         /// <summary>
-        /// The ID ofthe comment.
+        /// The ID of the comment.
         /// </summary>
         public DomainId Id { get; set; }
 

@@ -14,7 +14,7 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
     public sealed class PlanDto
     {
         /// <summary>
-        /// The ID ofthe plan.
+        /// The ID of the plan.
         /// </summary>
         [LocalizedRequired]
         public string Id { get; set; }
@@ -47,7 +47,7 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         public string? YearlyCosts { get; set; }
 
         /// <summary>
-        /// The yearly ID ofthe plan.
+        /// The yearly ID of the plan.
         /// </summary>
         public string? YearlyId { get; set; }
 

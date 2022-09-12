@@ -6,18 +6,15 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
-import { AppDto, CurrentStorageDto } from '@app/shared';
+import { CurrentStorageDto } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-asset-uploads-size-summary-card[app][usage]',
+    selector: 'sqx-asset-uploads-size-summary-card[usage]',
     styleUrls: ['./asset-uploads-size-summary-card.component.scss'],
     templateUrl: './asset-uploads-size-summary-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetUploadsSizeSummaryCardComponent implements OnChanges {
-    @Input()
-    public app!: AppDto;
-
     @Input()
     public usage?: CurrentStorageDto;
 

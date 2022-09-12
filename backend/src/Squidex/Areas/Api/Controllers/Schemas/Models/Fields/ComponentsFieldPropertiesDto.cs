@@ -25,7 +25,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public int? MaxItems { get; set; }
 
         /// <summary>
-        /// The ID ofthe embedded schemas.
+        /// The ID of the embedded schemas.
         /// </summary>
         public ReadonlyList<DomainId>? SchemaIds { get; set; }
 

@@ -61,8 +61,8 @@ export class UsagesService {
     ) {
     }
 
-    public getLog(app: string): Observable<string> {
-        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/log`);
+    public getLog(appName: string): Observable<string> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/usages/log`);
 
         return this.http.get<any>(url).pipe(
             map(body => {
@@ -71,8 +71,8 @@ export class UsagesService {
             pretifyError('i18n:usages.loadMonthlyCallsFailed'));
     }
 
-    public getTodayStorage(app: string): Observable<CurrentStorageDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/storage/today`);
+    public getTodayStorage(appName: string): Observable<CurrentStorageDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/usages/storage/today`);
 
         return this.http.get<any>(url).pipe(
             map(body => {
@@ -81,8 +81,18 @@ export class UsagesService {
             pretifyError('i18n:usages.loadTodayStorageFailed'));
     }
 
-    public getCallsUsages(app: string, fromDate: string, toDate: string): Observable<CallsUsageDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/calls/${fromDate}/${toDate}`);
+    public getTodayStorageForTeam(teamId: string): Observable<CurrentStorageDto> {
+        const url = this.apiUrl.buildUrl(`api/teams/${teamId}/usages/storage/today`);
+
+        return this.http.get<any>(url).pipe(
+            map(body => {
+                return parseCurrentStorage(body);
+            }),
+            pretifyError('i18n:usages.loadTodayStorageFailed'));
+    }
+
+    public getCallsUsages(appName: string, fromDate: string, toDate: string): Observable<CallsUsageDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/usages/calls/${fromDate}/${toDate}`);
 
         return this.http.get<any>(url).pipe(
             map(body => {
@@ -91,8 +101,28 @@ export class UsagesService {
             pretifyError('i18n:usages.loadCallsFailed'));
     }
 
-    public getStorageUsages(app: string, fromDate: string, toDate: string): Observable<ReadonlyArray<StorageUsagePerDateDto>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/storage/${fromDate}/${toDate}`);
+    public getCallsUsagesForTeam(teamId: string, fromDate: string, toDate: string): Observable<CallsUsageDto> {
+        const url = this.apiUrl.buildUrl(`api/teams/${teamId}/usages/calls/${fromDate}/${toDate}`);
+
+        return this.http.get<any>(url).pipe(
+            map(body => {
+                return parseCallsUsage(body);
+            }),
+            pretifyError('i18n:usages.loadCallsFailed'));
+    }
+
+    public getStorageUsages(appName: string, fromDate: string, toDate: string): Observable<ReadonlyArray<StorageUsagePerDateDto>> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/usages/storage/${fromDate}/${toDate}`);
+
+        return this.http.get<any[]>(url).pipe(
+            map(body => {
+                return parseStorageUser(body);
+            }),
+            pretifyError('i18n:usages.loadStorageFailed'));
+    }
+
+    public getStorageUsagesForTeam(teamId: string, fromDate: string, toDate: string): Observable<ReadonlyArray<StorageUsagePerDateDto>> {
+        const url = this.apiUrl.buildUrl(`api/teams/${teamId}/usages/storage/${fromDate}/${toDate}`);
 
         return this.http.get<any[]>(url).pipe(
             map(body => {

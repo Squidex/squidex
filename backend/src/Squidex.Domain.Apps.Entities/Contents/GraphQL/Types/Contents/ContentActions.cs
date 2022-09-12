@@ -444,7 +444,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 new QueryArgument(Scalars.NonNullString)
                 {
                     Name = "id",
-                    Description = "The ID ofthe content (usually GUID).",
+                    Description = "The ID of the content (usually GUID).",
                     DefaultValue = null
                 },
                 new QueryArgument(Scalars.Int)

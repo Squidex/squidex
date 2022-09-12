@@ -87,7 +87,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> GetUserSettings(string app)
         {
-            var result = await appUISettings.GetAsync(AppId, UserId(), HttpContext.RequestAborted);
+            var result = await appUISettings.GetAsync(AppId, UserId, HttpContext.RequestAborted);
 
             return Ok(result);
         }
@@ -127,7 +127,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> PutUserSetting(string app, string key, [FromBody] UpdateSettingDto request)
         {
-            await appUISettings.SetAsync(AppId, UserId(), key, request.Value, HttpContext.RequestAborted);
+            await appUISettings.SetAsync(AppId, UserId, key, request.Value, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -165,21 +165,9 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> DeleteUserSetting(string app, string key)
         {
-            await appUISettings.RemoveAsync(AppId, UserId(), key, HttpContext.RequestAborted);
+            await appUISettings.RemoveAsync(AppId, UserId, key, HttpContext.RequestAborted);
 
             return NoContent();
-        }
-
-        private string UserId()
-        {
-            var subject = User.OpenIdSubject();
-
-            if (string.IsNullOrWhiteSpace(subject))
-            {
-                throw new DomainForbiddenException(T.Get("common.httpOnlyAsUser"));
-            }
-
-            return subject;
         }
     }
 }

@@ -111,6 +111,11 @@ namespace Squidex.Web
             get => App.Id;
         }
 
+        protected DomainId TeamId
+        {
+            get => Team.Id;
+        }
+
         protected ApiController(ICommandBus commandBus)
         {
             CommandBus = commandBus;

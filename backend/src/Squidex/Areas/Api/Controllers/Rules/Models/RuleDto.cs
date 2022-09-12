@@ -21,7 +21,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
     public sealed class RuleDto : Resource
     {
         /// <summary>
-        /// The ID ofthe rule.
+        /// The ID of the rule.
         /// </summary>
         public DomainId Id { get; set; }
 

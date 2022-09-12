@@ -13,7 +13,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
     public sealed class NestedFieldDto : Resource
     {
         /// <summary>
-        /// The ID ofthe field.
+        /// The ID of the field.
         /// </summary>
         public long FieldId { get; set; }
 

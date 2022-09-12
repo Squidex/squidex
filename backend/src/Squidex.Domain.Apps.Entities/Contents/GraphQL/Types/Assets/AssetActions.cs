@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 new QueryArgument(Scalars.NonNullString)
                 {
                     Name = "id",
-                    Description = "The ID ofthe asset (usually GUID).",
+                    Description = "The ID of the asset (usually GUID).",
                     DefaultValue = null
                 }
             };

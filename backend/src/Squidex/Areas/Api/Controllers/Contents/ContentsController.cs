@@ -184,7 +184,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe content to fetch.</param>
+        /// <param name="id">The ID of the content to fetch.</param>
         /// <returns>
         /// 200 => Content returned.
         /// 404 => Content, schema or app not found.
@@ -219,7 +219,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe content to fetch.</param>
+        /// <param name="id">The ID of the content to fetch.</param>
         /// <returns>
         /// 204 => Content is valid.
         /// 400 => Content not valid.
@@ -246,7 +246,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe content to fetch.</param>
+        /// <param name="id">The ID of the content to fetch.</param>
         /// <param name="q">The optional json query.</param>
         /// <returns>
         /// 200 => Contents returned.
@@ -277,7 +277,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe content to fetch.</param>
+        /// <param name="id">The ID of the content to fetch.</param>
         /// <param name="q">The optional json query.</param>
         /// <returns>
         /// 200 => Content returned.
@@ -308,7 +308,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe content to fetch.</param>
+        /// <param name="id">The ID of the content to fetch.</param>
         /// <param name="version">The version fo the content to fetch.</param>
         /// <returns>
         /// 200 => Content version returned.
@@ -431,7 +431,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe content item to update.</param>
+        /// <param name="id">The ID of the content item to update.</param>
         /// <param name="request">The request parameters.</param>
         /// <returns>
         /// 200 => Content created or updated.
@@ -460,7 +460,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe content item to update.</param>
+        /// <param name="id">The ID of the content item to update.</param>
         /// <param name="request">The full data for the content item.</param>
         /// <returns>
         /// 200 => Content updated.
@@ -489,7 +489,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe content item to patch.</param>
+        /// <param name="id">The ID of the content item to patch.</param>
         /// <param name="request">The patch for the content item.</param>
         /// <returns>
         /// 200 => Content patched.
@@ -518,7 +518,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe content item to change.</param>
+        /// <param name="id">The ID of the content item to change.</param>
         /// <param name="request">The status request.</param>
         /// <returns>
         /// 200 => Content status changed.
@@ -547,7 +547,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe content item to cancel.</param>
+        /// <param name="id">The ID of the content item to cancel.</param>
         /// <returns>
         /// 200 => Content status change cancelled.
         /// 400 => Content request not valid.
@@ -575,7 +575,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe content item to create the draft for.</param>
+        /// <param name="id">The ID of the content item to create the draft for.</param>
         /// <returns>
         /// 200 => Content draft created.
         /// 404 => Content, schema or app not found.
@@ -602,7 +602,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe content item to delete the draft from.</param>
+        /// <param name="id">The ID of the content item to delete the draft from.</param>
         /// <returns>
         /// 200 => Content draft deleted.
         /// 404 => Content, schema or app not found.
@@ -629,7 +629,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe content item to delete.</param>
+        /// <param name="id">The ID of the content item to delete.</param>
         /// <param name="request">The request parameters.</param>
         /// <returns>
         /// 204 => Content deleted.

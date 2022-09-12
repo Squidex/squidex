@@ -108,11 +108,11 @@ namespace Squidex.Areas.Api.Controllers
 
         private ContributorsDto CreateTeamLinks(Resources resources)
         {
-            var values = new { app = resources.App };
+            var values = new { team = resources.Team };
 
             AddSelfLink(resources.Url<TeamContributorsController>(x => nameof(x.GetContributors), values));
 
-            if (resources.CanAssignContributor)
+            if (resources.CanAssignTeamContributor)
             {
                 AddPostLink("create",
                     resources.Url<TeamContributorsController>(x => nameof(x.PostContributor), values));

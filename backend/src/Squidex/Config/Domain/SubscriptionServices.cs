@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 using Squidex.Web;
@@ -25,7 +26,7 @@ namespace Squidex.Config.Domain
                 .AsOptional<IBillingManager>();
 
             services.AddSingletonAs<UsageGate>()
-                .AsOptional<IAppUsageGate>();
+                .AsOptional<IAppUsageGate>().As<IAssetUsageTracker>();
         }
     }
 }

@@ -10,13 +10,14 @@ using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Billing
 {
-    public class UsageGate : IAppUsageGate, IAssetUsageTracker
+    public sealed class UsageGate : IAppUsageGate, IAssetUsageTracker
     {
         private const string CounterTotalCount = "TotalAssets";
         private const string CounterTotalSize = "TotalSize";
@@ -127,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
             await apiUsageTracker.TrackAsync(date, appId, clientId, costs, elapsedMs, bytes, ct);
         }
 
-        public virtual async Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateTime date,
+        public async Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateTime date,
             CancellationToken ct = default)
         {
             Guard.NotNull(app);
@@ -235,19 +236,11 @@ namespace Squidex.Domain.Apps.Entities.Billing
             await Task.WhenAll(tasks);
         }
 
-        private static string AppAssetsKey(DomainId appId)
-        {
-            return $"{appId}_Assets";
-        }
-
-        private static string TeamAssetsKey(DomainId appId)
-        {
-            return $"{appId}_TeamAssets";
-        }
-
         public Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanForAppAsync(IAppEntity app,
             CancellationToken ct = default)
         {
+            Guard.NotNull(app);
+
             return memoryCache.GetOrCreateAsync(app, async x =>
             {
                 x.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
@@ -299,6 +292,24 @@ namespace Squidex.Domain.Apps.Entities.Billing
 
                 return (plan, planId, null);
             }
+        }
+
+        public Task<(Plan Plan, string PlanId)> GetPlanForTeamAsync(ITeamEntity team,
+            CancellationToken ct = default)
+        {
+            var (plan, planId) = billingPlans.GetActualPlan(team?.Plan?.PlanId);
+
+            return Task.FromResult((plan, planId));
+        }
+
+        private static string AppAssetsKey(DomainId appId)
+        {
+            return $"{appId}_Assets";
+        }
+
+        private static string TeamAssetsKey(DomainId appId)
+        {
+            return $"{appId}_TeamAssets";
         }
     }
 }

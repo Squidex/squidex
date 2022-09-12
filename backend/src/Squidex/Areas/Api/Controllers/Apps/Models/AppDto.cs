@@ -29,7 +29,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
     public sealed class AppDto : Resource
     {
         /// <summary>
-        /// The ID ofthe app.
+        /// The ID of the app.
         /// </summary>
         public DomainId Id { get; set; }
 

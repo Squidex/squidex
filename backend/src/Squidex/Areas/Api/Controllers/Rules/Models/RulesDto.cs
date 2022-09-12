@@ -22,7 +22,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         public RuleDto[] Items { get; set; }
 
         /// <summary>
-        /// The ID ofthe rule that is currently rerunning.
+        /// The ID of the rule that is currently rerunning.
         /// </summary>
         public DomainId? RunningRuleId { get; set; }
 

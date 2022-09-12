@@ -88,7 +88,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public ScheduleJobDto? ScheduleJob { get; set; }
 
         /// <summary>
-        /// The ID ofthe schema.
+        /// The ID of the schema.
         /// </summary>
         public DomainId SchemaId { get; set; }
 

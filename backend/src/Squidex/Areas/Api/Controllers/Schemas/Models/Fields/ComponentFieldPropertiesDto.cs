@@ -15,7 +15,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
     public sealed class ComponentFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>
-        /// The ID ofthe embedded schemas.
+        /// The ID of the embedded schemas.
         /// </summary>
         public ReadonlyList<DomainId>? SchemaIds { get; set; }
 

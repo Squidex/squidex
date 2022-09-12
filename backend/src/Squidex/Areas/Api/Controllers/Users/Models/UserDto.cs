@@ -16,7 +16,7 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
     public sealed class UserDto : Resource
     {
         /// <summary>
-        /// The ID ofthe user.
+        /// The ID of the user.
         /// </summary>
         [LocalizedRequired]
         public string Id { get; set; }

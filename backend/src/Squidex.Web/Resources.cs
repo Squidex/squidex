@@ -52,7 +52,11 @@ namespace Squidex.Web
         // Contributors
         public bool CanAssignContributor => Can(PermissionIds.AppContributorsAssign);
 
+        public bool CanAssignTeamContributor => Can(PermissionIds.TeamContributorsAssign);
+
         public bool CanRevokeContributor => Can(PermissionIds.AppContributorsRevoke);
+
+        public bool CanRevokeTeamContributor => Can(PermissionIds.TeamContributorsRevoke);
 
         // Workflows
         public bool CanCreateWorkflow => Can(PermissionIds.AppWorkflowsCreate);
@@ -140,6 +144,8 @@ namespace Squidex.Web
         public string? App => GetAppName();
 
         public string? Schema => GetAppName();
+
+        public string? Team => GetTeamId().ToString();
 
         public DomainId AppId => GetAppId();
 

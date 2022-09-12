@@ -160,7 +160,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe field to update.</param>
+        /// <param name="id">The ID of the field to update.</param>
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>
         /// 200 => Schema field updated.
@@ -187,7 +187,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
         /// <param name="parentId">The parent field id.</param>
-        /// <param name="id">The ID ofthe field to update.</param>
+        /// <param name="id">The ID of the field to update.</param>
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>
         /// 200 => Schema field updated.
@@ -213,7 +213,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe field to lock.</param>
+        /// <param name="id">The ID of the field to lock.</param>
         /// <returns>
         /// 200 => Schema field shown.
         /// 400 => Schema field request not valid or field locked.
@@ -242,7 +242,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
         /// <param name="parentId">The parent field id.</param>
-        /// <param name="id">The ID ofthe field to lock.</param>
+        /// <param name="id">The ID of the field to lock.</param>
         /// <returns>
         /// 200 => Schema field hidden.
         /// 400 => Schema field request not valid or field locked.
@@ -270,7 +270,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe field to hide.</param>
+        /// <param name="id">The ID of the field to hide.</param>
         /// <returns>
         /// 200 => Schema field hidden.
         /// 400 => Schema field request not valid or field locked.
@@ -299,7 +299,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
         /// <param name="parentId">The parent field id.</param>
-        /// <param name="id">The ID ofthe field to hide.</param>
+        /// <param name="id">The ID of the field to hide.</param>
         /// <returns>
         /// 200 => Schema field hidden.
         /// 400 => Schema field request not valid or field locked.
@@ -327,7 +327,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe field to show.</param>
+        /// <param name="id">The ID of the field to show.</param>
         /// <returns>
         /// 200 => Schema field shown.
         /// 400 => Schema field request not valid or field locked.
@@ -356,7 +356,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
         /// <param name="parentId">The parent field id.</param>
-        /// <param name="id">The ID ofthe field to show.</param>
+        /// <param name="id">The ID of the field to show.</param>
         /// <returns>
         /// 200 => Schema field shown.
         /// 400 => Schema field request not valid or field locked.
@@ -384,7 +384,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe field to enable.</param>
+        /// <param name="id">The ID of the field to enable.</param>
         /// <returns>
         /// 200 => Schema field enabled.
         /// 400 => Schema field request not valid or field locked.
@@ -413,7 +413,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
         /// <param name="parentId">The parent field id.</param>
-        /// <param name="id">The ID ofthe field to enable.</param>
+        /// <param name="id">The ID of the field to enable.</param>
         /// <returns>
         /// 200 => Schema field enabled.
         /// 400 => Schema field request not valid or field locked.
@@ -441,7 +441,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe field to disable.</param>
+        /// <param name="id">The ID of the field to disable.</param>
         /// <returns>
         /// 200 => Schema field disabled.
         /// 400 => Schema field request not valid or field locked.
@@ -470,7 +470,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
         /// <param name="parentId">The parent field id.</param>
-        /// <param name="id">The ID ofthe field to disable.</param>
+        /// <param name="id">The ID of the field to disable.</param>
         /// <returns>
         /// 200 => Schema field disabled.
         /// 400 => Schema field request not valid or field locked.
@@ -498,7 +498,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID ofthe field to disable.</param>
+        /// <param name="id">The ID of the field to disable.</param>
         /// <returns>
         /// 200 => Schema field deleted.
         /// 400 => Schema field request not valid or field locked.
@@ -524,7 +524,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
         /// <param name="parentId">The parent field id.</param>
-        /// <param name="id">The ID ofthe field to disable.</param>
+        /// <param name="id">The ID of the field to disable.</param>
         /// <returns>
         /// 200 => Schema field deleted.
         /// 400 => Schema field request not valid or field locked.

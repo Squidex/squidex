@@ -6,6 +6,7 @@
  */
 
 export * from '@app/framework';
+export * from './components/cards/shared';
 export * from './interceptors/auth.interceptor';
 export * from './services/app-languages.service';
 export * from './services/apps.service';

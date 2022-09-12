@@ -20,7 +20,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
     public class SchemaDto : Resource
     {
         /// <summary>
-        /// The ID ofthe schema.
+        /// The ID of the schema.
         /// </summary>
         public DomainId Id { get; set; }
 

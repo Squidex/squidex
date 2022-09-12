@@ -31,10 +31,6 @@ export class TeamsState extends State<Snapshot> {
         return this.snapshot.selectedTeam?.id || '';
     }
 
-    public get teamName() {
-        return this.snapshot.selectedTeam?.name || '';
-    }
-
     constructor(
         private readonly teamsService: TeamsService,
         private readonly dialogs: DialogService,
@@ -46,7 +42,7 @@ export class TeamsState extends State<Snapshot> {
     }
 
     public reloadTeams() {
-        return this.loadTeam(this.teamName).pipe(
+        return this.loadTeam(this.teamId).pipe(
             shareSubscribed(this.dialogs));
     }
 

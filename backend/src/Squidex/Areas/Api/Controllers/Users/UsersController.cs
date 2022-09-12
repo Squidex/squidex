@@ -107,7 +107,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         /// <summary>
         /// Get user by id.
         /// </summary>
-        /// <param name="id">The ID ofthe user (GUID).</param>
+        /// <param name="id">The ID of the user (GUID).</param>
         /// <returns>
         /// 200 => User found.
         /// 404 => User not found.
@@ -140,7 +140,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         /// <summary>
         /// Get user picture by id.
         /// </summary>
-        /// <param name="id">The ID ofthe user (GUID).</param>
+        /// <param name="id">The ID of the user (GUID).</param>
         /// <returns>
         /// 200 => User found and image or fallback returned.
         /// 404 => User not found.

@@ -214,7 +214,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The ID ofthe parent folder. Empty for files without parent..
+        ///   Looks up a localized string similar to The ID of the parent folder. Empty for files without parent..
         /// </summary>
         public static string AssetParentId {
             get {

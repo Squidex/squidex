@@ -169,7 +169,7 @@
     <value>The mime type.</value>
   </data>
   <data name="AssetParentId" xml:space="preserve">
-    <value>The ID ofthe parent folder. Empty for files without parent.</value>
+    <value>The ID of the parent folder. Empty for files without parent.</value>
   </data>
   <data name="AssetParentPath" xml:space="preserve">
     <value>The full path in the folder hierarchy as array of folder infos.</value>

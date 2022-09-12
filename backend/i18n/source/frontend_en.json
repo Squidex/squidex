@@ -13,7 +13,7 @@
   "apps.appNameWarning": "The app name cannot be changed later.",
   "apps.appsButtonCreate": "Create App",
   "apps.appsButtonCreateTeam": "Create Team",
-  "apps.appsButtonFallbackTitle": "Apps Overview",
+  "apps.appsButtonFallbackTitle": "Apps and Teams",
   "apps.archiveFailed": "Failed to archive app.",
   "apps.create": "Create App",
   "apps.createBlankApp": "New App",

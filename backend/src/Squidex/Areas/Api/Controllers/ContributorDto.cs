@@ -18,7 +18,7 @@ namespace Squidex.Areas.Api.Controllers
     public sealed class ContributorDto : Resource
     {
         /// <summary>
-        /// The ID ofthe user that contributes to the app.
+        /// The ID of the user that contributes to the app.
         /// </summary>
         [LocalizedRequired]
         public string ContributorId { get; set; }
@@ -97,19 +97,19 @@ namespace Squidex.Areas.Api.Controllers
                 return this;
             }
 
-            var app = resources.App;
+            var team = resources.Team;
 
-            if (resources.CanAssignContributor)
+            if (resources.CanAssignTeamContributor)
             {
-                var values = new { app };
+                var values = new { team };
 
                 AddPostLink("update",
                     resources.Url<TeamContributorsController>(x => nameof(x.PostContributor), values));
             }
 
-            if (resources.CanRevokeContributor)
+            if (resources.CanRevokeTeamContributor)
             {
-                var values = new { app, id = ContributorId };
+                var values = new { team, id = ContributorId };
 
                 AddDeleteLink("delete",
                     resources.Url<TeamContributorsController>(x => nameof(x.DeleteContributor), values));

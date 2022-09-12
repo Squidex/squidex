@@ -21,7 +21,7 @@ using Squidex.Web;
 namespace Squidex.Areas.Api.Controllers.Statistics
 {
     /// <summary>
-    /// Retrieves usage information for apps.
+    /// Retrieves usage information for apps and teams.
     /// </summary>
     [ApiExplorerSettings(GroupName = nameof(Statistics))]
     public sealed class UsagesController : ApiController
@@ -78,6 +78,28 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             return Ok(response);
         }
 
+        [HttpGet]
+        [Route("apps/log/{token}/")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public IActionResult GetLogFile(string token)
+        {
+            // Decrypt the token that has previously been generated.
+            var appId = DomainId.Create(dataProtector.Unprotect(token));
+
+            var fileDate = DateTime.UtcNow.Date;
+            var fileName = $"Usage-{fileDate:yyy-MM-dd}.csv";
+
+            var callback = new FileCallback((body, range, ct) =>
+            {
+                return appLogStore.ReadLogAsync(appId, fileDate.AddDays(-30), fileDate, body, ct);
+            });
+
+            return new FileCallbackResult("text/csv", callback)
+            {
+                FileDownloadName = fileName
+            };
+        }
+
         /// <summary>
         /// Get api calls in date range.
         /// </summary>
@@ -113,6 +135,40 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         }
 
         /// <summary>
+        /// Get api calls in date range for team.
+        /// </summary>
+        /// <param name="team">The name of the team.</param>
+        /// <param name="fromDate">The from date.</param>
+        /// <param name="toDate">The to date.</param>
+        /// <returns>
+        /// 200 => API call returned.
+        /// 400 => Range between from date and to date is not valid or has more than 100 days.
+        /// 404 => Team not found.
+        /// </returns>
+        [HttpGet]
+        [Route("teams/{team}/usages/calls/{fromDate}/{toDate}/")]
+        [ProducesResponseType(typeof(CallsUsageDtoDto), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous(PermissionIds.TeamUsage)]
+        [ApiCosts(0)]
+        public async Task<IActionResult> GetUsagesForTeam(string team, DateTime fromDate, DateTime toDate)
+        {
+            // We can only query 100 logs for up to 100 days.
+            if (fromDate > toDate && (toDate - fromDate).TotalDays > 100)
+            {
+                return BadRequest();
+            }
+
+            var (summary, details) = await usageTracker.QueryAsync(TeamId.ToString(), fromDate.Date, toDate.Date, HttpContext.RequestAborted);
+
+            // Use the current team plan to show the limits to the user.
+            var (plan, _) = await appUsageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
+
+            var response = CallsUsageDtoDto.FromDomain(plan, summary, details);
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Get total asset size.
         /// </summary>
         /// <param name="app">The name of the app.</param>
@@ -131,6 +187,31 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             // Use the current app plan to show the limits to the user.
             var (plan, _, _) = await appUsageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
+
+            var response = new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize };
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get total asset size by team.
+        /// </summary>
+        /// <param name="team">The ID of the team.</param>
+        /// <returns>
+        /// 200 => Storage usage returned.
+        /// 404 => Team not found.
+        /// </returns>
+        [HttpGet]
+        [Route("teams/{team}/usages/storage/today/")]
+        [ProducesResponseType(typeof(CurrentStorageDto), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous(PermissionIds.TeamUsage)]
+        [ApiCosts(0)]
+        public async Task<IActionResult> GetTeamCurrentStorageSizeForTeam(string team)
+        {
+            var size = await assetStatsRepository.GetTotalSizeByTeamAsync(TeamId, HttpContext.RequestAborted);
+
+            // Use the current team plan to show the limits to the user.
+            var (plan, _) = await appUsageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
 
             var response = new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize };
 
@@ -167,26 +248,34 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             return Ok(models);
         }
 
+        /// <summary>
+        /// Get asset usage by date for team.
+        /// </summary>
+        /// <param name="team">The ID of the team.</param>
+        /// <param name="fromDate">The from date.</param>
+        /// <param name="toDate">The to date.</param>
+        /// <returns>
+        /// 200 => Storage usage returned.
+        /// 400 => Range between from date and to date is not valid or has more than 100 days.
+        /// 404 => Team not found.
+        /// </returns>
         [HttpGet]
-        [Route("apps/log/{token}/")]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public IActionResult GetLogFile(string token)
+        [Route("teams/{team}/usages/storage/{fromDate}/{toDate}/")]
+        [ProducesResponseType(typeof(StorageUsagePerDateDto[]), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous(PermissionIds.TeamUsage)]
+        [ApiCosts(0)]
+        public async Task<IActionResult> GetStorageSizesForTeam(string team, DateTime fromDate, DateTime toDate)
         {
-            // Decrypt the token that has previously been generated.
-            var appId = DomainId.Create(dataProtector.Unprotect(token));
-
-            var fileDate = DateTime.UtcNow.Date;
-            var fileName = $"Usage-{fileDate:yyy-MM-dd}.csv";
-
-            var callback = new FileCallback((body, range, ct) =>
+            if (fromDate > toDate && (toDate - fromDate).TotalDays > 100)
             {
-                return appLogStore.ReadLogAsync(appId, fileDate.AddDays(-30), fileDate, body, ct);
-            });
+                return BadRequest();
+            }
 
-            return new FileCallbackResult("text/csv", callback)
-            {
-                FileDownloadName = fileName
-            };
+            var usages = await assetStatsRepository.QueryByTeamAsync(TeamId, fromDate.Date, toDate.Date, HttpContext.RequestAborted);
+
+            var models = usages.Select(StorageUsagePerDateDto.FromDomain).ToArray();
+
+            return Ok(models);
         }
     }
 }

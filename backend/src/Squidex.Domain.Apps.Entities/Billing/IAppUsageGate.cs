@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Billing
@@ -31,6 +32,9 @@ namespace Squidex.Domain.Apps.Entities.Billing
             CancellationToken ct = default);
 
         Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanForAppAsync(DomainId appId,
+            CancellationToken ct = default);
+
+        Task<(Plan Plan, string PlanId)> GetPlanForTeamAsync(ITeamEntity team,
             CancellationToken ct = default);
     }
 }

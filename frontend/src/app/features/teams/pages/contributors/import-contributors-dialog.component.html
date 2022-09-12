@@ -1,0 +1,63 @@
+<form [formGroup]="importForm.form" (ngSubmit)="detect()">  
+    <sqx-modal-dialog (close)="close.emit()">
+        <ng-container title>
+            {{ 'contributors.importTitle' | sqxTranslate }}
+        </ng-container>
+
+        <ng-container content>
+            <ng-container [ngSwitch]="importStage">
+                <ng-container *ngSwitchCase="'Start'">
+                    <textarea class="form-control content" placeholder="user1@squidex.io;user2@squidex.io" formControlName="import"></textarea>
+                   
+                    <sqx-form-hint>
+                        <ng-container *ngIf="importForm.numberOfEmails | async; let count">
+                            {{ 'contributors.import.emailsDetected' | sqxTranslate: { count: count } }}
+                        </ng-container>
+        
+                        &nbsp;
+                    </sqx-form-hint>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'Change'">
+                    <div class="row pb-2" *ngFor="let status of importStatus">
+                        <div class="col-12 truncate aligned">
+                            {{status.email}}
+                        </div>
+                    </div>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'Wait'">
+                    <div class="row pb-2" *ngFor="let status of importStatus">
+                        <div class="col truncate aligned">
+                            {{status.email}}
+                        </div>
+
+                        <div class="col-auto aligned">
+                            <sqx-status-icon size="sm" [status]="status.result" [statusText]="status.resultText | sqxTranslate"></sqx-status-icon>
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </ng-container>
+
+        <ng-container footer>
+            <button type="button" class="btn btn-text-secondary" (click)="close.emit()">
+                {{ 'common.cancel' | sqxTranslate }}
+            </button>
+
+            <ng-container [ngSwitch]="importStage">
+                <ng-container *ngSwitchCase="'Start'">
+                    <button type="submit" class="btn btn-success" [disabled]="importForm.hasNoUser | async">
+                        {{ 'contributors.import.run' | sqxTranslate }}
+                    </button>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'Change'">
+                    <button type="button" class="btn btn-success" [disabled]="importStatus.length === 0" (click)="import()">
+                        {{ 'contributors.import.run2' | sqxTranslate }}
+                    </button>
+                </ng-container>
+            </ng-container>
+        </ng-container>
+    </sqx-modal-dialog>
+</form>

@@ -16,7 +16,7 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
     public sealed class BackupJobDto : Resource
     {
         /// <summary>
-        /// The ID ofthe backup job.
+        /// The ID of the backup job.
         /// </summary>
         public DomainId Id { get; set; }
 
