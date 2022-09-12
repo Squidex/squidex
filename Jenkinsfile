@@ -4,6 +4,7 @@ import groovy.time.*
 def aws_region = 'us-east-1'
 def app = '' /* the docker app build gets stored here */
 def upstream_image_name = "squidex/squidex"
+def create_db = true
 def full_image_name = null
 def cluster = null
 def dbname = null
@@ -19,6 +20,7 @@ pipeline {
     disableConcurrentBuilds()
   }
   parameters {
+    booleanParam(name: 'create_db', defaultValue: true, description: 'Create New MongoDB Environment')
     string(name: 'tag', description: 'The tag to deploy: ex. 6.7.0', defaultValue: 'latest')
     string(name: 'dbname', description: 'The current mongodb to use (like: homer-squidex-staging or homer-squidex-staging-v2upgrade)', defaultValue: 'none')
     choice(name: 'cluster', choices: ['staging', 'production'], description: 'The Kubernetes Cluster to deploy to')
@@ -46,6 +48,9 @@ pipeline {
     }
 
     stage('Create New Environment MongoDB') {
+      when {
+        expression { create_db }
+      }
       steps {
         script{
           timeout(time: 40, unit:'MINUTES') {
