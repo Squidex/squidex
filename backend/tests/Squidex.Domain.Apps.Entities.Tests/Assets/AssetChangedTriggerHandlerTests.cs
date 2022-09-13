@@ -88,9 +88,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     new AssetEntity()
                 }.ToAsyncEnumerable());
 
-            var result = await sut.CreateSnapshotEventsAsync(ctx, ct).ToListAsync(ct);
+            var actual = await sut.CreateSnapshotEventsAsync(ctx, ct).ToListAsync(ct);
 
-            var typed = result.OfType<EnrichedAssetEvent>().ToList();
+            var typed = actual.OfType<EnrichedAssetEvent>().ToList();
 
             Assert.Equal(2, typed.Count);
             Assert.Equal(2, typed.Count(x => x.Type == EnrichedAssetEventType.Created && x.Name == "AssetQueried"));
@@ -107,9 +107,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => assetLoader.GetAsync(ctx.AppId.Id, @event.AssetId, 12, ct))
                 .Returns(new AssetEntity());
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, ct).ToListAsync(ct);
+            var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, ct).ToListAsync(ct);
 
-            var enrichedEvent = (EnrichedAssetEvent)result.Single();
+            var enrichedEvent = (EnrichedAssetEvent)actual.Single();
 
             Assert.Equal(type, enrichedEvent.Type);
             Assert.Equal(@event.Actor, enrichedEvent.Actor);
@@ -124,9 +124,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 var @event = new EnrichedAssetEvent();
 
-                var result = sut.Trigger(@event, ctx);
+                var actual = sut.Trigger(@event, ctx);
 
-                Assert.True(result);
+                Assert.True(actual);
             });
         }
 
@@ -137,9 +137,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 var @event = new EnrichedAssetEvent();
 
-                var result = sut.Trigger(@event, ctx);
+                var actual = sut.Trigger(@event, ctx);
 
-                Assert.True(result);
+                Assert.True(actual);
             });
         }
 
@@ -150,9 +150,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 var @event = new EnrichedAssetEvent();
 
-                var result = sut.Trigger(@event, ctx);
+                var actual = sut.Trigger(@event, ctx);
 
-                Assert.False(result);
+                Assert.False(actual);
             });
         }
 

@@ -274,12 +274,12 @@ namespace Squidex.Infrastructure.Json.Objects
                 id
             };
 
-            var result = id.ToString();
+            var actual = id.ToString();
 
             foreach (var json in jsons)
             {
-                Assert.Equal(result, json.Value);
-                Assert.Equal(result, json.AsString);
+                Assert.Equal(actual, json.Value);
+                Assert.Equal(actual, json.AsString);
                 Assert.Equal(JsonValueType.String, json.Type);
 
                 Assert.Throws<InvalidOperationException>(() => json.AsBoolean);
@@ -305,12 +305,12 @@ namespace Squidex.Infrastructure.Json.Objects
                 input
             };
 
-            var result = new JsonArray { 1, 2 };
+            var actual = new JsonArray { 1, 2 };
 
             foreach (var json in jsons)
             {
-                Assert.Equal(result, json.Value);
-                Assert.Equal(result, json.AsArray);
+                Assert.Equal(actual, json.Value);
+                Assert.Equal(actual, json.AsArray);
                 Assert.Equal(JsonValueType.Array, json.Type);
 
                 Assert.Throws<InvalidOperationException>(() => json.AsBoolean);
@@ -334,12 +334,12 @@ namespace Squidex.Infrastructure.Json.Objects
                 input
             };
 
-            var result = new JsonObject().Add("1", 1).Add("2", 2);
+            var actual = new JsonObject().Add("1", 1).Add("2", 2);
 
             foreach (var json in jsons)
             {
-                Assert.Equal(result, json.Value);
-                Assert.Equal(result, json.AsObject);
+                Assert.Equal(actual, json.Value);
+                Assert.Equal(actual, json.AsObject);
                 Assert.Equal(JsonValueType.Object, json.Type);
 
                 Assert.Throws<InvalidOperationException>(() => json.AsBoolean);
@@ -430,10 +430,10 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             var json = JsonValue.Null;
 
-            var found = json.TryGetByPath("path", out var result);
+            var found = json.TryGetByPath("path", out var actual);
 
             Assert.False(found);
-            Assert.Equal(default, result);
+            Assert.Equal(default, actual);
         }
 
         [Fact]
@@ -441,10 +441,10 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             var json = JsonValue.Create("string");
 
-            var found = json.TryGetByPath("path", out var result);
+            var found = json.TryGetByPath("path", out var actual);
 
             Assert.False(found);
-            Assert.Equal(default, result);
+            Assert.Equal(default, actual);
         }
 
         [Fact]
@@ -452,10 +452,10 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             var json = JsonValue.True;
 
-            var found = json.TryGetByPath("path", out var result);
+            var found = json.TryGetByPath("path", out var actual);
 
             Assert.False(found);
-            Assert.Equal(default, result);
+            Assert.Equal(default, actual);
         }
 
         [Fact]
@@ -463,10 +463,10 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             var json = JsonValue.Create(12);
 
-            var found = json.TryGetByPath("path", out var result);
+            var found = json.TryGetByPath("path", out var actual);
 
             Assert.False(found);
-            Assert.Equal(default, result);
+            Assert.Equal(default, actual);
         }
 
         [Fact]
@@ -474,10 +474,10 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             JsonValue json = new JsonObject().Add("property", 12);
 
-            var found = json.TryGetByPath((string?)null, out var result);
+            var found = json.TryGetByPath((string?)null, out var actual);
 
             Assert.False(found);
-            Assert.Equal(json, result);
+            Assert.Equal(json, actual);
         }
 
         [Fact]
@@ -485,10 +485,10 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             JsonValue json = new JsonObject().Add("property", 12);
 
-            var found = json.TryGetByPath(string.Empty, out var result);
+            var found = json.TryGetByPath(string.Empty, out var actual);
 
             Assert.False(found);
-            Assert.Equal(json, result);
+            Assert.Equal(json, actual);
         }
 
         [Fact]
@@ -502,10 +502,10 @@ namespace Squidex.Infrastructure.Json.Objects
                             new JsonObject()
                                 .Add("nested", 13)));
 
-            var found = json.TryGetByPath("property[1].nested", out var result);
+            var found = json.TryGetByPath("property[1].nested", out var actual);
 
             Assert.True(found);
-            Assert.Equal(JsonValue.Create(13), result);
+            Assert.Equal(JsonValue.Create(13), actual);
         }
 
         [Fact]
@@ -515,10 +515,10 @@ namespace Squidex.Infrastructure.Json.Objects
                 new JsonObject()
                     .Add("property", 12);
 
-            var found = json.TryGetByPath("notfound", out var result);
+            var found = json.TryGetByPath("notfound", out var actual);
 
             Assert.False(found);
-            Assert.Equal(default, result);
+            Assert.Equal(default, actual);
         }
 
         [Fact]
@@ -526,10 +526,10 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             JsonValue json = JsonValue.Array(12, 14);
 
-            var found = json.TryGetByPath("-1", out var result);
+            var found = json.TryGetByPath("-1", out var actual);
 
             Assert.False(found);
-            Assert.Equal(default, result);
+            Assert.Equal(default, actual);
         }
 
         [Fact]
@@ -537,10 +537,10 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             JsonValue json = JsonValue.Array(12, 14);
 
-            var found = json.TryGetByPath("2", out var result);
+            var found = json.TryGetByPath("2", out var actual);
 
             Assert.False(found);
-            Assert.Equal(default, result);
+            Assert.Equal(default, actual);
         }
     }
 }

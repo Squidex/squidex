@@ -92,9 +92,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 Text: {assets[1].FileName} {assets[1].Id}
             ";
 
-            var result = await sut.RenderAsync(template, vars);
+            var actual = await sut.RenderAsync(template, vars);
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         [Fact]
@@ -114,9 +114,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 Text: {assets[1].FileName} {assets[1].Id}
             ";
 
-            var result = await sut.RenderAsync(template, vars);
+            var actual = await sut.RenderAsync(template, vars);
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         [Theory]
@@ -136,9 +136,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 Text: hello+assets
             ";
 
-            var result = await sut.RenderAsync(template, vars);
+            var actual = await sut.RenderAsync(template, vars);
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         [Fact]
@@ -155,9 +155,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 Text: ErrorTooBig
             ";
 
-            var result = await sut.RenderAsync(template, vars);
+            var actual = await sut.RenderAsync(template, vars);
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
 
             A.CallTo(() => assetFileStore.DownloadAsync(A<DomainId>._, A<DomainId>._, A<long>._, null, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -190,9 +190,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 Text: hello+assets
             ";
 
-            var result = await sut.RenderAsync(template, vars);
+            var actual = await sut.RenderAsync(template, vars);
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         [Fact]
@@ -211,9 +211,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 Text: Hash
             ";
 
-            var result = await sut.RenderAsync(template, vars);
+            var actual = await sut.RenderAsync(template, vars);
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         [Fact]
@@ -230,9 +230,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 Text: ErrorTooBig
             ";
 
-            var result = await sut.RenderAsync(template, vars);
+            var actual = await sut.RenderAsync(template, vars);
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
 
             A.CallTo(() => assetFileStore.DownloadAsync(A<DomainId>._, A<DomainId>._, A<long>._, null, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -252,9 +252,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 Text: NoImage
             ";
 
-            var result = await sut.RenderAsync(template, vars);
+            var actual = await sut.RenderAsync(template, vars);
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
 
             A.CallTo(() => assetFileStore.DownloadAsync(A<DomainId>._, A<DomainId>._, A<long>._, null, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -287,9 +287,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 Text: Hash
             ";
 
-            var result = await sut.RenderAsync(template, vars);
+            var actual = await sut.RenderAsync(template, vars);
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         private void SetupBlurHash(AssetRef asset, string hash)

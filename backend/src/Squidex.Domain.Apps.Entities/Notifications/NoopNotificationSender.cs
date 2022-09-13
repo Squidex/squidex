@@ -21,6 +21,11 @@ namespace Squidex.Domain.Apps.Entities.Notifications
             return Task.CompletedTask;
         }
 
+        public Task SendTeamInviteAsync(IUser assigner, IUser user, string teamName)
+        {
+            return Task.CompletedTask;
+        }
+
         public Task SendUsageAsync(IUser user, string appName, long usage, long limit)
         {
             return Task.CompletedTask;

@@ -11,7 +11,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppDto, AppsState, DialogModel, ModalModel, Title, TitleService, UIState } from '@app/shared';
+import { AppDto, AppsState, DialogModel, ModalModel, TeamDto, TeamsState, Title, TitleService, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-apps-menu',
@@ -21,6 +21,7 @@ import { AppDto, AppsState, DialogModel, ModalModel, Title, TitleService, UIStat
 })
 export class AppsMenuComponent {
     public addAppDialog = new DialogModel();
+    public addTeamDialog = new DialogModel();
 
     public appsMenu = new ModalModel();
     public appPath: Observable<ReadonlyArray<Title>>;
@@ -28,6 +29,7 @@ export class AppsMenuComponent {
     constructor(titleService: TitleService,
         public readonly appsState: AppsState,
         public readonly route: ActivatedRoute,
+        public readonly teamsState: TeamsState,
         public readonly uiState: UIState,
     ) {
         this.appPath = titleService.pathChanges.pipe(map(x => x.slice(1)));
@@ -35,6 +37,10 @@ export class AppsMenuComponent {
 
     public trackByApp(_index: number, app: AppDto) {
         return app.id;
+    }
+
+    public trackByTeam(_index: number, team: TeamDto) {
+        return team.id;
     }
 
     public trackByTitle(_index: number, title: Title) {

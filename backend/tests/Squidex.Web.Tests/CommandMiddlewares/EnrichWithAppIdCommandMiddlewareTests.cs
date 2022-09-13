@@ -42,7 +42,7 @@ namespace Squidex.Web.CommandMiddlewares
         }
 
         [Fact]
-        public async Task Should_assign_app_id_and_name_to_app_command()
+        public async Task Should_assign_named_id_to_command()
         {
             var context = await HandleAsync(new CreateContent());
 
@@ -50,7 +50,7 @@ namespace Squidex.Web.CommandMiddlewares
         }
 
         [Fact]
-        public async Task Should_not_override_app_id_and_name()
+        public async Task Should_not_override_existing_named_id()
         {
             var customId = NamedId.Of(DomainId.NewGuid(), "other-app");
 

@@ -7,8 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, AppDto, AppsService, DateTime, ErrorDto, Resource, ResourceLinks, Version } from '@app/shared/internal';
-import { AppSettingsDto, AssetScriptsDto, AssetScriptsPayload, EditorDto, PatternDto } from './apps.service';
+import { ApiUrlConfig, AppDto, AppSettingsDto, AppsService, AssetScriptsDto, AssetScriptsPayload, DateTime, EditorDto, ErrorDto, PatternDto, Resource, ResourceLinks, Version } from '@app/shared/internal';
 
 describe('AppsService', () => {
     const version = new Version('1');
@@ -38,6 +37,28 @@ describe('AppsService', () => {
             });
 
             const req = httpMock.expectOne('http://service/p/api/apps');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush([
+                appResponse(12),
+                appResponse(13),
+            ]);
+
+            expect(apps!).toEqual([createApp(12), createApp(13)]);
+        }));
+
+
+    it('should make get request to get team apps',
+        inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            let apps: ReadonlyArray<AppDto>;
+
+            appsService.getTeamApps('my-team').subscribe(result => {
+                apps = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/teams/my-team/apps');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();
@@ -204,6 +225,30 @@ describe('AppsService', () => {
             expect(app!).toEqual(createApp(12));
         }));
 
+    it('should make put request to transfer app',
+        inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    transfer: { method: 'PUT', href: '/api/apps/my-app/team' },
+                },
+            };
+
+            let app: AppDto;
+
+            appsService.transferApp('my-app', resource, { teamId: 'my-team' }, version).subscribe(result => {
+                app = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/team');
+
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+            req.flush(appResponse(12));
+
+            expect(app!).toEqual(createApp(12));
+        }));
+
     it('should make post request to upload app image',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
@@ -282,11 +327,11 @@ describe('AppsService', () => {
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
-                    delete: { method: 'DELETE', href: '/api/apps/my-app/contributors/me' },
+                    leave: { method: 'DELETE', href: '/api/apps/my-app/contributors/me' },
                 },
             };
 
-            appsService.deleteApp('my-app', resource).subscribe();
+            appsService.leaveApp('my-app', resource).subscribe();
 
             const req = httpMock.expectOne('http://service/p/api/apps/my-app/contributors/me');
 
@@ -332,6 +377,7 @@ describe('AppsService', () => {
             permissions: ['Owner'],
             roleName: `Role${id}`,
             roleProperties: createProperties(id),
+            teamId: `app-team${key}`,
             _links: {
                 update: { method: 'PUT', href: `apps/${id}` },
             },
@@ -391,7 +437,8 @@ export function createApp(id: number, suffix = '') {
         id % 2 === 0,
         id % 2 === 0,
         `Role${id}`,
-        createProperties(id));
+        createProperties(id),
+        `app-team${key}`);
 }
 
 export function createAppSettings(id: number, suffix = '') {

@@ -8,28 +8,20 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, shareSubscribed, State, Version } from '@app/framework';
+import { DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
 import { CreateRoleDto, RoleDto, RolesPayload, RolesService, UpdateRoleDto } from './../services/roles.service';
 import { AppsState } from './apps.state';
 
-interface Snapshot {
+interface Snapshot extends LoadingState {
     // The current roles.
-    roles: RolesList;
+    roles: ReadonlyArray<RoleDto>;
 
     // The app version.
     version: Version;
 
-    // Indicates if the roles are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the roles are loading.
-    isLoading?: boolean;
-
     // Indicates if the user can add a role.
     canCreate?: boolean;
 }
-
-type RolesList = ReadonlyArray<RoleDto>;
 
 @Injectable()
 export class RolesState extends State<Snapshot> {

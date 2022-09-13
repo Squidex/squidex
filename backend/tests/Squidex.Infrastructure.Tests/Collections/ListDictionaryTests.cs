@@ -302,18 +302,18 @@ namespace Squidex.Infrastructure.Collections
             sut.Add(1, 10);
             sut.Add(2, 20);
 
-            var result = new List<KeyValuePair<int, int>>();
+            var actual = new List<KeyValuePair<int, int>>();
 
             foreach (var entry in sut)
             {
-                result.Add(entry);
+                actual.Add(entry);
             }
 
             Assert.Equal(new[]
             {
                 new KeyValuePair<int, int>(1, 10),
                 new KeyValuePair<int, int>(2, 20)
-            }, result.ToArray());
+            }, actual.ToArray());
         }
 
         [Fact]
@@ -324,18 +324,18 @@ namespace Squidex.Infrastructure.Collections
             sut.Add(1, 10);
             sut.Add(2, 20);
 
-            var result = new List<KeyValuePair<int, int>>();
+            var actual = new List<KeyValuePair<int, int>>();
 
             foreach (KeyValuePair<int, int> entry in (IEnumerable)sut)
             {
-                result.Add(entry);
+                actual.Add(entry);
             }
 
             Assert.Equal(new[]
             {
                 new KeyValuePair<int, int>(1, 10),
                 new KeyValuePair<int, int>(2, 20)
-            }, result.ToArray());
+            }, actual.ToArray());
         }
 
         [Fact]
@@ -361,14 +361,14 @@ namespace Squidex.Infrastructure.Collections
             sut.Add(1, 10);
             sut.Add(2, 20);
 
-            var result = new List<int>();
+            var actual = new List<int>();
 
             foreach (var entry in sut.Keys)
             {
-                result.Add(entry);
+                actual.Add(entry);
             }
 
-            Assert.Equal(new[] { 1, 2 }, result.ToArray());
+            Assert.Equal(new[] { 1, 2 }, actual.ToArray());
         }
 
         [Fact]
@@ -379,14 +379,14 @@ namespace Squidex.Infrastructure.Collections
             sut.Add(1, 10);
             sut.Add(2, 20);
 
-            var result = new List<int>();
+            var actual = new List<int>();
 
             foreach (int entry in (IEnumerable)sut.Keys)
             {
-                result.Add(entry);
+                actual.Add(entry);
             }
 
-            Assert.Equal(new[] { 1, 2 }, result.ToArray());
+            Assert.Equal(new[] { 1, 2 }, actual.ToArray());
         }
 
         [Fact]
@@ -408,14 +408,14 @@ namespace Squidex.Infrastructure.Collections
             sut.Add(1, 10);
             sut.Add(2, 20);
 
-            var result = new List<int>();
+            var actual = new List<int>();
 
             foreach (var entry in sut.Values)
             {
-                result.Add(entry);
+                actual.Add(entry);
             }
 
-            Assert.Equal(new[] { 10, 20 }, result.ToArray());
+            Assert.Equal(new[] { 10, 20 }, actual.ToArray());
         }
 
         [Fact]
@@ -426,14 +426,14 @@ namespace Squidex.Infrastructure.Collections
             sut.Add(1, 10);
             sut.Add(2, 20);
 
-            var result = new List<int>();
+            var actual = new List<int>();
 
             foreach (int entry in (IEnumerable)sut.Values)
             {
-                result.Add(entry);
+                actual.Add(entry);
             }
 
-            Assert.Equal(new[] { 10, 20 }, result.ToArray());
+            Assert.Equal(new[] { 10, 20 }, actual.ToArray());
         }
 
         [Fact]

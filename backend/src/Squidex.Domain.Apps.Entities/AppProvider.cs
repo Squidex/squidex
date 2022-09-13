@@ -12,6 +12,8 @@ using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
+using Squidex.Domain.Apps.Entities.Teams;
+using Squidex.Domain.Apps.Entities.Teams.Indexes;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
@@ -23,14 +25,16 @@ namespace Squidex.Domain.Apps.Entities
         private readonly IAppsIndex indexForApps;
         private readonly IRulesIndex indexForRules;
         private readonly ISchemasIndex indexForSchemas;
+        private readonly ITeamsIndex indexForTeams;
 
-        public AppProvider(IAppsIndex indexForApps, IRulesIndex indexForRules, ISchemasIndex indexForSchemas,
+        public AppProvider(IAppsIndex indexForApps, IRulesIndex indexForRules, ISchemasIndex indexForSchemas, ITeamsIndex indexForTeams,
             ILocalCache localCache)
         {
             this.localCache = localCache;
             this.indexForApps = indexForApps;
             this.indexForRules = indexForRules;
             this.indexForSchemas = indexForSchemas;
+            this.indexForTeams = indexForTeams;
         }
 
         public async Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
@@ -89,6 +93,19 @@ namespace Squidex.Domain.Apps.Entities
             return app;
         }
 
+        public async Task<ITeamEntity?> GetTeamAsync(DomainId teamId,
+            CancellationToken ct = default)
+        {
+            var cacheKey = TeamCacheKey(teamId);
+
+            var team = await GetOrCreate(cacheKey, () =>
+            {
+                return indexForTeams.GetTeamAsync(teamId, ct);
+            });
+
+            return team;
+        }
+
         public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache = false,
             CancellationToken ct = default)
         {
@@ -134,6 +151,27 @@ namespace Squidex.Domain.Apps.Entities
             });
 
             return apps?.ToList() ?? new List<IAppEntity>();
+        }
+
+        public async Task<List<IAppEntity>> GetTeamAppsAsync(DomainId teamId,
+            CancellationToken ct = default)
+        {
+            var apps = await GetOrCreate($"GetTeamApps({teamId})", () =>
+            {
+                return indexForApps.GetAppsForTeamAsync(teamId, ct)!;
+            });
+
+            return apps?.ToList() ?? new List<IAppEntity>();
+        }
+
+        public async Task<List<ITeamEntity>> GetUserTeamsAsync(string userId, CancellationToken ct = default)
+        {
+            var teams = await GetOrCreate($"GetUserTeams({userId})", () =>
+            {
+                return indexForTeams.GetTeamsAsync(userId, ct)!;
+            });
+
+            return teams?.ToList() ?? new List<ITeamEntity>();
         }
 
         public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId,
@@ -205,6 +243,11 @@ namespace Squidex.Domain.Apps.Entities
         private static string AppCacheKey(string appName)
         {
             return $"APPS_NAME_{appName}";
+        }
+
+        private static string TeamCacheKey(DomainId teamId)
+        {
+            return $"TEAMS_ID{teamId}";
         }
 
         private static string SchemaCacheKey(DomainId appId, DomainId id)

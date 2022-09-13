@@ -72,9 +72,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             var command = new CreateAssetFolder { FolderName = "New Name" };
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.FolderName, sut.Snapshot.FolderName);
 
@@ -91,9 +91,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.FolderName, sut.Snapshot.FolderName);
 
@@ -110,9 +110,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(parentId, sut.Snapshot.ParentId);
 
@@ -129,9 +129,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(None.Value);
+            actual.ShouldBeEquivalent(None.Value);
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -177,9 +177,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private async Task<object> PublishAsync(AssetFolderCommand command)
         {
-            var result = await sut.ExecuteAsync(CreateAssetFolderCommand(command), default);
+            var actual = await sut.ExecuteAsync(CreateAssetFolderCommand(command), default);
 
-            return result.Payload;
+            return actual.Payload;
         }
     }
 }

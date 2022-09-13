@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
@@ -14,7 +14,7 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
     public sealed class PlanDto
     {
         /// <summary>
-        /// The id of the plan.
+        /// The ID of the plan.
         /// </summary>
         [LocalizedRequired]
         public string Id { get; set; }
@@ -47,7 +47,7 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         public string? YearlyCosts { get; set; }
 
         /// <summary>
-        /// The yearly id of the plan.
+        /// The yearly ID of the plan.
         /// </summary>
         public string? YearlyId { get; set; }
 
@@ -71,7 +71,7 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// </summary>
         public int MaxContributors { get; set; }
 
-        public static PlanDto FromDomain(IAppLimitsPlan plan)
+        public static PlanDto FromDomain(Plan plan)
         {
             var result = SimpleMapper.Map(plan, new PlanDto());
 

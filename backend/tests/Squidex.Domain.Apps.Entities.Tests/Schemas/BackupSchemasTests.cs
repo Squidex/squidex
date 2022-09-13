@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             @event.AppId = appId;
 
-            return Envelope.Create(@event).SetAggregateId(DomainId.Combine(appId.Id, @event.SchemaId.Id));
+            return Envelope.Create(@event).SetAggregateId(DomainId.Combine(appId, @event.SchemaId.Id));
         }
     }
 }

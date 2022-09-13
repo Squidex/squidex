@@ -55,7 +55,14 @@ namespace Squidex.Web
                             schema = Permission.Any;
                         }
 
-                        if (permissions.Allows(id, app, schema))
+                        var team = context.HttpContext.Features.Get<ITeamFeature>()?.Team.Id.ToString();
+
+                        if (string.IsNullOrWhiteSpace(team))
+                        {
+                            team = Permission.Any;
+                        }
+
+                        if (permissions.Allows(id, app, schema, team))
                         {
                             hasPermission = true;
                             break;

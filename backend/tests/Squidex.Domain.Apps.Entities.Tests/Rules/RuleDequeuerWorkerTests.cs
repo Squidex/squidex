@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         [InlineData(2, 360, RuleResult.Failed, RuleJobResult.Retry)]
         [InlineData(3, 720, RuleResult.Failed, RuleJobResult.Retry)]
         [InlineData(4, 0, RuleResult.Failed, RuleJobResult.Failed)]
-        public async Task Should_set_next_attempt_based_on_num_calls(int calls, int minutes, RuleResult result, RuleJobResult jobResult)
+        public async Task Should_set_next_attempt_based_on_num_calls(int calls, int minutes, RuleResult actual, RuleJobResult jobResult)
         {
             var actionData = "{}";
             var actionName = "MyAction";
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var requestDump = "Dump";
 
             A.CallTo(() => ruleService.InvokeAsync(@event.Job.ActionName, @event.Job.ActionData, default))
-                .Returns((Result.Create(requestDump, result), requestElapsed));
+                .Returns((Result.Create(requestDump, actual), requestElapsed));
 
             var now = clock.GetCurrentInstant();
 
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.HandleAsync(@event);
 
-            if (result == RuleResult.Failed)
+            if (actual == RuleResult.Failed)
             {
                 A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Warning)
                     .MustHaveHappened();
@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                     A<RuleJobUpdate>.That.Matches(x =>
                         x.Elapsed == requestElapsed &&
                         x.ExecutionDump == requestDump &&
-                        x.ExecutionResult == result &&
+                        x.ExecutionResult == actual &&
                         x.Finished == now &&
                         x.JobNext == nextCall &&
                         x.JobResult == jobResult),

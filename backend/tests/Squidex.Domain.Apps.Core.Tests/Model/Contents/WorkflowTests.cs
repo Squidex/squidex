@@ -34,9 +34,9 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         [Fact]
         public void Should_provide_default_workflow_if_none_found()
         {
-            var result = Workflows.Empty.GetFirst();
+            var actual = Workflows.Empty.GetFirst();
 
-            Assert.Same(Workflow.Default, result);
+            Assert.Same(Workflow.Default, actual);
         }
 
         [Fact]

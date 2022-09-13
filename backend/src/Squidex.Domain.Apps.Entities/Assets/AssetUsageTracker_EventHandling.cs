@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.UsageTracking;
 
 #pragma warning disable MA0048 // File name must match type name
 
@@ -58,8 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await store.ClearAsync();
 
-            // Use a well defined prefix query for the deletion to improve performance.
-            await usageTracker.DeleteByKeyPatternAsync("^([a-zA-Z0-9]+)_Assets");
+            await appUsageGate.DeleteAssetsUsageAsync();
         }
 
         public async Task On(IEnumerable<Envelope<IEvent>> events)
@@ -187,13 +185,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             switch (@event.Payload)
             {
                 case AssetCreated assetCreated:
-                    return UpdateSizeAsync(assetCreated.AppId.Id, GetDate(@event), assetCreated.FileSize, 1);
+                    return appUsageGate.TrackAssetAsync(assetCreated.AppId.Id, GetDate(@event), assetCreated.FileSize, 1);
 
                 case AssetUpdated assetUpdated:
-                    return UpdateSizeAsync(assetUpdated.AppId.Id, GetDate(@event), assetUpdated.FileSize, 0);
+                    return appUsageGate.TrackAssetAsync(assetUpdated.AppId.Id, GetDate(@event), assetUpdated.FileSize, 0);
 
                 case AssetDeleted assetDeleted:
-                    return UpdateSizeAsync(assetDeleted.AppId.Id, GetDate(@event), -assetDeleted.DeletedSize, -1);
+                    return appUsageGate.TrackAssetAsync(assetDeleted.AppId.Id, GetDate(@event), -assetDeleted.DeletedSize, -1);
             }
 
             return Task.CompletedTask;
@@ -202,26 +200,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private static DateTime GetDate(Envelope<IEvent> @event)
         {
             return @event.Headers.Timestamp().ToDateTimeUtc().Date;
-        }
-
-        private Task UpdateSizeAsync(DomainId appId, DateTime date, long size, long count)
-        {
-            var counters = new Counters
-            {
-                [CounterTotalSize] = size,
-                [CounterTotalCount] = count
-            };
-
-            var appKey = GetKey(appId);
-
-            return Task.WhenAll(
-                usageTracker.TrackAsync(date, appKey, null, counters),
-                usageTracker.TrackAsync(SummaryDate, appKey, null, counters));
-        }
-
-        private static string GetKey(DomainId appId)
-        {
-            return $"{appId}_Assets";
         }
     }
 }

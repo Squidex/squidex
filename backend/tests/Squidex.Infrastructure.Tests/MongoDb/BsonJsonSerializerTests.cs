@@ -86,7 +86,7 @@ namespace Squidex.Infrastructure.MongoDb
 
             public static TestObject CreateWithValues(bool nested = true)
             {
-                var result = new TestObject
+                var actual = new TestObject
                 {
                     Bool = true,
                     Byte = 0x2,
@@ -110,11 +110,11 @@ namespace Squidex.Infrastructure.MongoDb
 
                 if (nested)
                 {
-                    result.Nested = CreateWithValues(false);
-                    result.NestedArray = Enumerable.Repeat(0, 4).Select(x => CreateWithValues(false)).ToArray();
+                    actual.Nested = CreateWithValues(false);
+                    actual.NestedArray = Enumerable.Repeat(0, 4).Select(x => CreateWithValues(false)).ToArray();
                 }
 
-                return result;
+                return actual;
             }
         }
 

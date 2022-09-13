@@ -9,49 +9,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiUrlConfig, HTTP, mapVersioned, pretifyError, Version, Versioned } from '@app/framework';
-
-export class PlanDto {
-    constructor(
-        public readonly id: string,
-        public readonly name: string,
-        public readonly costs: string,
-        public readonly confirmText: string | undefined,
-        public readonly yearlyId: string,
-        public readonly yearlyCosts: string,
-        public readonly yearlyConfirmText: string | undefined,
-        public readonly maxApiBytes: number,
-        public readonly maxApiCalls: number,
-        public readonly maxAssetSize: number,
-        public readonly maxContributors: number,
-    ) {
-    }
-}
-
-export type PlansDto = Versioned<PlansPayload>;
-
-export type PlansPayload = Readonly<{
-    // The ID of the current plan.
-    currentPlanId: string;
-
-    // The user, who owns the plan.
-    planOwner: string;
-
-    // True, if the installation has a billing portal.
-    hasPortal: boolean;
-
-    // The actual plans.
-    plans: ReadonlyArray<PlanDto>;
-}>;
-
-export type PlanChangedDto = Readonly<{
-    // The redirect URI.
-    redirectUri?: string;
-}>;
-
-export type ChangePlanDto = Readonly<{
-    // The new plan ID.
-    planId: string;
-}>;
+import { ChangePlanDto, parsePlans, PlanChangedDto, PlansDto } from './shared';
+export * from './shared';
 
 @Injectable()
 export class PlansService {
@@ -80,26 +39,4 @@ export class PlansService {
             }),
             pretifyError('i18n:plans.changeFailed'));
     }
-}
-
-function parsePlans(response: { plans: any[]; hasPortal: boolean; currentPlanId: string; planOwner: string }): PlansPayload {
-    const { plans: list, currentPlanId, hasPortal, planOwner } = response;
-    const plans = list.map(parsePlan);
-
-    return { plans, planOwner, currentPlanId, hasPortal };
-}
-
-function parsePlan(response: any) {
-    return new PlanDto(
-        response.id,
-        response.name,
-        response.costs,
-        response.confirmText,
-        response.yearlyId,
-        response.yearlyCosts,
-        response.yearlyConfirmText,
-        response.maxApiBytes,
-        response.maxApiCalls,
-        response.maxAssetSize,
-        response.maxContributors);
 }

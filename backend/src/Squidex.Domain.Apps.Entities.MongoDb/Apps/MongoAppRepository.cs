@@ -10,7 +10,6 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
@@ -32,7 +31,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
                         .Ascending(x => x.IndexedName)),
                 new CreateIndexModel<MongoAppEntity>(
                     Index
-                        .Ascending(x => x.IndexedUserIds))
+                        .Ascending(x => x.IndexedUserIds)),
+                new CreateIndexModel<MongoAppEntity>(
+                    Index
+                        .Ascending(x => x.IndexedTeamId))
             }, ct);
         }
 
@@ -42,46 +44,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             return Collection.DeleteManyAsync(Filter.Eq(x => x.DocumentId, app.Id), ct);
         }
 
-        public async Task<Dictionary<string, DomainId>> QueryIdsAsync(string contributorId,
-            CancellationToken ct = default)
-        {
-            using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryIdsAsync"))
-            {
-                var find = Collection.Find(x => x.IndexedUserIds.Contains(contributorId) && !x.IndexedDeleted);
-
-                return await QueryAsync(find, ct);
-            }
-        }
-
-        public async Task<Dictionary<string, DomainId>> QueryIdsAsync(IEnumerable<string> names,
-            CancellationToken ct = default)
-        {
-            using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAsync"))
-            {
-                var find = Collection.Find(x => names.Contains(x.IndexedName) && !x.IndexedDeleted);
-
-                return await QueryAsync(find, ct);
-            }
-        }
-
-        private static async Task<Dictionary<string, DomainId>> QueryAsync(IFindFluent<MongoAppEntity, MongoAppEntity> find,
-            CancellationToken ct)
-        {
-            var entities = await find.SortBy(x => x.IndexedCreated).Only(x => x.DocumentId, x => x.IndexedName).ToListAsync(ct);
-
-            var result = new Dictionary<string, DomainId>();
-
-            foreach (var entity in entities)
-            {
-                var indexedId = DomainId.Create(entity["_id"].AsString);
-                var indexedName = entity["_an"].AsString;
-
-                result[indexedName] = indexedId;
-            }
-
-            return result;
-        }
-
         public async Task<List<IAppEntity>> QueryAllAsync(string contributorId, IEnumerable<string> names,
             CancellationToken ct = default)
         {
@@ -89,6 +51,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             {
                 var entities =
                     await Collection.Find(x => (x.IndexedUserIds.Contains(contributorId) || names.Contains(x.IndexedName)) && !x.IndexedDeleted)
+                        .ToListAsync(ct);
+
+                return entities.Select(x => (IAppEntity)x.Document).ToList();
+            }
+        }
+
+        public async Task<List<IAppEntity>> QueryAllAsync(DomainId teamId,
+            CancellationToken ct = default)
+        {
+            using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAllAsync"))
+            {
+                var entities =
+                    await Collection.Find(x => x.IndexedTeamId == teamId)
                         .ToListAsync(ct);
 
                 return entities.Select(x => (IAppEntity)x.Document).ToList();

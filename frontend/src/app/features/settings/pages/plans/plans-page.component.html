@@ -16,6 +16,10 @@
                     {{ 'plans.notPlanOwner' | sqxTranslate }} {{ 'plans.planOwner' | sqxTranslate }}: <strong className="no-wrap">{{plansState.planOwner | async | sqxUserName}}</strong>
                 </div>
 
+                <div class="alert alert-danger" *ngIf="(plansState.teamId | async) !== null">
+                    {{ 'plans.managedByTeam' | sqxTranslate }}
+                </div>
+
                 <div>
                     <div class="text-muted text-center empty" *ngIf="plans.length === 0">
                         {{ 'plans.noPlanConfigured' | sqxTranslate }}

@@ -10,9 +10,9 @@ using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.UsageTracking;
 using Xunit;
 
 namespace Squidex.Web.Pipeline
@@ -20,7 +20,7 @@ namespace Squidex.Web.Pipeline
     public class UsageMiddlewareTests
     {
         private readonly IAppLogStore appLogStore = A.Fake<IAppLogStore>();
-        private readonly IApiUsageTracker usageTracker = A.Fake<IApiUsageTracker>();
+        private readonly IAppUsageGate appUsageGate = A.Fake<IAppUsageGate>();
         private readonly IClock clock = A.Fake<IClock>();
         private readonly Instant instant = SystemClock.Instance.GetCurrentInstant();
         private readonly HttpContext httpContext = new DefaultHttpContext();
@@ -41,7 +41,7 @@ namespace Squidex.Web.Pipeline
                 return Task.CompletedTask;
             };
 
-            sut = new UsageMiddleware(appLogStore, usageTracker)
+            sut = new UsageMiddleware(appLogStore, appUsageGate)
             {
                 Clock = clock
             };
@@ -56,14 +56,16 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, A<double>._, A<long>._, A<long>._, default))
+            A.CallTo(() => appUsageGate.TrackRequestAsync(A<IAppEntity>._, A<string>._, A<DateTime>._, A<double>._, A<long>._, A<long>._, default))
                 .MustNotHaveHappened();
         }
 
         [Fact]
         public async Task Should_not_track_if_call_blocked()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
+            var app = Mocks.App(appId);
+
+            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
             httpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
@@ -74,14 +76,16 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, A<double>._, A<long>._, A<long>._, default))
+            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, A<double>._, A<long>._, A<long>._, default))
                 .MustNotHaveHappened();
         }
 
         [Fact]
         public async Task Should_track_if_calls_left()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
+            var app = Mocks.App(appId);
+
+            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
             await sut.InvokeAsync(httpContext, next);
@@ -90,14 +94,16 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, A<long>._, default))
+            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, A<long>._, default))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_track_request_bytes()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
+            var app = Mocks.App(appId);
+
+            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
             httpContext.Request.ContentLength = 1024;
 
@@ -107,14 +113,16 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 1024, default))
+            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 1024, default))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_track_response_bytes_with_writer()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
+            var app = Mocks.App(appId);
+
+            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
             await sut.InvokeAsync(httpContext, async x =>
@@ -128,14 +136,16 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11, default))
+            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 11, default))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_track_response_bytes_with_stream()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
+            var app = Mocks.App(appId);
+
+            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
             await sut.InvokeAsync(httpContext, async x =>
@@ -149,14 +159,16 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11, default))
+            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 11, default))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_track_response_bytes_with_file()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
+            var app = Mocks.App(appId);
+
+            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
             var tempFileName = Path.GetTempFileName();
@@ -180,14 +192,16 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11, default))
+            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 11, default))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_not_track_if_costs_are_zero()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
+            var app = Mocks.App(appId);
+
+            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(0));
 
             await sut.InvokeAsync(httpContext, next);
@@ -196,14 +210,16 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, A<double>._, A<long>._, A<long>._, default))
+            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, A<double>._, A<long>._, A<long>._, default))
                 .MustNotHaveHappened();
         }
 
         [Fact]
         public async Task Should_log_request_even_if_costs_are_zero()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
+            var app = Mocks.App(appId);
+
+            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(0));
 
             httpContext.Request.Method = "GET";

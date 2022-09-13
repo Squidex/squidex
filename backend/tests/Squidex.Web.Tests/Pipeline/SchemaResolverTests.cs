@@ -64,7 +64,7 @@ namespace Squidex.Web.Pipeline
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public async Task Should_return_not_found_if_schema_name_is_null(string? schema)
+        public async Task Should_return_404_if_schema_name_is_null(string? schema)
         {
             actionContext.RouteData.Values["schema"] = schema;
 
@@ -77,7 +77,7 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_return_not_found_if_schema_not_published_when_attribute_applied()
+        public async Task Should_return_404_if_schema_not_published_when_attribute_applied()
         {
             actionContext.ActionDescriptor.EndpointMetadata.Add(new SchemaMustBePublishedAttribute());
             actionContext.RouteData.Values["schema"] = schemaId.Id.ToString();
@@ -108,7 +108,7 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_return_not_found_if_schema_not_found()
+        public async Task Should_return_404_if_schema_not_found()
         {
             actionContext.RouteData.Values["schema"] = schemaId.Id.ToString();
 

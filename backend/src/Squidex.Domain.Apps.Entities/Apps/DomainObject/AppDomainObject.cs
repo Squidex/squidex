@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
@@ -42,12 +42,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         protected override bool CanAcceptCreation(ICommand command)
         {
-            return command is CreateApp;
+            return command is AppCommandBase;
         }
 
         protected override bool CanAccept(ICommand command)
         {
-            return command is AppUpdateCommand update && Equals(update?.AppId?.Id, Snapshot.Id);
+            return command is AppCommand update && Equals(update?.AppId?.Id, Snapshot.Id);
         }
 
         public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
@@ -71,6 +71,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         GuardApp.CanUpdate(c);
 
                         Update(c);
+
+                        return Snapshot;
+                    }, ct);
+
+                case TransferToTeam transfer:
+                    return UpdateReturnAsync(transfer, async (c, ct) =>
+                    {
+                        await GuardApp.CanTransfer(c, Snapshot, AppProvider(), ct);
+
+                        Transfer(c);
 
                         return Snapshot;
                     }, ct);
@@ -258,7 +268,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 case DeleteApp delete:
                     return UpdateAsync(delete, async (c, ct) =>
                     {
-                        await Billing().UnsubscribeAsync(c.Actor.Identifier, Snapshot.NamedId(), default);
+                        await BillingManager().UnsubscribeAsync(c.Actor.Identifier, Snapshot.NamedId(), default);
 
                         DeleteApp(c);
                     }, ct);
@@ -279,7 +289,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             var result = await UpdateReturnAsync(changePlan, async (c, ct) =>
             {
-                GuardApp.CanChangePlan(c, Snapshot, Plans());
+                GuardApp.CanChangePlan(c, Snapshot, BillingPlans());
 
                 if (string.Equals(GetFreePlan()?.Id, c.PlanId, StringComparison.Ordinal))
                 {
@@ -290,7 +300,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
                 if (!c.FromCallback)
                 {
-                    var redirectUri = await Billing().MustRedirectToPortalAsync(userId, Snapshot.NamedId(), c.PlanId, ct);
+                    var redirectUri = await BillingManager().MustRedirectToPortalAsync(userId, Snapshot.NamedId(), c.PlanId, ct);
 
                     if (redirectUri != null)
                     {
@@ -310,11 +320,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             if (result.Payload is PlanChangedResult { Unsubscribed: true, RedirectUri: null })
             {
-                await Billing().UnsubscribeAsync(userId, Snapshot.NamedId(), default);
+                await BillingManager().UnsubscribeAsync(userId, Snapshot.NamedId(), default);
             }
             else if (result.Payload is PlanChangedResult { RedirectUri: null })
             {
-                await Billing().SubscribeAsync(userId, Snapshot.NamedId(), changePlan.PlanId, default);
+                await BillingManager().SubscribeAsync(userId, Snapshot.NamedId(), changePlan.PlanId, default);
             }
 
             return result;
@@ -324,23 +334,25 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var appId = NamedId.Of(command.AppId, command.Name);
 
-            var events = new List<AppEvent>
+            void RaiseInitial<T>(T @event) where T : AppEvent
             {
-                CreateInitalEvent(command.Name)
-            };
-
-            if (command.Actor.IsUser)
-            {
-                events.Add(CreateInitialOwner(command.Actor));
+                Raise(command, @event, appId);
             }
 
-            events.Add(CreateInitialSettings());
+            RaiseInitial(new AppCreated());
 
-            foreach (var @event in events)
+            var actor = command.Actor;
+
+            if (actor.IsUser)
             {
-                @event.AppId = appId;
+                RaiseInitial(new AppContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner });
+            }
 
-                Raise(command, @event);
+            var settings = serviceProvider.GetService<InitialSettings>()?.Settings;
+
+            if (settings != null)
+            {
+                RaiseInitial(new AppSettingsUpdated { Settings = settings });
             }
         }
 
@@ -357,6 +369,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private void Update(UpdateApp command)
         {
             Raise(command, new AppUpdated());
+        }
+
+        private void Transfer(TransferToTeam command)
+        {
+            Raise(command, new AppTransfered());
         }
 
         private void UpdateSettings(UpdateAppSettings command)
@@ -454,38 +471,28 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             Raise(command, new AppDeleted());
         }
 
-        private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
+        private void Raise<T, TEvent>(T command, TEvent @event, NamedId<DomainId>? id = null) where T : class where TEvent : AppEvent
         {
             SimpleMapper.Map(command, @event);
 
-            @event.AppId ??= Snapshot.NamedId();
+            @event.AppId ??= id ?? Snapshot.NamedId();
 
             RaiseEvent(Envelope.Create(@event));
         }
 
-        private static AppCreated CreateInitalEvent(string name)
+        private IAppProvider AppProvider()
         {
-            return new AppCreated { Name = name };
+            return serviceProvider.GetRequiredService<IAppProvider>();
         }
 
-        private static AppContributorAssigned CreateInitialOwner(RefToken actor)
+        private IBillingPlans BillingPlans()
         {
-            return new AppContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner };
+            return serviceProvider.GetRequiredService<IBillingPlans>();
         }
 
-        private AppSettingsUpdated CreateInitialSettings()
+        private IBillingManager BillingManager()
         {
-            return new AppSettingsUpdated { Settings = serviceProvider.GetRequiredService<InitialSettings>().Settings };
-        }
-
-        private IAppPlansProvider Plans()
-        {
-            return serviceProvider.GetRequiredService<IAppPlansProvider>();
-        }
-
-        private IAppPlanBillingManager Billing()
-        {
-            return serviceProvider.GetRequiredService<IAppPlanBillingManager>();
+            return serviceProvider.GetRequiredService<IBillingManager>();
         }
 
         private IUserResolver Users()
@@ -493,14 +500,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return serviceProvider.GetRequiredService<IUserResolver>();
         }
 
-        private IAppLimitsPlan GetFreePlan()
+        private Plan GetFreePlan()
         {
-            return Plans().GetFreePlan();
+            return BillingPlans().GetFreePlan();
         }
 
-        private IAppLimitsPlan GetPlan()
+        private Plan GetPlan()
         {
-            return Plans().GetPlanForApp(Snapshot).Plan;
+            return BillingPlans().GetActualPlan(Snapshot.Plan?.PlanId).Plan;
         }
     }
 }

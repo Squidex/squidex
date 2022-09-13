@@ -6,7 +6,8 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Options;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 using Squidex.Web;
 
@@ -18,14 +19,14 @@ namespace Squidex.Config.Domain
         {
             services.AddSingletonAs(c => c.GetRequiredService<IOptions<UsageOptions>>()?.Value?.Plans.OrEmpty()!);
 
-            services.AddSingletonAs<ConfigAppPlansProvider>()
-                .AsOptional<IAppPlansProvider>();
+            services.AddSingletonAs<ConfigPlansProvider>()
+                .AsOptional<IBillingPlans>();
 
-            services.AddSingletonAs<NoopAppPlanBillingManager>()
-                .AsOptional<IAppPlanBillingManager>();
+            services.AddSingletonAs<NoopBillingManager>()
+                .AsOptional<IBillingManager>();
 
             services.AddSingletonAs<UsageGate>()
-                .AsSelf();
+                .AsOptional<IAppUsageGate>().As<IAssetUsageTracker>();
         }
     }
 }

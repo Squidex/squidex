@@ -1,0 +1,147 @@
+/*
+ * Squidex Headless CMS
+ *
+ * @license
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
+ */
+
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { finalize, tap } from 'rxjs/operators';
+import { TeamPlansService } from '@app/features/teams/internal';
+import { AuthService, DialogService, LoadingState, PlanDto, shareSubscribed, State, TeamsState, Version } from '@app/shared';
+
+export interface PlanInfo {
+    // The plan.
+    plan: PlanDto;
+
+    // Indicates if the yearly subscription is selected.
+    isYearlySelected?: boolean;
+
+    // Indicates if the monthly subscription is selected.
+    isSelected?: boolean;
+}
+
+interface Snapshot extends LoadingState {
+    // The current plans.
+    plans: ReadonlyArray<PlanInfo>;
+
+    // Indicates if the user is the plan owner.
+    isOwner?: boolean;
+
+    // The user, who owns the plan.
+    planOwner?: string;
+
+    // Indicates if there is a billing portal for the current Squidex instance.
+    hasPortal?: boolean;
+
+    // The team version.
+    version: Version;
+}
+
+@Injectable()
+export class TeamPlansState extends State<Snapshot> {
+    public plans =
+        this.project(x => x.plans);
+
+    public planOwner =
+        this.project(x => x.planOwner);
+
+    public isOwner =
+        this.project(x => x.isOwner === true);
+
+    public isLoaded =
+        this.project(x => x.isLoaded === true);
+
+    public isLoading =
+        this.project(x => x.isLoading === true);
+
+    public isDisabled =
+        this.project(x => !x.isOwner);
+
+    public hasPortal =
+        this.project(x => x.hasPortal);
+
+    public get teamId() {
+        return this.teamsState.teamId;
+    }
+
+    public window = window;
+
+    constructor(
+        private readonly teamsState: TeamsState,
+        private readonly authState: AuthService,
+        private readonly dialogs: DialogService,
+        private readonly plansService: TeamPlansService,
+    ) {
+        super({ plans: [], version: Version.EMPTY }, 'Plans');
+    }
+
+    public load(isReload = false, overridePlanId?: string): Observable<any> {
+        if (!isReload) {
+            this.resetState('Loading Initial');
+        }
+
+        return this.loadInternal(isReload, overridePlanId);
+    }
+
+    private loadInternal(isReload: boolean, overridePlanId?: string): Observable<any> {
+        this.next({ isLoading: true }, 'Loading Started');
+
+        return this.plansService.getPlans(this.teamId).pipe(
+            tap(({ version, payload }) => {
+                if (isReload) {
+                    this.dialogs.notifyInfo('i18n:plans.reloaded');
+                }
+
+                const planId = overridePlanId || payload.currentPlanId;
+                const plans = payload.plans.map(x => createPlan(x, planId));
+
+                this.next({
+                    hasPortal: payload.hasPortal,
+                    isLoaded: true,
+                    isLoading: false,
+                    isOwner: !payload.planOwner || payload.planOwner === this.userId,
+                    planOwner: payload.planOwner,
+                    plans,
+                    version,
+                }, 'Loading Success');
+            }),
+            finalize(() => {
+                this.next({ isLoading: false }, 'Loading Done');
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public change(planId: string): Observable<any> {
+        return this.plansService.putPlan(this.teamId, { planId }, this.version).pipe(
+            tap(({ payload, version }) => {
+                if (payload.redirectUri && payload.redirectUri.length > 0) {
+                    this.window.location.href = payload.redirectUri;
+                } else {
+                    this.next(s => {
+                        const plans = s.plans.map(x => createPlan(x.plan, planId));
+
+                        return { ...s, plans, isOwner: true, version };
+                    }, 'Change');
+                }
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    private get userId() {
+        return this.authState.user!.id;
+    }
+
+    private get version() {
+        return this.snapshot.version;
+    }
+}
+
+function createPlan(plan: PlanDto, id: string) {
+    return {
+        plan,
+        isSelected: plan.id === id,
+        isYearlySelected: plan.yearlyId === id,
+    };
+}

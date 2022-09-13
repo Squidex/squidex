@@ -1,6 +1,11 @@
 @import 'mixins';
 @import 'vars';
 
+hr {
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+}
+
 .app {
     &-image {
         min-height: 150px;

@@ -62,9 +62,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => assetStore.GeneratePublicUrl(fullName))
                 .Returns(url);
 
-            var result = sut.GeneratePublicUrl(appId, assetId, assetFileVersion, suffix);
+            var actual = sut.GeneratePublicUrl(appId, assetId, assetFileVersion, suffix);
 
-            Assert.Equal(url, result);
+            Assert.Equal(url, actual);
         }
 
         [Theory]
@@ -80,9 +80,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => assetStore.GetSizeAsync(fullName, ct))
                 .Returns(size);
 
-            var result = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion, suffix, ct);
+            var actual = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion, suffix, ct);
 
-            Assert.Equal(size, result);
+            Assert.Equal(size, actual);
         }
 
         [Theory]
@@ -99,9 +99,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => assetStore.GetSizeAsync(fullName, ct))
                 .Returns(size);
 
-            var result = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion, suffix, ct);
+            var actual = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion, suffix, ct);
 
-            Assert.Equal(size, result);
+            Assert.Equal(size, actual);
         }
 
         [Fact]

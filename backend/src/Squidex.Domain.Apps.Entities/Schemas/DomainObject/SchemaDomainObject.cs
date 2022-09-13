@@ -36,12 +36,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
         protected override bool CanAcceptCreation(ICommand command)
         {
-            return command is SchemaCommand;
+            return command is SchemaCommandBase;
         }
 
         protected override bool CanAccept(ICommand command)
         {
-            return command is SchemaUpdateCommand schemaCommand &&
+            return command is SchemaCommand schemaCommand &&
                 Equals(schemaCommand.AppId, Snapshot.AppId) &&
                 Equals(schemaCommand.SchemaId?.Id, Snapshot.Id);
         }

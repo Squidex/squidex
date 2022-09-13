@@ -8,22 +8,16 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { finalize, map, tap } from 'rxjs/operators';
-import { DialogService, shareSubscribed, State } from '@app/framework';
+import { DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
 import { RuleDto, RulesService, UpsertRuleDto } from './../services/rules.service';
 import { AppsState } from './apps.state';
 
-interface Snapshot {
+interface Snapshot extends LoadingState {
     // The current rules.
-    rules: RulesList;
+    rules: ReadonlyArray<RuleDto>;
 
     // The selected rule.
     selectedRule?: RuleDto | null;
-
-    // Indicates if the rules are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the rules are loading.
-    isLoading?: boolean;
 
     // The id of the rule that is currently running.
     runningRuleId?: string;
@@ -37,8 +31,6 @@ interface Snapshot {
     // Indicates if the user can read events.
     canReadEvents?: boolean;
 }
-
-type RulesList = ReadonlyArray<RuleDto>;
 
 @Injectable()
 export class RulesState extends State<Snapshot> {

@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_write_state_and_events_if_created()
         {
-            var result = await sut.ExecuteAsync(new CreateAuto { Value = 4 }, ct);
+            var actual = await sut.ExecuteAsync(new CreateAuto { Value = 4 }, ct);
 
             A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 4), default))
                 .MustHaveHappened();
@@ -79,7 +79,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => state.Persistence.ReadAsync(A<long>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            Assert.Equal(CommandResult.Empty(id, 0, EtagVersion.Empty), result);
+            Assert.Equal(CommandResult.Empty(id, 0, EtagVersion.Empty), actual);
             Assert.Equal(0, sut.Version);
             Assert.Equal(0, sut.Snapshot.Version);
 
@@ -174,7 +174,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, ct))
                 .Throws(new InconsistentStateException(2, -1)).Once();
 
-            var result = await sut.ExecuteAsync(new CreateAuto { Value = 4 }, ct);
+            var actual = await sut.ExecuteAsync(new CreateAuto { Value = 4 }, ct);
 
             A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1), ct))
                 .MustHaveHappenedANumberOfTimesMatching(x => x == 3);
@@ -182,7 +182,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => state.Persistence.ReadAsync(A<long>._, ct))
                 .MustHaveHappened();
 
-            Assert.Equal(CommandResult.Empty(id, 2, 1), result);
+            Assert.Equal(CommandResult.Empty(id, 2, 1), actual);
             Assert.Equal(2, sut.Version);
             Assert.Equal(2, sut.Snapshot.Version);
 
@@ -216,7 +216,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, ct))
                 .Throws(new InconsistentStateException(2, -1)).Once();
 
-            var result = await sut.ExecuteAsync(new Upsert { Value = 4 }, ct);
+            var actual = await sut.ExecuteAsync(new Upsert { Value = 4 }, ct);
 
             A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1), ct))
                 .MustHaveHappenedANumberOfTimesMatching(x => x == 3);
@@ -224,7 +224,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => state.Persistence.ReadAsync(A<long>._, ct))
                 .MustHaveHappened();
 
-            Assert.Equal(CommandResult.Empty(id, 2, 1), result);
+            Assert.Equal(CommandResult.Empty(id, 2, 1), actual);
             Assert.Equal(2, sut.Version);
             Assert.Equal(2, sut.Snapshot.Version);
 
@@ -251,7 +251,7 @@ namespace Squidex.Infrastructure.Commands
         {
             await sut.ExecuteAsync(new CreateAuto { Value = 4 }, ct);
 
-            var result = await sut.ExecuteAsync(new UpdateAuto { Value = 8, ExpectedVersion = 0 }, ct);
+            var actual = await sut.ExecuteAsync(new UpdateAuto { Value = 8, ExpectedVersion = 0 }, ct);
 
             A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 8), default))
                 .MustHaveHappened();
@@ -262,7 +262,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => state.Persistence.ReadAsync(A<long>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            Assert.Equal(CommandResult.Empty(id, 1, 0), result);
+            Assert.Equal(CommandResult.Empty(id, 1, 0), actual);
             Assert.Equal(1, sut.Version);
             Assert.Equal(1, sut.Snapshot.Version);
 
@@ -275,7 +275,7 @@ namespace Squidex.Infrastructure.Commands
         {
             SetupCreated(4);
 
-            var result = await sut.ExecuteAsync(new UpdateAuto { Value = 8, ExpectedVersion = 0 }, ct);
+            var actual = await sut.ExecuteAsync(new UpdateAuto { Value = 8, ExpectedVersion = 0 }, ct);
 
             A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 8), default))
                 .MustHaveHappened();
@@ -286,7 +286,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => state.Persistence.ReadAsync(A<long>._, ct))
                 .MustHaveHappenedOnceExactly();
 
-            Assert.Equal(CommandResult.Empty(id, 1, 0), result);
+            Assert.Equal(CommandResult.Empty(id, 1, 0), actual);
             Assert.Equal(1, sut.Version);
             Assert.Equal(1, sut.Snapshot.Version);
 
@@ -362,11 +362,11 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_return_custom_result_on_create()
+        public async Task Should_return_custom_actual_on_create()
         {
-            var result = await sut.ExecuteAsync(new CreateCustom(), ct);
+            var actual = await sut.ExecuteAsync(new CreateCustom(), ct);
 
-            Assert.Equal(new CommandResult(id, 0, EtagVersion.Empty, "CREATED"), result);
+            Assert.Equal(new CommandResult(id, 0, EtagVersion.Empty, "CREATED"), actual);
         }
 
         [Fact]
@@ -384,13 +384,13 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_return_custom_result_on_update()
+        public async Task Should_return_custom_actual_on_update()
         {
             SetupCreated(4);
 
-            var result = await sut.ExecuteAsync(new UpdateCustom(), ct);
+            var actual = await sut.ExecuteAsync(new UpdateCustom(), ct);
 
-            Assert.Equal(new CommandResult(id, 1, 0, "UPDATED"), result);
+            Assert.Equal(new CommandResult(id, 1, 0, "UPDATED"), actual);
         }
 
         [Fact]
@@ -406,9 +406,9 @@ namespace Squidex.Infrastructure.Commands
         {
             SetupCreated(4);
 
-            var result = await sut.ExecuteAsync(new UpdateAuto { Value = MyDomainState.Unchanged }, ct);
+            var actual = await sut.ExecuteAsync(new UpdateAuto { Value = MyDomainState.Unchanged }, ct);
 
-            Assert.Equal(CommandResult.Empty(id, 0, 0), result);
+            Assert.Equal(CommandResult.Empty(id, 0, 0), actual);
             Assert.Equal(0, sut.Version);
             Assert.Equal(0, sut.Snapshot.Version);
 

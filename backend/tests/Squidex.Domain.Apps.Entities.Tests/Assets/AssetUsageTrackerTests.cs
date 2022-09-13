@@ -9,11 +9,11 @@ using FakeItEasy;
 using FluentAssertions;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Tags;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.UsageTracking;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetLoader assetLoader = A.Fake<IAssetLoader>();
         private readonly ISnapshotStore<AssetUsageTracker.State> store = A.Fake<ISnapshotStore<AssetUsageTracker.State>>();
         private readonly ITagService tagService = A.Fake<ITagService>();
-        private readonly IUsageTracker usageTracker = A.Fake<IUsageTracker>();
+        private readonly IAppUsageGate appUsageGate = A.Fake<IAppUsageGate>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly DomainId assetId = DomainId.NewGuid();
         private readonly DomainId assetKey;
@@ -33,10 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             assetKey = DomainId.Combine(appId, assetId);
 
-            A.CallTo(() => usageTracker.FallbackCategory)
-                .Returns("*");
-
-            sut = new AssetUsageTracker(usageTracker, assetLoader, tagService, store);
+            sut = new AssetUsageTracker(appUsageGate, assetLoader, tagService, store);
         }
 
         [Fact]
@@ -63,58 +60,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             Assert.Equal(nameof(AssetUsageTracker), consumer.Name);
         }
 
-        [Fact]
-        public async Task Should_get_total_size_from_summary_date()
-        {
-            A.CallTo(() => usageTracker.GetAsync($"{appId.Id}_Assets", default, default, null, default))
-                .Returns(new Counters { ["TotalSize"] = 2048 });
-
-            var size = await sut.GetTotalSizeAsync(appId.Id);
-
-            Assert.Equal(2048, size);
-        }
-
-        [Theory]
-        [InlineData("*")]
-        [InlineData("Default")]
-        public async Task Should_get_counters_from_categories(string category)
-        {
-            var dateFrom = new DateTime(2018, 01, 05);
-            var dateTo = dateFrom.AddDays(3);
-
-            A.CallTo(() => usageTracker.QueryAsync($"{appId.Id}_Assets", dateFrom, dateTo, default))
-                .Returns(new Dictionary<string, List<(DateTime, Counters)>>
-                {
-                    [category] = new List<(DateTime, Counters)>
-                    {
-                        (dateFrom.AddDays(0), new Counters
-                        {
-                            ["TotalSize"] = 128,
-                            ["TotalAssets"] = 2
-                        }),
-                        (dateFrom.AddDays(1), new Counters
-                        {
-                            ["TotalSize"] = 256,
-                            ["TotalAssets"] = 3
-                        }),
-                        (dateFrom.AddDays(2), new Counters
-                        {
-                            ["TotalSize"] = 512,
-                            ["TotalAssets"] = 4
-                        })
-                    }
-                });
-
-            var result = await sut.QueryAsync(appId.Id, dateFrom, dateTo);
-
-            result.Should().BeEquivalentTo(new List<AssetStats>
-            {
-                new AssetStats(dateFrom.AddDays(0), 2, 128),
-                new AssetStats(dateFrom.AddDays(1), 3, 256),
-                new AssetStats(dateFrom.AddDays(2), 4, 512)
-            });
-        }
-
         public static IEnumerable<object[]> EventData()
         {
             yield return new object[]
@@ -135,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         [Theory]
         [MemberData(nameof(EventData))]
-        public async Task Should_increase_usage_if_asset_created(AssetEvent @event, long sizeDiff, long countDiff)
+        public async Task Should_increase_usage_if_for_event(AssetEvent @event, long sizeDiff, long countDiff)
         {
             var date = DateTime.UtcNow.Date.AddDays(13);
 
@@ -145,25 +90,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 Envelope.Create<IEvent>(@event)
                     .SetTimestamp(Instant.FromDateTimeUtc(date));
 
-            Counters? countersSummary = null;
-            Counters? countersDate = null;
-
-            A.CallTo(() => usageTracker.TrackAsync(default, $"{appId.Id}_Assets", null, A<Counters>._, default))
-                .Invokes(x => countersSummary = x.GetArgument<Counters>(3));
-
-            A.CallTo(() => usageTracker.TrackAsync(date, $"{appId.Id}_Assets", null, A<Counters>._, default))
-                .Invokes(x => countersDate = x.GetArgument<Counters>(3));
-
             await sut.On(new[] { envelope });
 
-            var expected = new Counters
-            {
-                ["TotalSize"] = sizeDiff,
-                ["TotalAssets"] = countDiff
-            };
-
-            countersSummary.Should().BeEquivalentTo(expected);
-            countersDate.Should().BeEquivalentTo(expected);
+            A.CallTo(() => appUsageGate.TrackAssetAsync(appId.Id, date, sizeDiff, countDiff, default))
+                .MustHaveHappened();
         }
 
         [Fact]

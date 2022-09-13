@@ -361,7 +361,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public static object Input(IContentEntity content, DomainId refId = default, DomainId assetId = default)
         {
-            var result = new Dictionary<string, object>
+            var actual = new Dictionary<string, object>
             {
                 ["myJson"] = new
                 {
@@ -462,7 +462,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             if (refId != default)
             {
-                result["myReferences"] = new
+                actual["myReferences"] = new
                 {
                     iv = new[]
                     {
@@ -470,7 +470,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     }
                 };
 
-                result["myUnion"] = new
+                actual["myUnion"] = new
                 {
                     iv = new[]
                     {
@@ -481,7 +481,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             if (assetId != default)
             {
-                result["myAssets"] = new
+                actual["myAssets"] = new
                 {
                     iv = new[]
                     {
@@ -492,18 +492,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             if (assetId != default || refId != default)
             {
-                result["myEmbeds"] = new
+                actual["myEmbeds"] = new
                 {
                     iv = $"assets:{assetId}, contents:{refId}"
                 };
             }
 
-            return result;
+            return actual;
         }
 
         private static object Data(IContentEntity content)
         {
-            var result = new Dictionary<string, object>
+            var actual = new Dictionary<string, object>
             {
                 ["myJson"] = new
                 {
@@ -629,12 +629,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            return result;
+            return actual;
         }
 
         private static object FlatData(IContentEntity content)
         {
-            var result = new Dictionary<string, object?>
+            var actual = new Dictionary<string, object?>
             {
                 ["myJson"] = new
                 {
@@ -715,7 +715,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             };
 
-            return result;
+            return actual;
         }
     }
 }

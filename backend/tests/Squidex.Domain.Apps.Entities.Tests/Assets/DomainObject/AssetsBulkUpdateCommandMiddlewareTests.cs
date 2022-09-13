@@ -41,9 +41,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             var command = new BulkUpdateAssets();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -51,9 +51,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             var command = new BulkUpdateAssets { Jobs = Array.Empty<BulkUpdateJob>() };
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -65,10 +65,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             var command = BulkCommand(BulkUpdateAssetType.Annotate, id, fileName: "file");
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(A<AnnotateAsset>.That.Matches(x => x.AssetId == id && x.FileName == "file"), ct))
                 .MustHaveHappened();
@@ -83,10 +83,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             var command = BulkCommand(BulkUpdateAssetType.Move, id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -101,10 +101,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             var command = BulkCommand(BulkUpdateAssetType.Move, id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(A<MoveAsset>.That.Matches(x => x.AssetId == id), ct))
                 .MustHaveHappened();
@@ -119,10 +119,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             var command = BulkCommand(BulkUpdateAssetType.Move, id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -137,10 +137,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             var command = BulkCommand(BulkUpdateAssetType.Delete, id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<DeleteAsset>.That.Matches(x => x.AssetId == id), ct))
@@ -156,10 +156,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             var command = BulkCommand(BulkUpdateAssetType.Delete, id: id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();

@@ -13,5 +13,10 @@ namespace Squidex.Areas.Api.Controllers.UI.Models
         /// True when the user can create apps.
         /// </summary>
         public bool CanCreateApps { get; set; }
+
+        /// <summary>
+        /// True when the user can create teams.
+        /// </summary>
+        public bool CanCreateTeams { get; set; }
     }
 }

@@ -9,7 +9,7 @@ using Roles = Squidex.Domain.Apps.Core.Apps.Role;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class AssignContributor : AppUpdateCommand
+    public sealed class AssignContributor : AppCommand
     {
         public string ContributorId { get; set; }
 

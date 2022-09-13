@@ -56,9 +56,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return html2Text(value);
             ";
 
-            var result = sut.Execute(vars, script).AsString;
+            var actual = sut.Execute(vars, script).AsString;
 
-            Assert.Equal("Hello World", result);
+            Assert.Equal("Hello World", actual);
         }
 
         [Fact]
@@ -73,9 +73,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return markdown2Text(value);
             ";
 
-            var result = sut.Execute(vars, script).AsString;
+            var actual = sut.Execute(vars, script).AsString;
 
-            Assert.Equal("Hello World", result);
+            Assert.Equal("Hello World", actual);
         }
 
         [Fact]
@@ -90,9 +90,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return wordCount(value);
             ";
 
-            var result = sut.Execute(vars, script).AsNumber;
+            var actual = sut.Execute(vars, script).AsNumber;
 
-            Assert.Equal(2, result);
+            Assert.Equal(2, actual);
         }
 
         [Fact]
@@ -107,9 +107,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return characterCount(value);
             ";
 
-            var result = sut.Execute(vars, script).AsNumber;
+            var actual = sut.Execute(vars, script).AsNumber;
 
-            Assert.Equal(10, result);
+            Assert.Equal(10, actual);
         }
 
         [Fact]
@@ -124,9 +124,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return toCamelCase(value);
             ";
 
-            var result = sut.Execute(vars, script).AsString;
+            var actual = sut.Execute(vars, script).AsString;
 
-            Assert.Equal("helloWorld", result);
+            Assert.Equal("helloWorld", actual);
         }
 
         [Fact]
@@ -141,9 +141,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return toPascalCase(value);
             ";
 
-            var result = sut.Execute(vars, script).AsString;
+            var actual = sut.Execute(vars, script).AsString;
 
-            Assert.Equal("HelloWorld", result);
+            Assert.Equal("HelloWorld", actual);
         }
 
         [Fact]
@@ -158,9 +158,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return slugify(value);
             ";
 
-            var result = sut.Execute(vars, script).AsString;
+            var actual = sut.Execute(vars, script).AsString;
 
-            Assert.Equal("4-haeuser", result);
+            Assert.Equal("4-haeuser", actual);
         }
 
         [Fact]
@@ -175,9 +175,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return slugify(value, true);
             ";
 
-            var result = sut.Execute(vars, script).AsString;
+            var actual = sut.Execute(vars, script).AsString;
 
-            Assert.Equal("4-hauser", result);
+            Assert.Equal("4-hauser", actual);
         }
 
         [Fact]
@@ -192,9 +192,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return sha256(value);
             ";
 
-            var result = sut.Execute(vars, script).AsString;
+            var actual = sut.Execute(vars, script).AsString;
 
-            Assert.Equal("HelloWorld".ToSha256(), result);
+            Assert.Equal("HelloWorld".ToSha256(), actual);
         }
 
         [Fact]
@@ -209,9 +209,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return sha512(value);
             ";
 
-            var result = sut.Execute(vars, script).AsString;
+            var actual = sut.Execute(vars, script).AsString;
 
-            Assert.Equal("HelloWorld".ToSha512(), result);
+            Assert.Equal("HelloWorld".ToSha512(), actual);
         }
 
         [Fact]
@@ -226,9 +226,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return md5(value);
             ";
 
-            var result = sut.Execute(vars, script).AsString;
+            var actual = sut.Execute(vars, script).AsString;
 
-            Assert.Equal("HelloWorld".ToMD5(), result);
+            Assert.Equal("HelloWorld".ToMD5(), actual);
         }
 
         [Fact]
@@ -242,9 +242,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return guid();
             ";
 
-            var result = sut.Execute(vars, script).AsString;
+            var actual = sut.Execute(vars, script).AsString;
 
-            Assert.True(Guid.TryParse(result, out _));
+            Assert.True(Guid.TryParse(actual, out _));
         }
 
         [Fact]
@@ -339,8 +339,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             };
 
             const string script = @"
-                getJSON(null, function(result) {
-                    complete(result);
+                getJSON(null, function(actual) {
+                    complete(actual);
                 });
             ";
 
@@ -375,19 +375,19 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             const string script = @"
                 var url = 'http://squidex.io';
 
-                getJSON(url, function(result) {
-                    complete(result);
+                getJSON(url, function(actual) {
+                    complete(actual);
                 });
             ";
 
-            var result = await sut.ExecuteAsync(vars, script);
+            var actual = await sut.ExecuteAsync(vars, script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Get);
             httpHandler.ShouldBeUrl("http://squidex.io/");
 
             var expectedResult = new JsonObject().Add("key", 42);
 
-            Assert.Equal(expectedResult, result);
+            Assert.Equal(expectedResult, actual);
         }
 
         [Fact]
@@ -407,12 +407,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
                 var url = 'http://squidex.io';
 
-                getJSON(url, function(result) {
-                    complete(result);
+                getJSON(url, function(actual) {
+                    complete(actual);
                 }, headers);
             ";
 
-            var result = await sut.ExecuteAsync(vars, script);
+            var actual = await sut.ExecuteAsync(vars, script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Get);
             httpHandler.ShouldBeUrl("http://squidex.io/");
@@ -421,7 +421,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var expectedResult = new JsonObject().Add("key", 42);
 
-            Assert.Equal(expectedResult, result);
+            Assert.Equal(expectedResult, actual);
         }
 
         [Fact]
@@ -436,19 +436,19 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             const string script = @"
                 var url = 'http://squidex.io';
 
-                deleteJSON(url, function(result) {
-                    complete(result);
+                deleteJSON(url, function(actual) {
+                    complete(actual);
                 });
             ";
 
-            var result = await sut.ExecuteAsync(vars, script);
+            var actual = await sut.ExecuteAsync(vars, script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Delete);
             httpHandler.ShouldBeUrl("http://squidex.io/");
 
             var expectedResult = new JsonObject().Add("key", 42);
 
-            Assert.Equal(expectedResult, result);
+            Assert.Equal(expectedResult, actual);
         }
 
         [Fact]
@@ -465,12 +465,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
                 var body = { key: 42 };
 
-                patchJSON(url, body, function(result) {
-                    complete(result);
+                patchJSON(url, body, function(actual) {
+                    complete(actual);
                 });
             ";
 
-            var result = await sut.ExecuteAsync(vars, script);
+            var actual = await sut.ExecuteAsync(vars, script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Patch);
             httpHandler.ShouldBeUrl("http://squidex.io/");
@@ -478,7 +478,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var expectedResult = new JsonObject().Add("key", 42);
 
-            Assert.Equal(expectedResult, result);
+            Assert.Equal(expectedResult, actual);
         }
 
         [Fact]
@@ -495,12 +495,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
                 var body = { key: 42 };
 
-                postJSON(url, body, function(result) {
-                    complete(result);
+                postJSON(url, body, function(actual) {
+                    complete(actual);
                 });
             ";
 
-            var result = await sut.ExecuteAsync(vars, script);
+            var actual = await sut.ExecuteAsync(vars, script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Post);
             httpHandler.ShouldBeUrl("http://squidex.io/");
@@ -508,7 +508,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var expectedResult = new JsonObject().Add("key", 42);
 
-            Assert.Equal(expectedResult, result);
+            Assert.Equal(expectedResult, actual);
         }
 
         [Fact]
@@ -525,12 +525,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
                 var body = { key: 42 };
 
-                putJSON(url, body, function(result) {
-                    complete(result);
+                putJSON(url, body, function(actual) {
+                    complete(actual);
                 });
             ";
 
-            var result = await sut.ExecuteAsync(vars, script);
+            var actual = await sut.ExecuteAsync(vars, script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Put);
             httpHandler.ShouldBeUrl("http://squidex.io/");
@@ -538,7 +538,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var expectedResult = new JsonObject().Add("key", 42);
 
-            Assert.Equal(expectedResult, result);
+            Assert.Equal(expectedResult, actual);
         }
 
         private MockupHttpHandler SetupRequest()

@@ -1,11 +1,14 @@
 @import 'mixins';
 @import 'vars';
 
-.apps {
-    &-section {
-        @include clearfix;
-        padding: 2rem 1.25rem 0 $size-sidebar-width + .25rem;
-    }
+.apps-section {
+    @include clearfix;
+    padding: 2rem 1.25rem 0 $size-sidebar-width + .25rem;
+}
+
+.teams-section {
+    @include clearfix;
+    padding: 2rem 1.25rem 0 $size-sidebar-width + .25rem;
 }
 
 .page {

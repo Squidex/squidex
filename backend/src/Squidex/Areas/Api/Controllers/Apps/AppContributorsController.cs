@@ -7,15 +7,12 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Invitation;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
-using Squidex.Infrastructure;
+using Squidex.Domain.Apps.Entities.Billing;
+using Squidex.Domain.Apps.Entities.Invitation;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Security;
-using Squidex.Infrastructure.Translations;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Shared;
 using Squidex.Shared.Users;
 using Squidex.Web;
@@ -28,15 +25,14 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppContributorsController : ApiController
     {
-        private readonly IAppPlansProvider appPlansProvider;
-        private readonly IUserResolver userResolver;
+        private readonly IAppUsageGate usageTracker;
+        private readonly IUserResolver usageGate;
 
-        public AppContributorsController(ICommandBus commandBus, IAppPlansProvider appPlansProvider, IUserResolver userResolver)
+        public AppContributorsController(ICommandBus commandBus, IAppUsageGate usageGate, IUserResolver userResolver)
             : base(commandBus)
         {
-            this.appPlansProvider = appPlansProvider;
-
-            this.userResolver = userResolver;
+            this.usageTracker = usageGate;
+            this.usageGate = userResolver;
         }
 
         /// <summary>
@@ -81,7 +77,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> PostContributor(string app, [FromBody] AssignContributorDto request)
         {
-            var command = request.ToCommand();
+            var command = SimpleMapper.Map(request, new AssignContributor());
 
             var response = await InvokeCommandAsync(command);
 
@@ -103,7 +99,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteMyself(string app)
         {
-            var command = new RemoveContributor { ContributorId = UserId() };
+            var command = new RemoveContributor { ContributorId = UserId };
 
             var response = await InvokeCommandAsync(command);
 
@@ -114,7 +110,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// Remove contributor.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the contributor.</param>
+        /// <param name="id">The ID of the contributor.</param>
         /// <returns>
         /// 200 => Contributor removed.
         /// 404 => Contributor or app not found.
@@ -137,9 +133,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-            if (context.PlainResult is InvitedResult invited)
+            if (context.PlainResult is InvitedResult<IAppEntity> invited)
             {
-                return await GetResponseAsync(invited.App, true);
+                return await GetResponseAsync(invited.Entity, true);
             }
             else
             {
@@ -147,21 +143,11 @@ namespace Squidex.Areas.Api.Controllers.Apps
             }
         }
 
-        private string UserId()
+        private async Task<ContributorsDto> GetResponseAsync(IAppEntity app, bool invited)
         {
-            var subject = User.OpenIdSubject();
+            var (plan, _, _) = await usageTracker.GetPlanForAppAsync(app, HttpContext.RequestAborted);
 
-            if (string.IsNullOrWhiteSpace(subject))
-            {
-                throw new DomainForbiddenException(T.Get("common.httpOnlyAsUser"));
-            }
-
-            return subject;
-        }
-
-        private Task<ContributorsDto> GetResponseAsync(IAppEntity app, bool invited)
-        {
-            return ContributorsDto.FromAppAsync(app, Resources, userResolver, appPlansProvider, invited);
+            return await ContributorsDto.FromDomainAsync(app, Resources, usageGate, plan, invited);
         }
     }
 }

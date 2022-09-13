@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -58,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var app = Mocks.App(NamedId.Of(appId, "my-app"));
 
             A.CallTo(() => app.Contributors)
-                .Returns(AppContributors.Empty.Assign(userId, Role.Owner));
+                .Returns(Contributors.Empty.Assign(userId, Role.Owner));
 
             var rootState = new TestState<AppUISettings.State>(appId, state.PersistenceFactory);
 

@@ -18,7 +18,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
     public sealed class RuleEventDto : Resource
     {
         /// <summary>
-        /// The id of the event.
+        /// The ID of the event.
         /// </summary>
         public DomainId Id { get; set; }
 

@@ -1,0 +1,36 @@
+<div class="card card-body mb-4">
+    <h5 class="card-title">{{ 'contributors.add.title' | sqxTranslate }}</h5>
+
+    <form [formGroup]="assignContributorForm.form" (ngSubmit)="assignContributor()">
+        <div class="row gx-2">
+            <div class="col">
+                <sqx-autocomplete [source]="usersDataSource" formControlName="user" icon="search" inputName="contributor" placeholder="{{ 'contributors.emailPlaceholder' | sqxTranslate }}" displayProperty="displayName">
+                    <ng-template let-user="$implicit">
+                        <span class="autocomplete-user">
+                            <img class="user-picture" [src]="user | sqxUserDtoPicture">
+
+                            <span class="user-name">{{user.displayName}}</span>
+                        </span>
+                    </ng-template>
+                </sqx-autocomplete>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-success" [disabled]="assignContributorForm.hasNoUser | async">
+                    {{ 'contributors.add' | sqxTranslate }}
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="import-hint">
+        <sqx-form-hint>
+            {{ 'contributors.importHintg' | sqxTranslate }} <a class="force" (click)="importDialog.show()">{{ 'contributors.importButton' | sqxTranslate }}</a>
+        </sqx-form-hint>
+    </div>
+</div>
+
+<ng-container *sqxModal="importDialog">
+    <sqx-import-contributors-dialog
+        (close)="importDialog.hide()">
+    </sqx-import-contributors-dialog>
+</ng-container>

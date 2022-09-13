@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
             public IUser? Assigner { get; init; }
 
-            public string AppName { get; init; }
+            public string TeamName { get; init; }
 
             public long? ApiCalls { get; init; }
 
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
             {
                 ApiCalls = usage,
                 ApiCallsLimit = usageLimit,
-                AppName = appName
+                TeamName = appName
             };
 
             return SendEmailAsync("Usage",
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
             Guard.NotNull(user);
             Guard.NotNull(appName);
 
-            var vars = new TemplatesVars { Assigner = assigner, AppName = appName };
+            var vars = new TemplatesVars { Assigner = assigner, TeamName = appName };
 
             if (user.Claims.HasConsent())
             {
@@ -95,6 +95,11 @@ namespace Squidex.Domain.Apps.Entities.Notifications
                     texts.NewUserBody,
                     user, vars);
             }
+        }
+
+        public Task SendTeamInviteAsync(IUser assigner, IUser user, string teamName)
+        {
+            return Task.CompletedTask;
         }
 
         private async Task SendEmailAsync(string template, string emailSubj, string emailBody, IUser user, TemplatesVars vars)
@@ -131,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
         private static string Format(string text, TemplatesVars vars)
         {
-            text = text.Replace("$APP_NAME", vars.AppName, StringComparison.Ordinal);
+            text = text.Replace("$APP_NAME", vars.TeamName, StringComparison.Ordinal);
 
             if (vars.Assigner != null)
             {

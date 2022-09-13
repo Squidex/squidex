@@ -29,6 +29,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
     public sealed class AppDto : Resource
     {
         /// <summary>
+        /// The ID of the app.
+        /// </summary>
+        public DomainId Id { get; set; }
+
+        /// <summary>
         /// The name of the app.
         /// </summary>
         [LocalizedRequired]
@@ -51,11 +56,6 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public long Version { get; set; }
 
         /// <summary>
-        /// The id of the app.
-        /// </summary>
-        public DomainId Id { get; set; }
-
-        /// <summary>
         /// The timestamp when the app has been created.
         /// </summary>
         public Instant Created { get; set; }
@@ -64,6 +64,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// The timestamp when the app has been modified last.
         /// </summary>
         public Instant LastModified { get; set; }
+
+        /// <summary>
+        /// The ID of the team.
+        /// </summary>
+        public DomainId? TeamId { get; set; }
 
         /// <summary>
         /// The permission level of the user.
@@ -123,7 +128,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 result.RoleProperties = new JsonObject();
             }
 
-            foreach (var (key, value) in resources.Context.User.Claims.GetUIProperties(app.Name))
+            foreach (var (key, value) in resources.Context.UserPrincipal.Claims.GetUIProperties(app.Name))
             {
                 result.RoleProperties[key] = JsonValue.Create(value);
             }
@@ -159,6 +164,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 AddDeleteLink("delete",
                     resources.Url<AppsController>(x => nameof(x.DeleteApp), values));
+            }
+
+            if (resources.IsAllowed(PermissionIds.AppTransfer, Name, additional: permissions))
+            {
+                AddPutLink("transfer",
+                    resources.Url<AppsController>(x => nameof(x.PutAppTeam), values));
             }
 
             if (resources.IsAllowed(PermissionIds.AppUpdate, Name, additional: permissions))

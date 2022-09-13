@@ -42,9 +42,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
                 User = RefToken.User("me")
             };
 
-            var result = await RenderAync(template, value);
+            var actual = await RenderAync(template, value);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -58,9 +58,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
                 Id = NamedId.Of("42", "my-app")
             };
 
-            var result = await RenderAync(template, value);
+            var actual = await RenderAync(template, value);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -73,9 +73,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
 
             var template = "{{ e.id }}";
 
-            var result = await RenderAync(template, value);
+            var actual = await RenderAync(template, value);
 
-            Assert.Equal(value.Id.ToString(), result);
+            Assert.Equal(value.Id.ToString(), actual);
         }
 
         [Fact]
@@ -88,9 +88,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
 
             var template = "{{ e.type }}";
 
-            var result = await RenderAync(template, value);
+            var actual = await RenderAync(template, value);
 
-            Assert.Equal(value.Type.ToString(), result);
+            Assert.Equal(value.Type.ToString(), actual);
         }
 
         [Fact]
@@ -105,9 +105,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
 
             var template = "{{ e.timestamp | format_date: 'yyyy-MM-dd-hh-mm-ss' }}";
 
-            var result = await RenderAync(template, value);
+            var actual = await RenderAync(template, value);
 
-            Assert.Equal($"{now:yyyy-MM-dd-hh-mm-ss}", result);
+            Assert.Equal($"{now:yyyy-MM-dd-hh-mm-ss}", actual);
         }
 
         [Fact]
@@ -124,9 +124,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
                                 .AddLocalized("en", "Hello"))
             };
 
-            var result = await RenderAync(template, value);
+            var actual = await RenderAync(template, value);
 
-            Assert.Equal("Hello", result);
+            Assert.Equal("Hello", actual);
         }
 
         [Fact]
@@ -139,9 +139,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
                 Text = "<script>Invalid</script><STYLE>Invalid</STYLE><p>Hello World</p>"
             };
 
-            var result = await RenderAync(template, value);
+            var actual = await RenderAync(template, value);
 
-            Assert.Equal("Hello World", result);
+            Assert.Equal("Hello World", actual);
         }
 
         [Fact]
@@ -154,9 +154,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
                 Text = "## Hello World"
             };
 
-            var result = await RenderAync(template, value);
+            var actual = await RenderAync(template, value);
 
-            Assert.Equal("Hello World", result);
+            Assert.Equal("Hello World", actual);
         }
 
         [Fact]
@@ -169,9 +169,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
                 Text = "Hello World"
             };
 
-            var result = await RenderAync(template, value);
+            var actual = await RenderAync(template, value);
 
-            Assert.Equal("2", result);
+            Assert.Equal("2", actual);
         }
 
         [Fact]
@@ -184,9 +184,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
                 text = "Hello World"
             };
 
-            var result = await RenderAync(template, value);
+            var actual = await RenderAync(template, value);
 
-            Assert.Equal("10", result);
+            Assert.Equal("10", actual);
         }
 
         [Fact]
@@ -199,9 +199,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
                 text = "HelloWorld"
             };
 
-            var result = await RenderAync(template, value);
+            var actual = await RenderAync(template, value);
 
-            Assert.Equal("HelloWorld".ToMD5(), result);
+            Assert.Equal("HelloWorld".ToMD5(), actual);
         }
 
         [Fact]
@@ -214,9 +214,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
                 text = "HelloWorld"
             };
 
-            var result = await RenderAync(template, value);
+            var actual = await RenderAync(template, value);
 
-            Assert.Equal("HelloWorld".ToSha256(), result);
+            Assert.Equal("HelloWorld".ToSha256(), actual);
         }
 
         [Fact]

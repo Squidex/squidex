@@ -96,7 +96,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Update an asset folder.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset folder.</param>
+        /// <param name="id">The ID of the asset folder.</param>
         /// <param name="request">The asset folder object that needs to updated.</param>
         /// <returns>
         /// 200 => Asset folder updated.
@@ -122,7 +122,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Move an asset folder.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset folder.</param>
+        /// <param name="id">The ID of the asset folder.</param>
         /// <param name="request">The asset folder object that needs to updated.</param>
         /// <returns>
         /// 200 => Asset folder moved.
@@ -148,7 +148,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Delete an asset folder.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset folder to delete.</param>
+        /// <param name="id">The ID of the asset folder to delete.</param>
         /// <returns>
         /// 204 => Asset folder deleted.
         /// 404 => Asset folder or app not found.

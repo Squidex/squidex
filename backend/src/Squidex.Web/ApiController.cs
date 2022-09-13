@@ -9,8 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Translations;
+using Squidex.Shared;
 
 namespace Squidex.Web
 {
@@ -41,6 +45,22 @@ namespace Squidex.Web
             }
         }
 
+        protected ITeamEntity Team
+        {
+            get
+            {
+                var team = HttpContext.Features.Get<ITeamFeature>()?.Team;
+
+                if (team == null)
+                {
+                    ThrowHelper.InvalidOperationException("Not in a team context.");
+                    return default!;
+                }
+
+                return team;
+            }
+        }
+
         protected ISchemaEntity Schema
         {
             get
@@ -57,6 +77,31 @@ namespace Squidex.Web
             }
         }
 
+        protected string UserId
+        {
+            get
+            {
+                var subject = User.OpenIdSubject();
+
+                if (string.IsNullOrWhiteSpace(subject))
+                {
+                    throw new DomainForbiddenException(T.Get("common.httpOnlyAsUser"));
+                }
+
+                return subject;
+            }
+        }
+
+        protected bool IsFrontend
+        {
+            get => HttpContext.User.IsInClient(DefaultClients.Frontend);
+        }
+
+        protected string UserOrClientId
+        {
+            get => HttpContext.User.UserOrClientId()!;
+        }
+
         protected Resources Resources
         {
             get => resources.Value;
@@ -70,6 +115,11 @@ namespace Squidex.Web
         protected DomainId AppId
         {
             get => App.Id;
+        }
+
+        protected DomainId TeamId
+        {
+            get => Team.Id;
         }
 
         protected ApiController(ICommandBus commandBus)

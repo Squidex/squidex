@@ -14,9 +14,9 @@ using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Translations;
@@ -32,24 +32,24 @@ namespace Squidex.Areas.Api.Controllers.Assets
     [ApiExplorerSettings(GroupName = nameof(Assets))]
     public sealed class AssetsController : ApiController
     {
+        private readonly IAppUsageGate appUsageGate;
         private readonly IAssetQueryService assetQuery;
-        private readonly IAssetUsageTracker assetStatsRepository;
-        private readonly IAppPlansProvider appPlansProvider;
+        private readonly IAssetUsageTracker assetUsageTracker;
         private readonly ITagService tagService;
         private readonly AssetTusRunner assetTusRunner;
 
         public AssetsController(
             ICommandBus commandBus,
+            IAppUsageGate appUsageGate,
             IAssetQueryService assetQuery,
-            IAssetUsageTracker assetStatsRepository,
-            IAppPlansProvider appPlansProvider,
+            IAssetUsageTracker assetUsageTracker,
             ITagService tagService,
             AssetTusRunner assetTusRunner)
             : base(commandBus)
         {
-            this.appPlansProvider = appPlansProvider;
+            this.appUsageGate = appUsageGate;
             this.assetQuery = assetQuery;
-            this.assetStatsRepository = assetStatsRepository;
+            this.assetUsageTracker = assetUsageTracker;
             this.assetTusRunner = assetTusRunner;
             this.tagService = tagService;
         }
@@ -165,7 +165,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Get an asset by id.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset to retrieve.</param>
+        /// <param name="id">The ID of the asset to retrieve.</param>
         /// <returns>
         /// 200 => Asset found.
         /// 404 => Asset or app not found.
@@ -319,7 +319,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Replace asset content.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset.</param>
+        /// <param name="id">The ID of the asset.</param>
         /// <param name="file">The file to upload.</param>
         /// <returns>
         /// 200 => Asset updated.
@@ -349,7 +349,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Update an asset.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset.</param>
+        /// <param name="id">The ID of the asset.</param>
         /// <param name="request">The asset object that needs to updated.</param>
         /// <returns>
         /// 200 => Asset updated.
@@ -375,7 +375,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Moves the asset.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset.</param>
+        /// <param name="id">The ID of the asset.</param>
         /// <param name="request">The asset object that needs to updated.</param>
         /// <returns>
         /// 200 => Asset moved.
@@ -401,7 +401,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Delete an asset.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset to delete.</param>
+        /// <param name="id">The ID of the asset to delete.</param>
         /// <param name="request">The request parameters.</param>
         /// <returns>
         /// 204 => Asset deleted.
@@ -469,9 +469,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 throw new ValidationException(error);
             }
 
-            var (plan, _) = appPlansProvider.GetPlanForApp(App);
+            var (plan, _, _) = await appUsageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
 
-            var currentSize = await assetStatsRepository.GetTotalSizeAsync(AppId);
+            var currentSize = await assetUsageTracker.GetTotalSizeByAppAsync(AppId, HttpContext.RequestAborted);
 
             if (plan.MaxAssetSize > 0 && plan.MaxAssetSize < currentSize + file.Length)
             {

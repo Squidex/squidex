@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 .Returns(user);
         }
 
-        private T CreateCommentsCommand<T>(T command) where T : CommentsCommand
+        private T CreateCommentsCommand<T>(T command) where T : CommentCommand
         {
             command.Actor = actor;
             command.AppId = appId;

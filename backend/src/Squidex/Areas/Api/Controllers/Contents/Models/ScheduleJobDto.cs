@@ -15,7 +15,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
     public sealed class ScheduleJobDto
     {
         /// <summary>
-        /// The id of the schedule job.
+        /// The ID of the schedule job.
         /// </summary>
         public DomainId Id { get; set; }
 

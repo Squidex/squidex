@@ -26,10 +26,10 @@ namespace Squidex.Web.Pipeline
 
             userIdentity.AddClaim(new Claim(userIdentity.RoleClaimType, role));
 
-            var result = await sut.TransformAsync(userPrincipal);
+            var actual = await sut.TransformAsync(userPrincipal);
 
-            Assert.Equal(PermissionIds.Admin, result.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.Permissions)?.Value);
-            Assert.Equal(role, result.Claims.FirstOrDefault(x => x.Type == userIdentity.RoleClaimType)?.Value);
+            Assert.Equal(PermissionIds.Admin, actual.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.Permissions)?.Value);
+            Assert.Equal(role, actual.Claims.FirstOrDefault(x => x.Type == userIdentity.RoleClaimType)?.Value);
         }
 
         [Fact]
@@ -40,9 +40,9 @@ namespace Squidex.Web.Pipeline
 
             userIdentity.AddClaim(new Claim(userIdentity.RoleClaimType, "Developer"));
 
-            var result = await sut.TransformAsync(userPrincipal);
+            var actual = await sut.TransformAsync(userPrincipal);
 
-            Assert.Single(result.Claims);
+            Assert.Single(actual.Claims);
         }
 
         [Fact]
@@ -51,9 +51,9 @@ namespace Squidex.Web.Pipeline
             var userIdentity = new ClaimsIdentity();
             var userPrincipal = new ClaimsPrincipal(userIdentity);
 
-            var result = await sut.TransformAsync(userPrincipal);
+            var actual = await sut.TransformAsync(userPrincipal);
 
-            Assert.Empty(result.Claims);
+            Assert.Empty(actual.Claims);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.History
     {
         public DomainId Id { get; set; } = DomainId.NewGuid();
 
-        public DomainId AppId { get; set; }
+        public DomainId OwnerId { get; set; }
 
         public Instant Created { get; set; }
 

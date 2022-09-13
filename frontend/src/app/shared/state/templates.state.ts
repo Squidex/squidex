@@ -8,24 +8,16 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, shareSubscribed, State } from '@app/framework';
+import { DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
 import { TemplateDto, TemplatesService } from './../services/templates.service';
 
-interface Snapshot {
+interface Snapshot extends LoadingState {
     // The current templates.
-    templates: TemplatesList;
-
-    // Indicates if the templates are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the templates are loading.
-    isLoading?: boolean;
+    templates: ReadonlyArray<TemplateDto>;
 
     // Indicates if the user can create new templates.
     canCreate?: boolean;
 }
-
-type TemplatesList = ReadonlyArray<TemplateDto>;
 
 @Injectable()
 export class TemplatesState extends State<Snapshot> {

@@ -8,21 +8,13 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, shareSubscribed, State } from '@app/shared';
+import { DialogService, LoadingState, shareSubscribed, State } from '@app/shared';
 import { EventConsumerDto, EventConsumersService } from './../services/event-consumers.service';
 
-interface Snapshot {
+interface Snapshot extends LoadingState {
     // The list of event consumers.
-    eventConsumers: EventConsumersList;
-
-    // Indicates if event consumers are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if event consumers are loading.
-    isLoading?: boolean;
+    eventConsumers: ReadonlyArray<EventConsumerDto>;
 }
-
-type EventConsumersList = ReadonlyArray<EventConsumerDto>;
 
 @Injectable()
 export class EventConsumersState extends State<Snapshot> {

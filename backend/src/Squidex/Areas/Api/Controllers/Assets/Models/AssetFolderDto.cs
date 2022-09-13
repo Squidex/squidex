@@ -16,12 +16,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
     public sealed class AssetFolderDto : Resource
     {
         /// <summary>
-        /// The id of the asset.
+        /// The ID of the asset.
         /// </summary>
         public DomainId Id { get; set; }
 
         /// <summary>
-        /// The id of the parent folder. Empty for files without parent.
+        /// The ID of the parent folder. Empty for files without parent.
         /// </summary>
         public DomainId ParentId { get; set; }
 

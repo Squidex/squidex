@@ -198,7 +198,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private static JsonValue CreateValue(int count, string? type, string key, JsonValue value, string? discriminator = null)
         {
-            var result = new JsonArray();
+            var actual = new JsonArray();
 
             for (var i = 0; i < count; i++)
             {
@@ -213,10 +213,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
                 obj.Add(key, value);
 
-                result.Add(obj);
+                actual.Add(obj);
             }
 
-            return result;
+            return actual;
         }
 
         private (DomainId, RootField<ComponentsFieldProperties>, ResolvedComponents) Field(ComponentsFieldProperties properties, bool isRequired = false)

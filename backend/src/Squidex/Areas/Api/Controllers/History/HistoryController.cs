@@ -42,9 +42,32 @@ namespace Squidex.Areas.Api.Controllers.History
         [ProducesResponseType(typeof(HistoryEventDto[]), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(PermissionIds.AppHistory)]
         [ApiCosts(0.1)]
-        public async Task<IActionResult> GetHistory(string app, string channel)
+        public async Task<IActionResult> GetAppHistory(string app, string channel)
         {
             var events = await historyService.QueryByChannelAsync(AppId, channel, 100, HttpContext.RequestAborted);
+
+            var response = events.Select(HistoryEventDto.FromDomain).Where(x => x.Message != null).ToArray();
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get historical events for a team.
+        /// </summary>
+        /// <param name="team">The ID of the team.</param>
+        /// <param name="channel">The name of the channel.</param>
+        /// <returns>
+        /// 200 => Events returned.
+        /// 404 => Team not found.
+        /// </returns>
+        [HttpGet]
+        [Route("teams/{team}/history/")]
+        [ProducesResponseType(typeof(HistoryEventDto[]), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous(PermissionIds.TeamHistory)]
+        [ApiCosts(0.1)]
+        public async Task<IActionResult> GetTeamHistory(string team, string channel)
+        {
+            var events = await historyService.QueryByChannelAsync(TeamId, channel, 100, HttpContext.RequestAborted);
 
             var response = events.Select(HistoryEventDto.FromDomain).Where(x => x.Message != null).ToArray();
 

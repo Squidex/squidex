@@ -12,9 +12,9 @@ namespace Squidex.Shared
 {
     public static class PermissionExtensions
     {
-        public static bool Allows(this PermissionSet permissions, string id, string app = Permission.Any, string schema = Permission.Any)
+        public static bool Allows(this PermissionSet permissions, string id, string app = Permission.Any, string schema = Permission.Any, string team = Permission.Any)
         {
-            var permission = PermissionIds.ForApp(id, app, schema);
+            var permission = PermissionIds.ForApp(id, app, schema, team);
 
             return permissions.Allows(permission);
         }

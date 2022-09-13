@@ -46,7 +46,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-auto">
-                                <div class="app-image" (sqxDropFile)="uploadImage($event)" [sqxDropDisabled]="uploading || !isImageEditable" [sqxDropOnlyImages]="true" [sqxDropNoPaste]="true">
+                                <div class="app-image" (sqxDropFile)="uploadImage($event)" [sqxDropDisabled]="uploading || !isEditableImage" [sqxDropOnlyImages]="true" [sqxDropNoPaste]="true">
                                     <div class="app-progress" *ngIf="uploading; else notUploading">
                                         <sqx-progress-bar mode="Circle" [value]="uploadProgress"></sqx-progress-bar>
                                     </div>
@@ -55,7 +55,7 @@
                                         <div>
                                             <sqx-avatar [image]="app?.image" [identifier]="app?.name" [size]="150"></sqx-avatar>
         
-                                            <ng-container *ngIf="isImageEditable && app?.image">
+                                            <ng-container *ngIf="isEditableImage && app?.image">
                                                 <button class="btn btn-danger btn-sm app-image-remove" title="i18n:apps.removeImage" (click)="removeImage()">
                                                     <i class="icon-bin2"></i>
                                                 </button>
@@ -72,7 +72,7 @@
                             <div class="col align-self-center">
                                 <sqx-form-hint>{{ 'apps.uploadImage' | sqxTranslate }}</sqx-form-hint>
         
-                                <span class="btn btn-success upload-button" [class.disabled]="!isImageEditable" (click)="fileInput.click()">
+                                <span class="btn btn-success upload-button" [class.disabled]="!isEditableImage" (click)="fileInput.click()">
                                     <span>{{ 'apps.uploadImageButton' | sqxTranslate }}</span>
                         
                                     <input type="file" (change)="uploadImage($event.target!['files'])" #fileInput single accept="image/x-png,image/gif,image/jpeg">
@@ -85,6 +85,29 @@
                 <h5>{{ 'apps.generalSettingsDangerZone' | sqxTranslate }}</h5>
         
                 <div class="card card-body">
+                    <form [formGroup]="transferForm.form" (ngSubmit)="transfer()">
+                        <div class="row pt-2 g-2">
+                            <div class="col-6">
+                                <h5>{{ 'apps.transferTitle' | sqxTranslate }}</h5>
+            
+                                <small>{{ 'apps.transferWarning' | sqxTranslate }}</small>
+                            </div>
+                            <div class="col">
+                                <select class="form-select" formControlName="teamId">
+                                    <option [ngValue]="null">-</option>
+                                    <option *ngFor="let team of teamsState.snapshot.teams" [ngValue]="team.id">{{team.name}}</option>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <button type="button" type="submit" class="btn btn-primary" [disabled]="!isTransferable">
+                                    {{ 'apps.transfer' | sqxTranslate }}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <hr />
+
                     <div class="row">
                         <div class="col">
                             <h5>{{ 'apps.delete' | sqxTranslate }}</h5>

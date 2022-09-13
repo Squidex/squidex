@@ -145,25 +145,25 @@ namespace Squidex.Domain.Apps.Entities.Notifications
                 .MustHaveHappened();
         }
 
-        private async Task TestUsageFormattingAsync(string pattern, string result)
+        private async Task TestUsageFormattingAsync(string pattern, string actual)
         {
             texts.UsageSubject = pattern;
             texts.UsageBody = pattern;
 
             await sut.SendUsageAsync(assigned, appName, 100, 120);
 
-            A.CallTo(() => emailSender.SendAsync(assigned.Email, result, result, A<CancellationToken>._))
+            A.CallTo(() => emailSender.SendAsync(assigned.Email, actual, actual, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
-        private async Task TestInvitationFormattingAsync(string pattern, string result)
+        private async Task TestInvitationFormattingAsync(string pattern, string actual)
         {
             texts.NewUserSubject = pattern;
             texts.NewUserBody = pattern;
 
             await sut.SendInviteAsync(assigner, assigned, appName);
 
-            A.CallTo(() => emailSender.SendAsync(assigned.Email, result, result, A<CancellationToken>._))
+            A.CallTo(() => emailSender.SendAsync(assigned.Email, actual, actual, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 

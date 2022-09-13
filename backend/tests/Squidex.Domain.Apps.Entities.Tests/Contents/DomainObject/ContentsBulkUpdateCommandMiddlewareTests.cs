@@ -49,9 +49,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             var command = new BulkUpdateContents();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -59,9 +59,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             var command = new BulkUpdateContents { Jobs = Array.Empty<BulkUpdateJob>() };
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -73,10 +73,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.ChangeStatus);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == null && x.Exception is DomainObjectNotFoundException);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == null && x.Exception is DomainObjectNotFoundException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -99,10 +99,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.ChangeStatus, new BulkUpdateJob { Query = query });
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == null && x.Exception is DomainException);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == null && x.Exception is DomainException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -125,10 +125,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Upsert, new BulkUpdateJob { Query = query, Data = data });
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), ct))
@@ -159,11 +159,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             command.Jobs![0].ExpectedCount = 2;
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Equal(2, result.Count);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id1 && x.Exception == null);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id2 && x.Exception == null);
+            Assert.Equal(2, actual.Count);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id1 && x.Exception == null);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id2 && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id1), ct))
@@ -183,10 +183,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Upsert, new BulkUpdateJob { Data = data });
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default), ct))
@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Should_upsert_content_with_random_id_if_query_returns_no_result()
+        public async Task Should_upsert_content_with_random_id_if_query_returns_no_actual()
         {
             SetupContext(PermissionIds.AppContentsUpsert);
 
@@ -202,10 +202,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Upsert, new BulkUpdateJob { Query = query, Data = data });
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default), ct))
@@ -221,10 +221,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Upsert, new BulkUpdateJob { Data = data }, id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), ct))
@@ -240,10 +240,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Upsert, new BulkUpdateJob { Data = data }, id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), ct))
@@ -259,10 +259,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Create, new BulkUpdateJob { Data = data }, id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<CreateContent>.That.Matches(x => x.ContentId == id && x.Data == data), ct))
@@ -278,10 +278,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Create, new BulkUpdateJob { Data = data }, id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -296,10 +296,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Update, new BulkUpdateJob { Data = data }, id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpdateContent>.That.Matches(x => x.ContentId == id && x.Data == data), ct))
@@ -315,10 +315,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Update, new BulkUpdateJob { Data = data }, id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -333,10 +333,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Patch, new BulkUpdateJob { Data = data }, id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<PatchContent>.That.Matches(x => x.ContentId == id && x.Data == data), ct))
@@ -352,10 +352,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Delete, new BulkUpdateJob { Data = data }, id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -370,10 +370,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.ChangeStatus, id: id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == null), ct))
@@ -389,10 +389,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.ChangeStatus, new BulkUpdateJob { DueTime = time }, id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == time), ct))
@@ -408,10 +408,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.ChangeStatus, id: id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -426,10 +426,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Validate, id: id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<ValidateContent>.That.Matches(x => x.ContentId == id), ct))
@@ -445,10 +445,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Validate, id: id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -463,10 +463,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Delete, id: id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<DeleteContent>.That.Matches(x => x.ContentId == id), ct))
@@ -482,10 +482,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Delete, id: id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -503,10 +503,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = BulkCommand(BulkUpdateContentType.Delete, new BulkUpdateJob { Schema = schemaCustomId.Name }, id);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            Assert.Single(result);
-            Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<DeleteContent>.That.Matches(x => x.SchemaId == schemaCustomId), ct))

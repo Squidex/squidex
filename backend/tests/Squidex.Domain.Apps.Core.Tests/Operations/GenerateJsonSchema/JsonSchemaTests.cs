@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
 
         private static HashSet<string> AllPropertyNames(JsonSchema schema)
         {
-            var result = new HashSet<string>();
+            var actual = new HashSet<string>();
 
             void AddProperties(JsonSchema current)
             {
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
 
                 foreach (var (key, value) in current.Properties.OrEmpty())
                 {
-                    result.Add(key);
+                    actual.Add(key);
 
                     AddProperties(value);
                 }
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
 
             AddProperties(schema);
 
-            return result;
+            return actual;
         }
     }
 }

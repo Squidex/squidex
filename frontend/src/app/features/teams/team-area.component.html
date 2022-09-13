@@ -1,0 +1,11 @@
+<ng-container *ngIf="selectedTeam | async; let team">
+    <sqx-title [message]="team.name"></sqx-title>
+    
+    <div class="sidebar">
+        <sqx-left-menu [team]="team"></sqx-left-menu>
+    </div>
+    
+    <div sqxLayoutContainer class="panel-container">
+        <router-outlet></router-outlet>
+    </div>
+</ng-container>

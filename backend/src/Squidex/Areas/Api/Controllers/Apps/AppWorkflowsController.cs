@@ -85,7 +85,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// Update a workflow.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the workflow to update.</param>
+        /// <param name="id">The ID of the workflow to update.</param>
         /// <param name="request">The new workflow.</param>
         /// <returns>
         /// 200 => Workflow updated.
@@ -110,7 +110,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// Delete a workflow.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the workflow to update.</param>
+        /// <param name="id">The ID of the workflow to update.</param>
         /// <returns>
         /// 200 => Workflow deleted.
         /// 404 => Workflow or app not found.

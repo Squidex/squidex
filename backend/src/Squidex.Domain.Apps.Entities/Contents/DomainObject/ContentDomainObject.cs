@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         protected override bool CanAcceptCreation(ICommand command)
         {
-            return command is CreateContent or UpsertContent;
+            return command is ContentCommandBase;
         }
 
         protected override bool CanRecreate()

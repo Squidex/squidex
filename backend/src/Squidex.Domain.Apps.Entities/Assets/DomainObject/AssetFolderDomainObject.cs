@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         protected override bool CanAcceptCreation(ICommand command)
         {
-            return command is AssetFolderCommand;
+            return command is AssetFolderCommandBase;
         }
 
         protected override bool CanAccept(ICommand command)

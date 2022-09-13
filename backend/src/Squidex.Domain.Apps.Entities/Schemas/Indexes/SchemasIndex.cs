@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                     case DeleteSchema delete:
                         await OnDeleteAsync(delete);
                         break;
-                    case SchemaUpdateCommand update:
+                    case SchemaCommand update:
                         await OnUpdateAsync(update);
                         break;
                 }
@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return InvalidateItAsync(delete.AppId.Id, delete.SchemaId.Id, delete.SchemaId.Name);
         }
 
-        private Task OnUpdateAsync(SchemaUpdateCommand update)
+        private Task OnUpdateAsync(SchemaCommand update)
         {
             return InvalidateItAsync(update.AppId.Id, update.SchemaId.Id, update.SchemaId.Name);
         }

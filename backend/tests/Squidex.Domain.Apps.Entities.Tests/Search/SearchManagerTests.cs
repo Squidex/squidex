@@ -30,9 +30,9 @@ namespace Squidex.Domain.Apps.Entities.Search
         [Fact]
         public async Task Should_not_call_sources_and_return_empty_if_query_is_empty()
         {
-            var result = await sut.SearchAsync(string.Empty, requestContext);
+            var actual = await sut.SearchAsync(string.Empty, requestContext);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
 
             A.CallTo(() => source1.SearchAsync(A<string>._, A<Context>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -44,9 +44,9 @@ namespace Squidex.Domain.Apps.Entities.Search
         [Fact]
         public async Task Should_not_call_sources_and_return_empty_if_is_too_short()
         {
-            var result = await sut.SearchAsync("11", requestContext);
+            var actual = await sut.SearchAsync("11", requestContext);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
 
             A.CallTo(() => source1.SearchAsync(A<string>._, A<Context>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -56,22 +56,22 @@ namespace Squidex.Domain.Apps.Entities.Search
         }
 
         [Fact]
-        public async Task Should_aggregate_results_from_all_sources()
+        public async Task Should_aggregate_actuals_from_all_sources()
         {
-            var result1 = new SearchResults().Add("Name1", SearchResultType.Setting, "Url1");
-            var result2 = new SearchResults().Add("Name2", SearchResultType.Setting, "Url2");
+            var actual1 = new SearchResults().Add("Name1", SearchResultType.Setting, "Url1");
+            var actual2 = new SearchResults().Add("Name2", SearchResultType.Setting, "Url2");
 
             var query = "a query";
 
             A.CallTo(() => source1.SearchAsync(query, requestContext, A<CancellationToken>._))
-                .Returns(result1);
+                .Returns(actual1);
 
             A.CallTo(() => source2.SearchAsync(query, requestContext, A<CancellationToken>._))
-                .Returns(result2);
+                .Returns(actual2);
 
-            var result = await sut.SearchAsync(query, requestContext);
+            var actual = await sut.SearchAsync(query, requestContext);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("Name1", SearchResultType.Setting, "Url1")
                     .Add("Name2", SearchResultType.Setting, "Url2"));
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Search
         [Fact]
         public async Task Should_ignore_exception_from_source()
         {
-            var result2 = new SearchResults().Add("Name2", SearchResultType.Setting, "Url2");
+            var actual2 = new SearchResults().Add("Name2", SearchResultType.Setting, "Url2");
 
             var query = "a query";
 
@@ -88,11 +88,11 @@ namespace Squidex.Domain.Apps.Entities.Search
                 .Throws(new InvalidOperationException());
 
             A.CallTo(() => source2.SearchAsync(query, requestContext, A<CancellationToken>._))
-                .Returns(result2);
+                .Returns(actual2);
 
-            var result = await sut.SearchAsync(query, requestContext);
+            var actual = await sut.SearchAsync(query, requestContext);
 
-            result.Should().BeEquivalentTo(result2);
+            actual.Should().BeEquivalentTo(actual2);
 
             A.CallTo(log).Where(x => x.Method.Name == "Log")
                 .MustHaveHappened();

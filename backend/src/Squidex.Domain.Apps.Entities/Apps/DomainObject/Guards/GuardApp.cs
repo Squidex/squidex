@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
@@ -123,7 +123,32 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
             });
         }
 
-        public static void CanChangePlan(ChangePlan command, IAppEntity app, IAppPlansProvider appPlans)
+        public static Task CanTransfer(TransferToTeam command, IAppEntity app, IAppProvider appProvider, CancellationToken ct)
+        {
+            Guard.NotNull(command);
+
+            return Validate.It(async e =>
+            {
+                if (command.TeamId == null)
+                {
+                    return;
+                }
+
+                var team = await appProvider.GetTeamAsync(command.TeamId.Value, ct);
+
+                if (team == null || !team.Contributors.ContainsKey(command.Actor.Identifier))
+                {
+                    e(T.Get("apps.transfer.teamNotFound"));
+                }
+
+                if (app.Plan != null)
+                {
+                    e(T.Get("apps.transfer.planAssigned"));
+                }
+            });
+        }
+
+        public static void CanChangePlan(ChangePlan command, IAppEntity app, IBillingPlans billingPlans)
         {
             Guard.NotNull(command);
 
@@ -135,9 +160,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                     return;
                 }
 
-                if (appPlans.GetPlan(command.PlanId) == null)
+                if (billingPlans.GetPlan(command.PlanId) == null)
                 {
                     e(T.Get("apps.plans.notFound"), nameof(command.PlanId));
+                }
+
+                if (app.TeamId != null)
+                {
+                    e(T.Get("apps.plans.assignedToTeam"));
                 }
 
                 var plan = app.Plan;

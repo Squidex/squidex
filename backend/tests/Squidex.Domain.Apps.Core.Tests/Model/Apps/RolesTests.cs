@@ -156,19 +156,19 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Theory]
         public void Should_get_default_roles(string name, int permissionCount)
         {
-            var found = roles_0.TryGet("app", name, false, out var result);
+            var found = roles_0.TryGet("app", name, false, out var actual);
 
             Assert.True(found);
-            Assert.True(result!.IsDefault);
+            Assert.True(actual!.IsDefault);
             Assert.True(roles_0.Contains(name));
 
-            foreach (var permission in result.Permissions)
+            foreach (var permission in actual.Permissions)
             {
                 Assert.StartsWith("squidex.apps.app.", permission.Id, StringComparison.Ordinal);
                 Assert.DoesNotContain("{app}", permission.Id, StringComparison.Ordinal);
             }
 
-            Assert.Equal(permissionCount, result!.Permissions.Count);
+            Assert.Equal(permissionCount, actual!.Permissions.Count);
         }
 
         [InlineData("Developer", 15)]
@@ -178,19 +178,19 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Theory]
         public void Should_add_extra_permissions_for_frontend_client(string name, int permissionCount)
         {
-            var found = roles_0.TryGet("app", name, true, out var result);
+            var found = roles_0.TryGet("app", name, true, out var actual);
 
             Assert.True(found);
-            Assert.Equal(permissionCount, result!.Permissions.Count);
+            Assert.Equal(permissionCount, actual!.Permissions.Count);
         }
 
         [Fact]
         public void Should_return_null_if_role_not_found()
         {
-            var found = roles_0.TryGet("app", "custom", false, out var result);
+            var found = roles_0.TryGet("app", "custom", false, out var actual);
 
             Assert.False(found);
-            Assert.Null(result);
+            Assert.Null(actual);
         }
     }
 }

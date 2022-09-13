@@ -12,10 +12,11 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Shared.Users;
 using Xunit;
@@ -24,8 +25,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 {
     public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     {
-        private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
-        private readonly IAppPlanBillingManager appPlansBillingManager = A.Fake<IAppPlanBillingManager>();
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
+        private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
+        private readonly IBillingManager billingManager = A.Fake<IBillingManager>();
         private readonly IUser user;
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly string contributorId = DomainId.NewGuid().ToString();
@@ -34,9 +36,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private readonly string roleName = "My Role";
         private readonly string planIdPaid = "premium";
         private readonly string planIdFree = "free";
-        private readonly AppDomainObject sut;
-        private readonly DomainId workflowId = DomainId.NewGuid();
         private readonly InitialSettings initialSettings;
+        private readonly DomainId teamId = DomainId.NewGuid();
+        private readonly DomainId workflowId = DomainId.NewGuid();
+        private readonly AppDomainObject sut;
 
         protected override DomainId Id
         {
@@ -50,17 +53,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId, default))
                 .Returns(user);
 
-            A.CallTo(() => appPlansProvider.GetFreePlan())
-                .Returns(new ConfigAppLimitsPlan { Id = planIdFree, MaxContributors = 10 });
+            A.CallTo(() => billingPlans.GetFreePlan())
+                .Returns(new Plan { Id = planIdFree, MaxContributors = 10 });
 
-            A.CallTo(() => appPlansProvider.GetPlan(planIdFree))
-                .Returns(new ConfigAppLimitsPlan { Id = planIdFree, MaxContributors = 10 });
+            A.CallTo(() => billingPlans.GetPlan(planIdFree))
+                .Returns(new Plan { Id = planIdFree, MaxContributors = 10 });
 
-            A.CallTo(() => appPlansProvider.GetPlan(planIdPaid))
-                .Returns(new ConfigAppLimitsPlan { Id = planIdPaid, MaxContributors = 30 });
+            A.CallTo(() => billingPlans.GetPlan(planIdPaid))
+                .Returns(new Plan { Id = planIdPaid, MaxContributors = 30 });
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, A<string>._, default))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, A<string>._, default))
                 .Returns(Task.FromResult<Uri?>(null));
+
+            A.CallTo(() => appProvider.GetTeamAsync(teamId, default))
+                .Returns(Mocks.Team(teamId, contributor: Actor.Identifier));
 
             // Create a non-empty setting, otherwise the event is not raised as it does not change the domain object.
             initialSettings = new InitialSettings
@@ -73,9 +79,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             var serviceProvider =
                 new ServiceCollection()
+                    .AddSingleton(appProvider)
                     .AddSingleton(initialSettings)
-                    .AddSingleton(appPlansProvider)
-                    .AddSingleton(appPlansBillingManager)
+                    .AddSingleton(billingPlans)
+                    .AddSingleton(billingManager)
                     .AddSingleton(userResolver)
                     .BuildServiceProvider();
 
@@ -100,9 +107,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var command = new CreateApp { Name = AppName, AppId = AppId };
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(AppName, sut.Snapshot.Name);
 
@@ -119,9 +126,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var command = new CreateApp { Name = AppName, Actor = ActorClient, AppId = AppId };
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(AppName, sut.Snapshot.Name);
 
@@ -139,12 +146,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal("my-label", sut.Snapshot.Label);
-            Assert.Equal("my-description", sut.Snapshot.Description);
+            Assert.Equal(command.Label, sut.Snapshot.Label);
+            Assert.Equal(command.Description, sut.Snapshot.Description);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -164,9 +171,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(settings, sut.Snapshot.Settings);
 
@@ -183,11 +190,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal("image/png", sut.Snapshot.Image!.MimeType);
+            Assert.Equal(command.File.MimeType, sut.Snapshot.Image!.MimeType);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -203,9 +210,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             await ExecuteCreateAsync();
             await ExecuteUploadImage();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Null(sut.Snapshot.Image);
 
@@ -220,14 +227,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var command = new ChangePlan { PlanId = planIdPaid };
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
                 .Returns(Task.FromResult<Uri?>(null));
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planIdPaid));
+            actual.ShouldBeEquivalent(new PlanChangedResult(planIdPaid));
 
             Assert.Equal(planIdPaid, sut.Snapshot.Plan!.PlanId);
 
@@ -236,10 +243,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
                 );
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
                 .MustHaveHappened();
 
-            A.CallTo(() => appPlansBillingManager.SubscribeAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
+            A.CallTo(() => billingManager.SubscribeAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
                 .MustHaveHappened();
         }
 
@@ -250,9 +257,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planIdPaid));
+            actual.ShouldBeEquivalent(new PlanChangedResult(planIdPaid));
 
             Assert.Equal(planIdPaid, sut.Snapshot.Plan!.PlanId);
 
@@ -261,10 +268,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
                 );
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => appPlansBillingManager.SubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
+            A.CallTo(() => billingManager.SubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -276,9 +283,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             await ExecuteCreateAsync();
             await ExecuteChangePlanAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planIdFree, true));
+            actual.ShouldBeEquivalent(new PlanChangedResult(planIdFree, true));
 
             Assert.Null(sut.Snapshot.Plan);
 
@@ -287,10 +294,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppPlanReset())
                 );
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => appPlansBillingManager.UnsubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<CancellationToken>._))
+            A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -302,9 +309,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             await ExecuteCreateAsync();
             await ExecuteChangePlanAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planIdFree, true));
+            actual.ShouldBeEquivalent(new PlanChangedResult(planIdFree, true));
 
             Assert.Null(sut.Snapshot.Plan);
 
@@ -313,26 +320,26 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppPlanReset())
                 );
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => appPlansBillingManager.UnsubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<CancellationToken>._))
+            A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task ChangePlan_should_not_make_update_for_redirect_result()
+        public async Task ChangePlan_should_not_make_update_for_redirect_actual()
         {
             var command = new ChangePlan { PlanId = planIdPaid };
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
                 .Returns(new Uri("http://squidex.io"));
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planIdPaid, false, new Uri("http://squidex.io")));
+            actual.ShouldBeEquivalent(new PlanChangedResult(planIdPaid, false, new Uri("http://squidex.io")));
 
             Assert.Null(sut.Snapshot.Plan);
         }
@@ -344,16 +351,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new PlanChangedResult(planIdPaid));
+            actual.ShouldBeEquivalent(new PlanChangedResult(planIdPaid));
 
             Assert.Equal(planIdPaid, sut.Snapshot.Plan?.PlanId);
 
-            A.CallTo(() => appPlansBillingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, A<CancellationToken>._))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => appPlansBillingManager.SubscribeAsync(Actor.Identifier, AppNamedId, planIdPaid, A<CancellationToken>._))
+            A.CallTo(() => billingManager.SubscribeAsync(Actor.Identifier, AppNamedId, planIdPaid, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -364,9 +371,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(Role.Editor, sut.Snapshot.Contributors[contributorId]);
 
@@ -384,9 +391,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             await ExecuteCreateAsync();
             await ExecuteAssignContributorAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(Role.Owner, sut.Snapshot.Contributors[contributorId]);
 
@@ -404,9 +411,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             await ExecuteCreateAsync();
             await ExecuteAssignContributorAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.False(sut.Snapshot.Contributors.ContainsKey(contributorId));
 
@@ -417,15 +424,54 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         }
 
         [Fact]
+        public async Task Transfer_should_create_events_and_set_team()
+        {
+            var command = new TransferToTeam { TeamId = teamId };
+
+            await ExecuteCreateAsync();
+
+            var actual = await PublishAsync(command);
+
+            actual.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(teamId, sut.Snapshot.TeamId);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppTransfered { TeamId = teamId })
+                );
+        }
+
+        [Fact]
+        public async Task Transfer_from_team_should_create_events_and_set_team()
+        {
+            var command = new TransferToTeam { TeamId = null };
+
+            await ExecuteCreateAsync();
+            await ExecuteTransferAsync();
+
+            var actual = await PublishAsync(command);
+
+            actual.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Null(sut.Snapshot.TeamId);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppTransfered { TeamId = null })
+                );
+        }
+
+        [Fact]
         public async Task AttachClient_should_create_events_and_add_client()
         {
             var command = new AttachClient { Id = clientId };
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.True(sut.Snapshot.Clients.ContainsKey(clientId));
 
@@ -443,9 +489,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             await ExecuteCreateAsync();
             await ExecuteAttachClientAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(clientNewName, sut.Snapshot.Clients[clientId].Name);
 
@@ -463,9 +509,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             await ExecuteCreateAsync();
             await ExecuteAttachClientAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.False(sut.Snapshot.Clients.ContainsKey(clientId));
 
@@ -482,9 +528,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.NotEmpty(sut.Snapshot.Workflows);
 
@@ -502,9 +548,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             await ExecuteCreateAsync();
             await ExecuteAddWorkflowAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.NotEmpty(sut.Snapshot.Workflows);
 
@@ -522,9 +568,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             await ExecuteCreateAsync();
             await ExecuteAddWorkflowAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Empty(sut.Snapshot.Workflows);
 
@@ -541,9 +587,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.True(sut.Snapshot.Languages.Contains(Language.DE));
 
@@ -561,9 +607,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             await ExecuteCreateAsync();
             await ExecuteAddLanguageAsync(Language.DE);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.False(sut.Snapshot.Languages.Contains(Language.DE));
 
@@ -581,9 +627,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             await ExecuteCreateAsync();
             await ExecuteAddLanguageAsync(Language.DE);
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.True(sut.Snapshot.Languages.Contains(Language.DE));
 
@@ -600,9 +646,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(1, sut.Snapshot.Roles.CustomCount);
 
@@ -620,9 +666,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             await ExecuteCreateAsync();
             await ExecuteAddRoleAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(0, sut.Snapshot.Roles.CustomCount);
 
@@ -640,9 +686,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             await ExecuteCreateAsync();
             await ExecuteAddRoleAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -657,9 +703,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(None.Value);
+            actual.ShouldBeEquivalent(None.Value);
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -668,7 +714,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppDeleted())
                 );
 
-            A.CallTo(() => appPlansBillingManager.UnsubscribeAsync(command.Actor.Identifier, AppNamedId, default))
+            A.CallTo(() => billingManager.UnsubscribeAsync(command.Actor.Identifier, AppNamedId, default))
                 .MustHaveHappened();
         }
 
@@ -712,21 +758,26 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return PublishAsync(new ChangePlan { PlanId = planIdPaid });
         }
 
+        private Task ExecuteTransferAsync()
+        {
+            return PublishAsync(new TransferToTeam { TeamId = teamId });
+        }
+
         private Task ExecuteArchiveAsync()
         {
             return PublishAsync(new DeleteApp());
         }
 
-        private Task<object> PublishIdempotentAsync(AppCommand command)
+        private Task<object> PublishIdempotentAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
         {
             return PublishIdempotentAsync(sut, CreateCommand(command));
         }
 
-        private async Task<object> PublishAsync(AppCommand command)
+        private async Task<object> PublishAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
         {
-            var result = await sut.ExecuteAsync(CreateCommand(command), default);
+            var actual = await sut.ExecuteAsync(CreateCommand(command), default);
 
-            return result.Payload;
+            return actual.Payload;
         }
     }
 }

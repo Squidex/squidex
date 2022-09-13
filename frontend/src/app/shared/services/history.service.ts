@@ -86,6 +86,22 @@ export class HistoryService {
             }),
             pretifyError('i18n:history.loadFailed'));
     }
+
+    public getHistoryForTeam(teamId: string, channel: string): Observable<ReadonlyArray<HistoryEventDto>> {
+        const url = this.apiUrl.buildUrl(`api/teams/${teamId}/history?channel=${channel}`);
+
+        const options = {
+            headers: new HttpHeaders({
+                'X-Silent': '1',
+            }),
+        };
+
+        return this.http.get<any[]>(url, options).pipe(
+            map(body => {
+                return parseHistoryEvents(body);
+            }),
+            pretifyError('i18n:history.loadFailed'));
+    }
 }
 
 function parseHistoryEvents(response: any[]) {

@@ -25,9 +25,6 @@ interface Snapshot extends ListState<string> {
     canCreate?: boolean;
 }
 
-export type UsersList = ReadonlyArray<UserDto>;
-export type UsersResult = { total: number; users: UsersList };
-
 @Injectable()
 export class UsersState extends State<Snapshot> {
     public users =

@@ -41,9 +41,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Subscriptions
 
             var sut = new EventMessageWrapper(envelope, new[] { creator1, creator2 });
 
-            var result = await sut.CreatePayloadAsync();
+            var actual = await sut.CreatePayloadAsync();
 
-            Assert.Same(enrichedEvent, result);
+            Assert.Same(enrichedEvent, actual);
         }
 
         [Fact]

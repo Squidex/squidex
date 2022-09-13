@@ -48,9 +48,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             var @event = new AppUsageExceeded { CallsCurrent = 80, CallsLimit = 120 };
             var envelope = Envelope.Create<AppEvent>(@event);
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+            var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
-            var enrichedEvent = result.Single() as EnrichedUsageExceededEvent;
+            var enrichedEvent = actual.Single() as EnrichedUsageExceededEvent;
 
             Assert.Equal(@event.CallsCurrent, enrichedEvent!.CallsCurrent);
             Assert.Equal(@event.CallsLimit, enrichedEvent!.CallsLimit);
@@ -63,9 +63,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
             var @event = new AppUsageExceeded();
 
-            var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -75,9 +75,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
             var @event = new AppUsageExceeded { RuleId = ctx.RuleId };
 
-            var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         private static RuleContext Context(RuleTrigger? trigger = null)

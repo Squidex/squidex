@@ -74,6 +74,22 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
+        public async Task<List<IAppEntity>> GetAppsForTeamAsync(DomainId teamId,
+            CancellationToken ct = default)
+        {
+            using (Telemetry.Activities.StartActivity("AppsIndex/GetAppsForTeamAsync"))
+            {
+                var apps = await appRepository.QueryAllAsync(teamId, ct);
+
+                foreach (var app in apps.Where(IsValid))
+                {
+                    await CacheItAsync(app);
+                }
+
+                return apps.Where(IsValid).ToList();
+            }
+        }
+
         public async Task<IAppEntity?> GetAppAsync(string name, bool canCache = false,
             CancellationToken ct = default)
         {
@@ -165,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                     case DeleteApp delete:
                         await OnDeleteAsync(delete);
                         break;
-                    case AppUpdateCommand update:
+                    case AppCommand update:
                         await OnUpdateAsync(update);
                         break;
                 }
@@ -195,7 +211,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             await InvalidateItAsync(delete.AppId.Id, delete.AppId.Name);
         }
 
-        private async Task OnUpdateAsync(AppUpdateCommand update)
+        private async Task OnUpdateAsync(AppCommand update)
         {
             await InvalidateItAsync(update.AppId.Id, update.AppId.Name);
         }

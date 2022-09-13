@@ -8,7 +8,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HelpComponent, HistoryComponent, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { AssetScriptsPageComponent, BackupComponent, BackupsPageComponent, ClientAddFormComponent, ClientComponent, ClientConnectFormComponent, ClientsPageComponent, ContributorAddFormComponent, ContributorComponent, ContributorsPageComponent, ImportContributorsDialogComponent, LanguageAddFormComponent, LanguageComponent, LanguagesPageComponent, MorePageComponent, PlanComponent, PlansPageComponent, RoleAddFormComponent, RoleComponent, RolesPageComponent, SettingsAreaComponent, SettingsPageComponent, TemplateComponent, TemplatesPageComponent, WorkflowAddFormComponent, WorkflowComponent, WorkflowDiagramComponent, WorkflowsPageComponent, WorkflowStepComponent, WorkflowTransitionComponent } from './declarations';
+import { AssetScriptsPageComponent, BackupComponent, BackupsPageComponent, ClientAddFormComponent, ClientComponent, ClientConnectFormComponent, ClientsPageComponent, ContributorAddFormComponent, ContributorComponent, ContributorsPageComponent, ImportContributorsDialogComponent, LanguageAddFormComponent, LanguageComponent, LanguagesPageComponent, MorePageComponent, PlanComponent, PlansPageComponent, RoleAddFormComponent, RoleComponent, RolesPageComponent, SettingsAreaComponent, SettingsMenuComponent, SettingsPageComponent, TemplateComponent, TemplatesPageComponent, WorkflowAddFormComponent, WorkflowComponent, WorkflowDiagramComponent, WorkflowsPageComponent, WorkflowStepComponent, WorkflowTransitionComponent } from './declarations';
 
 const routes: Routes = [
     {
@@ -191,6 +191,7 @@ const routes: Routes = [
         RoleComponent,
         RolesPageComponent,
         SettingsAreaComponent,
+        SettingsMenuComponent,
         SettingsPageComponent,
         TemplateComponent,
         TemplatesPageComponent,

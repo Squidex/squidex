@@ -38,17 +38,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_return_draft_as_initial_status()
         {
-            var result = await sut.GetInitialStatusAsync(null!);
+            var actual = await sut.GetInitialStatusAsync(null!);
 
-            Assert.Equal(Status.Draft, result);
+            Assert.Equal(Status.Draft, actual);
         }
 
         [Fact]
         public async Task Should_allow_publish_on_create()
         {
-            var result = await sut.CanPublishInitialAsync(null!, null);
+            var actual = await sut.CanPublishInitialAsync(null!, null);
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -56,9 +56,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity { Status = Status.Published };
 
-            var result = await sut.CanMoveToAsync(null!, content.Status, Status.Draft, null!, null!);
+            var actual = await sut.CanMoveToAsync(null!, content.Status, Status.Draft, null!, null!);
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -66,9 +66,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity { Status = Status.Published };
 
-            var result = await sut.CanMoveToAsync(content, content.Status, Status.Draft, null!);
+            var actual = await sut.CanMoveToAsync(content, content.Status, Status.Draft, null!);
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -76,9 +76,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity { Status = Status.Published };
 
-            var result = await sut.CanUpdateAsync(content, content.Status, null!);
+            var actual = await sut.CanUpdateAsync(content, content.Status, null!);
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -86,9 +86,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity { Status = Status.Published };
 
-            var result = await sut.CanUpdateAsync(content, content.Status, null!);
+            var actual = await sut.CanUpdateAsync(content, content.Status, null!);
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -96,9 +96,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity { Status = Status.Archived };
 
-            var result = await sut.CanUpdateAsync(content, content.Status, null!);
+            var actual = await sut.CanUpdateAsync(content, content.Status, null!);
 
-            Assert.False(result);
+            Assert.False(actual);
         }
 
         [Fact]
@@ -112,9 +112,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            var result = await sut.GetNextAsync(content, content.Status, null!);
+            var actual = await sut.GetNextAsync(content, content.Status, null!);
 
-            result.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -127,9 +127,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Draft, StatusColors.Draft)
             };
 
-            var result = await sut.GetNextAsync(content, content.Status, null!);
+            var actual = await sut.GetNextAsync(content, content.Status, null!);
 
-            result.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -143,9 +143,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Draft, StatusColors.Draft)
             };
 
-            var result = await sut.GetNextAsync(content, content.Status, null!);
+            var actual = await sut.GetNextAsync(content, content.Status, null!);
 
-            result.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -158,33 +158,33 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            var result = await sut.GetAllAsync(null!);
+            var actual = await sut.GetAllAsync(null!);
 
-            result.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
         public async Task Should_not_validate_when_not_publishing()
         {
-            var result = await sut.ShouldValidateAsync(null!, Status.Draft);
+            var actual = await sut.ShouldValidateAsync(null!, Status.Draft);
 
-            Assert.False(result);
+            Assert.False(actual);
         }
 
         [Fact]
         public async Task Should_not_validate_when_publishing_but_not_enabled()
         {
-            var result = await sut.ShouldValidateAsync(CreateSchema(false), Status.Published);
+            var actual = await sut.ShouldValidateAsync(CreateSchema(false), Status.Published);
 
-            Assert.False(result);
+            Assert.False(actual);
         }
 
         [Fact]
         public async Task Should_validate_when_publishing_and_enabled()
         {
-            var result = await sut.ShouldValidateAsync(CreateSchema(true), Status.Published);
+            var actual = await sut.ShouldValidateAsync(CreateSchema(true), Status.Published);
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         private static ISchemaEntity CreateSchema(bool validateOnPublish)

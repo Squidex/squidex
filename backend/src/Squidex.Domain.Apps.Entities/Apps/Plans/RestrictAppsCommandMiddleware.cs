@@ -54,8 +54,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
             if (context.IsCompleted && user != null)
             {
-                var newApps = totalApps + 1;
-                var newAppsValue = newApps.ToString(CultureInfo.InvariantCulture);
+                var newAppsCount = totalApps + 1;
+                var newAppsValue = newAppsCount.ToString(CultureInfo.InvariantCulture);
 
                 // Always update the user and therefore do nto pass cancellation token.
                 await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.TotalApps, newAppsValue, true, default);

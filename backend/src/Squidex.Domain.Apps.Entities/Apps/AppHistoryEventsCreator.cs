@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public class AppHistoryEventsCreator : HistoryEventsCreatorBase
+    public sealed class AppHistoryEventsCreator : HistoryEventsCreatorBase
     {
         public AppHistoryEventsCreator(TypeNameRegistry typeNameRegistry)
             : base(typeNameRegistry)
@@ -62,6 +62,21 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             AddEventMessage<AppRoleUpdated>(
                 "history.apps.roleUpdated");
+
+            AddEventMessage<AppAssetsScriptsConfigured>(
+                "history.apps.assetScriptsConfigured");
+
+            AddEventMessage<AppUpdated>(
+                "history.apps.updated");
+
+            AddEventMessage<AppTransfered>(
+                "history.apps.transfered");
+
+            AddEventMessage<AppImageUploaded>(
+                "history.apps.imageUploaded");
+
+            AddEventMessage<AppImageRemoved>(
+                "history.apps.imageRemoved");
         }
 
         private HistoryEvent? CreateEvent(IEvent @event)
@@ -97,13 +112,28 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case AppPlanReset e:
                     return CreatePlansEvent(e);
                 case AppSettingsUpdated e:
-                    return CreateAppSettingsEvent(e);
+                    return CreateAssetScriptsEvent(e);
+                case AppAssetsScriptsConfigured e:
+                    return CreateGeneralEvent(e);
+                case AppUpdated e:
+                    return CreateGeneralEvent(e);
+                case AppTransfered e:
+                    return CreateGeneralEvent(e);
+                case AppImageUploaded e:
+                    return CreateGeneralEvent(e);
+                case AppImageRemoved e:
+                    return CreateGeneralEvent(e);
             }
 
             return null;
         }
 
-        private HistoryEvent CreateAppSettingsEvent(AppSettingsUpdated e)
+        private HistoryEvent CreateGeneralEvent(IEvent e)
+        {
+            return ForEvent(e, "general");
+        }
+
+        private HistoryEvent CreateAppSettingsEvent(IEvent e)
         {
             return ForEvent(e, "settings.appSettings");
         }
@@ -131,6 +161,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private HistoryEvent CreatePlansEvent(IEvent e, string? plan = null)
         {
             return ForEvent(e, "settings.plan").Param("Plan", plan);
+        }
+
+        private HistoryEvent CreateAssetScriptsEvent(IEvent e)
+        {
+            return ForEvent(e, "settings.assetScripts");
         }
 
         protected override Task<HistoryEvent?> CreateEventCoreAsync(Envelope<IEvent> @event)

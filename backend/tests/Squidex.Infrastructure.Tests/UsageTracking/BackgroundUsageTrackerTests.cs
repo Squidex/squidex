@@ -106,13 +106,13 @@ namespace Squidex.Infrastructure.UsageTracking
             A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, ct))
                 .Returns(originalData);
 
-            var result1 = await sut.GetForMonthAsync(key, date, null, ct);
-            var result2 = await sut.GetForMonthAsync(key, date, "category2", ct);
+            var actual1 = await sut.GetForMonthAsync(key, date, null, ct);
+            var actual2 = await sut.GetForMonthAsync(key, date, "category2", ct);
 
-            Assert.Equal(38, result1["A"]);
-            Assert.Equal(55, result1["B"]);
+            Assert.Equal(38, actual1["A"]);
+            Assert.Equal(55, actual1["B"]);
 
-            Assert.Equal(22, result2["B"]);
+            Assert.Equal(22, actual2["B"]);
         }
 
         [Fact]
@@ -132,17 +132,17 @@ namespace Squidex.Infrastructure.UsageTracking
             A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, ct))
                 .Returns(originalData);
 
-            var result1 = await sut.GetAsync(key, dateFrom, dateTo, null, ct);
-            var result2 = await sut.GetAsync(key, dateFrom, dateTo, "category2", ct);
+            var actual1 = await sut.GetAsync(key, dateFrom, dateTo, null, ct);
+            var actual2 = await sut.GetAsync(key, dateFrom, dateTo, "category2", ct);
 
-            Assert.Equal(38, result1["A"]);
-            Assert.Equal(55, result1["B"]);
+            Assert.Equal(38, actual1["A"]);
+            Assert.Equal(55, actual1["B"]);
 
-            Assert.Equal(22, result2["B"]);
+            Assert.Equal(22, actual2["B"]);
         }
 
         [Fact]
-        public async Task Should_create_empty_results_with_default_category_is_result_is_empty()
+        public async Task Should_create_empty_actuals_with_default_category_is_actual_is_empty()
         {
             var dateFrom = date;
             var dateTo = dateFrom.AddDays(4);
@@ -150,7 +150,7 @@ namespace Squidex.Infrastructure.UsageTracking
             A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, ct))
                 .Returns(new List<StoredUsage>());
 
-            var result = await sut.QueryAsync(key, dateFrom, dateTo, ct);
+            var actual = await sut.QueryAsync(key, dateFrom, dateTo, ct);
 
             var expected = new Dictionary<string, List<(DateTime Date, Counters Counters)>>
             {
@@ -164,11 +164,11 @@ namespace Squidex.Infrastructure.UsageTracking
                 }
             };
 
-            result.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
-        public async Task Should_create_results_with_filled_days()
+        public async Task Should_create_actuals_with_filled_days()
         {
             var dateFrom = date;
             var dateTo = dateFrom.AddDays(4);
@@ -185,7 +185,7 @@ namespace Squidex.Infrastructure.UsageTracking
             A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, ct))
                 .Returns(originalData);
 
-            var result = await sut.QueryAsync(key, dateFrom, dateTo, ct);
+            var actual = await sut.QueryAsync(key, dateFrom, dateTo, ct);
 
             var expected = new Dictionary<string, List<(DateTime Date, Counters Counters)>>
             {
@@ -207,7 +207,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 }
             };
 
-            result.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -256,19 +256,19 @@ namespace Squidex.Infrastructure.UsageTracking
 
         private static Counters Counters(double? a = null, double? b = null)
         {
-            var result = new Counters();
+            var actual = new Counters();
 
             if (a != null)
             {
-                result["A"] = a.Value;
+                actual["A"] = a.Value;
             }
 
             if (b != null)
             {
-                result["B"] = b.Value;
+                actual["B"] = b.Value;
             }
 
-            return result;
+            return actual;
         }
     }
 }

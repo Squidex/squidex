@@ -8,24 +8,18 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { DialogService, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
+import { DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
 import { AddFieldDto, CreateSchemaDto, FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from './../services/schemas.service';
 import { AppsState } from './apps.state';
 
 type AnyFieldDto = NestedFieldDto | RootFieldDto;
 
-interface Snapshot {
+interface Snapshot extends LoadingState {
     // The schema categories.
     addedCategories: Set<string>;
 
     // The current schemas.
-    schemas: SchemasList;
-
-    // Indicates if the schemas are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the schemas are loading.
-    isLoading?: boolean;
+    schemas: ReadonlyArray<SchemaDto>;
 
     // The selected schema.
     selectedSchema?: SchemaDto | null;
@@ -33,8 +27,6 @@ interface Snapshot {
     // Indicates if the user can create a schema.
     canCreate?: boolean;
 }
-
-export type SchemasList = ReadonlyArray<SchemaDto>;
 
 @Injectable()
 export class SchemasState extends State<Snapshot> {
@@ -370,7 +362,7 @@ function getField(x: SchemaDto, request: AddFieldDto, parent?: RootFieldDto | nu
     }
 }
 
-function buildCategoryNames(categories: Set<string>, allSchemas: SchemasList): ReadonlyArray<string> {
+function buildCategoryNames(categories: Set<string>, allSchemas: ReadonlyArray<SchemaDto>): ReadonlyArray<string> {
     const uniqueCategories: { [name: string]: boolean } = {};
 
     function addCategory(name: string) {

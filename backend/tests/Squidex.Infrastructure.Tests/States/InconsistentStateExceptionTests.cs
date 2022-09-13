@@ -16,16 +16,16 @@ namespace Squidex.Infrastructure.States
         public void Should_serialize_and_deserialize()
         {
             var source = new InconsistentStateException(100, 200, new InvalidOperationException("Inner"));
-            var result = source.SerializeAndDeserializeBinary();
+            var actual = source.SerializeAndDeserializeBinary();
 
-            Assert.IsType<InvalidOperationException>(result.InnerException);
+            Assert.IsType<InvalidOperationException>(actual.InnerException);
 
-            Assert.Equal("Inner", result.InnerException?.Message);
+            Assert.Equal("Inner", actual.InnerException?.Message);
 
-            Assert.Equal(result.VersionExpected, source.VersionExpected);
-            Assert.Equal(result.VersionCurrent, source.VersionCurrent);
+            Assert.Equal(actual.VersionExpected, source.VersionExpected);
+            Assert.Equal(actual.VersionCurrent, source.VersionCurrent);
 
-            Assert.Equal(result.Message, source.Message);
+            Assert.Equal(actual.Message, source.Message);
         }
     }
 }

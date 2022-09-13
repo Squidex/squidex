@@ -8,22 +8,16 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, Resource, shareSubscribed, State, Version } from '@app/framework';
+import { DialogService, LoadingState, Resource, shareSubscribed, State, Version } from '@app/framework';
 import { AppsService, AssetScripts, AssetScriptsPayload } from '../services/apps.service';
 import { AppsState } from './apps.state';
 
-interface Snapshot {
+interface Snapshot extends LoadingState {
     // The current scripts.
     scripts: AssetScripts;
 
     // The app version.
     version: Version;
-
-    // Indicates if the scripts are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the scripts are loading.
-    isLoading?: boolean;
 
     // Indicates if the user can update the scripts.
     canUpdate?: boolean;

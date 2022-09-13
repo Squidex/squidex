@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { AppDto, Settings } from '@app/shared';
 
 @Component({
-    selector: 'sqx-left-menu',
+    selector: 'sqx-left-menu[app]',
     styleUrls: ['./left-menu.component.scss'],
     templateUrl: './left-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

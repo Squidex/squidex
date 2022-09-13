@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 {
-    public sealed class AppCommandMiddleware : AggregateCommandMiddleware<AppCommand, AppDomainObject>
+    public sealed class AppCommandMiddleware : AggregateCommandMiddleware<AppCommandBase, AppDomainObject>
     {
         private readonly IAppImageStore appImageStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;

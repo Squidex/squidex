@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Domain.Apps.Events.Teams;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -141,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.History
             }
         }
 
-        public async Task HandleEventsAsync(IEnumerable<(Envelope<AppEvent> AppEvent, HistoryEvent? HistoryEvent)> events)
+        public async Task HandleEventsAsync(IEnumerable<(Envelope<IEvent> AppEvent, HistoryEvent? HistoryEvent)> events)
         {
             Guard.NotNull(events);
 
@@ -176,12 +177,20 @@ namespace Squidex.Domain.Apps.Entities.History
                 {
                     switch (@event.AppEvent.Payload)
                     {
-                        case AppContributorAssigned contributorAssigned:
-                            await AssignContributorAsync(client, contributorAssigned);
+                        case AppContributorAssigned assigned:
+                            await AssignContributorAsync(client, assigned.ContributorId, GetAppPrefix(assigned));
                             break;
 
-                        case AppContributorRemoved contributorRemoved:
-                            await RemoveContributorAsync(client, contributorRemoved);
+                        case AppContributorRemoved removed:
+                            await RemoveContributorAsync(client, removed.ContributorId, GetAppPrefix(removed));
+                            break;
+
+                        case TeamContributorAssigned assigned:
+                            await AssignContributorAsync(client, assigned.ContributorId, GetTeamPrefix(assigned));
+                            break;
+
+                        case TeamContributorRemoved removed:
+                            await RemoveContributorAsync(client, removed.ContributorId, GetTeamPrefix(removed));
                             break;
                     }
                 }
@@ -196,10 +205,8 @@ namespace Squidex.Domain.Apps.Entities.History
             }
         }
 
-        private async Task AssignContributorAsync(INotifoClient actualClient, AppContributorAssigned contributorAssigned)
+        private async Task AssignContributorAsync(INotifoClient actualClient, string userId, string prefix)
         {
-            var userId = contributorAssigned.ContributorId;
-
             var user = await userResolver.FindByIdAsync(userId);
 
             if (user != null)
@@ -211,7 +218,7 @@ namespace Squidex.Domain.Apps.Entities.History
             {
                 var request = new AddAllowedTopicDto
                 {
-                    Prefix = GetAppPrefix(contributorAssigned)
+                    Prefix = prefix
                 };
 
                 await actualClient.Users.PostAllowedTopicAsync(options.AppId, userId, request);
@@ -222,14 +229,10 @@ namespace Squidex.Domain.Apps.Entities.History
             }
         }
 
-        private async Task RemoveContributorAsync(INotifoClient actualClient, AppContributorRemoved contributorRemoved)
+        private async Task RemoveContributorAsync(INotifoClient actualClient, string userId, string prefix)
         {
-            var userId = contributorRemoved.ContributorId;
-
             try
             {
-                var prefix = GetAppPrefix(contributorRemoved);
-
                 await actualClient.Users.DeleteAllowedTopicAsync(options.ApiKey, userId, prefix);
             }
             catch (NotifoException ex) when (ex.StatusCode != 404)
@@ -238,22 +241,22 @@ namespace Squidex.Domain.Apps.Entities.History
             }
         }
 
-        private IEnumerable<PublishDto> CreateRequests(Envelope<AppEvent> appEvent, HistoryEvent? historyEvent)
+        private IEnumerable<PublishDto> CreateRequests(Envelope<IEvent> @event, HistoryEvent? historyEvent)
         {
-            if (appEvent.Payload is CommentCreated { Mentions.Length: > 0 } comment)
+            if (@event.Payload is CommentCreated { Mentions.Length: > 0 } comment)
             {
                 foreach (var userId in comment.Mentions)
                 {
                     yield return CreateMentionRequest(comment, userId);
                 }
             }
-            else if (historyEvent != null)
+            else if (historyEvent != null && @event.Payload is AppEvent appEvent)
             {
-                yield return CreateHistoryRequest(historyEvent, appEvent.Payload);
+                yield return CreateHistoryRequest(historyEvent, appEvent);
             }
         }
 
-        private PublishDto CreateHistoryRequest(HistoryEvent historyEvent, AppEvent payload)
+        private PublishDto CreateHistoryRequest(HistoryEvent historyEvent, IEvent payload)
         {
             var publishRequest = new PublishDto
             {
@@ -265,7 +268,25 @@ namespace Squidex.Domain.Apps.Entities.History
                 publishRequest.Properties.Add(key, value);
             }
 
-            publishRequest.Properties["SquidexApp"] = payload.AppId.Name;
+            if (payload is AppEvent appEvent)
+            {
+                publishRequest.Properties["SquidexApp"] = appEvent.AppId.Name;
+            }
+
+            if (payload is SquidexEvent squidexEvent)
+            {
+                SetUser(squidexEvent, publishRequest);
+            }
+
+            if (payload is AppEvent appEvent2)
+            {
+                publishRequest.Topic = BuildTopic(GetAppPrefix(appEvent2), historyEvent);
+            }
+
+            if (payload is TeamEvent teamEvent)
+            {
+                publishRequest.Topic = BuildTopic(GetTeamPrefix(teamEvent), historyEvent);
+            }
 
             if (payload is ContentEvent @event and not ContentDeleted)
             {
@@ -275,9 +296,6 @@ namespace Squidex.Domain.Apps.Entities.History
             }
 
             publishRequest.TemplateCode = historyEvent.EventType;
-
-            SetUser(payload, publishRequest);
-            SetTopic(payload, publishRequest, historyEvent);
 
             return publishRequest;
         }
@@ -309,25 +327,27 @@ namespace Squidex.Domain.Apps.Entities.History
             return publishRequest;
         }
 
-        private static void SetUser(AppEvent appEvent, PublishDto publishRequest)
+        private static void SetUser(SquidexEvent @event, PublishDto publishRequest)
         {
-            if (appEvent.Actor.IsUser)
+            if (@event.Actor.IsUser)
             {
-                publishRequest.CreatorId = appEvent.Actor.Identifier;
+                publishRequest.CreatorId = @event.Actor.Identifier;
             }
         }
 
-        private static void SetTopic(AppEvent appEvent, PublishDto publishRequest, HistoryEvent @event)
+        private static string BuildTopic(string prefix, HistoryEvent @event)
         {
-            var topicPrefix = GetAppPrefix(appEvent);
-            var topicSuffix = @event.Channel.Replace('.', '/').Trim();
-
-            publishRequest.Topic = $"{topicPrefix}/{topicSuffix}";
+            return $"{prefix}/{@event.Channel.Replace('.', '/').Trim()}";
         }
 
         private static string GetAppPrefix(AppEvent appEvent)
         {
             return $"apps/{appEvent.AppId.Id}";
+        }
+
+        private static string GetTeamPrefix(TeamEvent teamEvent)
+        {
+            return $"apps/{teamEvent.TeamId}";
         }
     }
 }

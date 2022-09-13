@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class ConfigureFieldRules : SchemaUpdateCommand
+    public sealed class ConfigureFieldRules : SchemaCommand
     {
         public FieldRuleCommand[]? FieldRules { get; set; }
 

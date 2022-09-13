@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             A.CallTo(() => scriptEngine.TransformAsync(
                     A<DataScriptVars>.That.Matches(x =>
-                        Equals(x["user"], ctx.User) &&
+                        Equals(x["user"], ctx.UserPrincipal) &&
                         Equals(x["data"], oldData) &&
                         Equals(x["contentId"], content.Id)),
                     "my-query",

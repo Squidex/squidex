@@ -60,9 +60,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             requestContext = new Context(Mocks.FrontendUser(), TestApp.Default);
         }
 
-        protected void AssertResult(object expected, ExecutionResult result)
+        protected void AssertResult(object expected, ExecutionResult actual)
         {
-            var jsonOutputResult = serializer.Serialize(result);
+            var jsonOutputResult = serializer.Serialize(actual);
             var isonOutputExpected = serializer.Serialize(expected);
 
             Assert.Equal(isonOutputExpected, jsonOutputResult);
@@ -97,20 +97,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             // Enrich the context with the schema.
             await sut.ExecuteAsync(options, x => Task.FromResult<ExecutionResult>(null!));
 
-            var result = await new DocumentExecuter().ExecuteAsync(options);
+            var actual = await new DocumentExecuter().ExecuteAsync(options);
 
-            if (result.Streams?.Count > 0 && result.Errors?.Any() != true)
+            if (actual.Streams?.Count > 0 && actual.Errors?.Any() != true)
             {
-                // Resolve the first stream result with a timeout.
-                var stream = result.Streams.First();
+                // Resolve the first stream actual with a timeout.
+                var stream = actual.Streams.First();
 
                 using (var cts = new CancellationTokenSource(5000))
                 {
-                    result = await stream.Value.FirstAsync().ToTask().WithCancellation(cts.Token);
+                    actual = await stream.Value.FirstAsync().ToTask().WithCancellation(cts.Token);
                 }
             }
 
-            return result;
+            return actual;
         }
 
         private static Context BuildContext(string permissionId)
@@ -205,7 +205,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 x.App == TestApp.Default &&
                 x.ShouldSkipCleanup() &&
                 x.ShouldSkipContentEnrichment() &&
-                x.User == requestContext.User);
+                x.UserPrincipal == requestContext.UserPrincipal);
         }
 
         protected Context MatchsContentContext()
@@ -214,7 +214,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 x.App == TestApp.Default &&
                 x.ShouldSkipCleanup() &&
                 x.ShouldSkipContentEnrichment() &&
-                x.User == requestContext.User);
+                x.UserPrincipal == requestContext.UserPrincipal);
         }
     }
 }

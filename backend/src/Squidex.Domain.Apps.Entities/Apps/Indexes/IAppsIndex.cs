@@ -15,6 +15,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions,
             CancellationToken ct = default);
 
+        Task<List<IAppEntity>> GetAppsForTeamAsync(DomainId teamId,
+            CancellationToken ct = default);
+
         Task<IAppEntity?> GetAppAsync(string name, bool canCache = false,
             CancellationToken ct = default);
 

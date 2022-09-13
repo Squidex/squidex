@@ -7,7 +7,7 @@
 
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 {
     public static class GuardAppContributors
     {
-        public static Task CanAssign(AssignContributor command, IAppEntity app, IUserResolver users, IAppLimitsPlan plan)
+        public static Task CanAssign(AssignContributor command, IAppEntity app, IUserResolver users, Plan plan)
         {
             Guard.NotNull(command);
 

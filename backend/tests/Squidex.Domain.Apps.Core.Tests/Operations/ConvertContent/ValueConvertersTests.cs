@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     id1,
                     id2);
 
-            var (_, result) =
+            var (_, actual) =
                 new ResolveAssetUrls(appId, urlGenerator, HashSet.Of(path))
                     .ConvertValue(field, source, null);
 
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     $"url/to/{id1}",
                     $"url/to/{id2}");
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -95,13 +95,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     id1,
                     id2);
 
-            var (_, result) =
+            var (_, actual) =
                 new ResolveAssetUrls(appId, urlGenerator, HashSet.Of(path))
                     .ConvertValue(field, source, null);
 
             var expected = source;
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     id1,
                     id2);
 
-            var (_, result) =
+            var (_, actual) =
                 new ResolveAssetUrls(appId, urlGenerator, HashSet.Of(path))
                     .ConvertValue(field.FieldsByName["assets"], source, field);
 
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     $"url/to/{id1}",
                     $"url/to/{id2}");
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
@@ -142,13 +142,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     id1,
                     id2);
 
-            var (_, result) =
+            var (_, actual) =
                 new ResolveAssetUrls(appId, urlGenerator, HashSet.Of(path))
                     .ConvertValue(field, source, null);
 
             var expected = source;
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -167,7 +167,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new JsonObject()
                     .Add(Component.Discriminator, componentId);
 
-            var result =
+            var actual =
                 new AddSchemaNames(components)
                     .ConvertItem(field, source);
 
@@ -176,7 +176,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     .Add(Component.Discriminator, componentId)
                     .Add("schemaName", component.Name);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -196,13 +196,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     .Add(Component.Discriminator, componentId)
                     .Add("schemaName", "existing");
 
-            var result =
+            var actual =
                 new AddSchemaNames(components)
                     .ConvertItem(field, source);
 
             var expected = source;
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -221,13 +221,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new JsonObject()
                     .Add(Component.Discriminator, componentId);
 
-            var result =
+            var actual =
                 new AddSchemaNames(components)
                     .ConvertItem(field, source);
 
             var expected = source;
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -245,13 +245,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var source =
                 new JsonObject();
 
-            var result =
+            var actual =
                 new AddSchemaNames(components)
                     .ConvertItem(field, source);
 
             var expected = source;
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -265,13 +265,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new JsonObject()
                     .Add(Component.Discriminator, componentId);
 
-            var result =
+            var actual =
                 new AddSchemaNames(ResolvedComponents.Empty)
                     .ConvertItem(field, source);
 
             var expected = source;
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
     }
 }

@@ -8,11 +8,11 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, shareSubscribed, State, Version } from '@app/framework';
+import { DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
 import { WorkflowDto, WorkflowsPayload, WorkflowsService } from './../services/workflows.service';
 import { AppsState } from './apps.state';
 
-interface Snapshot {
+interface Snapshot extends LoadingState {
     // The current workflow.
     workflows: ReadonlyArray<WorkflowDto>;
 
@@ -21,12 +21,6 @@ interface Snapshot {
 
     // The errors.
     errors: ReadonlyArray<string>;
-
-    // Indicates if the workflows are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the workflows are loading.
-    isLoading?: boolean;
 
     // Indicates if the user can create new workflow.
     canCreate?: boolean;

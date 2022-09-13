@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Should_not_add_result_to_contents_if_user_has_no_permission()
+        public async Task Should_not_add_actual_to_contents_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
@@ -45,15 +45,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             A.CallTo(() => urlGenerator.SchemaUI(appId, schema1.NamedId()))
                 .Returns("schemaA1-url");
 
-            var result = await sut.SearchAsync("schema", ctx, default);
+            var actual = await sut.SearchAsync("schema", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("schemaA1 Schema", SearchResultType.Schema, "schemaA1-url"));
         }
 
         [Fact]
-        public async Task Should_not_add_result_to_contents_if_schema_is_component()
+        public async Task Should_not_add_actual_to_contents_if_schema_is_component()
         {
             var permission = PermissionIds.ForApp(PermissionIds.AppContentsReadOwn, appId.Name, "schemaA1");
 
@@ -67,15 +67,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             A.CallTo(() => urlGenerator.SchemaUI(appId, schema1.NamedId()))
                 .Returns("schemaA1-url");
 
-            var result = await sut.SearchAsync("schema", ctx, default);
+            var actual = await sut.SearchAsync("schema", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("schemaA1 Schema", SearchResultType.Schema, "schemaA1-url"));
         }
 
         [Fact]
-        public async Task Should_return_result_to_schema_and_contents_if_matching_and_permission_given()
+        public async Task Should_return_actual_to_schema_and_contents_if_matching_and_permission_given()
         {
             var permission = PermissionIds.ForApp(PermissionIds.AppContentsReadOwn, appId.Name, "schemaA2");
 
@@ -97,9 +97,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             A.CallTo(() => urlGenerator.ContentsUI(appId, schema2.NamedId()))
                 .Returns("schemaA2-contents-url");
 
-            var result = await sut.SearchAsync("schemaA", ctx, default);
+            var actual = await sut.SearchAsync("schemaA", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("schemaA1 Schema", SearchResultType.Schema, "schemaA1-url")
                     .Add("schemaA2 Schema", SearchResultType.Schema, "schemaA2-url")
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Should_return_result_to_schema_and_contents_if_schema_is_singleton()
+        public async Task Should_return_actual_to_schema_and_contents_if_schema_is_singleton()
         {
             var permission = PermissionIds.ForApp(PermissionIds.AppContentsReadOwn, appId.Name, "schemaA1");
 
@@ -124,9 +124,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             A.CallTo(() => urlGenerator.ContentUI(appId, schema1.NamedId(), schema1.Id))
                 .Returns("schemaA1-content-url");
 
-            var result = await sut.SearchAsync("schemaA", ctx, default);
+            var actual = await sut.SearchAsync("schemaA", ctx, default);
 
-            result.Should().BeEquivalentTo(
+            actual.Should().BeEquivalentTo(
                 new SearchResults()
                     .Add("schemaA1 Schema", SearchResultType.Schema, "schemaA1-url")
                     .Add("schemaA1 Content", SearchResultType.Content, "schemaA1-content-url", "schemaA1"));

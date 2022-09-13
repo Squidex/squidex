@@ -31,13 +31,10 @@ export interface Upload {
 
 interface Snapshot {
     // The uploads.
-    uploads: UploadList;
+    uploads: ReadonlyArray<Upload>;
 }
 
 export class UploadCanceled {}
-
-type UploadList = ReadonlyArray<Upload>;
-type UploadResult = AssetDto | number;
 
 @Injectable()
 export class AssetUploaderState extends State<Snapshot> {
@@ -70,7 +67,7 @@ export class AssetUploaderState extends State<Snapshot> {
         }, 'Stopped');
     }
 
-    public uploadFile(file: File, target?: AssetsState, parentId?: string): Observable<UploadResult> {
+    public uploadFile(file: File, target?: AssetsState, parentId?: string): Observable<AssetDto | number> {
         const stream = this.assetsService.postAssetFile(this.appName, file, parentId ?? target?.parentId);
 
         return this.upload(stream, MathHelper.guid(), file.name, asset => {
@@ -84,7 +81,7 @@ export class AssetUploaderState extends State<Snapshot> {
         });
     }
 
-    public uploadAsset(asset: AssetDto, file: Blob): Observable<UploadResult> {
+    public uploadAsset(asset: AssetDto, file: Blob): Observable<AssetDto | number> {
         const stream = this.assetsService.putAssetFile(this.appName, asset, file, asset.version);
 
         return this.upload(stream, asset.id, file['name'] || asset.fileName);

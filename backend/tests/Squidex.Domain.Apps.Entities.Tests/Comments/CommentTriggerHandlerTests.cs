@@ -82,12 +82,12 @@ namespace Squidex.Domain.Apps.Entities.Comments
             A.CallTo(() => userResolver.QueryManyAsync(userIds, default))
                 .Returns(users.ToDictionary(x => x.Id));
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+            var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
-            Assert.Equal(2, result.Count);
+            Assert.Equal(2, actual.Count);
 
-            var enrichedEvent1 = result[0] as EnrichedCommentEvent;
-            var enrichedEvent2 = result[1] as EnrichedCommentEvent;
+            var enrichedEvent1 = actual[0] as EnrichedCommentEvent;
+            var enrichedEvent2 = actual[1] as EnrichedCommentEvent;
 
             Assert.Equal(user1, enrichedEvent1!.MentionedUser);
             Assert.Equal(user2, enrichedEvent2!.MentionedUser);
@@ -109,9 +109,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
             var @event = new CommentCreated { Mentions = userIds };
             var envelope = Envelope.Create<AppEvent>(@event);
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+            var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -122,9 +122,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
             var @event = new CommentCreated { Mentions = null };
             var envelope = Envelope.Create<AppEvent>(@event);
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+            var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
 
             A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -138,9 +138,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
             var @event = new CommentCreated { Mentions = Array.Empty<string>() };
             var envelope = Envelope.Create<AppEvent>(@event);
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+            var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
 
             A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -153,9 +153,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 var @event = new CommentCreated();
 
-                var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+                var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
-                Assert.True(result);
+                Assert.True(actual);
             });
         }
 
@@ -166,9 +166,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 var @event = new EnrichedCommentEvent();
 
-                var result = sut.Trigger(@event, ctx);
+                var actual = sut.Trigger(@event, ctx);
 
-                Assert.True(result);
+                Assert.True(actual);
             });
         }
 
@@ -179,9 +179,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 var @event = new EnrichedCommentEvent();
 
-                var result = sut.Trigger(new EnrichedCommentEvent(), ctx);
+                var actual = sut.Trigger(new EnrichedCommentEvent(), ctx);
 
-                Assert.True(result);
+                Assert.True(actual);
             });
         }
 
@@ -192,9 +192,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 var @event = new EnrichedCommentEvent();
 
-                var result = sut.Trigger(@event, ctx);
+                var actual = sut.Trigger(@event, ctx);
 
-                Assert.False(result);
+                Assert.False(actual);
             });
         }
 
@@ -208,9 +208,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
                     MentionedUser = UserMocks.User("1", "1@email.com")
                 };
 
-                var result = handler.Trigger(@event, ctx);
+                var actual = handler.Trigger(@event, ctx);
 
-                Assert.True(result);
+                Assert.True(actual);
             });
         }
 
@@ -224,9 +224,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
                     MentionedUser = UserMocks.User("1", "1@email.com")
                 };
 
-                var result = handler.Trigger(@event, ctx);
+                var actual = handler.Trigger(@event, ctx);
 
-                Assert.False(result);
+                Assert.False(actual);
             });
         }
 
@@ -240,9 +240,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
                     Text = "very_urgent_text"
                 };
 
-                var result = handler.Trigger(@event, ctx);
+                var actual = handler.Trigger(@event, ctx);
 
-                Assert.True(result);
+                Assert.True(actual);
             });
         }
 
@@ -256,9 +256,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
                     Text = "just_gossip"
                 };
 
-                var result = handler.Trigger(@event, ctx);
+                var actual = handler.Trigger(@event, ctx);
 
-                Assert.False(result);
+                Assert.False(actual);
             });
         }
 

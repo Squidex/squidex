@@ -9,10 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.UI.Models;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
-using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -21,6 +19,7 @@ namespace Squidex.Areas.Api.Controllers.UI
     public sealed class UIController : ApiController
     {
         private static readonly Permission CreateAppPermission = new Permission(PermissionIds.AdminAppCreate);
+        private static readonly Permission CreateTeamPermission = new Permission(PermissionIds.AdminTeamCreate);
         private readonly MyUIOptions uiOptions;
         private readonly IAppUISettings appUISettings;
 
@@ -46,7 +45,8 @@ namespace Squidex.Areas.Api.Controllers.UI
         {
             var result = new UISettingsDto
             {
-                CanCreateApps = !uiOptions.OnlyAdminsCanCreateApps || Context.UserPermissions.Includes(CreateAppPermission)
+                CanCreateApps = !uiOptions.OnlyAdminsCanCreateApps || Context.UserPermissions.Includes(CreateAppPermission),
+                CanCreateTeams = !uiOptions.OnlyAdminsCanCreateApps || Context.UserPermissions.Includes(CreateTeamPermission),
             };
 
             return Ok(result);
@@ -85,7 +85,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> GetUserSettings(string app)
         {
-            var result = await appUISettings.GetAsync(AppId, UserId(), HttpContext.RequestAborted);
+            var result = await appUISettings.GetAsync(AppId, UserId, HttpContext.RequestAborted);
 
             return Ok(result);
         }
@@ -125,7 +125,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> PutUserSetting(string app, string key, [FromBody] UpdateSettingDto request)
         {
-            await appUISettings.SetAsync(AppId, UserId(), key, request.Value, HttpContext.RequestAborted);
+            await appUISettings.SetAsync(AppId, UserId, key, request.Value, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -163,21 +163,9 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> DeleteUserSetting(string app, string key)
         {
-            await appUISettings.RemoveAsync(AppId, UserId(), key, HttpContext.RequestAborted);
+            await appUISettings.RemoveAsync(AppId, UserId, key, HttpContext.RequestAborted);
 
             return NoContent();
-        }
-
-        private string UserId()
-        {
-            var subject = User.OpenIdSubject();
-
-            if (string.IsNullOrWhiteSpace(subject))
-            {
-                throw new DomainForbiddenException(T.Get("common.httpOnlyAsUser"));
-            }
-
-            return subject;
         }
     }
 }

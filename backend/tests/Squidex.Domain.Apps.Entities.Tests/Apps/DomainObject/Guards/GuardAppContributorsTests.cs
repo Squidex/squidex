@@ -6,10 +6,11 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
@@ -26,8 +27,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         private readonly IUser user2 = UserMocks.User("2");
         private readonly IUser user3 = UserMocks.User("3");
         private readonly IUserResolver users = A.Fake<IUserResolver>();
-        private readonly IAppLimitsPlan appPlan = A.Fake<IAppLimitsPlan>();
-        private readonly AppContributors contributors_0 = AppContributors.Empty;
+        private readonly Contributors contributors_0 = Contributors.Empty;
+        private readonly Plan planWithoutLimit = new Plan { MaxContributors = -1 };
+        private readonly Plan planWithLimit = new Plan { MaxContributors = 2 };
         private readonly Roles roles = Roles.Empty;
 
         public GuardAppContributorsTests()
@@ -52,9 +54,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
             A.CallTo(() => users.FindByIdAsync("notfound", default))
                 .Returns(Task.FromResult<IUser?>(null));
-
-            A.CallTo(() => appPlan.MaxContributors)
-                .Returns(10);
         }
 
         [Fact]
@@ -62,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             var command = new AssignContributor();
 
-            await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(command, App(contributors_0), users, appPlan),
+            await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(command, App(contributors_0), users, planWithoutLimit),
                 new ValidationError("Contributor ID or email is required.", "ContributorId"));
         }
 
@@ -71,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             var command = new AssignContributor { ContributorId = "1", Role = "Invalid" };
 
-            await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(command, App(contributors_0), users, appPlan),
+            await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(command, App(contributors_0), users, planWithoutLimit),
                 new ValidationError("Role is not a valid value.", "Role"));
         }
 
@@ -82,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
             var contributors_1 = contributors_0.Assign("1", Role.Owner);
 
-            await GuardAppContributors.CanAssign(command, App(contributors_1), users, appPlan);
+            await GuardAppContributors.CanAssign(command, App(contributors_1), users, planWithoutLimit);
         }
 
         [Fact]
@@ -92,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
             var contributors_1 = contributors_0.Assign("1", Role.Owner);
 
-            await GuardAppContributors.CanAssign(command, App(contributors_1), users, appPlan);
+            await GuardAppContributors.CanAssign(command, App(contributors_1), users, planWithoutLimit);
         }
 
         [Fact]
@@ -100,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             var command = new AssignContributor { ContributorId = "notfound", Role = Role.Owner };
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => GuardAppContributors.CanAssign(command, App(contributors_0), users, appPlan));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => GuardAppContributors.CanAssign(command, App(contributors_0), users, planWithoutLimit));
         }
 
         [Fact]
@@ -108,85 +107,70 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             var command = new AssignContributor { ContributorId = "3", Role = Role.Editor, Actor = RefToken.User("3") };
 
-            await Assert.ThrowsAsync<DomainForbiddenException>(() => GuardAppContributors.CanAssign(command, App(contributors_0), users, appPlan));
+            await Assert.ThrowsAsync<DomainForbiddenException>(() => GuardAppContributors.CanAssign(command, App(contributors_0), users, planWithoutLimit));
         }
 
         [Fact]
         public async Task CanAssign_should_throw_exception_if_contributor_max_reached()
         {
-            A.CallTo(() => appPlan.MaxContributors)
-                .Returns(2);
-
             var command = new AssignContributor { ContributorId = "3" };
 
             var contributors_1 = contributors_0.Assign("1", Role.Owner);
             var contributors_2 = contributors_1.Assign("2", Role.Editor);
 
-            await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(command, App(contributors_2), users, appPlan),
+            await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(command, App(contributors_2), users, planWithLimit),
                 new ValidationError("You have reached the maximum number of contributors for your plan."));
         }
 
         [Fact]
         public async Task CanAssign_should_not_throw_exception_if_contributor_max_reached_but_ignored()
         {
-            A.CallTo(() => appPlan.MaxContributors)
-                .Returns(2);
-
             var command = new AssignContributor { ContributorId = "3", IgnorePlans = true };
 
             var contributors_1 = contributors_0.Assign("1", Role.Owner);
             var contributors_2 = contributors_1.Assign("2", Role.Editor);
 
-            await GuardAppContributors.CanAssign(command, App(contributors_2), users, appPlan);
+            await GuardAppContributors.CanAssign(command, App(contributors_2), users, planWithLimit);
         }
 
         [Fact]
         public async Task CanAssign_should_not_throw_exception_if_user_found()
         {
-            A.CallTo(() => appPlan.MaxContributors)
-                .Returns(-1);
-
             var command = new AssignContributor { ContributorId = "1" };
 
-            await GuardAppContributors.CanAssign(command, App(contributors_0), users, appPlan);
+            await GuardAppContributors.CanAssign(command, App(contributors_0), users, planWithoutLimit);
         }
 
         [Fact]
-        public async Task CanAssign_should_not_throw_exception_if_contributor_has_another_role()
+        public async Task CanAssign_should_not_throw_exception_if_role_is_valid()
         {
             var command = new AssignContributor { ContributorId = "1" };
 
             var contributors_1 = contributors_0.Assign("1", Role.Developer);
 
-            await GuardAppContributors.CanAssign(command, App(contributors_1), users, appPlan);
+            await GuardAppContributors.CanAssign(command, App(contributors_1), users, planWithoutLimit);
         }
 
         [Fact]
         public async Task CanAssign_should_not_throw_exception_if_contributor_max_reached_but_role_changed()
         {
-            A.CallTo(() => appPlan.MaxContributors)
-                .Returns(2);
-
             var command = new AssignContributor { ContributorId = "1" };
 
             var contributors_1 = contributors_0.Assign("1", Role.Developer);
             var contributors_2 = contributors_1.Assign("2", Role.Developer);
 
-            await GuardAppContributors.CanAssign(command, App(contributors_2), users, appPlan);
+            await GuardAppContributors.CanAssign(command, App(contributors_2), users, planWithLimit);
         }
 
         [Fact]
         public async Task CanAssign_should_not_throw_exception_if_contributor_max_reached_but_ígnored()
         {
-            A.CallTo(() => appPlan.MaxContributors)
-                .Returns(2);
-
             var command = new AssignContributor { ContributorId = "3", IgnorePlans = true };
 
             var contributors_1 = contributors_0.Assign("1", Role.Editor);
             var contributors_2 = contributors_1.Assign("2", Role.Editor);
 
-            await GuardAppContributors.CanAssign(command, App(contributors_2), users, appPlan);
+            await GuardAppContributors.CanAssign(command, App(contributors_2), users, planWithoutLimit);
         }
 
         [Fact]
@@ -229,7 +213,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
             GuardAppContributors.CanRemove(command, App(contributors_2));
         }
 
-        private IAppEntity App(AppContributors contributors)
+        private IAppEntity App(Contributors contributors)
         {
             var app = A.Fake<IAppEntity>();
 

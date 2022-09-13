@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             }
             else
             {
-                content.NextStatuses = await contentWorkflow.GetNextAsync(content, editingStatus, context.User);
+                content.NextStatuses = await contentWorkflow.GetNextAsync(content, editingStatus, context.UserPrincipal);
             }
         }
 
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         {
             var editingStatus = content.NewStatus ?? content.Status;
 
-            content.CanUpdate = await contentWorkflow.CanUpdateAsync(content, editingStatus, context.User);
+            content.CanUpdate = await contentWorkflow.CanUpdateAsync(content, editingStatus, context.UserPrincipal);
         }
 
         private async Task EnrichColorAsync(ContentEntity content, ContentEntity result, Dictionary<(DomainId, Status), StatusInfo> cache)

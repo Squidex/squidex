@@ -39,12 +39,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
         {
             var source = CreateRule();
 
-            var result = await sut.EnrichAsync(source, requestContext, ct);
+            var actual = await sut.EnrichAsync(source, requestContext, ct);
 
-            Assert.Equal(0, result.NumFailed);
-            Assert.Equal(0, result.NumSucceeded);
+            Assert.Equal(0, actual.NumFailed);
+            Assert.Equal(0, actual.NumSucceeded);
 
-            Assert.Null(result.LastExecuted);
+            Assert.Null(actual.LastExecuted);
 
             A.CallTo(() => requestCache.AddDependency(source.UniqueId, source.Version))
                 .MustHaveHappened();

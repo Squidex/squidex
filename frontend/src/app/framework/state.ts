@@ -63,7 +63,15 @@ export function getPagingInfo<T>(state: ListState<T>, count: number) {
     return { page, pageSize, total, count };
 }
 
-export interface ListState<TQuery = any> {
+export interface LoadingState {
+    // True if currently loading.
+    isLoading?: boolean;
+
+    // True if already loaded.
+    isLoaded?: boolean;
+}
+
+export interface ListState<TQuery = any> extends LoadingState {
     // The total number of items.
     total: number;
 

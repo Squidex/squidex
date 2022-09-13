@@ -142,6 +142,9 @@
   <data name="apps.notImage" xml:space="preserve">
     <value>文件不是图像</value>
   </data>
+  <data name="apps.plans.assignedToTeam" xml:space="preserve">
+    <value>Plan is managed by the team.</value>
+  </data>
   <data name="apps.plans.notFound" xml:space="preserve">
     <value>不存在具有此 ID 的计划。</value>
   </data>
@@ -162,6 +165,12 @@
   </data>
   <data name="apps.roles.usedRoleByContributorsNotRemovable" xml:space="preserve">
     <value>当分配了贡献者时无法删除角色。</value>
+  </data>
+  <data name="apps.transfer.planAssigned" xml:space="preserve">
+    <value>Subscription must be cancelled first before the app can be transfered.</value>
+  </data>
+  <data name="apps.transfer.teamNotFound" xml:space="preserve">
+    <value>The team does not exist.</value>
   </data>
   <data name="assets.folderNotFound" xml:space="preserve">
     <value>资源文件夹不存在。</value>
@@ -709,6 +718,9 @@
   <data name="exceptions.domainObjectVersion" xml:space="preserve">
     <value>实体 ({id}) 请求版本 {expectedVersion}，但找到 {currentVersion}。</value>
   </data>
+  <data name="history.apps.assetScriptsConfigured" xml:space="preserve">
+    <value>updated asset scripts</value>
+  </data>
   <data name="history.apps.clientAdded" xml:space="preserve">
     <value>将客户端 {[Id]} 添加到应用程序</value>
   </data>
@@ -723,6 +735,12 @@
   </data>
   <data name="history.apps.contributoreRemoved" xml:space="preserve">
     <value>从应用中删除了 {user:[Contributor]}</value>
+  </data>
+  <data name="history.apps.imageRemoved" xml:space="preserve">
+    <value>removed app image</value>
+  </data>
+  <data name="history.apps.imageUploaded" xml:space="preserve">
+    <value>uploaded a new app image</value>
   </data>
   <data name="history.apps.languagedAdded" xml:space="preserve">
     <value>添加语言 {[Language]}</value>
@@ -753,6 +771,12 @@
   </data>
   <data name="history.apps.settingsUpdated" xml:space="preserve">
     <value>更新的 UI 设置</value>
+  </data>
+  <data name="history.apps.transfered" xml:space="preserve">
+    <value>updated app to client</value>
+  </data>
+  <data name="history.apps.updated" xml:space="preserve">
+    <value>updated general settings</value>
   </data>
   <data name="history.assets.replaced" xml:space="preserve">
     <value>替换的资源。</value>
@@ -828,6 +852,21 @@
   </data>
   <data name="history.statusChanged" xml:space="preserve">
     <value>已将 {[Schema]} 内容的状态更改为 {[Status]}。</value>
+  </data>
+  <data name="history.teams.contributoreAssigned" xml:space="preserve">
+    <value>assigned {user:[Contributor]} as {[Role]}</value>
+  </data>
+  <data name="history.teams.contributoreRemoved" xml:space="preserve">
+    <value>removed {user:[Contributor]} from team</value>
+  </data>
+  <data name="history.teams.planChanged" xml:space="preserve">
+    <value>changed plan to {[Plan]}</value>
+  </data>
+  <data name="history.teams.planReset" xml:space="preserve">
+    <value>resetted plan</value>
+  </data>
+  <data name="history.teams.updated" xml:space="preserve">
+    <value>updated general settings</value>
   </data>
   <data name="login.githubPrivateEmail" xml:space="preserve">
     <value>您的邮箱在 Github 中设置为私有。请设置为公开以使用 Github 登录。</value>
@@ -963,6 +1002,12 @@
   </data>
   <data name="setup.rules.headline" xml:space="preserve">
     <value>系统清单</value>
+  </data>
+  <data name="setup.ruleTeamCreation.warningAdmins" xml:space="preserve">
+    <value>With your setup, only admins can create new teams. If you want to change this set &lt;code&gt;UI__ONLYADMINSCANCREATETEAMS=false&lt;/code&gt; as environment variable.</value>
+  </data>
+  <data name="setup.ruleTeamCreation.warningAll" xml:space="preserve">
+    <value>With your setup, every user can create new teams. If you want to change this set &lt;code&gt;UI__ONLYADMINSCANCREATETEAMS=true&lt;/code&gt; as environment variable.</value>
   </data>
   <data name="setup.ruleUrl.failure" xml:space="preserve">
     <value>您应该仅通过一个规范 URL 访问 Squidex，并通过 &lt;code&gt;URLS__BASEURL&lt;/code&gt; 环境变量配置此 URL。当前的基本 URL &lt;code&gt;{actual}&lt;/code&gt;与基本 url &lt;code&gt;{configured}&lt;/code&gt; 不匹配。</value>

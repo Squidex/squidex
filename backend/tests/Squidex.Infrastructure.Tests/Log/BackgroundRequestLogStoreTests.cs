@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.Log
         }
 
         [Fact]
-        public async Task Should_provide_results_from_repository()
+        public async Task Should_provide_actuals_from_repository()
         {
             var key = "my-key";
 
@@ -85,13 +85,13 @@ namespace Squidex.Infrastructure.Log
             A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, ct))
                 .Returns(AsyncEnumerable.Repeat(new Request { Key = key }, 1));
 
-            var results = await sut.QueryAllAsync(key, dateFrom, dateTo, ct).ToListAsync(ct);
+            var actuals = await sut.QueryAllAsync(key, dateFrom, dateTo, ct).ToListAsync(ct);
 
-            Assert.NotEmpty(results);
+            Assert.NotEmpty(actuals);
         }
 
         [Fact]
-        public async Task Should_not_provide_results_from_repository_if_disabled()
+        public async Task Should_not_provide_actuals_from_repository_if_disabled()
         {
             options.StoreEnabled = false;
 
@@ -100,9 +100,9 @@ namespace Squidex.Infrastructure.Log
             var dateFrom = DateTime.Today;
             var dateTo = dateFrom.AddDays(4);
 
-            var results = await sut.QueryAllAsync(key, dateFrom, dateTo, ct).ToListAsync(ct);
+            var actuals = await sut.QueryAllAsync(key, dateFrom, dateTo, ct).ToListAsync(ct);
 
-            Assert.Empty(results);
+            Assert.Empty(actuals);
 
             A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, A<CancellationToken>._))
                 .MustNotHaveHappened();

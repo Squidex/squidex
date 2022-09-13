@@ -29,25 +29,25 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_provide_custom_language()
         {
-            var result = Language.GetLanguage("xy");
+            var actual = Language.GetLanguage("xy");
 
-            Assert.Equal("xy", result.Iso2Code);
+            Assert.Equal("xy", actual.Iso2Code);
         }
 
         [Fact]
         public void Should_trim_custom_language()
         {
-            var result = Language.GetLanguage("xy ");
+            var actual = Language.GetLanguage("xy ");
 
-            Assert.Equal("xy", result.Iso2Code);
+            Assert.Equal("xy", actual.Iso2Code);
         }
 
         [Fact]
         public void Should_provide_default_language()
         {
-            var result = Language.GetLanguage("de");
+            var actual = Language.GetLanguage("de");
 
-            Assert.Same(Language.DE, result);
+            Assert.Same(Language.DE, actual);
         }
 
         [Fact]

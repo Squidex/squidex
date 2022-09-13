@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         }
 
         [Fact]
-        public async Task Should_not_invoke_enricher_for_other_result()
+        public async Task Should_not_invoke_enricher_for_other_actual()
         {
             await HandleAsync(new EnableRule(), 12);
 
@@ -54,36 +54,36 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         [Fact]
         public async Task Should_not_invoke_enricher_if_already_enriched()
         {
-            var result = new RuleEntity();
+            var actual = new RuleEntity();
 
             var context =
                 await HandleAsync(new EnableRule(),
-                    result);
+                    actual);
 
-            Assert.Same(result, context.Result<IEnrichedRuleEntity>());
+            Assert.Same(actual, context.Result<IEnrichedRuleEntity>());
 
             A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnrichedRuleEntity>._, requestContext, default))
                 .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task Should_enrich_rule_result()
+        public async Task Should_enrich_rule_actual()
         {
-            var result = A.Fake<IRuleEntity>();
+            var actual = A.Fake<IRuleEntity>();
 
             var enriched = new RuleEntity();
 
-            A.CallTo(() => ruleEnricher.EnrichAsync(result, requestContext, default))
+            A.CallTo(() => ruleEnricher.EnrichAsync(actual, requestContext, default))
                 .Returns(enriched);
 
             var context =
                 await HandleAsync(new EnableRule(),
-                    result);
+                    actual);
 
             Assert.Same(enriched, context.Result<IEnrichedRuleEntity>());
         }
 
-        private Task<CommandContext> HandleAsync(RuleCommand command, object result)
+        private Task<CommandContext> HandleAsync(RuleCommand command, object actual)
         {
             command.RuleId = ruleId;
 
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             var domainObject = A.Fake<RuleDomainObject>();
 
             A.CallTo(() => domainObject.ExecuteAsync(A<IAggregateCommand>._, A<CancellationToken>._))
-                .Returns(new CommandResult(command.AggregateId, 1, 0, result));
+                .Returns(new CommandResult(command.AggregateId, 1, 0, actual));
 
             A.CallTo(() => domainObjectFactory.Create<RuleDomainObject>(command.AggregateId))
                 .Returns(domainObject);

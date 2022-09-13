@@ -60,10 +60,10 @@ namespace Squidex.Domain.Apps.Core.Model.Assets
         {
             var sut = new AssetMetadata();
 
-            var found = sut.TryGetByPath(string.Empty, out var result);
+            var found = sut.TryGetByPath(string.Empty, out var actual);
 
             Assert.False(found);
-            Assert.Same(sut, result);
+            Assert.Same(sut, actual);
         }
 
         [Fact]
@@ -74,10 +74,10 @@ namespace Squidex.Domain.Apps.Core.Model.Assets
                 ["someValue"] = JsonValue.Create(800)
             };
 
-            var found = sut.TryGetByPath("someValue", out var result);
+            var found = sut.TryGetByPath("someValue", out var actual);
 
             Assert.True(found);
-            Assert.Equal(JsonValue.Create(800), result);
+            Assert.Equal(JsonValue.Create(800), actual);
         }
 
         [Fact]
@@ -85,10 +85,10 @@ namespace Squidex.Domain.Apps.Core.Model.Assets
         {
             var sut = new AssetMetadata();
 
-            var found = sut.TryGetByPath("notFound", out var result);
+            var found = sut.TryGetByPath("notFound", out var actual);
 
             Assert.False(found);
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
@@ -103,10 +103,10 @@ namespace Squidex.Domain.Apps.Core.Model.Assets
                                 .Add("nested2", 12))
             };
 
-            var found = sut.TryGetByPath("meta.nested1.nested2", out var result);
+            var found = sut.TryGetByPath("meta.nested1.nested2", out var actual);
 
             Assert.True(found);
-            Assert.Equal(JsonValue.Create(12), result);
+            Assert.Equal(JsonValue.Create(12), actual);
         }
 
         [Fact]
@@ -119,10 +119,10 @@ namespace Squidex.Domain.Apps.Core.Model.Assets
                 ["string"] = JsonValue.Create(value)
             };
 
-            var found = sut.TryGetString("string", out var result);
+            var found = sut.TryGetString("string", out var actual);
 
             Assert.True(found);
-            Assert.Equal(value, result);
+            Assert.Equal(value, actual);
         }
 
         [Fact]
@@ -133,10 +133,10 @@ namespace Squidex.Domain.Apps.Core.Model.Assets
                 ["string"] = JsonValue.Create(12)
             };
 
-            var found = sut.TryGetString("string", out var result);
+            var found = sut.TryGetString("string", out var actual);
 
             Assert.False(found);
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
@@ -144,10 +144,10 @@ namespace Squidex.Domain.Apps.Core.Model.Assets
         {
             var sut = new AssetMetadata();
 
-            var found = sut.TryGetString("other", out var result);
+            var found = sut.TryGetString("other", out var actual);
 
             Assert.False(found);
-            Assert.Null(result);
+            Assert.Null(actual);
         }
 
         [Fact]
@@ -160,10 +160,10 @@ namespace Squidex.Domain.Apps.Core.Model.Assets
                 ["number"] = JsonValue.Create(value)
             };
 
-            var found = sut.TryGetNumber("number", out var result);
+            var found = sut.TryGetNumber("number", out var actual);
 
             Assert.True(found);
-            Assert.Equal(value, result);
+            Assert.Equal(value, actual);
         }
 
         [Fact]
@@ -174,10 +174,10 @@ namespace Squidex.Domain.Apps.Core.Model.Assets
                 ["number"] = JsonValue.Create(true)
             };
 
-            var found = sut.TryGetNumber("number", out var result);
+            var found = sut.TryGetNumber("number", out var actual);
 
             Assert.False(found);
-            Assert.Equal(0, result);
+            Assert.Equal(0, actual);
         }
 
         [Fact]
@@ -185,10 +185,10 @@ namespace Squidex.Domain.Apps.Core.Model.Assets
         {
             var sut = new AssetMetadata();
 
-            var found = sut.TryGetNumber("other", out var result);
+            var found = sut.TryGetNumber("other", out var actual);
 
             Assert.False(found);
-            Assert.Equal(0, result);
+            Assert.Equal(0, actual);
         }
     }
 }

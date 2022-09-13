@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                                                     .Add("nested", JsonValue.Array(1, 2))))
                                         .Add(Component.Discriminator, DomainId.Empty))));
 
-            var result =
+            var actual =
                 new ContentConverter(components, schema)
                     .Add(new ValueConverter())
                     .Convert(source);
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                                                 new JsonObject()))
                                         .Add(Component.Discriminator, DomainId.Empty))));
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                                                     .Add("nested", JsonValue.Array(1, 2))))
                                         .Add(Component.Discriminator, DomainId.Empty))));
 
-            var result =
+            var actual =
                 new ContentConverter(components, schema)
                     .Add(new ItemConverter())
                     .Convert(source);
@@ -221,7 +221,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                                                     .Add("nested", JsonValue.Array(1, 2))))
                                         .Add(Component.Discriminator, DomainId.Empty))));
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         private sealed class ItemConverter : IContentItemConverter

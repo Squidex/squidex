@@ -52,7 +52,11 @@ namespace Squidex.Web
         // Contributors
         public bool CanAssignContributor => Can(PermissionIds.AppContributorsAssign);
 
+        public bool CanAssignTeamContributor => Can(PermissionIds.TeamContributorsAssign);
+
         public bool CanRevokeContributor => Can(PermissionIds.AppContributorsRevoke);
+
+        public bool CanRevokeTeamContributor => Can(PermissionIds.TeamContributorsRevoke);
 
         // Workflows
         public bool CanCreateWorkflow => Can(PermissionIds.AppWorkflowsCreate);
@@ -141,6 +145,8 @@ namespace Squidex.Web
 
         public string? Schema => GetAppName();
 
+        public string? Team => GetTeamId().ToString();
+
         public DomainId AppId => GetAppId();
 
         public ApiController Controller { get; }
@@ -187,7 +193,7 @@ namespace Squidex.Web
             return permissions.GetOrAdd((Id: id, Schema: schema), k => IsAllowed(k.Id, Permission.Any, k.Schema));
         }
 
-        public bool IsAllowed(string id, string app = Permission.Any, string schema = Permission.Any, PermissionSet? additional = null)
+        public bool IsAllowed(string id, string app = Permission.Any, string schema = Permission.Any, string team = Permission.Any, PermissionSet? additional = null)
         {
             if (app == Permission.Any)
             {
@@ -209,7 +215,17 @@ namespace Squidex.Web
                 }
             }
 
-            var permission = PermissionIds.ForApp(id, app, schema);
+            if (team == Permission.Any)
+            {
+                var fallback = GetTeamId();
+
+                if (fallback != default)
+                {
+                    team = fallback.ToString();
+                }
+            }
+
+            var permission = PermissionIds.ForApp(id, app, schema, team);
 
             return Context.UserPermissions.Allows(permission) || additional?.Allows(permission) == true;
         }
@@ -227,6 +243,11 @@ namespace Squidex.Web
         private DomainId GetAppId()
         {
             return Controller.HttpContext.Context().App?.Id ?? default;
+        }
+
+        private DomainId GetTeamId()
+        {
+            return Controller.HttpContext.Features.Get<ITeamFeature>()?.Team?.Id ?? default;
         }
     }
 }

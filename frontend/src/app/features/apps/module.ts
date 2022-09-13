@@ -8,7 +8,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { AppComponent, AppsPageComponent, NewsDialogComponent, OnboardingDialogComponent } from './declarations';
+import { AppComponent, AppsPageComponent, NewsDialogComponent, OnboardingDialogComponent, TeamComponent } from './declarations';
 
 const routes: Routes = [
     {
@@ -28,6 +28,7 @@ const routes: Routes = [
         AppsPageComponent,
         NewsDialogComponent,
         OnboardingDialogComponent,
+        TeamComponent,
     ],
 })
 export class SqxFeatureAppsModule {}

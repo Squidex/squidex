@@ -55,6 +55,9 @@
     settings: {
       method: GET
     },
+    transfer: {
+      method: PUT
+    },
     update: {
       method: PUT
     },

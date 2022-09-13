@@ -28,33 +28,33 @@ namespace Squidex.Domain.Apps.Entities.Backup
         [Fact]
         public void Should_map_old_app_id()
         {
-            var result = sut.Map($"app-{appIdOld}");
+            var actual = sut.Map($"app-{appIdOld}");
 
-            Assert.Equal(($"app-{appId}", appId), result);
+            Assert.Equal(($"app-{appId}", appId), actual);
         }
 
         [Fact]
         public void Should_map_old_app_broken_id()
         {
-            var result = sut.Map($"app-{appIdOld}--{appIdOld}");
+            var actual = sut.Map($"app-{appIdOld}--{appIdOld}");
 
-            Assert.Equal(($"app-{appId}", appId), result);
+            Assert.Equal(($"app-{appId}", appId), actual);
         }
 
         [Fact]
         public void Should_map_non_app_id()
         {
-            var result = sut.Map($"content-{appIdOld}--123");
+            var actual = sut.Map($"content-{appIdOld}--123");
 
-            Assert.Equal(($"content-{appId}--123", DomainId.Create($"{appId}--123")), result);
+            Assert.Equal(($"content-{appId}--123", DomainId.Create($"{appId}--123")), actual);
         }
 
         [Fact]
         public void Should_map_non_app_id_with_double_slash()
         {
-            var result = sut.Map($"content-{appIdOld}--other--id");
+            var actual = sut.Map($"content-{appIdOld}--other--id");
 
-            Assert.Equal(($"content-{appId}--other--id", DomainId.Create($"{appId}--other--id")), result);
+            Assert.Equal(($"content-{appId}--other--id", DomainId.Create($"{appId}--other--id")), actual);
         }
 
         [Fact]
@@ -62,9 +62,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var id = DomainId.NewGuid();
 
-            var result = sut.Map($"content-{id}");
+            var actual = sut.Map($"content-{id}");
 
-            Assert.Equal(($"content-{appId}--{id}", DomainId.Create($"{appId}--{id}")), result);
+            Assert.Equal(($"content-{appId}--{id}", DomainId.Create($"{appId}--{id}")), actual);
         }
     }
 }

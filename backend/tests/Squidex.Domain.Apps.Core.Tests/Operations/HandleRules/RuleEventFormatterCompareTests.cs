@@ -126,9 +126,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent { AppId = appId };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal($"Name my-app has id {appId.Id}", result);
+            Assert.Equal($"Name my-app has id {appId.Id}", actual);
         }
 
         [Theory]
@@ -142,9 +142,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent { AppId = appId, SchemaId = schemaId };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal($"Name my-schema has id {schemaId.Id}", result);
+            Assert.Equal($"Name my-schema has id {schemaId.Id}", actual);
         }
 
         [Theory]
@@ -158,9 +158,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent { AppId = appId, Timestamp = now };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal($"DateTime: {now:yyyy-MM-dd-hh-mm-ss}", result);
+            Assert.Equal($"DateTime: {now:yyyy-MM-dd-hh-mm-ss}", actual);
         }
 
         [Theory]
@@ -174,9 +174,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent { AppId = appId, Timestamp = now };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal($"Date: {now:yyyy-MM-dd}", result);
+            Assert.Equal($"Date: {now:yyyy-MM-dd}", actual);
         }
 
         [Theory]
@@ -190,9 +190,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedCommentEvent { AppId = appId, MentionedUser = user };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("From me (me@email.com, user123)", result);
+            Assert.Equal("From me (me@email.com, user123)", actual);
         }
 
         [Theory]
@@ -206,9 +206,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("From me (me@email.com, user123)", result);
+            Assert.Equal("From me (me@email.com, user123)", actual);
         }
 
         [Theory]
@@ -222,9 +222,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent { AppId = appId };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("From null (null, null)", result);
+            Assert.Equal("From null (null, null)", actual);
         }
 
         [Theory]
@@ -238,9 +238,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent { AppId = appId, User = new ClientUser(RefToken.Client("android")) };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("From android (client:android, android)", result);
+            Assert.Equal("From android (client:android, android)", actual);
         }
 
         [Theory]
@@ -254,9 +254,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedAssetEvent { AppId = appId, Version = 13 };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Version: 13", result);
+            Assert.Equal("Version: 13", actual);
         }
 
         [Theory]
@@ -270,9 +270,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedAssetEvent { AppId = appId, FileName = "my-file.png" };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("File: my-file.png", result);
+            Assert.Equal("File: my-file.png", actual);
         }
 
         [Theory]
@@ -286,9 +286,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedAssetEvent { AppId = appId, AssetType = AssetType.Audio };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Type: Audio", result);
+            Assert.Equal("Type: Audio", actual);
         }
 
         [Theory]
@@ -303,9 +303,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedAssetEvent { AppId = appId, Id = assetId };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Download at asset-content-url", result);
+            Assert.Equal("Download at asset-content-url", actual);
         }
 
         [Theory]
@@ -320,9 +320,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent { AppId = appId };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Download at null", result);
+            Assert.Equal("Download at null", actual);
         }
 
         [Theory]
@@ -337,9 +337,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedAssetEvent { AppId = appId, Id = assetId, FileName = "File Name" };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Download at asset-content-url", result);
+            Assert.Equal("Download at asset-content-url", actual);
         }
 
         [Theory]
@@ -354,9 +354,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent { AppId = appId };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Download at null", result);
+            Assert.Equal("Download at null", actual);
         }
 
         [Theory]
@@ -371,9 +371,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedAssetEvent { AppId = appId, Id = assetId, FileName = "File Name" };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Download at asset-content-slug-url", result);
+            Assert.Equal("Download at asset-content-slug-url", actual);
         }
 
         [Theory]
@@ -388,9 +388,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent { AppId = appId };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Download at null", result);
+            Assert.Equal("Download at null", actual);
         }
 
         [Theory]
@@ -404,9 +404,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent { AppId = appId, Id = contentId, SchemaId = schemaId };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Go to content-url", result);
+            Assert.Equal("Go to content-url", actual);
         }
 
         [Theory]
@@ -420,9 +420,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedAssetEvent { AppId = appId };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Go to null", result);
+            Assert.Equal("Go to null", actual);
         }
 
         [Theory]
@@ -436,9 +436,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent { AppId = appId, Status = Status.Published };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Published", result);
+            Assert.Equal("Published", actual);
         }
 
         [Theory]
@@ -452,9 +452,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedAssetEvent { AppId = appId };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("null", result);
+            Assert.Equal("null", actual);
         }
 
         [Theory]
@@ -468,9 +468,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent { AppId = appId, Type = EnrichedContentEventType.Created };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Created", result);
+            Assert.Equal("Created", actual);
         }
 
         [Theory]
@@ -484,9 +484,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedAssetEvent { AppId = appId };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("null", result);
+            Assert.Equal("null", actual);
         }
 
         [Theory]
@@ -508,9 +508,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddLocalized("zh-TW", "Berlin"))
             };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Berlin", result);
+            Assert.Equal("Berlin", actual);
         }
 
         [Theory]
@@ -532,9 +532,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddInvariant("Berlin"))
             };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("null", result);
+            Assert.Equal("null", actual);
         }
 
         [Theory]
@@ -556,9 +556,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddInvariant("Berlin"))
             };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("null", result);
+            Assert.Equal("null", actual);
         }
 
         [Theory]
@@ -580,9 +580,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddInvariant(new JsonArray()))
             };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("null", result);
+            Assert.Equal("null", actual);
         }
 
         [Theory]
@@ -604,9 +604,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddInvariant(new JsonObject().Add("name", "Berlin")))
             };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("null", result);
+            Assert.Equal("null", actual);
         }
 
         [Theory]
@@ -628,9 +628,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddInvariant("Berlin"))
             };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Berlin", result);
+            Assert.Equal("Berlin", actual);
         }
 
         [Theory]
@@ -652,9 +652,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddInvariant(JsonValue.Array("Berlin")))
             };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Berlin", result);
+            Assert.Equal("Berlin", actual);
         }
 
         [Theory]
@@ -676,9 +676,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddInvariant(new JsonObject().Add("name", "Berlin")))
             };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Berlin", result);
+            Assert.Equal("Berlin", actual);
         }
 
         [Theory]
@@ -700,9 +700,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddInvariant(new JsonObject().Add("name", "Berlin")))
             };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("{\"name\":\"Berlin\"}", result);
+            Assert.Equal("{\"name\":\"Berlin\"}", actual);
         }
 
         [Theory]
@@ -724,9 +724,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddInvariant(JsonValue.Array(1, 2, 3)))
             };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("[1,2,3]", result?.Replace(" ", string.Empty, StringComparison.Ordinal));
+            Assert.Equal("[1,2,3]", actual?.Replace(" ", string.Empty, StringComparison.Ordinal));
         }
 
         [Theory]
@@ -748,9 +748,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddInvariant(new JsonObject().Add("name", "Berlin")))
             };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("{\"city\":{\"iv\":{\"name\":\"Berlin\"}}}", result);
+            Assert.Equal("{\"city\":{\"iv\":{\"name\":\"Berlin\"}}}", actual);
         }
 
         [Theory]
@@ -764,9 +764,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent { AppId = appId, Actor = RefToken.Client("android") };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("From client:android", result);
+            Assert.Equal("From client:android", actual);
         }
 
         [Theory]
@@ -780,9 +780,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedAssetEvent { AppId = appId, LastModified = Instant.FromUnixTimeSeconds(1590769584) };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("1590769584000", result);
+            Assert.Equal("1590769584000", actual);
         }
 
         [Theory]
@@ -803,9 +803,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddInvariant("2020-06-01T10:10:20Z"))
             };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("1591006220000", result);
+            Assert.Equal("1591006220000", actual);
         }
 
         [Theory]
@@ -819,9 +819,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedAssetEvent { AppId = appId, LastModified = Instant.FromUnixTimeSeconds(1590769584) };
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("1590769584", result);
+            Assert.Equal("1590769584", actual);
         }
 
         [Theory]
@@ -838,9 +838,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck") });
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("DONALD DUCK", result);
+            Assert.Equal("DONALD DUCK", actual);
         }
 
         [Theory]
@@ -857,9 +857,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck") });
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("donald duck", result);
+            Assert.Equal("donald duck", actual);
         }
 
         [Theory]
@@ -876,9 +876,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck  ") });
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Donald Duck", result);
+            Assert.Equal("Donald Duck", actual);
         }
 
         [Theory]
@@ -895,9 +895,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck") });
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("donald-duck", result);
+            Assert.Equal("donald-duck", actual);
         }
 
         [Theory]
@@ -914,9 +914,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck  ") });
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("DONALD DUCK", result);
+            Assert.Equal("DONALD DUCK", actual);
         }
 
         [Theory]
@@ -933,9 +933,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald\"Duck") });
 
-            var result = await sut.FormatAsync(script, @event);
+            var actual = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("Donald\\\"Duck", result);
+            Assert.Equal("Donald\\\"Duck", actual);
         }
     }
 }

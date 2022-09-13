@@ -9,11 +9,10 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Commands;
-using SchemaField = Squidex.Domain.Apps.Entities.Schemas.Commands.UpsertSchemaField;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class CreateSchema : SchemaCommand, IUpsertCommand, IAggregateCommand
+    public sealed class CreateSchema : SchemaCommandBase, IUpsertCommand, IAggregateCommand
     {
         public DomainId SchemaId { get; set; }
 
@@ -25,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         public SchemaType Type { get; set; }
 
-        public SchemaField[]? Fields { get; set; }
+        public UpsertSchemaField[]? Fields { get; set; }
 
         public FieldNames? FieldsInReferences { get; set; }
 
@@ -51,9 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         public Schema BuildSchema()
         {
-            IUpsertCommand self = this;
-
-            return self.ToSchema(Name, Type);
+            return ((IUpsertCommand)this).ToSchema(Name, Type);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Squidex.Web.Pipeline
     public class RequestExceptionMiddlewareTests
     {
         private readonly ILogger<RequestExceptionMiddleware> log = A.Fake<ILogger<RequestExceptionMiddleware>>();
-        private readonly IActionResultExecutor<ObjectResult> resultWriter = A.Fake<IActionResultExecutor<ObjectResult>>();
+        private readonly IActionResultExecutor<ObjectResult> actualWriter = A.Fake<IActionResultExecutor<ObjectResult>>();
         private readonly IHttpResponseFeature responseFeature = A.Fake<IHttpResponseFeature>();
         private readonly HttpContext httpContext = new DefaultHttpContext();
         private readonly RequestDelegate next;
@@ -43,11 +43,11 @@ namespace Squidex.Web.Pipeline
 
             var sut = new RequestExceptionMiddleware(next);
 
-            await sut.InvokeAsync(httpContext, resultWriter, log);
+            await sut.InvokeAsync(httpContext, actualWriter, log);
 
             Assert.False(isNextCalled);
 
-            A.CallTo(() => resultWriter.ExecuteAsync(A<ActionContext>._,
+            A.CallTo(() => actualWriter.ExecuteAsync(A<ActionContext>._,
                     A<ObjectResult>.That.Matches(x => x.StatusCode == 412 && x.Value is ErrorDto)))
                 .MustHaveHappened();
         }
@@ -59,11 +59,11 @@ namespace Squidex.Web.Pipeline
 
             var sut = new RequestExceptionMiddleware(next);
 
-            await sut.InvokeAsync(httpContext, resultWriter, log);
+            await sut.InvokeAsync(httpContext, actualWriter, log);
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => resultWriter.ExecuteAsync(A<ActionContext>._, A<ObjectResult>._))
+            A.CallTo(() => actualWriter.ExecuteAsync(A<ActionContext>._, A<ObjectResult>._))
                 .MustNotHaveHappened();
         }
 
@@ -74,11 +74,11 @@ namespace Squidex.Web.Pipeline
 
             var sut = new RequestExceptionMiddleware(next);
 
-            await sut.InvokeAsync(httpContext, resultWriter, log);
+            await sut.InvokeAsync(httpContext, actualWriter, log);
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => resultWriter.ExecuteAsync(A<ActionContext>._, A<ObjectResult>._))
+            A.CallTo(() => actualWriter.ExecuteAsync(A<ActionContext>._, A<ObjectResult>._))
                 .MustNotHaveHappened();
         }
 
@@ -92,9 +92,9 @@ namespace Squidex.Web.Pipeline
 
             var sut = new RequestExceptionMiddleware(failingNext);
 
-            await sut.InvokeAsync(httpContext, resultWriter, log);
+            await sut.InvokeAsync(httpContext, actualWriter, log);
 
-            A.CallTo(() => resultWriter.ExecuteAsync(A<ActionContext>._,
+            A.CallTo(() => actualWriter.ExecuteAsync(A<ActionContext>._,
                     A<ObjectResult>.That.Matches(x => x.StatusCode == 500 && x.Value is ErrorDto)))
                 .MustHaveHappened();
         }
@@ -111,7 +111,7 @@ namespace Squidex.Web.Pipeline
 
             var sut = new RequestExceptionMiddleware(failingNext);
 
-            await sut.InvokeAsync(httpContext, resultWriter, log);
+            await sut.InvokeAsync(httpContext, actualWriter, log);
 
             A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Error)
                 .MustHaveHappened();
@@ -130,9 +130,9 @@ namespace Squidex.Web.Pipeline
 
             var sut = new RequestExceptionMiddleware(failingNext);
 
-            await sut.InvokeAsync(httpContext, resultWriter, log);
+            await sut.InvokeAsync(httpContext, actualWriter, log);
 
-            A.CallTo(() => resultWriter.ExecuteAsync(A<ActionContext>._, A<ObjectResult>._))
+            A.CallTo(() => actualWriter.ExecuteAsync(A<ActionContext>._, A<ObjectResult>._))
                 .MustNotHaveHappened();
         }
 
@@ -148,9 +148,9 @@ namespace Squidex.Web.Pipeline
 
             var sut = new RequestExceptionMiddleware(failingNext);
 
-            await sut.InvokeAsync(httpContext, resultWriter, log);
+            await sut.InvokeAsync(httpContext, actualWriter, log);
 
-            A.CallTo(() => resultWriter.ExecuteAsync(A<ActionContext>._,
+            A.CallTo(() => actualWriter.ExecuteAsync(A<ActionContext>._,
                     A<ObjectResult>.That.Matches(x => x.StatusCode == 412 && x.Value is ErrorDto)))
                 .MustHaveHappened();
         }
@@ -170,9 +170,9 @@ namespace Squidex.Web.Pipeline
 
             var sut = new RequestExceptionMiddleware(failingNext);
 
-            await sut.InvokeAsync(httpContext, resultWriter, log);
+            await sut.InvokeAsync(httpContext, actualWriter, log);
 
-            A.CallTo(() => resultWriter.ExecuteAsync(A<ActionContext>._, A<ObjectResult>._))
+            A.CallTo(() => actualWriter.ExecuteAsync(A<ActionContext>._, A<ObjectResult>._))
                 .MustNotHaveHappened();
         }
     }

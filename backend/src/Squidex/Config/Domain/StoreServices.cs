@@ -29,12 +29,15 @@ using Squidex.Domain.Apps.Entities.MongoDb.Contents;
 using Squidex.Domain.Apps.Entities.MongoDb.History;
 using Squidex.Domain.Apps.Entities.MongoDb.Rules;
 using Squidex.Domain.Apps.Entities.MongoDb.Schemas;
+using Squidex.Domain.Apps.Entities.MongoDb.Teams;
 using Squidex.Domain.Apps.Entities.MongoDb.Text;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
+using Squidex.Domain.Apps.Entities.Teams.DomainObject;
+using Squidex.Domain.Apps.Entities.Teams.Repositories;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.InMemory;
 using Squidex.Domain.Users.MongoDb;
@@ -136,6 +139,9 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs<MongoAppRepository>()
                         .As<IAppRepository>().As<ISnapshotStore<AppDomainObject.State>>().As<IDeleter>();
+
+                    services.AddSingletonAs<MongoTeamRepository>()
+                        .As<ITeamRepository>().As<ISnapshotStore<TeamDomainObject.State>>();
 
                     services.AddSingletonAs<MongoRuleRepository>()
                         .As<IRuleRepository>().As<ISnapshotStore<RuleDomainObject.State>>().As<IDeleter>();

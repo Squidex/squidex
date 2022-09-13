@@ -388,15 +388,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var query = new GeoQuery(schemaId.Id, field, latitude, longitude, 1000, 1000);
 
-            var result = await Sut.TextIndex.SearchAsync(app, query, target);
+            var actual = await Sut.TextIndex.SearchAsync(app, query, target);
 
             if (expected != null)
             {
-                result.Should().BeEquivalentTo(expected.ToHashSet());
+                actual.Should().BeEquivalentTo(expected.ToHashSet());
             }
             else
             {
-                result.Should().BeEmpty();
+                actual.Should().BeEmpty();
             }
         }
 
@@ -407,15 +407,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 RequiredSchemaIds = new List<DomainId> { schemaId.Id }
             };
 
-            var result = await Sut.TextIndex.SearchAsync(app, query, target);
+            var actual = await Sut.TextIndex.SearchAsync(app, query, target);
 
             if (expected != null)
             {
-                result.Should().BeEquivalentTo(expected.ToHashSet());
+                actual.Should().BeEquivalentTo(expected.ToHashSet());
             }
             else
             {
-                result.Should().BeEmpty();
+                actual.Should().BeEmpty();
             }
         }
     }

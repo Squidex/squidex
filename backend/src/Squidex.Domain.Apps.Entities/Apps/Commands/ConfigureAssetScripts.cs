@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Core.Assets;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class ConfigureAssetScripts : AppUpdateCommand
+    public sealed class ConfigureAssetScripts : AppCommand
     {
         public AssetScripts? Scripts { get; set; }
     }

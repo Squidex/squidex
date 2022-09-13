@@ -39,13 +39,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), "schema2"))
                 });
 
-            var result = await sut.GetPermissionsAsync(app);
+            var actual = await sut.GetPermissionsAsync(app);
 
-            Assert.True(result.Contains("*"));
-            Assert.True(result.Contains("clients.read"));
-            Assert.True(result.Contains("schemas.*.update"));
-            Assert.True(result.Contains("schemas.schema1.update"));
-            Assert.True(result.Contains("schemas.schema2.update"));
+            Assert.True(actual.Contains("*"));
+            Assert.True(actual.Contains("clients.read"));
+            Assert.True(actual.Contains("schemas.*.update"));
+            Assert.True(actual.Contains("schemas.schema1.update"));
+            Assert.True(actual.Contains("schemas.schema2.update"));
         }
     }
 }

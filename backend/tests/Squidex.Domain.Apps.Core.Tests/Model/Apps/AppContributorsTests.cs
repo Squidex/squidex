@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 {
     public class AppContributorsTests
     {
-        private readonly AppContributors contributors_0 = AppContributors.Empty;
+        private readonly Contributors contributors_0 = Contributors.Empty;
 
         [Fact]
         public void Should_assign_new_contributor()

@@ -63,14 +63,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var script = @"
                 getReference(data.references.iv[0], function (references) {
-                    var result1 = `Text: ${references[0].data.field1.iv} ${references[0].data.field2.iv}`;
+                    var actual1 = `Text: ${references[0].data.field1.iv} ${references[0].data.field2.iv}`;
 
-                    complete(`${result1}`);
+                    complete(`${actual1}`);
                 })";
 
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+            var actual = (await sut.ExecuteAsync(vars, script)).ToString();
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         [Fact]
@@ -85,15 +85,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var script = @"
                 getReferences(data.references.iv, function (references) {
-                    var result1 = `Text: ${references[0].data.field1.iv} ${references[0].data.field2.iv}`;
-                    var result2 = `Text: ${references[1].data.field1.iv} ${references[1].data.field2.iv}`;
+                    var actual1 = `Text: ${references[0].data.field1.iv} ${references[0].data.field2.iv}`;
+                    var actual2 = `Text: ${references[1].data.field1.iv} ${references[1].data.field2.iv}`;
 
-                    complete(`${result1}\n${result2}`);
+                    complete(`${actual1}\n${actual2}`);
                 })";
 
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+            var actual = (await sut.ExecuteAsync(vars, script)).ToString();
 
-            Assert.Equal(Cleanup(expected), Cleanup(result));
+            Assert.Equal(Cleanup(expected), Cleanup(actual));
         }
 
         private (ScriptVars, IContentEntity[]) SetupReferenceVars(int count)
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             .AddInvariant(JsonValue.Array(referenceIds)));
 
             A.CallTo(() => contentQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), A<Q>.That.HasIds(referenceIds), A<CancellationToken>._))
+                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.UserPrincipal == user), A<Q>.That.HasIds(referenceIds), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(2, references));
 
             var vars = new ScriptVars

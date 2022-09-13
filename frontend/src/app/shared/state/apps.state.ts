@@ -137,6 +137,14 @@ export class AppsState extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
+    public transfer(app: AppDto, teamId: string | null): Observable<AppDto> {
+        return this.appsService.transferApp(app.name, app, { teamId }, app.version).pipe(
+            tap(updated => {
+                this.replaceApp(updated);
+            }),
+            shareSubscribed(this.dialogs, { silent: true }));
+    }
+
     public updateSettings(settings: AppSettingsDto, request: UpdateAppSettingsDto): Observable<AppSettingsDto> {
         return this.appsService.putSettings(this.appName, settings, request, settings.version).pipe(
             tap(updated => {

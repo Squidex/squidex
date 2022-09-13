@@ -87,7 +87,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// Updates an app client.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the client that must be updated.</param>
+        /// <param name="id">The ID of the client that must be updated.</param>
         /// <param name="request">Client object that needs to be updated.</param>
         /// <returns>
         /// 200 => Client updated.
@@ -115,7 +115,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// Revoke an app client.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the client that must be deleted.</param>
+        /// <param name="id">The ID of the client that must be deleted.</param>
         /// <returns>
         /// 200 => Client deleted.
         /// 404 => Client or app not found.

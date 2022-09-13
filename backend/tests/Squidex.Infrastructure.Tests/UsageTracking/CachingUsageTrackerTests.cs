@@ -88,11 +88,11 @@ namespace Squidex.Infrastructure.UsageTracking
             A.CallTo(() => inner.GetForMonthAsync(key, date, category, ct))
                 .Returns(counters);
 
-            var result1 = await sut.GetForMonthAsync(key, date, category, ct);
-            var result2 = await sut.GetForMonthAsync(key, date, category, ct);
+            var actual1 = await sut.GetForMonthAsync(key, date, category, ct);
+            var actual2 = await sut.GetForMonthAsync(key, date, category, ct);
 
-            Assert.Same(counters, result1);
-            Assert.Same(counters, result2);
+            Assert.Same(counters, actual1);
+            Assert.Same(counters, actual2);
 
             A.CallTo(() => inner.GetForMonthAsync(key, DateTime.Today, category, ct))
                 .MustHaveHappenedOnceExactly();
@@ -109,11 +109,11 @@ namespace Squidex.Infrastructure.UsageTracking
             A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo, category, ct))
                 .Returns(counters);
 
-            var result1 = await sut.GetAsync(key, dateFrom, dateTo, category, ct);
-            var result2 = await sut.GetAsync(key, dateFrom, dateTo, category, ct);
+            var actual1 = await sut.GetAsync(key, dateFrom, dateTo, category, ct);
+            var actual2 = await sut.GetAsync(key, dateFrom, dateTo, category, ct);
 
-            Assert.Same(counters, result1);
-            Assert.Same(counters, result2);
+            Assert.Same(counters, actual1);
+            Assert.Same(counters, actual2);
 
             A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo, category, ct))
                 .MustHaveHappenedOnceExactly();
@@ -125,10 +125,10 @@ namespace Squidex.Infrastructure.UsageTracking
             var dateFrom = date;
             var dateTo = dateFrom.AddDays(10);
 
-            var result1 = await sut.QueryAsync(key, dateFrom, dateTo, ct);
-            var result2 = await sut.QueryAsync(key, dateFrom, dateTo, ct);
+            var actual1 = await sut.QueryAsync(key, dateFrom, dateTo, ct);
+            var actual2 = await sut.QueryAsync(key, dateFrom, dateTo, ct);
 
-            Assert.NotSame(result2, result1);
+            Assert.NotSame(actual2, actual1);
 
             A.CallTo(() => inner.QueryAsync(key, dateFrom, dateTo, ct))
                 .MustHaveHappenedTwiceOrMore();

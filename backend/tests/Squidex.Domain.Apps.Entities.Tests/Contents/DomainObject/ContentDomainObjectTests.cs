@@ -138,9 +138,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             var command = new CreateContent { Data = data };
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
             Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
@@ -161,9 +161,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             var command = new CreateContent { Data = data, Status = Status.Draft };
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
             Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
@@ -184,9 +184,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             var command = new CreateContent { Data = data, Status = Status.Archived };
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
             Assert.Equal(Status.Archived, sut.Snapshot.Status);
@@ -238,9 +238,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             var command = new UpsertContent { Data = data };
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var actual = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
             Assert.Equal(Status.Draft, sut.Snapshot.Status);
@@ -261,9 +261,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             var command = new UpsertContent { Data = data };
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var actual = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
             Assert.Equal(Status.Draft, sut.Snapshot.Status);
@@ -284,9 +284,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             var command = new UpsertContent { Data = data, Status = Status.Archived };
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var actual = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
             Assert.Equal(Status.Archived, sut.Snapshot.Status);
@@ -310,9 +310,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var actual = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(otherData, sut.Snapshot.CurrentVersion.Data);
 
@@ -332,9 +332,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var actual = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(patched, sut.Snapshot.CurrentVersion.Data);
 
@@ -354,9 +354,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var actual = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(otherData, sut.Snapshot.CurrentVersion.Data);
 
@@ -376,9 +376,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var actual = await PublishAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(otherData, sut.Snapshot.CurrentVersion.Data);
             Assert.Equal(Status.Archived, sut.Snapshot.Status);
@@ -434,9 +434,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(otherData, sut.Snapshot.CurrentVersion.Data);
 
@@ -458,9 +458,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             await ExecutePublishAsync();
             await ExecuteCreateDraftAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(otherData, sut.Snapshot.NewVersion?.Data);
 
@@ -480,9 +480,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Single(LastEvents);
 
@@ -507,9 +507,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.NotEqual(data, sut.Snapshot.CurrentVersion.Data);
 
@@ -531,9 +531,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             await ExecutePublishAsync();
             await ExecuteCreateDraftAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(patched, sut.Snapshot.NewVersion?.Data);
 
@@ -553,9 +553,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Single(LastEvents);
 
@@ -570,9 +570,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(Status.Archived, sut.Snapshot.CurrentVersion.Status);
 
@@ -592,9 +592,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(Status.Archived, sut.Snapshot.CurrentVersion.Status);
 
@@ -615,9 +615,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             await ExecuteCreateAsync();
             await ExecutePublishAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
 
@@ -641,9 +641,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             await ExecuteCreateAsync();
             await ExecutePublishAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
             Assert.Equal(otherData, sut.Snapshot.CurrentVersion.Data);
@@ -667,9 +667,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             await ExecutePublishAsync();
             await ExecuteCreateDraftAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(Status.Archived, sut.Snapshot.NewVersion?.Status);
 
@@ -691,9 +691,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             await ExecutePublishAsync();
             await ExecuteCreateDraftAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Null(sut.Snapshot.NewVersion?.Status);
 
@@ -715,9 +715,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
             Assert.Equal(Status.Published, sut.Snapshot.ScheduleJob?.Status);
@@ -746,9 +746,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>._, Status.Draft, Status.Archived, User))
                 .Returns(true);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Null(sut.Snapshot.ScheduleJob);
 
@@ -774,9 +774,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>._, Status.Draft, Status.Published, User))
                 .Returns(false);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Null(sut.Snapshot.ScheduleJob);
 
@@ -825,9 +825,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             await ExecuteCreateAsync();
             await ExecuteChangeStatusAsync(Status.Published, SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(1)));
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Null(sut.Snapshot.ScheduleJob);
 
@@ -856,9 +856,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = new DeleteContent();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(None.Value);
+            actual.ShouldBeEquivalent(None.Value);
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -878,9 +878,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var command = new DeleteContent { Permanent = true };
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(None.Value);
+            actual.ShouldBeEquivalent(None.Value);
 
             Assert.Equal(EtagVersion.Empty, sut.Snapshot.Version);
             Assert.Empty(LastEvents);
@@ -923,9 +923,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             await ExecuteCreateAsync();
             await ExecutePublishAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(Status.Draft, sut.Snapshot.NewVersion?.Status);
 
@@ -944,9 +944,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             await ExecutePublishAsync();
             await ExecuteCreateDraftAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Null(sut.Snapshot.NewVersion);
 
@@ -1028,9 +1028,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task<object> PublishAsync(ContentCommand command)
         {
-            var result = await sut.ExecuteAsync(CreateContentCommand(command), default);
+            var actual = await sut.ExecuteAsync(CreateContentCommand(command), default);
 
-            return result.Payload;
+            return actual.Payload;
         }
     }
 }

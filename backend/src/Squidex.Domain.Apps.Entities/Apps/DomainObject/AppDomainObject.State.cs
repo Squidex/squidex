@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Text.Json.Serialization;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
@@ -29,17 +30,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             public string Description { get; set; }
 
+            public DomainId? TeamId { get; set; }
+
+            public Contributors Contributors { get; set; } = Contributors.Empty;
+
             public Roles Roles { get; set; } = Roles.Empty;
 
-            public AppImage? Image { get; set; }
-
-            public AppPlan? Plan { get; set; }
+            public AssignedPlan? Plan { get; set; }
 
             public AppClients Clients { get; set; } = AppClients.Empty;
 
-            public AppSettings Settings { get; set; } = AppSettings.Empty;
+            public AppImage? Image { get; set; }
 
-            public AppContributors Contributors { get; set; } = AppContributors.Empty;
+            public AppSettings Settings { get; set; } = AppSettings.Empty;
 
             public AssetScripts AssetScripts { get; set; } = new AssetScripts();
 
@@ -64,25 +67,29 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                             Id = e.AppId.Id;
 
                             SimpleMapper.Map(e, this);
-
                             return true;
                         }
 
                     case AppUpdated e when Is.Change(Label, e.Label) || Is.Change(Description, e.Description):
                         {
                             SimpleMapper.Map(e, this);
+                            return true;
+                        }
 
+                    case AppTransfered e when Is.Change(TeamId, e.TeamId):
+                        {
+                            SimpleMapper.Map(e, this);
                             return true;
                         }
 
                     case AppSettingsUpdated e when Is.Change(Settings, e.Settings):
                         return UpdateSettings(e.Settings);
 
-                    case AppPlanChanged e when Is.Change(Plan?.PlanId, e.PlanId):
-                        return UpdatePlan(e.ToPlan());
-
                     case AppAssetsScriptsConfigured e when Is.Change(e.Scripts, AssetScripts):
                         return UpdateAssetScripts(e.Scripts);
+
+                    case AppPlanChanged e when Is.Change(Plan?.PlanId, e.PlanId):
+                        return UpdatePlan(e.ToPlan());
 
                     case AppPlanReset e when Plan != null:
                         return UpdatePlan(null);
@@ -150,7 +157,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                             Plan = null;
 
                             IsDeleted = true;
-
                             return true;
                         }
                 }
@@ -158,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 return false;
             }
 
-            private bool UpdateContributors<T>(T @event, Func<T, AppContributors, AppContributors> update)
+            private bool UpdateContributors<T>(T @event, Func<T, Contributors, Contributors> update)
             {
                 var previous = Contributors;
 
@@ -224,7 +230,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 return true;
             }
 
-            private bool UpdatePlan(AppPlan? plan)
+            private bool UpdatePlan(AssignedPlan? plan)
             {
                 Plan = plan;
 

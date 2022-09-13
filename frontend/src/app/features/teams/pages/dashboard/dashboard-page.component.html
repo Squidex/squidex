@@ -1,0 +1,67 @@
+<sqx-title message="i18n:dashboard.pageTitle"></sqx-title>
+
+<ng-container *ngIf="selectedTeam | async; let team">
+    <div class="dashboard" @fade>
+        <div class="dashboard-summary" *ngIf="!isScrolled" @fade>
+            <h1 class="dashboard-title">{{ 'dashboard.welcomeTitle' | sqxTranslate: { user: user } }}</h1>
+
+            <div class="subtext" [innerHTML]="'dashboard.welcomeTextTeam' | sqxTranslate: { team: team.name } | sqxMarkdown | sqxSafeHtml"></div>
+        </div>
+
+        <gridster [options]="gridOptions" #grid>
+            <gridster-item [item]="item" *ngFor="let item of gridConfig">
+                <ng-container [ngSwitch]="item.type">
+                    <ng-container *ngSwitchCase="'apps'">
+                        <sqx-apps-card [team]="team"></sqx-apps-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'api-calls'">
+                        <sqx-api-calls-card [usage]="callsUsage"></sqx-api-calls-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'api-traffic-summary'">                
+                        <sqx-api-traffic-summary-card [usage]="callsUsage"></sqx-api-traffic-summary-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'api-calls-summary'">
+                        <sqx-api-calls-summary-card [usage]="callsUsage"></sqx-api-calls-summary-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'asset-uploads-count'">
+                        <sqx-asset-uploads-count-card [usage]="storageUsage"></sqx-asset-uploads-count-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'asset-uploads-size-summary'">
+                        <sqx-asset-uploads-size-summary-card [usage]="storageCurrent"></sqx-asset-uploads-size-summary-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'asset-uploads-size'">
+                        <sqx-asset-uploads-size-card [usage]="storageUsage"></sqx-asset-uploads-size-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'api-traffic'">                
+                        <sqx-api-traffic-card 
+                            [usage]="callsUsage"
+                            [isStacked]="isStacked"
+                            (isStackedChange)="changeIsStacked($event)">
+                        </sqx-api-traffic-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'api-performance'">
+                        <sqx-api-performance-card
+                            [usage]="callsUsage"
+                            [isStacked]="isStacked"
+                            (isStackedChange)="changeIsStacked($event)">
+                        </sqx-api-performance-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'random-dog'">
+                        <sqx-random-dog-card></sqx-random-dog-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'random-cat'">
+                        <sqx-random-cat-card></sqx-random-cat-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'support'">
+                        <sqx-support-card></sqx-support-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'iframe'">
+                        <sqx-iframe-card [options]="item"></sqx-iframe-card>
+                    </ng-container>
+                </ng-container>
+            </gridster-item>
+
+            <div [style.height]="extendedHeight" [style.width]="'0px'"></div>
+        </gridster>
+    </div>
+</ng-container>

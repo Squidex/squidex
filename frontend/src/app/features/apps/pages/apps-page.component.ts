@@ -8,7 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, take } from 'rxjs/operators';
-import { AppDto, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, NewsService, OnboardingService, TemplateDto, TemplatesState, UIOptions, UIState } from '@app/shared';
+import { AppDto, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, NewsService, OnboardingService, TeamDto, TeamsState, TemplateDto, TemplatesState, UIOptions, UIState } from '@app/shared';
 import { Settings } from '@app/shared/state/settings';
 
 @Component({
@@ -35,6 +35,7 @@ export class AppsPageComponent implements OnInit {
         public readonly appsState: AppsState,
         public readonly authState: AuthService,
         public readonly uiState: UIState,
+        public readonly teamsState: TeamsState,
         private readonly localStore: LocalStoreService,
         private readonly newsService: NewsService,
         private readonly onboardingService: OnboardingService,
@@ -79,11 +80,19 @@ export class AppsPageComponent implements OnInit {
         this.addAppDialog.show();
     }
 
-    public leave(app: AppDto) {
+    public leaveApp(app: AppDto) {
         this.appsState.leave(app);
+    }
+
+    public leaveTeam(team: TeamDto) {
+        this.teamsState.leave(team);
     }
 
     public trackByApp(_index: number, app: AppDto) {
         return app.id;
+    }
+
+    public trackByTeam(_index: number, team: TeamDto) {
+        return team.id;
     }
 }

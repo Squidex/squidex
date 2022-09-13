@@ -43,9 +43,9 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         {
             var command = new CreateComment { Text = "text1", Url = new Uri("http://uri") };
 
-            var result = await sut.ExecuteAsync(CreateCommentsCommand(command), default);
+            var actual = await sut.ExecuteAsync(CreateCommentsCommand(command), default);
 
-            result.ShouldBeEquivalent(CommandResult.Empty(commentsId, 0, EtagVersion.Empty));
+            actual.ShouldBeEquivalent(CommandResult.Empty(commentsId, 0, EtagVersion.Empty));
 
             sut.GetComments(0).Should().BeEquivalentTo(new CommentsResult
             {
@@ -74,9 +74,9 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var updateCommand = new UpdateComment { Text = "text2" };
 
-            var result = await sut.ExecuteAsync(CreateCommentsCommand(updateCommand), default);
+            var actual = await sut.ExecuteAsync(CreateCommentsCommand(updateCommand), default);
 
-            result.ShouldBeEquivalent(CommandResult.Empty(commentsId, 1, 0));
+            actual.ShouldBeEquivalent(CommandResult.Empty(commentsId, 1, 0));
 
             sut.GetComments(-1).Should().BeEquivalentTo(new CommentsResult
             {
@@ -110,9 +110,9 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             var deleteCommand = new DeleteComment();
 
-            var result = await sut.ExecuteAsync(CreateCommentsCommand(deleteCommand), default);
+            var actual = await sut.ExecuteAsync(CreateCommentsCommand(deleteCommand), default);
 
-            result.ShouldBeEquivalent(CommandResult.Empty(commentsId, 2, 1));
+            actual.ShouldBeEquivalent(CommandResult.Empty(commentsId, 2, 1));
 
             sut.GetComments(-1).Should().BeEquivalentTo(new CommentsResult
             {
@@ -162,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             return @event;
         }
 
-        private T CreateCommentsCommand<T>(T command) where T : CommentsCommand
+        private T CreateCommentsCommand<T>(T command) where T : CommentCommand
         {
             command.Actor = actor;
             command.CommentsId = commentsId;

@@ -51,16 +51,44 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public async Task<IActionResult> GetApps()
         {
-            var userOrClientId = HttpContext.User.UserOrClientId()!;
+            var userOrClientId = UserOrClientId!;
             var userPermissions = Resources.Context.UserPermissions;
 
             var apps = await appProvider.GetUserAppsAsync(userOrClientId, userPermissions, HttpContext.RequestAborted);
 
             var response = Deferred.Response(() =>
             {
-                var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
+                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromDomain(a, userOrClientId, IsFrontend, Resources)).ToArray();
+            });
 
-                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromDomain(a, userOrClientId, isFrontend, Resources)).ToArray();
+            Response.Headers[HeaderNames.ETag] = apps.ToEtag();
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get team apps.
+        /// </summary>
+        /// <param name="team">The ID of the team.</param>
+        /// <returns>
+        /// 200 => Apps returned.
+        /// </returns>
+        /// <remarks>
+        /// You can only retrieve the list of apps when you are authenticated as a user (OpenID implicit flow).
+        /// You will retrieve all apps, where you are assigned as a contributor.
+        /// </remarks>
+        [HttpGet]
+        [Route("teams/{team}/apps")]
+        [ProducesResponseType(typeof(AppDto[]), StatusCodes.Status200OK)]
+        [ApiPermission]
+        [ApiCosts(0)]
+        public async Task<IActionResult> GetTeamApps(string team)
+        {
+            var apps = await appProvider.GetTeamAppsAsync(Team.Id, HttpContext.RequestAborted);
+
+            var response = Deferred.Response(() =>
+            {
+                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromDomain(a, UserOrClientId, IsFrontend, Resources)).ToArray();
             });
 
             Response.Headers[HeaderNames.ETag] = apps.ToEtag();
@@ -85,11 +113,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var response = Deferred.Response(() =>
             {
-                var userOrClientId = HttpContext.User.UserOrClientId()!;
-
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
-                return AppDto.FromDomain(App, userOrClientId, isFrontend, Resources);
+                return AppDto.FromDomain(App, UserOrClientId, IsFrontend, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
@@ -138,6 +164,28 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiPermissionOrAnonymous(PermissionIds.AppUpdate)]
         [ApiCosts(0)]
         public async Task<IActionResult> PutApp(string app, [FromBody] UpdateAppDto request)
+        {
+            var response = await InvokeCommandAsync(request.ToCommand());
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Transfer the app.
+        /// </summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <param name="request">The team information.</param>
+        /// <returns>
+        /// 200 => App transferred.
+        /// 400 => App request not valid.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/team")]
+        [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppTransfer)]
+        [ApiCosts(0)]
+        public async Task<IActionResult> PutAppTeam(string app, [FromBody] TransferToTeamDto request)
         {
             var response = await InvokeCommandAsync(request.ToCommand());
 
@@ -211,11 +259,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             return InvokeCommandAsync(command, x =>
             {
-                var userOrClientId = HttpContext.User.UserOrClientId()!;
-
-                var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
-
-                return AppDto.FromDomain(x, userOrClientId, isFrontend, Resources);
+                return AppDto.FromDomain(x, UserOrClientId, IsFrontend, Resources);
             });
         }
 

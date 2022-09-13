@@ -77,7 +77,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                             TotalSize += e.FileSize;
 
                             EnsureProperties();
-
                             return true;
                         }
 
@@ -88,7 +87,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                             TotalSize += e.FileSize;
 
                             EnsureProperties();
-
                             return true;
                         }
 
@@ -132,7 +130,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                             }
 
                             EnsureProperties();
-
                             return hasChanged;
                         }
 
@@ -141,14 +138,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                             ParentId = e.ParentId;
 
                             EnsureProperties();
-
                             return true;
                         }
 
                     case AssetDeleted:
                         {
                             IsDeleted = true;
-
                             return true;
                         }
                 }

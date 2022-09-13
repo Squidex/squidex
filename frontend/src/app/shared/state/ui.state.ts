@@ -12,7 +12,7 @@ import { UIService } from './../services/ui.service';
 import { UsersService } from './../services/users.service';
 import { AppsState } from './apps.state';
 
-type Settings = { canCreateApps?: boolean; [key: string]: any };
+type Settings = { canCreateApps?: boolean; canCreateTeams?: boolean; [key: string]: any };
 
 interface Snapshot {
     // All common settings.

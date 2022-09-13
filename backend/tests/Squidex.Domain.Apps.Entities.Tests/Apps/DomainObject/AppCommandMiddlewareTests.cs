@@ -46,13 +46,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         }
 
         [Fact]
-        public async Task Should_replace_context_app_with_domain_object_result()
+        public async Task Should_replace_context_app_with_domain_object_actual()
         {
-            var result = A.Fake<IAppEntity>();
+            var actual = A.Fake<IAppEntity>();
 
-            await HandleAsync(new UpdateApp(), result);
+            await HandleAsync(new UpdateApp(), actual);
 
-            Assert.Same(result, requestContext.App);
+            Assert.Same(actual, requestContext.App);
         }
 
         [Fact]
@@ -82,14 +82,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             await Assert.ThrowsAsync<ValidationException>(() => HandleAsync(sut, command));
         }
 
-        private Task<CommandContext> HandleAsync(AppUpdateCommand command, object result)
+        private Task<CommandContext> HandleAsync(AppCommand command, object actual)
         {
             command.AppId = appId;
 
             var domainObject = A.Fake<AppDomainObject>();
 
             A.CallTo(() => domainObject.ExecuteAsync(A<IAggregateCommand>._, A<CancellationToken>._))
-                .Returns(new CommandResult(command.AggregateId, 1, 0, result));
+                .Returns(new CommandResult(command.AggregateId, 1, 0, actual));
 
             A.CallTo(() => domainObjectFactory.Create<AppDomainObject>(command.AggregateId))
                 .Returns(domainObject);

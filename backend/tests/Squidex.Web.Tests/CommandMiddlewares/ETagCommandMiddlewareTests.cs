@@ -71,11 +71,11 @@ namespace Squidex.Web.CommandMiddlewares
         }
 
         [Fact]
-        public async Task Should_add_version_from_result_as_etag_to_response()
+        public async Task Should_add_version_from_actual_as_etag_to_response()
         {
-            var result = CommandResult.Empty(DomainId.Empty, 17, 16);
+            var actual = CommandResult.Empty(DomainId.Empty, 17, 16);
 
-            await HandleAsync(new CreateContent(), result);
+            await HandleAsync(new CreateContent(), actual);
 
             Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext!.Response.Headers[HeaderNames.ETag]);
         }
@@ -83,16 +83,16 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_add_version_from_entity_as_etag_to_response()
         {
-            var result = new ContentEntity { Version = 17 };
+            var actual = new ContentEntity { Version = 17 };
 
-            await HandleAsync(new CreateContent(), result);
+            await HandleAsync(new CreateContent(), actual);
 
             Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext!.Response.Headers[HeaderNames.ETag]);
         }
 
-        private async Task<CommandContext> HandleAsync(ICommand command, object result)
+        private async Task<CommandContext> HandleAsync(ICommand command, object actual)
         {
-            var commandContext = new CommandContext(command, A.Fake<ICommandBus>()).Complete(result);
+            var commandContext = new CommandContext(command, A.Fake<ICommandBus>()).Complete(actual);
 
             await sut.HandleAsync(commandContext, default);
 

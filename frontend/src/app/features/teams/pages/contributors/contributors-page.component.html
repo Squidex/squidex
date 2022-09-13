@@ -1,0 +1,61 @@
+<sqx-title message="i18n:common.contributors"></sqx-title>
+
+<sqx-layout layout="main" titleText="i18n:common.contributors" titleIcon="contributors" [innerWidth]="55">
+    <ng-container menu>
+        <div class="d-flex justify-content-end">
+            <sqx-notifo topic="apps/{{contributorsState.teamId}}/settings/contributors"></sqx-notifo>
+
+            <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:contributors.refreshTooltip" shortcut="CTRL + B">
+                <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+            </button>
+
+            <div class="form-inline">
+                <input class="form-control" placeholder="{{ 'contributors.search' | sqxTranslate }}" 
+                    [ngModel]="contributorsState.query | async" 
+                    (ngModelChange)="search($event)"
+                    shortcut="CTRL + I"
+                    shortcutAction="focus">
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container>
+        <sqx-list-view innerWidth="55rem" [isLoading]="contributorsState.isLoading | async">
+            <ng-container>
+                <ng-container *ngIf="contributorsState.canCreate | async">
+                    <sqx-contributor-add-form></sqx-contributor-add-form>
+                </ng-container>
+
+                <ng-container *ngIf="(contributorsState.isLoaded | async) && (contributorsState.contributorsFiltered | async); let contributors">       
+                    <div class="table-items-row  table-items-row-summary table-items-row-empty" *ngIf="contributors.length === 0">
+                        {{ 'contributors.empty' | sqxTranslate }}
+                    </div>
+
+                    <table class="table table-items table-fixed">
+                        <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor" [sqxContributor]="contributor" 
+                            [search]="contributorsState.queryRegex | async">
+                        </tbody>
+                    </table>
+                </ng-container>
+            </ng-container>
+
+            <ng-container footer>
+                <sqx-pager [paging]="contributorsState.paging | async" (pagingChange)="contributorsState.page($event)"></sqx-pager>
+            </ng-container>
+        </sqx-list-view>
+    </ng-container>
+
+    <ng-container sidebarMenu>
+        <div class="panel-nav">
+            <a class="panel-link" routerLink="history" routerLinkActive="active" queryParamsHandling="preserve" queryParamsHandling="preserve" title="i18n:common.history" titlePosition="left-center">
+                <i class="icon-time"></i>
+            </a>
+
+            <a class="panel-link" routerLink="help" routerLinkActive="active" queryParamsHandling="preserve" queryParamsHandling="preserve" title="i18n:common.help" titlePosition="left-center">
+                <i class="icon-help2"></i>
+            </a>
+        </div>
+    </ng-container>
+</sqx-layout>
+
+<router-outlet></router-outlet>

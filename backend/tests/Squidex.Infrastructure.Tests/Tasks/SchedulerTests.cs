@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.Tasks
 {
     public class SchedulerTests
     {
-        private readonly ConcurrentBag<int> results = new ConcurrentBag<int>();
+        private readonly ConcurrentBag<int> actuals = new ConcurrentBag<int>();
         private readonly Scheduler sut = new Scheduler();
 
         [Fact]
@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.Tasks
 
             await sut.CompleteAsync();
 
-            Assert.Equal(new[] { 1 }, results.ToArray());
+            Assert.Equal(new[] { 1 }, actuals.ToArray());
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure.Tasks
 
             await limited.CompleteAsync();
 
-            Assert.Equal(Enumerable.Range(1, 10).ToArray(), results.OrderBy(x => x).ToArray());
+            Assert.Equal(Enumerable.Range(1, 10).ToArray(), actuals.OrderBy(x => x).ToArray());
         }
 
         [Fact]
@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure.Tasks
 
             await sut.CompleteAsync();
 
-            Assert.Equal(new[] { 1, 2 }, results.OrderBy(x => x).ToArray());
+            Assert.Equal(new[] { 1, 2 }, actuals.OrderBy(x => x).ToArray());
         }
 
         [Fact]
@@ -58,13 +58,13 @@ namespace Squidex.Infrastructure.Tasks
             {
                 await Task.Delay(1);
 
-                results.Add(1);
+                actuals.Add(1);
 
                 sut.Schedule(async _ =>
                 {
                     await Task.Delay(1);
 
-                    results.Add(2);
+                    actuals.Add(2);
 
                     Schedule(3);
                 });
@@ -72,7 +72,7 @@ namespace Squidex.Infrastructure.Tasks
 
             await sut.CompleteAsync();
 
-            Assert.Equal(new[] { 1, 2, 3 }, results.OrderBy(x => x).ToArray());
+            Assert.Equal(new[] { 1, 2, 3 }, actuals.OrderBy(x => x).ToArray());
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace Squidex.Infrastructure.Tasks
 
             await Task.Delay(50);
 
-            Assert.Equal(new[] { 1 }, results.OrderBy(x => x).ToArray());
+            Assert.Equal(new[] { 1 }, actuals.OrderBy(x => x).ToArray());
         }
 
         private void Schedule(int value)
@@ -95,7 +95,7 @@ namespace Squidex.Infrastructure.Tasks
             {
                 await Task.Delay(1);
 
-                results.Add(value);
+                actuals.Add(value);
             });
         }
 
@@ -105,7 +105,7 @@ namespace Squidex.Infrastructure.Tasks
             {
                 await Task.Delay(1);
 
-                results.Add(value);
+                actuals.Add(value);
             });
         }
     }

@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
@@ -18,6 +19,12 @@ namespace Squidex.Domain.Apps.Entities
         Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
             CancellationToken ct = default);
 
+        Task<ITeamEntity?> GetTeamAsync(DomainId teamId,
+            CancellationToken ct = default);
+
+        Task<List<ITeamEntity>> GetUserTeamsAsync(string userId,
+            CancellationToken ct = default);
+
         Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
             CancellationToken ct = default);
 
@@ -25,6 +32,9 @@ namespace Squidex.Domain.Apps.Entities
             CancellationToken ct = default);
 
         Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions,
+            CancellationToken ct = default);
+
+        Task<List<IAppEntity>> GetTeamAppsAsync(DomainId teamId,
             CancellationToken ct = default);
 
         Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache = false,

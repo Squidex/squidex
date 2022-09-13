@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Comments.Commands
 {
-    public abstract class CommentTextCommand : CommentsCommand
+    public abstract class CommentTextCommand : CommentCommand
     {
         public string Text { get; set; }
 

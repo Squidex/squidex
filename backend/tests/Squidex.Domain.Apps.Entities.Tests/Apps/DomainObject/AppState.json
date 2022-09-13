@@ -2,6 +2,9 @@
     "name": "test",
     "label": "label",
     "description": "description",
+    "contributors": {
+        "62cee33bcc71c0d140ad103a": "Owner"
+    },
     "roles": {
         "custom": {
             "permissions": [
@@ -46,9 +49,6 @@
         ],
         "hideScheduler": false,
         "hideDateTimeModeButton": false
-    },
-    "contributors": {
-        "62cee33bcc71c0d140ad103a": "Owner"
     },
     "assetScripts": {
 

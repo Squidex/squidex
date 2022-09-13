@@ -8,18 +8,18 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 
 namespace Squidex.Web.Pipeline
 {
     public sealed class ApiCostsFilter : IAsyncActionFilter, IFilterContainer
     {
-        private readonly UsageGate usageGate;
+        private readonly IAppUsageGate appUsageGate;
 
-        public ApiCostsFilter(UsageGate usageGate)
+        public ApiCostsFilter(IAppUsageGate appUsageGate)
         {
-            this.usageGate = usageGate;
+            this.appUsageGate = appUsageGate;
         }
 
         IFilterMetadata IFilterContainer.FilterDefinition { get; set; }
@@ -50,7 +50,7 @@ namespace Squidex.Web.Pipeline
                     {
                         var (_, clientId) = context.HttpContext.User.GetClient();
 
-                        var isBlocked = await usageGate.IsBlockedAsync(app, clientId, DateTime.Today, context.HttpContext.RequestAborted);
+                        var isBlocked = await appUsageGate.IsBlockedAsync(app, clientId, DateTime.Today, context.HttpContext.RequestAborted);
 
                         if (isBlocked)
                         {

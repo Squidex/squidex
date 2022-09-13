@@ -178,9 +178,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 ContributorId = "found"
             });
 
-            var result = await sut.RestoreEventAsync(@event, context, ct);
+            var actual = await sut.RestoreEventAsync(@event, context, ct);
 
-            Assert.True(result);
+            Assert.True(actual);
             Assert.Equal("found_mapped", @event.Payload.ContributorId);
         }
 
@@ -194,9 +194,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 ContributorId = "unknown"
             });
 
-            var result = await sut.RestoreEventAsync(@event, context, ct);
+            var actual = await sut.RestoreEventAsync(@event, context, ct);
 
-            Assert.False(result);
+            Assert.False(actual);
             Assert.Equal("unknown", @event.Payload.ContributorId);
         }
 
@@ -210,9 +210,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 ContributorId = "found"
             });
 
-            var result = await sut.RestoreEventAsync(@event, context, ct);
+            var actual = await sut.RestoreEventAsync(@event, context, ct);
 
-            Assert.True(result);
+            Assert.True(actual);
             Assert.Equal("found_mapped", @event.Payload.ContributorId);
         }
 
@@ -226,9 +226,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 ContributorId = "unknown"
             });
 
-            var result = await sut.RestoreEventAsync(@event, context, ct);
+            var actual = await sut.RestoreEventAsync(@event, context, ct);
 
-            Assert.False(result);
+            Assert.False(actual);
             Assert.Equal("unknown", @event.Payload.ContributorId);
         }
 

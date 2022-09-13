@@ -97,9 +97,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 x => x
             ";
 
-            var result = await sut.TransformAsync(vars, script, contentOptions);
+            var actual = await sut.TransformAsync(vars, script, contentOptions);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -138,9 +138,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 replace(data);
             ";
 
-            var result = await sut.TransformAsync(vars, script, contentOptions);
+            var actual = await sut.TransformAsync(vars, script, contentOptions);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -180,9 +180,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 var x = 0;
             ";
 
-            var result = await sut.TransformAsync(vars, script, contentOptions);
+            var actual = await sut.TransformAsync(vars, script, contentOptions);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -196,14 +196,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             const string script = @"
                 var x = 0;
 
-                getJSON('http://mockup.squidex.io', function(result) {
+                getJSON('http://mockup.squidex.io', function(actual) {
                     complete();
                 });                    
             ";
 
-            var result = await sut.TransformAsync(vars, script, contentOptions);
+            var actual = await sut.TransformAsync(vars, script, contentOptions);
 
-            Assert.Empty(result);
+            Assert.Empty(actual);
         }
 
         [Fact]
@@ -232,9 +232,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 replace(data);
             ";
 
-            var result = await sut.TransformAsync(vars, script, contentOptions);
+            var actual = await sut.TransformAsync(vars, script, contentOptions);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -258,17 +258,17 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             const string script = @"
                 var data = ctx.data;
 
-                getJSON('http://mockup.squidex.io', function(result) {
-                    data.operation = { iv: result.key };
+                getJSON('http://mockup.squidex.io', function(actual) {
+                    data.operation = { iv: actual.key };
 
                     replace(data);
                 });        
 
             ";
 
-            var result = await sut.TransformAsync(vars, script, contentOptions);
+            var actual = await sut.TransformAsync(vars, script, contentOptions);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -284,17 +284,17 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             const string script = @"
                 var data = ctx.data;
 
-                getJSON('http://mockup.squidex.io', function(result) {
-                    data.operation = { iv: result.key };
+                getJSON('http://mockup.squidex.io', function(actual) {
+                    data.operation = { iv: actual.key };
 
                     replace(data);
                 });        
 
             ";
 
-            var result = await sut.TransformAsync(vars, script, contentOptions);
+            var actual = await sut.TransformAsync(vars, script, contentOptions);
 
-            Assert.NotEmpty(result);
+            Assert.NotEmpty(actual);
         }
 
         [Fact]
@@ -310,8 +310,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             const string script = @"
                 var data = ctx.data;
 
-                getJSON('http://cloud.squidex.io/healthz', function(result) {
-                    data.operation = { iv: result.key };
+                getJSON('http://cloud.squidex.io/healthz', function(actual) {
+                    data.operation = { iv: actual.key };
                 });
             ";
 
@@ -354,9 +354,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 replace(data);
             ";
 
-            var result = await sut.TransformAsync(vars, script, contentOptions);
+            var actual = await sut.TransformAsync(vars, script, contentOptions);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -398,9 +398,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 replace(ctx.data);
             ";
 
-            var result = await sut.TransformAsync(vars, script, contentOptions);
+            var actual = await sut.TransformAsync(vars, script, contentOptions);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -415,9 +415,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 value.i == 2
             ";
 
-            var result = ((IScriptEngine)sut).Evaluate(vars, script);
+            var actual = ((IScriptEngine)sut).Evaluate(vars, script);
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -432,9 +432,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 value.status == 'Published'
             ";
 
-            var result = ((IScriptEngine)sut).Evaluate(vars, script);
+            var actual = ((IScriptEngine)sut).Evaluate(vars, script);
 
-            Assert.True(result);
+            Assert.True(actual);
         }
 
         [Fact]
@@ -449,9 +449,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 value.i == 3
             ";
 
-            var result = ((IScriptEngine)sut).Evaluate(vars, script);
+            var actual = ((IScriptEngine)sut).Evaluate(vars, script);
 
-            Assert.False(result);
+            Assert.False(actual);
         }
 
         [Fact]
@@ -466,9 +466,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 function();
             ";
 
-            var result = ((IScriptEngine)sut).Evaluate(vars, script);
+            var actual = ((IScriptEngine)sut).Evaluate(vars, script);
 
-            Assert.False(result);
+            Assert.False(actual);
         }
 
         [Fact]
@@ -485,9 +485,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return value;
             ";
 
-            var result = sut.Execute(vars, script);
+            var actual = sut.Execute(vars, script);
 
-            Assert.Equal(id.ToString(), result.ToString());
+            Assert.Equal(id.ToString(), actual.ToString());
         }
 
         [Fact]
@@ -508,9 +508,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             sut.Execute(vars, script1, new ScriptOptions { AsContext = true });
 
-            var result = sut.Execute(vars, script2, new ScriptOptions { AsContext = true });
+            var actual = sut.Execute(vars, script2, new ScriptOptions { AsContext = true });
 
-            Assert.Equal(JsonValue.Create(28), result);
+            Assert.Equal(JsonValue.Create(28), actual);
         }
 
         [Fact]
@@ -531,9 +531,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             sut.Execute(vars, script1, new ScriptOptions { AsContext = true });
 
-            var result = sut.Execute(vars, script2, new ScriptOptions { AsContext = true });
+            var actual = sut.Execute(vars, script2, new ScriptOptions { AsContext = true });
 
-            Assert.Equal(JsonValue.Create(28), result);
+            Assert.Equal(JsonValue.Create(28), actual);
         }
 
         [Fact]
@@ -570,9 +570,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 }
             }
 
-            var result = await sut.TransformAsync(vars2, script2, new ScriptOptions { AsContext = true });
+            var actual = await sut.TransformAsync(vars2, script2, new ScriptOptions { AsContext = true });
 
-            Assert.Equal(JsonValue.Create(28), result["test"]!["iv"]);
+            Assert.Equal(JsonValue.Create(28), actual["test"]!["iv"]);
         }
     }
 }

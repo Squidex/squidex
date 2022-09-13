@@ -97,9 +97,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             var command = new CreateAsset { File = file, FileHash = "NewHash" };
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(0, sut.Snapshot.FileVersion);
             Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
@@ -150,9 +150,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             var command = new UpsertAsset { File = file, FileHash = "NewHash" };
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(0, sut.Snapshot.FileVersion);
             Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
@@ -183,9 +183,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(1, sut.Snapshot.FileVersion);
             Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
@@ -213,9 +213,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(1, sut.Snapshot.FileVersion);
             Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
@@ -243,9 +243,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.FileName, sut.Snapshot.FileName);
 
@@ -265,9 +265,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.Slug, sut.Snapshot.Slug);
 
@@ -287,9 +287,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.IsProtected, sut.Snapshot.IsProtected);
 
@@ -309,9 +309,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.Metadata, sut.Snapshot.Metadata);
 
@@ -331,9 +331,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -351,9 +351,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            var result = await PublishIdempotentAsync(command);
+            var actual = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(sut.Snapshot);
+            actual.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(parentId, sut.Snapshot.ParentId);
 
@@ -374,9 +374,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             await ExecuteCreateAsync();
             await ExecuteUpdateAsync();
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(None.Value);
+            actual.ShouldBeEquivalent(None.Value);
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -399,9 +399,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All, A<CancellationToken>._))
                 .Returns(false);
 
-            var result = await PublishAsync(command);
+            var actual = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(None.Value);
+            actual.ShouldBeEquivalent(None.Value);
 
             Assert.Equal(EtagVersion.Empty, sut.Snapshot.Version);
             Assert.Empty(LastEvents);
@@ -483,9 +483,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private async Task<object> PublishAsync(AssetCommand command)
         {
-            var result = await sut.ExecuteAsync(CreateAssetCommand(command), default);
+            var actual = await sut.ExecuteAsync(CreateAssetCommand(command), default);
 
-            return result.Payload;
+            return actual.Payload;
         }
     }
 }
