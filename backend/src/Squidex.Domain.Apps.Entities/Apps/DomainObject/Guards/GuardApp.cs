@@ -134,7 +134,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                     return;
                 }
 
-                if (await appProvider.GetTeamAsync(command.TeamId.Value, ct) == null)
+                var team = await appProvider.GetTeamAsync(command.TeamId.Value, ct);
+
+                if (team == null || !team.Contributors.ContainsKey(command.Actor.Identifier))
                 {
                     e(T.Get("apps.transfer.teamNotFound"));
                 }

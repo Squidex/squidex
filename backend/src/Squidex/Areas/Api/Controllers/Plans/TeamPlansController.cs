@@ -23,14 +23,17 @@ namespace Squidex.Areas.Api.Controllers.Plans
     [ApiExplorerSettings(GroupName = nameof(Plans))]
     public sealed class TeamPlansController : ApiController
     {
+        private readonly IAppUsageGate appUsageGate;
         private readonly IBillingPlans billingPlans;
         private readonly IBillingManager billingManager;
 
         public TeamPlansController(ICommandBus commandBus,
+            IAppUsageGate appUsageGate,
             IBillingPlans billingPlans,
             IBillingManager billingManager)
             : base(commandBus)
         {
+            this.appUsageGate = appUsageGate;
             this.billingPlans = billingPlans;
             this.billingManager = billingManager;
         }
@@ -52,9 +55,11 @@ namespace Squidex.Areas.Api.Controllers.Plans
         {
             var hasPortal = billingManager.HasPortal;
 
-            var response = Deferred.Response(() =>
+            var response = Deferred.AsyncResponse(async () =>
             {
-                return PlansDto.FromDomain(Team, billingPlans, hasPortal);
+                var (_, planId, _) = await appUsageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
+
+                return PlansDto.FromDomain(Team, billingPlans, planId, hasPortal);
             });
 
             Response.Headers[HeaderNames.ETag] = Team.ToEtag();

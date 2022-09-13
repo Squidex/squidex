@@ -203,6 +203,30 @@ describe('AppsService', () => {
             expect(app!).toEqual(createApp(12));
         }));
 
+    it('should make put request to transfer app',
+        inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    transfer: { method: 'PUT', href: '/api/apps/my-app/team' },
+                },
+            };
+
+            let app: AppDto;
+
+            appsService.transferApp('my-app', resource, { teamId: 'my-team' }, version).subscribe(result => {
+                app = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/team');
+
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+            req.flush(appResponse(12));
+
+            expect(app!).toEqual(createApp(12));
+        }));
+
     it('should make post request to upload app image',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
@@ -331,6 +355,7 @@ describe('AppsService', () => {
             permissions: ['Owner'],
             roleName: `Role${id}`,
             roleProperties: createProperties(id),
+            teamId: `app-team${key}`,
             _links: {
                 update: { method: 'PUT', href: `apps/${id}` },
             },
@@ -390,7 +415,8 @@ export function createApp(id: number, suffix = '') {
         id % 2 === 0,
         id % 2 === 0,
         `Role${id}`,
-        createProperties(id));
+        createProperties(id),
+        `app-team${key}`);
 }
 
 export function createAppSettings(id: number, suffix = '') {

@@ -66,6 +66,7 @@ namespace Squidex.Shared
         // App General
         public const string AppAdmin = "squidex.apps.{app}.*";
         public const string AppDelete = "squidex.apps.{app}.delete";
+        public const string AppTransfer = "squidex.apps.{app}.transfer";
         public const string AppUpdate = "squidex.apps.{app}.update";
         public const string AppUpdateSettings = "squidex.apps.{app}.settings";
 

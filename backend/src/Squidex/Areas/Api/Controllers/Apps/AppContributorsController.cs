@@ -10,11 +10,9 @@ using Microsoft.Net.Http.Headers;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Billing;
-using Squidex.Infrastructure;
+using Squidex.Domain.Apps.Entities.Invitation;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Security;
-using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 using Squidex.Shared.Users;
 using Squidex.Web;
@@ -28,13 +26,13 @@ namespace Squidex.Areas.Api.Controllers.Apps
     public sealed class AppContributorsController : ApiController
     {
         private readonly IAppUsageGate usageTracker;
-        private readonly IUserResolver userResolver;
+        private readonly IUserResolver usageGate;
 
-        public AppContributorsController(ICommandBus commandBus, IAppUsageGate usageTracker, IUserResolver userResolver)
+        public AppContributorsController(ICommandBus commandBus, IAppUsageGate usageGate, IUserResolver userResolver)
             : base(commandBus)
         {
-            this.usageTracker = usageTracker;
-            this.userResolver = userResolver;
+            this.usageTracker = usageGate;
+            this.usageGate = userResolver;
         }
 
         /// <summary>
@@ -149,7 +147,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var (plan, _, _) = await usageTracker.GetPlanForAppAsync(app, HttpContext.RequestAborted);
 
-            return await ContributorsDto.FromDomainAsync(app, Resources, userResolver, plan, invited);
+            return await ContributorsDto.FromDomainAsync(app, Resources, usageGate, plan, invited);
         }
     }
 }

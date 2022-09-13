@@ -9,10 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.UI.Models;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
-using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 using Squidex.Web;
 

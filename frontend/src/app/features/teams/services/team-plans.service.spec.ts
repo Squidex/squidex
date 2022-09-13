@@ -43,6 +43,7 @@ describe('TeamPlansService', () => {
             expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
+                teamId: 'my-team',
                 currentPlanId: '123',
                 planOwner: '456',
                 plans: [
@@ -82,6 +83,7 @@ describe('TeamPlansService', () => {
 
             expect(plans!).toEqual({
                 payload: {
+                    teamId: 'my-team',
                     currentPlanId: '123',
                     planOwner: '456',
                     plans: [

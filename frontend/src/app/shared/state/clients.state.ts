@@ -8,28 +8,20 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, shareSubscribed, State, Version } from '@app/framework';
+import { DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
 import { ClientDto, ClientsPayload, ClientsService, CreateClientDto, UpdateClientDto } from './../services/clients.service';
 import { AppsState } from './apps.state';
 
-interface Snapshot {
+interface Snapshot extends LoadingState {
     // The current clients.
-    clients: ClientsList;
+    clients: ReadonlyArray<ClientDto>;
 
     // The app version.
     version: Version;
 
-    // Indicates if the clients are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the clients are loading.
-    isLoading?: boolean;
-
     // Indicates if the user can create new clients.
     canCreate?: boolean;
 }
-
-type ClientsList = ReadonlyArray<ClientDto>;
 
 @Injectable()
 export class ClientsState extends State<Snapshot> {

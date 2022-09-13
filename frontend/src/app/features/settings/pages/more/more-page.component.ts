@@ -7,7 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AppDto, AppsState, defined, ResourceOwner, Types, UpdateAppForm } from '@app/shared';
+import { AppDto, AppsState, defined, DialogService, ResourceOwner, TeamsState, TransferAppForm, Types, UpdateAppForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',
@@ -17,18 +17,25 @@ import { AppDto, AppsState, defined, ResourceOwner, Types, UpdateAppForm } from 
 export class MorePageComponent extends ResourceOwner implements OnInit {
     public app!: AppDto;
 
+    public teams: { id: string | null; name: string }[] = [];
+
     public isEditable = false;
-    public isImageEditable = false;
+    public isEditableImage = false;
     public isDeletable = false;
+    public isTransferable = false;
 
     public uploading = false;
     public uploadProgress = 10;
+
+    public transferForm = new TransferAppForm();
 
     public updateForm = new UpdateAppForm();
 
     constructor(
         private readonly appsState: AppsState,
+        private readonly dialogs: DialogService,
         private readonly router: Router,
+        public readonly teamsState: TeamsState,
     ) {
         super();
     }
@@ -41,10 +48,14 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
 
                     this.isDeletable = app.canDelete;
                     this.isEditable = app.canUpdateGeneral;
-                    this.isImageEditable = app.canUpdateImage;
+                    this.isEditableImage = app.canUpdateImage;
+                    this.isTransferable = app.canUpdateTeam;
 
                     this.updateForm.load(app);
                     this.updateForm.setEnabled(this.isEditable);
+
+                    this.transferForm.load(app);
+                    this.transferForm.setEnabled(this.isTransferable);
                 }));
 
         this.appsState.reloadApps();
@@ -64,14 +75,38 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
                         this.updateForm.submitCompleted({ newValue: app });
                     },
                     error: error => {
+                        this.dialogs.notifyError(error);
+
                         this.updateForm.submitFailed(error);
                     },
                 });
         }
     }
 
+    public transfer() {
+        if (!this.isTransferable) {
+            return;
+        }
+
+        const value = this.transferForm.submit();
+
+        if (value) {
+            this.appsState.transfer(this.app, value.teamId)
+                .subscribe({
+                    next: app => {
+                        this.transferForm.submitCompleted({ newValue: app });
+                    },
+                    error: error => {
+                        this.dialogs.notifyError(error);
+
+                        this.transferForm.submitFailed(error);
+                    },
+                });
+        }
+    }
+
     public uploadImage(file: ReadonlyArray<File>) {
-        if (!this.isImageEditable) {
+        if (!this.isEditableImage) {
             return;
         }
 
@@ -95,7 +130,7 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
     }
 
     public removeImage() {
-        if (!this.isImageEditable) {
+        if (!this.isEditableImage) {
             return;
         }
 

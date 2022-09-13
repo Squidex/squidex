@@ -7,14 +7,11 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using Squidex.Domain.Apps.Entities.Billing;
+using Squidex.Domain.Apps.Entities.Invitation;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Security;
-using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 using Squidex.Shared.Users;
 using Squidex.Web;

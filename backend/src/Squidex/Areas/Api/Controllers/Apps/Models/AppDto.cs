@@ -66,6 +66,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public Instant LastModified { get; set; }
 
         /// <summary>
+        /// The ID of the team.
+        /// </summary>
+        public DomainId? TeamId { get; set; }
+
+        /// <summary>
         /// The permission level of the user.
         /// </summary>
         public IEnumerable<string> Permissions { get; set; } = Array.Empty<string>();
@@ -159,6 +164,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 AddDeleteLink("delete",
                     resources.Url<AppsController>(x => nameof(x.DeleteApp), values));
+            }
+
+            if (resources.IsAllowed(PermissionIds.AppTransfer, Name, additional: permissions))
+            {
+                AddPutLink("transfer",
+                    resources.Url<AppsController>(x => nameof(x.PutAppTeam), values));
             }
 
             if (resources.IsAllowed(PermissionIds.AppUpdate, Name, additional: permissions))

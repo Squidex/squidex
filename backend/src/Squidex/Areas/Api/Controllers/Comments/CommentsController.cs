@@ -13,8 +13,6 @@ using Squidex.Domain.Apps.Entities.Comments;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Security;
-using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 using Squidex.Web;
 

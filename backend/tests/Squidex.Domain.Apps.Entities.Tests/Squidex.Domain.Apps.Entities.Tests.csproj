@@ -78,4 +78,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Apps\Invitation\" />
+  </ItemGroup>
 </Project>

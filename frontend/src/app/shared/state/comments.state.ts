@@ -7,25 +7,23 @@
 
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { DateTime, DialogService, shareSubscribed, State, Version } from '@app/framework';
+import { DateTime, DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
 import { CommentDto, CommentsService } from './../services/comments.service';
 
-interface Snapshot {
+interface Snapshot extends LoadingState {
     // The current comments.
-    comments: CommentsList;
+    comments:  ReadonlyArray<CommentDto>;
 
     // The version of the comments state.
     version: Version;
-
-    // Indicates if the comments are loaded.
-    isLoaded?: boolean;
 }
-
-type CommentsList = ReadonlyArray<CommentDto>;
 
 export class CommentsState extends State<Snapshot> {
     public comments =
         this.project(x => x.comments);
+
+    public isLoading =
+        this.project(x => x.isLoading === true);
 
     public isLoaded =
         this.project(x => x.isLoaded === true);

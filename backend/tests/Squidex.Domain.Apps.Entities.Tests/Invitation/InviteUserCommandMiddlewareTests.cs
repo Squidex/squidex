@@ -7,15 +7,15 @@
 
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Invitation
+namespace Squidex.Domain.Apps.Entities.Invitation
 {
     public class InviteUserCommandMiddlewareTests
     {
@@ -24,13 +24,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly IAppEntity app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-        private readonly AppInviteUserCommandMiddleware sut;
+        private readonly InviteUserCommandMiddleware sut;
 
         public InviteUserCommandMiddlewareTests()
         {
             ct = cts.Token;
 
-            sut = new AppInviteUserCommandMiddleware(userResolver);
+            sut = new InviteUserCommandMiddleware(userResolver);
         }
 
         [Fact]

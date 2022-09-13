@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Teams;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Plans.Models
@@ -31,29 +32,31 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         public string? PlanOwner { get; set; }
 
         /// <summary>
+        /// The ID of the team.
+        /// </summary>
+        public DomainId? TeamId { get; set; }
+
+        /// <summary>
         /// Indicates if there is a billing portal.
         /// </summary>
         public bool HasPortal { get; set; }
 
-        public static PlansDto FromDomain(IAppEntity app, IBillingPlans plans, bool hasPortal)
+        public static PlansDto FromDomain(IAppEntity app, IBillingPlans plans, string planId, bool hasPortal)
         {
-            var (_, planId) = plans.GetActualPlan(app.Plan?.PlanId);
-
             var result = new PlansDto
             {
                 CurrentPlanId = planId,
                 Plans = plans.GetAvailablePlans().Select(PlanDto.FromDomain).ToArray(),
                 PlanOwner = app.Plan?.Owner.Identifier,
-                HasPortal = hasPortal
+                HasPortal = hasPortal,
+                TeamId = app.TeamId
             };
 
             return result;
         }
 
-        public static PlansDto FromDomain(ITeamEntity team, IBillingPlans plans, bool hasPortal)
+        public static PlansDto FromDomain(ITeamEntity team, IBillingPlans plans, string planId, bool hasPortal)
         {
-            var (_, planId) = plans.GetActualPlan(team.Plan?.PlanId);
-
             var result = new PlansDto
             {
                 CurrentPlanId = planId,

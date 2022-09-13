@@ -86,6 +86,9 @@ export type PlansPayload = Readonly<{
     // True, if the installation has a billing portal.
     hasPortal: boolean;
 
+    // The ID of the team.
+    teamId?: string | null;
+
     // The actual plans.
     plans: ReadonlyArray<PlanDto>;
 }>;
@@ -100,11 +103,11 @@ export type ChangePlanDto = Readonly<{
     planId: string;
 }>;
 
-export function parsePlans(response: { plans: any[]; hasPortal: boolean; currentPlanId: string; planOwner: string }): PlansPayload {
-    const { plans: list, currentPlanId, hasPortal, planOwner } = response;
+export function parsePlans(response: { plans: any[]; hasPortal: boolean; currentPlanId: string; planOwner: string; teamId: string | null }): PlansPayload {
+    const { plans: list, currentPlanId, hasPortal, planOwner, teamId } = response;
     const plans = list.map(parsePlan);
 
-    return { plans, planOwner, currentPlanId, hasPortal };
+    return { plans, planOwner, currentPlanId, hasPortal, teamId };
 }
 
 export function parsePlan(response: any) {

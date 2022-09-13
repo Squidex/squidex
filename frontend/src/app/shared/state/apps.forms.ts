@@ -9,7 +9,7 @@
 
 import { FormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, TemplatedFormArray, ValidatorsEx } from '@app/framework';
-import { AppDto, AppSettingsDto, CreateAppDto, UpdateAppDto, UpdateAppSettingsDto } from './../services/apps.service';
+import { AppDto, AppSettingsDto, CreateAppDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto } from './../services/apps.service';
 
 export class CreateAppForm extends Form<ExtendedFormGroup, CreateAppDto> {
     constructor() {
@@ -19,6 +19,16 @@ export class CreateAppForm extends Form<ExtendedFormGroup, CreateAppDto> {
                 Validators.maxLength(40),
                 ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:apps.appNameValidationMessage'),
             ]),
+        }));
+    }
+}
+
+export class TransferAppForm extends Form<ExtendedFormGroup, TransferToTeamDto, AppDto> {
+    constructor() {
+        super(new ExtendedFormGroup({
+            teamId: new FormControl('',
+                Validators.required,
+            ),
         }));
     }
 }

@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Billing
+namespace Squidex.Domain.Apps.Entities.Invitation
 {
     public sealed class InvitedResult<T>
     {

@@ -28,6 +28,7 @@ export class AppDto {
     public readonly canReadRules: boolean;
     public readonly canReadSchemas: boolean;
     public readonly canReadWorkflows: boolean;
+    public readonly canUpdateTeam: boolean;
     public readonly canUpdateGeneral: boolean;
     public readonly canUpdateImage: boolean;
     public readonly canUploadAssets: boolean;
@@ -51,8 +52,11 @@ export class AppDto {
         public readonly canAccessContent: boolean,
         public readonly roleName: string | undefined,
         public readonly roleProperties: {},
+        public readonly teamId: string | null,
     ) {
         this._links = links;
+
+        this.displayName = StringHelper.firstNonEmpty(this.label, this.name);
 
         this.canCreateSchema = hasAnyLink(links, 'schemas/create');
         this.canDelete = hasAnyLink(links, 'delete');
@@ -68,13 +72,11 @@ export class AppDto {
         this.canReadRules = hasAnyLink(links, 'rules');
         this.canReadSchemas = hasAnyLink(links, 'schemas');
         this.canReadWorkflows = hasAnyLink(links, 'workflows');
+        this.canUpdateTeam = hasAnyLink(links, 'transfer');
         this.canUpdateGeneral = hasAnyLink(links, 'update');
         this.canUpdateImage = hasAnyLink(links, 'image/upload');
         this.canUploadAssets = hasAnyLink(links, 'assets/create');
-
         this.image = getLinkUrl(links, 'image');
-
-        this.displayName = StringHelper.firstNonEmpty(this.label, this.name);
     }
 }
 
@@ -140,6 +142,11 @@ export type CreateAppDto = Readonly<{
     name: string;
 }>;
 
+export type TransferToTeamDto = Readonly<{
+    // The target team ID.
+    teamId: string | null;
+}>;
+
 export type UpdateAppDto = Readonly<{
     // The label, which is like a display name.
     label?: string;
@@ -202,8 +209,20 @@ export class AppsService {
             pretifyError('i18n:apps.updateFailed'));
     }
 
-    public getSettings(name: string): Observable<AppSettingsDto> {
-        const url = this.apiUrl.buildUrl(`/api/apps/${name}/settings`);
+    public transferApp(appName: string, resource: Resource, dto: TransferToTeamDto, version: Version): Observable<AppDto> {
+        const link = resource._links['transfer'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ payload }) => {
+                return parseApp(payload.body);
+            }),
+            pretifyError('i18n:apps.transferFailed'));
+    }
+
+    public getSettings(appName: string): Observable<AppSettingsDto> {
+        const url = this.apiUrl.buildUrl(`/api/apps/${appName}/settings`);
 
         return this.http.get<any>(url).pipe(
             map(body => {
@@ -224,8 +243,8 @@ export class AppsService {
             pretifyError('i18n:apps.updateSettingsFailed'));
     }
 
-    public getAssetScripts(name: string): Observable<AssetScriptsDto> {
-        const url = this.apiUrl.buildUrl(`/api/apps/${name}/assets/scripts`);
+    public getAssetScripts(appName: string): Observable<AssetScriptsDto> {
+        const url = this.apiUrl.buildUrl(`/api/apps/${appName}/assets/scripts`);
 
         return HTTP.getVersioned(this.http, url).pipe(
             mapVersioned(({ body }) => {
@@ -320,7 +339,8 @@ function parseApp(response: any & Resource) {
         response.canAccessApi,
         response.canAccessContent,
         response.roleName,
-        response.roleProperties);
+        response.roleProperties,
+        response.teamId);
 }
 
 function parseAppSettings(response: any & Resource) {

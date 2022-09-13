@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
 import { finalize, map, shareReplay, tap } from 'rxjs/operators';
-import { DialogService, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
+import { DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
 import { AppLanguageDto, AppLanguagesPayload, AppLanguagesService, UpdateAppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto, LanguagesService } from './../services/languages.service';
 import { AppsState } from './apps.state';
@@ -18,38 +18,28 @@ export interface SnapshotLanguage {
     language: AppLanguageDto;
 
     // All configured fallback languages.
-    fallbackLanguages: LanguageList;
+    fallbackLanguages: ReadonlyArray<LanguageDto>;
 
     // The fallback languages that have not been added yet.
-    fallbackLanguagesNew: LanguageList;
+    fallbackLanguagesNew: ReadonlyArray<LanguageDto>;
 }
 
-interface Snapshot {
+interface Snapshot extends LoadingState {
     // All supported languages.
-    allLanguages: LanguageList;
+    allLanguages: ReadonlyArray<LanguageDto>;
 
     // The languages that have not been added yet.
-    allLanguagesNew: LanguageList;
+    allLanguagesNew: ReadonlyArray<LanguageDto>;
 
     // The configured languages with extra information.
-    languages: LanguageResultList;
+    languages: ReadonlyArray<SnapshotLanguage>;
 
     // The app version.
     version: Version;
 
-    // Indicates if the languages are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the languages are loading.
-    isLoading?: boolean;
-
     // Inedicates if the user can add a language.
     canCreate?: boolean;
 }
-
-type AppLanguagesList = ReadonlyArray<AppLanguageDto>;
-type LanguageList = ReadonlyArray<LanguageDto>;
-type LanguageResultList = ReadonlyArray<SnapshotLanguage>;
 
 @Injectable()
 export class LanguagesState extends State<Snapshot> {
@@ -154,7 +144,7 @@ export class LanguagesState extends State<Snapshot> {
             shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
-    private replaceLanguages(payload: AppLanguagesPayload, version: Version, allLanguages?: LanguageList) {
+    private replaceLanguages(payload: AppLanguagesPayload, version: Version, allLanguages?: ReadonlyArray<LanguageDto>) {
         this.next(s => {
             allLanguages = allLanguages || s.allLanguages;
 
@@ -191,7 +181,7 @@ export class LanguagesState extends State<Snapshot> {
         return this.cachedLanguage$;
     }
 
-    private createLanguage(language: AppLanguageDto, languages: AppLanguagesList): SnapshotLanguage {
+    private createLanguage(language: AppLanguageDto, languages: ReadonlyArray<LanguageDto>): SnapshotLanguage {
         return {
             language,
             fallbackLanguages:

@@ -10,6 +10,7 @@ using NodaTime;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Teams;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Shared.Users;
 
@@ -65,65 +66,29 @@ namespace Squidex.Domain.Apps.Entities.Invitation
 
             switch (@event.Payload)
             {
-                case AppContributorAssigned appContributorAssigned:
+                case AppContributorAssigned assigned when assigned.IsAdded:
                     {
-                        if (!appContributorAssigned.Actor.IsUser || !appContributorAssigned.IsAdded)
+                        var (assigner, assignee) = await ResolveUsersAsync(assigned.Actor, assigned.ContributorId, default);
+
+                        if (assigner == null || assignee == null)
                         {
                             return;
                         }
 
-                        var assignerId = appContributorAssigned.Actor.Identifier;
-                        var assigneeId = appContributorAssigned.ContributorId;
-
-                        var assigner = await userResolver.FindByIdAsync(assignerId);
-
-                        if (assigner == null)
-                        {
-                            log.LogWarning("Failed to invite user: Assigner {assignerId} not found.", assignerId);
-                            return;
-                        }
-
-                        var assignee = await userResolver.FindByIdAsync(appContributorAssigned.ContributorId);
-
-                        if (assignee == null)
-                        {
-                            log.LogWarning("Failed to invite user: Assignee {assigneeId} not found.", assigneeId);
-                            return;
-                        }
-
-                        var appName = appContributorAssigned.AppId.Name;
-
-                        await emailSender.SendInviteAsync(assigner, assignee, appName);
+                        await emailSender.SendInviteAsync(assigner, assignee, assigned.AppId.Name);
                         return;
                     }
 
-                case TeamContributorAssigned teamContributorAssigned:
+                case TeamContributorAssigned assigned when assigned.IsAdded:
                     {
-                        if (!teamContributorAssigned.Actor.IsUser || !teamContributorAssigned.IsAdded)
+                        var (assigner, assignee) = await ResolveUsersAsync(assigned.Actor, assigned.ContributorId, default);
+
+                        if (assigner == null || assignee == null)
                         {
                             return;
                         }
 
-                        var assignerId = teamContributorAssigned.Actor.Identifier;
-                        var assigneeId = teamContributorAssigned.ContributorId;
-
-                        var assigner = await userResolver.FindByIdAsync(assignerId);
-
-                        if (assigner == null)
-                        {
-                            log.LogWarning("Failed to invite user: Assigner {assignerId} not found.", assignerId);
-                            return;
-                        }
-
-                        var assignee = await userResolver.FindByIdAsync(teamContributorAssigned.ContributorId);
-
-                        if (assignee == null)
-                        {
-                            log.LogWarning("Failed to invite user: Assignee {assigneeId} not found.", assigneeId);
-                            return;
-                        }
-
-                        var team = await appProvider.GetTeamAsync(teamContributorAssigned.TeamId);
+                        var team = await appProvider.GetTeamAsync(assigned.TeamId);
 
                         if (team == null)
                         {
@@ -134,6 +99,33 @@ namespace Squidex.Domain.Apps.Entities.Invitation
                         break;
                     }
             }
+        }
+
+        private async Task<(IUser? Assignee, IUser? Assigner)> ResolveUsersAsync(RefToken assignerId, string assigneeId,
+            CancellationToken ct)
+        {
+            if (!assignerId.IsUser)
+            {
+                return default;
+            }
+
+            var assigner = await userResolver.FindByIdAsync(assignerId.Identifier, ct);
+
+            if (assigner == null)
+            {
+                log.LogWarning("Failed to invite user: Assigner {assignerId} not found.", assignerId);
+                return default;
+            }
+
+            var assignee = await userResolver.FindByIdAsync(assigneeId, ct);
+
+            if (assignee == null)
+            {
+                log.LogWarning("Failed to invite user: Assignee {assigneeId} not found.", assigneeId);
+                return default;
+            }
+
+            return (assigner, assignee);
         }
     }
 }

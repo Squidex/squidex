@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, shareSubscribed, State, Version } from '@app/framework';
+import { DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
 import { AuthService } from './../services/auth.service';
 import { PlanDto, PlansService } from './../services/plans.service';
 import { AppsState } from './apps.state';
@@ -24,7 +24,7 @@ export interface PlanInfo {
     isSelected?: boolean;
 }
 
-interface Snapshot {
+interface Snapshot extends LoadingState {
     // The current plans.
     plans: ReadonlyArray<PlanInfo>;
 
@@ -34,11 +34,8 @@ interface Snapshot {
     // The user, who owns the plan.
     planOwner?: string;
 
-    // Indicates if the plans are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the plans are loading.
-    isLoading?: boolean;
+    // The ID of the team.
+    teamId?: string | null;
 
     // Indicates if there is a billing portal for the current Squidex instance.
     hasPortal?: boolean;
@@ -58,6 +55,9 @@ export class PlansState extends State<Snapshot> {
     public isOwner =
         this.project(x => x.isOwner === true);
 
+    public teamId =
+        this.project(x => x.teamId);
+
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
@@ -65,7 +65,7 @@ export class PlansState extends State<Snapshot> {
         this.project(x => x.isLoading === true);
 
     public isDisabled =
-        this.project(x => !x.isOwner);
+        this.project(x => !x.isOwner || x.teamId);
 
     public hasPortal =
         this.project(x => x.hasPortal);
@@ -116,6 +116,7 @@ export class PlansState extends State<Snapshot> {
                     isOwner: !payload.planOwner || payload.planOwner === this.userId,
                     planOwner: payload.planOwner,
                     plans,
+                    teamId: payload.teamId,
                     version,
                 }, 'Loading Success');
             }),

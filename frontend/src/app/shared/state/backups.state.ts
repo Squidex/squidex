@@ -8,25 +8,17 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, shareSubscribed, State } from '@app/framework';
+import { DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
 import { BackupDto, BackupsService } from './../services/backups.service';
 import { AppsState } from './apps.state';
 
-interface Snapshot {
+interface Snapshot extends LoadingState {
     // The current backups.
-    backups: BackupsList;
-
-    // Indicates if the backups are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the backups are loading.
-    isLoading?: boolean;
+    backups: ReadonlyArray<BackupDto>;
 
     // Indicates if the user can create new backups.
     canCreate?: boolean;
 }
-
-type BackupsList = ReadonlyArray<BackupDto>;
 
 @Injectable()
 export class BackupsState extends State<Snapshot> {

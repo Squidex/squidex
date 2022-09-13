@@ -167,7 +167,7 @@
     <value>Cannot remove a role when a contributor is assigned.</value>
   </data>
   <data name="apps.transfer.planAssigned" xml:space="preserve">
-    <value>Subscription must be cancelled first before a team is assigned.</value>
+    <value>Subscription must be cancelled first before the app can be transfered.</value>
   </data>
   <data name="apps.transfer.teamNotFound" xml:space="preserve">
     <value>The team does not exist.</value>

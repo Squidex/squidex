@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { TeamPlansService } from '@app/features/teams/internal';
-import { AuthService, DialogService, PlanDto, shareSubscribed, State, TeamsState, Version } from '@app/shared';
+import { AuthService, DialogService, LoadingState, PlanDto, shareSubscribed, State, TeamsState, Version } from '@app/shared';
 
 export interface PlanInfo {
     // The plan.
@@ -22,7 +22,7 @@ export interface PlanInfo {
     isSelected?: boolean;
 }
 
-interface Snapshot {
+interface Snapshot extends LoadingState {
     // The current plans.
     plans: ReadonlyArray<PlanInfo>;
 
@@ -31,12 +31,6 @@ interface Snapshot {
 
     // The user, who owns the plan.
     planOwner?: string;
-
-    // Indicates if the plans are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the plans are loading.
-    isLoading?: boolean;
 
     // Indicates if there is a billing portal for the current Squidex instance.
     hasPortal?: boolean;

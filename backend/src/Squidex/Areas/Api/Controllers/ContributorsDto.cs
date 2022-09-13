@@ -65,7 +65,7 @@ namespace Squidex.Areas.Api.Controllers
                 Items = team.Contributors
                     .Select(x => ContributorDto.FromDomain(x.Key, x.Value))
                     .Select(x => x.CreateUser(users))
-                    .Select(x => x.CreateAppLinks(resources))
+                    .Select(x => x.CreateTeamLinks(resources))
                     .OrderBy(x => x.ContributorName)
                     .ToArray()
             };

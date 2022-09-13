@@ -143,6 +143,28 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
+        /// Transfer the app.
+        /// </summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <param name="request">The team information.</param>
+        /// <returns>
+        /// 200 => App transferred.
+        /// 400 => App request not valid.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/team")]
+        [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous(PermissionIds.AppTransfer)]
+        [ApiCosts(0)]
+        public async Task<IActionResult> PutAppTeam(string app, [FromBody] TransferToTeamDto request)
+        {
+            var response = await InvokeCommandAsync(request.ToCommand());
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Upload the app image.
         /// </summary>
         /// <param name="app">The name of the app to update.</param>

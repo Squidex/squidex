@@ -25,14 +25,17 @@ namespace Squidex.Areas.Api.Controllers.Plans
     {
         private readonly IBillingPlans billingPlans;
         private readonly IBillingManager billingManager;
+        private readonly IAppUsageGate appUsageGate;
 
         public AppPlansController(ICommandBus commandBus,
+            IAppUsageGate appUsageGate,
             IBillingPlans billingPlans,
             IBillingManager billingManager)
             : base(commandBus)
         {
             this.billingPlans = billingPlans;
             this.billingManager = billingManager;
+            this.appUsageGate = appUsageGate;
         }
 
         /// <summary>
@@ -52,9 +55,11 @@ namespace Squidex.Areas.Api.Controllers.Plans
         {
             var hasPortal = billingManager.HasPortal;
 
-            var response = Deferred.Response(() =>
+            var response = Deferred.AsyncResponse(async () =>
             {
-                return PlansDto.FromDomain(App, billingPlans, hasPortal);
+                var (_, planId) = await appUsageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
+
+                return PlansDto.FromDomain(App, billingPlans, planId, hasPortal);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();

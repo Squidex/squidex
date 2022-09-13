@@ -27,7 +27,7 @@
   "apps.roles.nameAlreadyExists": "A role with the same name already exists.",
   "apps.roles.usedRoleByClientsNotRemovable": "Cannot remove a role when a client is assigned.",
   "apps.roles.usedRoleByContributorsNotRemovable": "Cannot remove a role when a contributor is assigned.",
-  "apps.transfer.planAssigned": "Subscription must be cancelled first before a team is assigned.",
+  "apps.transfer.planAssigned": "Subscription must be cancelled first before the app can be transfered.",
   "apps.transfer.teamNotFound": "The team does not exist.",
   "assets.folderNotFound": "Asset folder does not exist.",
   "assets.folderRecursion": "Cannot add folder to its own child.",
