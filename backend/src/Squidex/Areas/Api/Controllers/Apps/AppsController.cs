@@ -58,9 +58,37 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var response = Deferred.Response(() =>
             {
-                var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
+                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromDomain(a, userOrClientId, IsFrontend, Resources)).ToArray();
+            });
 
-                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromDomain(a, userOrClientId, isFrontend, Resources)).ToArray();
+            Response.Headers[HeaderNames.ETag] = apps.ToEtag();
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get team apps.
+        /// </summary>
+        /// <param name="team">The ID of the team.</param>
+        /// <returns>
+        /// 200 => Apps returned.
+        /// </returns>
+        /// <remarks>
+        /// You can only retrieve the list of apps when you are authenticated as a user (OpenID implicit flow).
+        /// You will retrieve all apps, where you are assigned as a contributor.
+        /// </remarks>
+        [HttpGet]
+        [Route("teams/{team}/apps")]
+        [ProducesResponseType(typeof(AppDto[]), StatusCodes.Status200OK)]
+        [ApiPermission]
+        [ApiCosts(0)]
+        public async Task<IActionResult> GetTeamApps(string team)
+        {
+            var apps = await appProvider.GetTeamAppsAsync(Team.Id, HttpContext.RequestAborted);
+
+            var response = Deferred.Response(() =>
+            {
+                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromDomain(a, UserOrClientId, IsFrontend, Resources)).ToArray();
             });
 
             Response.Headers[HeaderNames.ETag] = apps.ToEtag();
@@ -87,7 +115,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             {
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
-                return AppDto.FromDomain(App, UserOrClientId, isFrontend, Resources);
+                return AppDto.FromDomain(App, UserOrClientId, IsFrontend, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
@@ -231,9 +259,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             return InvokeCommandAsync(command, x =>
             {
-                var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
-
-                return AppDto.FromDomain(x, UserOrClientId, isFrontend, Resources);
+                return AppDto.FromDomain(x, UserOrClientId, IsFrontend, Resources);
             });
         }
 

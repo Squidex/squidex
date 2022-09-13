@@ -49,6 +49,28 @@ describe('AppsService', () => {
             expect(apps!).toEqual([createApp(12), createApp(13)]);
         }));
 
+
+    it('should make get request to get team apps',
+        inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            let apps: ReadonlyArray<AppDto>;
+
+            appsService.getTeamApps('my-team').subscribe(result => {
+                apps = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/teams/my-team/apps');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush([
+                appResponse(12),
+                appResponse(13),
+            ]);
+
+            expect(apps!).toEqual([createApp(12), createApp(13)]);
+        }));
+
     it('should make get request to get app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
             let app: AppDto;
@@ -305,7 +327,7 @@ describe('AppsService', () => {
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
-                    delete: { method: 'DELETE', href: '/api/apps/my-app/contributors/me' },
+                    leave: { method: 'DELETE', href: '/api/apps/my-app/contributors/me' },
                 },
             };
 

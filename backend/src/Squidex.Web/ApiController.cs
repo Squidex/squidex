@@ -14,6 +14,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
+using Squidex.Shared;
 
 namespace Squidex.Web
 {
@@ -89,6 +90,11 @@ namespace Squidex.Web
 
                 return subject;
             }
+        }
+
+        protected bool IsFrontend
+        {
+            get => HttpContext.User.IsInClient(DefaultClients.Frontend);
         }
 
         protected string UserOrClientId

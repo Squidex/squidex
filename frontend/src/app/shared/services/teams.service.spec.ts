@@ -115,7 +115,7 @@ describe('TeamsService', () => {
         inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
-                    delete: { method: 'DELETE', href: '/api/teams/my-team/contributors/me' },
+                    leave: { method: 'DELETE', href: '/api/teams/my-team/contributors/me' },
                 },
             };
 

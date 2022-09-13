@@ -12,7 +12,7 @@ import { TeamPlansService, TeamPlansState } from '@app/features/teams/internal';
 import { DialogService, PlanDto, versioned } from '@app/shared';
 import { TestValues } from '@app/shared/state/_test-helpers';
 
-describe('PlansState', () => {
+describe('TeamPlansState', () => {
     const {
         authService,
         creator,

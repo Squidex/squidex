@@ -13,7 +13,7 @@ import { ContributorDto, ContributorsPayload, DialogService, ErrorDto, versioned
 import { createContributors } from '@app/shared/services/contributors.service.spec';
 import { TestValues } from '@app/shared/state/_test-helpers';
 
-describe('ContributorsState', () => {
+describe('TeamContributorsState', () => {
     const {
         team,
         teamsState,

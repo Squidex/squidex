@@ -175,6 +175,18 @@ export class AppsService {
             pretifyError('i18n:apps.loadFailed'));
     }
 
+    public getTeamApps(teamId: string): Observable<ReadonlyArray<AppDto>> {
+        const url = this.apiUrl.buildUrl(`/api/teams/${teamId}/apps`);
+
+        return this.http.get<any[]>(url).pipe(
+            map(body => {
+                const apps = body.map(parseApp);
+
+                return apps;
+            }),
+            pretifyError('i18n:apps.loadFailed'));
+    }
+
     public getApp(appName: string): Observable<AppDto> {
         const url = this.apiUrl.buildUrl(`/api/apps/${appName}`);
 

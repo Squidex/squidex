@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
 
             if (app.TeamId != null)
             {
-                await apiUsageTracker.TrackAsync(date, app.TeamId.ToString()!, appId, costs, elapsedMs, bytes, ct);
+                await apiUsageTracker.TrackAsync(date, app.TeamId.ToString()!, app.Name, costs, elapsedMs, bytes, ct);
             }
 
             await apiUsageTracker.TrackAsync(date, appId, clientId, costs, elapsedMs, bytes, ct);
