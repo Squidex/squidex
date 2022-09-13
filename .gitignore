@@ -3,6 +3,7 @@
 *.suo
 *.user
 *.vs
+*.received.txt
 
 .angular
 .awCache
