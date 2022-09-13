@@ -718,6 +718,9 @@
   <data name="exceptions.domainObjectVersion" xml:space="preserve">
     <value>Entiteit ({id}) heeft versie {verwachteVersion} aangevraagd, maar heeft {currentVersion} gevonden.</value>
   </data>
+  <data name="history.apps.assetScriptsConfigured" xml:space="preserve">
+    <value>updated asset scripts</value>
+  </data>
   <data name="history.apps.clientAdded" xml:space="preserve">
     <value>client {[Id]} toegevoegd aan app</value>
   </data>
@@ -732,6 +735,12 @@
   </data>
   <data name="history.apps.contributoreRemoved" xml:space="preserve">
     <value>heeft {user:[Contributor]} verwijderd uit app</value>
+  </data>
+  <data name="history.apps.imageRemoved" xml:space="preserve">
+    <value>removed app image</value>
+  </data>
+  <data name="history.apps.imageUploaded" xml:space="preserve">
+    <value>uploaded a new app image</value>
   </data>
   <data name="history.apps.languagedAdded" xml:space="preserve">
     <value>taal toegevoegd {[Language]}</value>
@@ -762,6 +771,12 @@
   </data>
   <data name="history.apps.settingsUpdated" xml:space="preserve">
     <value>Bijgewerkte UI instellingen</value>
+  </data>
+  <data name="history.apps.transfered" xml:space="preserve">
+    <value>updated app to client</value>
+  </data>
+  <data name="history.apps.updated" xml:space="preserve">
+    <value>updated general settings</value>
   </data>
   <data name="history.assets.replaced" xml:space="preserve">
     <value>item vervangen.</value>
@@ -837,6 +852,21 @@
   </data>
   <data name="history.statusChanged" xml:space="preserve">
     <value>veranderde status van {[Schema]} inhoud in {[Status]}.</value>
+  </data>
+  <data name="history.teams.contributoreAssigned" xml:space="preserve">
+    <value>assigned {user:[Contributor]} as {[Role]}</value>
+  </data>
+  <data name="history.teams.contributoreRemoved" xml:space="preserve">
+    <value>removed {user:[Contributor]} from team</value>
+  </data>
+  <data name="history.teams.planChanged" xml:space="preserve">
+    <value>changed plan to {[Plan]}</value>
+  </data>
+  <data name="history.teams.planReset" xml:space="preserve">
+    <value>resetted plan</value>
+  </data>
+  <data name="history.teams.updated" xml:space="preserve">
+    <value>updated general settings</value>
   </data>
   <data name="login.githubPrivateEmail" xml:space="preserve">
     <value>Jouw e-mailadres is ingesteld op privé in Github. Stel het in op openbaar om Github-login te gebruiken.</value>
@@ -972,6 +1002,12 @@
   </data>
   <data name="setup.rules.headline" xml:space="preserve">
     <value>System Checklist</value>
+  </data>
+  <data name="setup.ruleTeamCreation.warningAdmins" xml:space="preserve">
+    <value>With your setup, only admins can create new teams. If you want to change this set &lt;code&gt;UI__ONLYADMINSCANCREATETEAMS=false&lt;/code&gt; as environment variable.</value>
+  </data>
+  <data name="setup.ruleTeamCreation.warningAll" xml:space="preserve">
+    <value>With your setup, every user can create new teams. If you want to change this set &lt;code&gt;UI__ONLYADMINSCANCREATETEAMS=true&lt;/code&gt; as environment variable.</value>
   </data>
   <data name="setup.ruleUrl.failure" xml:space="preserve">
     <value>You should access Squidex only over one canonical URL and configure this URL with the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable. The current base URL &lt;code&gt;{actual}&lt;/code&gt; does not match to the base url &lt;code&gt;{configured}&lt;/code&gt;. This variable must point to the public URL under which your Squidex instance is available.</value>

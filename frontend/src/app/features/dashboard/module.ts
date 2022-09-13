@@ -10,7 +10,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { GridsterModule } from 'angular-gridster2';
 import { ChartModule } from 'angular2-chartjs';
 import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { ApiCardComponent, ContentSummaryCardComponent, DashboardConfigComponent, DashboardPageComponent, GithubCardComponent, HistoryCardComponent, SchemaCardComponent, SupportCardComponent } from './declarations';
+import { ApiCardComponent, ContentSummaryCardComponent, DashboardConfigComponent, DashboardPageComponent, GithubCardComponent, HistoryCardComponent, SchemaCardComponent } from './declarations';
 
 const routes: Routes = [
     {
@@ -35,7 +35,6 @@ const routes: Routes = [
         GithubCardComponent,
         HistoryCardComponent,
         SchemaCardComponent,
-        SupportCardComponent,
     ],
 })
 export class SqxFeatureDashboardModule {}

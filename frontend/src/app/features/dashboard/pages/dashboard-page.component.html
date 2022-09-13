@@ -17,9 +17,6 @@
                     <ng-container *ngSwitchCase="'api'">
                         <sqx-api-card [app]="app"></sqx-api-card>
                     </ng-container>
-                    <ng-container *ngSwitchCase="'support'">
-                        <sqx-support-card></sqx-support-card>
-                    </ng-container>
                     <ng-container *ngSwitchCase="'github'">
                         <sqx-github-card></sqx-github-card>
                     </ng-container>
@@ -60,6 +57,9 @@
                     </ng-container>
                     <ng-container *ngSwitchCase="'random-cat'">
                         <sqx-random-cat-card></sqx-random-cat-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'support'">
+                        <sqx-support-card></sqx-support-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'history'">
                         <sqx-history-card [app]="app"></sqx-history-card>

@@ -7,6 +7,7 @@
 
 using System.Security.Claims;
 using FakeItEasy;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -54,13 +55,14 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return schema;
         }
 
-        public static ITeamEntity Team(DomainId teamId, string teamName = "my-team")
+        public static ITeamEntity Team(DomainId teamId, string teamName = "my-team", string contributor = "user")
         {
             var team = A.Fake<ITeamEntity>();
 
             A.CallTo(() => team.Id).Returns(teamId);
             A.CallTo(() => team.UniqueId).Returns(teamId);
             A.CallTo(() => team.Name).Returns(teamName);
+            A.CallTo(() => team.Contributors).Returns(Contributors.Empty.Assign(contributor, Role.Owner));
 
             return team;
         }

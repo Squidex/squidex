@@ -23,6 +23,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
             {
                 cm.AutoMap();
 
+                cm.MapProperty(x => x.OwnerId)
+                    .SetElementName("AppId");
+
                 cm.MapProperty(x => x.EventType)
                     .SetElementName("Message");
             });
@@ -45,13 +48,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
             {
                 new CreateIndexModel<HistoryEvent>(
                     Index
-                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.OwnerId)
                         .Ascending(x => x.Channel)
                         .Descending(x => x.Created)
                         .Descending(x => x.Version)),
                 new CreateIndexModel<HistoryEvent>(
                     Index
-                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.OwnerId)
                         .Descending(x => x.Created)
                         .Descending(x => x.Version))
             }, ct);
@@ -60,22 +63,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
         async Task IDeleter.DeleteAppAsync(IAppEntity app,
             CancellationToken ct)
         {
-            await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
+            await Collection.DeleteManyAsync(Filter.Eq(x => x.OwnerId, app.Id), ct);
         }
 
-        public async Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(DomainId appId, string channelPrefix, int count,
+        public async Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(DomainId ownerId, string channelPrefix, int count,
             CancellationToken ct = default)
         {
-            if (!string.IsNullOrWhiteSpace(channelPrefix))
-            {
-                return await Collection.Find(x => x.AppId == appId && x.Channel == channelPrefix)
-                    .SortByDescending(x => x.Created).ThenByDescending(x => x.Version).Limit(count).ToListAsync(ct);
-            }
-            else
-            {
-                return await Collection.Find(x => x.AppId == appId)
-                    .SortByDescending(x => x.Created).ThenByDescending(x => x.Version).Limit(count).ToListAsync(ct);
-            }
+            var find =
+                !string.IsNullOrWhiteSpace(channelPrefix) ?
+                    Collection.Find(x => x.OwnerId == ownerId && x.Channel == channelPrefix) :
+                    Collection.Find(x => x.OwnerId == ownerId);
+
+            return await find.SortByDescending(x => x.Created).ThenByDescending(x => x.Version).Limit(count).ToListAsync(ct);
         }
 
         public Task InsertManyAsync(IEnumerable<HistoryEvent> historyEvents,

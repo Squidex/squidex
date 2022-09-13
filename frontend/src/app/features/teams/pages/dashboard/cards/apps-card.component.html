@@ -1,0 +1,13 @@
+<div class="card card">
+    <div class="card-header">{{ 'common.apps' | sqxTranslate }}</div>
+    <div class="card-body">
+        <div class="row" *ngFor="let app of snapshot.apps">
+            <div class="col">
+                {{app.displayName}}
+            </div>
+            <div class="col-auto">
+                <a [routerLink]="['/app', app.name]" sqxStopClick>{{ 'common.edit' | sqxTranslate }}</a>
+            </div>
+        </div>
+    </div>
+</div>

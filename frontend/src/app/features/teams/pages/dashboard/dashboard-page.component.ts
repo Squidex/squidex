@@ -110,22 +110,23 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
 }
 
 const DEFAULT_CONFIG: GridsterItem[] = [
+    // Row 1
+    { cols: 1, rows: 1, x: 0, y: 0, name: 'i18n:dashboard.trafficSummaryCard', type: 'api-traffic-summary' },
+    { cols: 2, rows: 1, x: 1, y: 0, name: 'i18n:dashboard.appsCard', type: 'apps' },
+    { cols: 1, rows: 1, x: 3, y: 0, name: 'i18n:dashboard.supportCard', type: 'support' },
+
     // Row 2
-    { cols: 2, rows: 1, x: 0, y: 0, name: 'i18n:dashboard.apiCallsChart', type: 'api-calls' },
-    { cols: 2, rows: 1, x: 2, y: 0, name: 'i18n:dashboard.apiPerformanceChart', type: 'api-performance' },
+    { cols: 2, rows: 1, x: 0, y: 1, name: 'i18n:dashboard.apiCallsChart', type: 'api-calls' },
+    { cols: 2, rows: 1, x: 2, y: 1, name: 'i18n:dashboard.apiPerformanceChart', type: 'api-performance' },
 
     // Row 3
-    { cols: 1, rows: 1, x: 0, y: 1, name: 'i18n:dashboard.apiCallsSummaryCard', type: 'api-calls-summary' },
-    { cols: 2, rows: 1, x: 1, y: 1, name: 'i18n:dashboard.assetUpdloadsCountChart', type: 'asset-uploads-count' },
-    { cols: 1, rows: 1, x: 2, y: 1, name: 'i18n:dashboard.assetUploadsSizeChart', type: 'asset-uploads-size-summary' },
+    { cols: 1, rows: 1, x: 0, y: 2, name: 'i18n:dashboard.apiCallsSummaryCard', type: 'api-calls-summary' },
+    { cols: 2, rows: 1, x: 1, y: 2, name: 'i18n:dashboard.assetUpdloadsCountChart', type: 'asset-uploads-count' },
+    { cols: 1, rows: 1, x: 2, y: 2, name: 'i18n:dashboard.assetUploadsSizeChart', type: 'asset-uploads-size-summary' },
 
     // Row 4
-    { cols: 2, rows: 1, x: 0, y: 2, name: 'i18n:dashboard.assetTotalSize', type: 'asset-uploads-size' },
-    { cols: 2, rows: 1, x: 2, y: 2, name: 'i18n:dashboard.trafficChart', type: 'api-traffic' },
-
-    // Row 5
-    { cols: 1, rows: 1, x: 0, y: 3, name: 'i18n:dashboard.trafficSummaryCard', type: 'api-traffic-summary' },
-    { cols: 2, rows: 1, x: 1, y: 3, name: 'i18n:dashboard.historyCard', type: 'history' },
+    { cols: 2, rows: 1, x: 0, y: 3, name: 'i18n:dashboard.assetTotalSize', type: 'asset-uploads-size' },
+    { cols: 2, rows: 1, x: 2, y: 3, name: 'i18n:dashboard.trafficChart', type: 'api-traffic' },
 ];
 
 const OPTIONAL_CARDS = [

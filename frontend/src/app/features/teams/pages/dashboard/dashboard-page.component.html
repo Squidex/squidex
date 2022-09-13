@@ -11,6 +11,9 @@
         <gridster [options]="gridOptions" #grid>
             <gridster-item [item]="item" *ngFor="let item of gridConfig">
                 <ng-container [ngSwitch]="item.type">
+                    <ng-container *ngSwitchCase="'apps'">
+                        <sqx-apps-card [team]="team"></sqx-apps-card>
+                    </ng-container>
                     <ng-container *ngSwitchCase="'api-calls'">
                         <sqx-api-calls-card [usage]="callsUsage"></sqx-api-calls-card>
                     </ng-container>
@@ -48,6 +51,9 @@
                     </ng-container>
                     <ng-container *ngSwitchCase="'random-cat'">
                         <sqx-random-cat-card></sqx-random-cat-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'support'">
+                        <sqx-support-card></sqx-support-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'iframe'">
                         <sqx-iframe-card [options]="item"></sqx-iframe-card>

@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 .Returns(Task.FromResult<Uri?>(null));
 
             A.CallTo(() => appProvider.GetTeamAsync(teamId, default))
-                .Returns(Mocks.Team(teamId));
+                .Returns(Mocks.Team(teamId, contributor: Actor.Identifier));
 
             // Create a non-empty setting, otherwise the event is not raised as it does not change the domain object.
             initialSettings = new InitialSettings

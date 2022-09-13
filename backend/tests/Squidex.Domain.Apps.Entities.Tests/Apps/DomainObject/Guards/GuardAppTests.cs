@@ -26,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IUserResolver users = A.Fake<IUserResolver>();
         private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
+        private readonly RefToken actor = RefToken.User("42");
 
         public GuardAppTests()
         {
@@ -140,12 +141,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         [Fact]
         public async Task CanTransfer_should_not_throw_exception_if_team_exists()
         {
-            var team = Mocks.Team(DomainId.NewGuid());
+            var team = Mocks.Team(DomainId.NewGuid(), contributor: actor.Identifier);
 
             A.CallTo(() => appProvider.GetTeamAsync(team.Id, default))
                 .Returns(team);
 
-            var command = new TransferToTeam { TeamId = team.Id };
+            var command = new TransferToTeam { TeamId = team.Id, Actor = actor };
 
             await GuardApp.CanTransfer(command, App(null), appProvider, default);
         }
@@ -153,12 +154,26 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         [Fact]
         public async Task CanTransfer_should_throw_exception_if_team_does_not_exist()
         {
-            var team = Mocks.Team(DomainId.NewGuid());
+            var team = Mocks.Team(DomainId.NewGuid(), contributor: actor.Identifier);
 
             A.CallTo(() => appProvider.GetTeamAsync(team.Id, default))
                 .Returns(Task.FromResult<ITeamEntity?>(null));
 
-            var command = new TransferToTeam { TeamId = team.Id };
+            var command = new TransferToTeam { TeamId = team.Id, Actor = actor };
+
+            await ValidationAssert.ThrowsAsync(() => GuardApp.CanTransfer(command, App(null), appProvider, default),
+                new ValidationError("The team does not exist."));
+        }
+
+        [Fact]
+        public async Task CanTransfer_should_throw_exception_if_actor_is_not_part_of_team()
+        {
+            var team = Mocks.Team(DomainId.NewGuid());
+
+            A.CallTo(() => appProvider.GetTeamAsync(team.Id, default))
+                .Returns(team);
+
+            var command = new TransferToTeam { TeamId = team.Id, Actor = actor };
 
             await ValidationAssert.ThrowsAsync(() => GuardApp.CanTransfer(command, App(null), appProvider, default),
                 new ValidationError("The team does not exist."));
@@ -167,17 +182,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         [Fact]
         public async Task CanTransfer_should_throw_exception_if_app_has_plan()
         {
-            var team = Mocks.Team(DomainId.NewGuid());
+            var team = Mocks.Team(DomainId.NewGuid(), contributor: actor.Identifier);
 
             A.CallTo(() => appProvider.GetTeamAsync(team.Id, default))
                 .Returns(team);
 
-            var command = new TransferToTeam { TeamId = team.Id };
+            var command = new TransferToTeam { TeamId = team.Id, Actor = actor };
 
             var plan = new AssignedPlan(RefToken.User("me"), "premium");
 
             await ValidationAssert.ThrowsAsync(() => GuardApp.CanTransfer(command, App(plan), appProvider, default),
-                new ValidationError("Subscription must be cancelled first before a team is assigned."));
+                new ValidationError("Subscription must be cancelled first before the app can be transfered."));
         }
 
         [Fact]

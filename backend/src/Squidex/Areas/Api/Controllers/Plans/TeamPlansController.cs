@@ -57,7 +57,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
 
             var response = Deferred.AsyncResponse(async () =>
             {
-                var (_, planId, _) = await appUsageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
+                var (_, planId) = await appUsageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
 
                 return PlansDto.FromDomain(Team, billingPlans, planId, hasPortal);
             });

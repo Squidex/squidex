@@ -319,7 +319,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
         {
             await sut.TrackRequestAsync(appWithTeam, "client", today, 42, 50, 512, ct);
 
-            A.CallTo(() => apiUsageTracker.TrackAsync(today, appWithTeam.TeamId!.ToString()!, appWithTeam.Id.ToString(), 42, 50, 512, ct))
+            A.CallTo(() => apiUsageTracker.TrackAsync(today, appWithTeam.TeamId!.ToString()!, appWithTeam.Name, 42, 50, 512, ct))
                 .MustHaveHappened();
         }
 

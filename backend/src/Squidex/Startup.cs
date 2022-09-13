@@ -69,6 +69,7 @@ namespace Squidex
             services.AddSquidexSerializers();
             services.AddSquidexStoreServices(config);
             services.AddSquidexSubscriptions(config);
+            services.AddSquidexTeams();
             services.AddSquidexTelemetry(config);
             services.AddSquidexTranslation(config);
             services.AddSquidexUsageTracking(config);

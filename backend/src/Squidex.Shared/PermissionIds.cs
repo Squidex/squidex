@@ -60,6 +60,9 @@ namespace Squidex.Shared
         // Team Usage
         public const string TeamUsage = "squidex.teams.{team}.usage";
 
+        // Team History
+        public const string TeamHistory = "squidex.teams.{team}.history";
+
         // App
         public const string App = "squidex.apps.{app}";
 

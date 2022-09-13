@@ -10,6 +10,7 @@ export * from './pages/contributors/contributor-add-form.component';
 export * from './pages/contributors/contributor.component';
 export * from './pages/contributors/contributors-page.component';
 export * from './pages/contributors/import-contributors-dialog.component';
+export * from './pages/dashboard/cards/apps-card.component';
 export * from './pages/dashboard/dashboard-page.component';
 export * from './pages/more/more-page.component';
 export * from './pages/plans/plan.component';

@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -34,9 +35,12 @@ namespace Squidex.Domain.Apps.Entities.History
             get => GetType().Name;
         }
 
-        public HistoryService(IHistoryEventRepository repository, IEnumerable<IHistoryEventsCreator> creators, NotifoService notifo)
+        public HistoryService(IHistoryEventRepository repository, IEnumerable<IHistoryEventsCreator> creators,
+            NotifoService notifo)
         {
             this.creators = creators.ToList();
+            this.repository = repository;
+            this.notifo = notifo;
 
             foreach (var creator in this.creators)
             {
@@ -46,9 +50,6 @@ namespace Squidex.Domain.Apps.Entities.History
                 }
             }
 
-            this.repository = repository;
-
-            this.notifo = notifo;
         }
 
         public Task ClearAsync()
@@ -58,32 +59,35 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public async Task On(IEnumerable<Envelope<IEvent>> events)
         {
-            var targets = new List<(Envelope<AppEvent> Event, HistoryEvent? HistoryEvent)>();
+            var targets = new List<(Envelope<IEvent> Event, HistoryEvent? HistoryEvent)>();
 
             foreach (var @event in events)
             {
-                if (@event.Payload is AppEvent)
+                switch (@event.Payload)
                 {
-                    var appEvent = @event.To<AppEvent>();
-
-                    HistoryEvent? historyEvent = null;
-
-                    foreach (var creator in creators)
-                    {
-                        historyEvent = await creator.CreateEventAsync(@event);
-
-                        if (historyEvent != null)
+                    case AppEvent appEvent:
                         {
-                            historyEvent.Actor = appEvent.Payload.Actor;
-                            historyEvent.AppId = appEvent.Payload.AppId.Id;
-                            historyEvent.Created = @event.Headers.Timestamp();
-                            historyEvent.Version = @event.Headers.EventStreamNumber();
+                            var historyEvent = await CreateEvent(appEvent.AppId.Id, appEvent.Actor, @event);
+
+                            if (historyEvent != null)
+                            {
+                                targets.Add((@event, historyEvent));
+                            }
 
                             break;
                         }
-                    }
 
-                    targets.Add((appEvent, historyEvent));
+                    case TeamEvent teamEvent:
+                        {
+                            var historyEvent = await CreateEvent(teamEvent.TeamId, teamEvent.Actor, @event);
+
+                            if (historyEvent != null)
+                            {
+                                targets.Add((@event, historyEvent));
+                            }
+
+                            break;
+                        }
                 }
             }
 
@@ -95,10 +99,29 @@ namespace Squidex.Domain.Apps.Entities.History
             }
         }
 
-        public async Task<IReadOnlyList<ParsedHistoryEvent>> QueryByChannelAsync(DomainId appId, string channelPrefix, int count,
+        private async Task<HistoryEvent?> CreateEvent(DomainId ownerId, RefToken actor, Envelope<IEvent> @event)
+        {
+            foreach (var creator in creators)
+            {
+                var historyEvent = await creator.CreateEventAsync(@event);
+
+                if (historyEvent != null)
+                {
+                    historyEvent.Actor = actor;
+                    historyEvent.OwnerId = ownerId;
+                    historyEvent.Created = @event.Headers.Timestamp();
+                    historyEvent.Version = @event.Headers.EventStreamNumber();
+                    return historyEvent;
+                }
+            }
+
+            return null;
+        }
+
+        public async Task<IReadOnlyList<ParsedHistoryEvent>> QueryByChannelAsync(DomainId ownerId, string channelPrefix, int count,
             CancellationToken ct = default)
         {
-            var items = await repository.QueryByChannelAsync(appId, channelPrefix, count, ct);
+            var items = await repository.QueryByChannelAsync(ownerId, channelPrefix, count, ct);
 
             return items.Select(x => new ParsedHistoryEvent(x, texts)).ToList();
         }

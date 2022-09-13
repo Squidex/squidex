@@ -9,7 +9,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { GridsterModule } from 'angular-gridster2';
 import { HelpComponent, HistoryComponent, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { ContributorAddFormComponent, ContributorComponent, ContributorsPageComponent, DashboardPageComponent, ImportContributorsDialogComponent, LeftMenuComponent, MorePageComponent, PlanComponent, PlansPageComponent, SettingsAreaComponent, SettingsMenuComponent, TeamAreaComponent } from './declarations';
+import { AppsCardComponent, ContributorAddFormComponent, ContributorComponent, ContributorsPageComponent, DashboardPageComponent, ImportContributorsDialogComponent, LeftMenuComponent, MorePageComponent, PlanComponent, PlansPageComponent, SettingsAreaComponent, SettingsMenuComponent, TeamAreaComponent } from './declarations';
 import { TeamContributorsService, TeamContributorsState, TeamPlansService, TeamPlansState } from './internal';
 
 const routes: Routes = [
@@ -76,6 +76,7 @@ const routes: Routes = [
         SqxSharedModule,
     ],
     declarations: [
+        AppsCardComponent,
         DashboardPageComponent,
         ContributorAddFormComponent,
         ContributorComponent,

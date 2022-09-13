@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { merge, Observable, timer } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { allParams, AppsState, HistoryChannelUpdated, HistoryEventDto, HistoryService, MessageBus, switchSafe } from '@app/shared/internal';
+import { allParams, AppsState, HistoryChannelUpdated, HistoryEventDto, HistoryService, MessageBus, switchSafe, TeamsState } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-history',
@@ -25,14 +25,23 @@ export class HistoryComponent {
             timer(0, 10000),
             this.messageBus.of(HistoryChannelUpdated).pipe(delay(1000)),
         ).pipe(
-            switchSafe(() => this.historyService.getHistory(this.appsState.appName, this.channel)));
+            switchSafe(() => this.getHistory()));
 
     constructor(
         private readonly appsState: AppsState,
         private readonly historyService: HistoryService,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute,
+        private readonly teamsState: TeamsState,
     ) {
+    }
+
+    private getHistory() {
+        if (this.teamsState.teamId) {
+            return this.historyService.getHistoryForTeam(this.teamsState.teamId, this.channel);
+        } else {
+            return this.historyService.getHistory(this.appsState.appName, this.channel);
+        }
     }
 
     private calculateChannel(): string {
