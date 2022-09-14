@@ -5,54 +5,56 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Teams;
 
 namespace Squidex.Domain.Apps.Entities.Billing
 {
     public sealed class NoopBillingManager : IBillingManager
     {
-        public bool HasPortal
-        {
-            get => false;
-        }
-
-        public Task<string> GetPortalLinkAsync(string userId,
-            CancellationToken ct = default)
-        {
-            return Task.FromResult(string.Empty);
-        }
-
-        public Task<Uri?> MustRedirectToPortalAsync(string userId, NamedId<DomainId> appId, string? planId,
+        public Task<Uri?> GetPortalLinkAsync(string userId, IAppEntity app,
             CancellationToken ct = default)
         {
             return Task.FromResult<Uri?>(null);
         }
 
-        public Task<Uri?> MustRedirectToPortalAsync(string userId, DomainId teamId, string? planId,
+        public Task<Uri?> GetPortalLinkAsync(string userId, ITeamEntity team,
             CancellationToken ct = default)
         {
             return Task.FromResult<Uri?>(null);
         }
 
-        public Task SubscribeAsync(string userId, NamedId<DomainId> appId, string planId,
+        public Task<Uri?> MustRedirectToPortalAsync(string userId, IAppEntity app, string? planId,
+            CancellationToken ct = default)
+        {
+            return Task.FromResult<Uri?>(null);
+        }
+
+        public Task<Uri?> MustRedirectToPortalAsync(string userId, ITeamEntity team, string? planId,
+            CancellationToken ct = default)
+        {
+            return Task.FromResult<Uri?>(null);
+        }
+
+        public Task SubscribeAsync(string userId, IAppEntity app, string planId,
             CancellationToken ct = default)
         {
             return Task.CompletedTask;
         }
 
-        public Task SubscribeAsync(string userId, DomainId teamId, string planId,
+        public Task SubscribeAsync(string userId, ITeamEntity team, string planId,
             CancellationToken ct = default)
         {
             return Task.CompletedTask;
         }
 
-        public Task UnsubscribeAsync(string userId, NamedId<DomainId> appId,
+        public Task UnsubscribeAsync(string userId, IAppEntity app,
             CancellationToken ct = default)
         {
             return Task.CompletedTask;
         }
 
-        public Task UnsubscribeAsync(string userId, DomainId teamId,
+        public Task UnsubscribeAsync(string userId, ITeamEntity team,
             CancellationToken ct = default)
         {
             return Task.CompletedTask;

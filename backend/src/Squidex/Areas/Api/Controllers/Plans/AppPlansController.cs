@@ -53,13 +53,37 @@ namespace Squidex.Areas.Api.Controllers.Plans
         [ApiCosts(0)]
         public IActionResult GetPlans(string app)
         {
-            var hasPortal = billingManager.HasPortal;
-
             var response = Deferred.AsyncResponse(async () =>
             {
-                var (_, planId, _) = await appUsageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
+                var owner = App.Plan?.Owner.Identifier;
 
-                return PlansDto.FromDomain(App, billingPlans, planId, hasPortal);
+                var (_, planId, teamId) = await appUsageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
+
+                var lockedReason = PlansLockedReason.None;
+
+                if (teamId != null)
+                {
+                    lockedReason = PlansLockedReason.ManagedByTeam;
+                }
+                else if (!Resources.CanChangePlan)
+                {
+                    lockedReason = PlansLockedReason.NoPermission;
+                }
+                else if (owner != null && !string.Equals(owner, UserId, StringComparison.OrdinalIgnoreCase))
+                {
+                    lockedReason = PlansLockedReason.NotOwner;
+                }
+
+                var linkUrl = (Uri?)null;
+
+                if (lockedReason == PlansLockedReason.None)
+                {
+                    linkUrl = await billingManager.GetPortalLinkAsync(UserId, App, HttpContext.RequestAborted);
+                }
+
+                var plans = billingPlans.GetAvailablePlans();
+
+                return PlansDto.FromDomain(plans.ToArray(), owner, planId, linkUrl, lockedReason);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();

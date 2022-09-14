@@ -18,8 +18,6 @@ namespace Squidex.Web
 
         public const string PrefixApi = "/api";
 
-        public const string PrefixPortal = "/portal";
-
         public const string PrefixIdentityServer = "/identity-server";
 
         public const string ScopePermissions = "permissions";

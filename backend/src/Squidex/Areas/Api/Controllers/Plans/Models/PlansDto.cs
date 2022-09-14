@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Billing;
-using Squidex.Domain.Apps.Entities.Teams;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Plans.Models
@@ -32,37 +29,24 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         public string? PlanOwner { get; set; }
 
         /// <summary>
-        /// The ID of the team.
+        /// The link to the management portal.
         /// </summary>
-        public DomainId? TeamId { get; set; }
+        public string? PortalLink { get; set; }
 
         /// <summary>
-        /// Indicates if there is a billing portal.
+        /// The reason why the plan cannot be changed.
         /// </summary>
-        public bool HasPortal { get; set; }
+        public PlansLockedReason Locked { get; set; }
 
-        public static PlansDto FromDomain(IAppEntity app, IBillingPlans plans, string planId, bool hasPortal)
+        public static PlansDto FromDomain(Plan[] plans, string? owner, string planId, Uri? portalLink, PlansLockedReason locked)
         {
             var result = new PlansDto
             {
+                Locked = locked,
                 CurrentPlanId = planId,
-                Plans = plans.GetAvailablePlans().Select(PlanDto.FromDomain).ToArray(),
-                PlanOwner = app.Plan?.Owner.Identifier,
-                HasPortal = hasPortal,
-                TeamId = app.TeamId
-            };
-
-            return result;
-        }
-
-        public static PlansDto FromDomain(ITeamEntity team, IBillingPlans plans, string planId, bool hasPortal)
-        {
-            var result = new PlansDto
-            {
-                CurrentPlanId = planId,
-                Plans = plans.GetAvailablePlans().Select(PlanDto.FromDomain).ToArray(),
-                PlanOwner = team.Plan?.Owner.Identifier,
-                HasPortal = hasPortal
+                Plans = plans.Select(PlanDto.FromDomain).ToArray(),
+                PlanOwner = owner,
+                PortalLink = portalLink?.ToString()
             };
 
             return result;

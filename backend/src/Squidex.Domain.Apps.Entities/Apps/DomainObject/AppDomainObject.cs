@@ -268,7 +268,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 case DeleteApp delete:
                     return UpdateAsync(delete, async (c, ct) =>
                     {
-                        await BillingManager().UnsubscribeAsync(c.Actor.Identifier, Snapshot.NamedId(), default);
+                        await BillingManager().UnsubscribeAsync(c.Actor.Identifier, Snapshot, default);
 
                         DeleteApp(c);
                     }, ct);
@@ -300,7 +300,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
                 if (!c.FromCallback)
                 {
-                    var redirectUri = await BillingManager().MustRedirectToPortalAsync(userId, Snapshot.NamedId(), c.PlanId, ct);
+                    var redirectUri = await BillingManager().MustRedirectToPortalAsync(userId, Snapshot, c.PlanId, ct);
 
                     if (redirectUri != null)
                     {
@@ -320,11 +320,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             if (result.Payload is PlanChangedResult { Unsubscribed: true, RedirectUri: null })
             {
-                await BillingManager().UnsubscribeAsync(userId, Snapshot.NamedId(), default);
+                await BillingManager().UnsubscribeAsync(userId, Snapshot, default);
             }
             else if (result.Payload is PlanChangedResult { RedirectUri: null })
             {
-                await BillingManager().SubscribeAsync(userId, Snapshot.NamedId(), changePlan.PlanId, default);
+                await BillingManager().SubscribeAsync(userId, Snapshot, changePlan.PlanId, default);
             }
 
             return result;

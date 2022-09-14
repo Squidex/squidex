@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
                 if (!c.FromCallback)
                 {
-                    var redirectUri = await BillingManager().MustRedirectToPortalAsync(userId, UniqueId, c.PlanId, ct);
+                    var redirectUri = await BillingManager().MustRedirectToPortalAsync(userId, Snapshot, c.PlanId, ct);
 
                     if (redirectUri != null)
                     {
@@ -141,11 +141,11 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
             if (result.Payload is PlanChangedResult { Unsubscribed: true, RedirectUri: null })
             {
-                await BillingManager().UnsubscribeAsync(userId, UniqueId, default);
+                await BillingManager().UnsubscribeAsync(userId, Snapshot, default);
             }
             else if (result.Payload is PlanChangedResult { RedirectUri: null })
             {
-                await BillingManager().SubscribeAsync(userId, UniqueId, changePlan.PlanId, default);
+                await BillingManager().SubscribeAsync(userId, Snapshot, changePlan.PlanId, default);
             }
 
             return result;
