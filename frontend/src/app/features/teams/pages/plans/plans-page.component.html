@@ -27,8 +27,8 @@
                         </div>
                     </div>
 
-                    <div *ngIf="plansState.hasPortal | async" class="billing-portal-link">
-                        {{ 'plans.billingPortalHint' | sqxTranslate }} <a [href]="portalUrl" sqxExternalLink>{{ 'plans.billingPortal' | sqxTranslate }}</a>
+                    <div *ngIf="plansState.portalLink| async; let portalLink" class="billing-portal-link">
+                        {{ 'plans.billingPortalHint' | sqxTranslate }} <a [href]="portalLink" sqxExternalLink>{{ 'plans.billingPortal' | sqxTranslate }}</a>
                     </div>
                 </div>
             </ng-container>

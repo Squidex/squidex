@@ -9,8 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
-import { AuthService } from './../services/auth.service';
-import { PlanDto, PlansService } from './../services/plans.service';
+import { PlanDto, PlanLockedReason, PlansService } from './../services/plans.service';
 import { AppsState } from './apps.state';
 
 export interface PlanInfo {
@@ -28,17 +27,14 @@ interface Snapshot extends LoadingState {
     // The current plans.
     plans: ReadonlyArray<PlanInfo>;
 
-    // Indicates if the user is the plan owner.
-    isOwner?: boolean;
-
     // The user, who owns the plan.
     planOwner?: string;
 
-    // The ID of the team.
-    teamId?: string | null;
+    // The portal link if available.
+    portalLink?: string;
 
-    // Indicates if there is a billing portal for the current Squidex instance.
-    hasPortal?: boolean;
+    // The reason why the plan cannot be changed.
+    locked?: PlanLockedReason;
 
     // The app version.
     version: Version;
@@ -52,23 +48,17 @@ export class PlansState extends State<Snapshot> {
     public planOwner =
         this.project(x => x.planOwner);
 
-    public isOwner =
-        this.project(x => x.isOwner === true);
-
-    public teamId =
-        this.project(x => x.teamId);
-
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
     public isLoading =
         this.project(x => x.isLoading === true);
 
-    public isDisabled =
-        this.project(x => !x.isOwner || x.teamId);
+    public locked =
+        this.project(x => x.locked);
 
-    public hasPortal =
-        this.project(x => x.hasPortal);
+    public portalLink =
+        this.project(x => x.portalLink);
 
     public get appId() {
         return this.appsState.appId;
@@ -82,7 +72,6 @@ export class PlansState extends State<Snapshot> {
 
     constructor(
         private readonly appsState: AppsState,
-        private readonly authState: AuthService,
         private readonly dialogs: DialogService,
         private readonly plansService: PlansService,
     ) {
@@ -110,13 +99,11 @@ export class PlansState extends State<Snapshot> {
                 const plans = payload.plans.map(x => createPlan(x, planId));
 
                 this.next({
-                    hasPortal: payload.hasPortal,
+                    locked: payload.locked,
                     isLoaded: true,
                     isLoading: false,
-                    isOwner: !payload.planOwner || payload.planOwner === this.userId,
                     planOwner: payload.planOwner,
                     plans,
-                    teamId: payload.teamId,
                     version,
                 }, 'Loading Success');
             }),
@@ -140,10 +127,6 @@ export class PlansState extends State<Snapshot> {
                 }
             }),
             shareSubscribed(this.dialogs));
-    }
-
-    private get userId() {
-        return this.authState.user!.id;
     }
 
     private get version() {

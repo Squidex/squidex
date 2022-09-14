@@ -8,14 +8,13 @@
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, PlanDto, PlansService, PlansState, versioned } from '@app/shared/internal';
+import { DialogService, PlanDto, PlanLockedReason, PlansService, PlansState, versioned } from '@app/shared/internal';
 import { TestValues } from './_test-helpers';
 
 describe('PlansState', () => {
     const {
         app,
         appsState,
-        authService,
         creator,
         newVersion,
         version,
@@ -28,7 +27,7 @@ describe('PlansState', () => {
             new PlanDto('id1', 'name1', '100€', undefined, 'id1_yearly', '200€', undefined, 1, 1, 1, 1),
             new PlanDto('id2', 'name2', '400€', undefined, 'id2_yearly', '800€', undefined, 2, 2, 2, 2),
         ],
-        hasPortal: true,
+        locked: 'None' as PlanLockedReason,
     };
 
     let dialogs: IMock<DialogService>;
@@ -39,7 +38,7 @@ describe('PlansState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         plansService = Mock.ofType<PlansService>();
-        plansState = new PlansState(appsState.object, authService.object, dialogs.object, plansService.object);
+        plansState = new PlansState(appsState.object, dialogs.object, plansService.object);
     });
 
     afterEach(() => {
@@ -57,9 +56,7 @@ describe('PlansState', () => {
                 { isSelected: true, isYearlySelected: false, plan: oldPlans.plans[0] },
                 { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[1] },
             ]);
-            expect(plansState.snapshot.isOwner).toBeFalsy();
             expect(plansState.snapshot.isLoaded).toBeTruthy();
-            expect(plansState.snapshot.hasPortal).toBeTruthy();
             expect(plansState.snapshot.version).toEqual(version);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
@@ -75,10 +72,8 @@ describe('PlansState', () => {
                 { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[0] },
                 { isSelected: false, isYearlySelected: true, plan: oldPlans.plans[1] },
             ]);
-            expect(plansState.snapshot.hasPortal).toBeTruthy();
             expect(plansState.snapshot.isLoaded).toBeTruthy();
             expect(plansState.snapshot.isLoading).toBeFalsy();
-            expect(plansState.snapshot.isOwner).toBeFalsy();
             expect(plansState.snapshot.version).toEqual(version);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
@@ -143,7 +138,6 @@ describe('PlansState', () => {
                 { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[0] },
                 { isSelected: false, isYearlySelected: true, plan: oldPlans.plans[1] },
             ]);
-            expect(plansState.snapshot.isOwner).toBeTruthy();
             expect(plansState.snapshot.version).toEqual(newVersion);
         });
     });

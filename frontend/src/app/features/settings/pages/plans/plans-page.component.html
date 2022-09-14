@@ -12,11 +12,11 @@
     <ng-container>
         <sqx-list-view innerWidth="60rem" [isLoading]="plansState.isLoading | async">
             <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
-                <div class="alert alert-danger" *ngIf="(plansState.isOwner | async) === false">
+                <div class="alert alert-danger" *ngIf="(plansState.locked | async) === 'NotOwner'">
                     {{ 'plans.notPlanOwner' | sqxTranslate }} {{ 'plans.planOwner' | sqxTranslate }}: <strong className="no-wrap">{{plansState.planOwner | async | sqxUserName}}</strong>
                 </div>
 
-                <div class="alert alert-danger" *ngIf="(plansState.teamId | async) !== null">
+                <div class="alert alert-danger" *ngIf="(plansState.locked | async) === 'ManagedByTeam'">
                     {{ 'plans.managedByTeam' | sqxTranslate }}
                 </div>
 
@@ -31,8 +31,8 @@
                         </div>
                     </div>
 
-                    <div *ngIf="plansState.hasPortal | async" class="billing-portal-link">
-                        {{ 'plans.billingPortalHint' | sqxTranslate }} <a [href]="portalUrl" sqxExternalLink>{{ 'plans.billingPortal' | sqxTranslate }}</a>
+                    <div *ngIf="plansState.portalLink| async; let portalLink" class="billing-portal-link">
+                        {{ 'plans.billingPortalHint' | sqxTranslate }} <a [href]="portalLink" sqxExternalLink>{{ 'plans.billingPortal' | sqxTranslate }}</a>
                     </div>
                 </div>
             </ng-container>
