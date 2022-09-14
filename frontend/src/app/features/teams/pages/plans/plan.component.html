@@ -25,7 +25,7 @@
             &#10003; {{ 'plans.selected' | sqxTranslate }}
         </button>
         
-        <button *ngIf="!planInfo.isSelected" class="btn btn-block btn-success"
+        <button *ngIf="!planInfo.isSelected" class="btn btn-block btn-success" [disabled]="(plansState.locked| async) !== 'None'"
             (sqxConfirmClick)="changeMonthly()"
             confirmRememberKey="changePlan"
             confirmTitle="i18n:plans.changeConfirmTitle"
@@ -45,7 +45,7 @@
             &#10003; {{ 'plans.selected' | sqxTranslate }}
         </button>
         
-        <button *ngIf="!planInfo.isYearlySelected" class="btn btn-block btn-success"
+        <button *ngIf="!planInfo.isYearlySelected" class="btn btn-block btn-success" [disabled]="(plansState.locked| async) !== 'None'"
             (sqxConfirmClick)="changeYearly()"
             confirmTitle="i18n:plans.changeConfirmTitle"
             [confirmText]="planInfo.plan.yearlyConfirmText!"

@@ -104,6 +104,7 @@ export class PlansState extends State<Snapshot> {
                     isLoading: false,
                     planOwner: payload.planOwner,
                     plans,
+                    portalLink: payload.portalLink,
                     version,
                 }, 'Loading Success');
             }),

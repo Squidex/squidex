@@ -70,7 +70,7 @@ export class TeamPlansState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly plansService: TeamPlansService,
     ) {
-        super({ plans: [], version: Version.EMPTY }, 'Plans');
+        super({ plans: [], version: Version.EMPTY }, 'Teams Plans');
     }
 
     public load(isReload = false, overridePlanId?: string): Observable<any> {
@@ -94,11 +94,12 @@ export class TeamPlansState extends State<Snapshot> {
                 const plans = payload.plans.map(x => createPlan(x, planId));
 
                 this.next({
-                    locked: payload.locked,
                     isLoaded: true,
                     isLoading: false,
+                    locked: payload.locked,
                     planOwner: payload.planOwner,
                     plans,
+                    portalLink: payload.portalLink,
                     version,
                 }, 'Loading Success');
             }),

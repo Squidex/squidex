@@ -61,7 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
 
                 var lockedReason = PlansLockedReason.None;
 
-                if (!Resources.CanChangePlan)
+                if (!Resources.CanChangeTeamPlan)
                 {
                     lockedReason = PlansLockedReason.NoPermission;
                 }
@@ -74,7 +74,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
 
                 if (lockedReason == PlansLockedReason.None)
                 {
-                    linkUrl = await billingManager.GetPortalLinkAsync(UserId, App, HttpContext.RequestAborted);
+                    linkUrl = await billingManager.GetPortalLinkAsync(UserId, Team, HttpContext.RequestAborted);
                 }
 
                 var plans = billingPlans.GetAvailablePlans();
