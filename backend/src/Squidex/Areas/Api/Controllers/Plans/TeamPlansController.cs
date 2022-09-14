@@ -55,7 +55,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
         {
             var response = Deferred.AsyncResponse(async () =>
             {
-                var owner = App.Plan?.Owner.Identifier;
+                var owner = Team.Plan?.Owner.Identifier;
 
                 var (_, planId) = await appUsageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
 
