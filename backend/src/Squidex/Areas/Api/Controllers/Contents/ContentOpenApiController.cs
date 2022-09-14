@@ -19,11 +19,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         private readonly IAppProvider appProvider;
         private readonly SchemasOpenApiGenerator schemasOpenApiGenerator;
 
-        public ContentOpenApiController(ICommandBus commandBus, IAppProvider appProvider, SchemasOpenApiGenerator schemasOpenApiGenerator)
+        public ContentOpenApiController(ICommandBus commandBus, IAppProvider appProvider,
+            SchemasOpenApiGenerator schemasOpenApiGenerator)
             : base(commandBus)
         {
             this.appProvider = appProvider;
-
             this.schemasOpenApiGenerator = schemasOpenApiGenerator;
         }
 

@@ -23,19 +23,19 @@ namespace Squidex.Config.Domain
             {
                 services.AddSingleton(Options.Create(emailOptions));
 
-                services.Configure<NotificationEmailTextOptions>(config,
+                services.Configure<EmailUserNotificationOptions>(config,
                     "email:notifications");
 
                 services.AddSingletonAs<SmtpEmailSender>()
                     .As<IEmailSender>();
 
-                services.AddSingletonAs<NotificationEmailSender>()
-                    .AsOptional<INotificationSender>();
+                services.AddSingletonAs<EmailUserNotifications>()
+                    .AsOptional<IUserNotifications>();
             }
             else
             {
-                services.AddSingletonAs<NoopNotificationSender>()
-                    .AsOptional<INotificationSender>();
+                services.AddSingletonAs<NoopUserNotifications>()
+                    .AsOptional<IUserNotifications>();
             }
 
             services.AddSingletonAs<InvitationEventConsumer>()

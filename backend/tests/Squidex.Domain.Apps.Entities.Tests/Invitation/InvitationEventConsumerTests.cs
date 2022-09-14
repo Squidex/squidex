@@ -9,6 +9,7 @@ using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -23,21 +24,21 @@ namespace Squidex.Domain.Apps.Entities.Invitation
 {
     public class InvitationEventConsumerTests
     {
+        private readonly IAppEntity app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly INotificationSender notificatíonSender = A.Fake<INotificationSender>();
-        private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-        private readonly IUser assigner = UserMocks.User("1");
-        private readonly IUser assignee = UserMocks.User("2");
         private readonly ILogger<InvitationEventConsumer> log = A.Fake<ILogger<InvitationEventConsumer>>();
+        private readonly ITeamEntity team = Mocks.Team(DomainId.NewGuid());
+        private readonly IUser assignee = UserMocks.User("2");
+        private readonly IUser assigner = UserMocks.User("1");
+        private readonly IUserNotifications userNotifications = A.Fake<IUserNotifications>();
+        private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly string assignerId = DomainId.NewGuid().ToString();
         private readonly string assigneeId = DomainId.NewGuid().ToString();
-        private readonly string appName = "my-app";
-        private readonly string teamName = "my-team";
         private readonly InvitationEventConsumer sut;
 
         public InvitationEventConsumerTests()
         {
-            A.CallTo(() => notificatíonSender.IsActive)
+            A.CallTo(() => userNotifications.IsActive)
                 .Returns(true);
 
             A.CallTo(() => userResolver.FindByIdAsync(assignerId, default))
@@ -46,10 +47,13 @@ namespace Squidex.Domain.Apps.Entities.Invitation
             A.CallTo(() => userResolver.FindByIdAsync(assigneeId, default))
                 .Returns(assignee);
 
-            A.CallTo(() => appProvider.GetTeamAsync(A<DomainId>._, default))
-                .Returns(Mocks.Team(DomainId.NewGuid(), teamName));
+            A.CallTo(() => appProvider.GetAppAsync(app.Id, true, default))
+                .Returns(app);
 
-            sut = new InvitationEventConsumer(notificatíonSender, userResolver, appProvider, log);
+            A.CallTo(() => appProvider.GetTeamAsync(team.Id, default))
+                .Returns(team);
+
+            sut = new InvitationEventConsumer(appProvider, userNotifications, userResolver, log);
         }
 
         [Fact]
@@ -136,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Invitation
         {
             var @event = CreateAppEvent(RefTokenType.Subject, true);
 
-            A.CallTo(() => notificatíonSender.IsActive)
+            A.CallTo(() => userNotifications.IsActive)
                 .Returns(false);
 
             await sut.On(@event);
@@ -150,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Invitation
         {
             var @event = CreateTeamEvent(true);
 
-            A.CallTo(() => notificatíonSender.IsActive)
+            A.CallTo(() => userNotifications.IsActive)
                 .Returns(false);
 
             await sut.On(@event);
@@ -222,7 +226,7 @@ namespace Squidex.Domain.Apps.Entities.Invitation
 
             await sut.On(@event);
 
-            A.CallTo(() => notificatíonSender.SendInviteAsync(assigner, assignee, appName))
+            A.CallTo(() => userNotifications.SendInviteAsync(assigner, assignee, app, default))
                 .MustHaveHappened();
         }
 
@@ -233,7 +237,7 @@ namespace Squidex.Domain.Apps.Entities.Invitation
 
             await sut.On(@event);
 
-            A.CallTo(() => notificatíonSender.SendTeamInviteAsync(assigner, assignee, teamName))
+            A.CallTo(() => userNotifications.SendInviteAsync(assigner, assignee, team, default))
                 .MustHaveHappened();
         }
 
@@ -244,7 +248,7 @@ namespace Squidex.Domain.Apps.Entities.Invitation
 
             await sut.On(@event);
 
-            A.CallTo(() => notificatíonSender.SendInviteAsync(assigner, assignee, appName))
+            A.CallTo(() => userNotifications.SendInviteAsync(assigner, assignee, app, default))
                 .MustHaveHappened();
         }
 
@@ -255,7 +259,7 @@ namespace Squidex.Domain.Apps.Entities.Invitation
 
             await sut.On(@event);
 
-            A.CallTo(() => notificatíonSender.SendTeamInviteAsync(assigner, assignee, teamName))
+            A.CallTo(() => userNotifications.SendInviteAsync(assigner, assignee, team, default))
                 .MustHaveHappened();
         }
 
@@ -286,10 +290,10 @@ namespace Squidex.Domain.Apps.Entities.Invitation
 
         private void MustNotSendEmail()
         {
-            A.CallTo(() => notificatíonSender.SendInviteAsync(A<IUser>._, A<IUser>._, A<string>._))
+            A.CallTo(() => userNotifications.SendInviteAsync(A<IUser>._, A<IUser>._, A<IAppEntity>._, default))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => notificatíonSender.SendTeamInviteAsync(A<IUser>._, A<IUser>._, A<string>._))
+            A.CallTo(() => userNotifications.SendInviteAsync(A<IUser>._, A<IUser>._, A<IAppEntity>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -298,7 +302,7 @@ namespace Squidex.Domain.Apps.Entities.Invitation
             var @event = new AppContributorAssigned
             {
                 Actor = new RefToken(assignerType, assignerId),
-                AppId = NamedId.Of(DomainId.NewGuid(), appName),
+                AppId = app.NamedId(),
                 ContributorId = assigneeId,
                 IsCreated = isNewUser,
                 IsAdded = isNewContributor
@@ -320,7 +324,7 @@ namespace Squidex.Domain.Apps.Entities.Invitation
                 ContributorId = assigneeId,
                 IsCreated = isNewUser,
                 IsAdded = isNewContributor,
-                TeamId = DomainId.NewGuid()
+                TeamId = team.Id
             };
 
             var envelope = Envelope.Create(@event);

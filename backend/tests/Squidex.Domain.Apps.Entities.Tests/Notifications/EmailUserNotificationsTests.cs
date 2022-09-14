@@ -10,30 +10,34 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Teams;
+using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Email;
 using Squidex.Shared.Users;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Notifications
 {
-    public class NotificationEmailSenderTests
+    public class EmailUserNotificationsTests
     {
         private readonly IEmailSender emailSender = A.Fake<IEmailSender>();
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly IUser assigner = UserMocks.User("1", "1@email.com", "user1");
         private readonly IUser assigned = UserMocks.User("2", "2@email.com", "user2");
-        private readonly ILogger<NotificationEmailSender> log = A.Fake<ILogger<NotificationEmailSender>>();
-        private readonly string appName = "my-app";
-        private readonly string appUI = "my-ui";
-        private readonly NotificationEmailTextOptions texts = new NotificationEmailTextOptions();
-        private readonly NotificationEmailSender sut;
+        private readonly ILogger<EmailUserNotifications> log = A.Fake<ILogger<EmailUserNotifications>>();
+        private readonly IAppEntity app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
+        private readonly ITeamEntity team = Mocks.Team(DomainId.NewGuid());
+        private readonly EmailUserNotificationOptions texts = new EmailUserNotificationOptions();
+        private readonly EmailUserNotifications sut;
 
-        public NotificationEmailSenderTests()
+        public EmailUserNotificationsTests()
         {
             A.CallTo(() => urlGenerator.UI())
-                .Returns(appUI);
+                .Returns("my-ui");
 
-            sut = new NotificationEmailSender(Options.Create(texts), emailSender, urlGenerator, log);
+            sut = new EmailUserNotifications(Options.Create(texts), emailSender, urlGenerator, log);
         }
 
         [Fact]
@@ -85,9 +89,9 @@ namespace Squidex.Domain.Apps.Entities.Notifications
         }
 
         [Fact]
-        public async Task Should_not_send_invitation_email_if_texts_for_new_user_are_empty()
+        public async Task Should_not_send_app_invitation_email_if_texts_for_new_user_are_empty()
         {
-            await sut.SendInviteAsync(assigner, assigned, appName);
+            await sut.SendInviteAsync(assigner, assigned, app);
 
             A.CallTo(() => emailSender.SendAsync(assigned.Email, A<string>._, A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -96,9 +100,31 @@ namespace Squidex.Domain.Apps.Entities.Notifications
         }
 
         [Fact]
-        public async Task Should_not_send_invitation_email_if_texts_for_existing_user_are_empty()
+        public async Task Should_not_send_text_invitation_email_if_texts_for_new_user_are_empty()
         {
-            await sut.SendInviteAsync(assigner, assigned, appName);
+            await sut.SendInviteAsync(assigner, assigned, team);
+
+            A.CallTo(() => emailSender.SendAsync(assigned.Email, A<string>._, A<string>._, A<CancellationToken>._))
+                .MustNotHaveHappened();
+
+            MustLogWarning();
+        }
+
+        [Fact]
+        public async Task Should_not_send_app_invitation_email_if_texts_for_existing_user_are_empty()
+        {
+            await sut.SendInviteAsync(assigner, assigned, app);
+
+            A.CallTo(() => emailSender.SendAsync(assigned.Email, A<string>._, A<string>._, A<CancellationToken>._))
+                .MustNotHaveHappened();
+
+            MustLogWarning();
+        }
+
+        [Fact]
+        public async Task Should_not_send_text_invitation_email_if_texts_for_existing_user_are_empty()
+        {
+            await sut.SendInviteAsync(assigner, assigned, team);
 
             A.CallTo(() => emailSender.SendAsync(assigned.Email, A<string>._, A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -109,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
         [Fact]
         public async Task Should_not_send_usage_email_if_texts_empty()
         {
-            await sut.SendUsageAsync(assigned, appName, 100, 120);
+            await sut.SendUsageAsync(assigned, app, 100, 120);
 
             A.CallTo(() => emailSender.SendAsync(assigned.Email, A<string>._, A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -118,28 +144,56 @@ namespace Squidex.Domain.Apps.Entities.Notifications
         }
 
         [Fact]
-        public async Task Should_not_send_invitation_email_if_no_consent_given()
+        public async Task Should_not_send_app_invitation_email_if_no_consent_given()
         {
             var withoutConsent = UserMocks.User("2", "2@email.com", "user", false);
 
             texts.ExistingUserSubject = "email-subject";
             texts.ExistingUserBody = "email-body";
 
-            await sut.SendInviteAsync(assigner, withoutConsent, appName);
+            await sut.SendInviteAsync(assigner, withoutConsent, app);
 
             A.CallTo(() => emailSender.SendAsync(withoutConsent.Email, "email-subject", "email-body", A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task Should_send_invitation_email_if_consent_given()
+        public async Task Should_not_send_team_invitation_email_if_no_consent_given()
+        {
+            var withoutConsent = UserMocks.User("2", "2@email.com", "user", false);
+
+            texts.ExistingTeamUserSubject = "email-subject";
+            texts.ExistingTeamUserBody = "email-body";
+
+            await sut.SendInviteAsync(assigner, withoutConsent, team);
+
+            A.CallTo(() => emailSender.SendAsync(withoutConsent.Email, "email-subject", "email-body", A<CancellationToken>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_send_app_invitation_email_if_consent_given()
         {
             var withConsent = UserMocks.User("2", "2@email.com", "user", true);
 
             texts.ExistingUserSubject = "email-subject";
             texts.ExistingUserBody = "email-body";
 
-            await sut.SendInviteAsync(assigner, withConsent, appName);
+            await sut.SendInviteAsync(assigner, withConsent, app);
+
+            A.CallTo(() => emailSender.SendAsync(withConsent.Email, "email-subject", "email-body", A<CancellationToken>._))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_send_team_invitation_email_if_consent_given()
+        {
+            var withConsent = UserMocks.User("2", "2@email.com", "user", true);
+
+            texts.ExistingTeamUserSubject = "email-subject";
+            texts.ExistingTeamUserBody = "email-body";
+
+            await sut.SendInviteAsync(assigner, withConsent, team);
 
             A.CallTo(() => emailSender.SendAsync(withConsent.Email, "email-subject", "email-body", A<CancellationToken>._))
                 .MustHaveHappened();
@@ -150,7 +204,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
             texts.UsageSubject = pattern;
             texts.UsageBody = pattern;
 
-            await sut.SendUsageAsync(assigned, appName, 100, 120);
+            await sut.SendUsageAsync(assigned, app, 100, 120);
 
             A.CallTo(() => emailSender.SendAsync(assigned.Email, actual, actual, A<CancellationToken>._))
                 .MustHaveHappened();
@@ -161,7 +215,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
             texts.NewUserSubject = pattern;
             texts.NewUserBody = pattern;
 
-            await sut.SendInviteAsync(assigner, assigned, appName);
+            await sut.SendInviteAsync(assigner, assigned, app);
 
             A.CallTo(() => emailSender.SendAsync(assigned.Email, actual, actual, A<CancellationToken>._))
                 .MustHaveHappened();

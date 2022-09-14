@@ -8,6 +8,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Email;
 using Squidex.Shared.Identity;
@@ -15,12 +17,12 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Notifications
 {
-    public sealed class NotificationEmailSender : INotificationSender
+    public sealed class EmailUserNotifications : IUserNotifications
     {
         private readonly IEmailSender emailSender;
         private readonly IUrlGenerator urlGenerator;
-        private readonly ILogger<NotificationEmailSender> log;
-        private readonly NotificationEmailTextOptions texts;
+        private readonly ILogger<EmailUserNotifications> log;
+        private readonly EmailUserNotificationOptions texts;
 
         private sealed class TemplatesVars
         {
@@ -28,7 +30,9 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
             public IUser? Assigner { get; init; }
 
-            public string TeamName { get; init; }
+            public string? AppName { get; init; }
+
+            public string? TeamName { get; init; }
 
             public long? ApiCalls { get; init; }
 
@@ -42,11 +46,11 @@ namespace Squidex.Domain.Apps.Entities.Notifications
             get => true;
         }
 
-        public NotificationEmailSender(
-            IOptions<NotificationEmailTextOptions> texts,
+        public EmailUserNotifications(
+            IOptions<EmailUserNotificationOptions> texts,
             IEmailSender emailSender,
             IUrlGenerator urlGenerator,
-            ILogger<NotificationEmailSender> log)
+            ILogger<EmailUserNotifications> log)
         {
             this.texts = texts.Value;
             this.emailSender = emailSender;
@@ -55,54 +59,77 @@ namespace Squidex.Domain.Apps.Entities.Notifications
             this.log = log;
         }
 
-        public Task SendUsageAsync(IUser user, string appName, long usage, long usageLimit)
+        public Task SendUsageAsync(IUser user, IAppEntity app, long usage, long usageLimit,
+            CancellationToken ct = default)
         {
             Guard.NotNull(user);
-            Guard.NotNull(appName);
+            Guard.NotNull(app);
 
             var vars = new TemplatesVars
             {
                 ApiCalls = usage,
                 ApiCallsLimit = usageLimit,
-                TeamName = appName
+                AppName = app.DisplayName()
             };
 
             return SendEmailAsync("Usage",
                 texts.UsageSubject,
                 texts.UsageBody,
-                user, vars);
+                user, vars, ct);
         }
 
-        public Task SendInviteAsync(IUser assigner, IUser user, string appName)
+        public Task SendInviteAsync(IUser assigner, IUser user, IAppEntity app,
+            CancellationToken ct = default)
         {
             Guard.NotNull(assigner);
             Guard.NotNull(user);
-            Guard.NotNull(appName);
+            Guard.NotNull(app);
 
-            var vars = new TemplatesVars { Assigner = assigner, TeamName = appName };
+            var vars = new TemplatesVars { Assigner = assigner, AppName = app.DisplayName() };
 
             if (user.Claims.HasConsent())
             {
                 return SendEmailAsync("ExistingUser",
                     texts.ExistingUserSubject,
                     texts.ExistingUserBody,
-                    user, vars);
+                    user, vars, ct);
             }
             else
             {
                 return SendEmailAsync("NewUser",
                     texts.NewUserSubject,
                     texts.NewUserBody,
-                    user, vars);
+                    user, vars, ct);
             }
         }
 
-        public Task SendTeamInviteAsync(IUser assigner, IUser user, string teamName)
+        public Task SendInviteAsync(IUser assigner, IUser user, ITeamEntity team,
+            CancellationToken ct = default)
         {
-            return Task.CompletedTask;
+            Guard.NotNull(assigner);
+            Guard.NotNull(user);
+            Guard.NotNull(team);
+
+            var vars = new TemplatesVars { Assigner = assigner, TeamName = team.Name };
+
+            if (user.Claims.HasConsent())
+            {
+                return SendEmailAsync("ExistingUser",
+                    texts.ExistingTeamUserSubject,
+                    texts.ExistingTeamUserBody,
+                    user, vars, ct);
+            }
+            else
+            {
+                return SendEmailAsync("NewUser",
+                    texts.NewTeamUserSubject,
+                    texts.NewTeamUserBody,
+                    user, vars, ct);
+            }
         }
 
-        private async Task SendEmailAsync(string template, string emailSubj, string emailBody, IUser user, TemplatesVars vars)
+        private async Task SendEmailAsync(string template, string emailSubj, string emailBody, IUser user, TemplatesVars vars,
+            CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(emailBody))
             {
@@ -125,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
             try
             {
-                await emailSender.SendAsync(user.Email, emailSubj, emailBody);
+                await emailSender.SendAsync(user.Email, emailSubj, emailBody, ct);
             }
             catch (Exception ex)
             {
@@ -136,7 +163,15 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
         private static string Format(string text, TemplatesVars vars)
         {
-            text = text.Replace("$APP_NAME", vars.TeamName, StringComparison.Ordinal);
+            if (!string.IsNullOrWhiteSpace(vars.AppName))
+            {
+                text = text.Replace("$APP_NAME", vars.AppName, StringComparison.Ordinal);
+            }
+
+            if (!string.IsNullOrWhiteSpace(vars.TeamName))
+            {
+                text = text.Replace("$TEAM_NAME", vars.AppName, StringComparison.Ordinal);
+            }
 
             if (vars.Assigner != null)
             {

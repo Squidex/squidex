@@ -22,9 +22,9 @@ namespace Squidex.Domain.Apps.Entities.Billing
         private const string CounterTotalCount = "TotalAssets";
         private const string CounterTotalSize = "TotalSize";
         private static readonly DateTime SummaryDate = default;
-        private readonly IBillingPlans billingPlans;
-        private readonly IAppProvider appProvider;
         private readonly IApiUsageTracker apiUsageTracker;
+        private readonly IAppProvider appProvider;
+        private readonly IBillingPlans billingPlans;
         private readonly IMemoryCache memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly IMessageBus messaging;
         private readonly IUsageTracker usageTracker;
@@ -150,7 +150,6 @@ namespace Squidex.Domain.Apps.Entities.Billing
                     var notification = new UsageTrackingCheck
                     {
                         AppId = appId,
-                        AppName = app.Name,
                         Usage = usage,
                         UsageLimit = blockLimit,
                         Users = GetUsers(app)

@@ -18,6 +18,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return new NamedId<DomainId>(app.Id, app.Name);
         }
 
+        public static string DisplayName(this IAppEntity app)
+        {
+            return app.Label.Or(app.Name);
+        }
+
         public static bool TryGetContributorRole(this IAppEntity app, string id, bool isFrontend, [MaybeNullWhen(false)] out Role role)
         {
             role = null;
