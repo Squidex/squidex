@@ -20,10 +20,10 @@ Current Version ![GitHub release](https://img.shields.io/github/release/squidex/
 
 ## Prerequisites
 
-* [Visual Studio Code](https://code.visualstudio.com/) or [Visual Studio 2017](https://www.visualstudio.com/vs/visual-studio-2017-rc/)
+* [Visual Studio Code](https://code.visualstudio.com/) or [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 * [Node.js](https://nodejs.org/en/) (development only)
 * [MongoDB](https://www.mongodb.com/)
-* [.NET Core SDK](https://www.microsoft.com/net/download/core#/current) (Already part of Visual Studio 2017)
+* [.NET 6 SDK](https://dotnet.microsoft.com/download#/current) (Already part of Visual Studio)
 
 ## Deployment Options
 
