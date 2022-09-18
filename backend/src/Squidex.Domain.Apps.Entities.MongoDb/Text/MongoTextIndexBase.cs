@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
             await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
         }
 
-        public virtual Task ExecuteAsync(IndexCommand[] commands,
+        public async virtual Task ExecuteAsync(IndexCommand[] commands,
             CancellationToken ct = default)
         {
             var writes = new List<WriteModel<MongoTextIndexEntity<T>>>(commands.Length);
@@ -87,10 +87,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 
             if (writes.Count == 0)
             {
-                return Task.CompletedTask;
+                return;
             }
 
-            return Collection.BulkWriteAsync(writes, BulkUnordered, ct);
+            try
+            {
+                await Collection.BulkWriteAsync(writes, BulkUnordered, ct);
+            }
+            catch (MongoBulkWriteException ex)
+            {
+                // Ignore invalid geodata.
+                if (ex.WriteErrors.Any(error => error.Code != MongoDbErrorCodes.Errror16755_InvalidGeoData))
+                {
+                    throw;
+                }
+            }
         }
 
         public virtual async Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,

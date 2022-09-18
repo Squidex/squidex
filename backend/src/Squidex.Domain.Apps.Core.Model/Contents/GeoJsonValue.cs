@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                     return GeoJsonParseResult.InvalidLongitude;
                 }
 
-                geoJSON = new Point(new Coordinate(lat, lon));
+                geoJSON = new Point(new Coordinate(lon, lat));
 
                 return GeoJsonParseResult.Success;
             }
