@@ -58,10 +58,9 @@ export class ArrayEditorComponent implements OnChanges {
     public schemasDropdown = new ModalModel();
     public schemasList: ReadonlyArray<SchemaDto> = [];
 
+    public isDisabledOrFull?: Observable<boolean>;
     public isDisabled?: Observable<boolean>;
     public isCollapsedInitial = false;
-
-    public isFull?: Observable<boolean>;
 
     public get hasField() {
         return this.formModel.field['nested']?.length > 0;
@@ -83,8 +82,7 @@ export class ArrayEditorComponent implements OnChanges {
             }
 
             this.isDisabled = disabled$(this.formModel.form);
-
-            this.isFull = combineLatest([
+            this.isDisabledOrFull = combineLatest([
                 this.isDisabled,
                 this.formModel.itemChanges,
             ]).pipe(map(([disabled, items]) => {
