@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
             }
             catch (MongoBulkWriteException ex)
             {
-                // Ignore invalid geodata.
+                // Ignore invalid geo data.
                 if (ex.WriteErrors.Any(error => error.Code != MongoDbErrorCodes.Errror16755_InvalidGeoData))
                 {
                     throw;
