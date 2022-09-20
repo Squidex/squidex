@@ -85,9 +85,16 @@ hr {
     opacity: .7;
 
     &.table-drag {
-        background: $color-white;
-        border: 2px dashed darken($color-border, 5%);
         display: table;
+
+        &::before {
+            @include force-height(100%);
+            background: $color-white;
+            border: 2px dashed darken($color-border, 5%);
+            border-radius: 2px;
+            display: block;
+            content: '';
+        }
 
         * {
             display: none;

@@ -1,7 +1,8 @@
 <ng-container *ngIf="formModel.itemChanges | async; let items">
-    <div class="array-container" [class.expanded]="isExpanded" *ngIf="items.length > 0 && items.length <= 20;"
+    <div class="array-container static" [class.expanded]="isExpanded" *ngIf="items.length > 0 && items.length <= 20;"
         cdkDropList
-        [cdkDropListDisabled]="false"
+        [cdkDropListSortingDisabled]="isDisabled | async"
+        [cdkDropListDisabled]="isDisabled | async"
         [cdkDropListData]="items"
         (cdkDropListDropped)="sort($event)">
         <div *ngFor="let itemForm of items; index as i; last as isLast; first as isFirst;" class="table-drag item"
@@ -26,7 +27,7 @@
                 (itemMove)="move(itemForm, $event)" 
                 [language]="language"
                 [languages]="languages">
-                <i cdkDragHandle class="icon-drag2"></i>
+                <i cdkDragHandle class="icon-drag2" [class.hidden]="isDisabled | async"></i>
             </sqx-array-item>
         </div>
     </div>
