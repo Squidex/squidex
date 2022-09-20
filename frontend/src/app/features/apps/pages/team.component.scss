@@ -1,14 +1,28 @@
 @import 'mixins';
 @import 'vars';
 
-.btn {
-    @include absolute(1rem, 1rem);
+h3 {
+    @include truncate;
 }
 
-.card-body {
-    position: relative;
+.row {
+    flex-wrap: nowrap;
 }
 
-.card-title {
-    padding-right: 2rem;
+.col {
+    overflow: hidden;
+}
+
+.team-header {
+    border-bottom: 1px solid $color-border;
+}
+
+.link {
+    font-size: $font-small;
+    font-weight: normal;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
 }

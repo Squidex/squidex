@@ -2,12 +2,6 @@
 @import 'vars';
 
 .apps-section {
-    @include clearfix;
-    padding: 2rem 1.25rem 0 $size-sidebar-width + .25rem;
-}
-
-.teams-section {
-    @include clearfix;
     padding: 2rem 1.25rem 0 $size-sidebar-width + .25rem;
 }
 
@@ -15,10 +9,6 @@
     left: 0;
     overflow-x: hidden;
     overflow-y: auto;
-}
-
-%no-decoration {
-    text-decoration: none;
 }
 
 :host ::ng-deep {
@@ -83,19 +73,35 @@
         &-href {
             cursor: pointer;
 
-            &:hover {
-                @extend %no-decoration;
-                @include box-shadow-outer(0, 3px, 16px, .2);
+            &:active,
+            &:focus {
+                text-decoration: none;
             }
 
             &:focus {
-                @extend %no-decoration;
                 outline: none;
             }
 
-            &:active {
-                @extend %no-decoration;
+            &:hover {
+                @include box-shadow-outer(0, 3px, 16px, .2);
             }
+        }
+    }
+}
+
+.team {
+    margin-top: 1rem;
+
+    &:first-child {
+        margin: 0;
+    }
+
+    &-body {
+        @include clearfix;
+
+        &.padded {
+            padding-bottom: 1rem;
+            padding-top: 1rem;
         }
     }
 }

@@ -9,27 +9,25 @@
         </div>
     </div>
 
-    <ng-container *ngIf="appsState.apps | async; let apps">
+    <ng-container *ngIf="groupedApps | async; let groups">
         <div class="apps-section">
-            <div class="empty" *ngIf="apps.length === 0">
+            <div class="empty" *ngIf="groups.length === 0">
                 <h3 class="empty-headline">{{ 'apps.empty' | sqxTranslate }}</h3>
             </div>
-            
-            <h3 *ngIf="apps.length > 0">{{ 'common.apps' | sqxTranslate }}</h3>
 
-            <sqx-app *ngFor="let app of apps; trackBy: trackByApp"
-                [app]="app" (leave)="leaveApp($event)">
-            </sqx-app>
-        </div>
-    </ng-container>
+            <div class="team" *ngFor="let group of groups; trackByGroup">
+                <div class="team-header" *ngIf="group.team">
+                    <sqx-team [team]="group.team" (leave)="leaveTeam($event)"></sqx-team>
+                </div>
 
-    <ng-container *ngIf="teamsState.teams | async; let teams">
-        <div class="teams-section">
-            <h3 *ngIf="teams.length > 0">{{ 'common.teams' | sqxTranslate }}</h3>
+                <div class="team-body" [class.padded]="group.team">
+                    <sqx-app *ngFor="let app of group.apps; trackBy: trackByApp" [app]="app" (leave)="leaveApp($event)"></sqx-app>
 
-            <sqx-team *ngFor="let team of teams; trackBy: trackByTeam"
-                [team]="team" (leave)="leaveTeam($event)">
-            </sqx-team>
+                    <small class="team-empty" *ngIf="group.apps.length === 0">
+                        {{ 'teams.empty' | sqxTranslate }}
+                    </small>
+                </div>
+            </div>
         </div>
     </ng-container>
 
