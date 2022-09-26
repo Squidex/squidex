@@ -5,33 +5,35 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Teams;
 
 namespace Squidex.Domain.Apps.Entities.Billing
 {
     public interface IBillingManager
     {
-        bool HasPortal { get; }
-
-        Task<Uri?> MustRedirectToPortalAsync(string userId, NamedId<DomainId> appId, string? planId,
+        Task<Uri?> GetPortalLinkAsync(string userId, IAppEntity app,
             CancellationToken ct = default);
 
-        Task<Uri?> MustRedirectToPortalAsync(string userId, DomainId teamId, string? planId,
+        Task<Uri?> GetPortalLinkAsync(string userId, ITeamEntity team,
             CancellationToken ct = default);
 
-        Task SubscribeAsync(string userId, NamedId<DomainId> appId, string planId,
+        Task<Uri?> MustRedirectToPortalAsync(string userId, IAppEntity app, string? planId,
             CancellationToken ct = default);
 
-        Task SubscribeAsync(string userId, DomainId teamId, string planId,
+        Task<Uri?> MustRedirectToPortalAsync(string userId, ITeamEntity team, string? planId,
             CancellationToken ct = default);
 
-        Task UnsubscribeAsync(string userId, NamedId<DomainId> appId,
+        Task SubscribeAsync(string userId, IAppEntity app, string planId,
             CancellationToken ct = default);
 
-        Task UnsubscribeAsync(string userId, DomainId teamId,
+        Task SubscribeAsync(string userId, ITeamEntity team, string planId,
             CancellationToken ct = default);
 
-        Task<string> GetPortalLinkAsync(string userId,
+        Task UnsubscribeAsync(string userId, IAppEntity app,
+            CancellationToken ct = default);
+
+        Task UnsubscribeAsync(string userId, ITeamEntity team,
             CancellationToken ct = default);
     }
 }

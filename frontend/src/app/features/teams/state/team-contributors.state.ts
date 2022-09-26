@@ -70,7 +70,7 @@ export class TeamContributorsState extends State<Snapshot> {
             pageSize: 10,
             total: 0,
             version: Version.EMPTY,
-        }, 'Contributors');
+        }, 'Team Contributors');
     }
 
     public loadIfNotLoaded(): Observable<any> {

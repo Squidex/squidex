@@ -5,7 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Teams;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Billing
@@ -15,47 +16,49 @@ namespace Squidex.Domain.Apps.Entities.Billing
         private readonly NoopBillingManager sut = new NoopBillingManager();
 
         [Fact]
-        public void Should_not_have_portal()
+        public async Task Should_do_nothing_if_subscribing_to_app()
         {
-            Assert.False(sut.HasPortal);
-        }
-
-        [Fact]
-        public async Task Should_do_nothing_if_subscribing()
-        {
-            await sut.SubscribeAsync(null!, null!, null!);
+            await sut.SubscribeAsync(null!, (IAppEntity)null!, null!);
         }
 
         [Fact]
         public async Task Should_do_nothing_if_subscribing_to_team()
         {
-            await sut.SubscribeAsync(null!, default(DomainId), null!);
+            await sut.SubscribeAsync(null!, (ITeamEntity)null!, null!);
         }
 
         [Fact]
-        public async Task Should_do_nothing_if_unsubscribing()
+        public async Task Should_do_nothing_if_unsubscribing_from_app()
         {
-            await sut.UnsubscribeAsync(null!, null!);
+            await sut.UnsubscribeAsync(null!, (IAppEntity)null!);
         }
 
         [Fact]
         public async Task Should_do_nothing_if_unsubscribing_from_team()
         {
-            await sut.UnsubscribeAsync(null!, default(DomainId));
+            await sut.UnsubscribeAsync(null!, (ITeamEntity)null!);
         }
 
         [Fact]
-        public async Task Should_not_return_portal_link()
+        public async Task Should_not_return_portal_link_for_app()
         {
-            var actual = await sut.GetPortalLinkAsync(null!);
+            var actual = await sut.GetPortalLinkAsync(null!, (IAppEntity)null!);
 
-            Assert.Empty(actual);
+            Assert.Null(actual);
         }
 
         [Fact]
-        public async Task Should_do_nothing_if_checking_for_redirect()
+        public async Task Should_not_return_portal_link_for_team()
         {
-            var actual = await sut.MustRedirectToPortalAsync(null!, null!, null);
+            var actual = await sut.GetPortalLinkAsync(null!, (ITeamEntity)null!);
+
+            Assert.Null(actual);
+        }
+
+        [Fact]
+        public async Task Should_do_nothing_if_checking_for_redirect_for_app()
+        {
+            var actual = await sut.MustRedirectToPortalAsync(null!, (IAppEntity)null!, null);
 
             Assert.Null(actual);
         }
@@ -63,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
         [Fact]
         public async Task Should_do_nothing_if_checking_for_redirect_for_team()
         {
-            var actual = await sut.MustRedirectToPortalAsync(null!, default(DomainId), null);
+            var actual = await sut.MustRedirectToPortalAsync(null!, (ITeamEntity)null!, null);
 
             Assert.Null(actual);
         }

@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Json.System
             public int PropertyB { get; init; }
         }
 
-        private class Converter : InheritanceConverterBase<Base>
+        private sealed class Converter : InheritanceConverterBase<Base>
         {
             public Converter()
                 : base("$type")

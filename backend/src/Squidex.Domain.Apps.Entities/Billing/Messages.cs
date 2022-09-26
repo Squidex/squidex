@@ -15,8 +15,6 @@ namespace Squidex.Domain.Apps.Entities.Billing
     {
         public DomainId AppId { get; init; }
 
-        public string AppName { get; init; }
-
         public long Usage { get; init; }
 
         public long UsageLimit { get; init; }

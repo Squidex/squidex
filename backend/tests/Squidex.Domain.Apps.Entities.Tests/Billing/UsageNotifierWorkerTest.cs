@@ -8,7 +8,10 @@
 using FakeItEasy;
 using NodaTime;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Notifications;
+using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.TestHelpers;
 using Squidex.Shared.Users;
 using Xunit;
@@ -19,20 +22,25 @@ namespace Squidex.Domain.Apps.Entities.Billing
     {
         private readonly TestState<UsageNotifierWorker.State> state = new TestState<UsageNotifierWorker.State>("Default");
         private readonly IClock clock = A.Fake<IClock>();
-        private readonly INotificationSender notificationSender = A.Fake<INotificationSender>();
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
+        private readonly IUserNotifications notificationSender = A.Fake<IUserNotifications>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
+        private readonly IAppEntity app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
         private readonly UsageNotifierWorker sut;
         private Instant time = SystemClock.Instance.GetCurrentInstant();
 
         public UsageNotifierWorkerTest()
         {
+            A.CallTo(() => appProvider.GetAppAsync(app.Id, true, default))
+                .Returns(app);
+
             A.CallTo(() => clock.GetCurrentInstant())
                 .ReturnsLazily(() => time);
 
             A.CallTo(() => notificationSender.IsActive)
                 .Returns(true);
 
-            sut = new UsageNotifierWorker(state.PersistenceFactory, notificationSender, userResolver)
+            sut = new UsageNotifierWorker(state.PersistenceFactory, appProvider, notificationSender, userResolver)
             {
                 Clock = clock
             };
@@ -46,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
 
             var message = new UsageTrackingCheck
             {
-                AppName = "my-app",
+                AppId = app.Id,
                 Usage = 1000,
                 UsageLimit = 3000,
                 Users = new[] { "1", "2" }
@@ -54,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
 
             await sut.HandleAsync(message, default);
 
-            A.CallTo(() => notificationSender.SendUsageAsync(A<IUser>._, "my-app", 1000, 3000))
+            A.CallTo(() => notificationSender.SendUsageAsync(A<IUser>._, A<IAppEntity>._, A<long>._, A<long>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -67,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
 
             var message = new UsageTrackingCheck
             {
-                AppName = "my-app",
+                AppId = app.Id,
                 Usage = 1000,
                 UsageLimit = 3000,
                 Users = new[] { "1", "2", "3" }
@@ -75,13 +83,13 @@ namespace Squidex.Domain.Apps.Entities.Billing
 
             await sut.HandleAsync(message, default);
 
-            A.CallTo(() => notificationSender.SendUsageAsync(user1!, "my-app", 1000, 3000))
+            A.CallTo(() => notificationSender.SendUsageAsync(user1!, app, 1000, 3000, default))
                 .MustHaveHappened();
 
-            A.CallTo(() => notificationSender.SendUsageAsync(user2!, "my-app", 1000, 3000))
+            A.CallTo(() => notificationSender.SendUsageAsync(user2!, app, 1000, 3000, default))
                 .MustHaveHappened();
 
-            A.CallTo(() => notificationSender.SendUsageAsync(user3!, "my-app", 1000, 3000))
+            A.CallTo(() => notificationSender.SendUsageAsync(user3!, app, 1000, 3000, default))
                 .MustNotHaveHappened();
         }
 
@@ -92,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
 
             var message = new UsageTrackingCheck
             {
-                AppName = "my-app",
+                AppId = app.Id,
                 Usage = 1000,
                 UsageLimit = 3000,
                 Users = new[] { "1" }
@@ -101,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
             await sut.HandleAsync(message, default);
             await sut.HandleAsync(message, default);
 
-            A.CallTo(() => notificationSender.SendUsageAsync(user!, "my-app", 1000, 3000))
+            A.CallTo(() => notificationSender.SendUsageAsync(user!, app, 1000, 3000, default))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -112,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
 
             var message = new UsageTrackingCheck
             {
-                AppName = "my-app",
+                AppId = app.Id,
                 Usage = 1000,
                 UsageLimit = 3000,
                 Users = new[] { "1" }
@@ -124,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
 
             await sut.HandleAsync(message, default);
 
-            A.CallTo(() => notificationSender.SendUsageAsync(user!, "my-app", 1000, 3000))
+            A.CallTo(() => notificationSender.SendUsageAsync(user!, app, 1000, 3000, default))
                 .MustHaveHappenedTwiceExactly();
         }
 
@@ -140,7 +148,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
 
             var message = new UsageTrackingCheck
             {
-                AppName = "my-app",
+                AppId = app.Id,
                 Usage = 1000,
                 UsageLimit = 3000,
                 Users = new[] { "1" }
@@ -152,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
 
             await sut.HandleAsync(message, default);
 
-            A.CallTo(() => notificationSender.SendUsageAsync(user!, "my-app", 1000, 3000))
+            A.CallTo(() => notificationSender.SendUsageAsync(user!, app, 1000, 3000, default))
                 .MustHaveHappenedOnceExactly();
         }
 

@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Invitation
     public sealed class InvitationEventConsumer : IEventConsumer
     {
         private static readonly Duration MaxAge = Duration.FromDays(2);
-        private readonly INotificationSender emailSender;
+        private readonly IUserNotifications userNotifications;
         private readonly IUserResolver userResolver;
         private readonly IAppProvider appProvider;
         private readonly ILogger<InvitationEventConsumer> log;
@@ -34,18 +34,21 @@ namespace Squidex.Domain.Apps.Entities.Invitation
             get { return "^app-|^app-"; }
         }
 
-        public InvitationEventConsumer(INotificationSender emailSender, IUserResolver userResolver, IAppProvider appProvider,
+        public InvitationEventConsumer(
+            IAppProvider appProvider,
+            IUserNotifications userNotifications,
+            IUserResolver userResolver,
             ILogger<InvitationEventConsumer> log)
         {
-            this.emailSender = emailSender;
-            this.userResolver = userResolver;
             this.appProvider = appProvider;
+            this.userNotifications = userNotifications;
+            this.userResolver = userResolver;
             this.log = log;
         }
 
         public async Task On(Envelope<IEvent> @event)
         {
-            if (!emailSender.IsActive)
+            if (!userNotifications.IsActive)
             {
                 return;
             }
@@ -75,7 +78,14 @@ namespace Squidex.Domain.Apps.Entities.Invitation
                             return;
                         }
 
-                        await emailSender.SendInviteAsync(assigner, assignee, assigned.AppId.Name);
+                        var app = await appProvider.GetAppAsync(assigned.AppId.Id, true);
+
+                        if (app == null)
+                        {
+                            return;
+                        }
+
+                        await userNotifications.SendInviteAsync(assigner, assignee, app);
                         return;
                     }
 
@@ -95,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Invitation
                             return;
                         }
 
-                        await emailSender.SendTeamInviteAsync(assigner, assignee, team.Name);
+                        await userNotifications.SendInviteAsync(assigner, assignee, team);
                         break;
                     }
             }

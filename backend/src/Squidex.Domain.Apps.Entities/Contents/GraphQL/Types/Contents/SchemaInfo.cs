@@ -18,35 +18,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         public ISchemaEntity Schema { get; }
 
-        public string TypeName { get; }
-
-        public string DisplayName { get; }
+        public string DisplayName => Schema.DisplayName();
 
         public string ComponentType { get; }
 
         public string ContentType { get; }
 
-        public string DataType { get; }
+        public string DataFlatType { get; }
 
         public string DataInputType { get; }
 
-        public string DataFlatType { get; }
+        public string DataType { get; }
 
-        public string ResultType { get; }
+        public string ContentResultType { get; }
 
-        public IReadOnlyList<FieldInfo> Fields { get; }
+        public string TypeName { get; }
 
-        private SchemaInfo(ISchemaEntity schema, string typeName, IReadOnlyList<FieldInfo> fields, Names names)
+        public IReadOnlyList<FieldInfo> Fields { get; init; }
+
+        private SchemaInfo(ISchemaEntity schema, string typeName, Names rootScope)
         {
             Schema = schema;
-            ComponentType = names[$"{typeName}Component"];
-            ContentType = names[typeName];
-            DataFlatType = names[$"{typeName}FlatDataDto"];
-            DataInputType = names[$"{typeName}DataInputDto"];
-            ResultType = names[$"{typeName}ResultDto"];
-            DataType = names[$"{typeName}DataDto"];
-            DisplayName = schema.DisplayName();
-            Fields = fields;
+
+            ComponentType = rootScope[$"{typeName}Component"];
+            ContentResultType = rootScope[$"{typeName}ResultDto"];
+            ContentType = typeName;
+            DataFlatType = rootScope[$"{typeName}FlatDataDto"];
+            DataInputType = rootScope[$"{typeName}DataInputDto"];
+            DataType = rootScope[$"{typeName}DataDto"];
             TypeName = typeName;
         }
 
@@ -57,79 +56,65 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public static IEnumerable<SchemaInfo> Build(IEnumerable<ISchemaEntity> schemas)
         {
-            var names = new Names();
+            var rootScope = new Names();
 
             foreach (var schema in schemas.OrderBy(x => x.Created))
             {
-                var typeName = schema.TypeName();
+                var typeName = rootScope[schema.TypeName()];
 
-                var fieldInfos = new List<FieldInfo>(schema.SchemaDef.Fields.Count);
-                var fieldNames = new Names();
-
-                foreach (var field in schema.SchemaDef.Fields.ForApi())
+                yield return new SchemaInfo(schema, typeName, rootScope)
                 {
-                    fieldInfos.Add(FieldInfo.Build(
-                        field,
-                        names[$"{typeName}Data{field.TypeName()}"],
-                        names,
-                        fieldNames));
-                }
-
-                yield return new SchemaInfo(schema, typeName, fieldInfos, names);
+                    Fields = FieldInfo.Build(schema.SchemaDef.Fields, $"{typeName}Data", rootScope).ToList()
+                };
             }
         }
     }
 
     internal sealed class FieldInfo
     {
-        public static readonly List<FieldInfo> EmptyFields = new List<FieldInfo>();
-
         public IField Field { get; set; }
+
+        public string DisplayName => Field.DisplayName();
+
+        public string EmbeddableStringType { get; }
+
+        public string EmbeddedEnumType { get; }
 
         public string FieldName { get; }
 
         public string FieldNameDynamic { get; }
 
-        public string DisplayName { get; }
-
-        public string EnumName { get; }
+        public string LocalizedInputType { get; }
 
         public string LocalizedType { get; }
 
         public string LocalizedTypeDynamic { get; }
 
-        public string LocalizedInputType { get; }
+        public string NestedInputType { get; }
 
         public string NestedType { get; }
 
-        public string NestedInputType { get; }
+        public string UnionComponentType { get; }
 
-        public string ComponentType { get; }
+        public string UnionReferenceType { get; }
 
-        public string ReferenceType { get; }
+        public IReadOnlyList<FieldInfo> Fields { get; init; }
 
-        public string EmbeddableStringType { get; }
-
-        public IReadOnlyList<FieldInfo> Fields { get; }
-
-        private FieldInfo(IField field, string typeName, Names names, Names parentNames, IReadOnlyList<FieldInfo> fields)
+        private FieldInfo(IField field, string fieldName, string typeName, Names rootScope)
         {
-            var fieldName = parentNames[field.Name.ToCamelCase(), false];
-
-            ComponentType = names[$"{typeName}ComponentUnionDto"];
-            DisplayName = field.DisplayName();
-            EmbeddableStringType = names[$"{typeName}EmbeddableString"];
-            EnumName = names[$"{fieldName}Enum"];
             Field = field;
+
+            EmbeddableStringType = rootScope[$"{typeName}EmbeddableString"];
+            EmbeddedEnumType = rootScope[$"{typeName}Enum"];
             FieldName = fieldName;
-            FieldNameDynamic = names[$"{fieldName}__Dynamic"];
-            Fields = fields;
-            LocalizedInputType = names[$"{typeName}InputDto"];
-            LocalizedType = names[$"{typeName}Dto"];
-            LocalizedTypeDynamic = names[$"{typeName}Dto__Dynamic"];
-            NestedInputType = names[$"{typeName}ChildInputDto"];
-            NestedType = names[$"{typeName}ChildDto"];
-            ReferenceType = names[$"{typeName}UnionDto"];
+            FieldNameDynamic = $"{fieldName}__Dynamic";
+            LocalizedInputType = rootScope[$"{typeName}InputDto"];
+            LocalizedType = rootScope[$"{typeName}Dto"];
+            LocalizedTypeDynamic = rootScope[$"{typeName}Dto__Dynamic"];
+            NestedInputType = rootScope[$"{typeName}ChildInputDto"];
+            NestedType = rootScope[$"{typeName}ChildDto"];
+            UnionComponentType = rootScope[$"{typeName}ComponentUnionDto"];
+            UnionReferenceType = rootScope[$"{typeName}UnionDto"];
         }
 
         public override string ToString()
@@ -137,28 +122,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return FieldName;
         }
 
-        internal static FieldInfo Build(IRootField rootField, string typeName, Names names, Names parentNames)
+        internal static IEnumerable<FieldInfo> Build(IEnumerable<IField> fields, string typeName, Names rootScope)
         {
-            var fieldInfos = EmptyFields;
+            var typeScope = new Names();
 
-            if (rootField is IArrayField arrayField)
+            foreach (var field in fields.ForApi())
             {
-                var fieldNames = new Names();
+                // Field names must be unique within the scope of the parent type.
+                var fieldName = typeScope[field.Name.ToCamelCase(), false];
 
-                fieldInfos = new List<FieldInfo>(arrayField.Fields.Count);
+                // Type names must be globally unique.
+                var fieldTypeName = rootScope[$"{typeName}{field.TypeName()}"];
 
-                foreach (var nestedField in arrayField.Fields.ForApi())
+                var nested = new List<FieldInfo>();
+
+                if (field is IArrayField arrayField)
                 {
-                    fieldInfos.Add(new FieldInfo(
-                        nestedField,
-                        names[$"{typeName}{nestedField.TypeName()}"],
-                        names,
-                        fieldNames,
-                        EmptyFields));
+                    nested = Build(arrayField.Fields, fieldTypeName, rootScope).ToList();
                 }
-            }
 
-            return new FieldInfo(rootField, typeName, names, parentNames, fieldInfos);
+                yield return new FieldInfo(
+                    field,
+                    fieldName,
+                    fieldTypeName,
+                    rootScope)
+                {
+                    Fields = nested
+                };
+            }
         }
     }
 

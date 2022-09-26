@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             A.CallTo(() => billingPlans.GetPlan(planIdPaid))
                 .Returns(new Plan { Id = planIdPaid, MaxContributors = 30 });
 
-            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, A<string>._, default))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<IAppEntity>._, A<string>._, default))
                 .Returns(Task.FromResult<Uri?>(null));
 
             A.CallTo(() => appProvider.GetTeamAsync(teamId, default))
@@ -227,7 +227,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var command = new ChangePlan { PlanId = planIdPaid };
 
-            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<IAppEntity>._, planIdPaid, default))
                 .Returns(Task.FromResult<Uri?>(null));
 
             await ExecuteCreateAsync();
@@ -243,10 +243,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
                 );
 
-            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<IAppEntity>._, planIdPaid, default))
                 .MustHaveHappened();
 
-            A.CallTo(() => billingManager.SubscribeAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
+            A.CallTo(() => billingManager.SubscribeAsync(Actor.Identifier, A<IAppEntity>._, planIdPaid, default))
                 .MustHaveHappened();
         }
 
@@ -268,10 +268,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
                 );
 
-            A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<IAppEntity>._, A<string?>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => billingManager.SubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
+            A.CallTo(() => billingManager.SubscribeAsync(A<string>._, A<IAppEntity>._, A<string?>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -294,10 +294,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppPlanReset())
                 );
 
-            A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<NamedId<DomainId>>._, A<string?>._, A<CancellationToken>._))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._,  A<IAppEntity>._, A<string?>._, A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<CancellationToken>._))
+            A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._,  A<IAppEntity>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -320,10 +320,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppPlanReset())
                 );
 
-            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<IAppEntity>._, planIdPaid, default))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, A<NamedId<DomainId>>._, A<CancellationToken>._))
+            A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._,  A<IAppEntity>._, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -332,7 +332,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var command = new ChangePlan { PlanId = planIdPaid };
 
-            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, default))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<IAppEntity>._, planIdPaid, default))
                 .Returns(new Uri("http://squidex.io"));
 
             await ExecuteCreateAsync();
@@ -357,10 +357,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             Assert.Equal(planIdPaid, sut.Snapshot.Plan?.PlanId);
 
-            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, AppNamedId, planIdPaid, A<CancellationToken>._))
+            A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<IAppEntity>._, planIdPaid, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => billingManager.SubscribeAsync(Actor.Identifier, AppNamedId, planIdPaid, A<CancellationToken>._))
+            A.CallTo(() => billingManager.SubscribeAsync(Actor.Identifier, A<IAppEntity>._, planIdPaid, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -714,7 +714,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     CreateEvent(new AppDeleted())
                 );
 
-            A.CallTo(() => billingManager.UnsubscribeAsync(command.Actor.Identifier, AppNamedId, default))
+            A.CallTo(() => billingManager.UnsubscribeAsync(command.Actor.Identifier, A<IAppEntity>._, default))
                 .MustHaveHappened();
         }
 

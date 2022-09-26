@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             if (field.Properties?.AllowedValues?.Count > 0 && field.Properties.CreateEnum)
             {
-                var @enum = builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
+                var @enum = builder.GetEnumeration(args.EmbeddedEnumType, field.Properties.AllowedValues);
 
                 if (@enum != null)
                 {
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             if (field.Properties?.AllowedValues?.Count > 0 && field.Properties.CreateEnum)
             {
-                var @enum = builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
+                var @enum = builder.GetEnumeration(args.EmbeddedEnumType, field.Properties.AllowedValues);
 
                 if (@enum != null)
                 {

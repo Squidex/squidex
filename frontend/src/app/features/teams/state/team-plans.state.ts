@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { TeamPlansService } from '@app/features/teams/internal';
-import { AuthService, DialogService, LoadingState, PlanDto, shareSubscribed, State, TeamsState, Version } from '@app/shared';
+import { DialogService, LoadingState, PlanDto, PlanLockedReason, shareSubscribed, State, TeamsState, Version } from '@app/shared';
 
 export interface PlanInfo {
     // The plan.
@@ -26,14 +26,14 @@ interface Snapshot extends LoadingState {
     // The current plans.
     plans: ReadonlyArray<PlanInfo>;
 
-    // Indicates if the user is the plan owner.
-    isOwner?: boolean;
-
     // The user, who owns the plan.
     planOwner?: string;
 
-    // Indicates if there is a billing portal for the current Squidex instance.
-    hasPortal?: boolean;
+    // The portal link if available.
+    portalLink?: string;
+
+    // The reason why the plan cannot be changed.
+    locked?: PlanLockedReason;
 
     // The team version.
     version: Version;
@@ -47,20 +47,17 @@ export class TeamPlansState extends State<Snapshot> {
     public planOwner =
         this.project(x => x.planOwner);
 
-    public isOwner =
-        this.project(x => x.isOwner === true);
-
     public isLoaded =
         this.project(x => x.isLoaded === true);
 
     public isLoading =
         this.project(x => x.isLoading === true);
 
-    public isDisabled =
-        this.project(x => !x.isOwner);
+    public locked =
+        this.project(x => x.locked);
 
-    public hasPortal =
-        this.project(x => x.hasPortal);
+    public portalLink =
+        this.project(x => x.portalLink);
 
     public get teamId() {
         return this.teamsState.teamId;
@@ -70,11 +67,10 @@ export class TeamPlansState extends State<Snapshot> {
 
     constructor(
         private readonly teamsState: TeamsState,
-        private readonly authState: AuthService,
         private readonly dialogs: DialogService,
         private readonly plansService: TeamPlansService,
     ) {
-        super({ plans: [], version: Version.EMPTY }, 'Plans');
+        super({ plans: [], version: Version.EMPTY }, 'Teams Plans');
     }
 
     public load(isReload = false, overridePlanId?: string): Observable<any> {
@@ -98,12 +94,12 @@ export class TeamPlansState extends State<Snapshot> {
                 const plans = payload.plans.map(x => createPlan(x, planId));
 
                 this.next({
-                    hasPortal: payload.hasPortal,
                     isLoaded: true,
                     isLoading: false,
-                    isOwner: !payload.planOwner || payload.planOwner === this.userId,
+                    locked: payload.locked,
                     planOwner: payload.planOwner,
                     plans,
+                    portalLink: payload.portalLink,
                     version,
                 }, 'Loading Success');
             }),
@@ -127,10 +123,6 @@ export class TeamPlansState extends State<Snapshot> {
                 }
             }),
             shareSubscribed(this.dialogs));
-    }
-
-    private get userId() {
-        return this.authState.user!.id;
     }
 
     private get version() {

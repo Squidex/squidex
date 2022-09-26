@@ -49,7 +49,6 @@ namespace Squidex.Domain.Apps.Entities.History
                     texts[key] = value;
                 }
             }
-
         }
 
         public Task ClearAsync()

@@ -51,15 +51,35 @@ namespace Squidex.Areas.Api.Controllers.Plans
         [ProducesResponseType(typeof(PlansDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(PermissionIds.TeamPlansRead)]
         [ApiCosts(0)]
-        public IActionResult GetPlans(string team)
+        public IActionResult GetTeamPlans(string team)
         {
-            var hasPortal = billingManager.HasPortal;
-
             var response = Deferred.AsyncResponse(async () =>
             {
+                var owner = Team.Plan?.Owner.Identifier;
+
                 var (_, planId) = await appUsageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
 
-                return PlansDto.FromDomain(Team, billingPlans, planId, hasPortal);
+                var lockedReason = PlansLockedReason.None;
+
+                if (!Resources.CanChangeTeamPlan)
+                {
+                    lockedReason = PlansLockedReason.NoPermission;
+                }
+                else if (owner != null && !string.Equals(owner, UserId, StringComparison.OrdinalIgnoreCase))
+                {
+                    lockedReason = PlansLockedReason.NotOwner;
+                }
+
+                var linkUrl = (Uri?)null;
+
+                if (lockedReason == PlansLockedReason.None)
+                {
+                    linkUrl = await billingManager.GetPortalLinkAsync(UserId, Team, HttpContext.RequestAborted);
+                }
+
+                var plans = billingPlans.GetAvailablePlans();
+
+                return PlansDto.FromDomain(plans.ToArray(), owner, planId, linkUrl, lockedReason);
             });
 
             Response.Headers[HeaderNames.ETag] = Team.ToEtag();
@@ -81,7 +101,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
         [ProducesResponseType(typeof(PlanChangedDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(PermissionIds.TeamPlansChange)]
         [ApiCosts(0)]
-        public async Task<IActionResult> PutPlan(string team, [FromBody] ChangePlanDto request)
+        public async Task<IActionResult> PutTeamPlan(string team, [FromBody] ChangePlanDto request)
         {
             var command = SimpleMapper.Map(request, new ChangePlan());
 

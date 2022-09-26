@@ -90,7 +90,7 @@ namespace Squidex.Areas.Api.Controllers.Teams.Models
             if (resources.IsAllowed(PermissionIds.TeamPlansRead, team: values.team, additional: permissions))
             {
                 AddGetLink("plans",
-                    resources.Url<TeamPlansController>(x => nameof(x.GetPlans), values));
+                    resources.Url<TeamPlansController>(x => nameof(x.GetTeamPlans), values));
             }
 
             return this;

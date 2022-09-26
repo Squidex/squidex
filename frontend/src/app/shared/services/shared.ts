@@ -74,6 +74,8 @@ export class PlanDto {
     }
 }
 
+export type PlanLockedReason =  'None' | 'NotOwner' |  'NoPermission' | 'ManagedByTeam';
+
 export type PlansDto = Versioned<PlansPayload>;
 
 export type PlansPayload = Readonly<{
@@ -83,14 +85,14 @@ export type PlansPayload = Readonly<{
     // The user, who owns the plan.
     planOwner: string;
 
-    // True, if the installation has a billing portal.
-    hasPortal: boolean;
-
-    // The ID of the team.
-    teamId?: string | null;
-
     // The actual plans.
     plans: ReadonlyArray<PlanDto>;
+
+    // The portal link if available.
+    portalLink?: string;
+
+    // The reason why the plan cannot be changed.
+    locked: PlanLockedReason;
 }>;
 
 export type PlanChangedDto = Readonly<{
@@ -103,11 +105,11 @@ export type ChangePlanDto = Readonly<{
     planId: string;
 }>;
 
-export function parsePlans(response: { plans: any[]; hasPortal: boolean; currentPlanId: string; planOwner: string; teamId: string | null }): PlansPayload {
-    const { plans: list, currentPlanId, hasPortal, planOwner, teamId } = response;
+export function parsePlans(response: { plans: any[] } & any): PlansPayload {
+    const { plans: list, ...more } = response;
     const plans = list.map(parsePlan);
 
-    return { plans, planOwner, currentPlanId, hasPortal, teamId };
+    return { ...more, plans };
 }
 
 export function parsePlan(response: any) {

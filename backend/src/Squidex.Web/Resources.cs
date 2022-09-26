@@ -130,6 +130,11 @@ namespace Squidex.Web
 
         public bool CanManageEvents => Can(PermissionIds.AdminEventsManage);
 
+        // Plans
+        public bool CanChangePlan => Can(PermissionIds.AppPlansChange);
+
+        public bool CanChangeTeamPlan => Can(PermissionIds.TeamPlansChange);
+
         // Backups
         public bool CanRestoreBackup => Can(PermissionIds.AdminRestore);
 

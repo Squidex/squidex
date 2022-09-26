@@ -8,7 +8,6 @@
 using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Areas.Frontend;
 using Squidex.Areas.IdentityServer.Config;
-using Squidex.Areas.Portal.Middlewares;
 using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
 using Squidex.Config.Messaging;
@@ -112,12 +111,6 @@ namespace Squidex
 
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.Map(Constants.PrefixPortal, builder =>
-            {
-                builder.UseMiddleware<PortalDashboardAuthenticationMiddleware>();
-                builder.UseMiddleware<PortalRedirectMiddleware>();
-            });
 
             app.UseEndpoints(endpoints =>
             {

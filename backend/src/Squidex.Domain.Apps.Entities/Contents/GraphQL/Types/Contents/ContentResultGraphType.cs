@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public ContentResultGraphType(ContentGraphType contentType, SchemaInfo schemaInfo)
         {
             // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-            Name = schemaInfo.ResultType;
+            Name = schemaInfo.ContentResultType;
 
             AddField(new FieldType
             {

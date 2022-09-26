@@ -9,7 +9,6 @@ using NodaTime;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Messaging;
 using Squidex.Shared.Users;
 
@@ -19,7 +18,8 @@ namespace Squidex.Domain.Apps.Entities.Billing
     {
         private static readonly TimeSpan TimeBetweenNotifications = TimeSpan.FromDays(3);
         private readonly SimpleState<State> state;
-        private readonly INotificationSender notificationSender;
+        private readonly IAppProvider appProvider;
+        private readonly IUserNotifications userNotifications;
         private readonly IUserResolver userResolver;
 
         [CollectionName("UsageNotifications")]
@@ -31,9 +31,12 @@ namespace Squidex.Domain.Apps.Entities.Billing
         public IClock Clock { get; set; } = SystemClock.Instance;
 
         public UsageNotifierWorker(IPersistenceFactory<State> persistenceFactory,
-            INotificationSender notificationSender, IUserResolver userResolver)
+            IAppProvider appProvider,
+            IUserNotifications userNotifications,
+            IUserResolver userResolver)
         {
-            this.notificationSender = notificationSender;
+            this.appProvider = appProvider;
+            this.userNotifications = userNotifications;
             this.userResolver = userResolver;
 
             state = new SimpleState<State>(persistenceFactory, GetType(), DomainId.Create("Default"));
@@ -42,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Billing
         public async Task HandleAsync(UsageTrackingCheck notification,
             CancellationToken ct)
         {
-            if (!notificationSender.IsActive)
+            if (!userNotifications.IsActive)
             {
                 return;
             }
@@ -51,23 +54,37 @@ namespace Squidex.Domain.Apps.Entities.Billing
 
             if (!HasBeenSentBefore(notification.AppId, now))
             {
-                if (notificationSender.IsActive)
-                {
-                    foreach (var userId in notification.Users)
-                    {
-                        var user = await userResolver.FindByIdOrEmailAsync(userId, ct);
-
-                        if (user != null)
-                        {
-                            notificationSender.SendUsageAsync(user,
-                                notification.AppName,
-                                notification.Usage,
-                                notification.UsageLimit).Forget();
-                        }
-                    }
-                }
+                await SendAsync(notification, ct);
 
                 await TrackNotifiedAsync(notification.AppId, now);
+            }
+        }
+
+        private async Task SendAsync(UsageTrackingCheck notification,
+            CancellationToken ct)
+        {
+            if (!userNotifications.IsActive)
+            {
+                return;
+            }
+
+            var app = await appProvider.GetAppAsync(notification.AppId, true, ct);
+
+            if (app == null)
+            {
+                return;
+            }
+
+            foreach (var userId in notification.Users)
+            {
+                var user = await userResolver.FindByIdOrEmailAsync(userId, ct);
+
+                if (user != null)
+                {
+                    await userNotifications.SendUsageAsync(user, app,
+                        notification.Usage,
+                        notification.UsageLimit, ct);
+                }
             }
         }
 

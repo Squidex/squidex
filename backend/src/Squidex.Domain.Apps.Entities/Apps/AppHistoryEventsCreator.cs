@@ -133,11 +133,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return ForEvent(e, "general");
         }
 
-        private HistoryEvent CreateAppSettingsEvent(IEvent e)
-        {
-            return ForEvent(e, "settings.appSettings");
-        }
-
         private HistoryEvent CreateContributorsEvent(IEvent e, string contributor, string? role = null)
         {
             return ForEvent(e, "settings.contributors").Param("Contributor", contributor).Param("Role", role);
