@@ -1,7 +1,8 @@
 <ng-container *ngIf="formModel.itemChanges | async; let items">
-    <div class="array-container" [class.expanded]="isExpanded" *ngIf="items.length > 0 && items.length <= 20;"
+    <div class="array-container static" [class.expanded]="isExpanded" *ngIf="items.length > 0 && items.length <= 20;"
         cdkDropList
-        [cdkDropListDisabled]="false"
+        [cdkDropListSortingDisabled]="isDisabled | async"
+        [cdkDropListDisabled]="isDisabled | async"
         [cdkDropListData]="items"
         (cdkDropListDropped)="sort($event)">
         <div *ngFor="let itemForm of items; index as i; last as isLast; first as isFirst;" class="table-drag item"
@@ -26,7 +27,7 @@
                 (itemMove)="move(itemForm, $event)" 
                 [language]="language"
                 [languages]="languages">
-                <i cdkDragHandle class="icon-drag2"></i>
+                <i cdkDragHandle class="icon-drag2" [class.hidden]="isDisabled | async"></i>
             </sqx-array-item>
         </div>
     </div>
@@ -63,7 +64,7 @@
         <div class="col-auto">
             <ng-container *ngIf="isArray; else component">
                 <ng-container *ngIf="hasField">
-                    <button type="button" class="btn btn-outline-success" [disabled]="isFull | async" (click)="addItem()">
+                    <button type="button" class="btn btn-outline-success" [disabled]="isDisabledOrFull | async" (click)="addItem()">
                         {{ 'contents.arrayAddItem' | sqxTranslate }}
                     </button>
                 </ng-container>
@@ -76,7 +77,7 @@
             
             <ng-template #component>
                 <ng-container *ngIf="schemasList.length > 1">
-                    <button type="button" class="btn btn-outline-success dropdown-toggle" [disabled]="isFull | async" (click)="schemasDropdown.show()" #buttonSelect>
+                    <button type="button" class="btn btn-outline-success dropdown-toggle" [disabled]="isDisabledOrFull | async" (click)="schemasDropdown.show()" #buttonSelect>
                         {{ 'contents.addComponent' | sqxTranslate}}
                     </button>
                     
@@ -89,7 +90,7 @@
                     </ng-container>
                 </ng-container>
                 <ng-container *ngIf="schemasList.length === 1">
-                    <button type="button" class="btn btn-outline-success" [disabled]="isFull | async" (click)="addComponent(schemasList[0])">
+                    <button type="button" class="btn btn-outline-success" [disabled]="isDisabledOrFull | async" (click)="addComponent(schemasList[0])">
                         {{ 'contents.addComponent' | sqxTranslate}}
                     </button>
                 </ng-container>
@@ -102,7 +103,7 @@
         </div>
 
         <div class="col">            
-            <button type="button" class="btn btn-text-danger ms-2" *ngIf="items.length > 0"
+            <button type="button" class="btn btn-text-danger ms-2" *ngIf="items.length > 0" [disabled]="isDisabled | async"
                 (sqxConfirmClick)="clear()"
                 confirmTitle="i18n:contents.arrayClearConfirmTitle"
                 confirmText="i18n:contents.arrayClearConfirmText"

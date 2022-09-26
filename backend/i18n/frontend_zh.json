@@ -992,6 +992,7 @@
   "start.madeByCopyright": "Sebastian Stehle 和贡献者，2016-2021",
   "teams.create": "Create",
   "teams.createFailed": "Failed to create team. Please reload.",
+  "teams.empty": "This team has no apps yet.",
   "teams.leave": "Leave team",
   "teams.leaveConfirmText": "Do you really want to leave this team?",
   "teams.leaveConfirmTitle": "Leave team.",

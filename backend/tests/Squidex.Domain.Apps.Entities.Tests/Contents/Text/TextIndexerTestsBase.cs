@@ -111,6 +111,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         }
 
         [Fact]
+        public async Task Should_search_by_geojson()
+        {
+            if (!SupportsGeo)
+            {
+                return;
+            }
+
+            var field = Guid.NewGuid().ToString();
+
+            // Within search radius
+            await CreateGeoJsonAsync(ids1[0], field, 51.343391192211506, 12.401476788622826);
+
+            // Outside of search radius
+            await CreateGeoJsonAsync(ids2[0], field, 51.30765141427311, 12.379631713912486);
+
+            // Within search radius and correct field.
+            await SearchGeo(expected: ids1, $"{field}.iv", 51.34641682574934, 12.401965298137707);
+
+            // Within search radius but incorrect field.
+            await SearchGeo(expected: null, "other.iv", 51.48596429889613, 12.102629469505713);
+        }
+
+        [Fact]
         public async Task Should_index_invariant_content_and_retrieve()
         {
             await CreateTextAsync(ids1[0], "iv", "Hello");
@@ -304,6 +327,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             await SearchText(expected: ids2, text: "V2_1");
         }
 
+        [Fact]
+        public async Task Should_index_invalid_geodata()
+        {
+            await CreateGeoAsync(ids1[0], "field", 144.34, -200);
+        }
+
+        [Fact]
+        public async Task Should_index_invalid_geojsondata()
+        {
+            await CreateGeoJsonAsync(ids1[0], "field", 144.34, -200);
+        }
+
         protected Task CreateTextAsync(DomainId id, string language, string text)
         {
             var data = TextData(language, text);
@@ -314,6 +349,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         protected Task CreateGeoAsync(DomainId id, string field, double latitude, double longitude)
         {
             var data = GeoData(field, latitude, longitude);
+
+            return UpdateAsync(id, new ContentCreated { Data = data });
+        }
+
+        protected Task CreateGeoJsonAsync(DomainId id, string field, double latitude, double longitude)
+        {
+            var data = GeoJsonData(field, latitude, longitude);
 
             return UpdateAsync(id, new ContentCreated { Data = data });
         }
@@ -382,6 +424,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 .AddField(field,
                     new ContentFieldData()
                         .AddInvariant(new JsonObject().Add("latitude", latitude).Add("longitude", longitude)));
+        }
+
+        private static ContentData GeoJsonData(string field, double latitude, double longitude)
+        {
+            return new ContentData()
+                .AddField(field,
+                    new ContentFieldData()
+                        .AddInvariant(new JsonObject()
+                            .Add("type", "Point")
+                            .Add("coordinates",
+                                new JsonArray()
+                                    .Add(longitude)
+                                    .Add(latitude))));
         }
 
         protected async Task SearchGeo(List<DomainId>? expected, string field, double latitude, double longitude, SearchScope target = SearchScope.All)

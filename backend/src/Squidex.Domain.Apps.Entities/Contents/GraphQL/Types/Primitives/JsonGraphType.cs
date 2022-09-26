@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
                     return booleanValue.BoolValue;
 
                 case GraphQLFloatValue floatValue:
-                    return double.Parse((string)floatValue.Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
+                    return double.Parse((string)floatValue.Value, NumberStyles.Any, CultureInfo.InvariantCulture);
 
                 case GraphQLIntValue intValue:
                     return double.Parse((string)intValue.Value, NumberStyles.Integer, CultureInfo.InvariantCulture);

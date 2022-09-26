@@ -230,10 +230,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(
                                 new JsonObject()
-                                    .Add("nested-number", 10)
+                                    .Add("nested-number", 42)
                                     .Add("nested-boolean", true),
                                 new JsonObject()
-                                    .Add("nested-number", 20)
+                                    .Add("nested-number", 3.14)
                                     .Add("nested-boolean", false))));
 
             if (assetId != default || refId != default)
@@ -448,12 +448,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     {
                         new
                         {
-                            nestedNumber = 10.0,
+                            nestedNumber = 42.0,
                             nestedBoolean = true
                         },
                         new
                         {
-                            nestedNumber = 20.0,
+                            nestedNumber = 3.14,
                             nestedBoolean = false
                         }
                     }
@@ -617,12 +617,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     {
                         new
                         {
-                            nestedNumber = 10.0,
+                            nestedNumber = 42.0,
                             nestedBoolean = true
                         },
                         new
                         {
-                            nestedNumber = 20.0,
+                            nestedNumber = 3.14,
                             nestedBoolean = false
                         }
                     }
@@ -704,12 +704,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 {
                     new
                     {
-                        nestedNumber = 10.0,
+                        nestedNumber = 42.0,
                         nestedBoolean = true
                     },
                     new
                     {
-                        nestedNumber = 20.0,
+                        nestedNumber = 3.14,
                         nestedBoolean = false
                     }
                 }

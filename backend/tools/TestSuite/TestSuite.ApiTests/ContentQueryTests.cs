@@ -79,7 +79,7 @@ namespace TestSuite.ApiTests
                     {
                         new
                         {
-                            path = "data.number.iv", order = "ascending"
+                            path = "data.number.iv"
                         }
                     }
                 }
@@ -111,7 +111,7 @@ namespace TestSuite.ApiTests
                     {
                         new
                         {
-                            path = "data.number.iv", order = "ascending"
+                            path = "data.number.iv"
                         }
                     },
                     skip = 5
@@ -145,7 +145,7 @@ namespace TestSuite.ApiTests
                     {
                         new
                         {
-                            path = "data.number.iv", order = "ascending"
+                            path = "data.number.iv"
                         }
                     },
                     top = 5
@@ -178,7 +178,7 @@ namespace TestSuite.ApiTests
                     {
                         new
                         {
-                            path = "data.number.iv", order = "ascending"
+                            path = "data.number.iv"
                         }
                     },
                     filter = new
@@ -218,7 +218,7 @@ namespace TestSuite.ApiTests
                     {
                         new
                         {
-                            path = "data.json.iv.nested1.nested2", order = "ascending"
+                            path = "data.json.iv.nested1.nested2"
                         }
                     },
                     filter = new
@@ -421,6 +421,42 @@ namespace TestSuite.ApiTests
             var value = result["createMyReadsContent"]["data"]["number"]["iv"].Value<int>();
 
             Assert.Equal(555, value);
+        }
+
+        [Fact]
+        public async Task Should_return_items_by_ids()
+        {
+            var q0 = new ContentQuery { Filter = "data/number/iv gt 3 and data/number/iv lt 7", OrderBy = "data/number/iv asc" };
+
+            var items_0 = await _.Contents.GetAsync(q0);
+
+            var q1 = new ContentQuery
+            {
+                JsonQuery = new
+                {
+                    sort = new[]
+                    {
+                        new
+                        {
+                            path = "data.number.iv"
+                        }
+                    },
+                    filter = new
+                    {
+                        or = items_0.Items.Select(x => new
+                        {
+                            path = "id",
+                            op = "eq",
+                            value = x.Id
+                        }).ToArray()
+                    }
+                }
+            };
+
+            var items_1 = await _.Contents.GetAsync(q1);
+
+            AssertItems(items_0, 3, new[] { 4, 5, 6 });
+            AssertItems(items_1, 3, new[] { 4, 5, 6 });
         }
 
         [Fact]

@@ -5,25 +5,34 @@
 
 virtual-scroller {
     height: 700px;
+
+    .item {
+        padding: .25rem 1rem;
+
+        &.first {
+            padding-top: .75rem;
+        }
+
+        &.last {
+            padding-bottom: .75rem;
+        }
+    }
+}
+
+.static {
+    padding-bottom: .375rem;
+    padding-top: .375rem;
 }
 
 .item {
-    padding: .25rem 1rem;
-
-    &.first {
-        padding-top: .75rem;
-    }
-
-    &.last {
-        padding-bottom: .75rem;
-    }
+    padding: .375rem 1rem;
 }
 
 .array-container {
     background: $color-border-lighter;
     margin: 0;
     margin-bottom: 1rem;
-    overflow-y: auto;
+    overflow-y: hidden;
 
     &.expanded {
         @include absolute(3rem, 1.25rem, 2.375rem + 1rem + .75rem, 1.25rem);
@@ -45,4 +54,8 @@ virtual-scroller {
 
 .drag-container {
     position: relative;
+}
+
+.cdk-drag-preview {
+    margin: 1rem;
 }

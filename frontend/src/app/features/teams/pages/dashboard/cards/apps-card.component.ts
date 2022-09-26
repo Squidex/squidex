@@ -10,7 +10,7 @@ import { AppDto, AppsService, StatefulComponent, TeamDto } from '@app/shared';
 
 interface State {
     // The apps for this team.
-    apps: ReadonlyArray<AppDto>;
+    apps?: ReadonlyArray<AppDto>;
 }
 
 @Component({
@@ -26,9 +26,7 @@ export class AppsCardComponent extends StatefulComponent<State> implements OnIni
     constructor(changeDetector: ChangeDetectorRef,
         private readonly appsService: AppsService,
     ) {
-        super(changeDetector, {
-            apps: [],
-        });
+        super(changeDetector, {});
     }
 
     public ngOnInit() {
