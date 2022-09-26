@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public string DataType { get; }
 
-        public string ResultType { get; }
+        public string ContentResultType { get; }
 
         public string TypeName { get; }
 
@@ -41,11 +41,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Schema = schema;
 
             ComponentType = rootScope[$"{typeName}Component"];
-            ContentType = rootScope[typeName];
+            ContentResultType = rootScope[$"{typeName}ResultDto"];
+            ContentType = typeName;
             DataFlatType = rootScope[$"{typeName}FlatDataDto"];
             DataInputType = rootScope[$"{typeName}DataInputDto"];
             DataType = rootScope[$"{typeName}DataDto"];
-            ResultType = rootScope[$"{typeName}ResultDto"];
             TypeName = typeName;
         }
 

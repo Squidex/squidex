@@ -42,8 +42,8 @@ describe('PlansService', () => {
             expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
-                teamId: 'my-team',
                 currentPlanId: '123',
+                portalLink: 'link/to/portal',
                 planOwner: '456',
                 plans: [
                     {
@@ -73,7 +73,7 @@ describe('PlansService', () => {
                         maxContributors: 6500,
                     },
                 ],
-                hasPortal: true,
+                locked: 'ManagedByTeam',
             }, {
                 headers: {
                     etag: '2',
@@ -82,8 +82,8 @@ describe('PlansService', () => {
 
             expect(plans!).toEqual({
                 payload: {
-                    teamId: 'my-team',
                     currentPlanId: '123',
+                    portalLink: 'link/to/portal',
                     planOwner: '456',
                     plans: [
                         new PlanDto(
@@ -99,7 +99,7 @@ describe('PlansService', () => {
                             'Change for 160 € per year?',
                             512, 4000, 5500, 6500),
                     ],
-                    hasPortal: true,
+                    locked: 'ManagedByTeam',
                 },
                 version: new Version('2'),
             });

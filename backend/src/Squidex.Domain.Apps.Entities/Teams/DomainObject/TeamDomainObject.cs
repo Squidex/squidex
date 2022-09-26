@@ -101,28 +101,34 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
                         if (string.Equals(FreePlan?.Id, c.PlanId, StringComparison.Ordinal))
                         {
-                            ResetPlan(c);
+                            if (!c.FromCallback)
+                            {
+                                await BillingManager.UnsubscribeAsync(c.Actor.Identifier, Snapshot, default);
+                            }
 
-                            await BillingManager.UnsubscribeAsync(c.Actor.Identifier, Snapshot, default);
+                            ResetPlan(c);
 
                             return new PlanChangedResult(c.PlanId, true, null);
                         }
-
-                        if (!c.FromCallback)
+                        else
                         {
-                            var redirectUri = await BillingManager.MustRedirectToPortalAsync(c.Actor.Identifier, Snapshot, c.PlanId, ct);
-
-                            if (redirectUri != null)
+                            if (!c.FromCallback)
                             {
-                                return new PlanChangedResult(c.PlanId, false, redirectUri);
+                                var redirectUri = await BillingManager.MustRedirectToPortalAsync(c.Actor.Identifier, Snapshot, c.PlanId, ct);
+
+                                if (redirectUri != null)
+                                {
+                                    return new PlanChangedResult(c.PlanId, false, redirectUri);
+                                }
+
+                                await BillingManager.SubscribeAsync(c.Actor.Identifier, Snapshot, changePlan.PlanId, default);
                             }
 
-                            await BillingManager.SubscribeAsync(c.Actor.Identifier, Snapshot, changePlan.PlanId, default);
+                            ChangePlan(c);
+
+                            return new PlanChangedResult(c.PlanId);
                         }
 
-                        ChangePlan(c);
-
-                        return new PlanChangedResult(c.PlanId);
                     }, ct);
 
                 default:
