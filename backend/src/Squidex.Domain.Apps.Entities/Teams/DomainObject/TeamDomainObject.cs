@@ -95,60 +95,40 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
                     }, ct);
 
                 case ChangePlan changePlan:
-                    return ChangeBillingPlanAsync(changePlan, ct);
+                    return UpdateReturnAsync(changePlan, async (c, ct) =>
+                    {
+                        GuardTeam.CanChangePlan(c, BillingPlans());
+
+                        if (string.Equals(GetFreePlan()?.Id, c.PlanId, StringComparison.Ordinal))
+                        {
+                            ResetPlan(c);
+
+                            await BillingManager().UnsubscribeAsync(c.Actor.Identifier, Snapshot, default);
+
+                            return new PlanChangedResult(c.PlanId, true, null);
+                        }
+
+                        if (!c.FromCallback)
+                        {
+                            var redirectUri = await BillingManager().MustRedirectToPortalAsync(c.Actor.Identifier, Snapshot, c.PlanId, ct);
+
+                            if (redirectUri != null)
+                            {
+                                return new PlanChangedResult(c.PlanId, false, redirectUri);
+                            }
+
+                            await BillingManager().SubscribeAsync(c.Actor.Identifier, Snapshot, changePlan.PlanId, default);
+                        }
+
+                        ChangePlan(c);
+
+                        return new PlanChangedResult(c.PlanId);
+                    }, ct);
 
                 default:
                     ThrowHelper.NotSupportedException();
                     return default!;
             }
-        }
-
-        private async Task<CommandResult> ChangeBillingPlanAsync(ChangePlan changePlan,
-            CancellationToken ct)
-        {
-            var userId = changePlan.Actor.Identifier;
-
-            var result = await UpdateReturnAsync(changePlan, async (c, ct) =>
-            {
-                GuardTeam.CanChangePlan(c, BillingPlans());
-
-                if (string.Equals(GetFreePlan()?.Id, c.PlanId, StringComparison.Ordinal))
-                {
-                    ResetPlan(c);
-
-                    return new PlanChangedResult(c.PlanId, true, null);
-                }
-
-                if (!c.FromCallback)
-                {
-                    var redirectUri = await BillingManager().MustRedirectToPortalAsync(userId, UniqueId, c.PlanId, ct);
-
-                    if (redirectUri != null)
-                    {
-                        return new PlanChangedResult(c.PlanId, false, redirectUri);
-                    }
-                }
-
-                ChangePlan(c);
-
-                return new PlanChangedResult(c.PlanId);
-            }, ct);
-
-            if (changePlan.FromCallback)
-            {
-                return result;
-            }
-
-            if (result.Payload is PlanChangedResult { Unsubscribed: true, RedirectUri: null })
-            {
-                await BillingManager().UnsubscribeAsync(userId, UniqueId, default);
-            }
-            else if (result.Payload is PlanChangedResult { RedirectUri: null })
-            {
-                await BillingManager().SubscribeAsync(userId, UniqueId, changePlan.PlanId, default);
-            }
-
-            return result;
         }
 
         private void Create(CreateTeam command)

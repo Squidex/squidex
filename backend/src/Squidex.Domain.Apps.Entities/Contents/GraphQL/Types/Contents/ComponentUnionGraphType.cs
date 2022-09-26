@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public ComponentUnionGraphType(Builder builder, FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)
         {
             // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-            Name = fieldInfo.ReferenceType;
+            Name = fieldInfo.UnionReferenceType;
 
             if (schemaIds?.Any() == true)
             {
