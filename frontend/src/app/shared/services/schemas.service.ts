@@ -161,7 +161,7 @@ export class SchemaDto {
                 const result: TableField[] = [];
 
                 for (const name of names) {
-                    const metaField = META_FIELDS[name];
+                    const metaField = Object.values(META_FIELDS).find(x => x.name === name);
 
                     if (metaField) {
                         result.push(metaField);
