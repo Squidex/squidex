@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Dynamic;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using GraphQLSchema = GraphQL.Types.Schema;
@@ -25,11 +26,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         private readonly Dictionary<SchemaInfo, ContentResultGraphType> contentResultTypes = new Dictionary<SchemaInfo, ContentResultGraphType>(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<FieldInfo, EmbeddableStringGraphType> embeddableStringTypes = new Dictionary<FieldInfo, EmbeddableStringGraphType>();
         private readonly Dictionary<string, EnumerationGraphType?> enumTypes = new Dictionary<string, EnumerationGraphType?>();
+        private readonly Dictionary<string, IGraphType[]> dynamicTypes = new Dictionary<string, IGraphType[]>();
         private readonly FieldVisitor fieldVisitor;
         private readonly FieldInputVisitor fieldInputVisitor;
         private readonly PartitionResolver partitionResolver;
-        private readonly HashSet<IGraphType> customTypes = new HashSet<IGraphType>();
         private readonly HashSet<SchemaInfo> allSchemas = new HashSet<SchemaInfo>();
+        private readonly ReservedNames typeNames = ReservedNames.ForTypes();
         private readonly GraphQLOptions options;
 
         static Builder()
@@ -41,8 +43,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public IInterfaceGraphType ContentInterface { get; } = new ContentInterfaceGraphType();
 
         public IInterfaceGraphType ComponentInterface { get; } = new ComponentInterfaceGraphType();
-
-        public TypeNames TypeNames { get; } = new TypeNames();
 
         public Builder(IAppEntity app, GraphQLOptions options)
         {
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public GraphQLSchema BuildSchema(IEnumerable<ISchemaEntity> schemas)
         {
             // Do not add schema without fields.
-            allSchemas.AddRange(SchemaInfo.Build(schemas, TypeNames).Where(x => x.Fields.Count > 0));
+            allSchemas.AddRange(SchemaInfo.Build(schemas, typeNames).Where(x => x.Fields.Count > 0));
 
             // Only published normal schemas (not components are used for entities).
             var schemaInfos = allSchemas.Where(x => x.Schema.SchemaDef.IsPublished && x.Schema.SchemaDef.Type != SchemaType.Component).ToList();
@@ -117,19 +117,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 newSchema.RegisterType(contentType);
             }
 
-            foreach (var customType in customTypes)
+            foreach (var customType in dynamicTypes.SelectMany(x => x.Value))
             {
                 newSchema.RegisterType(customType);
             }
 
+            newSchema.RegisterVisitor(ErrorVisitor.Instance);
+            newSchema.RegisterVisitor(new DynamicNameVisitor(typeNames));
+
             newSchema.Initialize();
 
             return newSchema;
-        }
-
-        public void AddType(IGraphType type)
-        {
-            customTypes.Add(type);
         }
 
         public FieldGraphSchema GetGraphType(FieldInfo fieldInfo)
@@ -172,6 +170,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
 
             return componentTypes.GetValueOrDefault(schema);
+        }
+
+        public IGraphType[] GetDynamicTypes(string? schema)
+        {
+            var graphQLSchema = schema;
+
+            if (string.IsNullOrWhiteSpace(graphQLSchema))
+            {
+                return Array.Empty<GraphType>();
+            }
+
+            return dynamicTypes.GetOrAdd(graphQLSchema, x => DynamicSchemaBuilder.ParseTypes(x));
         }
 
         public EmbeddableStringGraphType GetEmbeddableString(FieldInfo fieldInfo, StringFieldProperties properties)

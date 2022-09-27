@@ -594,7 +594,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 {
                     iv = new Dictionary<string, object>
                     {
-                        ["__typename"] = "JsonRoot",
+                        ["__typename"] = "JsonObject2",
                         ["rootString"] = "Root String",
                         ["rootInt"] = 42,
                         ["rootFloat"] = 3.14,
@@ -741,7 +741,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 ["myJsonValue"] = 1,
                 ["myJson2"] = new Dictionary<string, object>
                 {
-                    ["__typename"] = "JsonRoot",
+                    ["__typename"] = "JsonObject2",
                     ["rootString"] = "Root String",
                     ["rootInt"] = 42,
                     ["rootFloat"] = 3.14,

@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Dynamic
 {
     internal static class DynamicSchemaBuilder
     {
-        public static IGraphType[] ParseTypes(string? typeDefinitions, TypeNames names)
+        public static IGraphType[] ParseTypes(string? typeDefinitions)
         {
             if (string.IsNullOrWhiteSpace(typeDefinitions))
             {
@@ -28,27 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Dynamic
                 return Array.Empty<IGraphType>();
             }
 
-            if (!schema.AdditionalTypeInstances.Any())
-            {
-                return Array.Empty<IGraphType>();
-            }
-
-            Dictionary<string, string>? nameMap = null;
-
             var result = schema.AdditionalTypeInstances.ToArray();
-
-            foreach (var type in result)
-            {
-                var newName = names[type.Name];
-
-                if (!string.Equals(newName, type.Name, StringComparison.Ordinal))
-                {
-                    nameMap ??= new Dictionary<string, string>();
-                    nameMap[type.Name] = newName;
-
-                    type.Name = newName;
-                }
-            }
 
             foreach (var type in result)
             {
@@ -56,19 +36,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Dynamic
                 {
                     foreach (var field in complexGraphType.Fields)
                     {
+                        // Assign a resolver to support json values.
                         field.Resolver = DynamicResolver.Instance;
-
-                        if (nameMap != null)
-                        {
-                            if (field.ResolvedType is GraphQLTypeReference reference && nameMap.TryGetValue(reference.Name, out var newName))
-                            {
-                                field.ResolvedType = new GraphQLTypeReference(newName);
-                            }
-                        }
                     }
                 }
 
-                type.Name = names[type.Name];
+                // The names could have conflicts with other types in the schema. Therefore mark them as dynamic to resolve them later.
+                DynamicNameVisitor.MarkDynamic(type);
             }
 
             return result;

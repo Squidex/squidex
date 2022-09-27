@@ -9,7 +9,6 @@ using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Dynamic;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
@@ -113,7 +112,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return context.GetReferencedContentsAsync(value, cacheDuration, fieldContext.CancellationToken);
         });
 
-        private readonly Dictionary<string, List<IGraphType>> dynamicCache = new Dictionary<string, List<IGraphType>>();
         private readonly Builder builder;
 
         public FieldVisitor(Builder builder)
@@ -179,21 +177,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public FieldGraphSchema Visit(IField<JsonFieldProperties> field, FieldInfo args)
         {
-            var schema = field.Properties.GraphQLSchema;
+            var schema = builder.GetDynamicTypes(field.Properties.GraphQLSchema);
 
-            if (!string.IsNullOrWhiteSpace(schema))
+            if (schema.Length > 0)
             {
-                var types = dynamicCache.GetOrAdd(schema, s => DynamicSchemaBuilder.ParseTypes(s, builder.TypeNames).ToList());
-
-                if (types.Count > 0)
-                {
-                    foreach (var customType in types)
-                    {
-                        builder.AddType(customType);
-                    }
-
-                    return new (types[0], JsonNoop, null);
-                }
+                return new (schema[0], JsonNoop, null);
             }
 
             return new (Scalars.Json, JsonPath, ContentActions.Json.Arguments);

@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var enums = ReadonlyList.Create("EnumA", "EnumB", "EnumC");
 
             var jsonSchema = @"
-                type JsonRoot {
+                type JsonObject {
                     rootString: String
                     rootInt: Int
                     rootFloat: Float

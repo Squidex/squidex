@@ -22,16 +22,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Dynamic
             if (context.Source is JsonObject jsonObject)
             {
                 var name = context.FieldDefinition.Name;
-                try
-                {
-                    var value = Convert(jsonObject[name]);
 
-                    return value;
-                }
-                catch (KeyNotFoundException)
+                if (!jsonObject.TryGetValue(name, out var jsonValue))
                 {
-                    throw new InvalidOperationException($"Expected to find property or method '{name}' but it does not exist.");
+                    return null;
                 }
+
+                var value = Convert(jsonObject[name]);
+
+                return value;
             }
 
             var result = await NameFieldResolver.Instance.ResolveAsync(context);
