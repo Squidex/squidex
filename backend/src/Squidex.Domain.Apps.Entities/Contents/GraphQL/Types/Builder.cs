@@ -28,7 +28,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         private readonly FieldVisitor fieldVisitor;
         private readonly FieldInputVisitor fieldInputVisitor;
         private readonly PartitionResolver partitionResolver;
-        private readonly List<SchemaInfo> allSchemas = new List<SchemaInfo>();
+        private readonly HashSet<IGraphType> customTypes = new HashSet<IGraphType>();
+        private readonly HashSet<SchemaInfo> allSchemas = new HashSet<SchemaInfo>();
         private readonly GraphQLOptions options;
 
         static Builder()
@@ -40,6 +41,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public IInterfaceGraphType ContentInterface { get; } = new ContentInterfaceGraphType();
 
         public IInterfaceGraphType ComponentInterface { get; } = new ComponentInterfaceGraphType();
+
+        public TypeNames TypeNames { get; } = new TypeNames();
 
         public Builder(IAppEntity app, GraphQLOptions options)
         {
@@ -54,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public GraphQLSchema BuildSchema(IEnumerable<ISchemaEntity> schemas)
         {
             // Do not add schema without fields.
-            allSchemas.AddRange(SchemaInfo.Build(schemas).Where(x => x.Fields.Count > 0));
+            allSchemas.AddRange(SchemaInfo.Build(schemas, TypeNames).Where(x => x.Fields.Count > 0));
 
             // Only published normal schemas (not components are used for entities).
             var schemaInfos = allSchemas.Where(x => x.Schema.SchemaDef.IsPublished && x.Schema.SchemaDef.Type != SchemaType.Component).ToList();
@@ -114,9 +117,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 newSchema.RegisterType(contentType);
             }
 
+            foreach (var customType in customTypes)
+            {
+                newSchema.RegisterType(customType);
+            }
+
             newSchema.Initialize();
 
             return newSchema;
+        }
+
+        public void AddType(IGraphType type)
+        {
+            customTypes.Add(type);
         }
 
         public FieldGraphSchema GetGraphType(FieldInfo fieldInfo)
@@ -151,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public IObjectGraphType? GetComponentType(DomainId schemaId)
         {
-            var schema = allSchemas.Find(x => x.Schema.Id == schemaId);
+            var schema = allSchemas.FirstOrDefault(x => x.Schema.Id == schemaId);
 
             if (schema == null)
             {

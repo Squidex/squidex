@@ -12,6 +12,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
 {
     public sealed class JsonFieldPropertiesDto : FieldPropertiesDto
     {
+        /// <summary>
+        /// The GraphQL schema.
+        /// </summary>
+        public string? GraphQLSchema { get; set; }
+
         public override FieldProperties ToProperties()
         {
             var result = SimpleMapper.Map(this, new JsonFieldProperties());

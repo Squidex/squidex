@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public IReadOnlyList<FieldInfo> Fields { get; init; }
 
-        private SchemaInfo(ISchemaEntity schema, string typeName, Names rootScope)
+        private SchemaInfo(ISchemaEntity schema, string typeName, TypeNames rootScope)
         {
             Schema = schema;
 
@@ -54,10 +54,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return TypeName;
         }
 
-        public static IEnumerable<SchemaInfo> Build(IEnumerable<ISchemaEntity> schemas)
+        public static IEnumerable<SchemaInfo> Build(IEnumerable<ISchemaEntity> schemas, TypeNames rootScope)
         {
-            var rootScope = new Names();
-
             foreach (var schema in schemas.OrderBy(x => x.Created))
             {
                 var typeName = rootScope[schema.TypeName()];
@@ -100,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public IReadOnlyList<FieldInfo> Fields { get; init; }
 
-        private FieldInfo(IField field, string fieldName, string typeName, Names rootScope)
+        private FieldInfo(IField field, string fieldName, string typeName, TypeNames rootScope)
         {
             Field = field;
 
@@ -122,9 +120,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return FieldName;
         }
 
-        internal static IEnumerable<FieldInfo> Build(IEnumerable<IField> fields, string typeName, Names rootScope)
+        internal static IEnumerable<FieldInfo> Build(IEnumerable<IField> fields, string typeName, TypeNames rootScope)
         {
-            var typeScope = new Names();
+            var typeScope = new TypeNames();
 
             foreach (var field in fields.ForApi())
             {
@@ -150,55 +148,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     Fields = nested
                 };
             }
-        }
-    }
-
-    internal sealed class Names
-    {
-        // Reserver names that are used for other GraphQL types.
-        private static readonly HashSet<string> ReservedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "Asset",
-            "AssetResultDto",
-            "Content",
-            "Component",
-            "EntityCreatedResultDto",
-            "EntitySavedResultDto",
-            "JsonScalar",
-            "JsonPrimitive",
-            "User"
-        };
-        private readonly Dictionary<string, int> takenNames = new Dictionary<string, int>();
-
-        public string this[string name, bool isEntity = true]
-        {
-            get => GetName(name, isEntity);
-        }
-
-        private string GetName(string name, bool isEntity)
-        {
-            Guard.NotNullOrEmpty(name);
-
-            if (!char.IsLetter(name[0]))
-            {
-                name = "gql_" + name;
-            }
-            else if (isEntity && ReservedNames.Contains(name))
-            {
-                name = $"{name}Entity";
-            }
-
-            // Avoid duplicate names.
-            if (!takenNames.TryGetValue(name, out var offset))
-            {
-                takenNames[name] = 0;
-                return name;
-            }
-
-            takenNames[name] = ++offset;
-
-            // Add + 1 to all offsets for backwards-compatibility.
-            return $"{name}{offset + 1}";
         }
     }
 }
