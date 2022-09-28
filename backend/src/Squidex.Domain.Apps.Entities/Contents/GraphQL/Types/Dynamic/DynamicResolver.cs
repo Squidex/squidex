@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Dynamic
                     return null;
                 }
 
-                var value = Convert(jsonObject[name]);
+                var value = Convert(jsonValue);
 
                 return value;
             }

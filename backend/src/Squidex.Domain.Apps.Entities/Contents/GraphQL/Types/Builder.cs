@@ -123,8 +123,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
 
             newSchema.RegisterVisitor(ErrorVisitor.Instance);
-            newSchema.RegisterVisitor(new DynamicNameVisitor(typeNames));
-
             newSchema.Initialize();
 
             return newSchema;
@@ -181,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 return Array.Empty<GraphType>();
             }
 
-            return dynamicTypes.GetOrAdd(graphQLSchema, x => DynamicSchemaBuilder.ParseTypes(x));
+            return dynamicTypes.GetOrAdd(graphQLSchema, x => DynamicSchemaBuilder.ParseTypes(x, typeNames));
         }
 
         public EmbeddableStringGraphType GetEmbeddableString(FieldInfo fieldInfo, StringFieldProperties properties)

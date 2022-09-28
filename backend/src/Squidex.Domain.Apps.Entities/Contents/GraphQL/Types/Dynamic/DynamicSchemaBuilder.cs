@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Dynamic
 {
     internal static class DynamicSchemaBuilder
     {
-        public static IGraphType[] ParseTypes(string? typeDefinitions)
+        public static IGraphType[] ParseTypes(string? typeDefinitions, ReservedNames typeNames)
         {
             if (string.IsNullOrWhiteSpace(typeDefinitions))
             {
@@ -28,24 +28,43 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Dynamic
                 return Array.Empty<IGraphType>();
             }
 
-            var result = schema.AdditionalTypeInstances.ToArray();
+            var map = schema.AdditionalTypeInstances.ToDictionary(x => x.Name);
 
-            foreach (var type in result)
+            IGraphType? Convert(IGraphType? type)
+            {
+                switch (type)
+                {
+                    case GraphQLTypeReference reference:
+                        return map.GetValueOrDefault(reference.TypeName) ?? reference;
+                    case NonNullGraphType nonNull:
+                        return new NonNullGraphType(Convert(nonNull.ResolvedType));
+                    case ListGraphType list:
+                        return new ListGraphType(Convert(list.ResolvedType));
+                    default:
+                        return type;
+                }
+            }
+
+            var result = new List<IGraphType>();
+
+            foreach (var type in schema.AdditionalTypeInstances)
             {
                 if (type is IComplexGraphType complexGraphType)
                 {
+                    type.Name = typeNames[type.Name];
+
                     foreach (var field in complexGraphType.Fields)
                     {
                         // Assign a resolver to support json values.
                         field.Resolver = DynamicResolver.Instance;
+                        field.ResolvedType = Convert(field.ResolvedType);
                     }
                 }
 
-                // The names could have conflicts with other types in the schema. Therefore mark them as dynamic to resolve them later.
-                DynamicNameVisitor.MarkDynamic(type);
+                result.Add(type);
             }
 
-            return result;
+            return result.ToArray();
         }
     }
 }
