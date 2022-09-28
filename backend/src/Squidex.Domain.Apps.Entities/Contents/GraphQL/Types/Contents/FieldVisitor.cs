@@ -177,6 +177,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public FieldGraphSchema Visit(IField<JsonFieldProperties> field, FieldInfo args)
         {
+            var schema = builder.GetDynamicTypes(field.Properties.GraphQLSchema);
+
+            if (schema.Length > 0)
+            {
+                return new (schema[0], JsonNoop, null);
+            }
+
             return new (Scalars.Json, JsonPath, ContentActions.Json.Arguments);
         }
 

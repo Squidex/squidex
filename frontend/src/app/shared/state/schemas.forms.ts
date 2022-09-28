@@ -302,6 +302,10 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['minValue'] = new FormControl(undefined, ValidatorsEx.validDateTime());
     }
 
+    public visitJson() {
+        this.config['graphQLSchema'] = new FormControl(undefined);
+    }
+
     public visitNumber() {
         this.config['allowedValues'] = new FormControl(undefined);
         this.config['defaultValue'] = new FormControl(undefined);
@@ -354,10 +358,6 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
     }
 
     public visitGeolocation() {
-        return undefined;
-    }
-
-    public visitJson() {
         return undefined;
     }
 

@@ -9,6 +9,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using GraphQLSchema = GraphQL.Types.Schema;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
 {
@@ -146,7 +147,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
 
         public IEnumerable<ValidationError> Visit(JsonFieldProperties properties, None args)
         {
-            yield break;
+            if (!IsValidGraphQLSchema(properties.GraphQLSchema))
+            {
+                yield return new ValidationError(Not.Valid(nameof(properties.GraphQLSchema)),
+                    nameof(properties.GraphQLSchema));
+            }
         }
 
         public IEnumerable<ValidationError> Visit(NumberFieldProperties properties, None args)
@@ -290,6 +295,24 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         private static bool IsMaxGreaterThanMin<T>(T? min, T? max) where T : struct, IComparable
         {
             return max.HasValue && min.HasValue && min.Value.CompareTo(max.Value) < 0;
+        }
+
+        private static bool IsValidGraphQLSchema(string? schema)
+        {
+            if (string.IsNullOrWhiteSpace(schema))
+            {
+                return true;
+            }
+
+            try
+            {
+                GraphQLSchema.For(schema);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

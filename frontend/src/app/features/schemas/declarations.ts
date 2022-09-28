@@ -27,6 +27,7 @@ export * from './pages/schema/fields/types/date-time-ui.component';
 export * from './pages/schema/fields/types/date-time-validation.component';
 export * from './pages/schema/fields/types/geolocation-ui.component';
 export * from './pages/schema/fields/types/geolocation-validation.component';
+export * from './pages/schema/fields/types/json-more.component';
 export * from './pages/schema/fields/types/json-ui.component';
 export * from './pages/schema/fields/types/json-validation.component';
 export * from './pages/schema/fields/types/number-ui.component';

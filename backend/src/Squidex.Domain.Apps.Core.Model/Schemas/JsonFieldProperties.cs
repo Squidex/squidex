@@ -9,6 +9,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed record JsonFieldProperties : FieldProperties
     {
+        public string? GraphQLSchema { get; set; }
+
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {
             return visitor.Visit(this, args);

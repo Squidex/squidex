@@ -15,6 +15,11 @@
                 {{ 'schemas.field.tabEditing' | sqxTranslate }}
             </a>
         </li>
+        <li class="nav-item" [class.hidden]="field.properties.fieldType !== 'Json'">
+            <a class="nav-link" (click)="selectTab(3)" [class.active]="selectedTab === 3">
+                {{ 'schemas.field.tabMore' | sqxTranslate }}
+            </a>
+        </li>
     </ul>
 
     <div class="float-end" *ngIf="showButtons">
@@ -53,4 +58,8 @@
         [field]="field"
         [schema]="schema">
     </sqx-field-form-ui>
+</div>
+
+<div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 3">
+    <sqx-json-more [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-json-more>
 </div>
