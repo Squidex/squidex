@@ -68,7 +68,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             user: { role, ...authService.user?.export() },
         };
 
-        this.showIdInput = !localStore.getBoolean(Settings.Local.HIDE_CONTENT_ID_INPUT);
+        this.showIdInput = localStore.getBoolean(Settings.Local.CONTENT_ID_INPUT);
     }
 
     public ngOnInit() {
@@ -297,7 +297,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public changeShowIdInput(value: boolean) {
-        this.localStore.setBoolean(Settings.Local.HIDE_CONTENT_ID_INPUT, !value);
+        this.localStore.setBoolean(Settings.Local.CONTENT_ID_INPUT, value);
 
         this.showIdInput = value;
     }
