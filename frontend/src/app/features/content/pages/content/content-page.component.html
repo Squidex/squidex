@@ -96,6 +96,11 @@
                 </ng-container>
 
                 <ng-template #noContentMenu>
+                    <button type="button" class="btn btn-more btn-outline-secondary btn-sm me-2" (click)="changeShowIdInput(!showIdInput)">
+                        <span [class.hidden]="showIdInput">+</span>
+                        <span [class.hidden]="!showIdInput">-</span>
+                    </button>
+
                     <sqx-language-selector class="languages-buttons" 
                         (languageChange)="changeLanguage($event)"
                         [language]="language" 
@@ -160,6 +165,7 @@
                     [formContext]="formContext"
                     [languages]="languages"
                     [schema]="schema"
+                    [showIdInput]="showIdInput"
                     [(contentId)]="contentId">
                 </sqx-content-editor>
             </ng-container>

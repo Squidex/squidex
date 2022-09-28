@@ -40,6 +40,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public language!: AppLanguageDto;
     public languages!: ReadonlyArray<AppLanguageDto>;
 
+    public showIdInput = true;
+
     public confirmPreview = () => {
         return this.checkPendingChangesBeforePreview();
     };
@@ -65,6 +67,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             appName: contentsState.appName,
             user: { role, ...authService.user?.export() },
         };
+
+        this.showIdInput = !localStore.getBoolean(Settings.Local.HIDE_CONTENT_ID_INPUT);
     }
 
     public ngOnInit() {
@@ -290,6 +294,12 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
         this.contentForm.load(data, isInitial);
         this.contentForm.setEnabled(!this.content || this.content.canUpdate);
+    }
+
+    public changeShowIdInput(value: boolean) {
+        this.localStore.setBoolean(Settings.Local.HIDE_CONTENT_ID_INPUT, !value);
+
+        this.showIdInput = value;
     }
 
     private languageKey(): any {

@@ -9,6 +9,18 @@
     color: $color-text;
 }
 
+.btn-more {
+    @include absolute(null, null, -.6125rem, 0);
+    @include force-width(1.25rem);
+    @include force-height(1.25rem);
+    background-color: $color-white;
+    line-height: 1;
+    padding: 0;
+    text-align: center;
+    text-decoration: none;
+    z-index: 600;
+}
+
 .nav-tabs2 {
     @include absolute(auto, auto, 0, 5rem);
     flex-wrap: nowrap;

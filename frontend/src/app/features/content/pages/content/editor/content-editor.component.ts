@@ -27,6 +27,9 @@ export class ContentEditorComponent {
     public isNew = false;
 
     @Input()
+    public showIdInput = false;
+
+    @Input()
     public contentId!: string;
 
     @Input()

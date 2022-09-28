@@ -16,6 +16,7 @@ export const Settings = {
     Local: {
         ASSETS_MODE: 'squidex.assets.list-view',
         CONTENT_LANGUAGE: (schema: any) => `squidex.schemas.${schema}.language`,
+        HIDE_CONTENT_ID_INPUT: 'squidex.contents.idField',
         DASHBOARD_CHART_STACKED: 'dashboard.charts.stacked',
         DISABLE_ONBOARDING: (key: any) => `squidex.onboarding.disable.${key}`,
         FIELD_ALL: (schema: any, field: any) => `squidex.schemas.${schema}.fields.${field}.show-all`,

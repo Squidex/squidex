@@ -10,7 +10,7 @@
             <div [innerHTML]="'contents.versionViewing' | sqxTranslate: { version: contentVersion } | sqxMarkdownInline | sqxSafeHtml"></div>
         </div>
         
-        <div *ngIf="isNew">
+        <div *ngIf="isNew && showIdInput">
             <input class="form-control" placeholder="{{ 'contents.idPlaceholder' | sqxTranslate }}" 
                 [ngModel]="contentId"    
                 (ngModelChange)="contentIdChange.emit($event)" />
