@@ -1,29 +1,57 @@
+## @section Global parameters
+
+## @skip labels
 labels:
 service:
+  ## @param service.type Kubernetes Service type
+  ##
   type: ClusterIP
+  ## @param service.port Kubernetes Service port
+  ##
   port: 80
 deployment:
+  ## @param deployment.replicaCount Number of instances.
+  ##
   replicaCount: 1
 selectors:
+  ## @skip selectors.component
+  ##
   component: squidex
+  ## @skip selectors.partOf
+  ##
   partOf: ""
+  ## @skip selectors.version
+  ##
   version: ""
 image:
+  ## @param image.repository Squidex image registry
+  ##
   repository: squidex/squidex
+  ## @param image.tag Squidex image tag
+  ##
   tag: "7.0.2"
+  ## @param image.pullPolicy Squidex image pull policy
+  ##
   pullPolicy: IfNotPresent
 
+## @skip resources
 resources: { }
+## @skip nodeSelector
 nodeSelector: { }
+## @skip tolerations
 tolerations: [ ]
+## @skip affinity
 affinity: { }
 
+## @skip clusterSuffix
 clusterSuffix: cluster.local
 
+## @skip auth
 auth:
   ## 
 
-ingress:  
+ingress:
+  ## @param ingress.enabled True to deploy an ingress
   ## If true, Squidex Ingress will be created.
   ##
   enabled: true
@@ -32,87 +60,171 @@ ingress:
   # annotations:
   #   kubernetes.io/ingress.class: nginx
   #   kubernetes.io/tls-acme: "true"
+  ## @param ingress.hostName The host name for the ingress.
+  ## 
   hostName: squidex.local
-
+  
+  ## @skip ingress.tls
   tls: [ ]
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
 
+## @section Squidex parameters
+
 env:
   # Define the type of the event store
-  EVENTSTORE__TYPE: MongoDb
+  ## @param env.EVENTSTORE__MONGODB__DATABASE The name of the database for events
   EVENTSTORE__MONGODB__DATABASE: "Squidex"
 
-  # CREATE LOCAL ADMIN USER
-  IDENTITY__ADMINEMAIL: ""
-  IDENTITY__ADMINPASSWORD: ""
-  IDENTITY__ADMINRECREATE: false # Recreate the admin if it does not exist or the password does not match
-  IDENTITY__ALLOWPASSWORDAUTH: "true" # Enable password auth. Set this to false if you want to disable local login, leaving only 3rd party login options
-  IDENTITY__LOCKAUTOMATICALLY: "false" # Lock new users automatically, the administrator must unlock them
-  IDENTITY__SHOWPII: true # Set to true to show PII (Personally Identifiable Information) in the logs
-  IDENTITY__PRIVACYURL: "https://squidex.io/privacy" # The url to you privacy statements, if you host squidex by yourself
+  ## @skip env.EVENTSTORE__TYPE
+  ## Define the type of the event store
+  ##
+  EVENTSTORE__TYPE: MongoDb
 
-  # Settings for Google auth (keep empty to disable)
+  # CREATE LOCAL ADMIN USER
+  ## @param env.IDENTITY__ADMINEMAIL The initial admin email address.
+  ##
+  IDENTITY__ADMINEMAIL: ""
+  ## @param env.IDENTITY__ADMINPASSWORD The initial admin email address.
+  ##
+  IDENTITY__ADMINPASSWORD: ""
+  ## @param env.IDENTITY__ADMINRECREATE Recreate the admin if it does not exist or the password does not match
+  ##
+  IDENTITY__ADMINRECREATE: false # 
+  ## @param env.IDENTITY__ALLOWPASSWORDAUTH Enable password auth. Set this to false if you want to disable local login, leaving only 3rd party login options
+  ## 
+  IDENTITY__ALLOWPASSWORDAUTH: "true"
+  ## @param env.IDENTITY__LOCKAUTOMATICALLY Lock new users automatically, the administrator must unlock them.
+  ##
+  IDENTITY__LOCKAUTOMATICALLY: "false" 
+  ## @param env.IDENTITY__PRIVACYURL The url to you privacy statements.
+  ##
+  IDENTITY__PRIVACYURL: "https://squidex.io/privacy"
+  ## @param env.IDENTITY__SHOWPII Set to true to show PII (Personally Identifiable Information) in the logs
+  ## 
+  IDENTITY__SHOWPII: true # 
+
+  ## @param env.IDENTITY__GOOGLECLIENT Google client ID (keep empty to disable Google authentication).
+  ##
   IDENTITY__GOOGLECLIENT: null
+  ## @param env.IDENTITY__GOOGLESECRET Google client secret (keep empty to disable Google authentication).
+  ##
   IDENTITY__GOOGLESECRET: null
 
-  # Settings for Github auth (keep empty to disable)
+  ## @param env.IDENTITY__GITHUBCLIENT Github client ID (keep empty to disable Github authentication).
+  ##
   IDENTITY__GITHUBCLIENT: null
+  ## @param env.IDENTITY__GITHUBSECRET Github client secret (keep empty to disable Github authentication).
+  ##
   IDENTITY__GITHUBSECRET: null
 
-  # Settings for Microsoft auth (keep empty to disable)
-  # NOTE: Tennant is optional for using a specific AzureAD tenant
+  ## @param env.IDENTITY__MICROSOFTCLIENT Microsoft client ID (keep empty to disable Microsoft authentication).
+  ##
   IDENTITY__MICROSOFTCLIENT: null
+  ## @param env.IDENTITY__MICROSOFTSECRET Microsoft client secret (keep empty to disable Microsoft authentication).
+  ##
   IDENTITY__MICROSOFTSECRET: null
+  ## @param env.IDENTITY__MICROSOFTTENANT Optional tenant name for Azure AD.
+  ##
   IDENTITY__MICROSOFTTENANT: null
 
   # Settings for your custom oidc server
-  IDENTITY__OIDCNAME: null
+  ## @param env.IDENTITY__OIDCAUTHORITY The URL to the custom OIDC authority.
+  ##
   IDENTITY__OIDCAUTHORITY: null
+  ## @param env.IDENTITY__OIDCCLIENT The client ID to the authority.
+  ##
   IDENTITY__OIDCCLIENT: null
+  ## @param env.IDENTITY__OIDCSECRET The client secret to the authority.
+  ##
   IDENTITY__OIDCSECRET: null
-  IDENTITY__OIDCMETADATAADDRESS: null
-  IDENTITY__OIDCSCOPES: [] # ["email"]
-  IDENTITY__OIDCRESPONSETYPE: null # id_token or code
+  ## @param env.IDENTITY__OIDCGETCLAIMSFROMUSERINFOENDPOINT True to get claims from the user endpoint.
+  ##
   IDENTITY__OIDCGETCLAIMSFROMUSERINFOENDPOINT: false
+  ## @param env.IDENTITY__OIDCMETADATAADDRESS A custom address for OIDC metadata.
+  ##
+  IDENTITY__OIDCMETADATAADDRESS: null
+  ## @param env.IDENTITY__OIDCNAME The name of the OIDC integration or server. Used in the UI
+  ##
+  IDENTITY__OIDCNAME: null
+  ## @param env.IDENTITY__OIDCRESPONSETYPE The type of the response. id_token or code.
+  ##
+  IDENTITY__OIDCRESPONSETYPE: null 
+  ## @param env.IDENTITY__OIDCSCOPES The scopes.
+  ##
+  IDENTITY__OIDCSCOPES: [] # ["email"]
+  ## @param env.IDENTITY__OIDCSINGOUTREDIRECTURL The redirect URL for the sign out.
+  ##
   IDENTITY__OIDCSINGOUTREDIRECTURL: null
 
+  ## @skip env.LETSENCRYPT_HOST
   LETSENCRYPT_HOST: null
+  ## @skip env.LETSENCRYPT_EMAIL
   LETSENCRYPT_EMAIL: null
 
-  # LOGGING SETTINGS
-  LOGGING__LEVEL: INFORMATION # Trace, Debug, Information, Warning, Error, Fatal
-  LOGGING__HUMAN: false # Setting the flag to true, enables well formatteds json logs
-  LOGGING__COLORS: false # Set to true, to use colors
-  LOGGING__LOGREQUESTS: true # Set to false to disable logging of http requests
-  LOGGING__STOREENABLED: true # False to disable the log store
-  LOGGING__STORERETENTIONINDAYS: 90 # The number of days request log items will be stored
-  LOGGING__STACKDRIVER__ENABLED: false # True, to enable stackdriver integration
-  LOGGING__OTLP__ENABLED: false # True, to enable OpenTelemetry Protocol integration
-  LOGGING__OLTP__ENDPOINT: null # The endpoint to the agent
-  LOGGING__APPLICATIONINSIGHTS__ENABLED: false # True, to enable application insights integraon
+  ## @param env.LOGGING__APPLICATIONINSIGHTS__ENABLED Enable monitoring via application insights.
+  ##
+  LOGGING__APPLICATIONINSIGHTS__ENABLED: falsen
+  ## @param env.LOGGING__APPLICATIONINSIGHTS__CONNECTIONSTRING The connection string to application insights.
+  ##
   LOGGING__APPLICATIONINSIGHTS__CONNECTIONSTRING: null # "instrumentationkey=keyvalue"
+  ## @param env.LOGGING__COLORS Use colors in the console output.
+  ##
+  LOGGING__COLORS: false
+  ## @param env.LOGGING__HUMAN Setting the flag to true, enables well formatteds json logs.
+  ##
+  LOGGING__HUMAN: false
+  ## @param env.LOGGING__LEVEL Trace, Debug, Information, Warning, Error, Fatal
+  ##
+  LOGGING__LEVEL: INFORMATION 
+  ## @param env.LOGGING__LOGREQUESTS Set to false to disable logging of http requests.
+  ##
+  LOGGING__LOGREQUESTS: true
+  ## @param env.LOGGING__OTLP__ENABLED True, to enable OpenTelemetry Protocol integration
+  ##
+  LOGGING__OTLP__ENABLED: false
+  ## @param env.LOGGING__OLTP__ENDPOINT The endpoint to the agent
+  ##
+  LOGGING__OLTP__ENDPOINT: null
+  ## @param env.LOGGING__STACKDRIVER__ENABLED True, to enable stackdriver integration.
+  ##
+  LOGGING__STACKDRIVER__ENABLED: false
+  ## @param env.LOGGING__STOREENABLED False to disable the log store for HTTP requests.
+  ##
+  LOGGING__STOREENABLED: true
+  ## @param env.LOGGING__STORERETENTIONINDAYS The number of days request log items will be stored
+  ##
+  LOGGING__STORERETENTIONINDAYS: 90
 
-  # Define the clustering type
-  ORLEANS__CLUSTERING: MongoDB # SUPPORTED: MongoDB, Development
-  ORLEANS__KUBERNETES: true # Tell Orleans it is running in kubernetes
-
-  # Define the type of the read store
+  ## @skip env.STORE__TYPE
   STORE__TYPE: MongoDb
+  ## @param env.STORE__MONGODB__DATABASE The name of the main database.
+  ##
   STORE__MONGODB__DATABASE: "Squidex"
+  ## @param env.STORE__MONGODB__CONTENTDATABASE The name of the database for content items.
+  ##
   STORE__MONGODB__CONTENTDATABASE: "SquidexContent"
   
-  # Assets
+  ## @skip env.ASSETSTORE__TYPE
   ASSETSTORE__TYPE: MongoDb
 
-  URLS__BASEURL: https://squidex.local/ # Set the base url of your application, to generate correct urls in background process
-  URLS__ENFORCEHTTPS: false # Set it to true to redirect the user from http to https permanently
+  ## @param env.URLS__BASEURL Set the base url of your application, to generate correct urls in background process.
+  URLS__BASEURL: https://squidex.local/ # 
 
+  ## @param env.URLS__ENFORCEHTTPS Set it to true to redirect the user from http to https permanently
+  URLS__ENFORCEHTTPS: false 
+
+## @section MongoDB parameters
 mongodb-replicaset:
+  ## @param mongodb-replicaset.enabled Uses the custom mongoDB instance.
+  ##
   enabled: true
+  ## @param mongodb-replicaset.replicas The number of replicas.
+  ##
   replicas: 3
   
+  ## @skip mongodb-replicaset.auth
   auth:
     enabled: false
     existingKeySecret: ""
@@ -125,7 +237,10 @@ mongodb-replicaset:
     # key: keycontent
   
   persistentVolume:
+    ## @param mongodb-replicaset.persistentVolume.enabled If true, persistent volume claims are created.
+    ##
     enabled: true
+    ## @param mongodb-replicaset.persistentVolume.storageClass Persistent volume storage class.
     ## mongodb-replicaset data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -133,9 +248,15 @@ mongodb-replicaset:
     ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
     ##   GKE, AWS & OpenStack)
     ##
+    ##
     storageClass: ""
+    ## @param mongodb-replicaset.persistentVolume.accessModes Persistent volume access modes.
+    ##
     accessModes:
       - ReadWriteOnce
+    ## @param mongodb-replicaset.persistentVolume.size Persistent volume size.
+    ##
     size: 10Gi
-
+  
+  ## @skip mongodb-replicaset.nodeSelector
   nodeSelector: {}
