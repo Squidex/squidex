@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Dynamic;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using GraphQLSchema = GraphQL.Types.Schema;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
@@ -25,6 +26,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         private readonly Dictionary<SchemaInfo, ContentGraphType> contentTypes = new Dictionary<SchemaInfo, ContentGraphType>(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<SchemaInfo, ContentResultGraphType> contentResultTypes = new Dictionary<SchemaInfo, ContentResultGraphType>(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<FieldInfo, EmbeddableStringGraphType> embeddableStringTypes = new Dictionary<FieldInfo, EmbeddableStringGraphType>();
+        private readonly Dictionary<FieldInfo, ReferenceUnionGraphType> referenceUnionTypes = new Dictionary<FieldInfo, ReferenceUnionGraphType>();
+        private readonly Dictionary<FieldInfo, ComponentUnionGraphType> componentUnionTypes = new Dictionary<FieldInfo, ComponentUnionGraphType>();
+        private readonly Dictionary<FieldInfo, NestedGraphType> nestedTypes = new Dictionary<FieldInfo, NestedGraphType>();
         private readonly Dictionary<string, EnumerationGraphType?> enumTypes = new Dictionary<string, EnumerationGraphType?>();
         private readonly Dictionary<string, IGraphType[]> dynamicTypes = new Dictionary<string, IGraphType[]>();
         private readonly FieldVisitor fieldVisitor;
@@ -190,6 +194,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public EnumerationGraphType? GetEnumeration(string name, IEnumerable<string> values)
         {
             return enumTypes.GetOrAdd(name, x => FieldEnumType.TryCreate(name, values));
+        }
+
+        public ReferenceUnionGraphType GetReferenceUnion(FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)
+        {
+            return referenceUnionTypes.GetOrAdd(fieldInfo, x => new ReferenceUnionGraphType(this, x, schemaIds));
+        }
+
+        public ComponentUnionGraphType GetComponentUnion(FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)
+        {
+            return componentUnionTypes.GetOrAdd(fieldInfo, x => new ComponentUnionGraphType(this, x, schemaIds));
+        }
+
+        public NestedGraphType GetNested(FieldInfo fieldInfo)
+        {
+            return nestedTypes.GetOrAdd(fieldInfo, x => new NestedGraphType(this, x));
         }
 
         public IEnumerable<KeyValuePair<SchemaInfo, ContentGraphType>> GetAllContentTypes()

@@ -47,6 +47,39 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_query_contents_with_full_text()
+        {
+            var query = CreateQuery(@"
+                query {
+                  queryMySchemaContents(search: ""Hello"") {
+                    <FIELDS_CONTENT_FLAT>
+                  }
+                }");
+
+            var contentId = DomainId.NewGuid();
+            var content = TestContent.Create(contentId);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$skip=0&$search=\"Hello\"" && x.NoTotal), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(0, content));
+
+            var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    queryMySchemaContents = new[]
+                    {
+                        TestContent.FlatResponse(content)
+                    }
+                }
+            };
+
+            AssertResult(expected, actual);
+        }
+
+        [Fact]
         public async Task Should_return_multiple_assets_if_querying_assets()
         {
             var query = CreateQuery(@"

@@ -24,18 +24,17 @@ namespace Squidex.Areas.Api.Controllers.Contents
     {
         private readonly IContentQueryService contentQuery;
         private readonly IContentWorkflow contentWorkflow;
-        private readonly GraphQLRunner graphQLMiddleware;
+        private readonly GraphQLRunner graphQLRunner;
 
         public ContentsController(ICommandBus commandBus,
             IContentQueryService contentQuery,
             IContentWorkflow contentWorkflow,
-            GraphQLRunner graphQLMiddleware)
+            GraphQLRunner graphQLRunner)
             : base(commandBus)
         {
             this.contentQuery = contentQuery;
             this.contentWorkflow = contentWorkflow;
-
-            this.graphQLMiddleware = graphQLMiddleware;
+            this.graphQLRunner = graphQLRunner;
         }
 
         /// <summary>
@@ -57,7 +56,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(2)]
         public Task GetGraphQL(string app)
         {
-            return graphQLMiddleware.InvokeAsync(HttpContext);
+            return graphQLRunner.InvokeAsync(HttpContext);
         }
 
         /// <summary>
