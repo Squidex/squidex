@@ -7,6 +7,7 @@
 
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Notifications;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 using Squidex.Messaging;
@@ -14,7 +15,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Billing
 {
-    public sealed class UsageNotifierWorker : IMessageHandler<UsageTrackingCheck>
+    public sealed class UsageNotifierWorker : IMessageHandler<UsageTrackingCheck>, IInitializable
     {
         private static readonly TimeSpan TimeBetweenNotifications = TimeSpan.FromDays(3);
         private readonly SimpleState<State> state;
@@ -40,6 +41,12 @@ namespace Squidex.Domain.Apps.Entities.Billing
             this.userResolver = userResolver;
 
             state = new SimpleState<State>(persistenceFactory, GetType(), DomainId.Create("Default"));
+        }
+
+        public Task InitializeAsync(
+            CancellationToken ct)
+        {
+            return state.LoadAsync(ct);
         }
 
         public async Task HandleAsync(UsageTrackingCheck notification,

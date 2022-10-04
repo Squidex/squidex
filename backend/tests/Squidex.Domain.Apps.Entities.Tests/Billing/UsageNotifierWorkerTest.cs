@@ -47,6 +47,15 @@ namespace Squidex.Domain.Apps.Entities.Billing
         }
 
         [Fact]
+        public async Task Should_load_on_initialize()
+        {
+            await sut.InitializeAsync(default);
+
+            A.CallTo(() => state.Persistence.ReadAsync(EtagVersion.Any, default))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_not_send_notification_if_not_active()
         {
             SetupUser("1", null);
