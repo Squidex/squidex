@@ -55,35 +55,34 @@ namespace Squidex.Areas.Api.Controllers.Plans
         {
             var response = Deferred.AsyncResponse(async () =>
             {
-                var owner = App.Plan?.Owner.Identifier;
-
                 var (_, planId, teamId) = await appUsageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
 
-                var lockedReason = PlansLockedReason.None;
+                var owner = App.Plan?.Owner.Identifier;
+                var isOwner = string.Equals(owner, UserId, StringComparison.Ordinal);
+                var isLocked = PlansLockedReason.None;
+                var linkUrl = (Uri?)null;
 
                 if (teamId != null)
                 {
-                    lockedReason = PlansLockedReason.ManagedByTeam;
+                    isLocked = PlansLockedReason.ManagedByTeam;
                 }
                 else if (!Resources.CanChangePlan)
                 {
-                    lockedReason = PlansLockedReason.NoPermission;
+                    isLocked = PlansLockedReason.NoPermission;
                 }
-                else if (owner != null && !string.Equals(owner, UserId, StringComparison.OrdinalIgnoreCase))
+                else if (owner != null && !isOwner)
                 {
-                    lockedReason = PlansLockedReason.NotOwner;
+                    isLocked = PlansLockedReason.NotOwner;
                 }
 
-                var linkUrl = (Uri?)null;
-
-                if (lockedReason == PlansLockedReason.None)
+                if (isLocked == PlansLockedReason.None || isOwner)
                 {
                     linkUrl = await billingManager.GetPortalLinkAsync(UserId, App, HttpContext.RequestAborted);
                 }
 
                 var plans = billingPlans.GetAvailablePlans();
 
-                return PlansDto.FromDomain(plans.ToArray(), owner, planId, linkUrl, lockedReason);
+                return PlansDto.FromDomain(plans.ToArray(), owner, planId, linkUrl, isLocked);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
