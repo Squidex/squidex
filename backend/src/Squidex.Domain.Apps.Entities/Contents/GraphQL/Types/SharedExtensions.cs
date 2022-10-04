@@ -32,6 +32,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                         if (!string.IsNullOrWhiteSpace(formatted))
                         {
+                            if (key == "search")
+                            {
+                                formatted = $"\"{formatted.Trim('"')}\"";
+                            }
+
                             if (sb.Length > 1)
                             {
                                 sb.Append('&');

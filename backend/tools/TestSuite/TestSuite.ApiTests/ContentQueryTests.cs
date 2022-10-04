@@ -8,6 +8,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
+using Squidex.ClientLibrary.Utils;
 using TestSuite.Model;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
@@ -625,6 +626,65 @@ namespace TestSuite.ApiTests
             var items = result["queryMyReadsContents"];
 
             Assert.Equal(items.Select(x => x["data"]["number"]["iv"].Value<int>()).ToArray(), new[] { 4, 5, 6 });
+        }
+
+        [Fact]
+        public async Task Should_query_items_complex_search()
+        {
+            var query = new
+            {
+                query = @"
+                    query ContentsQuery($search: String!) {
+                        queryMyReadsContents(search: $search) {
+                            id,
+                            data {
+                                number {
+                                    iv
+                                }
+                            }
+                        }
+                    }",
+                variables = new
+                {
+                    search = @"The answer is 42"
+                }
+            };
+
+            await _.Contents.GraphQlAsync<QueryResult>(query);
+        }
+
+        [Fact]
+        public async Task Should_return_correct_content_type_for_graphql()
+        {
+            var query = new
+            {
+                query = @"
+                    query ContentsQuery($filter: String!) {
+                        queryMyReadsContents(filter: $filter, orderby: ""data/number/iv asc"") {
+                            id,
+                            data {
+                                number {
+                                    iv
+                                }
+                            }
+                        }
+                    }",
+                variables = new
+                {
+                    filter = @"data/number/iv gt 3 and data/number/iv lt 7"
+                }
+            };
+
+            using (var client = _.ClientManager.CreateHttpClient())
+            {
+                var response = await client.PostAsync(_.ClientManager.GenerateUrl($"api/content/{_.AppName}/graphql/batch"), query.ToContent());
+
+                Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);
+
+                var result = await response.Content.ReadAsJsonAsync<GraphQlResponse<QueryResult>>();
+
+                Assert.Equal(result.Data.Items.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
+            }
         }
 
         private sealed class QueryResult
