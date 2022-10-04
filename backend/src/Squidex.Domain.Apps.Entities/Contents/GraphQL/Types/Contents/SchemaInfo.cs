@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Infrastructure;
 using Squidex.Text;
 
 #pragma warning disable MA0048 // File name must match type name
@@ -36,16 +35,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public IReadOnlyList<FieldInfo> Fields { get; init; }
 
-        private SchemaInfo(ISchemaEntity schema, string typeName, Names rootScope)
+        private SchemaInfo(ISchemaEntity schema, string typeName, ReservedNames typeNames)
         {
             Schema = schema;
 
-            ComponentType = rootScope[$"{typeName}Component"];
-            ContentResultType = rootScope[$"{typeName}ResultDto"];
+            ComponentType = typeNames[$"{typeName}Component"];
+            ContentResultType = typeNames[$"{typeName}ResultDto"];
             ContentType = typeName;
-            DataFlatType = rootScope[$"{typeName}FlatDataDto"];
-            DataInputType = rootScope[$"{typeName}DataInputDto"];
-            DataType = rootScope[$"{typeName}DataDto"];
+            DataFlatType = typeNames[$"{typeName}FlatDataDto"];
+            DataInputType = typeNames[$"{typeName}DataInputDto"];
+            DataType = typeNames[$"{typeName}DataDto"];
             TypeName = typeName;
         }
 
@@ -54,17 +53,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return TypeName;
         }
 
-        public static IEnumerable<SchemaInfo> Build(IEnumerable<ISchemaEntity> schemas)
+        public static IEnumerable<SchemaInfo> Build(IEnumerable<ISchemaEntity> schemas, ReservedNames typeNames)
         {
-            var rootScope = new Names();
-
             foreach (var schema in schemas.OrderBy(x => x.Created))
             {
-                var typeName = rootScope[schema.TypeName()];
+                var typeName = typeNames[schema.TypeName()];
 
-                yield return new SchemaInfo(schema, typeName, rootScope)
+                yield return new SchemaInfo(schema, typeName, typeNames)
                 {
-                    Fields = FieldInfo.Build(schema.SchemaDef.Fields, $"{typeName}Data", rootScope).ToList()
+                    Fields = FieldInfo.Build(schema.SchemaDef.Fields, $"{typeName}Data", typeNames).ToList()
                 };
             }
         }
@@ -100,21 +97,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public IReadOnlyList<FieldInfo> Fields { get; init; }
 
-        private FieldInfo(IField field, string fieldName, string typeName, Names rootScope)
+        private FieldInfo(IField field, string fieldName, string typeName, ReservedNames typeNames)
         {
             Field = field;
 
-            EmbeddableStringType = rootScope[$"{typeName}EmbeddableString"];
-            EmbeddedEnumType = rootScope[$"{typeName}Enum"];
+            EmbeddableStringType = typeNames[$"{typeName}EmbeddableString"];
+            EmbeddedEnumType = typeNames[$"{typeName}Enum"];
             FieldName = fieldName;
             FieldNameDynamic = $"{fieldName}__Dynamic";
-            LocalizedInputType = rootScope[$"{typeName}InputDto"];
-            LocalizedType = rootScope[$"{typeName}Dto"];
-            LocalizedTypeDynamic = rootScope[$"{typeName}Dto__Dynamic"];
-            NestedInputType = rootScope[$"{typeName}ChildInputDto"];
-            NestedType = rootScope[$"{typeName}ChildDto"];
-            UnionComponentType = rootScope[$"{typeName}ComponentUnionDto"];
-            UnionReferenceType = rootScope[$"{typeName}UnionDto"];
+            LocalizedInputType = typeNames[$"{typeName}InputDto"];
+            LocalizedType = typeNames[$"{typeName}Dto"];
+            LocalizedTypeDynamic = typeNames[$"{typeName}Dto__Dynamic"];
+            NestedInputType = typeNames[$"{typeName}ChildInputDto"];
+            NestedType = typeNames[$"{typeName}ChildDto"];
+            UnionComponentType = typeNames[$"{typeName}ComponentUnionDto"];
+            UnionReferenceType = typeNames[$"{typeName}UnionDto"];
         }
 
         public override string ToString()
@@ -122,83 +119,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return FieldName;
         }
 
-        internal static IEnumerable<FieldInfo> Build(IEnumerable<IField> fields, string typeName, Names rootScope)
+        internal static IEnumerable<FieldInfo> Build(IEnumerable<IField> fields, string typeName, ReservedNames typeNames)
         {
-            var typeScope = new Names();
+            var typeScope = ReservedNames.ForFields();
 
             foreach (var field in fields.ForApi())
             {
                 // Field names must be unique within the scope of the parent type.
-                var fieldName = typeScope[field.Name.ToCamelCase(), false];
+                var fieldName = typeScope[field.Name.ToCamelCase()];
 
                 // Type names must be globally unique.
-                var fieldTypeName = rootScope[$"{typeName}{field.TypeName()}"];
+                var fieldTypeName = typeNames[$"{typeName}{field.TypeName()}"];
 
                 var nested = new List<FieldInfo>();
 
                 if (field is IArrayField arrayField)
                 {
-                    nested = Build(arrayField.Fields, fieldTypeName, rootScope).ToList();
+                    nested = Build(arrayField.Fields, fieldTypeName, typeNames).ToList();
                 }
 
                 yield return new FieldInfo(
                     field,
                     fieldName,
                     fieldTypeName,
-                    rootScope)
+                    typeNames)
                 {
                     Fields = nested
                 };
             }
-        }
-    }
-
-    internal sealed class Names
-    {
-        // Reserver names that are used for other GraphQL types.
-        private static readonly HashSet<string> ReservedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "Asset",
-            "AssetResultDto",
-            "Content",
-            "Component",
-            "EntityCreatedResultDto",
-            "EntitySavedResultDto",
-            "JsonScalar",
-            "JsonPrimitive",
-            "User"
-        };
-        private readonly Dictionary<string, int> takenNames = new Dictionary<string, int>();
-
-        public string this[string name, bool isEntity = true]
-        {
-            get => GetName(name, isEntity);
-        }
-
-        private string GetName(string name, bool isEntity)
-        {
-            Guard.NotNullOrEmpty(name);
-
-            if (!char.IsLetter(name[0]))
-            {
-                name = "gql_" + name;
-            }
-            else if (isEntity && ReservedNames.Contains(name))
-            {
-                name = $"{name}Entity";
-            }
-
-            // Avoid duplicate names.
-            if (!takenNames.TryGetValue(name, out var offset))
-            {
-                takenNames[name] = 0;
-                return name;
-            }
-
-            takenNames[name] = ++offset;
-
-            // Add + 1 to all offsets for backwards-compatibility.
-            return $"{name}{offset + 1}";
         }
     }
 }

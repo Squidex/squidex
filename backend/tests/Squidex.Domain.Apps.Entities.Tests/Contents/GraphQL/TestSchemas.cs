@@ -38,45 +38,65 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var enums = ReadonlyList.Create("EnumA", "EnumB", "EnumC");
 
+            var jsonSchema = @"
+                type JsonObject {
+                    rootString: String
+                    rootInt: Int
+                    rootFloat: Float
+                    rootBoolean: Boolean,
+                    rootArray: [String]
+                    rootObject: JsonNested
+                }
+
+                type JsonNested {
+                    nestedString: String
+                    nestedInt: Int
+                    nestedFloat: Float
+                    nestedBoolean: Boolean,
+                    nestedArray: [String]
+                }";
+
             Default = Mocks.Schema(TestApp.DefaultId, DefaultId,
                 new Schema(DefaultId.Name)
                     .Publish()
                     .AddJson(1, "my-json", Partitioning.Invariant,
                         new JsonFieldProperties())
-                    .AddString(2, "my-string", Partitioning.Invariant,
+                    .AddJson(2, "my-json2", Partitioning.Invariant,
+                        new JsonFieldProperties { GraphQLSchema = jsonSchema })
+                    .AddString(3, "my-string", Partitioning.Invariant,
                         new StringFieldProperties())
-                    .AddString(3, "my-string-enum", Partitioning.Invariant,
+                    .AddString(4, "my-string-enum", Partitioning.Invariant,
                         new StringFieldProperties { AllowedValues = enums, CreateEnum = true })
-                    .AddString(4, "my-localized-string", Partitioning.Language,
+                    .AddString(5, "my-localized-string", Partitioning.Language,
                         new StringFieldProperties())
-                    .AddNumber(5, "my-number", Partitioning.Invariant,
+                    .AddNumber(6, "my-number", Partitioning.Invariant,
                         new NumberFieldProperties())
-                    .AddAssets(6, "my-assets", Partitioning.Invariant,
+                    .AddAssets(7, "my-assets", Partitioning.Invariant,
                         new AssetsFieldProperties())
-                    .AddBoolean(7, "my-boolean", Partitioning.Invariant,
+                    .AddBoolean(8, "my-boolean", Partitioning.Invariant,
                         new BooleanFieldProperties())
-                    .AddDateTime(8, "my-datetime", Partitioning.Invariant,
+                    .AddDateTime(9, "my-datetime", Partitioning.Invariant,
                         new DateTimeFieldProperties())
-                    .AddReferences(9, "my-references", Partitioning.Invariant,
+                    .AddReferences(10, "my-references", Partitioning.Invariant,
                         new ReferencesFieldProperties { SchemaId = Ref1Id.Id })
-                    .AddReferences(10, "my-union", Partitioning.Invariant,
+                    .AddReferences(11, "my-union", Partitioning.Invariant,
                         new ReferencesFieldProperties())
-                    .AddGeolocation(11, "my-geolocation", Partitioning.Invariant,
+                    .AddGeolocation(12, "my-geolocation", Partitioning.Invariant,
                         new GeolocationFieldProperties())
-                    .AddComponent(12, "my-component", Partitioning.Invariant,
+                    .AddComponent(13, "my-component", Partitioning.Invariant,
                         new ComponentFieldProperties { SchemaId = Ref1Id.Id })
-                    .AddComponents(13, "my-components", Partitioning.Invariant,
+                    .AddComponents(14, "my-components", Partitioning.Invariant,
                         new ComponentsFieldProperties { SchemaIds = ReadonlyList.Create(Ref1.Id, Ref2.Id) })
-                    .AddTags(14, "my-tags", Partitioning.Invariant,
+                    .AddTags(15, "my-tags", Partitioning.Invariant,
                         new TagsFieldProperties())
-                    .AddTags(15, "my-tags-enum", Partitioning.Invariant,
+                    .AddTags(16, "my-tags-enum", Partitioning.Invariant,
                         new TagsFieldProperties { AllowedValues = enums, CreateEnum = true })
                     .AddArray(100, "my-array", Partitioning.Invariant, f => f
                         .AddBoolean(121, "nested-boolean",
                             new BooleanFieldProperties())
                         .AddNumber(122, "nested-number",
                             new NumberFieldProperties()))
-                    .AddString(16, "my-embeds", Partitioning.Invariant,
+                    .AddString(17, "my-embeds", Partitioning.Invariant,
                         new StringFieldProperties { IsEmbeddable = true, SchemaIds = ReadonlyList.Create(Ref1.Id, Ref2.Id) })
                     .SetScripts(new SchemaScripts { Query = "<query-script>" }));
         }

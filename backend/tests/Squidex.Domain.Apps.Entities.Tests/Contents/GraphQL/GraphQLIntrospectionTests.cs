@@ -191,7 +191,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            Assert.Contains(graphQLSchema.AllTypes, x => x.Name == "ContentEntity");
+            Assert.Contains(graphQLSchema.AllTypes, x => x.Name == "Content2");
         }
 
         [Fact]

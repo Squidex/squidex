@@ -102,13 +102,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return field.GetMetadata<NamedId<DomainId>>(nameof(SchemaNamedId))!;
         }
 
-        private static FieldType WithMetadata(this FieldType field, string key, object value)
-        {
-            field.Metadata[key] = value;
-
-            return field;
-        }
-
         internal static IGraphType? Flatten(this QueryArgument type)
         {
             return type.ResolvedType?.Flatten();

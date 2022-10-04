@@ -42,6 +42,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 iv
                 ivValue: iv(path: ""value"")
               }
+              myJson2 {
+                iv {
+                  __typename
+                  rootString,
+                  rootInt, 
+                  rootFloat, 
+                  rootBoolean,
+                  rootArray,
+                  rootObject {
+                    __typename
+                    nestedString,
+                    nestedInt, 
+                    nestedFloat, 
+                    nestedBoolean,
+                    nestedArray,
+                  }
+                }
+              }
               myString {
                 iv
               }
@@ -128,6 +146,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             flatData {
               myJson
               myJsonValue: myJson(path: ""value"")
+              myJson2 {
+                __typename
+                rootString,
+                rootInt,
+                rootFloat,
+                rootBoolean,
+                rootArray,
+                rootObject {
+                  __typename
+                  nestedString,
+                  nestedInt, 
+                  nestedFloat, 
+                  nestedBoolean,
+                  nestedArray,
+                }
+              }
               myString
               myStringEnum
               myLocalizedString
@@ -226,6 +260,30 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             .AddInvariant(
                                 new JsonObject()
                                     .Add("value", 1)))
+                    .AddField("my-json2",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Object()
+                                    .Add("rootString", "Root String")
+                                    .Add("rootInt", 42)
+                                    .Add("rootFloat", 3.14)
+                                    .Add("rootBoolean", true)
+                                    .Add("rootArray",
+                                        JsonValue.Array()
+                                            .Add("1")
+                                            .Add("2")
+                                            .Add("3"))
+                                    .Add("rootObject",
+                                        JsonValue.Object()
+                                            .Add("nestedString", "Nested String")
+                                            .Add("nestedInt", 42)
+                                            .Add("nestedFloat", 3.14)
+                                            .Add("nestedBoolean", true)
+                                            .Add("nestedArray",
+                                                JsonValue.Array()
+                                                    .Add("1")
+                                                    .Add("2")
+                                                    .Add("3")))))
                     .AddField("my-array",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(
@@ -368,6 +426,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     iv = new
                     {
                         value = 1
+                    }
+                },
+                ["myJson2"] = new
+                {
+                    iv = new Dictionary<string, object>
+                    {
+                        ["rootString"] = "Root String",
+                        ["rootInt"] = 42,
+                        ["rootFloat"] = 3.14,
+                        ["rootBoolean"] = true,
+                        ["rootArray"] = new[] { "1", "2", "3" },
+                        ["rootObject"] = new Dictionary<string, object>
+                        {
+                            ["nestedString"] = "Nested String",
+                            ["nestedInt"] = 42,
+                            ["nestedFloat"] = 3.14,
+                            ["nestedBoolean"] = true,
+                            ["nestedArray"] = new[] { "1", "2", "3" },
+                        }
                     }
                 },
                 ["myString"] = new
@@ -513,6 +590,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     },
                     ivValue = 1
                 },
+                ["myJson2"] = new
+                {
+                    iv = new Dictionary<string, object>
+                    {
+                        ["__typename"] = "JsonObject2",
+                        ["rootString"] = "Root String",
+                        ["rootInt"] = 42,
+                        ["rootFloat"] = 3.14,
+                        ["rootBoolean"] = true,
+                        ["rootArray"] = new[] { "1", "2", "3" },
+                        ["rootObject"] = new Dictionary<string, object>
+                        {
+                            ["__typename"] = "JsonNested",
+                            ["nestedString"] = "Nested String",
+                            ["nestedInt"] = 42,
+                            ["nestedFloat"] = 3.14,
+                            ["nestedBoolean"] = true,
+                            ["nestedArray"] = new[] { "1", "2", "3" },
+                        }
+                    }
+                },
                 ["myString"] = new
                 {
                     iv = (string?)null
@@ -641,6 +739,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     value = 1
                 },
                 ["myJsonValue"] = 1,
+                ["myJson2"] = new Dictionary<string, object>
+                {
+                    ["__typename"] = "JsonObject2",
+                    ["rootString"] = "Root String",
+                    ["rootInt"] = 42,
+                    ["rootFloat"] = 3.14,
+                    ["rootBoolean"] = true,
+                    ["rootArray"] = new[] { "1", "2", "3" },
+                    ["rootObject"] = new Dictionary<string, object>
+                    {
+                        ["__typename"] = "JsonNested",
+                        ["nestedString"] = "Nested String",
+                        ["nestedInt"] = 42,
+                        ["nestedFloat"] = 3.14,
+                        ["nestedBoolean"] = true,
+                        ["nestedArray"] = new[] { "1", "2", "3" },
+                    }
+                },
                 ["myString"] = null,
                 ["myStringEnum"] = "EnumA",
                 ["myLocalizedString"] = "de-DE",

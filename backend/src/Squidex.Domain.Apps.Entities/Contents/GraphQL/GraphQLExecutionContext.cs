@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 .WithoutContentEnrichment());
         }
 
-        public async Task<IUser?> FindUserAsync(RefToken refToken,
+        public async ValueTask<IUser?> FindUserAsync(RefToken refToken,
             CancellationToken ct)
         {
             if (refToken.IsClient)
