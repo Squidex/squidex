@@ -128,7 +128,6 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
 
                             return new PlanChangedResult(c.PlanId);
                         }
-
                     }, ct);
 
                 default:

@@ -138,10 +138,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         private async Task<IResultList<IAssetEntity>> QueryAsync(DomainId? parentId, ClrQuery clrQuery)
         {
             clrQuery.Top = 1000;
-
             clrQuery.Skip = 100;
 
-            if (clrQuery.Sort.Count == 0)
+            if (clrQuery.Sort == null || clrQuery.Sort.Count == 0)
             {
                 clrQuery.Sort = new List<SortNode>
                 {

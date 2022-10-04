@@ -216,7 +216,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                 clrQuery.Skip = skip;
             }
 
-            if (clrQuery.Sort.Count == 0)
+            if (clrQuery.Sort == null || clrQuery.Sort.Count == 0)
             {
                 clrQuery.Sort = new List<SortNode>
                 {

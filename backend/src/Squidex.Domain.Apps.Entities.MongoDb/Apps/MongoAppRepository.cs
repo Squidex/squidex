@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAllAsync"))
             {
                 var entities =
-                    await Collection.Find(x => (x.IndexedUserIds.Contains(contributorId) || names.Contains(x.IndexedName)) && !x.IndexedDeleted).SortBy(x => x.IndexedCreated)
+                    await Collection.Find(x => (x.IndexedUserIds.Contains(contributorId) || names.Contains(x.IndexedName)) && !x.IndexedDeleted)
                         .ToListAsync(ct);
 
                 return RemoveDuplcateNames(entities);

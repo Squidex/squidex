@@ -307,7 +307,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
                             return new PlanChangedResult(c.PlanId);
                         }
-
                     }, ct);
 
                 default:

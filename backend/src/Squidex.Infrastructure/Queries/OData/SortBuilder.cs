@@ -19,6 +19,7 @@ namespace Squidex.Infrastructure.Queries.OData
             {
                 while (orderBy != null)
                 {
+                    result.Sort ??= new List<SortNode>();
                     result.Sort.Add(OrderBy(orderBy));
 
                     orderBy = orderBy.ThenBy;

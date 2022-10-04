@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.Queries
             set => Take = value;
         }
 
-        public List<SortNode> Sort { get; set; } = new List<SortNode>();
+        public List<SortNode>? Sort { get; set; } = new List<SortNode>();
 
         public HashSet<string> GetAllFields()
         {
@@ -65,7 +65,7 @@ namespace Squidex.Infrastructure.Queries
                 parts.Add($"Take: {Take}");
             }
 
-            if (Sort.Count > 0)
+            if (Sort != null && Sort.Count > 0)
             {
                 parts.Add($"Sort: {string.Join(", ", Sort)}");
             }

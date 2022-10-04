@@ -143,6 +143,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private static void WithSorting(ClrQuery query)
         {
+            query.Sort ??= new List<SortNode>();
+
             if (query.Sort.Count == 0)
             {
                 query.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
