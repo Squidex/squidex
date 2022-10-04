@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             if (contentType == null)
             {
-                var union = new ReferenceUnionGraphType(builder, fieldInfo, schemaIds);
+                var union = builder.GetReferenceUnion(fieldInfo, schemaIds);
 
                 if (!union.HasType)
                 {

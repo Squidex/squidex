@@ -35,9 +35,9 @@
   
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.6" />
-    <PackageReference Include="GraphQL" Version="7.0.2" />
-    <PackageReference Include="GraphQL.MicrosoftDI" Version="7.0.2" />
-    <PackageReference Include="GraphQL.SystemTextJson" Version="7.0.2" />
+    <PackageReference Include="GraphQL" Version="7.1.1" />
+    <PackageReference Include="GraphQL.MicrosoftDI" Version="7.1.1" />
+    <PackageReference Include="GraphQL.SystemTextJson" Version="7.1.1" />
     <PackageReference Include="Meziantou.Analyzer" Version="1.0.702">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

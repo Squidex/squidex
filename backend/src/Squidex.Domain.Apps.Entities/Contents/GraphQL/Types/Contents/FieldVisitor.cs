@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 return default;
             }
 
-            var type = new NestedGraphType(builder, args);
+            var type = builder.GetNested(args);
 
             if (type.Fields.Count == 0)
             {
@@ -263,7 +263,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             if (contentType == null)
             {
-                var union = new ReferenceUnionGraphType(builder, fieldInfo, schemaIds);
+                var union = builder.GetReferenceUnion(fieldInfo, schemaIds);
 
                 if (!union.HasType)
                 {
@@ -287,7 +287,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             if (componentType == null)
             {
-                var union = new ComponentUnionGraphType(builder, fieldInfo, schemaIds);
+                var union = builder.GetComponentUnion(fieldInfo, schemaIds);
 
                 if (!union.HasType)
                 {

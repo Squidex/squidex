@@ -8,6 +8,7 @@
 using GraphQL.Server.Transports.AspNetCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Net.Http.Headers;
 
 namespace Squidex.Web.GraphQL
 {
@@ -19,7 +20,10 @@ namespace Squidex.Web.GraphQL
         {
             RequestDelegate next = x => Task.CompletedTask;
 
-            var options = new GraphQLHttpMiddlewareOptions();
+            var options = new GraphQLHttpMiddlewareOptions
+            {
+                DefaultResponseContentType = new MediaTypeHeaderValue("application/json")
+            };
 
             middleware = ActivatorUtilities.CreateInstance<GraphQLHttpMiddleware<DummySchema>>(serviceProvider, next, options);
         }
