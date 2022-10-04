@@ -50,10 +50,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAllAsync"))
             {
                 var entities =
-                    await Collection.Find(x => (x.IndexedUserIds.Contains(contributorId) || names.Contains(x.IndexedName)) && !x.IndexedDeleted)
+                    await Collection.Find(x => (x.IndexedUserIds.Contains(contributorId) || names.Contains(x.IndexedName)) && !x.IndexedDeleted).SortBy(x => x.IndexedCreated)
                         .ToListAsync(ct);
 
-                return entities.Select(x => (IAppEntity)x.Document).ToList();
+                return RemoveDuplcateNames(entities);
             }
         }
 
@@ -63,10 +63,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAllAsync"))
             {
                 var entities =
-                    await Collection.Find(x => x.IndexedTeamId == teamId)
+                    await Collection.Find(x => x.IndexedTeamId == teamId).SortBy(x => x.IndexedCreated)
                         .ToListAsync(ct);
 
-                return entities.Select(x => (IAppEntity)x.Document).ToList();
+                return RemoveDuplcateNames(entities);
             }
         }
 
@@ -89,11 +89,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             using (Telemetry.Activities.StartActivity("MongoAppRepository/FindAsyncByName"))
             {
                 var entity =
-                    await Collection.Find(x => x.IndexedName == name && !x.IndexedDeleted)
+                    await Collection.Find(x => x.IndexedName == name && !x.IndexedDeleted).SortByDescending(x => x.IndexedCreated)
                         .FirstOrDefaultAsync(ct);
 
                 return entity?.Document;
             }
+        }
+
+        private static List<IAppEntity> RemoveDuplcateNames(List<MongoAppEntity> entities)
+        {
+            var byName = new Dictionary<string, IAppEntity>();
+
+            // Remove duplicate names, the latest wins.
+            foreach (var entity in entities.OrderBy(x => x.IndexedCreated))
+            {
+                byName[entity.IndexedName] = entity.Document;
+            }
+
+            return byName.Values.ToList();
         }
     }
 }
