@@ -91,17 +91,19 @@ namespace Squidex.Config.Messaging
                 options.Routing.AddFallback(channelFallback);
             });
 
-            services.AddMessaging(channelFallback, isWorker, options =>
-            {
-                options.Scheduler = InlineScheduler.Instance;
-            });
-
             services.AddMessaging(channelBackupStart, isWorker, options =>
             {
+                options.Timeout = TimeSpan.FromHours(4);
                 options.Scheduler = new ParallelScheduler(4);
             });
 
             services.AddMessaging(channelBackupRestore, isWorker, options =>
+            {
+                options.Timeout = TimeSpan.FromHours(24);
+                options.Scheduler = InlineScheduler.Instance;
+            });
+
+            services.AddMessaging(channelFallback, isWorker, options =>
             {
                 options.Scheduler = InlineScheduler.Instance;
             });

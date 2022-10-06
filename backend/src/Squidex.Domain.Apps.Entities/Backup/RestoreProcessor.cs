@@ -113,8 +113,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 state.Value.Job = run.Job;
                 try
                 {
-                    await state.WriteAsync(run.CancellationToken);
-
                     await ProcessAsync(run, run.CancellationToken);
                 }
                 finally
@@ -133,6 +131,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 try
                 {
+                    await state.WriteAsync(run.CancellationToken);
+
                     await LogAsync(run, "Started. The restore process has the following steps:");
                     await LogAsync(run, "  * Download backup");
                     await LogAsync(run, "  * Restore events and attachments.");

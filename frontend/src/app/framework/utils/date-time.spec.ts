@@ -120,7 +120,7 @@ describe('DateTime', () => {
 
     it('should print to from now string', () => {
         const value = DateTime.now().addMinutes(-4);
-        const expected = '4 minutes';
+        const expected = '4 minutes ago';
 
         expect(value.toFromNow()).toBe(expected);
     });
@@ -231,7 +231,7 @@ describe('DateTime', () => {
 
         it('should format to from now string', () => {
             const value = DateTime.now().addMinutes(-4);
-            const expected = '4 minuten';
+            const expected = '4 minuten geleden';
 
             expect(value.toFromNow()).toBe(expected);
         });
@@ -262,7 +262,7 @@ describe('DateTime', () => {
 
         it('should format to from now string', () => {
             const value = DateTime.now().addMinutes(-4);
-            const expected = '4 minuti';
+            const expected = '4 minuti fa';
 
             expect(value.toFromNow()).toBe(expected);
         });

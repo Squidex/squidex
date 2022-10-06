@@ -193,7 +193,7 @@ export class DateTime {
     }
 
     public toFromNow(): string {
-        return formatDistanceToNow(this.value, { locale: DateHelper.getFnsLocale() });
+        return formatDistanceToNow(this.value, { locale: DateHelper.getFnsLocale(), addSuffix: true });
     }
 
     public toISOString(withoutMilliseconds = true): string {

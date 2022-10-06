@@ -114,13 +114,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     Handlers = backupHandlerFactory.CreateMany()
                 };
 
-                log.LogInformation("Starting new backup with backup id '{backupId}'.", run.Job.Id);
+                log.LogInformation("Starting new backup with backup id '{backupId}' for app {appId}.", run.Job.Id, appId);
 
                 state.Value.Jobs.Insert(0, run.Job);
                 try
                 {
-                    await state.WriteAsync(run.CancellationToken);
-
                     await ProcessAsync(run, run.CancellationToken);
                 }
                 finally
@@ -137,6 +135,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             try
             {
+                await state.WriteAsync(run.CancellationToken);
+
                 await using (var stream = backupArchiveLocation.OpenStream(run.Job.Id))
                 {
                     using (var writer = await backupArchiveLocation.OpenWriterAsync(stream, ct))
@@ -190,10 +190,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 }
 
                 await SetStatusAsync(run, JobStatus.Completed);
-            }
-            catch (OperationCanceledException)
-            {
-                await RemoveAsync(run.Job);
             }
             catch (Exception ex)
             {
