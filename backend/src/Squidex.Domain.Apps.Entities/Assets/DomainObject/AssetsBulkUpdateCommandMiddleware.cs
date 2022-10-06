@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Faield to execute asset bulk job with index {index} of type {type}.",
+                log.LogError(ex, "Failed to execute asset bulk job with index {index} of type {type}.",
                     task.JobIndex,
                     task.CommandJob.Type);
 
@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Faield to execute asset bulk job with index {index} of type {type}.",
+                log.LogError(ex, "Failed to execute asset bulk job with index {index} of type {type}.",
                     task.JobIndex,
                     task.CommandJob.Type);
 

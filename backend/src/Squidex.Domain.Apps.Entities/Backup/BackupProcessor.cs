@@ -67,6 +67,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             if (state.Value.Jobs.RemoveAll(x => x.Stopped == null) > 0)
             {
+                // This should actually never happen, so we log with warning.
+                log.LogWarning("Removed unfinished backups for app {appId} after start.", appId);
+
                 await state.WriteAsync(ct);
             }
         }
@@ -75,6 +78,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             return scheduler.ScheduleAsync(async _ =>
             {
+                log.LogInformation("Clearing backups for app {appId}.", appId);
+
                 foreach (var backup in state.Value.Jobs)
                 {
                     await backupArchiveStore.DeleteAsync(backup.Id, default);
@@ -108,6 +113,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     },
                     Handlers = backupHandlerFactory.CreateMany()
                 };
+
+                log.LogInformation("Starting new backup with backup id '{backupId}'.", run.Job.Id);
 
                 state.Value.Jobs.Insert(0, run.Job);
                 try
@@ -192,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 await SetStatusAsync(run, JobStatus.Failed);
 
-                log.LogError(ex, "Faield to make backup with backup id '{backupId}'.", run.Job.Id);
+                log.LogError(ex, "Failed to make backup with backup id '{backupId}'.", run.Job.Id);
             }
         }
 
@@ -211,6 +218,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     throw new DomainObjectNotFoundException(id.ToString());
                 }
+
+                log.LogInformation("Deleting backup with backup id '{backupId}' for app {appId}.", job.Id, appId);
 
                 if (currentRun?.Job == job)
                 {
