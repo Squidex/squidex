@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Security.Cryptography;
+using System.Text;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
@@ -92,7 +94,7 @@ namespace TestSuite
             return new List<SearchResultDto>();
         }
 
-        public static async Task<IList<HistoryEventDto>> WaitForHistoryAsync(this IHistoryClient assetsClient, string app, string channel,
+        public static async Task<IList<HistoryEventDto>> WaitForHistoryAsync(this IHistoryClient historyClient, string app, string channel,
             Func<HistoryEventDto, bool> predicate, TimeSpan timeout)
         {
             try
@@ -101,7 +103,7 @@ namespace TestSuite
 
                 while (!cts.IsCancellationRequested)
                 {
-                    var result = await assetsClient.GetHistoryAsync(app, channel, cts.Token);
+                    var result = await historyClient.GetAppHistoryAsync(app, channel, cts.Token);
 
                     if (result.Any(predicate))
                     {

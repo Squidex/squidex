@@ -28,6 +28,21 @@ namespace TestSuite.Fixtures
 
         [JsonPropertyName("content_base64")]
         public string Content { get; set; }
+
+        [JsonIgnore]
+        public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
+
+        [JsonPropertyName("headers")]
+        public WebhookHeader[] HeaderValues { get; set; }
+    }
+
+    public sealed class WebhookHeader
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [JsonPropertyName("value")]
+        public string Value { get; set; }
     }
 
     public sealed class WebhookCatcherClient
@@ -81,6 +96,14 @@ namespace TestSuite.Fixtures
                 if (request.Content != null)
                 {
                     request.Content = Encoding.Default.GetString(Convert.FromBase64String(request.Content));
+                }
+
+                if (request.HeaderValues != null)
+                {
+                    foreach (var header in request.HeaderValues)
+                    {
+                        request.Headers[header.Name] = header.Value;
+                    }
                 }
             }
 

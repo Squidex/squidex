@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using TestSuite.Model;
@@ -16,6 +17,7 @@ namespace TestSuite.ApiTests
 {
     public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<WebhookCatcherFixture>
     {
+        private readonly string secret = Guid.NewGuid().ToString();
         private readonly string appName = Guid.NewGuid().ToString();
         private readonly string schemaName = $"schema-{Guid.NewGuid()}";
         private readonly string contentString = Guid.NewGuid().ToString();
@@ -46,6 +48,7 @@ namespace TestSuite.ApiTests
             {
                 Action = new WebhookRuleActionDto
                 {
+                    SharedSecret = secret,
                     Method = WebhookMethod.POST,
                     Payload = null,
                     PayloadType = null,
@@ -65,8 +68,11 @@ namespace TestSuite.ApiTests
 
             // Get requests.
             var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
+            var request = requests.FirstOrDefault(x => x.Method == "POST" && x.Content.Contains(schemaName, StringComparison.OrdinalIgnoreCase));
 
-            Assert.Contains(requests, x => x.Method == "POST" && x.Content.Contains(schemaName, StringComparison.OrdinalIgnoreCase));
+            Assert.NotNull(request);
+            Assert.NotNull(request.Headers["X-Signature"]);
+            Assert.Equal(request.Headers["X-Signature"], WebhookUtils.CalculateSignature(request.Content, secret));
 
 
             // STEP 4: Get events
@@ -93,6 +99,7 @@ namespace TestSuite.ApiTests
             {
                 Action = new WebhookRuleActionDto
                 {
+                    SharedSecret = secret,
                     Method = WebhookMethod.POST,
                     Payload = null,
                     PayloadType = null,
@@ -109,8 +116,11 @@ namespace TestSuite.ApiTests
 
             // Get requests.
             var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
+            var request = requests.FirstOrDefault(x => x.Method == "POST" && x.Content.Contains("logo-squared", StringComparison.OrdinalIgnoreCase));
 
-            Assert.Contains(requests, x => x.Method == "POST" && x.Content.Contains("logo-squared", StringComparison.OrdinalIgnoreCase));
+            Assert.NotNull(request);
+            Assert.NotNull(request.Headers["X-Signature"]);
+            Assert.Equal(request.Headers["X-Signature"], WebhookUtils.CalculateSignature(request.Content, secret));
 
 
             // STEP 4: Get events
@@ -137,6 +147,7 @@ namespace TestSuite.ApiTests
             {
                 Action = new WebhookRuleActionDto
                 {
+                    SharedSecret = secret,
                     Method = WebhookMethod.POST,
                     Payload = null,
                     PayloadType = null,
@@ -153,8 +164,11 @@ namespace TestSuite.ApiTests
 
             // Get requests.
             var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
+            var request = requests.FirstOrDefault(x => x.Method == "POST" && x.Content.Contains(schemaName, StringComparison.OrdinalIgnoreCase));
 
-            Assert.Contains(requests, x => x.Method == "POST" && x.Content.Contains(schemaName, StringComparison.OrdinalIgnoreCase));
+            Assert.NotNull(request);
+            Assert.NotNull(request.Headers["X-Signature"]);
+            Assert.Equal(request.Headers["X-Signature"], WebhookUtils.CalculateSignature(request.Content, secret));
 
 
             // STEP 4: Get events
@@ -181,6 +195,7 @@ namespace TestSuite.ApiTests
             {
                 Action = new WebhookRuleActionDto
                 {
+                    SharedSecret = secret,
                     Method = WebhookMethod.POST,
                     Payload = null,
                     PayloadType = null,
@@ -197,8 +212,11 @@ namespace TestSuite.ApiTests
 
             // Get requests.
             var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromSeconds(30));
+            var request = requests.FirstOrDefault(x => x.Method == "POST");
 
-            Assert.Contains(requests, x => x.Method == "POST");
+            Assert.NotNull(request);
+            Assert.NotNull(request.Headers["X-Signature"]);
+            Assert.Equal(request.Headers["X-Signature"], WebhookUtils.CalculateSignature(request.Content, secret));
 
 
             // STEP 4: Get events
