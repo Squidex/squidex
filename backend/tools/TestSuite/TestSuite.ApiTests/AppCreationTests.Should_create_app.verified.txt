@@ -1,7 +1,7 @@
 ﻿{
-  name: Guid_1,
+  id: Guid_1,
+  name: Guid_2,
   version: 2,
-  id: Guid_2,
   canAccessContent: true,
   _links: {
     assets: {
