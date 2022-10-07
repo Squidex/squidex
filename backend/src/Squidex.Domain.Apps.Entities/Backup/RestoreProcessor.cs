@@ -59,7 +59,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.userResolver = userResolver;
             this.log = log;
 
-            state = new SimpleState<BackupRestoreState>(persistenceFactory, GetType(), "Default");
+            // Enable locking for the parallel operations that might write stuff.
+            state = new SimpleState<BackupRestoreState>(persistenceFactory, GetType(), "Default", true);
         }
 
         public async Task LoadAsync(
