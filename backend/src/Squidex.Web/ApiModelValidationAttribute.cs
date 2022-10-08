@@ -27,60 +27,57 @@ namespace Squidex.Web
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (!context.ModelState.IsValid)
+            if (context.ModelState.IsValid)
             {
-                var errors = new List<ValidationError>();
+                return;
+            }
 
-                foreach (var (key, value) in context.ModelState)
+            var errors = new List<ValidationError>();
+
+            foreach (var (key, value) in context.ModelState)
+            {
+                if (value.ValidationState == ModelValidationState.Invalid)
                 {
-                    if (value.ValidationState == ModelValidationState.Invalid)
+                    foreach (var error in value.Errors)
                     {
+                        if (error.ErrorMessage?.Contains(RequestBodyTooLarge, StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            throw new BadHttpRequestException(error.ErrorMessage, 413);
+                        }
+                    }
+
+                    if (string.IsNullOrWhiteSpace(key))
+                    {
+                        errors.Add(new ValidationError(T.Get("common.httpInvalidRequestFormat")));
+                    }
+                    else
+                    {
+                        var properties = Array.Empty<string>();
+
+                        if (!string.IsNullOrWhiteSpace(key))
+                        {
+                            properties = new[] { key.ToCamelCase() };
+                        }
+
                         foreach (var error in value.Errors)
                         {
-                            if (error.ErrorMessage?.Contains(RequestBodyTooLarge, StringComparison.OrdinalIgnoreCase) == true)
+                            if (!string.IsNullOrWhiteSpace(error.ErrorMessage) && allErrors)
                             {
-                                throw new BadHttpRequestException(error.ErrorMessage, 413);
+                                errors.Add(new ValidationError(error.ErrorMessage, properties));
                             }
-                        }
-
-                        if (string.IsNullOrWhiteSpace(key))
-                        {
-                            errors.Add(new ValidationError(T.Get("common.httpInvalidRequestFormat")));
-                        }
-                        else
-                        {
-                            var properties = Array.Empty<string>();
-
-                            if (!string.IsNullOrWhiteSpace(key))
+                            else if (error.Exception is JsonException jsonException)
                             {
-                                properties = new[] { key.ToCamelCase() };
-                            }
-
-                            foreach (var error in value.Errors)
-                            {
-                                if (!string.IsNullOrWhiteSpace(error.ErrorMessage) && ShouldExpose(error))
-                                {
-                                    errors.Add(new ValidationError(error.ErrorMessage, properties));
-                                }
-                                else if (error.Exception is JsonException jsonException)
-                                {
-                                    errors.Add(new ValidationError(jsonException.Message));
-                                }
+                                errors.Add(new ValidationError(jsonException.Message));
                             }
                         }
                     }
                 }
-
-                if (errors.Count > 0)
-                {
-                    throw new ValidationException(errors);
-                }
             }
-        }
 
-        private bool ShouldExpose(ModelError error)
-        {
-            return allErrors || error.Exception is JsonException;
+            if (errors.Count > 0)
+            {
+                throw new ValidationException(errors);
+            }
         }
     }
 }

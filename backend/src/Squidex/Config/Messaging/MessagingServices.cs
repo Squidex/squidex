@@ -95,22 +95,25 @@ namespace Squidex.Config.Messaging
             {
                 options.Timeout = TimeSpan.FromHours(4);
                 options.Scheduler = new ParallelScheduler(4);
+                options.LogMessage = x => true;
             });
 
             services.AddMessaging(channelBackupRestore, isWorker, options =>
             {
                 options.Timeout = TimeSpan.FromHours(24);
                 options.Scheduler = InlineScheduler.Instance;
-            });
-
-            services.AddMessaging(channelFallback, isWorker, options =>
-            {
-                options.Scheduler = InlineScheduler.Instance;
+                options.LogMessage = x => true;
             });
 
             services.AddMessaging(channelRules, isWorker, options =>
             {
                 options.Scheduler = new ParallelScheduler(4);
+                options.LogMessage = x => true;
+            });
+
+            services.AddMessaging(channelFallback, isWorker, options =>
+            {
+                options.Scheduler = InlineScheduler.Instance;
             });
         }
     }

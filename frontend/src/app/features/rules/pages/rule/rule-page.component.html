@@ -49,7 +49,7 @@
                             </div>
         
                             <div class="col col-icon" *ngIf="currentTrigger">
-                                <sqx-rule-element [type]="currentTrigger.type" [isSmall]="true" [element]="triggerElement" [disabled]="true"></sqx-rule-element>
+                                <sqx-rule-element [type]="currentTrigger.triggerType" [isSmall]="true" [element]="triggerElement" [disabled]="true"></sqx-rule-element>
                             </div>
 
                             <div class="col text-end" *ngIf="currentTrigger && !rule">
@@ -69,18 +69,18 @@
                                 {{ 'rules.triggerHint' | sqxTranslate }}
                             </sqx-form-alert>
         
-                            <ng-container [ngSwitch]="currentTrigger.type">
+                            <ng-container [ngSwitch]="currentTrigger.triggerType">
                                 <ng-container *ngSwitchCase="'AssetChanged'">
-                                    <sqx-asset-changed-trigger [triggerForm]="currentTrigger.form"></sqx-asset-changed-trigger>
+                                    <sqx-asset-changed-trigger [triggerForm]="currentTrigger"></sqx-asset-changed-trigger>
                                 </ng-container>
                                 <ng-container *ngSwitchCase="'Comment'">
-                                    <sqx-comment-trigger [triggerForm]="currentTrigger.form"></sqx-comment-trigger>
+                                    <sqx-comment-trigger [triggerForm]="currentTrigger"></sqx-comment-trigger>
                                 </ng-container>
                                 <ng-container *ngSwitchCase="'ContentChanged'">
                                     <sqx-content-changed-trigger 
                                         [schemas]="schemasState.schemas | async" 
-                                        [trigger]="currentTrigger.values" 
-                                        [triggerForm]="currentTrigger.form">
+                                        [trigger]="currentTrigger.form.value" 
+                                        [triggerForm]="currentTrigger">
                                     </sqx-content-changed-trigger>
                                 </ng-container>
                                 <ng-container *ngSwitchCase="'SchemaChanged'">
@@ -112,7 +112,7 @@
                             </div>
 
                             <div class="col col-icon" *ngIf="currentAction">
-                                <sqx-rule-element [type]="currentAction.type" [isSmall]="true" [element]="actionElement" [disabled]="true"></sqx-rule-element>
+                                <sqx-rule-element [type]="currentAction.actionType" [isSmall]="true" [element]="actionElement" [disabled]="true"></sqx-rule-element>
                             </div>
 
                             <div class="col text-end" *ngIf="currentAction && !rule">
@@ -134,9 +134,9 @@
                             </sqx-form-alert>
         
                             <sqx-generic-action 
-                                [actionForm]="currentAction.form"
-                                [trigger]="currentTrigger"
-                                [triggerType]="currentTrigger?.type"
+                                [actionForm]="currentAction"
+                                [trigger]="currentTrigger?.form.value"
+                                [triggerType]="currentTrigger?.triggerType"
                                 [appName]="rulesState.appName">
                             </sqx-generic-action>
                         </ng-container>

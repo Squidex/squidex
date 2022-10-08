@@ -12,8 +12,6 @@ import { debounceTime, Subscription } from 'rxjs';
 import { ActionForm, ALL_TRIGGERS, MessageBus, ResourceOwner, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, TriggerForm, value$ } from '@app/shared';
 import { RuleConfigured } from '../messages';
 
-type ComponentState<T> = { type: string; values: any; form: T };
-
 @Component({
     selector: 'sqx-rule-page',
     styleUrls: ['./rule-page.component.scss'],
@@ -28,8 +26,8 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
 
     public rule?: RuleDto | null;
 
-    public currentTrigger?: ComponentState<TriggerForm>;
-    public currentAction?: ComponentState<ActionForm>;
+    public currentTrigger?: TriggerForm;
+    public currentAction?: ActionForm;
 
     public isEnabled = false;
     public isEditable = false;
@@ -39,11 +37,11 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
     }
 
     public get actionElement() {
-        return this.supportedActions![this.currentAction?.type || ''];
+        return this.supportedActions![this.currentAction?.actionType || ''];
     }
 
     public get triggerElement() {
-        return this.supportedTriggers[this.currentTrigger?.type || ''];
+        return this.supportedTriggers[this.currentTrigger?.triggerType || ''];
     }
 
     constructor(
@@ -92,30 +90,32 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
         }
     }
 
-    public selectAction(type: string, values = {}) {
-        if (this.currentAction?.type !== type && this.supportedActions) {
-            const form = new ActionForm(this.supportedActions[type], type);
+    public selectAction(type: string, values?: any) {
+        const definition = this.supportedActions[type];
 
-            this.currentAction = { form, type, values };
-            this.currentAction.form.setEnabled(this.isEditable);
+        if (this.currentAction?.actionType !== type && definition) {
+            this.currentAction = new ActionForm(definition, type);
+            this.currentAction.setEnabled(this.isEditable);
             this.currentActionSubscription?.unsubscribe();
-            this.currentActionSubscription = this.subscribe(form.form);
+            this.currentActionSubscription = this.subscribe(this.currentAction.form);
         }
 
-        this.currentAction!.form.load(values);
+        if (values) {
+            this.currentAction?.load(values);
+        }
     }
 
-    public selectTrigger(type: string, values = {}) {
-        if (this.currentTrigger?.type !== type) {
-            const form = new TriggerForm(type);
-
-            this.currentTrigger = { form, type, values };
-            this.currentTrigger.form.setEnabled(this.isEditable);
+    public selectTrigger(type: string, values?: any) {
+        if (this.currentTrigger?.triggerType !== type) {
+            this.currentTrigger = new TriggerForm(type);
+            this.currentTrigger.setEnabled(this.isEditable);
             this.currentTriggerSubscription?.unsubscribe();
-            this.currentTriggerSubscription = this.subscribe(form.form);
+            this.currentTriggerSubscription = this.subscribe(this.currentTrigger.form);
         }
 
-        this.currentTrigger.form.load(values);
+        if (values) {
+            this.currentTrigger?.load(values || {});
+        }
     }
 
     private subscribe(form: AbstractControl) {
@@ -139,13 +139,13 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
             return;
         }
 
-        const action = this.currentAction.form.submit();
+        const action = this.currentAction.submit();
 
         if (!action) {
             return;
         }
 
-        const trigger = this.currentTrigger.form.submit();
+        const trigger = this.currentTrigger.submit();
 
         if (!trigger || !action) {
             return;
@@ -183,23 +183,23 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
             return;
         }
 
-        if (!this.currentAction.form.form.valid || !this.currentTrigger.form.form.valid) {
+        if (!this.currentAction.form.valid || !this.currentTrigger.form.valid) {
             return;
         }
 
         this.messageBus.emit(new RuleConfigured(
-            this.currentTrigger.form.getValue(),
-            this.currentAction.form.getValue()));
+            this.currentTrigger.getValue(),
+            this.currentAction.getValue()));
     }
 
     private submitCompleted() {
-        this.currentAction?.form.submitCompleted({ noReset: true });
-        this.currentTrigger?.form.submitCompleted({ noReset: true });
+        this.currentAction?.submitCompleted({ noReset: true });
+        this.currentTrigger?.submitCompleted({ noReset: true });
     }
 
     private submitFailed(error: any) {
-        this.currentAction?.form?.submitFailed(error);
-        this.currentTrigger?.form?.submitFailed(error);
+        this.currentAction?.submitFailed(error);
+        this.currentTrigger?.submitFailed(error);
     }
 
     public back() {

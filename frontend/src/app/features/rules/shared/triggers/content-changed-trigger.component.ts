@@ -75,13 +75,13 @@ export class ContentChangedTriggerComponent implements OnChanges {
     }
 
     public updateCondition(schema: SchemaDto, condition: string) {
-        this.triggerSchemas = this.triggerSchemas.map(s => (s.schema === schema ? { schema, condition } : s));
+        this.triggerSchemas.replaceBy('schema', { schema, condition });
 
         this.updateValue();
     }
 
     public updateValue() {
-        const schemas = this.triggerSchemas.map(s => ({ schemaId: s.schema.id, condition: s.condition }));
+        const schemas = this.triggerSchemas.map(({ schema, condition }) => ({ schemaId: schema.id, condition }));
 
         this.triggerForm.form.patchValue({ schemas });
     }

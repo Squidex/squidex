@@ -189,8 +189,7 @@ export class LanguagesState extends State<Snapshot> {
                     .map(l => languages.find(x => x.iso2Code === l)).defined(),
             fallbackLanguagesNew:
                 languages
-                    .filter(l => language.iso2Code !== l.iso2Code && !language.fallback.includes(l.iso2Code))
-                    .sortByString(x => x.englishName),
+                    .filter(l => language.iso2Code !== l.iso2Code && !language.fallback.includes(l.iso2Code)).sortByString(x => x.englishName),
         };
     }
 }

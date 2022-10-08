@@ -11,7 +11,7 @@ import { RuleElementDto } from '../services/rules.service';
 
 export class ActionForm extends Form<any, FormGroup> {
     constructor(public readonly definition: RuleElementDto,
-        private readonly actionType: string,
+        public readonly actionType: string,
     ) {
         super(ActionForm.builForm(definition));
     }
@@ -40,7 +40,7 @@ export class ActionForm extends Form<any, FormGroup> {
 
 export class TriggerForm extends Form<any, FormGroup> {
     constructor(
-        private readonly triggerType: string,
+        public readonly triggerType: string,
     ) {
         super(TriggerForm.builForm(triggerType));
     }
