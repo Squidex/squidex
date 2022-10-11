@@ -232,14 +232,17 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
+            var numTasks = 50;
+            var numEvents = 100;
+
             // Append and read in parallel.
             var readEvents = await QueryWithSubscriptionAsync($"^{streamName}", async () =>
             {
-                await Parallel.ForEachAsync(Enumerable.Range(0, 50), async (i, ct) =>
+                await Parallel.ForEachAsync(Enumerable.Range(0, numTasks), async (i, ct) =>
                 {
                     var fullStreamName = $"{streamName}-{Guid.NewGuid()}";
 
-                    for (var j = 0; j < 100; j++)
+                    for (var j = 0; j < numEvents; j++)
                     {
                         var commit1 = new[]
                         {
@@ -251,7 +254,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 });
             });
 
-            Assert.Equal(5000, readEvents?.Count);
+            Assert.Equal(numEvents * numTasks, readEvents?.Count);
         }
 
         [Fact]
