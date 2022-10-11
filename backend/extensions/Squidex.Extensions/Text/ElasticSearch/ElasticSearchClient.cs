@@ -9,7 +9,7 @@ using Elasticsearch.Net;
 
 namespace Squidex.Extensions.Text.ElasticSearch
 {
-    internal class ElasticSearchClient : IElasticSearchClient
+    public sealed class ElasticSearchClient : IElasticSearchClient
     {
         private readonly IElasticLowLevelClient elasticSearch;
 
