@@ -7,6 +7,7 @@
 
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Caching;
@@ -45,7 +46,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 appProvider,
                 ruleEventRepository,
                 ruleService,
-                options);
+                options,
+                A.Fake<ILogger<RuleEnqueuer>>());
         }
 
         [Fact]

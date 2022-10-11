@@ -228,6 +228,33 @@ namespace Squidex.Infrastructure.EventSourcing
         }
 
         [Fact]
+        public async Task Should_subscribe_with_parallel_writes()
+        {
+            var streamName = $"test-{Guid.NewGuid()}";
+
+            // Append and read in parallel.
+            var readEvents = await QueryWithSubscriptionAsync($"^{streamName}", async () =>
+            {
+                await Parallel.ForEachAsync(Enumerable.Range(0, 50), async (i, ct) =>
+                {
+                    var fullStreamName = $"{streamName}-{Guid.NewGuid()}";
+
+                    for (var j = 0; j < 100; j++)
+                    {
+                        var commit1 = new[]
+                        {
+                            CreateEventData(i * j)
+                        };
+
+                        await Sut.AppendAsync(Guid.NewGuid(), fullStreamName, commit1);
+                    }
+                });
+            });
+
+            Assert.Equal(5000, readEvents?.Count);
+        }
+
+        [Fact]
         public async Task Should_read_events_from_offset()
         {
             var streamName = $"test-{Guid.NewGuid()}";

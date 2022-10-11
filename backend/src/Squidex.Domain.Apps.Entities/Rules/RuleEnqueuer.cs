@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -22,6 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly IMemoryCache cache;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly IRuleService ruleService;
+        private readonly ILogger<RuleEnqueuer> log;
         private readonly IAppProvider appProvider;
         private readonly ILocalCache localCache;
         private readonly TimeSpan cacheDuration;
@@ -35,13 +37,15 @@ namespace Squidex.Domain.Apps.Entities.Rules
             IAppProvider appProvider,
             IRuleEventRepository ruleEventRepository,
             IRuleService ruleService,
-            IOptions<RuleOptions> options)
+            IOptions<RuleOptions> options,
+            ILogger<RuleEnqueuer> log)
         {
             this.appProvider = appProvider;
             this.cache = cache;
             this.cacheDuration = options.Value.RuleCacheDuration;
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
+            this.log = log;
             this.localCache = localCache;
         }
 
@@ -63,6 +67,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 // We do not want to handle disabled rules in the normal flow.
                 if (job.Job != null && job.SkipReason is SkipReason.None or SkipReason.Failed)
                 {
+                    log.LogInformation("Adding rule job {jobId} for Rule(action={ruleAction}, trigger={ruleTrigger})",
+                        job.Job.Id,
+                        rule.Action.GetType().Name,
+                        rule.Trigger.GetType().Name);
+
                     await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError);
                 }
             }
