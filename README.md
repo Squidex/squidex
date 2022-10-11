@@ -29,7 +29,7 @@ Current Version ![GitHub release](https://img.shields.io/github/release/squidex/
 
 | Platform | Documentation | Quicklink | 
 | -------- | ------------- | ---- |
-| Azure    | [Docs](https://docs.squidex.io/01-getting-started/installation/platforms/install-azure) |
+| Azure    | [Docs](https://docs.squidex.io/01-getting-started/installation/platforms/install-azure) | [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fsangramrath%2Fsquidex-docs2%2Fmaster%2Fscripts%2Fsquidex-minimal-azure-arm.json)
 | AWS      | [Docs](https://docs.squidex.io/01-getting-started/installation/platforms/install-on-aws) |
 | Docker   | [Docs](https://docs.squidex.io/01-getting-started/installation/platforms/install-docker) | [![Docker Compose](https://img.shields.io/badge/-docker--compose.yml-2496ED?style=for-the-badge&logo=docker&logoColor=ffffff)](https://github.com/Squidex/squidex-hosting/blob/master/docker-compose/docker-compose.yml) |
 | GCP      | [Docs](https://docs.squidex.io/01-getting-started/installation/platforms/install-on-gcp) |
