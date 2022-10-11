@@ -12,14 +12,14 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed class ElasticTextIndexFixture : IAsyncLifetime
+    public sealed class ElasticSearchTextIndexFixture : IAsyncLifetime
     {
         public ElasticSearchTextIndex Index { get; }
 
-        public ElasticTextIndexFixture()
+        public ElasticSearchTextIndexFixture()
         {
             Index = new ElasticSearchTextIndex(
-                TestConfig.Configuration["elastic:configuration"],
+                new ElasticSearchClient(TestConfig.Configuration["elastic:configuration"]),
                 TestConfig.Configuration["elastic:indexName"],
                 TestUtils.DefaultSerializer);
         }

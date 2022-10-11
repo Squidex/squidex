@@ -12,15 +12,15 @@ using Xunit;
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     [Trait("Category", "Dependencies")]
-    public class ElasticTextIndexTests : TextIndexerTestsBase, IClassFixture<ElasticTextIndexFixture>
+    public class ElasticSearchTextIndexTests : TextIndexerTestsBase, IClassFixture<ElasticSearchTextIndexFixture>
     {
         public override bool SupportsGeo => true;
 
         public override int WaitAfterUpdate => 2000;
 
-        public ElasticTextIndexFixture _ { get; }
+        public ElasticSearchTextIndexFixture _ { get; }
 
-        public ElasticTextIndexTests(ElasticTextIndexFixture fixture)
+        public ElasticSearchTextIndexTests(ElasticSearchTextIndexFixture fixture)
         {
             _ = fixture;
         }
@@ -33,8 +33,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [Fact]
         public async Task Should_retrieve_english_stopword_only_for_german_query()
         {
-            await CreateTextAsync(ids1[0], "de", "and und");
-            await CreateTextAsync(ids2[0], "en", "and und");
+            await CreateTextAsync(ids1[0], "de", "and y");
+            await CreateTextAsync(ids2[0], "en", "and y");
 
             await SearchText(expected: ids2, text: "und");
         }

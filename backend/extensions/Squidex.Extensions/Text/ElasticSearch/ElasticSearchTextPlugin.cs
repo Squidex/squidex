@@ -23,9 +23,9 @@ namespace Squidex.Extensions.Text.ElasticSearch
 
             if (string.Equals(fullTextType, "elastic", StringComparison.OrdinalIgnoreCase))
             {
-                var elasticConfiguration = config.GetValue<string>("fullText:elastic:configuration");
+                var configuration = config.GetValue<string>("fullText:elastic:configuration");
 
-                if (string.IsNullOrWhiteSpace(elasticConfiguration))
+                if (string.IsNullOrWhiteSpace(configuration))
                 {
                     var error = new ConfigurationError("Value is required.", "fullText:elastic:configuration");
 
@@ -39,8 +39,23 @@ namespace Squidex.Extensions.Text.ElasticSearch
                     indexName = "squidex-index";
                 }
 
-                services.AddSingleton(
-                    c => new ElasticSearchTextIndex(elasticConfiguration, indexName, c.GetRequiredService<IJsonSerializer>()));
+                var openSearch = config.GetValue<bool>("fullText:elastic:openSearch");
+
+                services.AddSingleton(c =>
+                {
+                    IElasticSearchClient elasticSearchClient;
+
+                    if (openSearch)
+                    {
+                        elasticSearchClient = new OpenSearchClient(configuration);
+                    }
+                    else
+                    {
+                        elasticSearchClient = new ElasticSearchClient(configuration);
+                    }
+
+                    return new ElasticSearchTextIndex(elasticSearchClient, indexName, c.GetRequiredService<IJsonSerializer>());
+                });
 
                 services.AddSingleton<ITextIndex>(
                     c => c.GetRequiredService<ElasticSearchTextIndex>());

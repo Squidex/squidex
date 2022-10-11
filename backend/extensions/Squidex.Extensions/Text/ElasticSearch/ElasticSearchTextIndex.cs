@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Text.RegularExpressions;
-using Elasticsearch.Net;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
@@ -20,17 +19,14 @@ namespace Squidex.Extensions.Text.ElasticSearch
     {
         private static readonly Regex LanguageRegex = new Regex(@"[^\w]+([a-z\-_]{2,}):", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
         private static readonly Regex LanguageRegexStart = new Regex(@"$^([a-z\-_]{2,}):", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-        private readonly ElasticLowLevelClient client;
+        private readonly IJsonSerializer jsonSerializer;
+        private readonly IElasticSearchClient elasticClient;
         private readonly QueryParser queryParser = new QueryParser(ElasticSearchIndexDefinition.GetFieldPath);
         private readonly string indexName;
-        private readonly IJsonSerializer jsonSerializer;
 
-        public ElasticSearchTextIndex(string configurationString, string indexName, IJsonSerializer jsonSerializer)
+        public ElasticSearchTextIndex(IElasticSearchClient elasticClient, string indexName, IJsonSerializer jsonSerializer)
         {
-            var config = new ConnectionConfiguration(new Uri(configurationString));
-
-            client = new ElasticLowLevelClient(config);
-
+            this.elasticClient = elasticClient;
             this.indexName = indexName;
             this.jsonSerializer = jsonSerializer;
         }
@@ -38,7 +34,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
         public Task InitializeAsync(
             CancellationToken ct)
         {
-            return ElasticSearchIndexDefinition.ApplyAsync(client, indexName, ct);
+            return ElasticSearchIndexDefinition.ApplyAsync(elasticClient, indexName, ct);
         }
 
         public Task ClearAsync(
@@ -47,7 +43,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
             return Task.CompletedTask;
         }
 
-        public async Task ExecuteAsync(IndexCommand[] commands,
+        public Task ExecuteAsync(IndexCommand[] commands,
             CancellationToken ct = default)
         {
             var args = new List<object>();
@@ -59,15 +55,10 @@ namespace Squidex.Extensions.Text.ElasticSearch
 
             if (args.Count == 0)
             {
-                return;
+                return Task.CompletedTask;
             }
 
-            var result = await client.BulkAsync<StringResponse>(PostData.MultiJson(args), ctx: ct);
-
-            if (!result.Success)
-            {
-                throw new InvalidOperationException($"Failed with ${result.Body}", result.OriginalException);
-            }
+            return elasticClient.BulkAsync(args, ct);
         }
 
         public async Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
@@ -220,21 +211,13 @@ namespace Squidex.Extensions.Text.ElasticSearch
         private async Task<List<DomainId>> SearchAsync(object query,
             CancellationToken ct)
         {
-            var result = await client.SearchAsync<DynamicResponse>(indexName, CreatePost(query), ctx: ct);
-
-            if (!result.Success)
-            {
-                throw result.OriginalException;
-            }
+            var hits = await elasticClient.SearchAsync(indexName, query, ct);
 
             var ids = new List<DomainId>();
 
-            foreach (var item in result.Body.hits.hits)
+            foreach (var item in hits)
             {
-                if (item != null)
-                {
-                    ids.Add(DomainId.Create(item["_source"]["contentId"]));
-                }
+                 ids.Add(DomainId.Create(item["_source"]["contentId"]));
             }
 
             return ids;
@@ -242,14 +225,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
 
         private static string GetServeField(SearchScope scope)
         {
-            return scope == SearchScope.Published ?
-                "servePublished" :
-                "serveAll";
-        }
-
-        private static PostData CreatePost<T>(T data)
-        {
-            return new SerializableData<T>(data);
+            return scope == SearchScope.Published ? "servePublished" : "serveAll";
         }
     }
 }

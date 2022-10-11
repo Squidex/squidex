@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Elasticsearch.Net;
-
 namespace Squidex.Extensions.Text.ElasticSearch
 {
     public static class ElasticSearchIndexDefinition
@@ -96,7 +94,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
             return "texts.iv";
         }
 
-        public static async Task ApplyAsync(IElasticLowLevelClient elastic, string indexName,
+        public static Task ApplyAsync(IElasticSearchClient client, string indexName,
             CancellationToken ct = default)
         {
             var query = new
@@ -119,17 +117,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                 };
             }
 
-            var result = await elastic.Indices.PutMappingAsync<StringResponse>(indexName, CreatePost(query), ctx: ct);
-
-            if (!result.Success)
-            {
-                throw new InvalidOperationException($"Failed with ${result.Body}", result.OriginalException);
-            }
-        }
-
-        private static PostData CreatePost<T>(T data)
-        {
-            return new SerializableData<T>(data);
+            return client.CreateIndexAsync(indexName, query, ct);
         }
     }
 }

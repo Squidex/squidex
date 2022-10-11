@@ -25,7 +25,13 @@ export class ActionForm extends Form<any, FormGroup> {
                 Validators.required :
                 Validators.nullValidator;
 
-            controls[property.name] = new FormControl(undefined, validator);
+            let defaultValue = undefined;
+
+            if (property.isRequired && property.options) {
+                defaultValue = property.options[0];
+            }
+
+            controls[property.name] = new FormControl(defaultValue, validator);
         }
 
         return new ExtendedFormGroup(controls);
