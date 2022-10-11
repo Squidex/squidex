@@ -67,10 +67,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 // We do not want to handle disabled rules in the normal flow.
                 if (job.Job != null && job.SkipReason is SkipReason.None or SkipReason.Failed)
                 {
-                    log.LogInformation("Adding rule job {jobId} for Rule(action={ruleAction}, trigger={ruleTrigger})",
-                        job.Job.Id,
-                        rule.Action.GetType().Name,
-                        rule.Trigger.GetType().Name);
+                    log.LogInformation("Adding rule job {jobId} for Rule(action={ruleAction}, trigger={ruleTrigger})", job.Job.Id,
+                        rule.Action.GetType().Name, rule.Trigger.GetType().Name);
 
                     await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError);
                 }
