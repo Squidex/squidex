@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             this.appProvider = appProvider;
             this.cache = cache;
-            this.cacheDuration = options.Value.RuleCacheDuration;
+            this.cacheDuration = options.Value.RulesCacheDuration;
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
             this.log = log;
@@ -98,6 +98,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private Task<List<IRuleEntity>> GetRulesAsync(DomainId appId)
         {
+            if (cacheDuration <= TimeSpan.Zero || cacheDuration == TimeSpan.MaxValue)
+            {
+                return appProvider.GetRulesAsync(appId);
+            }
+
             var cacheKey = $"{typeof(RuleEnqueuer)}_Rules_{appId}";
 
             // Cache the rules for performance reasons for a short period of time (usually 10 sec).

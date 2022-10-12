@@ -11,6 +11,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     {
         public int ExecutionTimeoutInSeconds { get; set; } = 3;
 
-        public TimeSpan RuleCacheDuration { get; set; } = TimeSpan.FromSeconds(10);
+        public TimeSpan RulesCacheDuration { get; set; } = TimeSpan.FromSeconds(10);
     }
 }
