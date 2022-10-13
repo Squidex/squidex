@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Security.Cryptography;
-using System.Text;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
@@ -43,7 +41,9 @@ namespace TestSuite
         }
 
         public static async Task<ContentsResult<TEntity, TData>> WaitForContentAsync<TEntity, TData>(this IContentsClient<TEntity, TData> contentsClient, ContentQuery q,
-            Func<TEntity, bool> predicate, TimeSpan timeout) where TEntity : Content<TData> where TData : class, new()
+            Func<TEntity, bool> predicate, TimeSpan timeout
+        )
+            where TEntity : Content<TData> where TData : class, new()
         {
             try
             {
@@ -198,14 +198,13 @@ namespace TestSuite
             return null;
         }
 
-        public static async Task<MemoryStream> DownloadAsync(this ClientManagerFixture fixture, AssetDto asset, int? version = null)
+        public static async Task<MemoryStream> DownloadAsync(this ClientFixture fixture, AssetDto asset, int? version = null)
         {
             var temp = new MemoryStream();
 
-            using (var client = new HttpClient())
+            var httpClient = fixture.ClientManager.CreateHttpClient();
+            try
             {
-                client.BaseAddress = new Uri(fixture.ServerUrl);
-
                 var url = asset._links["content"].Href[1..];
 
                 if (version > 0)
@@ -213,7 +212,7 @@ namespace TestSuite
                     url += $"?version={version}";
                 }
 
-                var response = await client.GetAsync(url);
+                using var response = await httpClient.GetAsync(url);
 
                 response.EnsureSuccessStatusCode();
 
@@ -221,6 +220,10 @@ namespace TestSuite
                 {
                     await stream.CopyToAsync(temp);
                 }
+            }
+            finally
+            {
+                fixture.ClientManager.ReturnHttpClient(httpClient);
             }
 
             return temp;

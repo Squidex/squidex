@@ -12,11 +12,11 @@ using TestSuite.Model;
 
 namespace TestSuite.ApiTests
 {
-    public class CDNTests : IClassFixture<CloudFixture>
+    public class CDNTests : IClassFixture<ClientCloudFixture>
     {
-        public CloudFixture _ { get; }
+        public ClientCloudFixture _ { get; }
 
-        public CDNTests(CloudFixture fixture)
+        public CDNTests(ClientCloudFixture fixture)
         {
             _ = fixture;
         }

@@ -31,7 +31,7 @@ namespace TestSuite.ApiTests
         public async Task Should_backup_and_restore_app()
         {
             // Load the backup from another URL, because the public URL is might not be accessible for the server.
-            var backupUrl = TestHelpers.GetAndPrintValue("config:backupUrl", _.ServerUrl);
+            var backupUrl = TestHelpers.GetAndPrintValue("config:backupUrl", _.Url);
 
             var appNameRestore = $"{appName}-restore";
 
@@ -80,7 +80,7 @@ namespace TestSuite.ApiTests
         public async Task Should_backup_and_restore_app_with_deleted_app()
         {
             // Load the backup from another URL, because the public URL is might not be accessible for the server.
-            var backupUrl = TestHelpers.GetAndPrintValue("config:backupUrl", _.ServerUrl);
+            var backupUrl = TestHelpers.GetAndPrintValue("config:backupUrl", _.Url);
 
             // STEP 1: Create app
             var createRequest = new CreateAppDto

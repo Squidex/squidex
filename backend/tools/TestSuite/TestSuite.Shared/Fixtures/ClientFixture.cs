@@ -5,38 +5,125 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
+using Xunit;
 
 namespace TestSuite.Fixtures
 {
-    public class ClientFixture : ClientManagerFixture
+    public class ClientFixture : IAsyncLifetime
     {
-        public IAppsClient Apps => Squidex.Apps;
+        public ClientManagerWrapper Squidex { get; private set; }
 
-        public IAssetsClient Assets => Squidex.Assets;
+        public string AppName => ClientManager.Options.AppName;
 
-        public IBackupsClient Backups => Squidex.Backups;
+        public string ClientId => ClientManager.Options.ClientId;
 
-        public ICommentsClient Comments => Squidex.Comments;
+        public string ClientSecret => ClientManager.Options.ClientSecret;
 
-        public IDiagnosticsClient Diagnostics => Squidex.Diagnostics;
+        public string Url => ClientManager.Options.Url;
 
-        public IHistoryClient History => Squidex.History;
+        public ISquidexClientManager ClientManager => Squidex.ClientManager;
 
-        public ILanguagesClient Languages => Squidex.Languages;
+        public IAppsClient Apps
+        {
+            get => ClientManager.CreateAppsClient();
+        }
 
-        public IPingClient Ping => Squidex.Ping;
+        public IAssetsClient Assets
+        {
+            get => ClientManager.CreateAssetsClient();
+        }
 
-        public IPlansClient Plans => Squidex.Plans;
+        public IBackupsClient Backups
+        {
+            get => ClientManager.CreateBackupsClient();
+        }
 
-        public IRulesClient Rules => Squidex.Rules;
+        public ICommentsClient Comments
+        {
+            get => ClientManager.CreateCommentsClient();
+        }
 
-        public ISchemasClient Schemas => Squidex.Schemas;
+        public IDiagnosticsClient Diagnostics
+        {
+            get => ClientManager.CreateDiagnosticsClient();
+        }
 
-        public ISearchClient Search => Squidex.Search;
+        public IHistoryClient History
+        {
+            get => ClientManager.CreateHistoryClient();
+        }
 
-        public ITemplatesClient Templates => Squidex.Templates;
+        public ILanguagesClient Languages
+        {
+            get => ClientManager.CreateLanguagesClient();
+        }
 
-        public ITranslationsClient Translations => Squidex.Translations;
+        public IPingClient Ping
+        {
+            get => ClientManager.CreatePingClient();
+        }
+
+        public IPlansClient Plans
+        {
+            get => ClientManager.CreatePlansClient();
+        }
+
+        public IRulesClient Rules
+        {
+            get => ClientManager.CreateRulesClient();
+        }
+
+        public ISchemasClient Schemas
+        {
+            get => ClientManager.CreateSchemasClient();
+        }
+
+        public ISearchClient Search
+        {
+            get => ClientManager.CreateSearchClient();
+        }
+
+        public ITemplatesClient Templates
+        {
+            get => ClientManager.CreateTemplatesClient();
+        }
+
+        public ITranslationsClient Translations
+        {
+            get => ClientManager.CreateTranslationsClient();
+        }
+
+        static ClientFixture()
+        {
+            VerifierSettings.IgnoreMember("AppName");
+            VerifierSettings.IgnoreMember("Created");
+            VerifierSettings.IgnoreMember("CreatedBy");
+            VerifierSettings.IgnoreMember("EditToken");
+            VerifierSettings.IgnoreMember("Href");
+            VerifierSettings.IgnoreMember("LastModified");
+            VerifierSettings.IgnoreMember("LastModifiedBy");
+            VerifierSettings.IgnoreMember("RoleProperties");
+            VerifierSettings.IgnoreMember("SchemaName");
+            VerifierSettings.IgnoreMembersWithType<DateTimeOffset>();
+        }
+
+        public virtual async Task InitializeAsync()
+        {
+            Squidex = await Factories.CreateAsync(nameof(ClientManagerWrapper), async () =>
+            {
+                var clientManager = new ClientManagerWrapper();
+
+                await clientManager.ConnectAsync();
+
+                return clientManager;
+            });
+        }
+
+        public virtual Task DisposeAsync()
+        {
+            return Task.CompletedTask;
+        }
     }
 }
