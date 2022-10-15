@@ -1,4 +1,4 @@
-<ng-container *ngIf="type === 'Text'; else textarea">
+<ng-container *ngIf="type === 'Text'; else code">
     <div class="input-group">
         <input class="form-control" ngDefaultControl />
 
@@ -10,7 +10,7 @@
     </div>
 </ng-container>
 
-<ng-template #textarea>
+<ng-template #code>
     <div class="btn-group btn-group-sm">
         <button type="button" class="btn btn-toggle" *ngFor="let supportedMode of modes" [class.active]="mode === supportedMode" (click)="setMode(supportedMode)" tabindex="-1">
             {{supportedMode}}

@@ -90,57 +90,53 @@ namespace Squidex.Extensions.Actions.Webhook
         protected override async Task<Result> ExecuteJobAsync(WebhookJob job,
             CancellationToken ct = default)
         {
-            using (var httpClient = httpClientFactory.CreateClient())
+            var httpClient = httpClientFactory.CreateClient();
+
+            var method = HttpMethod.Post;
+
+            switch (job.Method)
             {
-                var method = HttpMethod.Post;
+                case WebhookMethod.PUT:
+                    method = HttpMethod.Put;
+                    break;
+                case WebhookMethod.GET:
+                    method = HttpMethod.Get;
+                    break;
+                case WebhookMethod.DELETE:
+                    method = HttpMethod.Delete;
+                    break;
+                case WebhookMethod.PATCH:
+                    method = HttpMethod.Patch;
+                    break;
+            }
 
-                switch (job.Method)
+            using var request = new HttpRequestMessage(method, job.RequestUrl);
+
+            if (!string.IsNullOrEmpty(job.RequestBody) && job.Method != WebhookMethod.GET)
+            {
+                var mediaType = job.RequestBodyType.Or("application/json");
+
+                request.Content = new StringContent(job.RequestBody, Encoding.UTF8, mediaType);
+            }
+
+            request.Headers.Add("User-Agent", "Squidex Webhook");
+
+            if (job.Headers != null)
+            {
+                foreach (var (key, value) in job.Headers)
                 {
-                    case WebhookMethod.PUT:
-                        method = HttpMethod.Put;
-                        break;
-                    case WebhookMethod.GET:
-                        method = HttpMethod.Get;
-                        break;
-                    case WebhookMethod.DELETE:
-                        method = HttpMethod.Delete;
-                        break;
-                    case WebhookMethod.PATCH:
-                        method = HttpMethod.Patch;
-                        break;
-                }
-
-                var request = new HttpRequestMessage(method, job.RequestUrl);
-
-                if (!string.IsNullOrEmpty(job.RequestBody) && job.Method != WebhookMethod.GET)
-                {
-                    var mediaType = job.RequestBodyType.Or("application/json");
-
-                    request.Content = new StringContent(job.RequestBody, Encoding.UTF8, mediaType);
-                }
-
-                using (request)
-                {
-                    request.Headers.Add("User-Agent", "Squidex Webhook");
-
-                    if (job.Headers != null)
-                    {
-                        foreach (var (key, value) in job.Headers)
-                        {
-                            request.Headers.TryAddWithoutValidation(key, value);
-                        }
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(job.RequestSignature))
-                    {
-                        request.Headers.Add("X-Signature", job.RequestSignature);
-                    }
-
-                    request.Headers.Add("X-Application", "Squidex Webhook");
-
-                    return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
+                    request.Headers.TryAddWithoutValidation(key, value);
                 }
             }
+
+            if (!string.IsNullOrWhiteSpace(job.RequestSignature))
+            {
+                request.Headers.Add("X-Signature", job.RequestSignature);
+            }
+
+            request.Headers.Add("X-Application", "Squidex Webhook");
+
+            return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
         }
     }
 

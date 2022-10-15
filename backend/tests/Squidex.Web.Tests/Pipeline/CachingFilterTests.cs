@@ -64,6 +64,22 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
+        public async Task Should_return_304_for_same_etags_from_cache_manager()
+        {
+            httpContext.Request.Method = HttpMethods.Get;
+            httpContext.Request.Headers[HeaderNames.IfNoneMatch] = "2C70E12B7A0646F92279F427C7B38E7334D8E5389CFF167A1DC30E73F826B683";
+
+            await sut.OnActionExecutionAsync(executingContext, () =>
+            {
+                cachingManager.AddDependency("key");
+
+                return Task.FromResult(executedContext);
+            });
+
+            Assert.Equal(304, ((StatusCodeResult)executedContext.Result!).StatusCode);
+        }
+
+        [Fact]
         public async Task Should_not_return_304_for_different_etags()
         {
             httpContext.Request.Method = HttpMethods.Get;

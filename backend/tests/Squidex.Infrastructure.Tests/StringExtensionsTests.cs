@@ -40,28 +40,6 @@ namespace Squidex.Infrastructure
             Assert.Equal(value, value.Or("fallback"));
         }
 
-        [Theory]
-        [InlineData("http://squidex.io/base/", "path/to/res", false, "http://squidex.io/base/path/to/res")]
-        [InlineData("http://squidex.io/base/", "path/to/res", true, "http://squidex.io/base/path/to/res/")]
-        [InlineData("http://squidex.io/base/", "/path/to/res", true, "http://squidex.io/base/path/to/res/")]
-        public void Should_provide_full_url_without_query_or_fragment(string baseUrl, string path, bool trailingSlash, string output)
-        {
-            var actual = baseUrl.BuildFullUrl(path, trailingSlash);
-
-            Assert.Equal(output, actual);
-        }
-
-        [Theory]
-        [InlineData("http://squidex.io/base/", "path/to/res?query=1", false, "http://squidex.io/base/path/to/res?query=1")]
-        [InlineData("http://squidex.io/base/", "path/to/res#query=1", true, "http://squidex.io/base/path/to/res#query=1")]
-        [InlineData("http://squidex.io/base/", "path/to/res;query=1", true, "http://squidex.io/base/path/to/res;query=1")]
-        public void Should_provide_full_url_wit_query_or_fragment(string baseUrl, string path, bool trailingSlash, string output)
-        {
-            var actual = baseUrl.BuildFullUrl(path, trailingSlash);
-
-            Assert.Equal(output, actual);
-        }
-
         [Fact]
         public void Should_join_non_empty_if_all_are_valid()
         {
@@ -100,6 +78,22 @@ namespace Squidex.Infrastructure
             var actual = StringExtensions.JsonEscape("Hello \"World\"");
 
             Assert.Equal("Hello \\\"World\\\"", actual);
+        }
+
+        [Fact]
+        public void Should_calculate_hex_code_from_empty_array()
+        {
+            var actual = Array.Empty<byte>().ToHexString();
+
+            Assert.Equal(string.Empty, actual);
+        }
+
+        [Fact]
+        public void Should_calculate_hex_code_from_byte_array()
+        {
+            var actual = new byte[] { 0x00, 0x01, 0xFF, 0x1A, 0x2B, 0x3C }.ToHexString();
+
+            Assert.Equal("0001FF1A2B3C", actual);
         }
     }
 }

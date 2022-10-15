@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text;
 using System.Text.Json.Serialization;
-using Elasticsearch.Net;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -16,34 +16,23 @@ using Squidex.Infrastructure.Json;
 #pragma warning disable IDE0059 // Value assigned to symbol is never used
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.Extensions.Actions.ElasticSearch
+namespace Squidex.Extensions.Actions.Typesense
 {
-    public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearchAction, ElasticSearchJob>
+    public sealed class TypesenseActionHandler : RuleActionHandler<TypesenseAction, TypesenseJob>
     {
-        private readonly ClientPool<(Uri Host, string Username, string Password), ElasticLowLevelClient> clients;
         private readonly IScriptEngine scriptEngine;
+        private readonly IHttpClientFactory httpClientFactory;
         private readonly IJsonSerializer serializer;
 
-        public ElasticSearchActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine, IJsonSerializer serializer)
+        public TypesenseActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory, IScriptEngine scriptEngine, IJsonSerializer serializer)
             : base(formatter)
         {
-            clients = new ClientPool<(Uri Host, string Username, string Password), ElasticLowLevelClient>(key =>
-            {
-                var config = new ConnectionConfiguration(key.Host);
-
-                if (!string.IsNullOrEmpty(key.Username) && !string.IsNullOrWhiteSpace(key.Password))
-                {
-                    config = config.BasicAuthentication(key.Username, key.Password);
-                }
-
-                return new ElasticLowLevelClient(config);
-            });
-
             this.scriptEngine = scriptEngine;
+            this.httpClientFactory = httpClientFactory;
             this.serializer = serializer;
         }
 
-        protected override async Task<(string Description, ElasticSearchJob Data)> CreateJobAsync(EnrichedEvent @event, ElasticSearchAction action)
+        protected override async Task<(string Description, TypesenseJob Data)> CreateJobAsync(EnrichedEvent @event, TypesenseAction action)
         {
             var delete = @event.ShouldDelete(scriptEngine, action.Delete);
 
@@ -58,13 +47,13 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                 contentId = DomainId.NewGuid().ToString();
             }
 
+            var indexName = await FormatAsync(action.IndexName, @event);
+
             var ruleDescription = string.Empty;
-            var ruleJob = new ElasticSearchJob
+            var ruleJob = new TypesenseJob
             {
-                IndexName = await FormatAsync(action.IndexName, @event),
-                ServerHost = action.Host.ToString(),
-                ServerUser = action.Username,
-                ServerPassword = action.Password,
+                ServerUrl = $"{action.Host.ToString().TrimEnd('/')}/collections/{indexName}/documents",
+                ServerKey = action.ApiKey,
                 ContentId = contentId
             };
 
@@ -76,7 +65,7 @@ namespace Squidex.Extensions.Actions.ElasticSearch
             {
                 ruleDescription = $"Upsert to index: {action.IndexName}";
 
-                ElasticSearchContent content;
+                TypesenseContent content;
                 try
                 {
                     string jsonString;
@@ -91,11 +80,11 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                         jsonString = ToJson(@event);
                     }
 
-                    content = serializer.Deserialize<ElasticSearchContent>(jsonString);
+                    content = serializer.Deserialize<TypesenseContent>(jsonString);
                 }
                 catch (Exception ex)
                 {
-                    content = new ElasticSearchContent
+                    content = new TypesenseContent
                     {
                         More = new Dictionary<string, object>
                         {
@@ -104,7 +93,7 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                     };
                 }
 
-                content.ContentId = contentId;
+                content.Id = contentId;
 
                 ruleJob.Content = serializer.Serialize(content, true);
             }
@@ -112,58 +101,55 @@ namespace Squidex.Extensions.Actions.ElasticSearch
             return (ruleDescription, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(ElasticSearchJob job,
+        protected override async Task<Result> ExecuteJobAsync(TypesenseJob job,
             CancellationToken ct = default)
         {
-            if (string.IsNullOrWhiteSpace(job.ServerHost))
+            if (string.IsNullOrWhiteSpace(job.ServerUrl))
             {
                 return Result.Ignored();
             }
 
-            var client = await clients.GetClientAsync((new Uri(job.ServerHost, UriKind.Absolute), job.ServerUser, job.ServerPassword));
+            var httpClient = httpClientFactory.CreateClient();
 
-            try
+            HttpRequestMessage request;
+
+            if (job.Content != null)
             {
-                if (job.Content != null)
+                request = new HttpRequestMessage(HttpMethod.Post, $"{job.ServerUrl}?action=upsert")
                 {
-                    var response = await client.IndexAsync<StringResponse>(job.IndexName, job.ContentId, job.Content, ctx: ct);
-
-                    return Result.SuccessOrFailed(response.OriginalException, response.Body);
-                }
-                else
-                {
-                    var response = await client.DeleteAsync<StringResponse>(job.IndexName, job.ContentId, ctx: ct);
-
-                    return Result.SuccessOrFailed(response.OriginalException, response.Body);
-                }
+                    Content = new StringContent(job.Content, Encoding.UTF8, "application/json")
+                };
             }
-            catch (ElasticsearchClientException ex)
+            else
             {
-                return Result.Failed(ex);
+                request = new HttpRequestMessage(HttpMethod.Delete, $"{job.ServerUrl}/{job.ContentId}");
+            }
+
+            using (request)
+            {
+                request.Headers.TryAddWithoutValidation("X-Typesense-Api-Key", job.ServerKey);
+
+                return await httpClient.OneWayRequestAsync(request, job.Content, ct);
             }
         }
     }
 
-    public sealed class ElasticSearchContent
+    public sealed class TypesenseContent
     {
-        public string ContentId { get; set; }
+        public string Id { get; set; }
 
         [JsonExtensionData]
         public Dictionary<string, object> More { get; set; } = new Dictionary<string, object>();
     }
 
-    public sealed class ElasticSearchJob
+    public sealed class TypesenseJob
     {
-        public string ServerHost { get; set; }
+        public string ServerUrl { get; set; }
 
-        public string ServerUser { get; set; }
-
-        public string ServerPassword { get; set; }
-
-        public string ContentId { get; set; }
+        public string ServerKey { get; set; }
 
         public string Content { get; set; }
 
-        public string IndexName { get; set; }
+        public string ContentId { get; set; }
     }
 }

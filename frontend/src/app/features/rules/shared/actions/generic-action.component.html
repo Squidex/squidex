@@ -9,10 +9,20 @@
 
             <ng-container [ngSwitch]="property.editor">
                 <ng-container *ngSwitchCase="'Text'">
-                    <sqx-formattable-input [formControlName]="property.name" type="Text" [formattable]="property.isFormattable"></sqx-formattable-input>
+                    <ng-container *ngIf="property.isFormattable; else plain">
+                        <sqx-formattable-input [formControlName]="property.name" type="Text"></sqx-formattable-input>
+                    </ng-container>
+                    <ng-template #plain>
+                        <input class="form-control" id="{{property.name}}" [formControlName]="property.name">
+                    </ng-template>
                 </ng-container>
                 <ng-container *ngSwitchCase="'TextArea'">
-                    <sqx-formattable-input [completion]="ruleCompletions | async" [formControlName]="property.name" type="Code" [formattable]="property.isFormattable"></sqx-formattable-input>
+                    <ng-container *ngIf="property.isFormattable; else plain">
+                        <sqx-formattable-input [completion]="ruleCompletions | async" [formControlName]="property.name" type="Code"></sqx-formattable-input>
+                    </ng-container>
+                    <ng-template #plain>
+                        <textarea class="form-control" id="{{property.name}}" [formControlName]="property.name"></textarea>
+                    </ng-template>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Javascript'">
                     <sqx-code-editor [completion]="ruleCompletions | async" [formControlName]="property.name" [height]="350"></sqx-code-editor>

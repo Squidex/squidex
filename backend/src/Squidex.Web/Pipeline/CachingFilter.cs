@@ -31,6 +31,8 @@ namespace Squidex.Web.Pipeline
 
             var resultContext = await next();
 
+            cachingManager.Finish(httpContext);
+
             if (httpContext.Response.HasStarted == false &&
                 httpContext.Response.Headers.TryGetString(HeaderNames.ETag, out var etag) &&
                 IsCacheable(httpContext, etag))
