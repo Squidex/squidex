@@ -14,6 +14,11 @@ namespace Squidex.Web
             return $"W/{etag}";
         }
 
+        public static bool IsStrongEtag(string etag)
+        {
+            return !IsWeakEtag(etag.AsSpan());
+        }
+
         public static bool IsWeakEtag(string etag)
         {
             return IsWeakEtag(etag.AsSpan());

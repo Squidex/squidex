@@ -192,6 +192,13 @@ namespace Squidex.Web.Pipeline
             });
         }
 
+        public void Reset(HttpContext httpContext)
+        {
+            Guard.NotNull(httpContext);
+
+            httpContext.Features.Set<CacheContext>(null);
+        }
+
         public void Start(HttpContext httpContext)
         {
             Guard.NotNull(httpContext);
