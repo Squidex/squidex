@@ -165,13 +165,13 @@ namespace TestSuite.ApiTests
         public async Task Should_not_create_very_big_asset()
         {
             // STEP 1: Create small asset
-            await _.Assets.UploadFileAsync(_.AppName, 1_000_000);
+            await _.Assets.UploadRandomFileAsync(_.AppName, 1_000_000);
 
 
             // STEP 2: Create big asset
             var ex = await Assert.ThrowsAnyAsync<Exception>(() =>
             {
-                return _.Assets.UploadFileAsync(_.AppName, 10_000_000);
+                return _.Assets.UploadRandomFileAsync(_.AppName, 10_000_000);
             });
 
             // Client library cannot catch this exception properly.

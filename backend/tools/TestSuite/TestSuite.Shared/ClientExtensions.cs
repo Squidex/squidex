@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Security.Cryptography;
-using System.Text;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
@@ -42,8 +40,7 @@ namespace TestSuite
             return false;
         }
 
-        public static async Task<ContentsResult<TEntity, TData>> WaitForContentAsync<TEntity, TData>(this IContentsClient<TEntity, TData> contentsClient, ContentQuery q,
-            Func<TEntity, bool> predicate, TimeSpan timeout) where TEntity : Content<TData> where TData : class, new()
+        public static async Task<ContentsResult<TEntity, TData>> WaitForContentAsync<TEntity, TData>(this IContentsClient<TEntity, TData> contentsClient, ContentQuery q, Func<TEntity, bool> predicate, TimeSpan timeout) where TEntity : Content<TData> where TData : class, new()
         {
             try
             {
@@ -68,8 +65,7 @@ namespace TestSuite
             return new ContentsResult<TEntity, TData>();
         }
 
-        public static async Task<IList<SearchResultDto>> WaitForSearchAsync(this ISearchClient searchClient, string app, string query,
-            Func<SearchResultDto, bool> predicate, TimeSpan timeout)
+        public static async Task<IList<SearchResultDto>> WaitForSearchAsync(this ISearchClient searchClient, string app, string query, Func<SearchResultDto, bool> predicate, TimeSpan timeout)
         {
             try
             {
@@ -94,8 +90,7 @@ namespace TestSuite
             return new List<SearchResultDto>();
         }
 
-        public static async Task<IList<HistoryEventDto>> WaitForHistoryAsync(this IHistoryClient historyClient, string app, string channel,
-            Func<HistoryEventDto, bool> predicate, TimeSpan timeout)
+        public static async Task<IList<HistoryEventDto>> WaitForHistoryAsync(this IHistoryClient historyClient, string app, string channel, Func<HistoryEventDto, bool> predicate, TimeSpan timeout)
         {
             try
             {
@@ -120,8 +115,7 @@ namespace TestSuite
             return new List<HistoryEventDto>();
         }
 
-        public static async Task<IDictionary<string, int>> WaitForTagsAsync(this IAssetsClient assetsClient, string app, string id,
-            TimeSpan timeout)
+        public static async Task<IDictionary<string, int>> WaitForTagsAsync(this IAssetsClient assetsClient, string app, string id, TimeSpan timeout)
         {
             try
             {
@@ -146,8 +140,7 @@ namespace TestSuite
             return await assetsClient.GetTagsAsync(app);
         }
 
-        public static async Task<IList<BackupJobDto>> WaitForBackupsAsync(this IBackupsClient backupsClient, string app,
-            Func<BackupJobDto, bool> predicate, TimeSpan timeout)
+        public static async Task<IList<BackupJobDto>> WaitForBackupsAsync(this IBackupsClient backupsClient, string app, Func<BackupJobDto, bool> predicate, TimeSpan timeout)
         {
             try
             {
@@ -172,8 +165,7 @@ namespace TestSuite
             return null;
         }
 
-        public static async Task<RestoreJobDto> WaitForRestoreAsync(this IBackupsClient backupsClient,
-            Func<RestoreJobDto, bool> predicate, TimeSpan timeout)
+        public static async Task<RestoreJobDto> WaitForRestoreAsync(this IBackupsClient backupsClient, Func<RestoreJobDto, bool> predicate, TimeSpan timeout)
         {
             try
             {
@@ -198,13 +190,13 @@ namespace TestSuite
             return null;
         }
 
-        public static async Task<MemoryStream> DownloadAsync(this ClientManagerFixture fixture, AssetDto asset, int? version = null)
+        public static async Task<MemoryStream> DownloadAsync(this ClientFixture fixture, AssetDto asset, int? version = null)
         {
             var temp = new MemoryStream();
 
-            using (var client = new HttpClient())
+            using (var httpClient = new HttpClient())
             {
-                client.BaseAddress = new Uri(fixture.ServerUrl);
+                httpClient.BaseAddress = new Uri(fixture.Url);
 
                 var url = asset._links["content"].Href[1..];
 
@@ -213,21 +205,21 @@ namespace TestSuite
                     url += $"?version={version}";
                 }
 
-                var response = await client.GetAsync(url);
-
-                response.EnsureSuccessStatusCode();
-
-                await using (var stream = await response.Content.ReadAsStreamAsync())
+                using (var response = await httpClient.GetAsync(url))
                 {
-                    await stream.CopyToAsync(temp);
+                    response.EnsureSuccessStatusCode();
+
+                    await using (var stream = await response.Content.ReadAsStreamAsync())
+                    {
+                        await stream.CopyToAsync(temp);
+                    }
                 }
             }
 
             return temp;
         }
 
-        public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string app, string path,
-            AssetDto asset, string fileName = null)
+        public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string app, string path, AssetDto asset, string fileName = null)
         {
             var fileInfo = new FileInfo(path);
 
@@ -239,25 +231,23 @@ namespace TestSuite
             }
         }
 
-        public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string app, string path,
-            string mimeType, string fileName = null, string parentId = null, string id = null)
+        public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string app, string path, string fileType, string fileName = null, string parentId = null, string id = null)
         {
             var fileInfo = new FileInfo(path);
 
             await using (var stream = fileInfo.OpenRead())
             {
-                var upload = new FileParameter(stream, fileName ?? fileInfo.Name, mimeType);
+                var upload = new FileParameter(stream, fileName ?? fileInfo.Name, fileType);
 
                 return await assetsClients.PostAssetAsync(app, parentId, id, true, upload);
             }
         }
 
-        public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string app, int size,
-            string fileName = null, string parentId = null, string id = null)
+        public static async Task<AssetDto> UploadRandomFileAsync(this IAssetsClient assetsClients, string app, int size, string parentId = null, string id = null)
         {
             using (var stream = RandomAsset(size))
             {
-                var upload = new FileParameter(stream, fileName ?? RandomName(".txt"), "text/csv");
+                var upload = new FileParameter(stream, RandomName(".txt"), "text/csv");
 
                 return await assetsClients.PostAssetAsync(app, parentId, id, true, upload);
             }

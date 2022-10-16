@@ -76,7 +76,7 @@ namespace Squidex.Extensions.Actions.OpenSearch
             {
                 ruleDescription = $"Upsert to index: {action.IndexName}";
 
-                ElasticContent content;
+                OpenSearchContent content;
                 try
                 {
                     string jsonString;
@@ -91,11 +91,11 @@ namespace Squidex.Extensions.Actions.OpenSearch
                         jsonString = ToJson(@event);
                     }
 
-                    content = serializer.Deserialize<ElasticContent>(jsonString);
+                    content = serializer.Deserialize<OpenSearchContent>(jsonString);
                 }
                 catch (Exception ex)
                 {
-                    content = new ElasticContent
+                    content = new OpenSearchContent
                     {
                         More = new Dictionary<string, object>
                         {
@@ -144,7 +144,7 @@ namespace Squidex.Extensions.Actions.OpenSearch
         }
     }
 
-    public sealed class ElasticContent
+    public sealed class OpenSearchContent
     {
         public string ContentId { get; set; }
 

@@ -320,7 +320,7 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_not_add_header_to_etag_if_not_found()
+        public async Task Should_not_add_header_to_etag_if_not_found_in_request()
         {
             var id1 = DomainId.NewGuid();
 
@@ -360,7 +360,7 @@ namespace Squidex.Web.Pipeline
 
             var etag = httpContext.Response.Headers[HeaderNames.ETag].ToString();
 
-            Assert.StartsWith("W/", etag, StringComparison.Ordinal);
+            Assert.True(ETagUtils.IsWeakEtag(etag));
             Assert.True(etag.Length > 20);
         }
 
@@ -381,7 +381,7 @@ namespace Squidex.Web.Pipeline
 
             var etag = httpContext.Response.Headers[HeaderNames.ETag].ToString();
 
-            Assert.False(etag.StartsWith("W/", StringComparison.Ordinal));
+            Assert.True(ETagUtils.IsStrongEtag(etag));
             Assert.True(etag.Length > 20);
         }
 
@@ -405,6 +405,8 @@ namespace Squidex.Web.Pipeline
 
         private async Task MakeRequestAsync(Action? action = null)
         {
+            cachingManager.Reset(httpContext);
+
             await sut.InvokeAsync(httpContext);
 
             action?.Invoke();

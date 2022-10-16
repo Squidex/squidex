@@ -34,6 +34,7 @@ namespace Squidex.Web.Pipeline
             private readonly ReaderWriterLockSlim slimLock = new ReaderWriterLockSlim();
             private readonly int maxKeysSize;
             private bool hasDependency;
+            private bool isFinished;
 
             public CacheContext(int maxKeysSize)
             {
@@ -49,12 +50,11 @@ namespace Squidex.Web.Pipeline
 
             public void AddDependency(string key, long version)
             {
-                if (key != default)
+                if (!string.IsNullOrWhiteSpace(key))
                 {
+                    slimLock.EnterWriteLock();
                     try
                     {
-                        slimLock.EnterWriteLock();
-
                         keys.Add(key);
 
                         hasher.AppendData(Encoding.Default.GetBytes(key));
@@ -71,18 +71,16 @@ namespace Squidex.Web.Pipeline
 
             public void AddDependency<T>(T value)
             {
-                if (value is not null)
+                var formatted = value?.ToString();
+
+                if (formatted != null)
                 {
+                    slimLock.EnterWriteLock();
                     try
                     {
-                        slimLock.EnterWriteLock();
+                        hasher.AppendData(Encoding.Default.GetBytes(formatted));
 
-                        var formatted = value.ToString();
-
-                        if (formatted != null)
-                        {
-                            hasher.AppendData(Encoding.Default.GetBytes(formatted));
-                        }
+                        hasDependency = true;
                     }
                     finally
                     {
@@ -93,12 +91,21 @@ namespace Squidex.Web.Pipeline
 
             public void Finish(HttpResponse response, ObjectPool<StringBuilder> stringBuilderPool)
             {
+                // Finish might be called multiple times.
+                if (isFinished)
+                {
+                    return;
+                }
+
+                // Set to finish before we start to ensure that we do not call it again in case of an error.
+                isFinished = true;
+
                 if (hasDependency && !response.Headers.ContainsKey(HeaderNames.ETag))
                 {
                     using (Telemetry.Activities.StartActivity("CalculateEtag"))
                     {
                         var cacheBuffer = hasher.GetHashAndReset();
-                        var cacheString = BitConverter.ToString(cacheBuffer).Replace("-", string.Empty, StringComparison.Ordinal).ToUpperInvariant();
+                        var cacheString = cacheBuffer.ToHexString();
 
                         response.Headers.Add(HeaderNames.ETag, cacheString);
                     }
@@ -185,20 +192,48 @@ namespace Squidex.Web.Pipeline
             });
         }
 
+        public void Reset(HttpContext httpContext)
+        {
+            Guard.NotNull(httpContext);
+
+            httpContext.Features.Set<CacheContext>(null);
+        }
+
         public void Start(HttpContext httpContext)
         {
             Guard.NotNull(httpContext);
 
             var maxKeysSize = GetKeysSize(httpContext);
 
+            // Ensure that we only add the cache context once.
+            if (httpContext.Features.Get<CacheContext>() != null)
+            {
+                return;
+            }
+
             httpContext.Features.Set(new CacheContext(maxKeysSize));
+        }
+
+        public void Finish(HttpContext httpContext)
+        {
+            Guard.NotNull(httpContext);
+
+            var cacheContext = httpContext.Features.Get<CacheContext>();
+
+            // If the cache context has not been set it does not make sense to handle it now.
+            if (cacheContext == null)
+            {
+                return;
+            }
+
+            cacheContext.Finish(httpContext.Response, stringBuilderPool);
         }
 
         private int GetKeysSize(HttpContext httpContext)
         {
             var headers = httpContext.Request.Headers;
 
-            if (!headers.TryGetValue(SurrogateKeySizeHeader, out var header) || !int.TryParse(header, NumberStyles.Integer, CultureInfo.InvariantCulture, out var size))
+            if (!headers.TryGetValue(SurrogateKeySizeHeader, out var header) || TryParseHeader(header, out var size))
             {
                 size = cachingOptions.MaxSurrogateKeysSize;
             }
@@ -206,10 +241,16 @@ namespace Squidex.Web.Pipeline
             return Math.Min(MaxAllowedKeysSize, size);
         }
 
+        private static bool TryParseHeader(StringValues header, out int size)
+        {
+            return !int.TryParse(header, NumberStyles.Integer, CultureInfo.InvariantCulture, out size);
+        }
+
         public void AddDependency(DomainId key, long version)
         {
             var cacheContext = httpContextAccessor.HttpContext?.Features.Get<CacheContext>();
 
+            // The cache context can be null if start has never been called.
             cacheContext?.AddDependency(key.ToString(), version);
         }
 
@@ -217,6 +258,7 @@ namespace Squidex.Web.Pipeline
         {
             var cacheContext = httpContextAccessor.HttpContext?.Features.Get<CacheContext>();
 
+            // The cache context can be null if start has never been called.
             cacheContext?.AddDependency(value);
         }
 
@@ -231,6 +273,7 @@ namespace Squidex.Web.Pipeline
 
             var cacheContext = httpContext.Features.Get<CacheContext>();
 
+            // The cache context can be null if start has never been called.
             if (cacheContext == null)
             {
                 return;
@@ -239,15 +282,6 @@ namespace Squidex.Web.Pipeline
             httpContext.Request.Headers.TryGetValue(header, out var value);
 
             cacheContext?.AddHeader(header, value);
-        }
-
-        public void Finish(HttpContext httpContext)
-        {
-            Guard.NotNull(httpContext);
-
-            var cacheContext = httpContext.Features.Get<CacheContext>();
-
-            cacheContext?.Finish(httpContext.Response, stringBuilderPool);
         }
     }
 }
