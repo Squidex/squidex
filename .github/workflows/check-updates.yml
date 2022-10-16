@@ -16,5 +16,7 @@ jobs:
         with:
           token: ${{ secrets.WORKFLOW_SECRET }}
 
-      - name: Run GitHub Actions Version Updater
+      - name: Check for Update
         uses: saadmk11/github-actions-version-updater@v0.5.6
+        with:
+          token: ${{ secrets.WORKFLOW_SECRET }}
