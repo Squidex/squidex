@@ -5,14 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormArray, FormControl } from '@angular/forms';
+import { UntypedFormArray, UntypedFormControl } from '@angular/forms';
 import { ExtendedFormArray, UndefinableFormArray } from './extended-form-array';
 
 describe('ExtendedFormArray', () => {
     it('should provide value even if controls are disabled', () => {
         const control = new ExtendedFormArray([
-            new FormControl('1'),
-            new FormControl('2'),
+            new UntypedFormControl('1'),
+            new UntypedFormControl('2'),
         ]);
 
         expect(control.value).toEqual(['1', '2']);
@@ -43,8 +43,8 @@ describe('UndefinableFormArray', () => {
 
     it('should provide value even if controls are disabled', () => {
         const control = new UndefinableFormArray([
-            new FormControl('1'),
-            new FormControl('2'),
+            new UntypedFormControl('1'),
+            new UntypedFormControl('2'),
         ]);
 
         expect(control.value).toEqual(['1', '2']);
@@ -89,7 +89,7 @@ describe('UndefinableFormArray', () => {
 
         assertValue(control, ['1'], () => {
             control.setValue(undefined);
-            control.push(new FormControl('1'));
+            control.push(new UntypedFormControl('1'));
         });
     });
 
@@ -98,22 +98,22 @@ describe('UndefinableFormArray', () => {
 
         assertValue(control, ['1'], () => {
             control.setValue(undefined);
-            control.insert(0, new FormControl('1'));
+            control.insert(0, new UntypedFormControl('1'));
         });
     });
 
     function buildControl(undefinable: boolean) {
         return undefinable ?
             new UndefinableFormArray([
-                new FormControl(''),
+                new UntypedFormControl(''),
             ]) :
             new ExtendedFormArray([
-                new FormControl(''),
+                new UntypedFormControl(''),
             ]);
     }
 });
 
-function assertValue(control: FormArray, expected: any, action: () => void) {
+function assertValue(control: UntypedFormArray, expected: any, action: () => void) {
     let currentValue: any;
 
     control.valueChanges.subscribe(value => {

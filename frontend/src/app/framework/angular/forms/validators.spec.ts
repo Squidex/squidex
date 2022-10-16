@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { DateTime } from '@app/framework/internal';
 import { ValidatorsEx } from './validators';
 
@@ -18,7 +18,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if value is equal to min and max', () => {
-            const input = new FormControl(3);
+            const input = new UntypedFormControl(3);
 
             const error = <any>ValidatorsEx.between(3, 3)(input);
 
@@ -26,7 +26,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if value is valid', () => {
-            const input = new FormControl(4);
+            const input = new UntypedFormControl(4);
 
             const error = <any>ValidatorsEx.between(1, 5)(input);
 
@@ -34,7 +34,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if value is null', () => {
-            const input = new FormControl(null);
+            const input = new UntypedFormControl(null);
 
             const error = <any>ValidatorsEx.between(1, 5)(input);
 
@@ -42,7 +42,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if value is undefined', () => {
-            const input = new FormControl(undefined);
+            const input = new UntypedFormControl(undefined);
 
             const error = <any>ValidatorsEx.between(1, 5)(input);
 
@@ -50,7 +50,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error if less than min', () => {
-            const input = new FormControl(0);
+            const input = new UntypedFormControl(0);
 
             const error = <any>ValidatorsEx.between(1, undefined)(input);
 
@@ -58,7 +58,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error if greater than max', () => {
-            const input = new FormControl(6);
+            const input = new UntypedFormControl(6);
 
             const error = <any>ValidatorsEx.between(undefined, 5)(input);
 
@@ -66,7 +66,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error if not in range', () => {
-            const input = new FormControl(1);
+            const input = new UntypedFormControl(1);
 
             const error = <any>ValidatorsEx.between(2, 4)(input);
 
@@ -74,7 +74,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error if not equal to min and max', () => {
-            const input = new FormControl(2);
+            const input = new UntypedFormControl(2);
 
             const error = <any>ValidatorsEx.between(3, 3)(input);
 
@@ -90,7 +90,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if value is equal to min and max', () => {
-            const input = new FormControl('xxx');
+            const input = new UntypedFormControl('xxx');
 
             const error = <any>ValidatorsEx.betweenLength(3, 3)(input);
 
@@ -98,7 +98,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if value is valid', () => {
-            const input = new FormControl('xxxx');
+            const input = new UntypedFormControl('xxxx');
 
             const error = <any>ValidatorsEx.betweenLength(1, 5)(input);
 
@@ -106,7 +106,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if value is null', () => {
-            const input = new FormControl(null);
+            const input = new UntypedFormControl(null);
 
             const error = <any>ValidatorsEx.betweenLength(1, 5)(input);
 
@@ -114,7 +114,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if value is undefined', () => {
-            const input = new FormControl(undefined);
+            const input = new UntypedFormControl(undefined);
 
             const error = <any>ValidatorsEx.betweenLength(1, 5)(input);
 
@@ -122,7 +122,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error if less than min', () => {
-            const input = new FormControl('x');
+            const input = new UntypedFormControl('x');
 
             const error = <any>ValidatorsEx.betweenLength(2, undefined)(input);
 
@@ -130,7 +130,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error if greater than max', () => {
-            const input = new FormControl('xxxxxx');
+            const input = new UntypedFormControl('xxxxxx');
 
             const error = <any>ValidatorsEx.betweenLength(undefined, 5)(input);
 
@@ -138,7 +138,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error if not in range', () => {
-            const input = new FormControl('x');
+            const input = new UntypedFormControl('x');
 
             const error = <any>ValidatorsEx.betweenLength(2, 4)(input);
 
@@ -146,7 +146,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error if not equal to min and max', () => {
-            const input = new FormControl('xx');
+            const input = new UntypedFormControl('xx');
 
             const error = <any>ValidatorsEx.betweenLength(3, 3)(input);
 
@@ -156,7 +156,7 @@ describe('ValidatorsEx', () => {
 
     describe('validDateTime', () => {
         it('should return null validator if valid is not defined', () => {
-            const input = new FormControl(null);
+            const input = new UntypedFormControl(null);
 
             const error = <any>ValidatorsEx.validDateTime()(input);
 
@@ -164,7 +164,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if date time is valid', () => {
-            const input = new FormControl(DateTime.now().toISOString());
+            const input = new UntypedFormControl(DateTime.now().toISOString());
 
             const error = ValidatorsEx.validDateTime()(input);
 
@@ -172,7 +172,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error if value is invalid date', () => {
-            const input = new FormControl('invalid');
+            const input = new UntypedFormControl('invalid');
 
             const error = <any>ValidatorsEx.validDateTime()(input);
 
@@ -188,7 +188,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if value is in allowed values', () => {
-            const input = new FormControl(10);
+            const input = new UntypedFormControl(10);
 
             const error = ValidatorsEx.validValues([10, 20, 30])(input);
 
@@ -196,7 +196,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error if value is not in allowed values', () => {
-            const input = new FormControl(50);
+            const input = new UntypedFormControl(50);
 
             const error = <any>ValidatorsEx.validValues([10, 20, 30])(input);
 
@@ -212,7 +212,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if value is in allowed values', () => {
-            const input = new FormControl([10, 20]);
+            const input = new UntypedFormControl([10, 20]);
 
             const error = ValidatorsEx.validArrayValues([10, 20, 30])(input);
 
@@ -220,7 +220,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error if value is not in allowed values', () => {
-            const input = new FormControl([50]);
+            const input = new UntypedFormControl([50]);
 
             const error = <any>ValidatorsEx.validArrayValues([10, 20, 30])(input);
 
@@ -232,9 +232,9 @@ describe('ValidatorsEx', () => {
         it('should revalidate if other control changes', () => {
             const validator = ValidatorsEx.match('password', 'Passwords are not the same.');
 
-            const form = new FormGroup({
-                password: new FormControl('1'),
-                passwordConfirm: new FormControl('2', validator),
+            const form = new UntypedFormGroup({
+                password: new UntypedFormControl('1'),
+                passwordConfirm: new UntypedFormControl('2', validator),
             });
 
             form.controls['passwordConfirm'].setValue('1');
@@ -250,9 +250,9 @@ describe('ValidatorsEx', () => {
         it('should return error if not the same value', () => {
             const validator = ValidatorsEx.match('password', 'Passwords are not the same.');
 
-            const form = new FormGroup({
-                password: new FormControl('1'),
-                passwordConfirm: new FormControl('2', validator),
+            const form = new UntypedFormGroup({
+                password: new UntypedFormControl('1'),
+                passwordConfirm: new UntypedFormControl('2', validator),
             });
 
             expect(validator(form.controls['passwordConfirm'])).toEqual({ match: { message: 'Passwords are not the same.' } });
@@ -261,9 +261,9 @@ describe('ValidatorsEx', () => {
         it('should return empty object if values are the same', () => {
             const validator = ValidatorsEx.match('password', 'Passwords are not the same.');
 
-            const form = new FormGroup({
-                password: new FormControl('1'),
-                passwordConfirm: new FormControl('1', validator),
+            const form = new UntypedFormGroup({
+                password: new UntypedFormControl('1'),
+                passwordConfirm: new UntypedFormControl('1', validator),
             });
 
             expect(validator(form.controls['passwordConfirm'])).toBeNull();
@@ -272,8 +272,8 @@ describe('ValidatorsEx', () => {
         it('should throw error if other object is not found', () => {
             const validator = ValidatorsEx.match('password', 'Passwords are not the same.');
 
-            const form = new FormGroup({
-                passwordConfirm: new FormControl('2', validator),
+            const form = new UntypedFormGroup({
+                passwordConfirm: new UntypedFormControl('2', validator),
             });
 
             expect(() => validator(form.controls['passwordConfirm'])).toThrow();
@@ -282,7 +282,7 @@ describe('ValidatorsEx', () => {
         it('should return empty object if control has no parent', () => {
             const validator = ValidatorsEx.match('password', 'Passwords are not the same.');
 
-            const control = new FormControl('2', validator);
+            const control = new UntypedFormControl('2', validator);
 
             expect(validator(control)).toBeNull();
         });
@@ -296,7 +296,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if value is valid pattern', () => {
-            const input = new FormControl('1234');
+            const input = new UntypedFormControl('1234');
 
             const error = ValidatorsEx.pattern(/^[0-9]{1,4}$/)(input);
 
@@ -304,7 +304,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if value is null string', () => {
-            const input = new FormControl(null);
+            const input = new UntypedFormControl(null);
 
             const error = ValidatorsEx.pattern(/^[0-9]{1,4}$/)(input);
 
@@ -312,7 +312,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if value is empty string', () => {
-            const input = new FormControl('');
+            const input = new UntypedFormControl('');
 
             const error = ValidatorsEx.pattern(/^[0-9]{1,4}$/)(input);
 
@@ -320,7 +320,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error with message if value does not match pattern string', () => {
-            const input = new FormControl('abc');
+            const input = new UntypedFormControl('abc');
 
             const error = <any>ValidatorsEx.pattern('[0-9]{1,4}', 'My-Message')(input);
             const expected: any = {
@@ -333,7 +333,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error with message if value does not match pattern', () => {
-            const input = new FormControl('abc');
+            const input = new UntypedFormControl('abc');
 
             const error = <any>ValidatorsEx.pattern(/^[0-9]{1,4}$/, 'My-Message')(input);
             const expected: any = {
@@ -346,7 +346,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error without message if value does not match pattern string', () => {
-            const input = new FormControl('abc');
+            const input = new UntypedFormControl('abc');
 
             const error = <any>ValidatorsEx.pattern('[0-9]{1,4}')(input);
             const expected: any = {
@@ -359,7 +359,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error without message if value does not match pattern', () => {
-            const input = new FormControl('abc');
+            const input = new UntypedFormControl('abc');
 
             const error = <any>ValidatorsEx.pattern(/^[0-9]{1,4}$/)(input);
             const expected: any = {
@@ -374,7 +374,7 @@ describe('ValidatorsEx', () => {
 
     describe('uniqueStrings', () => {
         it('should return null if value is null', () => {
-            const input = new FormControl(null);
+            const input = new UntypedFormControl(null);
 
             const error = ValidatorsEx.uniqueStrings()(input);
 
@@ -382,7 +382,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if value is not a string array', () => {
-            const input = new FormControl([1, 2, 3]);
+            const input = new UntypedFormControl([1, 2, 3]);
 
             const error = ValidatorsEx.uniqueStrings()(input);
 
@@ -390,7 +390,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if values are unique', () => {
-            const input = new FormControl(['1', '2', '3']);
+            const input = new UntypedFormControl(['1', '2', '3']);
 
             const error = ValidatorsEx.uniqueStrings()(input);
 
@@ -398,7 +398,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error if values are not unique', () => {
-            const input = new FormControl(['1', '2', '2', '3']);
+            const input = new UntypedFormControl(['1', '2', '2', '3']);
 
             const error = ValidatorsEx.uniqueStrings()(input);
 
@@ -408,7 +408,7 @@ describe('ValidatorsEx', () => {
 
     describe('uniqueObjectValues', () => {
         it('should return null if value is null', () => {
-            const input = new FormControl(null);
+            const input = new UntypedFormControl(null);
 
             const error = ValidatorsEx.uniqueObjectValues(['myString'])(input);
 
@@ -416,7 +416,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if value is not an object array', () => {
-            const input = new FormControl([1, 2, 3]);
+            const input = new UntypedFormControl([1, 2, 3]);
 
             const error = ValidatorsEx.uniqueObjectValues(['myString'])(input);
 
@@ -424,7 +424,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if values array has one item', () => {
-            const input = new FormControl([{}]);
+            const input = new UntypedFormControl([{}]);
 
             const error = ValidatorsEx.uniqueObjectValues(['myString'])(input);
 
@@ -432,7 +432,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if values array has no duplicate', () => {
-            const input = new FormControl([{ myString: '1' }, { myString: '2' }]);
+            const input = new UntypedFormControl([{ myString: '1' }, { myString: '2' }]);
 
             const error = ValidatorsEx.uniqueObjectValues(['myString'])(input);
 
@@ -440,7 +440,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return null if values array has unchecked duplicate', () => {
-            const input = new FormControl([{ other: '1' }, { other: '1' }]);
+            const input = new UntypedFormControl([{ other: '1' }, { other: '1' }]);
 
             const error = ValidatorsEx.uniqueObjectValues(['myString'])(input);
 
@@ -448,7 +448,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error if values array has duplicate', () => {
-            const input = new FormControl([{ myString: '1' }, { myString: '1' }]);
+            const input = new UntypedFormControl([{ myString: '1' }, { myString: '1' }]);
 
             const error = ValidatorsEx.uniqueObjectValues(['myString'])(input);
 
@@ -456,7 +456,7 @@ describe('ValidatorsEx', () => {
         });
 
         it('should return error if values array has multiple duplicates', () => {
-            const input = new FormControl([{ myString: '1', myNumber: 2 }, { myString: '1', myNumber: 2 }]);
+            const input = new UntypedFormControl([{ myString: '1', myNumber: 2 }, { myString: '1', myNumber: 2 }]);
 
             const error = ValidatorsEx.uniqueObjectValues(['myString', 'myNumber'])(input);
 

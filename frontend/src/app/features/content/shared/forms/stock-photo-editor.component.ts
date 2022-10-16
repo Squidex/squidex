@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
-import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { BehaviorSubject, of } from 'rxjs';
 import { debounceTime, map, switchMap, tap } from 'rxjs/operators';
 import { DialogModel, StatefulControlComponent, StockPhotoDto, StockPhotoService, thumbnail, Types, value$, valueProjection$ } from '@app/shared';
@@ -46,11 +46,11 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
         this.setDisabledState(value === true);
     }
 
-    public valueControl = new FormControl('');
+    public valueControl = new UntypedFormControl('');
 
     public stockPhotoRequests = new BehaviorSubject<Request>({ page: 1 });
     public stockPhotoThumbnail = valueProjection$(this.valueControl, x => thumbnail(x, undefined, 300) || x);
-    public stockPhotoSearch = new FormControl('');
+    public stockPhotoSearch = new UntypedFormControl('');
 
     public searchDialog = new DialogModel();
 

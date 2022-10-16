@@ -16,9 +16,6 @@ const routes: Routes = [
         component: ApiAreaComponent,
         children: [
             {
-                path: '',
-            },
-            {
                 path: 'graphql',
                 component: GraphQLPageComponent,
             },

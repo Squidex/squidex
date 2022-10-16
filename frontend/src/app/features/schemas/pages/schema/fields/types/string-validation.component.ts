@@ -6,7 +6,7 @@
  */
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AppSettingsDto, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, SchemaDto, STRING_CONTENT_TYPES, StringFieldPropertiesDto, Types, value$ } from '@app/shared';
 
@@ -19,7 +19,7 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
     public readonly contentTypes = STRING_CONTENT_TYPES;
 
     @Input()
-    public fieldForm!: FormGroup;
+    public fieldForm!: UntypedFormGroup;
 
     @Input()
     public field!: FieldDto;

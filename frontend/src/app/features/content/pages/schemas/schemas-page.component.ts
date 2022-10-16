@@ -6,7 +6,7 @@
  */
 
 import { Component } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppsState, getCategoryTree, SchemaCategory, SchemasState, Settings, UIOptions, value$ } from '@app/shared';
@@ -17,7 +17,7 @@ import { AppsState, getCategoryTree, SchemaCategory, SchemasState, Settings, UIO
     templateUrl: './schemas-page.component.html',
 })
 export class SchemasPageComponent {
-    public schemasFilter = new FormControl();
+    public schemasFilter = new UntypedFormControl();
 
     public isEmbedded = false;
 

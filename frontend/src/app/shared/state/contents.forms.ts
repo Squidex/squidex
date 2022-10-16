@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { debounceTimeSafe, ExtendedFormGroup, Form, FormArrayTemplate, TemplatedFormArray, Types, value$ } from '@app/framework';
@@ -23,10 +23,10 @@ type SaveQueryFormType = { name: string; user: boolean };
 export class SaveQueryForm extends Form<ExtendedFormGroup, SaveQueryFormType> {
     constructor() {
         super(new ExtendedFormGroup({
-            name: new FormControl('',
+            name: new UntypedFormControl('',
                 Validators.required,
             ),
-            user: new FormControl(false,
+            user: new UntypedFormControl(false,
                 Validators.nullValidator,
             ),
         }));
@@ -47,7 +47,7 @@ export class PatchContentForm extends Form<ExtendedFormGroup, any> {
         for (const field of this.editableFields) {
             const validators = FieldsValidators.create(field, this.language.isOptional);
 
-            this.form.setControl(field.name, new FormControl(undefined, { validators }));
+            this.form.setControl(field.name, new UntypedFormControl(undefined, { validators }));
         }
     }
 
@@ -202,7 +202,7 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
     }
 }
 
-export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
+export class FieldForm extends AbstractContentForm<RootFieldDto, UntypedFormGroup> {
     private readonly partitions: { [partition: string]: FieldItemForm } = {};
     private isRequired: boolean;
 
@@ -279,7 +279,7 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
     }
 }
 
-export class FieldValueForm extends AbstractContentForm<FieldDto, FormControl> {
+export class FieldValueForm extends AbstractContentForm<FieldDto, UntypedFormControl> {
     private isRequired = false;
 
     constructor(globals: FormGlobals, field: FieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
@@ -318,7 +318,7 @@ export class FieldValueForm extends AbstractContentForm<FieldDto, FormControl> {
             validators.push(globals.remoteValidator);
         }
 
-        return new FormControl(value, { validators });
+        return new UntypedFormControl(value, { validators });
     }
 }
 
@@ -514,7 +514,7 @@ abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> impleme
 
     protected abstract getSchema(value: any, model: T): ReadonlyArray<FieldDto> | undefined;
 
-    public setControls(form: FormGroup, value: any) {
+    public setControls(form: UntypedFormGroup, value: any) {
         const schema = this.getSchema(value, this.model);
 
         if (this.currentSchema !== schema) {
@@ -536,7 +536,7 @@ abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> impleme
         }
     }
 
-    protected setControlsCore(schema: ReadonlyArray<FieldDto>, _: any, model: T, form: FormGroup) {
+    protected setControlsCore(schema: ReadonlyArray<FieldDto>, _: any, model: T, form: UntypedFormGroup) {
         const fieldByName: FieldMap = {};
         const fieldSections: FieldSection<FieldDto, FieldItemForm>[] = [];
 
@@ -629,8 +629,8 @@ class ComponentTemplate extends ObjectTemplate<ComponentForm> {
         return model.globals.schemas[value?.schemaId]?.fields;
     }
 
-    protected setControlsCore(schema: ReadonlyArray<FieldDto>, value: any, model: ComponentForm, form: FormGroup) {
-        form.setControl('schemaId', new FormControl());
+    protected setControlsCore(schema: ReadonlyArray<FieldDto>, value: any, model: ComponentForm, form: UntypedFormGroup) {
+        form.setControl('schemaId', new UntypedFormControl());
 
         this.model.internalSchema = model.globals.schemas[value?.schemaId];
 

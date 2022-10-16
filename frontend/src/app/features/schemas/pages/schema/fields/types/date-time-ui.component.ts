@@ -6,7 +6,7 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { DATETIME_FIELD_EDITORS, DateTimeFieldPropertiesDto, FieldDto, FloatConverter } from '@app/shared';
 
 @Component({
@@ -19,7 +19,7 @@ export class DateTimeUIComponent {
     public readonly editors = DATETIME_FIELD_EDITORS;
 
     @Input()
-    public fieldForm!: FormGroup;
+    public fieldForm!: UntypedFormGroup;
 
     @Input()
     public field!: FieldDto;

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, Validators } from '@angular/forms';
+import { UntypedFormControl, Validators } from '@angular/forms';
 import { debounceTime, map, shareReplay } from 'rxjs/operators';
 import { AssignContributorDto, ExtendedFormGroup, Form, hasNoValue$, Types, UserDto, value$ } from '@app/shared';
 
@@ -18,7 +18,7 @@ export class AssignTeamContributorForm extends Form<ExtendedFormGroup, AssignCon
 
     constructor() {
         super(new ExtendedFormGroup({
-            user: new FormControl('',
+            user: new UntypedFormControl('',
                 Validators.required,
             ),
         }));
@@ -48,7 +48,7 @@ export class ImportContributorsForm extends Form<ExtendedFormGroup, ImportContri
 
     constructor() {
         super(new ExtendedFormGroup({
-            import: new FormControl('',
+            import: new UntypedFormControl('',
                 Validators.required,
             ),
         }));

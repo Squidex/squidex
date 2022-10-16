@@ -6,7 +6,7 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { BOOLEAN_FIELD_EDITORS, BooleanFieldPropertiesDto, FieldDto } from '@app/shared';
 
 @Component({
@@ -18,7 +18,7 @@ export class BooleanUIComponent {
     public readonly editors = BOOLEAN_FIELD_EDITORS;
 
     @Input()
-    public fieldForm!: FormGroup;
+    public fieldForm!: UntypedFormGroup;
 
     @Input()
     public field!: FieldDto;

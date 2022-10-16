@@ -6,7 +6,7 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, REFERENCES_FIELD_EDITORS, ReferencesFieldPropertiesDto } from '@app/shared';
 
 @Component({
@@ -18,7 +18,7 @@ export class ReferencesUIComponent {
     public readonly editors = REFERENCES_FIELD_EDITORS;
 
     @Input()
-    public fieldForm!: FormGroup;
+    public fieldForm!: UntypedFormGroup;
 
     @Input()
     public field!: FieldDto;

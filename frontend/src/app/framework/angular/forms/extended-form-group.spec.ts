@@ -5,14 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { ExtendedFormGroup, UndefinableFormGroup } from './extended-form-group';
 
 describe('UndefinableFormGroup', () => {
     it('should provide value even if controls are disabled', () => {
         const control = new ExtendedFormGroup({
-            test1: new FormControl('1'),
-            test2: new FormControl('2'),
+            test1: new UntypedFormControl('1'),
+            test2: new UntypedFormControl('2'),
         });
 
         expect(control.value).toEqual({ test1: '1', test2: '2' });
@@ -43,8 +43,8 @@ describe('ExtendedFormGroup', () => {
 
     it('should provide value even if controls are disabled', () => {
         const control = new ExtendedFormGroup({
-            test1: new FormControl('1'),
-            test2: new FormControl('2'),
+            test1: new UntypedFormControl('1'),
+            test2: new UntypedFormControl('2'),
         });
 
         expect(control.value).toEqual({ test1: '1', test2: '2' });
@@ -87,15 +87,15 @@ describe('ExtendedFormGroup', () => {
     function buildControl(undefinable: boolean) {
         return undefinable ?
             new UndefinableFormGroup({
-                field: new FormControl(),
+                field: new UntypedFormControl(),
             }) :
             new ExtendedFormGroup({
-                field: new FormControl(),
+                field: new UntypedFormControl(),
             });
     }
 });
 
-function assertValue(control: FormGroup, expected: any, action: () => void) {
+function assertValue(control: UntypedFormGroup, expected: any, action: () => void) {
     let currentValue: any;
 
     control.valueChanges.subscribe(value => {

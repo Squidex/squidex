@@ -5,12 +5,12 @@
 * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
 */
 
-import { AbstractControlOptions, AsyncValidatorFn, FormGroup, ValidatorFn } from '@angular/forms';
+import { AbstractControlOptions, AsyncValidatorFn, UntypedFormGroup, ValidatorFn } from '@angular/forms';
 import { Types } from '@app/framework/internal';
 import { UndefinableFormGroup } from './extended-form-group';
 
 export interface FormGroupTemplate {
-    setControls(form: FormGroup, value: any): void;
+    setControls(form: UntypedFormGroup, value: any): void;
 
     clearControls?(): void;
 }

@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormArray, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { getControlPath, hasNoValue$, hasValue$, touchedChange$, value$ } from './forms-helper';
 
 describe('FormHelpers', () => {
     describe('value$', () => {
         it('should provide change values', () => {
-            const form = new FormControl('1', Validators.required);
+            const form = new UntypedFormControl('1', Validators.required);
 
             const values: any[] = [];
 
@@ -26,7 +26,7 @@ describe('FormHelpers', () => {
         });
 
         it('should also trigger on disable', () => {
-            const form = new FormControl('1', Validators.required);
+            const form = new UntypedFormControl('1', Validators.required);
 
             const values: any[] = [];
 
@@ -45,7 +45,7 @@ describe('FormHelpers', () => {
     });
 
     it('should provide touched changes', () => {
-        const form = new FormControl('1', Validators.required);
+        const form = new UntypedFormControl('1', Validators.required);
 
         const values: any[] = [];
 
@@ -61,7 +61,7 @@ describe('FormHelpers', () => {
     });
 
     it('should provide value when defined', () => {
-        const form = new FormControl('1', Validators.required);
+        const form = new UntypedFormControl('1', Validators.required);
 
         const values: any[] = [];
 
@@ -77,7 +77,7 @@ describe('FormHelpers', () => {
     });
 
     it('should provide value when defined', () => {
-        const form = new FormControl('1', Validators.required);
+        const form = new UntypedFormControl('1', Validators.required);
 
         const values: any[] = [];
 
@@ -94,7 +94,7 @@ describe('FormHelpers', () => {
 
     describe('getControlPath', () => {
         it('should calculate path for standalone control', () => {
-            const control = new FormControl();
+            const control = new UntypedFormControl();
 
             const path = getControlPath(control);
 
@@ -102,8 +102,8 @@ describe('FormHelpers', () => {
         });
 
         it('should calculate path for nested control', () => {
-            const control = new FormGroup({
-                nested: new FormControl(),
+            const control = new UntypedFormGroup({
+                nested: new UntypedFormControl(),
             });
 
             const path = getControlPath(control.get('nested'));
@@ -112,9 +112,9 @@ describe('FormHelpers', () => {
         });
 
         it('should calculate path for deeply nested control', () => {
-            const control = new FormGroup({
-                nested1: new FormGroup({
-                    nested2: new FormControl(),
+            const control = new UntypedFormGroup({
+                nested1: new UntypedFormGroup({
+                    nested2: new UntypedFormControl(),
                 }),
             });
 
@@ -124,10 +124,10 @@ describe('FormHelpers', () => {
         });
 
         it('should calculate path for deeply nested array control', () => {
-            const control = new FormGroup({
-                nested1: new FormArray([
-                    new FormGroup({
-                        nested2: new FormControl(),
+            const control = new UntypedFormGroup({
+                nested1: new UntypedFormArray([
+                    new UntypedFormGroup({
+                        nested2: new UntypedFormControl(),
                     }),
                 ]),
             });
@@ -138,10 +138,10 @@ describe('FormHelpers', () => {
         });
 
         it('should calculate api compatible path for deeply nested array control', () => {
-            const control = new FormGroup({
-                nested1: new FormArray([
-                    new FormGroup({
-                        nested2: new FormControl(),
+            const control = new UntypedFormGroup({
+                nested1: new UntypedFormArray([
+                    new UntypedFormGroup({
+                        nested2: new UntypedFormControl(),
                     }),
                 ]),
             });

@@ -6,7 +6,7 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, TAGS_FIELD_EDITORS, TagsFieldPropertiesDto } from '@app/shared';
 
 @Component({
@@ -18,7 +18,7 @@ export class TagsUIComponent {
     public readonly editors = TAGS_FIELD_EDITORS;
 
     @Input()
-    public fieldForm!: FormGroup;
+    public fieldForm!: UntypedFormGroup;
 
     @Input()
     public field!: FieldDto;

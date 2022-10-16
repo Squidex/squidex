@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { ContentDto, FieldValue, getContentValue, LanguageDto, META_FIELDS, SchemaDto, StatefulComponent, TableField, TableSettings } from '@app/shared/internal';
 
 interface State {
@@ -36,7 +36,7 @@ export class ContentListFieldComponent extends StatefulComponent<State> implemen
     public patchAllowed?: boolean | null;
 
     @Input()
-    public patchForm?: FormGroup | null;
+    public patchForm?: UntypedFormGroup | null;
 
     @Input()
     public schema?: SchemaDto;

@@ -5,29 +5,29 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, Validators } from '@angular/forms';
+import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, ValidatorsEx } from '@app/shared';
 import { UpsertUserDto, UserDto } from './../services/users.service';
 
 export class UserForm extends Form<ExtendedFormGroup, UpsertUserDto, UserDto> {
     constructor() {
         super(new ExtendedFormGroup({
-            email: new FormControl('', [
+            email: new UntypedFormControl('', [
                 Validators.email,
                 Validators.required,
                 Validators.maxLength(100),
             ]),
-            displayName: new FormControl('', [
+            displayName: new UntypedFormControl('', [
                 Validators.required,
                 Validators.maxLength(100),
             ]),
-            password: new FormControl('',
+            password: new UntypedFormControl('',
                 Validators.required,
             ),
-            passwordConfirm: new FormControl('',
+            passwordConfirm: new UntypedFormControl('',
                 ValidatorsEx.match('password', 'i18n:users.passwordConfirmValidationMessage'),
             ),
-            permissions: new FormControl('',
+            permissions: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
         }));
