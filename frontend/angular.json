@@ -34,7 +34,8 @@
               "mersenne-twister",
               "oidc-client",
               "pikaday/pikaday",
-              "progressbar.js"
+              "progressbar.js",
+              "slugify"
             ],
             "assets": [
               "src/app/assets"
