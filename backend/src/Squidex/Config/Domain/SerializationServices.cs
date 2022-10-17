@@ -116,8 +116,11 @@ namespace Squidex.Config.Domain
             {
                 ConfigureJson(c.GetRequiredService<TypeNameRegistry>(), options.JsonSerializerOptions);
 
+                // Do not write null values.
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                options.AllowInputFormatterExceptionMessages = true;
+
+                // Expose the json exceptions to the model state.
+                options.AllowInputFormatterExceptionMessages = false;
             });
 
             return builder;
