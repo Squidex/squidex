@@ -76,7 +76,7 @@ jobs:
           echo "BUILD_NUMBER=$(($BUILD_NUMBER + 5967))" >> $GITHUB_ENV
 
       - name: Checkout
-        uses: actions/cache@v3
+        uses: actions/checkout@v3
 
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4
