@@ -7,7 +7,7 @@
 
 /* eslint-disable no-useless-escape */
 
-import { AbstractControl, FormControl, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, Validators } from '@angular/forms';
 import { map } from 'rxjs/operators';
 import { ExtendedFormGroup, Form, TemplatedFormArray, ValidatorsEx, value$ } from '@app/framework';
 import { AddFieldDto, CreateSchemaDto, FieldRule, SchemaDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from './../services/schemas.service';
@@ -18,7 +18,7 @@ type CreateCategoryFormType = { name: string };
 export class CreateCategoryForm extends Form<ExtendedFormGroup, CreateCategoryFormType> {
     constructor() {
         super(new ExtendedFormGroup({
-            name: new FormControl('',
+            name: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
         }));
@@ -28,18 +28,18 @@ export class CreateCategoryForm extends Form<ExtendedFormGroup, CreateCategoryFo
 export class CreateSchemaForm extends Form<ExtendedFormGroup, CreateSchemaDto> {
     constructor() {
         super(new ExtendedFormGroup({
-            name: new FormControl('', [
+            name: new UntypedFormControl('', [
                 Validators.required,
                 Validators.maxLength(40),
                 ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:schemas.schemaNameValidationMessage'),
             ]),
-            type: new FormControl('Default',
+            type: new UntypedFormControl('Default',
                 Validators.required,
             ),
-            initialCategory: new FormControl(undefined,
+            initialCategory: new UntypedFormControl(undefined,
                 Validators.nullValidator,
             ),
-            importing: new FormControl({},
+            importing: new UntypedFormControl({},
                 Validators.nullValidator,
             ),
         }));
@@ -61,13 +61,13 @@ export class CreateSchemaForm extends Form<ExtendedFormGroup, CreateSchemaDto> {
 export class SynchronizeSchemaForm extends Form<ExtendedFormGroup, SynchronizeSchemaDto> {
     constructor() {
         super(new ExtendedFormGroup({
-            json: new FormControl({},
+            json: new UntypedFormControl({},
                 Validators.nullValidator,
             ),
-            fieldsDelete: new FormControl(false,
+            fieldsDelete: new UntypedFormControl(false,
                 Validators.nullValidator,
             ),
-            fieldsRecreate: new FormControl(false,
+            fieldsRecreate: new UntypedFormControl(false,
                 Validators.nullValidator,
             ),
         }));
@@ -113,13 +113,13 @@ class FieldRuleTemplate {
 
     public createControl(_: any, fieldNames?: ReadonlyArray<string>) {
         return new ExtendedFormGroup({
-            action: new FormControl('Disable',
+            action: new UntypedFormControl('Disable',
                 Validators.required,
             ),
-            field: new FormControl(fieldNames?.[0],
+            field: new UntypedFormControl(fieldNames?.[0],
                 Validators.required,
             ),
-            condition: new FormControl('',
+            condition: new UntypedFormControl('',
                 Validators.required,
             ),
         });
@@ -165,10 +165,10 @@ class PreviewUrlTemplate {
 
     public createControl() {
         return new ExtendedFormGroup({
-            name: new FormControl('',
+            name: new UntypedFormControl('',
                 Validators.required,
             ),
-            url: new FormControl('',
+            url: new UntypedFormControl('',
                 Validators.required,
             ),
         });
@@ -178,22 +178,22 @@ class PreviewUrlTemplate {
 export class EditSchemaScriptsForm extends Form<ExtendedFormGroup, {}, object> {
     constructor() {
         super(new ExtendedFormGroup({
-            query: new FormControl('',
+            query: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
-            queryPre: new FormControl('',
+            queryPre: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
-            create: new FormControl('',
+            create: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
-            change: new FormControl('',
+            change: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
-            delete: new FormControl('',
+            delete: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
-            update: new FormControl('',
+            update: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
         }));
@@ -207,31 +207,31 @@ export class EditFieldForm extends Form<ExtendedFormGroup, {}, FieldPropertiesDt
 
     private static buildForm(properties: FieldPropertiesDto) {
         const config = {
-            label: new FormControl('',
+            label: new UntypedFormControl('',
                 Validators.maxLength(100),
             ),
-            hints: new FormControl('',
+            hints: new UntypedFormControl('',
                 Validators.maxLength(1000),
             ),
-            placeholder: new FormControl('',
+            placeholder: new UntypedFormControl('',
                 Validators.maxLength(1000),
             ),
-            editor: new FormControl(undefined,
+            editor: new UntypedFormControl(undefined,
                 Validators.nullValidator,
             ),
-            editorUrl: new FormControl(undefined,
+            editorUrl: new UntypedFormControl(undefined,
                 Validators.nullValidator,
             ),
-            isRequired: new FormControl(false,
+            isRequired: new UntypedFormControl(false,
                 Validators.nullValidator,
             ),
-            isRequiredOnPublish: new FormControl(false,
+            isRequiredOnPublish: new UntypedFormControl(false,
                 Validators.nullValidator,
             ),
-            isHalfWidth: new FormControl(false,
+            isHalfWidth: new UntypedFormControl(false,
                 Validators.nullValidator,
             ),
-            tags: new FormControl([],
+            tags: new UntypedFormControl([],
                 Validators.nullValidator,
             ),
         };
@@ -249,112 +249,112 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
     }
 
     public visitArray() {
-        this.config['maxItems'] = new FormControl(undefined);
-        this.config['minItems'] = new FormControl(undefined);
-        this.config['uniqueFields'] = new FormControl(undefined);
+        this.config['maxItems'] = new UntypedFormControl(undefined);
+        this.config['minItems'] = new UntypedFormControl(undefined);
+        this.config['uniqueFields'] = new UntypedFormControl(undefined);
     }
 
     public visitAssets() {
-        this.config['allowDuplicates'] = new FormControl(undefined);
-        this.config['allowedExtensions'] = new FormControl(undefined);
-        this.config['aspectHeight'] = new FormControl(undefined);
-        this.config['aspectHeight'] = new FormControl(undefined);
-        this.config['aspectWidth'] = new FormControl(undefined);
-        this.config['defaultValue'] = new FormControl(undefined);
-        this.config['defaultValues'] = new FormControl(undefined);
-        this.config['expectedType'] = new FormControl(undefined);
-        this.config['folderId'] = new FormControl(undefined);
-        this.config['maxHeight'] = new FormControl(undefined);
-        this.config['maxItems'] = new FormControl(undefined);
-        this.config['maxSize'] = new FormControl(undefined);
-        this.config['maxWidth'] = new FormControl(undefined);
-        this.config['minHeight'] = new FormControl(undefined);
-        this.config['minItems'] = new FormControl(undefined);
-        this.config['minSize'] = new FormControl(undefined);
-        this.config['minWidth'] = new FormControl(undefined);
-        this.config['previewMode'] = new FormControl(undefined);
-        this.config['resolveFirst'] = new FormControl(undefined);
+        this.config['allowDuplicates'] = new UntypedFormControl(undefined);
+        this.config['allowedExtensions'] = new UntypedFormControl(undefined);
+        this.config['aspectHeight'] = new UntypedFormControl(undefined);
+        this.config['aspectHeight'] = new UntypedFormControl(undefined);
+        this.config['aspectWidth'] = new UntypedFormControl(undefined);
+        this.config['defaultValue'] = new UntypedFormControl(undefined);
+        this.config['defaultValues'] = new UntypedFormControl(undefined);
+        this.config['expectedType'] = new UntypedFormControl(undefined);
+        this.config['folderId'] = new UntypedFormControl(undefined);
+        this.config['maxHeight'] = new UntypedFormControl(undefined);
+        this.config['maxItems'] = new UntypedFormControl(undefined);
+        this.config['maxSize'] = new UntypedFormControl(undefined);
+        this.config['maxWidth'] = new UntypedFormControl(undefined);
+        this.config['minHeight'] = new UntypedFormControl(undefined);
+        this.config['minItems'] = new UntypedFormControl(undefined);
+        this.config['minSize'] = new UntypedFormControl(undefined);
+        this.config['minWidth'] = new UntypedFormControl(undefined);
+        this.config['previewMode'] = new UntypedFormControl(undefined);
+        this.config['resolveFirst'] = new UntypedFormControl(undefined);
     }
 
     public visitBoolean() {
-        this.config['inlineEditable'] = new FormControl(undefined);
-        this.config['defaultValues'] = new FormControl(undefined);
-        this.config['defaultValue'] = new FormControl(undefined);
+        this.config['inlineEditable'] = new UntypedFormControl(undefined);
+        this.config['defaultValues'] = new UntypedFormControl(undefined);
+        this.config['defaultValue'] = new UntypedFormControl(undefined);
     }
 
     public visitComponent() {
-        this.config['schemaIds'] = new FormControl(undefined);
+        this.config['schemaIds'] = new UntypedFormControl(undefined);
     }
 
     public visitComponents() {
-        this.config['schemaIds'] = new FormControl(undefined);
-        this.config['maxItems'] = new FormControl(undefined);
-        this.config['minItems'] = new FormControl(undefined);
-        this.config['uniqueFields'] = new FormControl(undefined);
+        this.config['schemaIds'] = new UntypedFormControl(undefined);
+        this.config['maxItems'] = new UntypedFormControl(undefined);
+        this.config['minItems'] = new UntypedFormControl(undefined);
+        this.config['uniqueFields'] = new UntypedFormControl(undefined);
     }
 
     public visitDateTime() {
-        this.config['calculatedDefaultValue'] = new FormControl(undefined);
-        this.config['defaultValue'] = new FormControl(undefined);
-        this.config['defaultValues'] = new FormControl(undefined);
-        this.config['format'] = new FormControl(undefined);
-        this.config['maxValue'] = new FormControl(undefined, ValidatorsEx.validDateTime());
-        this.config['minValue'] = new FormControl(undefined, ValidatorsEx.validDateTime());
+        this.config['calculatedDefaultValue'] = new UntypedFormControl(undefined);
+        this.config['defaultValue'] = new UntypedFormControl(undefined);
+        this.config['defaultValues'] = new UntypedFormControl(undefined);
+        this.config['format'] = new UntypedFormControl(undefined);
+        this.config['maxValue'] = new UntypedFormControl(undefined, ValidatorsEx.validDateTime());
+        this.config['minValue'] = new UntypedFormControl(undefined, ValidatorsEx.validDateTime());
     }
 
     public visitJson() {
-        this.config['graphQLSchema'] = new FormControl(undefined);
+        this.config['graphQLSchema'] = new UntypedFormControl(undefined);
     }
 
     public visitNumber() {
-        this.config['allowedValues'] = new FormControl(undefined);
-        this.config['defaultValue'] = new FormControl(undefined);
-        this.config['defaultValues'] = new FormControl(undefined);
-        this.config['inlineEditable'] = new FormControl(undefined);
-        this.config['isUnique'] = new FormControl(undefined);
-        this.config['maxValue'] = new FormControl(undefined);
-        this.config['minValue'] = new FormControl(undefined);
+        this.config['allowedValues'] = new UntypedFormControl(undefined);
+        this.config['defaultValue'] = new UntypedFormControl(undefined);
+        this.config['defaultValues'] = new UntypedFormControl(undefined);
+        this.config['inlineEditable'] = new UntypedFormControl(undefined);
+        this.config['isUnique'] = new UntypedFormControl(undefined);
+        this.config['maxValue'] = new UntypedFormControl(undefined);
+        this.config['minValue'] = new UntypedFormControl(undefined);
     }
 
     public visitReferences() {
-        this.config['allowDuplicates'] = new FormControl(undefined);
-        this.config['defaultValue'] = new FormControl(undefined);
-        this.config['defaultValues'] = new FormControl(undefined);
-        this.config['maxItems'] = new FormControl(undefined);
-        this.config['minItems'] = new FormControl(undefined);
-        this.config['mustBePublished'] = new FormControl(false);
-        this.config['resolveReference'] = new FormControl(false);
-        this.config['schemaIds'] = new FormControl(undefined);
+        this.config['allowDuplicates'] = new UntypedFormControl(undefined);
+        this.config['defaultValue'] = new UntypedFormControl(undefined);
+        this.config['defaultValues'] = new UntypedFormControl(undefined);
+        this.config['maxItems'] = new UntypedFormControl(undefined);
+        this.config['minItems'] = new UntypedFormControl(undefined);
+        this.config['mustBePublished'] = new UntypedFormControl(false);
+        this.config['resolveReference'] = new UntypedFormControl(false);
+        this.config['schemaIds'] = new UntypedFormControl(undefined);
     }
 
     public visitString() {
-        this.config['allowedValues'] = new FormControl(undefined);
-        this.config['contentType'] = new FormControl(undefined);
-        this.config['createEnum'] = new FormControl(undefined);
-        this.config['defaultValue'] = new FormControl(undefined);
-        this.config['defaultValues'] = new FormControl(undefined);
-        this.config['folderId'] = new FormControl(undefined);
-        this.config['inlineEditable'] = new FormControl(undefined);
-        this.config['isEmbeddable'] = new FormControl(undefined);
-        this.config['isUnique'] = new FormControl(undefined);
-        this.config['maxCharacters'] = new FormControl(undefined);
-        this.config['maxLength'] = new FormControl(undefined);
-        this.config['maxWords'] = new FormControl(undefined);
-        this.config['minCharacters'] = new FormControl(undefined);
-        this.config['minLength'] = new FormControl(undefined);
-        this.config['minWords'] = new FormControl(undefined);
-        this.config['pattern'] = new FormControl(undefined);
-        this.config['patternMessage'] = new FormControl(undefined);
-        this.config['schemaIds'] = new FormControl(undefined);
+        this.config['allowedValues'] = new UntypedFormControl(undefined);
+        this.config['contentType'] = new UntypedFormControl(undefined);
+        this.config['createEnum'] = new UntypedFormControl(undefined);
+        this.config['defaultValue'] = new UntypedFormControl(undefined);
+        this.config['defaultValues'] = new UntypedFormControl(undefined);
+        this.config['folderId'] = new UntypedFormControl(undefined);
+        this.config['inlineEditable'] = new UntypedFormControl(undefined);
+        this.config['isEmbeddable'] = new UntypedFormControl(undefined);
+        this.config['isUnique'] = new UntypedFormControl(undefined);
+        this.config['maxCharacters'] = new UntypedFormControl(undefined);
+        this.config['maxLength'] = new UntypedFormControl(undefined);
+        this.config['maxWords'] = new UntypedFormControl(undefined);
+        this.config['minCharacters'] = new UntypedFormControl(undefined);
+        this.config['minLength'] = new UntypedFormControl(undefined);
+        this.config['minWords'] = new UntypedFormControl(undefined);
+        this.config['pattern'] = new UntypedFormControl(undefined);
+        this.config['patternMessage'] = new UntypedFormControl(undefined);
+        this.config['schemaIds'] = new UntypedFormControl(undefined);
     }
 
     public visitTags() {
-        this.config['allowedValues'] = new FormControl(undefined);
-        this.config['createEnum'] = new FormControl(undefined);
-        this.config['defaultValue'] = new FormControl(undefined);
-        this.config['defaultValues'] = new FormControl(undefined);
-        this.config['maxItems'] = new FormControl(undefined);
-        this.config['minItems'] = new FormControl(undefined);
+        this.config['allowedValues'] = new UntypedFormControl(undefined);
+        this.config['createEnum'] = new UntypedFormControl(undefined);
+        this.config['defaultValue'] = new UntypedFormControl(undefined);
+        this.config['defaultValues'] = new UntypedFormControl(undefined);
+        this.config['maxItems'] = new UntypedFormControl(undefined);
+        this.config['minItems'] = new UntypedFormControl(undefined);
     }
 
     public visitGeolocation() {
@@ -369,25 +369,25 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
 export class EditSchemaForm extends Form<ExtendedFormGroup, UpdateSchemaDto, SchemaPropertiesDto> {
     constructor() {
         super(new ExtendedFormGroup({
-            label: new FormControl('',
+            label: new UntypedFormControl('',
                 Validators.maxLength(100),
             ),
-            hints: new FormControl('',
+            hints: new UntypedFormControl('',
                 Validators.maxLength(1000),
             ),
-            contentsSidebarUrl: new FormControl('',
+            contentsSidebarUrl: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
-            contentSidebarUrl: new FormControl('',
+            contentSidebarUrl: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
-            contentEditorUrl: new FormControl('',
+            contentEditorUrl: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
-            validateOnPublish: new FormControl(false,
+            validateOnPublish: new UntypedFormControl(false,
                 Validators.nullValidator,
             ),
-            tags: new FormControl([],
+            tags: new UntypedFormControl([],
                 Validators.nullValidator,
             ),
         }));
@@ -399,15 +399,15 @@ export class AddFieldForm extends Form<ExtendedFormGroup, AddFieldDto> {
 
     constructor() {
         super(new ExtendedFormGroup({
-            type: new FormControl('String',
+            type: new UntypedFormControl('String',
                 Validators.required,
             ),
-            name: new FormControl('', [
+            name: new UntypedFormControl('', [
                 Validators.required,
                 Validators.maxLength(40),
                 ValidatorsEx.pattern('[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*', 'i18n:schemas.field.nameValidationMessage'),
             ]),
-            isLocalizable: new FormControl(false,
+            isLocalizable: new UntypedFormControl(false,
                 Validators.nullValidator,
             ),
         }));

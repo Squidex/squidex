@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, ValidatorsEx } from '@app/framework';
 import { RuleElementDto } from '../services/rules.service';
 
-export class ActionForm extends Form<any, FormGroup> {
+export class ActionForm extends Form<any, UntypedFormGroup> {
     constructor(public readonly definition: RuleElementDto,
         public readonly actionType: string,
     ) {
@@ -31,7 +31,7 @@ export class ActionForm extends Form<any, FormGroup> {
                 defaultValue = property.options[0];
             }
 
-            controls[property.name] = new FormControl(defaultValue, validator);
+            controls[property.name] = new UntypedFormControl(defaultValue, validator);
         }
 
         return new ExtendedFormGroup(controls);
@@ -44,7 +44,7 @@ export class ActionForm extends Form<any, FormGroup> {
     }
 }
 
-export class TriggerForm extends Form<any, FormGroup> {
+export class TriggerForm extends Form<any, UntypedFormGroup> {
     constructor(
         public readonly triggerType: string,
     ) {
@@ -55,27 +55,27 @@ export class TriggerForm extends Form<any, FormGroup> {
         switch (triggerType) {
             case 'ContentChanged': {
                 return new ExtendedFormGroup({
-                    handleAll: new FormControl(false,
+                    handleAll: new UntypedFormControl(false,
                         Validators.nullValidator,
                     ),
-                    schemas: new FormControl(undefined,
+                    schemas: new UntypedFormControl(undefined,
                         Validators.nullValidator,
                     ),
                 });
             }
             case 'Usage': {
                 return new ExtendedFormGroup({
-                    limit: new FormControl(20000,
+                    limit: new UntypedFormControl(20000,
                         Validators.required,
                     ),
-                    numDays: new FormControl(3,
+                    numDays: new UntypedFormControl(3,
                         ValidatorsEx.between(1, 30),
                     ),
                 });
             }
             default: {
                 return new ExtendedFormGroup({
-                    condition: new FormControl('',
+                    condition: new UntypedFormControl('',
                         Validators.nullValidator,
                     ),
                 });

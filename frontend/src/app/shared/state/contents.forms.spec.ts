@@ -7,7 +7,7 @@
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { AbstractControl, FormArray } from '@angular/forms';
+import { AbstractControl, UntypedFormArray } from '@angular/forms';
 import { MathHelper } from '@app/framework';
 import { AppLanguageDto, createProperties, EditContentForm, getContentValue, HtmlValue, LanguageDto, RootFieldDto } from '@app/shared/internal';
 import { FieldRule, SchemaDto } from './../services/schemas.service';
@@ -959,7 +959,7 @@ describe('ContentForm', () => {
                 createField({ id: 4, properties: createProperties('Array'), partitioning: 'invariant' }),
             ]);
 
-            const nestedForm = contentForm.form.get('field4.iv') as FormArray;
+            const nestedForm = contentForm.form.get('field4.iv') as UntypedFormArray;
 
             expect(nestedForm.controls.length).toBe(0);
         });

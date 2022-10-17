@@ -6,7 +6,7 @@
  */
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { BooleanFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto } from '@app/shared';
 
@@ -17,7 +17,7 @@ import { BooleanFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto } from '@
 })
 export class BooleanValidationComponent implements OnChanges {
     @Input()
-    public fieldForm!: FormGroup;
+    public fieldForm!: UntypedFormGroup;
 
     @Input()
     public field!: FieldDto;

@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { UntypedFormControl, Validators } from '@angular/forms';
 import { Keys } from '@app/framework/internal';
 
 @Component({
@@ -41,7 +41,7 @@ export class EditableTitleComponent {
     }
 
     public renaming = false;
-    public renameForm = new FormControl();
+    public renameForm = new UntypedFormControl();
 
     public onKeyDown(event: KeyboardEvent) {
         if (Keys.isEscape(event)) {

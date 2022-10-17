@@ -114,7 +114,6 @@ export class AppRouteReuseStrategy extends BaseRouteReuseStrategy {
         { provide: UIOptions, useFactory: configUIOptions },
         { provide: APP_BASE_HREF, useValue: basePath() },
     ],
-    entryComponents: [AppComponent],
 })
 export class AppModule {
     public ngDoBootstrap(appRef: ApplicationRef) {

@@ -27,9 +27,15 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "allowedCommonJsDependencies": [
+              "@tweenjs/tween.js",
               "angular2-chartjs",
+              "cropperjs",
+              "mousetrap",
+              "mersenne-twister",
+              "oidc-client",
               "pikaday/pikaday",
-              "progressbar.js"
+              "progressbar.js",
+              "slugify"
             ],
             "assets": [
               "src/app/assets"
@@ -119,5 +125,7 @@
       }
     }
   },
-  "defaultProject": "squidex"
+  "cli": {
+    "analytics": "a157454d-c7c0-4947-986a-982746edc974"
+  }
 }

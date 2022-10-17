@@ -6,7 +6,7 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
-import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { ExtendedFormGroup, LocalStoreService, ResourceLoaderService, Settings, StatefulControlComponent, Types, UIOptions, ValidatorsEx } from '@app/shared/internal';
 
@@ -56,10 +56,10 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
 
     public geolocationForm =
         new ExtendedFormGroup({
-            latitude: new FormControl('',
+            latitude: new UntypedFormControl('',
                 ValidatorsEx.between(-90, 90),
             ),
-            longitude: new FormControl('',
+            longitude: new UntypedFormControl('',
                 ValidatorsEx.between(-180, 180),
             ),
         });

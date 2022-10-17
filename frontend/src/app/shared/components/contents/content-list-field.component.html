@@ -77,7 +77,7 @@
                 [statusColor]="content.scheduleJob.color">
             </sqx-content-status>
         
-            {{ 'contents.scheduledAt' | sqxTranslate }}&nbsp;{{content.scheduleJob?.dueTime | sqxShortDate}}
+            {{ 'contents.scheduledAt' | sqxTranslate }}&nbsp;{{content.scheduleJob.dueTime | sqxShortDate}}
         </span>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.statusColor">

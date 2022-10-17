@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, Validators } from '@angular/forms';
+import { UntypedFormControl, Validators } from '@angular/forms';
 import slugify from 'slugify';
 import { ExtendedFormGroup, Form, Mutable, TemplatedFormArray, Types } from '@app/framework';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, RenameAssetFolderDto, RenameAssetTagDto } from './../services/assets.service';
@@ -21,16 +21,16 @@ export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto,
 
     constructor() {
         super(new ExtendedFormGroup({
-            isProtected: new FormControl(false,
+            isProtected: new UntypedFormControl(false,
                 Validators.nullValidator,
             ),
-            fileName: new FormControl('',
+            fileName: new UntypedFormControl('',
                 Validators.required,
             ),
-            slug: new FormControl('',
+            slug: new UntypedFormControl('',
                 Validators.required,
             ),
-            tags: new FormControl([],
+            tags: new UntypedFormControl([],
                 Validators.nullValidator,
             ),
             metadata: new TemplatedFormArray(
@@ -162,10 +162,10 @@ class MetadataTemplate {
 
     public createControl() {
         return new ExtendedFormGroup({
-            name: new FormControl('',
+            name: new UntypedFormControl('',
                 Validators.required,
             ),
-            value: new FormControl('',
+            value: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
         });
@@ -175,19 +175,19 @@ class MetadataTemplate {
 export class EditAssetScriptsForm extends Form<ExtendedFormGroup, {}, object> {
     constructor() {
         super(new ExtendedFormGroup({
-            annotate: new FormControl('',
+            annotate: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
-            create: new FormControl('',
+            create: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
-            delete: new FormControl('',
+            delete: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
-            move: new FormControl('',
+            move: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
-            update: new FormControl('',
+            update: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
         }));
@@ -197,7 +197,7 @@ export class EditAssetScriptsForm extends Form<ExtendedFormGroup, {}, object> {
 export class RenameAssetFolderForm extends Form<ExtendedFormGroup, RenameAssetFolderDto, AssetFolderDto> {
     constructor() {
         super(new ExtendedFormGroup({
-            folderName: new FormControl('',
+            folderName: new UntypedFormControl('',
                 Validators.required,
             ),
         }));
@@ -207,7 +207,7 @@ export class RenameAssetFolderForm extends Form<ExtendedFormGroup, RenameAssetFo
 export class RenameAssetTagForm extends Form<ExtendedFormGroup, RenameAssetTagDto, RenameAssetTagDto> {
     constructor() {
         super(new ExtendedFormGroup({
-            tagName: new FormControl('',
+            tagName: new UntypedFormControl('',
                 Validators.required,
             ),
         }));

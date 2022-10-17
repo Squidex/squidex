@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { FormGroupTemplate, TemplatedFormGroup } from './templated-form-group';
 
 describe('TemplatedFormGroup', () => {
@@ -13,8 +13,8 @@ describe('TemplatedFormGroup', () => {
         public clearCalled = 0;
         public removeCalled: number[] = [];
 
-        public setControls(form: FormGroup) {
-            form.setControl('value', new FormControl());
+        public setControls(form: UntypedFormGroup) {
+            form.setControl('value', new UntypedFormControl());
         }
 
         public clearControls() {

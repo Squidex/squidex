@@ -6,7 +6,7 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { AssetsFieldPropertiesDto, FieldDto, LanguageDto } from '@app/shared';
 
 @Component({
@@ -16,7 +16,7 @@ import { AssetsFieldPropertiesDto, FieldDto, LanguageDto } from '@app/shared';
 })
 export class AssetsValidationComponent {
     @Input()
-    public fieldForm!: FormGroup;
+    public fieldForm!: UntypedFormGroup;
 
     @Input()
     public field!: FieldDto;

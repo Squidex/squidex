@@ -6,7 +6,7 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import * as Pikaday from 'pikaday/pikaday';
 import { DateHelper, DateTime, StatefulControlComponent, UIOptions } from '@app/framework/internal';
 import { FocusComponent } from './../forms-helper';
@@ -69,8 +69,8 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     @ViewChild('dateInput', { static: false })
     public dateInput!: ElementRef<HTMLInputElement>;
 
-    public readonly timeControl = new FormControl();
-    public readonly dateControl = new FormControl();
+    public readonly timeControl = new UntypedFormControl();
+    public readonly dateControl = new UntypedFormControl();
 
     public get shouldShowDateButtons() {
         return !this.hideDateButtonsSettings && !this.hideDateButtons;

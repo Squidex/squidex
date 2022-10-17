@@ -6,7 +6,7 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
 
 @Component({
@@ -16,7 +16,7 @@ import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
 })
 export class ComponentUIComponent {
     @Input()
-    public fieldForm!: FormGroup;
+    public fieldForm!: UntypedFormGroup;
 
     @Input()
     public field!: FieldDto;

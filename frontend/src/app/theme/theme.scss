@@ -1,16 +1,19 @@
 @import 'bootstrap-vars';
 
 // Bootstrap
-@import '~bootstrap/scss/bootstrap';
+@import 'bootstrap/scss/bootstrap';
 
 // Pikaday
-@import '~pikaday/css/pikaday.css';
+@import 'pikaday/css/pikaday.css';
 
 // Bootstrap Overrides
 @import 'bootstrap';
 
-// icomoon
+// Icomoon
 @import 'icomoon/style';
+
+// GraphiQL
+@import 'graphiql/graphiql';
 
 // Custom files
 @import 'common';

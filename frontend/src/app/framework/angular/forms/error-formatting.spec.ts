@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { LocalizerService } from './../../services/localizer.service';
 import { formatError } from './error-formatting';
 import { ValidatorsEx } from './validators';
@@ -197,10 +197,10 @@ describe('formatErrors', () => {
     });
 
     it('should format match', () => {
-        const formControl1 = new FormControl(1);
-        const formControl2 = new FormControl(2);
+        const formControl1 = new UntypedFormControl(1);
+        const formControl2 = new UntypedFormControl(2);
 
-        const formGroup = new FormGroup({
+        const formGroup = new UntypedFormGroup({
             field1: formControl1,
             field2: formControl2,
         });
@@ -214,7 +214,7 @@ describe('formatErrors', () => {
     });
 
     function validate(value: any, validator: ValidatorFn) {
-        const formControl = new FormControl(value);
+        const formControl = new UntypedFormControl(value);
 
         const formError = validator(formControl)!;
         const formMessage = formatError(localizer, 'MY_FIELD', Object.keys(formError)[0], Object.values(formError)[0], value);

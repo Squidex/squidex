@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, Validators } from '@angular/forms';
+import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, hasNoValue$ } from '@app/framework';
 import { CreateWorkflowDto } from './../services/workflows.service';
 
@@ -18,7 +18,7 @@ export class AddWorkflowForm extends Form<ExtendedFormGroup, CreateWorkflowDto> 
 
     constructor() {
         super(new ExtendedFormGroup({
-            name: new FormControl('',
+            name: new UntypedFormControl('',
                 Validators.required,
             ),
         }));

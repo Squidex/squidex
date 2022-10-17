@@ -6,7 +6,7 @@
  */
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { FieldDto, FloatConverter, NUMBER_FIELD_EDITORS, NumberFieldPropertiesDto, ResourceOwner, valueProjection$ } from '@app/shared';
 
@@ -20,7 +20,7 @@ export class NumberUIComponent extends ResourceOwner implements OnChanges {
     public readonly editors = NUMBER_FIELD_EDITORS;
 
     @Input()
-    public fieldForm!: FormGroup;
+    public fieldForm!: UntypedFormGroup;
 
     @Input()
     public field!: FieldDto;
