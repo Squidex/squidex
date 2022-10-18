@@ -95,6 +95,11 @@ namespace TestSuite.Fixtures
             get => ClientManager.CreateTranslationsClient();
         }
 
+        public IUserManagementClient UserManagement
+        {
+            get => ClientManager.CreateUserManagementClient();
+        }
+
         static ClientFixture()
         {
             VerifierSettings.IgnoreMember("AppName");
