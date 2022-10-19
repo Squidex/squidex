@@ -24,6 +24,12 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         public JsonSchema ChangeStatusSchema { get; }
 
+        public JsonSchema BulkResponseSchema { get; }
+
+        public JsonSchema BulkRequestSchema { get; }
+
+        public JsonSchema QuerySchema { get; }
+
         public OpenApiDocument OpenApiDocument { get; }
 
         public OpenApiSchemaResolver OpenApiSchemaResolver { get; }
@@ -38,9 +44,17 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             OpenApiDocument = document;
             OpenApiSchemaResolver = schemaResolver;
 
-            var changeStatusType = typeof(ChangeStatusDto).ToContextualType();
+            ChangeStatusSchema = CreateSchema<ChangeStatusDto>(schemaResolver, schemaGenerator);
+            BulkRequestSchema = CreateSchema<BulkUpdateContentsDto>(schemaResolver, schemaGenerator);
+            BulkResponseSchema = CreateSchema<BulkResultDto>(schemaResolver, schemaGenerator);
+            QuerySchema = CreateSchema<QueryDto>(schemaResolver, schemaGenerator);
+        }
 
-            ChangeStatusSchema = schemaGenerator.GenerateWithReference<JsonSchema>(changeStatusType, schemaResolver);
+        private static JsonSchema CreateSchema<T>(OpenApiSchemaResolver schemaResolver, OpenApiSchemaGenerator schemaGenerator)
+        {
+            var contextualType = typeof(T).ToContextualType();
+
+            return schemaGenerator.GenerateWithReference<JsonSchema>(contextualType, schemaResolver);
         }
 
         public OperationsBuilder Shared()

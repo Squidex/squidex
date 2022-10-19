@@ -62,16 +62,25 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return this;
         }
 
-        private OperationBuilder AddParameter(string name, JsonSchema schema, OpenApiParameterKind kind, string description)
+        private OperationBuilder AddParameter(string name, JsonSchema schema, OpenApiParameterKind kind, string? description)
         {
-            var parameter = new OpenApiParameter { Schema = schema, Name = name, Kind = kind };
+            var parameter = new OpenApiParameter
+            {
+                Kind = kind,
+                Schema = schema,
+                Name = name,
+            };
 
             if (!string.IsNullOrWhiteSpace(description))
             {
                 parameter.Description = operations.FormatText(description);
             }
 
-            parameter.IsRequired = kind != OpenApiParameterKind.Query;
+            if (kind != OpenApiParameterKind.Query)
+            {
+                parameter.IsRequired = true;
+                parameter.IsNullableRaw = false;
+            }
 
             operation.Parameters.Add(parameter);
 
@@ -85,7 +94,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return this;
         }
 
-        public OperationBuilder HasQuery(string name, JsonObjectType type, string description)
+        public OperationBuilder HasQuery(string name, JsonObjectType type, string? description = null)
         {
             var jsonSchema = new JsonSchema { Type = type };
 
@@ -99,7 +108,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return AddParameter(name, jsonSchema, OpenApiParameterKind.Path, description);
         }
 
-        public OperationBuilder HasBody(string name, JsonSchema jsonSchema, string description)
+        public OperationBuilder HasBody(string name, JsonSchema jsonSchema, string? description = null)
         {
             return AddParameter(name, jsonSchema, OpenApiParameterKind.Body, description);
         }
@@ -115,14 +124,13 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         public OperationBuilder RequirePermission(string permissionId)
         {
+            var fullId = PermissionIds.ForApp(permissionId, operations.Parent.AppName, operations.SchemaName).Id;
+
             operation.Security = new List<OpenApiSecurityRequirement>
             {
                 new OpenApiSecurityRequirement
                 {
-                    [Constants.SecurityDefinition] = new[]
-                    {
-                        PermissionIds.ForApp(permissionId, operations.Parent.AppName, operations.SchemaName).Id
-                    }
+                    [Constants.SecurityDefinition] = new[] { fullId }
                 }
             };
 

@@ -113,6 +113,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .Responds(200, "Content items retrieved.", builder.ContentsSchema)
                 .Responds(400, "Content query not valid.");
 
+            builder.AddOperation(OpenApiOperationMethod.Post, "/query")
+                .RequirePermission(PermissionIds.AppContentsReadOwn)
+                .Operation("QueryPost")
+                .OperationSummary("Query [schema] contents items using Post.")
+                .HasBody("query", builder.Parent.QuerySchema, null)
+                .Responds(200, "Content items retrieved.", builder.ContentsSchema)
+                .Responds(400, "Content query not valid.");
+
             builder.AddOperation(OpenApiOperationMethod.Get, "/{id}")
                 .RequirePermission(PermissionIds.AppContentsReadOwn)
                 .Operation("Get")
@@ -145,6 +153,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .HasBody("data", builder.DataSchema, Resources.OpenApiSchemaBody)
                 .Responds(201, "Content item created", builder.ContentSchema)
                 .Responds(400, "Content data not valid.");
+
+            builder.AddOperation(OpenApiOperationMethod.Post, "/bulk")
+                .RequirePermission(PermissionIds.AppContentsReadOwn)
+                .Operation("Bulk")
+                .OperationSummary("Bulk update content items.")
+                .HasBody("request", builder.Parent.BulkRequestSchema, null)
+                .Responds(200, "Contents created, update or delete.", builder.Parent.BulkResponseSchema)
+                .Responds(400, "Contents request not valid.");
 
             builder.AddOperation(OpenApiOperationMethod.Post, "/{id}")
                 .RequirePermission(PermissionIds.AppContentsUpsert)
@@ -188,6 +204,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .RequirePermission(PermissionIds.AppContentsDeleteOwn)
                 .Operation("Delete")
                 .OperationSummary("Delete a [schema] content item.")
+                .HasQuery("permanent", JsonObjectType.Boolean, FieldDescriptions.EntityRequestDeletePermanent)
                 .HasId()
                 .Responds(204, "Content item deleted");
         }
