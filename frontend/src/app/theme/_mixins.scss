@@ -24,10 +24,12 @@
 }
 
 @mixin build-text-button($color) {
-    color: $color;
+    color: $color !important;
 
     &:disabled,
     &.disabled {
+        border: none;
+        border-radius: 0;
         opacity: .4;
     }
 

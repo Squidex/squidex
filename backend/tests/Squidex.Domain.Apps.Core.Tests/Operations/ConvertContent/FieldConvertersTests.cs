@@ -249,7 +249,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var actual =
                 new ContentConverter(ResolvedComponents.Empty, schema)
-                    .Add(new ResolveLanguages(languages))
+                    .Add(new ResolveLanguages(languages, false))
                     .Convert(source);
 
             var expected =
@@ -257,6 +257,41 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     .AddField(field1.Name,
                         new ContentFieldData()
                             .AddLocalized("en", "A"));
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [MemberData(nameof(InvalidValues))]
+        public void Should_remove_unwanted_languages_and_invariant(JsonValue value)
+        {
+            var field1 = Fields.String(1, "string", Partitioning.Language);
+
+            var schema =
+                new Schema("my-schema")
+                    .AddField(field1);
+
+            var source =
+                new ContentData()
+                    .AddField(field1.Name,
+                        new ContentFieldData()
+                            .AddLocalized("iv", "A")
+                            .AddLocalized("it", "B"));
+
+            if (value != false)
+            {
+                source[field1.Name]!["en"] = value!;
+            }
+
+            var actual =
+                new ContentConverter(ResolvedComponents.Empty, schema)
+                    .Add(new ResolveLanguages(languages, false, Language.DE))
+                    .Convert(source);
+
+            var expected =
+                new ContentData()
+                    .AddField(field1.Name,
+                        new ContentFieldData());
 
             Assert.Equal(expected, actual);
         }
@@ -297,6 +332,35 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             {
                 expected[field1.Name]!["en"] = value;
             }
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Should_resolve_language_from_master_and_filter()
+        {
+            var field1 = Fields.String(1, "string", Partitioning.Language);
+
+            var schema =
+                new Schema("my-schema")
+                    .AddField(field1);
+
+            var source =
+                new ContentData()
+                    .AddField(field1.Name,
+                        new ContentFieldData()
+                            .AddLocalized("en", "A"));
+
+            var actual =
+                new ContentConverter(ResolvedComponents.Empty, schema)
+                    .Add(new ResolveLanguages(languages, true, Language.DE))
+                    .Convert(source);
+
+            var expected =
+                new ContentData()
+                    .AddField(field1.Name,
+                        new ContentFieldData()
+                            .AddLocalized("de", "A"));
 
             Assert.Equal(expected, actual);
         }

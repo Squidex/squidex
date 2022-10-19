@@ -78,6 +78,10 @@ $panel-sidebar:             3.75rem;
 $font-small:                85%;
 $font-smallest:             80%;
 
+$btn-disabled-color:        inherit;
+$btn-disabled-bg:           inherit;
+$btn-disabled-border-color: inherit;
+
 $history-dot-size: 10px;
 $history-dot-offset-x: -($history-dot-size * .5 + 1px);
 $history-dot-sm-size: 6px;

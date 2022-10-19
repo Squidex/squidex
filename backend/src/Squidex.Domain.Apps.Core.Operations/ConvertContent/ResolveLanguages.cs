@@ -48,12 +48,30 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
             if (source.TryGetNonNull(InvariantPartitioning.Key, out var value))
             {
-                var result = new ContentFieldData
+                source = new ContentFieldData
                 {
                     [languages.Master] = value
                 };
+            }
 
-                return result;
+            if (resolveFallback)
+            {
+                foreach (var languageCode in languageCodes)
+                {
+                    if (source.TryGetNonNull(languageCode, out _))
+                    {
+                        continue;
+                    }
+
+                    foreach (var fallback in languages.GetPriorities(languageCode))
+                    {
+                        if (source.TryGetNonNull(fallback, out var fallbackValue))
+                        {
+                            source[languageCode] = fallbackValue;
+                            break;
+                        }
+                    }
+                }
             }
 
             while (true)
@@ -73,28 +91,6 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 if (!isRemoved)
                 {
                     break;
-                }
-            }
-
-            if (!resolveFallback)
-            {
-                return source;
-            }
-
-            foreach (var languageCode in languageCodes)
-            {
-                if (source.TryGetNonNull(languageCode, out _))
-                {
-                    continue;
-                }
-
-                foreach (var fallback in languages.GetPriorities(languageCode))
-                {
-                    if (source.TryGetNonNull(fallback, out var fallbackValue))
-                    {
-                        source[languageCode] = fallbackValue;
-                        break;
-                    }
                 }
             }
 
