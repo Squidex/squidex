@@ -1,7 +1,7 @@
 <div class="step">
     <div class="row g-0 step-header">
         <div class="col-auto">
-            <button class="btn btn-initial me-1" (click)="makeInitial.emit()" 
+            <button class="btn btn-text-secondary btn-initial me-1" (click)="makeInitial.emit()" 
                 [class.enabled]="step.name !== workflow.initial && !step.isLocked" 
                 [class.active]="step.name === workflow.initial"
                 [disabled]="step.name === workflow.initial || step.isLocked || disabled">
