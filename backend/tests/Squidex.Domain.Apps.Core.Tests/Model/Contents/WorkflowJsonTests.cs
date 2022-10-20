@@ -29,7 +29,8 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                             [Status.Published] = WorkflowTransition.When("Expression", "Role1", "Role2")
                         }.ToReadonlyDictionary(),
                         "#00ff00",
-                        NoUpdate.When("Expression", "Role1", "Role2"))
+                        NoUpdate.When("Expression", "Role1", "Role2"),
+                        true)
                 }.ToReadonlyDictionary(),
                 ReadonlyList.Create(DomainId.NewGuid()), "MyName");
 

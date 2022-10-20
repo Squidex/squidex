@@ -15,7 +15,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
-using Squidex.Web.GraphQL;
 
 namespace Squidex.Areas.Api.Controllers.Contents
 {
@@ -24,97 +23,14 @@ namespace Squidex.Areas.Api.Controllers.Contents
     {
         private readonly IContentQueryService contentQuery;
         private readonly IContentWorkflow contentWorkflow;
-        private readonly GraphQLRunner graphQLRunner;
 
         public ContentsController(ICommandBus commandBus,
             IContentQueryService contentQuery,
-            IContentWorkflow contentWorkflow,
-            GraphQLRunner graphQLRunner)
+            IContentWorkflow contentWorkflow)
             : base(commandBus)
         {
             this.contentQuery = contentQuery;
             this.contentWorkflow = contentWorkflow;
-            this.graphQLRunner = graphQLRunner;
-        }
-
-        /// <summary>
-        /// GraphQL endpoint.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <returns>
-        /// 200 => Contents returned or mutated.
-        /// 404 => App not found.
-        /// </returns>
-        /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
-        /// </remarks>
-        [HttpGet]
-        [HttpPost]
-        [Route("content/{app}/graphql/")]
-        [Route("content/{app}/graphql/batch")]
-        [ApiPermissionOrAnonymous]
-        [ApiCosts(2)]
-        public Task GetGraphQL(string app)
-        {
-            return graphQLRunner.InvokeAsync(HttpContext);
-        }
-
-        /// <summary>
-        /// Queries contents.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="query">The required query object.</param>
-        /// <returns>
-        /// 200 => Contents returned.
-        /// 404 => App not found.
-        /// </returns>
-        /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
-        /// </remarks>
-        [HttpGet]
-        [Route("content/{app}/")]
-        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous]
-        [ApiCosts(1)]
-        public async Task<IActionResult> GetAllContents(string app, AllContentsByGetDto query)
-        {
-            var contents = await contentQuery.QueryAsync(Context, query?.ToQuery() ?? Q.Empty, HttpContext.RequestAborted);
-
-            var response = Deferred.AsyncResponse(() =>
-            {
-                return ContentsDto.FromContentsAsync(contents, Resources, null, contentWorkflow);
-            });
-
-            return Ok(response);
-        }
-
-        /// <summary>
-        /// Queries contents.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="query">The required query object.</param>
-        /// <returns>
-        /// 200 => Contents returned.
-        /// 404 => App not found.
-        /// </returns>
-        /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
-        /// </remarks>
-        [HttpPost]
-        [Route("content/{app}/")]
-        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous]
-        [ApiCosts(1)]
-        public async Task<IActionResult> GetAllContentsPost(string app, [FromBody] AllContentsByPostDto query)
-        {
-            var contents = await contentQuery.QueryAsync(Context, query?.ToQuery() ?? Q.Empty, HttpContext.RequestAborted);
-
-            var response = Deferred.AsyncResponse(() =>
-            {
-                return ContentsDto.FromContentsAsync(contents, Resources, null, contentWorkflow);
-            });
-
-            return Ok(response);
         }
 
         /// <summary>
@@ -415,7 +331,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(5)]
         public async Task<IActionResult> BulkUpdateContents(string app, string schema, [FromBody] BulkUpdateContentsDto request)
         {
-            var command = request.ToCommand();
+            var command = request.ToCommand(false);
 
             var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 

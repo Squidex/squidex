@@ -51,24 +51,28 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// </summary>
         public bool OptimizeValidation { get; set; } = true;
 
-        public BulkUpdateContents ToCommand()
+        public BulkUpdateContents ToCommand(bool setSchema)
         {
             var result = SimpleMapper.Map(this, new BulkUpdateContents());
 
-            result.Jobs = Jobs?.Select(x => x.ToJob())?.ToArray();
+            result.Jobs = Jobs?.Select(x =>
+            {
+                var job = x.ToJob();
 
 #pragma warning disable CS0618 // Type or member is obsolete
-            if (result.Jobs != null && Publish)
-            {
-                foreach (var job in result.Jobs)
+                if (Publish)
                 {
-                    if (job != null)
-                    {
-                        job.Status = Status.Published;
-                    }
+                    job.Status = Status.Published;
                 }
-            }
 #pragma warning restore CS0618 // Type or member is obsolete
+
+                return job;
+            }).ToArray();
+
+            if (setSchema)
+            {
+                result.SchemaId = BulkUpdateContents.NoSchema;
+            }
 
             return result;
         }

@@ -218,96 +218,96 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         private async Task<IResultList<IAssetFolderEntity>> QueryFoldersCoreAsync(Context context, DomainId parentId,
             CancellationToken ct)
         {
-            using (var timeout = new CancellationTokenSource(options.TimeoutQuery))
+            using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
-                {
-                    return await assetFolderRepository.QueryAsync(context.App.Id, parentId, combined.Token);
-                }
+                // Enforce a hard timeout
+                combined.CancelAfter(options.TimeoutQuery);
+
+                return await assetFolderRepository.QueryAsync(context.App.Id, parentId, combined.Token);
             }
         }
 
         private async Task<IResultList<IAssetFolderEntity>> QueryFoldersCoreAsync(DomainId appId, DomainId parentId,
             CancellationToken ct)
         {
-            using (var timeout = new CancellationTokenSource(options.TimeoutQuery))
+            using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
-                {
-                    return await assetFolderRepository.QueryAsync(appId, parentId, combined.Token);
-                }
+                // Enforce a hard timeout
+                combined.CancelAfter(options.TimeoutQuery);
+
+                return await assetFolderRepository.QueryAsync(appId, parentId, combined.Token);
             }
         }
 
         private async Task<IResultList<IAssetEntity>> QueryCoreAsync(Context context, DomainId? parentId, Q q,
             CancellationToken ct)
         {
-            using (var timeout = new CancellationTokenSource(options.TimeoutQuery))
+            using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
-                {
-                    return await assetRepository.QueryAsync(context.App.Id, parentId, q, combined.Token);
-                }
+                // Enforce a hard timeout
+                combined.CancelAfter(options.TimeoutQuery);
+
+                return await assetRepository.QueryAsync(context.App.Id, parentId, q, combined.Token);
             }
         }
 
         private async Task<IAssetFolderEntity?> FindFolderCoreAsync(DomainId appId, DomainId id,
             CancellationToken ct)
         {
-            using (var timeout = new CancellationTokenSource(options.TimeoutFind))
+            using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
-                {
-                    return await assetFolderRepository.FindAssetFolderAsync(appId, id, combined.Token);
-                }
+                // Enforce a hard timeout
+                combined.CancelAfter(options.TimeoutFind);
+
+                return await assetFolderRepository.FindAssetFolderAsync(appId, id, combined.Token);
             }
         }
 
         private async Task<IAssetEntity?> FindByHashCoreAsync(Context context, string hash, string fileName, long fileSize,
             CancellationToken ct)
         {
-            using (var timeout = new CancellationTokenSource(options.TimeoutFind))
+            using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
-                {
-                    return await assetRepository.FindAssetByHashAsync(context.App.Id, hash, fileName, fileSize, combined.Token);
-                }
+                // Enforce a hard timeout
+                combined.CancelAfter(options.TimeoutFind);
+
+                return await assetRepository.FindAssetByHashAsync(context.App.Id, hash, fileName, fileSize, combined.Token);
             }
         }
 
         private async Task<IAssetEntity?> FindBySlugCoreAsync(Context context, string slug,
             CancellationToken ct)
         {
-            using (var timeout = new CancellationTokenSource(options.TimeoutFind))
+            using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
-                {
-                    return await assetRepository.FindAssetBySlugAsync(context.App.Id, slug, combined.Token);
-                }
+                // Enforce a hard timeout
+                combined.CancelAfter(options.TimeoutFind);
+
+                return await assetRepository.FindAssetBySlugAsync(context.App.Id, slug, combined.Token);
             }
         }
 
         private async Task<IAssetEntity?> FindCoreAsync(DomainId id,
             CancellationToken ct)
         {
-            using (var timeout = new CancellationTokenSource(options.TimeoutFind))
+            using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
-                {
-                    return await assetRepository.FindAssetAsync(id, combined.Token);
-                }
+                // Enforce a hard timeout
+                combined.CancelAfter(options.TimeoutFind);
+
+                return await assetRepository.FindAssetAsync(id, combined.Token);
             }
         }
 
         private async Task<IAssetEntity?> FindCoreAsync(Context context, DomainId id,
             CancellationToken ct)
         {
-            using (var timeout = new CancellationTokenSource(options.TimeoutFind))
+            using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
-                {
-                    return await assetRepository.FindAssetAsync(context.App.Id, id, combined.Token);
-                }
+                // Enforce a hard timeout
+                combined.CancelAfter(options.TimeoutFind);
+
+                return await assetRepository.FindAssetAsync(context.App.Id, id, combined.Token);
             }
         }
     }

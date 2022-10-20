@@ -33,29 +33,29 @@ namespace Squidex.Infrastructure.Email
             var smtpClient = clientPool.Get();
             try
             {
-                using (var timeout = new CancellationTokenSource(options.Timeout))
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
                 {
-                    using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct, timeout.Token))
+                    // Enforce a hard timeout from the configuration.
+                    combined.CancelAfter(options.Timeout);
+
+                    await EnsureConnectedAsync(smtpClient, combined.Token);
+
+                    var smtpMessage = new MimeMessage();
+
+                    smtpMessage.From.Add(MailboxAddress.Parse(
+                        options.Sender));
+
+                    smtpMessage.To.Add(MailboxAddress.Parse(
+                        recipient));
+
+                    smtpMessage.Body = new TextPart(TextFormat.Html)
                     {
-                        await EnsureConnectedAsync(smtpClient, combined.Token);
+                        Text = body
+                    };
 
-                        var smtpMessage = new MimeMessage();
+                    smtpMessage.Subject = subject;
 
-                        smtpMessage.From.Add(MailboxAddress.Parse(
-                            options.Sender));
-
-                        smtpMessage.To.Add(MailboxAddress.Parse(
-                            recipient));
-
-                        smtpMessage.Body = new TextPart(TextFormat.Html)
-                        {
-                            Text = body
-                        };
-
-                        smtpMessage.Subject = subject;
-
-                        await smtpClient.SendAsync(smtpMessage, ct);
-                    }
+                    await smtpClient.SendAsync(smtpMessage, ct);
                 }
             }
             finally

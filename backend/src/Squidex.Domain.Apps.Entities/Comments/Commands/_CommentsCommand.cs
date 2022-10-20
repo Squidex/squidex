@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Commands
 
     public abstract class CommentsCommand : CommentsCommandBase
     {
-        public static readonly NamedId<DomainId> NoApp = NamedId.Of(DomainId.NewGuid(), "none");
+        public static readonly NamedId<DomainId> NoApp = NamedId.Of(DomainId.Empty, "none");
 
         public DomainId CommentsId { get; set; }
 

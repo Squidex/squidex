@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             BulkUpdateJob CommandJob,
             BulkUpdateAssets Command,
             ConcurrentBag<BulkUpdateResultItem> Results,
-            CancellationToken CancellationToken);
+            CancellationToken Aborted);
 
         public AssetsBulkUpdateCommandMiddleware(IContextProvider contextProvider, ILogger<AssetsBulkUpdateCommandMiddleware> log)
         {
@@ -56,6 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2)
                     };
 
+                    // Each job can create exactly one command.
                     var createCommandsBlock = new TransformBlock<BulkTask, BulkTaskCommand?>(task =>
                     {
                         try
@@ -69,6 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         }
                     }, executionOptions);
 
+                    // Execute the commands in batches
                     var executeCommandBlock = new ActionBlock<BulkTaskCommand?>(async command =>
                     {
                         try
@@ -113,6 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                     createCommandsBlock.Complete();
 
+                    // Wait for all commands to be executed.
                     await executeCommandBlock.Completion;
 
                     context.Complete(new BulkUpdateResult(results));
@@ -150,14 +153,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         private BulkTaskCommand? CreateCommand(BulkTask task)
         {
             var id = task.CommandJob.Id;
-
             try
             {
                 var command = CreateCommandCore(task);
 
+                // Set the asset id here in case we have another way to resolve ids.
                 command.AssetId = id;
 
-                return new BulkTaskCommand(task, id, command, task.CancellationToken);
+                return new BulkTaskCommand(task, id, command, task.Aborted);
             }
             catch (Exception ex)
             {

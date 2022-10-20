@@ -46,25 +46,25 @@ namespace Squidex.Domain.Apps.Core.Scripting
             Guard.NotNull(vars);
             Guard.NotNullOrEmpty(script);
 
-            using (var cts = new CancellationTokenSource(timeoutExecution))
+            using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct))
+                // Enforce a timeout after a configured time span.
+                combined.CancelAfter(timeoutExecution);
+
+                var context =
+                    CreateEngine<JsonValue?>(options, combined.Token)
+                        .Extend(vars, options)
+                        .Extend(extensions)
+                        .ExtendAsync(extensions);
+
+                context.Engine.SetValue("complete", new Action<JsValue?>(value =>
                 {
-                    var context =
-                        CreateEngine<JsonValue?>(options, combined.Token)
-                            .Extend(vars, options)
-                            .Extend(extensions)
-                            .ExtendAsync(extensions);
+                    context.Complete(JsonMapper.Map(value));
+                }));
 
-                    context.Engine.SetValue("complete", new Action<JsValue?>(value =>
-                    {
-                        context.Complete(JsonMapper.Map(value));
-                    }));
+                var result = Execute(context.Engine, script);
 
-                    var result = Execute(context.Engine, script);
-
-                    return await context.CompleteAsync() ?? JsonMapper.Map(result);
-                }
+                return await context.CompleteAsync() ?? JsonMapper.Map(result);
             }
         }
 
@@ -74,38 +74,38 @@ namespace Squidex.Domain.Apps.Core.Scripting
             Guard.NotNull(vars);
             Guard.NotNullOrEmpty(script);
 
-            using (var cts = new CancellationTokenSource(timeoutExecution))
+            using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct))
-                {
-                    var context =
+                // Enforce a timeout after a configured time span.
+                combined.CancelAfter(timeoutExecution);
+
+                var context =
                         CreateEngine<ContentData>(options, combined.Token)
                             .Extend(vars, options)
                             .Extend(extensions)
                             .ExtendAsync(extensions);
 
-                    context.Engine.SetValue("complete", new Action<JsValue?>(_ =>
-                    {
-                        context.Complete(vars.Data!);
-                    }));
+                context.Engine.SetValue("complete", new Action<JsValue?>(_ =>
+                {
+                    context.Complete(vars.Data!);
+                }));
 
-                    context.Engine.SetValue("replace", new Action(() =>
-                    {
-                        var dataInstance = context.Engine.GetValue("ctx").AsObject().Get("data");
+                context.Engine.SetValue("replace", new Action(() =>
+                {
+                    var dataInstance = context.Engine.GetValue("ctx").AsObject().Get("data");
 
-                        if (dataInstance != null && dataInstance.IsObject() && dataInstance.AsObject() is ContentDataObject data)
+                    if (dataInstance != null && dataInstance.IsObject() && dataInstance.AsObject() is ContentDataObject data)
+                    {
+                        if (!context.IsCompleted && data.TryUpdate(out var modified))
                         {
-                            if (!context.IsCompleted && data.TryUpdate(out var modified))
-                            {
-                                context.Complete(modified);
-                            }
+                            context.Complete(modified);
                         }
-                    }));
+                    }
+                }));
 
-                    Execute(context.Engine, script);
+                Execute(context.Engine, script);
 
-                    return await context.CompleteAsync() ?? vars.Data!;
-                }
+                return await context.CompleteAsync() ?? vars.Data!;
             }
         }
 

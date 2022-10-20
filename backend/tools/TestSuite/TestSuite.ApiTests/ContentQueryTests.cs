@@ -46,9 +46,28 @@ namespace TestSuite.ApiTests
         {
             var q = new ContentQuery { OrderBy = "data/number/iv asc" };
 
-            var items = await _.Contents.GetAsync(q);
+            var itemsByQ = await _.Contents.GetAsync(q);
+            var itemsIds = itemsByQ.Items.Take(3).Select(x => x.Id).ToHashSet();
+            var itemsById = await _.Contents.GetAsync(new ContentQuery { Ids = itemsIds });
 
-            var itemsById = await _.Contents.GetAsync(new HashSet<string>(items.Items.Take(3).Select(x => x.Id)));
+            Assert.Equal(3, itemsById.Items.Count);
+            Assert.Equal(3, itemsById.Total);
+
+            foreach (var item in itemsById.Items)
+            {
+                Assert.Equal(_.AppName, item.AppName);
+                Assert.Equal(_.SchemaName, item.SchemaName);
+            }
+        }
+
+        [Fact]
+        public async Task Should_query_by_ids_across_schemas()
+        {
+            var q = new ContentQuery { OrderBy = "data/number/iv asc" };
+
+            var itemsByQ = await _.Contents.GetAsync(q);
+            var itemsIds = itemsByQ.Items.Take(3).Select(x => x.Id).ToHashSet();
+            var itemsById = await _.SharedContents.GetAsync(itemsIds);
 
             Assert.Equal(3, itemsById.Items.Count);
             Assert.Equal(3, itemsById.Total);
@@ -418,7 +437,7 @@ namespace TestSuite.ApiTests
                     }"
             };
 
-            var result = await _.Contents.GraphQlAsync<JObject>(query);
+            var result = await _.SharedContents.GraphQlAsync<JObject>(query);
 
             var value = result["createMyReadsContent"]["data"]["number"]["iv"].Value<int>();
 
@@ -489,7 +508,7 @@ namespace TestSuite.ApiTests
                 }
             };
 
-            var result = await _.Contents.GraphQlAsync<JObject>(query);
+            var result = await _.SharedContents.GraphQlAsync<JObject>(query);
 
             var value = result["createMyReadsContent"]["data"]["number"]["iv"].Value<int>();
 
@@ -537,7 +556,7 @@ namespace TestSuite.ApiTests
                 }
             };
 
-            var results = await _.Contents.GraphQlAsync<QueryResult>(new[] { query1, query2 });
+            var results = await _.SharedContents.GraphQlAsync<QueryResult>(new[] { query1, query2 });
 
             var items1 = results.ElementAt(0).Data.Items;
             var items2 = results.ElementAt(1).Data.Items;
@@ -568,8 +587,7 @@ namespace TestSuite.ApiTests
                 }
             };
 
-            var result = await _.Contents.GraphQlAsync<QueryResult>(query);
-
+            var result = await _.SharedContents.GraphQlAsync<QueryResult>(query);
             var items = result.Items;
 
             Assert.Equal(items.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
@@ -597,8 +615,7 @@ namespace TestSuite.ApiTests
                 }
             };
 
-            var result = await _.Contents.GraphQlGetAsync<QueryResult>(query);
-
+            var result = await _.SharedContents.GraphQlGetAsync<QueryResult>(query);
             var items = result.Items;
 
             Assert.Equal(items.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
@@ -622,8 +639,7 @@ namespace TestSuite.ApiTests
                 }"
             };
 
-            var result = await _.Contents.GraphQlAsync<JObject>(query);
-
+            var result = await _.SharedContents.GraphQlAsync<JObject>(query);
             var items = result["queryMyReadsContents"];
 
             Assert.Equal(items.Select(x => x["data"]["number"]["iv"].Value<int>()).ToArray(), new[] { 4, 5, 6 });
@@ -651,7 +667,7 @@ namespace TestSuite.ApiTests
                 }
             };
 
-            await _.Contents.GraphQlAsync<QueryResult>(query);
+            await _.SharedContents.GraphQlAsync<QueryResult>(query);
         }
 
         [Fact]

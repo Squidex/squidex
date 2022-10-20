@@ -916,6 +916,88 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_update_content_with_bulk_and_shared_client()
+        {
+            TestEntity content = null;
+            try
+            {
+                var schemaName = $"schema-{Guid.NewGuid()}";
+
+                // STEP 0: Create dummy schema.
+                var createSchema = new CreateSchemaDto
+                {
+                    Name = schemaName,
+
+                    // Publish it to avoid validations issues.
+                    IsPublished = true
+                };
+
+                await _.Schemas.PostSchemaAsync(_.AppName, createSchema);
+
+
+
+                // STEP 1: Create a new item.
+                content = await _.Contents.CreateAsync(new TestEntityData
+                {
+                    String = "test"
+                }, ContentCreateOptions.AsPublish);
+
+
+                // STEP 2: Patch an item.
+                await _.SharedContents.BulkUpdateAsync(new BulkUpdate
+                {
+                    Jobs = new List<BulkUpdateJob>
+                    {
+                        new BulkUpdateJob
+                        {
+                            Id = content.Id,
+                            Data = new
+                            {
+                                number = new
+                                {
+                                    iv = 1
+                                }
+                            },
+                            Schema = _.SchemaName
+                        }
+                    }
+                });
+
+
+                // STEP 3: Update the item and ensure that the data has changed.
+                await _.SharedContents.BulkUpdateAsync(new BulkUpdate
+                {
+                    Jobs = new List<BulkUpdateJob>
+                    {
+                        new BulkUpdateJob
+                        {
+                            Id = content.Id,
+                            Data = new
+                            {
+                                number = new
+                                {
+                                    iv = 2
+                                }
+                            },
+                            Schema = _.SchemaName
+                        }
+                    }
+                });
+
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal(2, updated.Data.Number);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
         public async Task Should_create_draft_version()
         {
             TestEntity content = null;
