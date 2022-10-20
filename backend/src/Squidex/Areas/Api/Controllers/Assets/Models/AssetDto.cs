@@ -145,7 +145,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The width of the image in pixels if the asset is an image.
         /// </summary>
-        [Obsolete("Use 'metdata' field now.")]
+        [Obsolete("Use 'metadata' field now.")]
         public int? PixelWidth
         {
             get => Metadata.GetPixelWidth();
@@ -154,7 +154,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The height of the image in pixels if the asset is an image.
         /// </summary>
-        [Obsolete("Use 'metdata' field now.")]
+        [Obsolete("Use 'metadata' field now.")]
         public int? PixelHeight
         {
             get => Metadata.GetPixelHeight();

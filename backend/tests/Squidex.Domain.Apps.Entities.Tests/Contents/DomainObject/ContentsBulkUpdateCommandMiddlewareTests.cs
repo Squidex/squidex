@@ -513,6 +513,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 .MustHaveHappened();
         }
 
+        [Fact]
+        public async Task Should_throw_exception_if_schema_name_not_defined()
+        {
+            SetupContext(PermissionIds.AppContentsDeleteOwn);
+
+            var (id, _, _) = CreateTestData(false);
+
+            var command = BulkCommand(BulkUpdateContentType.Delete, new BulkUpdateJob(), id);
+
+            // Unset schema id, so that no schema id is set for the command.
+            command.SchemaId = null!;
+
+            var actual = await PublishAsync(command);
+
+            Assert.Single(actual);
+            Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainObjectNotFoundException);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<DeleteContent>.That.Matches(x => x.SchemaId == schemaCustomId), ct))
+                .MustNotHaveHappened();
+        }
+
         private async Task<BulkUpdateResult> PublishAsync(ICommand command)
         {
             var context = new CommandContext(command, commandBus);

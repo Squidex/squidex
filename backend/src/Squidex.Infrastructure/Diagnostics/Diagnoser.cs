@@ -108,7 +108,10 @@ namespace Squidex.Infrastructure.Diagnostics
             }
 
             using var cts = new CancellationTokenSource(DefaultTimeout);
-            using var ctl = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct);
+            using var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct);
+
+            // Enforce a hard timeout.
+            combined.CancelAfter(DefaultTimeout);
 
             var tempPath = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
 
@@ -121,7 +124,7 @@ namespace Squidex.Infrastructure.Diagnostics
                 process.StartInfo.UseShellExecute = false;
                 process.Start();
 
-                await process.WaitForExitAsync(ctl.Token);
+                await process.WaitForExitAsync(combined.Token);
 
                 if (process.ExitCode != 0)
                 {
@@ -132,7 +135,7 @@ namespace Squidex.Infrastructure.Diagnostics
                 {
                     var name = $"diagnostics/{extension}/{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}.{extension}";
 
-                    await assetStore.UploadAsync(name, fs, true, ctl.Token);
+                    await assetStore.UploadAsync(name, fs, true, combined.Token);
                 }
             }
             finally

@@ -364,12 +364,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                 var deserialized = serializer.Deserialize<object>(job, actionHandler.DataType);
 
-                using (var cts = new CancellationTokenSource(GetTimeoutInMs()))
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
                 {
-                    using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct))
-                    {
-                        result = await actionHandler.ExecuteJobAsync(deserialized, combined.Token).WithCancellation(combined.Token);
-                    }
+                    // Enforce a timeout after a configured time span.
+                    combined.CancelAfter(GetTimeoutInMs());
+
+                    result = await actionHandler.ExecuteJobAsync(deserialized, combined.Token).WithCancellation(combined.Token);
                 }
             }
             catch (Exception ex)

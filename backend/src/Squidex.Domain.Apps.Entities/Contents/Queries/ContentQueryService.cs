@@ -218,36 +218,36 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private async Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, Q q, ISchemaEntity schema,
             CancellationToken ct)
         {
-            using (var timeout = new CancellationTokenSource(options.TimeoutQuery))
+            using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
-                {
-                    return await contentRepository.QueryAsync(context.App, schema, q, context.Scope(), ct);
-                }
+                // Enforce a hard timeout
+                combined.CancelAfter(options.TimeoutQuery);
+
+                return await contentRepository.QueryAsync(context.App, schema, q, context.Scope(), combined.Token);
             }
         }
 
         private async Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, Q q, List<ISchemaEntity> schemas,
             CancellationToken ct)
         {
-            using (var timeout = new CancellationTokenSource(options.TimeoutQuery))
+            using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
-                {
-                    return await contentRepository.QueryAsync(context.App, schemas, q, context.Scope(), ct);
-                }
+                // Enforce a hard timeout
+                combined.CancelAfter(options.TimeoutQuery);
+
+                return await contentRepository.QueryAsync(context.App, schemas, q, context.Scope(), combined.Token);
             }
         }
 
         private async Task<IContentEntity?> FindCoreAsync(Context context, DomainId id, ISchemaEntity schema,
             CancellationToken ct)
         {
-            using (var timeout = new CancellationTokenSource(options.TimeoutFind))
+            using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
-                {
-                    return await contentRepository.FindContentAsync(context.App, schema, id, context.Scope(), combined.Token);
-                }
+                // Enforce a hard timeout
+                combined.CancelAfter(options.TimeoutFind);
+
+                return await contentRepository.FindContentAsync(context.App, schema, id, context.Scope(), combined.Token);
             }
         }
 
