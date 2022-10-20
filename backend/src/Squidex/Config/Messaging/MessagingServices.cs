@@ -63,7 +63,7 @@ namespace Squidex.Config.Messaging
             }
 
             services.AddSingleton<IMessagingSerializer>(c =>
-                new SystemTextJsonTransportSerializer(c.GetRequiredService<JsonSerializerOptions>()));
+                new SystemTextJsonMessagingSerializer(c.GetRequiredService<JsonSerializerOptions>()));
 
             services.AddSingletonAs<SubscriptionPublisher>()
                 .As<IEventConsumer>();
