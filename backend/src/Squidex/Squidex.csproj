@@ -78,7 +78,7 @@
     <PackageReference Include="Squidex.Assets.S3" Version="4.13.0" />
     <PackageReference Include="Squidex.Assets.TusAdapter" Version="4.13.0" />
     <PackageReference Include="Squidex.Caching.Orleans" Version="1.9.0" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="11.0.0-beta1" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="10.2.0" />
     <PackageReference Include="Squidex.Hosting" Version="4.13.0" />
     <PackageReference Include="Squidex.Messaging.All" Version="4.13.0" />
     <PackageReference Include="Squidex.Messaging.Subscriptions" Version="4.13.0" />
