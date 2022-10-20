@@ -40,20 +40,23 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         {
             var result = SimpleMapper.Map(this, new BulkUpdateContents());
 
-            result.Jobs = Datas?.Select(x => new BulkUpdateJob { Type = BulkUpdateContentType.Create, Data = x }).ToArray();
+            result.Jobs = Datas?.Select(x =>
+            {
+                var job = new BulkUpdateJob
+                {
+                    Type = BulkUpdateContentType.Create,
+                    Data = x
+                };
 
 #pragma warning disable CS0618 // Type or member is obsolete
-            if (result.Jobs != null && Publish)
-            {
-                foreach (var job in result.Jobs)
+                if (Publish)
                 {
-                    if (job != null)
-                    {
-                        job.Status = Status.Published;
-                    }
+                    job.Status = Status.Published;
                 }
-            }
 #pragma warning restore CS0618 // Type or member is obsolete
+
+                return job;
+            }).ToArray();
 
             return result;
         }

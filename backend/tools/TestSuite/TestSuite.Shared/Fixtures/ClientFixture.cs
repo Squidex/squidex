@@ -100,6 +100,11 @@ namespace TestSuite.Fixtures
             get => ClientManager.CreateUserManagementClient();
         }
 
+        public IContentsSharedClient<DynamicContent, DynamicData> SharedContents
+        {
+            get => ClientManager.CreateSharedDynamicContentsClient();
+        }
+
         static ClientFixture()
         {
             VerifierSettings.IgnoreMember("AppName");

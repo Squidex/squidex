@@ -331,7 +331,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(5)]
         public async Task<IActionResult> BulkUpdateContents(string app, string schema, [FromBody] BulkUpdateContentsDto request)
         {
-            var command = request.ToCommand();
+            var command = request.ToCommand(false);
 
             var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
