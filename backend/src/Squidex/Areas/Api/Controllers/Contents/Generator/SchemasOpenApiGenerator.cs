@@ -100,6 +100,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .HasQuery("ids", JsonObjectType.String, "Comma-separated list of content IDs.")
                 .Responds(200, "Content items retrieved.", builder.ContentsSchema)
                 .Responds(400, "Query not valid.");
+
+            builder.AddOperation(OpenApiOperationMethod.Post, "/bulk")
+                .RequirePermission(PermissionIds.AppContentsReadOwn)
+                .Operation("Bulk")
+                .OperationSummary("Bulk update content items across all schemas.")
+                .HasBody("request", builder.Parent.BulkRequestSchema, null)
+                .Responds(200, "Contents created, update or delete.", builder.Parent.BulkResponseSchema)
+                .Responds(400, "Contents request not valid.");
         }
 
         private static void GenerateSchemaOperations(OperationsBuilder builder)
