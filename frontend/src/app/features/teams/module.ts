@@ -40,7 +40,7 @@ const routes: Routes = [
                                 path: 'help',
                                 component: HelpComponent,
                                 data: {
-                                    helpPage: '05-integrated/team-contributors',
+                                    helpPage: '05-integrated/contributors-team',
                                 },
                             },
                         ],
@@ -56,11 +56,34 @@ const routes: Routes = [
                                     channel: 'settings.plan',
                                 },
                             },
+                            {
+                                path: 'help',
+                                component: HelpComponent,
+                                data: {
+                                    helpPage: '05-integrated/plans-team',
+                                },
+                            },
                         ],
                     },
                     {
                         path: 'more',
                         component: MorePageComponent,
+                        children: [
+                            {
+                                path: 'history',
+                                component: HistoryComponent,
+                                data: {
+                                    channel: 'settings.general',
+                                },
+                            },
+                            {
+                                path: 'help',
+                                component: HelpComponent,
+                                data: {
+                                    helpPage: '05-integrated/more-team',
+                                },
+                            },
+                        ],
                     },
                 ],
             },

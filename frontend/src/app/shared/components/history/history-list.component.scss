@@ -24,12 +24,16 @@
 }
 
 .event {
-    font-size: $font-small;
-    font-weight: normal;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
+
+    &-message {
+        font-size: $font-small;
+    }
 
     &-created {
-        font-size: $font-small;
+        font-size: $font-smallest;
+        font-weight: normal;
+        margin: .25rem 0;
     }
 
     &-right {

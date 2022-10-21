@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { merge, Observable, timer } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { allParams, AppsState, HistoryChannelUpdated, HistoryEventDto, HistoryService, MessageBus, switchSafe, TeamsState } from '@app/shared/internal';
+import { allParams, AppsState, HistoryChannelUpdated, HistoryEventDto, HistoryService, MessageBus, SchemasState, switchSafe, TeamsState } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-history',
@@ -32,6 +32,7 @@ export class HistoryComponent {
         private readonly historyService: HistoryService,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute,
+        private readonly schemasState: SchemasState,
         private readonly teamsState: TeamsState,
     ) {
     }
@@ -49,6 +50,8 @@ export class HistoryComponent {
 
         if (channel) {
             const params = allParams(this.route);
+
+            channel = channel.replace('{schemaId}', this.schemasState.snapshot.selectedSchema?.id);
 
             for (const [key, value] of Object.entries(params)) {
                 channel = channel.replace(`{${key}}`, value);

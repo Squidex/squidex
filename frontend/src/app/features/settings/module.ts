@@ -18,6 +18,22 @@ const routes: Routes = [
             {
                 path: 'more',
                 component: MorePageComponent,
+                children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.general',
+                        },
+                    },
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/more',
+                        },
+                    },
+                ],
             },
             {
                 path: 'backups',
@@ -95,10 +111,35 @@ const routes: Routes = [
             {
                 path: 'settings',
                 component: SettingsPageComponent,
+                children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.ui',
+                        },
+                    },
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/settings',
+                        },
+                    },
+                ],
             },
             {
                 path: 'templates',
                 component: TemplatesPageComponent,
+                children: [
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/templates',
+                        },
+                    },
+                ],
             },
             {
                 path: 'plans',
@@ -109,6 +150,13 @@ const routes: Routes = [
                         component: HistoryComponent,
                         data: {
                             channel: 'settings.plan',
+                        },
+                    },
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/plans',
                         },
                     },
                 ],
@@ -138,6 +186,13 @@ const routes: Routes = [
                 component: WorkflowsPageComponent,
                 children: [
                     {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.workflows',
+                        },
+                    },
+                    {
                         path: 'help',
                         component: HelpComponent,
                         data: {
@@ -150,6 +205,13 @@ const routes: Routes = [
                 path: 'asset-scripts',
                 component: AssetScriptsPageComponent,
                 children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.assetScripts',
+                        },
+                    },
                     {
                         path: 'help',
                         component: HelpComponent,
