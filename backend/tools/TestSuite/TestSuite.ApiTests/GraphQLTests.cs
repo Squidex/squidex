@@ -92,7 +92,7 @@ namespace TestSuite.ApiTests
                 }".Replace("<ID>", content_0.Id, StringComparison.Ordinal)
             };
 
-            var result1 = await _.Contents.GraphQlAsync<JToken>(query);
+            var result1 = await _.SharedContents.GraphQlAsync<JToken>(query);
 
             Assert.Equal(1, result1["findMyWritesContent"]["flatData"]["json"]["value"].Value<int>());
             Assert.Equal(2, result1["findMyWritesContent"]["flatData"]["json"]["obj"]["value"].Value<int>());
@@ -119,8 +119,6 @@ namespace TestSuite.ApiTests
                 // Do nothing
             }
 
-            var countriesClient = _.ClientManager.CreateContentsClient<DynamicEntity, object>("countries");
-
             var query = new
             {
                 query = @"
@@ -143,7 +141,7 @@ namespace TestSuite.ApiTests
                 }"
             };
 
-            var result1 = await countriesClient.GraphQlAsync<JToken>(query);
+            var result1 = await _.SharedContents.GraphQlAsync<JToken>(query);
 
             var typed = result1["queryCountriesContents"].ToObject<List<Country>>();
 

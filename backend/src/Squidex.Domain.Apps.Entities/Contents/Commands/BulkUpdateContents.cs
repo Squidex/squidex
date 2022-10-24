@@ -11,6 +11,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
     public sealed class BulkUpdateContents : SquidexCommand, IAppCommand, ISchemaCommand
     {
+        public static readonly NamedId<DomainId> NoSchema = NamedId.Of(DomainId.Empty, "none");
+
         public NamedId<DomainId> AppId { get; set; }
 
         public NamedId<DomainId> SchemaId { get; set; }

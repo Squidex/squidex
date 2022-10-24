@@ -107,8 +107,7 @@ namespace Squidex.Infrastructure.Diagnostics
                 return false;
             }
 
-            using var cts = new CancellationTokenSource(DefaultTimeout);
-            using var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct);
+            using var combined = CancellationTokenSource.CreateLinkedTokenSource(ct);
 
             // Enforce a hard timeout.
             combined.CancelAfter(DefaultTimeout);

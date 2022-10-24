@@ -16,11 +16,13 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
     {
         public Dictionary<Status, WorkflowTransitionSurrogate> Transitions { get; set; }
 
+        [JsonPropertyName("noUpdateRules")]
+        public NoUpdate? NoUpdate { get; set; }
+
         [JsonPropertyName("noUpdate")]
         public bool NoUpdateFlag { get; set; }
 
-        [JsonPropertyName("noUpdateRules")]
-        public NoUpdate? NoUpdate { get; set; }
+        public bool Validate { get; set; }
 
         public string? Color { get; set; }
 
@@ -52,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
                     x => x.Key,
                     x => x.Value.ToSource());
 
-            return new WorkflowStep(transitions, Color, noUpdate);
+            return new WorkflowStep(transitions, Color, noUpdate, Validate);
         }
     }
 }

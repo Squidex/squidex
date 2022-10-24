@@ -175,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 }
 
                 // The bulk command can be invoke in a schema controller or without a schema controller, therefore the name might be null.
-                if (task.SchemaId == null)
+                if (task.SchemaId == null || task.SchemaId.Id == default)
                 {
                     throw new DomainObjectNotFoundException("undefined");
                 }

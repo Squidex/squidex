@@ -35,6 +35,15 @@ namespace Squidex.Config.Domain
                 builder.AddHttpClientInstrumentation();
                 builder.AddMongoDBInstrumentation();
 
+                var sampling = config.GetValue<double>("logging:otlp:sampling");
+
+                if (sampling > 0 && sampling < 1)
+                {
+                    builder.SetSampler(
+                        new ParentBasedSampler(
+                            new TraceIdRatioBasedSampler(sampling)));
+                }
+
                 foreach (var configurator in serviceProvider.GetRequiredService<IEnumerable<ITelemetryConfigurator>>())
                 {
                     configurator.Configure(builder);

@@ -22,7 +22,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
     <PackageReference Include="NSwag.Core" Version="13.16.1" />
     <PackageReference Include="PuppeteerSharp" Version="7.1.0" />
-    <PackageReference Include="Squidex.Assets" Version="4.11.0" />
+    <PackageReference Include="Squidex.Assets" Version="4.13.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="Verify.Xunit" Version="17.5.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
