@@ -32,8 +32,6 @@ namespace Squidex.Extensions.APM.Otlp
                 builder.AddOtlpExporter(options =>
                 {
                     config.GetSection("logging:otlp").Bind(options);
-
-
                 });
             }
         }
