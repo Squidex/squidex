@@ -121,7 +121,7 @@ export class AppModule {
             appRef.bootstrap(AppComponent);
         } catch (e) {
             // eslint-disable-next-line no-console
-            console.log('Application element not found');
+            console.log('Application element not found.');
         }
     }
 }

@@ -72,8 +72,8 @@
                     </div>
 
                     <div class="dropdown-header" *ngIf="(uiState.settings | async)?.canCreateTeams">
-                        <button type="button" class="btn btn-block btn-outline-success" (click)="addTeamDialog.show()">
-                            <i class="icon-plus"></i> {{ 'apps.appsButtonCreateTeam' | sqxTranslate }}
+                        <button type="button" class="btn btn-block btn-sm btn-text-success" (click)="addTeamDialog.show()">
+                            {{ 'apps.appsButtonCreateTeam' | sqxTranslate }}
                         </button>
                     </div>
                 </ng-container>

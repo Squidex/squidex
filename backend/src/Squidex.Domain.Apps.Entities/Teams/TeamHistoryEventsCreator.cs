@@ -17,6 +17,9 @@ namespace Squidex.Domain.Teams.Entities.Teams
         public TeamHistoryEventsCreator(TypeNameRegistry typeNameRegistry)
             : base(typeNameRegistry)
         {
+            AddEventMessage<TeamCreated>(
+                "history.teams.created");
+
             AddEventMessage<TeamContributorAssigned>(
                 "history.teams.contributoreAssigned");
 
@@ -37,6 +40,8 @@ namespace Squidex.Domain.Teams.Entities.Teams
         {
             switch (@event)
             {
+                case TeamCreated e:
+                    return CreateGeneralEvent(e, e.Name);
                 case TeamContributorAssigned e:
                     return CreateContributorsEvent(e, e.ContributorId, e.Role);
                 case TeamContributorRemoved e:
@@ -46,15 +51,15 @@ namespace Squidex.Domain.Teams.Entities.Teams
                 case TeamPlanReset e:
                     return CreatePlansEvent(e);
                 case TeamUpdated e:
-                    return CreateGeneralEvent(e);
+                    return CreateGeneralEvent(e, e.Name);
             }
 
             return null;
         }
 
-        private HistoryEvent CreateGeneralEvent(IEvent e)
+        private HistoryEvent CreateGeneralEvent(IEvent e, string? name = null)
         {
-            return ForEvent(e, "settings.general");
+            return ForEvent(e, "settings.general").Param("Name", name);
         }
 
         private HistoryEvent CreateContributorsEvent(IEvent e, string contributor, string? role = null)

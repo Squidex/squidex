@@ -18,11 +18,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public AppHistoryEventsCreator(TypeNameRegistry typeNameRegistry)
             : base(typeNameRegistry)
         {
-            AddEventMessage<AppContributorAssigned>(
-                "history.apps.contributoreAssigned");
+            AddEventMessage<AppCreated>(
+                "history.apps.created");
 
-            AddEventMessage<AppContributorRemoved>(
-                "history.apps.contributoreRemoved");
+            AddEventMessage<AppAssetsScriptsConfigured>(
+                "history.apps.assetScriptsConfigured");
 
             AddEventMessage<AppClientAttached>(
                 "history.apps.clientAdded");
@@ -33,11 +33,17 @@ namespace Squidex.Domain.Apps.Entities.Apps
             AddEventMessage<AppClientUpdated>(
                 "history.apps.clientUpdated");
 
-            AddEventMessage<AppPlanChanged>(
-                "history.apps.planChanged");
+            AddEventMessage<AppContributorAssigned>(
+                "history.apps.contributoreAssigned");
 
-            AddEventMessage<AppPlanReset>(
-                "history.apps.planReset");
+            AddEventMessage<AppContributorRemoved>(
+                "history.apps.contributoreRemoved");
+
+            AddEventMessage<AppImageRemoved>(
+                "history.apps.imageRemoved");
+
+            AddEventMessage<AppImageUploaded>(
+                "history.apps.imageUploaded");
 
             AddEventMessage<AppLanguageAdded>(
                 "history.apps.languagedAdded");
@@ -51,8 +57,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
             AddEventMessage<AppMasterLanguageSet>(
                 "history.apps.languagedSetToMaster");
 
-            AddEventMessage<AppSettingsUpdated>(
-                "history.apps.settingsUpdated");
+            AddEventMessage<AppPlanChanged>(
+                "history.apps.planChanged");
+
+            AddEventMessage<AppPlanReset>(
+                "history.apps.planReset");
 
             AddEventMessage<AppRoleAdded>(
                 "history.apps.roleAdded");
@@ -63,26 +72,31 @@ namespace Squidex.Domain.Apps.Entities.Apps
             AddEventMessage<AppRoleUpdated>(
                 "history.apps.roleUpdated");
 
-            AddEventMessage<AppAssetsScriptsConfigured>(
-                "history.apps.assetScriptsConfigured");
-
-            AddEventMessage<AppUpdated>(
-                "history.apps.updated");
+            AddEventMessage<AppSettingsUpdated>(
+                "history.apps.settingsUpdated");
 
             AddEventMessage<AppTransfered>(
                 "history.apps.transfered");
 
-            AddEventMessage<AppImageUploaded>(
-                "history.apps.imageUploaded");
+            AddEventMessage<AppUpdated>(
+                "history.apps.common.updated");
 
-            AddEventMessage<AppImageRemoved>(
-                "history.apps.imageRemoved");
+            AddEventMessage<AppWorkflowAdded>(
+                "history.apps.workflowAdded");
+
+            AddEventMessage<AppWorkflowDeleted>(
+                "history.apps.workflowDeleted");
+
+            AddEventMessage<AppWorkflowUpdated>(
+                "history.apps.workflowUpdated");
         }
 
         private HistoryEvent? CreateEvent(IEvent @event)
         {
             switch (@event)
             {
+                case AppCreated e:
+                    return CreateGeneralEvent(e);
                 case AppContributorAssigned e:
                     return CreateContributorsEvent(e, e.ContributorId, e.Role);
                 case AppContributorRemoved e:
@@ -112,9 +126,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case AppPlanReset e:
                     return CreatePlansEvent(e);
                 case AppSettingsUpdated e:
-                    return CreateAssetScriptsEvent(e);
+                    return CreateUIEvent(e);
                 case AppAssetsScriptsConfigured e:
-                    return CreateGeneralEvent(e);
+                    return CreateAssetScriptsEvent(e);
                 case AppUpdated e:
                     return CreateGeneralEvent(e);
                 case AppTransfered e:
@@ -123,6 +137,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     return CreateGeneralEvent(e);
                 case AppImageRemoved e:
                     return CreateGeneralEvent(e);
+                case AppWorkflowAdded e:
+                    return CreateWorkflowEvent(e, e.Name);
+                case AppWorkflowUpdated e:
+                    return CreateWorkflowEvent(e);
+                case AppWorkflowDeleted e:
+                    return CreateWorkflowEvent(e);
             }
 
             return null;
@@ -130,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private HistoryEvent CreateGeneralEvent(IEvent e)
         {
-            return ForEvent(e, "general");
+            return ForEvent(e, "settings.general");
         }
 
         private HistoryEvent CreateContributorsEvent(IEvent e, string contributor, string? role = null)
@@ -161,6 +181,16 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private HistoryEvent CreateAssetScriptsEvent(IEvent e)
         {
             return ForEvent(e, "settings.assetScripts");
+        }
+
+        private HistoryEvent CreateWorkflowEvent(IEvent e, string? name = null)
+        {
+            return ForEvent(e, "settings.workflows").Param("Name", name);
+        }
+
+        private HistoryEvent CreateUIEvent(IEvent e)
+        {
+            return ForEvent(e, "settings.ui");
         }
 
         protected override Task<HistoryEvent?> CreateEventCoreAsync(Envelope<IEvent> @event)
