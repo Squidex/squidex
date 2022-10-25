@@ -24,7 +24,7 @@
             <ng-container>
                 <ng-container *ngIf="rolesState.roles | async; let roles">
                     <ng-container *ngIf="contributorsState.maxContributors | async; let maxContributors">
-                        <div class="alert alert-success mb-2" *ngIf="maxContributors > 0">
+                        <div class="alert alert-success mb-4" *ngIf="maxContributors > 0">
                             {{ 'contributors.planHint' | sqxTranslate: { maxContributors: maxContributors } }}
                         </div>
                     </ng-container>
