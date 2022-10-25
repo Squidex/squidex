@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -55,14 +56,19 @@ namespace Squidex.Areas.Api.Controllers.Plans
         {
             var response = Deferred.AsyncResponse(async () =>
             {
-                var (_, planId, teamId) = await appUsageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
+                var plans = billingPlans.GetAvailablePlans();
+
+                var (plan, link, referral) =
+                    await AsyncHelper.WhenAll(
+                        appUsageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted),
+                        billingManager.GetPortalLinkAsync(UserId, App, HttpContext.RequestAborted),
+                        billingManager.GetReferralCodeAsync(UserId, App, HttpContext.RequestAborted));
 
                 var owner = App.Plan?.Owner.Identifier;
                 var isOwner = string.Equals(owner, UserId, StringComparison.Ordinal);
                 var isLocked = PlansLockedReason.None;
-                var linkUrl = (Uri?)null;
 
-                if (teamId != null)
+                if (plan.TeamId != null)
                 {
                     isLocked = PlansLockedReason.ManagedByTeam;
                 }
@@ -75,14 +81,13 @@ namespace Squidex.Areas.Api.Controllers.Plans
                     isLocked = PlansLockedReason.NotOwner;
                 }
 
-                if (isLocked == PlansLockedReason.None || isOwner)
-                {
-                    linkUrl = await billingManager.GetPortalLinkAsync(UserId, App, HttpContext.RequestAborted);
-                }
+                var dto = PlansDto.FromDomain(plans.ToArray(), owner, plan.PlanId, isLocked);
 
-                var plans = billingPlans.GetAvailablePlans();
+                dto.PortalLink = isLocked == PlansLockedReason.None ? link : null;
+                dto.ReferralCode = referral.Code;
+                dto.ReferralEarned = $"{referral.AmountEarned:00} EUR";
 
-                return PlansDto.FromDomain(plans.ToArray(), owner, planId, linkUrl, isLocked);
+                return dto;
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();

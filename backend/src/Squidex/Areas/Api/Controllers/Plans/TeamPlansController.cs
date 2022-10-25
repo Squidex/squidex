@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -55,31 +56,23 @@ namespace Squidex.Areas.Api.Controllers.Plans
         {
             var response = Deferred.AsyncResponse(async () =>
             {
-                var owner = Team.Plan?.Owner.Identifier;
-
-                var (_, planId) = await appUsageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
-
-                var lockedReason = PlansLockedReason.None;
-
-                if (!Resources.CanChangeTeamPlan)
-                {
-                    lockedReason = PlansLockedReason.NoPermission;
-                }
-                else if (owner != null && !string.Equals(owner, UserId, StringComparison.OrdinalIgnoreCase))
-                {
-                    lockedReason = PlansLockedReason.NotOwner;
-                }
-
-                var linkUrl = (Uri?)null;
-
-                if (lockedReason == PlansLockedReason.None)
-                {
-                    linkUrl = await billingManager.GetPortalLinkAsync(UserId, Team, HttpContext.RequestAborted);
-                }
-
                 var plans = billingPlans.GetAvailablePlans();
 
-                return PlansDto.FromDomain(plans.ToArray(), owner, planId, linkUrl, lockedReason);
+                var (plan, link, referral) =
+                    await AsyncHelper.WhenAll(
+                        appUsageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted),
+                        billingManager.GetPortalLinkAsync(UserId, Team, HttpContext.RequestAborted),
+                        billingManager.GetReferralCodeAsync(UserId, Team, HttpContext.RequestAborted));
+
+                var isLocked = !Resources.CanChangeTeamPlan ? PlansLockedReason.NoPermission : PlansLockedReason.None;
+
+                var dto = PlansDto.FromDomain(plans.ToArray(), null, plan.PlanId, isLocked);
+
+                dto.PortalLink = isLocked == PlansLockedReason.None ? link : null;
+                dto.ReferralCode = referral.Code;
+                dto.ReferralEarned = $"{referral.AmountEarned:00} EUR";
+
+                return dto;
             });
 
             Response.Headers[HeaderNames.ETag] = Team.ToEtag();

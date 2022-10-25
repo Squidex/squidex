@@ -12,12 +12,21 @@
     <ng-container>
         <sqx-list-view innerWidth="60rem" [isLoading]="plansState.isLoading | async">
             <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
-                <div class="alert alert-danger" *ngIf="(plansState.locked | async) === 'NotOwner'">
+                <div class="alert alert-danger" *ngIf="(plansState.locked | async) !== 'NotOwner'">
                     {{ 'plans.notPlanOwner' | sqxTranslate }} {{ 'plans.planOwner' | sqxTranslate }}: <strong className="no-wrap">{{plansState.planOwner | async | sqxUserName}}</strong>
                 </div>
 
                 <div class="alert alert-danger" *ngIf="(plansState.locked | async) === 'ManagedByTeam'">
                     {{ 'plans.managedByTeam' | sqxTranslate }}
+                </div>
+
+                <div class="card card-body mb-4" *ngIf="plansState.referralCode | async">
+                    <h5 class="card-title">Squidex Referal Program</h5>
+                    
+                    <sqx-form-hint>
+                        <div [innerHTML]="'plans.referralHint' | sqxTranslate: { code: plansState.snapshot.referralCode } | sqxMarkdown | sqxSafeHtml"></div>
+                        <div [innerHTML]="'plans.referralEarned' | sqxTranslate: { amount: plansState.snapshot.referralEarned } | sqxMarkdown | sqxSafeHtml"></div>
+                    </sqx-form-hint>
                 </div>
 
                 <div>
