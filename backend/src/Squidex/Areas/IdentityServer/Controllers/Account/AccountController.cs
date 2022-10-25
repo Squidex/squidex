@@ -78,6 +78,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         [Route("account/consent/")]
         public async Task<IActionResult> Consent(ConsentModel model, string? returnUrl = null)
         {
+            // We ask new users to agree to the cookie and privacy agreements and show and error if they do not agree.
             if (!model.ConsentToCookies)
             {
                 ModelState.AddModelError(nameof(model.ConsentToCookies), T.Get("users.consent.needed"));
@@ -97,6 +98,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             var user = await userService.GetAsync(User, HttpContext.RequestAborted);
 
+            // There is almost no case where this could have happened.
             if (user == null)
             {
                 throw new DomainException(T.Get("users.userNotFound"));
@@ -173,10 +175,12 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
         private async Task<IActionResult> LoginViewAsync(string? returnUrl, bool isLogin, bool isFailed)
         {
+            // If password authentication is enabled we always show the page.
             var allowPasswordAuth = identityOptions.AllowPasswordAuth;
 
             var externalProviders = await SignInManager.GetExternalProvidersAsync();
 
+            // If there is only one external authentication provider, we can redirect just directly.
             if (externalProviders.Count == 1 && !allowPasswordAuth)
             {
                 var provider = externalProviders[0].AuthenticationScheme;
@@ -184,6 +188,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
                 var challengeRedirectUrl = Url.Action(nameof(ExternalCallback));
                 var challengeProperties = SignInManager.ConfigureExternalAuthenticationProperties(provider, challengeRedirectUrl);
 
+                // Redirect to the external authentication provider.
                 return Challenge(challengeProperties, provider);
             }
 
