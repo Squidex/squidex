@@ -24,12 +24,12 @@ namespace Squidex.Areas.Api.Controllers.Plans
     [ApiExplorerSettings(GroupName = nameof(Plans))]
     public sealed class TeamPlansController : ApiController
     {
-        private readonly IAppUsageGate appUsageGate;
+        private readonly IUsageGate appUsageGate;
         private readonly IBillingPlans billingPlans;
         private readonly IBillingManager billingManager;
 
         public TeamPlansController(ICommandBus commandBus,
-            IAppUsageGate appUsageGate,
+            IUsageGate appUsageGate,
             IBillingPlans billingPlans,
             IBillingManager billingManager)
             : base(commandBus)
@@ -64,15 +64,23 @@ namespace Squidex.Areas.Api.Controllers.Plans
                         billingManager.GetPortalLinkAsync(UserId, Team, HttpContext.RequestAborted),
                         billingManager.GetReferralCodeAsync(UserId, Team, HttpContext.RequestAborted));
 
-                var isLocked = !Resources.CanChangeTeamPlan ? PlansLockedReason.NoPermission : PlansLockedReason.None;
+                PlansLockedReason GetLocked()
+                {
+                    if (!Resources.CanChangeTeamPlan)
+                    {
+                        return PlansLockedReason.NoPermission;
+                    }
 
-                var dto = PlansDto.FromDomain(plans.ToArray(), null, plan.PlanId, isLocked);
+                    return PlansLockedReason.None;
+                }
 
-                dto.PortalLink = isLocked == PlansLockedReason.None ? link : null;
-                dto.ReferralCode = referral.Code;
-                dto.ReferralEarned = $"{referral.AmountEarned:00} EUR";
-
-                return dto;
+                return PlansDto.FromDomain(
+                    plans.ToArray(), null,
+                    plan.PlanId,
+                    referral.Code,
+                    referral.AmountEarned,
+                    link,
+                    GetLocked());
             });
 
             Response.Headers[HeaderNames.ETag] = Team.ToEtag();

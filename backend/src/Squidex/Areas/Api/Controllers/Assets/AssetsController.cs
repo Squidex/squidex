@@ -32,7 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
     [ApiExplorerSettings(GroupName = nameof(Assets))]
     public sealed class AssetsController : ApiController
     {
-        private readonly IAppUsageGate appUsageGate;
+        private readonly IUsageGate usageGate;
         private readonly IAssetQueryService assetQuery;
         private readonly IAssetUsageTracker assetUsageTracker;
         private readonly ITagService tagService;
@@ -40,14 +40,14 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
         public AssetsController(
             ICommandBus commandBus,
-            IAppUsageGate appUsageGate,
+            IUsageGate usageGate,
             IAssetQueryService assetQuery,
             IAssetUsageTracker assetUsageTracker,
             ITagService tagService,
             AssetTusRunner assetTusRunner)
             : base(commandBus)
         {
-            this.appUsageGate = appUsageGate;
+            this.usageGate = usageGate;
             this.assetQuery = assetQuery;
             this.assetUsageTracker = assetUsageTracker;
             this.assetTusRunner = assetTusRunner;
@@ -469,7 +469,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 throw new ValidationException(error);
             }
 
-            var (plan, _, _) = await appUsageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
+            var (plan, _, _) = await usageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
 
             var currentSize = await assetUsageTracker.GetTotalSizeByAppAsync(AppId, HttpContext.RequestAborted);
 

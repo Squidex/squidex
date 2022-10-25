@@ -15,11 +15,11 @@ namespace Squidex.Web.Pipeline
 {
     public sealed class ApiCostsFilter : IAsyncActionFilter, IFilterContainer
     {
-        private readonly IAppUsageGate appUsageGate;
+        private readonly IUsageGate usageGate;
 
-        public ApiCostsFilter(IAppUsageGate appUsageGate)
+        public ApiCostsFilter(IUsageGate usageGate)
         {
-            this.appUsageGate = appUsageGate;
+            this.usageGate = usageGate;
         }
 
         IFilterMetadata IFilterContainer.FilterDefinition { get; set; }
@@ -50,7 +50,7 @@ namespace Squidex.Web.Pipeline
                     {
                         var (_, clientId) = context.HttpContext.User.GetClient();
 
-                        var isBlocked = await appUsageGate.IsBlockedAsync(app, clientId, DateTime.Today, context.HttpContext.RequestAborted);
+                        var isBlocked = await usageGate.IsBlockedAsync(app, clientId, DateTime.Today, context.HttpContext.RequestAborted);
 
                         if (isBlocked)
                         {

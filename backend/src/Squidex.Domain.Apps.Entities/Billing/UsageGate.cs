@@ -17,7 +17,7 @@ using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Billing
 {
-    public sealed class UsageGate : IAppUsageGate, IAssetUsageTracker
+    public sealed class UsageGate : IUsageGate, IAssetUsageTracker
     {
         private const string CounterTotalCount = "TotalAssets";
         private const string CounterTotalSize = "TotalSize";

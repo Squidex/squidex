@@ -12,7 +12,7 @@
     <ng-container>
         <sqx-list-view innerWidth="60rem" [isLoading]="plansState.isLoading | async">
             <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
-                <div class="alert alert-danger" *ngIf="(plansState.locked | async) !== 'NotOwner'">
+                <div class="alert alert-danger" *ngIf="(plansState.locked | async) === 'NotOwner'">
                     {{ 'plans.notPlanOwner' | sqxTranslate }} {{ 'plans.planOwner' | sqxTranslate }}: <strong className="no-wrap">{{plansState.planOwner | async | sqxUserName}}</strong>
                 </div>
 

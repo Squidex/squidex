@@ -19,8 +19,8 @@ namespace Squidex.Web.Pipeline
 {
     public class UsageMiddlewareTests
     {
-        private readonly IAppLogStore appLogStore = A.Fake<IAppLogStore>();
-        private readonly IAppUsageGate appUsageGate = A.Fake<IAppUsageGate>();
+        private readonly IAppLogStore usageLog = A.Fake<IAppLogStore>();
+        private readonly IUsageGate usageGate = A.Fake<IUsageGate>();
         private readonly IClock clock = A.Fake<IClock>();
         private readonly Instant instant = SystemClock.Instance.GetCurrentInstant();
         private readonly HttpContext httpContext = new DefaultHttpContext();
@@ -41,7 +41,7 @@ namespace Squidex.Web.Pipeline
                 return Task.CompletedTask;
             };
 
-            sut = new UsageMiddleware(appLogStore, appUsageGate)
+            sut = new UsageMiddleware(usageLog, usageGate)
             {
                 Clock = clock
             };
@@ -56,7 +56,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => appUsageGate.TrackRequestAsync(A<IAppEntity>._, A<string>._, A<DateTime>._, A<double>._, A<long>._, A<long>._, default))
+            A.CallTo(() => usageGate.TrackRequestAsync(A<IAppEntity>._, A<string>._, A<DateTime>._, A<double>._, A<long>._, A<long>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -76,7 +76,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, A<double>._, A<long>._, A<long>._, default))
+            A.CallTo(() => usageGate.TrackRequestAsync(app, A<string>._, date, A<double>._, A<long>._, A<long>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -94,7 +94,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, A<long>._, default))
+            A.CallTo(() => usageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, A<long>._, default))
                 .MustHaveHappened();
         }
 
@@ -113,7 +113,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 1024, default))
+            A.CallTo(() => usageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 1024, default))
                 .MustHaveHappened();
         }
 
@@ -136,7 +136,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 11, default))
+            A.CallTo(() => usageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 11, default))
                 .MustHaveHappened();
         }
 
@@ -159,7 +159,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 11, default))
+            A.CallTo(() => usageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 11, default))
                 .MustHaveHappened();
         }
 
@@ -192,7 +192,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 11, default))
+            A.CallTo(() => usageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 11, default))
                 .MustHaveHappened();
         }
 
@@ -210,7 +210,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, A<double>._, A<long>._, A<long>._, default))
+            A.CallTo(() => usageGate.TrackRequestAsync(app, A<string>._, date, A<double>._, A<long>._, A<long>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -227,7 +227,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.InvokeAsync(httpContext, next);
 
-            A.CallTo(() => appLogStore.LogAsync(appId.Id,
+            A.CallTo(() => usageLog.LogAsync(appId.Id,
                 A<RequestLog>.That.Matches(x =>
                     x.Timestamp == instant &&
                     x.RequestMethod == "GET" &&

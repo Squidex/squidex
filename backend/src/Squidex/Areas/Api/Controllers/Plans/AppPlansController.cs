@@ -26,17 +26,17 @@ namespace Squidex.Areas.Api.Controllers.Plans
     {
         private readonly IBillingPlans billingPlans;
         private readonly IBillingManager billingManager;
-        private readonly IAppUsageGate appUsageGate;
+        private readonly IUsageGate usageGate;
 
         public AppPlansController(ICommandBus commandBus,
-            IAppUsageGate appUsageGate,
+            IUsageGate usageGate,
             IBillingPlans billingPlans,
             IBillingManager billingManager)
             : base(commandBus)
         {
             this.billingPlans = billingPlans;
             this.billingManager = billingManager;
-            this.appUsageGate = appUsageGate;
+            this.usageGate = usageGate;
         }
 
         /// <summary>
@@ -60,34 +60,38 @@ namespace Squidex.Areas.Api.Controllers.Plans
 
                 var (plan, link, referral) =
                     await AsyncHelper.WhenAll(
-                        appUsageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted),
+                        usageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted),
                         billingManager.GetPortalLinkAsync(UserId, App, HttpContext.RequestAborted),
                         billingManager.GetReferralCodeAsync(UserId, App, HttpContext.RequestAborted));
 
-                var owner = App.Plan?.Owner.Identifier;
-                var isOwner = string.Equals(owner, UserId, StringComparison.Ordinal);
-                var isLocked = PlansLockedReason.None;
+                var planOwner = App.Plan?.Owner.Identifier;
 
-                if (plan.TeamId != null)
+                PlansLockedReason GetLocked()
                 {
-                    isLocked = PlansLockedReason.ManagedByTeam;
-                }
-                else if (!Resources.CanChangePlan)
-                {
-                    isLocked = PlansLockedReason.NoPermission;
-                }
-                else if (owner != null && !isOwner)
-                {
-                    isLocked = PlansLockedReason.NotOwner;
+                    if (plan.TeamId != null)
+                    {
+                        return PlansLockedReason.ManagedByTeam;
+                    }
+                    else if (!Resources.CanChangePlan)
+                    {
+                        return PlansLockedReason.NoPermission;
+                    }
+                    else if (planOwner != null && !string.Equals(planOwner, UserId, StringComparison.Ordinal))
+                    {
+                        return PlansLockedReason.NotOwner;
+                    }
+
+                    return PlansLockedReason.None;
                 }
 
-                var dto = PlansDto.FromDomain(plans.ToArray(), owner, plan.PlanId, isLocked);
-
-                dto.PortalLink = isLocked == PlansLockedReason.None ? link : null;
-                dto.ReferralCode = referral.Code;
-                dto.ReferralEarned = $"{referral.AmountEarned:00} EUR";
-
-                return dto;
+                return PlansDto.FromDomain(
+                    plans.ToArray(),
+                    planOwner,
+                    plan.PlanId,
+                    referral.Code,
+                    referral.AmountEarned,
+                    link,
+                    GetLocked());
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();

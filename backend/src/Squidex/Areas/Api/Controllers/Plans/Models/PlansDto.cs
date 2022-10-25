@@ -48,15 +48,29 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// </summary>
         public PlansLockedReason Locked { get; set; }
 
-        public static PlansDto FromDomain(Plan[] plans, string? owner, string planId, PlansLockedReason locked)
+        public static PlansDto FromDomain(
+            Plan[] plans,
+            string? planOwner,
+            string? planId,
+            string? referralCode,
+            double? referralAmount,
+            Uri? portalLink,
+            PlansLockedReason locked)
         {
             var result = new PlansDto
             {
                 Locked = locked,
                 CurrentPlanId = planId,
                 Plans = plans.Select(PlanDto.FromDomain).ToArray(),
-                PlanOwner = owner
+                PlanOwner = planOwner,
+                ReferralCode = referralCode,
+                ReferralEarned = $"{referralAmount ?? 0:0.00} EUR"
             };
+
+            if (locked == PlansLockedReason.None)
+            {
+                result.PortalLink = portalLink;
+            }
 
             return result;
         }
