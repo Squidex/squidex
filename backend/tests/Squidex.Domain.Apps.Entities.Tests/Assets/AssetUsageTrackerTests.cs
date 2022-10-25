@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetLoader assetLoader = A.Fake<IAssetLoader>();
         private readonly ISnapshotStore<AssetUsageTracker.State> store = A.Fake<ISnapshotStore<AssetUsageTracker.State>>();
         private readonly ITagService tagService = A.Fake<ITagService>();
-        private readonly IAppUsageGate appUsageGate = A.Fake<IAppUsageGate>();
+        private readonly IUsageGate usageGate = A.Fake<IUsageGate>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly DomainId assetId = DomainId.NewGuid();
         private readonly DomainId assetKey;
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             assetKey = DomainId.Combine(appId, assetId);
 
-            sut = new AssetUsageTracker(appUsageGate, assetLoader, tagService, store);
+            sut = new AssetUsageTracker(usageGate, assetLoader, tagService, store);
         }
 
         [Fact]
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.On(new[] { envelope });
 
-            A.CallTo(() => appUsageGate.TrackAssetAsync(appId.Id, date, sizeDiff, countDiff, default))
+            A.CallTo(() => usageGate.TrackAssetAsync(appId.Id, date, sizeDiff, countDiff, default))
                 .MustHaveHappened();
         }
 

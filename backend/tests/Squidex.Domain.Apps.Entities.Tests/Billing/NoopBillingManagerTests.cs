@@ -56,6 +56,22 @@ namespace Squidex.Domain.Apps.Entities.Billing
         }
 
         [Fact]
+        public async Task Should_not_return_referral_code_for_app()
+        {
+            var actual = await sut.GetReferralCodeAsync(null!, (IAppEntity)null!);
+
+            Assert.Equal((null, 00), actual);
+        }
+
+        [Fact]
+        public async Task Should_not_return_referral_code_for_team()
+        {
+            var actual = await sut.GetReferralCodeAsync(null!, (ITeamEntity)null!);
+
+            Assert.Equal((null, 0), actual);
+        }
+
+        [Fact]
         public async Task Should_do_nothing_if_checking_for_redirect_for_app()
         {
             var actual = await sut.MustRedirectToPortalAsync(null!, (IAppEntity)null!, null);

@@ -31,23 +31,46 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// <summary>
         /// The link to the management portal.
         /// </summary>
-        public string? PortalLink { get; set; }
+        public Uri? PortalLink { get; set; }
+
+        /// <summary>
+        /// The code for referral managemenent.
+        /// </summary>
+        public string? ReferralCode { get; set; }
+
+        /// <summary>
+        /// The amount earned.
+        /// </summary>
+        public string? ReferralEarned { get; set; }
 
         /// <summary>
         /// The reason why the plan cannot be changed.
         /// </summary>
         public PlansLockedReason Locked { get; set; }
 
-        public static PlansDto FromDomain(Plan[] plans, string? owner, string planId, Uri? portalLink, PlansLockedReason locked)
+        public static PlansDto FromDomain(
+            Plan[] plans,
+            string? planOwner,
+            string? planId,
+            string? referralCode,
+            double? referralAmount,
+            Uri? portalLink,
+            PlansLockedReason locked)
         {
             var result = new PlansDto
             {
                 Locked = locked,
                 CurrentPlanId = planId,
                 Plans = plans.Select(PlanDto.FromDomain).ToArray(),
-                PlanOwner = owner,
-                PortalLink = portalLink?.ToString()
+                PlanOwner = planOwner,
+                ReferralCode = referralCode,
+                ReferralEarned = $"{referralAmount ?? 0:0.00} EUR"
             };
+
+            if (locked == PlansLockedReason.None)
+            {
+                result.PortalLink = portalLink;
+            }
 
             return result;
         }

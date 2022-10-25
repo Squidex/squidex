@@ -91,6 +91,12 @@ export type PlansPayload = Readonly<{
     // The portal link if available.
     portalLink?: string;
 
+    // The referral code.
+    referralCode?: string;
+
+    // The amount earned with referrals.
+    referralEarned?: string;
+
     // The reason why the plan cannot be changed.
     locked: PlanLockedReason;
 }>;

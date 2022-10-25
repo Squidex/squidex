@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Billing
 {
-    public interface IAppUsageGate
+    public interface IUsageGate
     {
         Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateTime date,
             CancellationToken ct = default);

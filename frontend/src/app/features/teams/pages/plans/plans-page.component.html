@@ -16,6 +16,15 @@
                     {{ 'plans.allApps' | sqxTranslate }}
                 </div>
 
+                <div class="card card-body mb-4" *ngIf="plansState.referralCode | async">
+                    <h5 class="card-title">Squidex Referal Program</h5>
+                    
+                    <sqx-form-hint>
+                        <div [innerHTML]="'plans.referralHint' | sqxTranslate: { code: plansState.snapshot.referralCode } | sqxMarkdown | sqxSafeHtml"></div>
+                        <div [innerHTML]="'plans.referralEarned' | sqxTranslate: { amount: plansState.snapshot.referralEarned } | sqxMarkdown | sqxSafeHtml"></div>
+                    </sqx-form-hint>
+                </div>
+
                 <div>
                     <div class="text-muted text-center empty" *ngIf="plans.length === 0">
                         {{ 'plans.noPlanConfigured' | sqxTranslate }}

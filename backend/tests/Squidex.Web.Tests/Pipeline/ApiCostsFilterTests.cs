@@ -21,7 +21,7 @@ namespace Squidex.Web.Pipeline
     public class ApiCostsFilterTests
     {
         private readonly IAppEntity appEntity = A.Fake<IAppEntity>();
-        private readonly IAppUsageGate appUsageGate = A.Fake<IAppUsageGate>();
+        private readonly IUsageGate usageGate = A.Fake<IUsageGate>();
         private readonly ActionExecutingContext actionContext;
         private readonly ActionExecutionDelegate next;
         private readonly HttpContext httpContext = new DefaultHttpContext();
@@ -43,7 +43,7 @@ namespace Squidex.Web.Pipeline
                 return Task.FromResult<ActionExecutedContext>(null!);
             };
 
-            sut = new ApiCostsFilter(appUsageGate);
+            sut = new ApiCostsFilter(usageGate);
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace Squidex.Web.Pipeline
 
             SetupApp();
 
-            A.CallTo(() => appUsageGate.IsBlockedAsync(appEntity, A<string>._, DateTime.Today, default))
+            A.CallTo(() => usageGate.IsBlockedAsync(appEntity, A<string>._, DateTime.Today, default))
                 .Returns(true);
 
             await sut.OnActionExecutionAsync(actionContext, next);
@@ -69,7 +69,7 @@ namespace Squidex.Web.Pipeline
 
             SetupApp();
 
-            A.CallTo(() => appUsageGate.IsBlockedAsync(appEntity, A<string>._, DateTime.Today, default))
+            A.CallTo(() => usageGate.IsBlockedAsync(appEntity, A<string>._, DateTime.Today, default))
                 .Returns(false);
 
             await sut.OnActionExecutionAsync(actionContext, next);
@@ -88,7 +88,7 @@ namespace Squidex.Web.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => appUsageGate.IsBlockedAsync(appEntity, A<string>._, DateTime.Today, default))
+            A.CallTo(() => usageGate.IsBlockedAsync(appEntity, A<string>._, DateTime.Today, default))
                 .MustNotHaveHappened();
         }
 
@@ -101,7 +101,7 @@ namespace Squidex.Web.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => appUsageGate.IsBlockedAsync(appEntity, A<string>._, DateTime.Today, default))
+            A.CallTo(() => usageGate.IsBlockedAsync(appEntity, A<string>._, DateTime.Today, default))
                 .MustNotHaveHappened();
         }
 

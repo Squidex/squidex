@@ -33,6 +33,12 @@ interface Snapshot extends LoadingState {
     // The portal link if available.
     portalLink?: string;
 
+    // The referral code.
+    referralCode?: string;
+
+    // The amount earned with referrals.
+    referralEarned?: string;
+
     // The reason why the plan cannot be changed.
     locked?: PlanLockedReason;
 
@@ -56,6 +62,12 @@ export class PlansState extends State<Snapshot> {
 
     public locked =
         this.project(x => x.locked);
+
+    public referralCode =
+        this.project(x => x.referralCode);
+
+    public referralEarned =
+        this.project(x => x.referralEarned);
 
     public portalLink =
         this.project(x => x.portalLink);
@@ -105,6 +117,8 @@ export class PlansState extends State<Snapshot> {
                     planOwner: payload.planOwner,
                     plans,
                     portalLink: payload.portalLink,
+                    referralCode: payload.referralCode,
+                    referralEarned: payload.referralEarned,
                     version,
                 }, 'Loading Success');
             }),

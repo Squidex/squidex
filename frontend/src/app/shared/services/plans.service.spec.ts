@@ -44,6 +44,8 @@ describe('PlansService', () => {
             req.flush({
                 currentPlanId: '123',
                 portalLink: 'link/to/portal',
+                referralCode: 'CODE',
+                referralEarned: '100.00 EUR',
                 planOwner: '456',
                 plans: [
                     {
@@ -84,6 +86,8 @@ describe('PlansService', () => {
                 payload: {
                     currentPlanId: '123',
                     portalLink: 'link/to/portal',
+                    referralCode: 'CODE',
+                    referralEarned: '100.00 EUR',
                     planOwner: '456',
                     plans: [
                         new PlanDto(

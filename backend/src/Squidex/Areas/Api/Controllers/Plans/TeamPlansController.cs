@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -23,12 +24,12 @@ namespace Squidex.Areas.Api.Controllers.Plans
     [ApiExplorerSettings(GroupName = nameof(Plans))]
     public sealed class TeamPlansController : ApiController
     {
-        private readonly IAppUsageGate appUsageGate;
+        private readonly IUsageGate appUsageGate;
         private readonly IBillingPlans billingPlans;
         private readonly IBillingManager billingManager;
 
         public TeamPlansController(ICommandBus commandBus,
-            IAppUsageGate appUsageGate,
+            IUsageGate appUsageGate,
             IBillingPlans billingPlans,
             IBillingManager billingManager)
             : base(commandBus)
@@ -55,31 +56,31 @@ namespace Squidex.Areas.Api.Controllers.Plans
         {
             var response = Deferred.AsyncResponse(async () =>
             {
-                var owner = Team.Plan?.Owner.Identifier;
-
-                var (_, planId) = await appUsageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
-
-                var lockedReason = PlansLockedReason.None;
-
-                if (!Resources.CanChangeTeamPlan)
-                {
-                    lockedReason = PlansLockedReason.NoPermission;
-                }
-                else if (owner != null && !string.Equals(owner, UserId, StringComparison.OrdinalIgnoreCase))
-                {
-                    lockedReason = PlansLockedReason.NotOwner;
-                }
-
-                var linkUrl = (Uri?)null;
-
-                if (lockedReason == PlansLockedReason.None)
-                {
-                    linkUrl = await billingManager.GetPortalLinkAsync(UserId, Team, HttpContext.RequestAborted);
-                }
-
                 var plans = billingPlans.GetAvailablePlans();
 
-                return PlansDto.FromDomain(plans.ToArray(), owner, planId, linkUrl, lockedReason);
+                var (plan, link, referral) =
+                    await AsyncHelper.WhenAll(
+                        appUsageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted),
+                        billingManager.GetPortalLinkAsync(UserId, Team, HttpContext.RequestAborted),
+                        billingManager.GetReferralCodeAsync(UserId, Team, HttpContext.RequestAborted));
+
+                PlansLockedReason GetLocked()
+                {
+                    if (!Resources.CanChangeTeamPlan)
+                    {
+                        return PlansLockedReason.NoPermission;
+                    }
+
+                    return PlansLockedReason.None;
+                }
+
+                return PlansDto.FromDomain(
+                    plans.ToArray(), null,
+                    plan.PlanId,
+                    referral.Code,
+                    referral.AmountEarned,
+                    link,
+                    GetLocked());
             });
 
             Response.Headers[HeaderNames.ETag] = Team.ToEtag();

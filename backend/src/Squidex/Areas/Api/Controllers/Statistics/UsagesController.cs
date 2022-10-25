@@ -27,8 +27,8 @@ namespace Squidex.Areas.Api.Controllers.Statistics
     public sealed class UsagesController : ApiController
     {
         private readonly IApiUsageTracker usageTracker;
-        private readonly IAppLogStore appLogStore;
-        private readonly IAppUsageGate appUsageGate;
+        private readonly IAppLogStore usageLog;
+        private readonly IUsageGate usageGate;
         private readonly IAssetUsageTracker assetStatsRepository;
         private readonly IDataProtector dataProtector;
         private readonly IUrlGenerator urlGenerator;
@@ -37,18 +37,17 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             ICommandBus commandBus,
             IDataProtectionProvider dataProtection,
             IApiUsageTracker usageTracker,
-            IAppLogStore appLogStore,
-            IAppUsageGate appUsageGate,
+            IAppLogStore usageLog,
+            IUsageGate usageGate,
             IAssetUsageTracker assetStatsRepository,
             IUrlGenerator urlGenerator)
             : base(commandBus)
         {
-            this.usageTracker = usageTracker;
-
-            this.appLogStore = appLogStore;
-            this.appUsageGate = appUsageGate;
+            this.usageLog = usageLog;
             this.assetStatsRepository = assetStatsRepository;
             this.urlGenerator = urlGenerator;
+            this.usageGate = usageGate;
+            this.usageTracker = usageTracker;
 
             dataProtector = dataProtection.CreateProtector("LogToken");
         }
@@ -91,7 +90,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var callback = new FileCallback((body, range, ct) =>
             {
-                return appLogStore.ReadLogAsync(appId, fileDate.AddDays(-30), fileDate, body, ct);
+                return usageLog.ReadLogAsync(appId, fileDate.AddDays(-30), fileDate, body, ct);
             });
 
             return new FileCallbackResult("text/csv", callback)
@@ -127,7 +126,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             var (summary, details) = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date, HttpContext.RequestAborted);
 
             // Use the current app plan to show the limits to the user.
-            var (plan, _, _) = await appUsageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
+            var (plan, _, _) = await usageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
 
             var response = CallsUsageDtoDto.FromDomain(plan, summary, details);
 
@@ -161,7 +160,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             var (summary, details) = await usageTracker.QueryAsync(TeamId.ToString(), fromDate.Date, toDate.Date, HttpContext.RequestAborted);
 
             // Use the current team plan to show the limits to the user.
-            var (plan, _) = await appUsageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
+            var (plan, _) = await usageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
 
             var response = CallsUsageDtoDto.FromDomain(plan, summary, details);
 
@@ -186,7 +185,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             var size = await assetStatsRepository.GetTotalSizeByAppAsync(AppId, HttpContext.RequestAborted);
 
             // Use the current app plan to show the limits to the user.
-            var (plan, _, _) = await appUsageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
+            var (plan, _, _) = await usageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
 
             var response = new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize };
 
@@ -211,7 +210,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             var size = await assetStatsRepository.GetTotalSizeByTeamAsync(TeamId, HttpContext.RequestAborted);
 
             // Use the current team plan to show the limits to the user.
-            var (plan, _) = await appUsageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
+            var (plan, _) = await usageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
 
             var response = new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize };
 

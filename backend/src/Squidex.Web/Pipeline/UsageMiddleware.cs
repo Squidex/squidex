@@ -17,15 +17,15 @@ namespace Squidex.Web.Pipeline
 {
     public sealed class UsageMiddleware : IMiddleware
     {
-        private readonly IAppLogStore appUsageLog;
-        private readonly IAppUsageGate appUsageGate;
+        private readonly IAppLogStore usageLog;
+        private readonly IUsageGate usageGate;
 
         public IClock Clock { get; set; } = SystemClock.Instance;
 
-        public UsageMiddleware(IAppLogStore appUsageLog, IAppUsageGate appUsageGate)
+        public UsageMiddleware(IAppLogStore usageLog, IUsageGate usageGate)
         {
-            this.appUsageLog = appUsageLog;
-            this.appUsageGate = appUsageGate;
+            this.usageLog = usageLog;
+            this.usageGate = usageGate;
         }
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -69,13 +69,13 @@ namespace Squidex.Web.Pipeline
                         request.UserClientId = clientId;
 
                         // Do not flow cancellation token because it is too important.
-                        await appUsageLog.LogAsync(app.Id, request, default);
+                        await usageLog.LogAsync(app.Id, request, default);
 
                         if (request.Costs > 0)
                         {
                             var date = request.Timestamp.ToDateTimeUtc().Date;
 
-                            await appUsageGate.TrackRequestAsync(app, request.UserClientId, date,
+                            await usageGate.TrackRequestAsync(app, request.UserClientId, date,
                                 request.Costs,
                                 request.ElapsedMs,
                                 request.Bytes,

@@ -629,6 +629,8 @@
   "plans.perMonth": "每月",
   "plans.perYear": "每年",
   "plans.planOwner": "Owner",
+  "plans.referralEarned": "Amount earned so far: **{amount}**",
+  "plans.referralHint": "Earn money and just share the following discount code to your friend and family: **{code}**.\n\nFor the first 12 months they will get a discount of 5% and you get a credit for 10% of the total invoice amount.",
   "plans.refreshTooltip": "刷新计划",
   "plans.reloaded": "计划重新加载。",
   "plans.selected": "已选择",

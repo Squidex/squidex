@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetLoader assetLoader;
         private readonly ISnapshotStore<State> store;
         private readonly ITagService tagService;
-        private readonly IAppUsageGate appUsageGate;
+        private readonly IUsageGate usageGate;
 
         [CollectionName("Index_TagHistory")]
         public sealed class State
@@ -27,10 +27,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
             public HashSet<string>? Tags { get; set; }
         }
 
-        public AssetUsageTracker(IAppUsageGate appUsageGate, IAssetLoader assetLoader, ITagService tagService,
+        public AssetUsageTracker(IUsageGate usageGate, IAssetLoader assetLoader, ITagService tagService,
             ISnapshotStore<State> store)
         {
-            this.appUsageGate = appUsageGate;
+            this.usageGate = usageGate;
             this.assetLoader = assetLoader;
             this.tagService = tagService;
             this.store = store;
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         Task IDeleter.DeleteAppAsync(IAppEntity app,
             CancellationToken ct)
         {
-            return appUsageGate.DeleteAssetUsageAsync(app.Id, ct);
+            return usageGate.DeleteAssetUsageAsync(app.Id, ct);
         }
     }
 }

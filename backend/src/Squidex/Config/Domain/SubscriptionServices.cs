@@ -26,7 +26,7 @@ namespace Squidex.Config.Domain
                 .AsOptional<IBillingManager>();
 
             services.AddSingletonAs<UsageGate>()
-                .AsOptional<IAppUsageGate>().As<IAssetUsageTracker>();
+                .AsOptional<IUsageGate>().As<IAssetUsageTracker>();
         }
     }
 }

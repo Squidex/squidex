@@ -25,14 +25,14 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppContributorsController : ApiController
     {
-        private readonly IAppUsageGate usageTracker;
-        private readonly IUserResolver usageGate;
+        private readonly IUsageGate usageGate;
+        private readonly IUserResolver userResolver;
 
-        public AppContributorsController(ICommandBus commandBus, IAppUsageGate usageGate, IUserResolver userResolver)
+        public AppContributorsController(ICommandBus commandBus, IUsageGate usageGate, IUserResolver userResolver)
             : base(commandBus)
         {
-            this.usageTracker = usageGate;
-            this.usageGate = userResolver;
+            this.usageGate = usageGate;
+            this.userResolver = userResolver;
         }
 
         /// <summary>
@@ -145,9 +145,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private async Task<ContributorsDto> GetResponseAsync(IAppEntity app, bool invited)
         {
-            var (plan, _, _) = await usageTracker.GetPlanForAppAsync(app, HttpContext.RequestAborted);
+            var (plan, _, _) = await usageGate.GetPlanForAppAsync(app, HttpContext.RequestAborted);
 
-            return await ContributorsDto.FromDomainAsync(app, Resources, usageGate, plan, invited);
+            return await ContributorsDto.FromDomainAsync(app, Resources, userResolver, plan, invited);
         }
     }
 }
