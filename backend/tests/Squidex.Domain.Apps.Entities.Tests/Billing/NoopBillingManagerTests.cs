@@ -58,17 +58,17 @@ namespace Squidex.Domain.Apps.Entities.Billing
         [Fact]
         public async Task Should_not_return_referral_code_for_app()
         {
-            var actual = await sut.GetReferralCodeAsync(null!, (IAppEntity)null!);
+            var actual = await sut.GetReferralInfoAsync(null!, (IAppEntity)null!);
 
-            Assert.Equal((null, 00), actual);
+            Assert.Null(actual);
         }
 
         [Fact]
         public async Task Should_not_return_referral_code_for_team()
         {
-            var actual = await sut.GetReferralCodeAsync(null!, (ITeamEntity)null!);
+            var actual = await sut.GetReferralInfoAsync(null!, (ITeamEntity)null!);
 
-            Assert.Equal((null, 0), actual);
+            Assert.Null(actual);
         }
 
         [Fact]

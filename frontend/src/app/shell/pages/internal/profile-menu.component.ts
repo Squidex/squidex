@@ -72,7 +72,6 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
     public changeLanguage(code: string) {
         Cookies.replace('.AspNetCore.Culture', `c=${code}|uic=${code}`, 365);
 
-        // eslint-disable-next-line no-restricted-globals
         location.reload();
     }
 

@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
-import { PlanDto, PlanLockedReason, PlansService } from './../services/plans.service';
+import { PlanDto, PlanLockedReason, PlansService, ReferralDto } from './../services/plans.service';
 import { AppsState } from './apps.state';
 
 export interface PlanInfo {
@@ -33,11 +33,8 @@ interface Snapshot extends LoadingState {
     // The portal link if available.
     portalLink?: string;
 
-    // The referral code.
-    referralCode?: string;
-
-    // The amount earned with referrals.
-    referralEarned?: string;
+    // The referral info.
+    referral?: ReferralDto;
 
     // The reason why the plan cannot be changed.
     locked?: PlanLockedReason;
@@ -63,11 +60,8 @@ export class PlansState extends State<Snapshot> {
     public locked =
         this.project(x => x.locked);
 
-    public referralCode =
-        this.project(x => x.referralCode);
-
-    public referralEarned =
-        this.project(x => x.referralEarned);
+    public referral =
+        this.project(x => x.referral);
 
     public portalLink =
         this.project(x => x.portalLink);
@@ -117,8 +111,7 @@ export class PlansState extends State<Snapshot> {
                     planOwner: payload.planOwner,
                     plans,
                     portalLink: payload.portalLink,
-                    referralCode: payload.referralCode,
-                    referralEarned: payload.referralEarned,
+                    referral: payload.referral,
                     version,
                 }, 'Loading Success');
             }),

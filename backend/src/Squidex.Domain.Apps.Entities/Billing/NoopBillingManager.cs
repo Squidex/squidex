@@ -24,16 +24,16 @@ namespace Squidex.Domain.Apps.Entities.Billing
             return Task.FromResult<Uri?>(null);
         }
 
-        public Task<(string? Code, double AmountEarned)> GetReferralCodeAsync(string userId, IAppEntity app,
+        public Task<ReferralInfo?> GetReferralInfoAsync(string userId, IAppEntity app,
             CancellationToken ct = default)
         {
-            return Task.FromResult<(string? Code, double AmountEarned)>((null, 0));
+            return Task.FromResult<ReferralInfo?>(null);
         }
 
-        public Task<(string? Code, double AmountEarned)> GetReferralCodeAsync(string userId, ITeamEntity team,
+        public Task<ReferralInfo?> GetReferralInfoAsync(string userId, ITeamEntity team,
             CancellationToken ct = default)
         {
-            return Task.FromResult<(string? Code, double AmountEarned)>((null, 0));
+            return Task.FromResult<ReferralInfo?>(null);
         }
 
         public Task<Uri?> MustRedirectToPortalAsync(string userId, IAppEntity app, string? planId,

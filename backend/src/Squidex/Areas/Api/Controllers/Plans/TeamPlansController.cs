@@ -62,7 +62,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
                     await AsyncHelper.WhenAll(
                         appUsageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted),
                         billingManager.GetPortalLinkAsync(UserId, Team, HttpContext.RequestAborted),
-                        billingManager.GetReferralCodeAsync(UserId, Team, HttpContext.RequestAborted));
+                        billingManager.GetReferralInfoAsync(UserId, Team, HttpContext.RequestAborted));
 
                 PlansLockedReason GetLocked()
                 {
@@ -77,8 +77,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
                 return PlansDto.FromDomain(
                     plans.ToArray(), null,
                     plan.PlanId,
-                    referral.Code,
-                    referral.AmountEarned,
+                    referral,
                     link,
                     GetLocked());
             });

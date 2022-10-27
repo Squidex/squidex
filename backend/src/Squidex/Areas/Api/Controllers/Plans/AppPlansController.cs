@@ -62,7 +62,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
                     await AsyncHelper.WhenAll(
                         usageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted),
                         billingManager.GetPortalLinkAsync(UserId, App, HttpContext.RequestAborted),
-                        billingManager.GetReferralCodeAsync(UserId, App, HttpContext.RequestAborted));
+                        billingManager.GetReferralInfoAsync(UserId, App, HttpContext.RequestAborted));
 
                 var planOwner = App.Plan?.Owner.Identifier;
 
@@ -88,8 +88,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
                     plans.ToArray(),
                     planOwner,
                     plan.PlanId,
-                    referral.Code,
-                    referral.AmountEarned,
+                    referral,
                     link,
                     GetLocked());
             });

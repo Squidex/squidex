@@ -20,12 +20,13 @@
                     {{ 'plans.managedByTeam' | sqxTranslate }}
                 </div>
 
-                <div class="card card-body mb-4" *ngIf="plansState.referralCode | async">
+                <div class="card card-body mb-4" *ngIf="plansState.referral | async; let referral">
                     <h5 class="card-title">Squidex Referal Program</h5>
                     
                     <sqx-form-hint>
-                        <div [innerHTML]="'plans.referralHint' | sqxTranslate: { code: plansState.snapshot.referralCode } | sqxMarkdown | sqxSafeHtml"></div>
-                        <div [innerHTML]="'plans.referralEarned' | sqxTranslate: { amount: plansState.snapshot.referralEarned } | sqxMarkdown | sqxSafeHtml"></div>
+                        <div [innerHTML]="'plans.referralHint' | sqxTranslate: referral | sqxMarkdown | sqxSafeHtml"></div>
+                        <div [innerHTML]="referral.condition | sqxMarkdown | sqxSafeHtml"></div>
+                        <div [innerHTML]="'plans.referralEarned' | sqxTranslate: referral | sqxMarkdown | sqxSafeHtml"></div>
                     </sqx-form-hint>
                 </div>
 

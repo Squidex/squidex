@@ -18,10 +18,10 @@ namespace Squidex.Domain.Apps.Entities.Billing
         Task<Uri?> GetPortalLinkAsync(string userId, ITeamEntity team,
             CancellationToken ct = default);
 
-        Task<(string? Code, double AmountEarned)> GetReferralCodeAsync(string userId, IAppEntity app,
+        Task<ReferralInfo?> GetReferralInfoAsync(string userId, IAppEntity app,
             CancellationToken ct = default);
 
-        Task<(string? Code, double AmountEarned)> GetReferralCodeAsync(string userId, ITeamEntity team,
+        Task<ReferralInfo?> GetReferralInfoAsync(string userId, ITeamEntity team,
             CancellationToken ct = default);
 
         Task<Uri?> MustRedirectToPortalAsync(string userId, IAppEntity app, string? planId,
