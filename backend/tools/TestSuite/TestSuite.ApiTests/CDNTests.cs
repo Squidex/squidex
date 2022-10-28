@@ -12,6 +12,7 @@ using TestSuite.Model;
 
 namespace TestSuite.ApiTests
 {
+    [Trait("Category", "NotAutomated")]
     public class CDNTests : IClassFixture<ClientCloudFixture>
     {
         public ClientCloudFixture _ { get; }

@@ -181,6 +181,19 @@ namespace Squidex.Web
         }
 
         [Fact]
+        public void Should_generate_408_for_OperationCanceledException()
+        {
+            var context = Error(new OperationCanceledException());
+
+            sut.OnException(context);
+
+            Validate(408, context.Result, null);
+
+            A.CallTo(log)
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public void Should_generate_403_and_log_for_SecurityException()
         {
             var context = Error(new SecurityException());

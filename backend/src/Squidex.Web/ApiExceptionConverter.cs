@@ -20,17 +20,18 @@ namespace Squidex.Web
     {
         private static readonly Dictionary<int, string> Links = new Dictionary<int, string>
         {
-            [400] = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-            [401] = "https://tools.ietf.org/html/rfc7235#section-3.1",
-            [403] = "https://tools.ietf.org/html/rfc7231#section-6.5.3",
-            [404] = "https://tools.ietf.org/html/rfc7231#section-6.5.4",
-            [406] = "https://tools.ietf.org/html/rfc7231#section-6.5.6",
-            [409] = "https://tools.ietf.org/html/rfc7231#section-6.5.8",
-            [410] = "https://tools.ietf.org/html/rfc7231#section-6.5.9",
-            [412] = "https://tools.ietf.org/html/rfc7231#section-6.5.10",
-            [415] = "https://tools.ietf.org/html/rfc7231#section-6.5.13",
-            [422] = "https://tools.ietf.org/html/rfc4918#section-11.2",
-            [500] = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
+            [400] = "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.1",
+            [401] = "https://www.rfc-editor.org/rfc/rfc7235#section-3.1",
+            [403] = "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.3",
+            [404] = "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.4",
+            [406] = "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.6",
+            [408] = "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.7",
+            [409] = "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.8",
+            [410] = "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.9",
+            [412] = "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.10",
+            [415] = "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.13",
+            [422] = "https://www.rfc-editor.org/rfc/rfc4918#section-11.2",
+            [500] = "https://www.rfc-editor.org/rfc/rfc7231#section-6.6.1"
         };
 
         public static (ErrorDto Error, Exception? Unhandled) ToErrorDto(int statusCode, HttpContext? httpContext)
@@ -105,8 +106,11 @@ namespace Squidex.Web
                 case DomainException ex:
                     return (CreateError(400, ex.Message, ex.ErrorCode), GetInner(exception));
 
-                case SecurityException:
-                    return (CreateError(403), exception);
+                case OperationCanceledException:
+                    return (CreateError(408), null);
+
+                case SecurityException ex:
+                    return (CreateError(403), ex);
 
                 case DecoderFallbackException ex:
                     return (CreateError(400, ex.Message), null);
