@@ -133,24 +133,18 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .RequirePermission(PermissionIds.AppContentsReadOwn)
                 .Operation("Get")
                 .OperationSummary("Get a [schema] content item.")
+                .HasQuery("version", JsonObjectType.Number, FieldDescriptions.EntityVersion)
                 .HasId()
                 .Responds(200, "Content item returned.", builder.ContentSchema);
 
             builder.AddOperation(OpenApiOperationMethod.Get, "/{id}/{version}")
                 .RequirePermission(PermissionIds.AppContentsReadOwn)
+                .Deprecated()
                 .Operation("GetVersioned")
                 .OperationSummary("Get a [schema] content item by id and version.")
                 .HasPath("version", JsonObjectType.Number, FieldDescriptions.EntityVersion)
                 .HasId()
                 .Responds(200, "Content item returned.", builder.DataSchema);
-
-            builder.AddOperation(OpenApiOperationMethod.Get, "/{id}/v/{version}")
-                .RequirePermission(PermissionIds.AppContentsReadOwn)
-                .Operation("GetVersionedV2")
-                .OperationSummary("Get a [schema] content item by id and version.")
-                .HasPath("version", JsonObjectType.Number, FieldDescriptions.EntityVersion)
-                .HasId()
-                .Responds(200, "Content item returned.", builder.ContentSchema);
 
             builder.AddOperation(OpenApiOperationMethod.Get, "/{id}/validity")
                 .RequirePermission(PermissionIds.AppContentsReadOwn)

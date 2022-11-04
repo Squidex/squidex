@@ -10,6 +10,7 @@ using NJsonSchema;
 using NSwag;
 using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Domain.Apps.Core;
+using Squidex.Infrastructure;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -94,7 +95,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return this;
         }
 
-        public OperationBuilder HasQuery(string name, JsonObjectType type, string? description = null)
+        public OperationBuilder Deprecated()
+        {
+            operation.IsDeprecated = true;
+
+            return this;
+        }
+
+        public OperationBuilder HasQuery(string name, JsonObjectType type, string description)
         {
             var jsonSchema = new JsonSchema { Type = type };
 
@@ -108,14 +116,26 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return AddParameter(name, jsonSchema, OpenApiParameterKind.Path, description);
         }
 
-        public OperationBuilder HasBody(string name, JsonSchema jsonSchema, string? description = null)
+        public OperationBuilder HasBody(string name, JsonSchema schema, string? description = null)
         {
+            var jsonSchema = schema;
+
             return AddParameter(name, jsonSchema, OpenApiParameterKind.Body, description);
         }
 
         public OperationBuilder Responds(int statusCode, string description, JsonSchema? schema = null)
         {
-            var response = new OpenApiResponse { Description = description, Schema = schema };
+            var response = new OpenApiResponse
+            {
+                Description = description
+            };
+
+            if (schema != null && statusCode == 204)
+            {
+                ThrowHelper.ArgumentException("Invalid status code.", nameof(statusCode));
+            }
+
+            response.Schema = schema;
 
             operation.Responses.Add(statusCode.ToString(CultureInfo.InvariantCulture), response);
 

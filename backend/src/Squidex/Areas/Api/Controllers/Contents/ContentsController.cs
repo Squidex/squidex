@@ -100,6 +100,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="app">The name of the app.</param>
         /// <param name="schema">The name of the schema.</param>
         /// <param name="id">The ID of the content to fetch.</param>
+        /// <param name="version">The optional version.</param>
         /// <returns>
         /// 200 => Content returned.
         /// 404 => Content, schema or app not found.
@@ -112,9 +113,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContent(string app, string schema, DomainId id)
+        public async Task<IActionResult> GetContent(string app, string schema, DomainId id, long version = EtagVersion.Any)
         {
-            var content = await contentQuery.FindAsync(Context, schema, id, ct: HttpContext.RequestAborted);
+            var content = await contentQuery.FindAsync(Context, schema, id, version, HttpContext.RequestAborted);
 
             if (content == null)
             {
@@ -213,41 +214,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var response = Deferred.AsyncResponse(() =>
             {
                 return ContentsDto.FromContentsAsync(contents, Resources, null, contentWorkflow);
-            });
-
-            return Ok(response);
-        }
-
-        /// <summary>
-        /// Get a content by version V2.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="schema">The name of the schema.</param>
-        /// <param name="id">The ID of the content to fetch.</param>
-        /// <param name="version">The version fo the content to fetch.</param>
-        /// <returns>
-        /// 200 => Content version returned.
-        /// 404 => Content, schema or app not found.
-        /// </returns>
-        /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
-        /// </remarks>
-        [HttpGet]
-        [Route("content/{app}/{schema}/{id}/v/{version}/")]
-        [ApiPermissionOrAnonymous(PermissionIds.AppContentsReadOwn)]
-        [ApiCosts(1)]
-        public async Task<IActionResult> GetContentVersionV2(string app, string schema, DomainId id, int version)
-        {
-            var content = await contentQuery.FindAsync(Context, schema, id, version, HttpContext.RequestAborted);
-
-            if (content == null)
-            {
-                return NotFound();
-            }
-
-            var response = Deferred.Response(() =>
-            {
-                return ContentDto.FromDomain(content, Resources);
             });
 
             return Ok(response);

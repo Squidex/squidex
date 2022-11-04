@@ -27,7 +27,8 @@
     }
 
     &-buttons {
-        @include absolute(-.75rem, 4.25rem);
+        @include absolute(-.75rem, 4.25rem, null, 0);
+        overflow: hidden;
     }
 
     &-buttons-compare {
