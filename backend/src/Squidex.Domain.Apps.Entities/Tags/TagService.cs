@@ -73,6 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
                     return false;
                 }
 
+                // Avoid the normalization of the new name, if the old name does not exist.
                 newName = NormalizeName(newName);
 
                 if (string.Equals(name, newName, StringComparison.OrdinalIgnoreCase))
@@ -80,15 +81,26 @@ namespace Squidex.Domain.Apps.Entities.Tags
                     return false;
                 }
 
-                tag.Value.Name = newName;
+                if (TryGetTag(newName, out var newTag))
+                {
+                    // Merge both tags by adding up the count.
+                    newTag.Info.Count += tag.Info.Count;
+
+                    // Remove one of the tags.
+                    Tags.Remove(tag.Id);
+                }
+                else
+                {
+                    tag.Info.Name = newName;
+                }
 
                 foreach (var alias in Alias.Where(x => x.Value == name).ToList())
                 {
                     Alias.Remove(alias.Key);
 
-                    if (alias.Key != tag.Value.Name)
+                    if (alias.Key != name)
                     {
-                        Alias[alias.Key] = tag.Value.Name;
+                        Alias[alias.Key] = name;
                     }
                 }
 
@@ -127,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
                 {
                     if (TryGetTag(name, out var tag))
                     {
-                        tagIds[name] = tag.Key;
+                        tagIds[name] = tag.Id;
                     }
                     else
                     {
@@ -149,9 +161,9 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
                 foreach (var id in ids)
                 {
-                    if (Tags.TryGetValue(id, out var tagInfo))
+                    if (Tags.TryGetValue(id, out var tag))
                     {
-                        tagNames[id] = tagInfo.Name;
+                        tagNames[id] = tag.Name;
                     }
                 }
 
@@ -160,19 +172,28 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             public TagsSet GetTags(long version)
             {
-                var clone = Tags.Values.ToDictionary(x => x.Name, x => x.Count);
+                var clone = new Dictionary<string, int>();
+
+                foreach (var tag in Tags.Values)
+                {
+                    // We have changed the normalization logic, therefore some names are not up to date.
+                    var name = NormalizeName(tag.Name);
+
+                    // An old bug could have produced duplicate names.
+                    clone[name] = clone.GetValueOrDefault(name) + tag.Count;
+                }
 
                 return new TagsSet(clone, version);
             }
 
             private static string NormalizeName(string name)
             {
-                return name.Trim().ToLowerInvariant();
+                return name.TrimNonLetterOrDigit().ToLowerInvariant();
             }
 
-            private bool TryGetTag(string name, out KeyValuePair<string, Tag> result)
+            private bool TryGetTag(string name, out (string Id, Tag Info)result)
             {
-                result = default;
+                result = default!;
 
                 if (Alias.TryGetValue(name, out var newName))
                 {
@@ -183,7 +204,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
                 if (found.Value != null)
                 {
-                    result = new KeyValuePair<string, Tag>(found.Key, found.Value);
+                    result = (found.Key, found.Value);
                     return true;
                 }
 

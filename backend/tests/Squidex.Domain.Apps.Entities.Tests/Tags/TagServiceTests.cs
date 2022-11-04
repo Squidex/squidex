@@ -126,6 +126,78 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
+        public async Task Should_merge_tags_on_rename()
+        {
+            var ids = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1", "tag2"), ct);
+
+            await sut.UpdateAsync(appId, group, new Dictionary<string, int>
+            {
+                [ids["tag1"]] = 1,
+                [ids["tag2"]] = 2
+            }, ct);
+
+            await sut.RenameTagAsync(appId, group, "tag2", "tag1", ct);
+
+            var allTags = await sut.GetTagsAsync(appId, group, ct);
+
+            Assert.Equal(new Dictionary<string, int>
+            {
+                ["tag1"] = 3
+            }, allTags);
+        }
+
+        [Fact]
+        public async Task Should_merge_tags_when_stored_with_duplicate_names()
+        {
+            var tags = new TagsExport
+            {
+                Tags = new Dictionary<string, Tag>
+                {
+                    ["id1"] = new Tag { Name = "tag1", Count = 10 },
+                    ["id2"] = new Tag { Name = "tag1", Count = 20 }
+                },
+                Alias = null!
+            };
+
+            await sut.RebuildTagsAsync(appId, group, tags, ct);
+
+            var allTags = await sut.GetTagsAsync(appId, group, ct);
+
+            Assert.Equal(new Dictionary<string, int>
+            {
+                ["tag1"] = 30
+            }, allTags);
+        }
+
+        [Fact]
+        public async Task Should_fix_names_when_stored_with_wrong_names()
+        {
+            var tags = new TagsExport
+            {
+                Tags = new Dictionary<string, Tag>
+                {
+                    ["id1"] = new Tag { Name = "tag1 ", Count = 10 },
+                    ["id2"] = new Tag { Name = "tag2,", Count = 20 },
+                    ["id3"] = new Tag { Name = " tag3,", Count = 30 },
+                    ["id4"] = new Tag { Name = ",tag4,", Count = 40 }
+                },
+                Alias = null!
+            };
+
+            await sut.RebuildTagsAsync(appId, group, tags, ct);
+
+            var allTags = await sut.GetTagsAsync(appId, group, ct);
+
+            Assert.Equal(new Dictionary<string, int>
+            {
+                ["tag1"] = 10,
+                ["tag2"] = 20,
+                ["tag3"] = 30,
+                ["tag4"] = 40
+            }, allTags);
+        }
+
+        [Fact]
         public async Task Should_rebuild_tags()
         {
             var tags = new TagsExport

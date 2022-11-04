@@ -95,5 +95,22 @@ namespace Squidex.Infrastructure
 
             Assert.Equal("0001FF1A2B3C", actual);
         }
+
+        [Theory]
+        [InlineData("", "")]
+        [InlineData(" ", "")]
+        [InlineData("-", "")]
+        [InlineData("--", "")]
+        [InlineData("text1 ", "text1")]
+        [InlineData("texts-", "texts")]
+        [InlineData(" 1text", "1text")]
+        [InlineData("-atext", "atext")]
+        [InlineData("a-text", "a-text")]
+        public void Should_trim_non_digits_or_letters(string input, string output)
+        {
+            var result = input.TrimNonLetterOrDigit();
+
+            Assert.Equal(output, result);
+        }
     }
 }

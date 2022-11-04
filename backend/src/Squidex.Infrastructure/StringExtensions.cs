@@ -82,5 +82,37 @@ namespace Squidex.Infrastructure
         {
             return value.ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture);
         }
+
+        public static string TrimNonLetterOrDigit(this string value)
+        {
+            var span = value.AsSpan();
+
+            while (span.Length > 0)
+            {
+                if (char.IsLetterOrDigit(span[0]))
+                {
+                    break;
+                }
+
+                span = span[1..];
+            }
+
+            while (span.Length > 0)
+            {
+                if (char.IsLetterOrDigit(span[^1]))
+                {
+                    break;
+                }
+
+                span = span[0..^1];
+            }
+
+            if (span.Length == value.Length)
+            {
+                return value;
+            }
+
+            return new string(span);
+        }
     }
 }
