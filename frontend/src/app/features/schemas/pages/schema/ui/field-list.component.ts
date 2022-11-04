@@ -43,7 +43,7 @@ export class FieldListComponent implements OnChanges {
             allFields = [...allFields, ...META_FIELD_NAMES];
         }
 
-        this.fieldsAdded = allFields.filter(x => this.fieldNames.includes(x.name));
+        this.fieldsAdded = this.fieldNames.map(x => allFields.find(z => z.name === x)).defined() as any;
         this.fieldsNotAdded = allFields.filter(x => !this.fieldNames.includes(x.name));
     }
 
