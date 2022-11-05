@@ -15,7 +15,23 @@ namespace Squidex.Infrastructure.MongoDb
         {
             var name = mapper(default!);
 
-            return BsonClassMap.LookupClassMap(typeof(T)).GetMemberMap(name).ElementName;
+            var classMap = BsonClassMap.LookupClassMap(typeof(T));
+
+            // The class map does not contain all inherited members, therefore we have to loop over the hierarchy.
+            while (classMap != null)
+            {
+                var member = classMap.GetMemberMap(name);
+
+                if (member != null)
+                {
+                    return member.ElementName;
+                }
+
+                classMap = classMap.BaseClassMap;
+            }
+
+            ThrowHelper.InvalidOperationException($"Cannot find member '{name}' in type '{typeof(T)}.");
+            return null!;
         }
     }
 }

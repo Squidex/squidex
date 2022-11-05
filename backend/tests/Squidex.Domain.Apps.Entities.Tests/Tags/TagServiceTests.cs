@@ -12,8 +12,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
-#pragma warning disable IDE0059 // Unnecessary assignment of a value
-
 namespace Squidex.Domain.Apps.Entities.Tags
 {
     public class TagServiceTests
@@ -81,48 +79,73 @@ namespace Squidex.Domain.Apps.Entities.Tags
         [Fact]
         public async Task Should_rename_tag()
         {
-            var ids_0 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1"), ct);
+            var ids_0 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag_0"), ct);
 
-            await sut.RenameTagAsync(appId, group, "tag1", "tag1_new", ct);
+            await sut.RenameTagAsync(appId, group, "tag_0", "tag_1", ct);
 
-            // Forward the old name to the new name.
-            var ids_1 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1_new"), ct);
+            // Both names should map to the same tag.
+            var ids_1 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag_0"), ct);
+            var ids_2 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag_1"), ct);
+
+            Assert.Equal(ids_0.Values, ids_1.Values);
+            Assert.Equal(ids_0.Values, ids_2.Values);
 
             var allTags = await sut.GetTagsAsync(appId, group, ct);
 
-            Assert.Equal(ids_0.Values, ids_1.Values);
+            Assert.Equal(new Dictionary<string, int>
+            {
+                ["tag_1"] = 0
+            }, allTags);
         }
 
         [Fact]
         public async Task Should_rename_tag_twice()
         {
-            var ids_0 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1"), ct);
-
-            await sut.RenameTagAsync(appId, group, "tag1", "tag2", ct);
-            await sut.RenameTagAsync(appId, group, "tag2", "tag3", ct);
+            var ids_0 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag_0"), ct);
 
             // Forward the old name to the new name.
-            var ids_1 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag2"), ct);
-            var ids_2 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag3"), ct);
+            await sut.RenameTagAsync(appId, group, "tag_0", "tag_1", ct);
+            await sut.RenameTagAsync(appId, group, "tag_1", "tag_2", ct);
 
-            // Assert.Equal(ids_0.Values, ids_1.Values);
+            // All names should map to the same tag.
+            var ids_1 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag_0"), ct);
+            var ids_2 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag_1"), ct);
+            var ids_3 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag_2"), ct);
+
+            Assert.Equal(ids_0.Values, ids_1.Values);
             Assert.Equal(ids_0.Values, ids_2.Values);
+            Assert.Equal(ids_0.Values, ids_3.Values);
+
+            var allTags = await sut.GetTagsAsync(appId, group, ct);
+
+            Assert.Equal(new Dictionary<string, int>
+            {
+                ["tag_2"] = 0
+            }, allTags);
         }
 
         [Fact]
         public async Task Should_rename_tag_back()
         {
-            var ids_0 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1"), ct);
-
-            await sut.RenameTagAsync(appId, group, "tag1", "tag2", ct);
-
-            // Rename back.
-            await sut.RenameTagAsync(appId, group, "tag2", "tag1", ct);
+            var ids_0 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag_0"), ct);
 
             // Forward the old name to the new name.
-            var ids_1 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag1"), ct);
+            await sut.RenameTagAsync(appId, group, "tag_0", "tag_1", ct);
+            await sut.RenameTagAsync(appId, group, "tag_1", "tag_0", ct);
+
+            // All names should map to the same tag.
+            var ids_1 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag_0"), ct);
+            var ids_2 = await sut.GetTagIdsAsync(appId, group, HashSet.Of("tag_1"), ct);
 
             Assert.Equal(ids_0.Values, ids_1.Values);
+            Assert.Equal(ids_0.Values, ids_2.Values);
+
+            var allTags = await sut.GetTagsAsync(appId, group, ct);
+
+            Assert.Equal(new Dictionary<string, int>
+            {
+                ["tag_0"] = 0
+            }, allTags);
         }
 
         [Fact]

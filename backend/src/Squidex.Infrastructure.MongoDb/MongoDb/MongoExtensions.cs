@@ -123,6 +123,8 @@ namespace Squidex.Infrastructure.MongoDb
             CancellationToken ct = default)
             where T : IVersionedEntity<DomainId>
         {
+            var field2 = Field.Of<T>(x => nameof(x.Version));
+
             var (key, snapshot, newVersion, oldVersion) = job;
             try
             {
@@ -161,6 +163,8 @@ namespace Squidex.Infrastructure.MongoDb
             CancellationToken ct = default)
             where T : IVersionedEntity<DomainId>
         {
+            var field2 = Field.Of<T>(x => nameof(x.Version));
+
             var (key, snapshot, newVersion, oldVersion) = job;
             try
             {

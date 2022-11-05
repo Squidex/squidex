@@ -22,15 +22,11 @@ namespace Squidex.Domain.Apps.Entities.Tags
         {
             public ValueTask OnReadAsync()
             {
-                if (Tags == null)
-                {
-                    Tags = new Dictionary<string, Tag>();
-                }
+                // Tags should never be null, but it might happen due of bugs.
+                Tags ??= new Dictionary<string, Tag>();
 
-                if (Alias == null)
-                {
-                    Alias = new Dictionary<string, string>();
-                }
+                // Alias can be null, because it was not part of the initial release.
+                Alias ??= new Dictionary<string, string>();
 
                 return default;
             }
@@ -54,6 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
             {
                 var isChanged = false;
 
+                // Clear only resets the counts to zero, because we have no other source for tag names.
                 foreach (var (_, tag) in Tags)
                 {
                     isChanged = tag.Count > 0;
@@ -68,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
             {
                 name = NormalizeName(name);
 
-                if (!TryGetTag(name, out var tag))
+                if (!TryGetTag(name, out var tag, false))
                 {
                     return false;
                 }
@@ -81,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
                     return false;
                 }
 
-                if (TryGetTag(newName, out var newTag))
+                if (TryGetTag(newName, out var newTag, false))
                 {
                     // Merge both tags by adding up the count.
                     newTag.Info.Count += tag.Info.Count;
@@ -96,13 +93,18 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
                 foreach (var alias in Alias.Where(x => x.Value == name).ToList())
                 {
+                    // Remove the mapping to the old name.
                     Alias.Remove(alias.Key);
 
-                    if (alias.Key != name)
+                    if (alias.Key != newName)
                     {
-                        Alias[alias.Key] = name;
+                        // Create a new mapping to the new name.
+                        Alias[alias.Key] = newName;
                     }
                 }
+
+                // Create a new mapping to the new name.
+                Alias[name] = newName;
 
                 return true;
             }
@@ -139,15 +141,18 @@ namespace Squidex.Domain.Apps.Entities.Tags
                 {
                     if (TryGetTag(name, out var tag))
                     {
+                        // If the tag exists, return the ID.
                         tagIds[name] = tag.Id;
                     }
                     else
                     {
+                        // If the tag does not exist create a new one with a random ID.
                         var id = Guid.NewGuid().ToString();
 
                         Tags[id] = new Tag { Name = name };
                         tagIds[name] = id;
 
+                        // Track that something has changed and the state needs to be written.
                         isChanged = true;
                     }
                 }
@@ -191,11 +196,12 @@ namespace Squidex.Domain.Apps.Entities.Tags
                 return name.TrimNonLetterOrDigit().ToLowerInvariant();
             }
 
-            private bool TryGetTag(string name, out (string Id, Tag Info)result)
+            private bool TryGetTag(string name, out (string Id, Tag Info)result, bool useAlias = true)
             {
                 result = default!;
 
-                if (Alias.TryGetValue(name, out var newName))
+                // If the tag has been renamed we create a mapping from the old name to the new name.
+                if (useAlias && Alias.TryGetValue(name, out var newName))
                 {
                     name = newName;
                 }
