@@ -237,6 +237,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [Route("content/{app}/{schema}/{id}/{version}/")]
         [ApiPermissionOrAnonymous(PermissionIds.AppContentsReadOwn)]
         [ApiCosts(1)]
+        [Obsolete("Use ID endpoint with version query.")]
         public async Task<IActionResult> GetContentVersion(string app, string schema, DomainId id, int version)
         {
             var content = await contentQuery.FindAsync(Context, schema, id, version, HttpContext.RequestAborted);
