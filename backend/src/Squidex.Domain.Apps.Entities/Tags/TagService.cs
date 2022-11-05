@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             public TagsSet GetTags(long version)
             {
-                var clone = new Dictionary<string, int>();
+                var tags = new Dictionary<string, int>();
 
                 foreach (var tag in Tags.Values)
                 {
@@ -185,10 +185,10 @@ namespace Squidex.Domain.Apps.Entities.Tags
                     var name = NormalizeName(tag.Name);
 
                     // An old bug could have produced duplicate names.
-                    clone[name] = clone.GetValueOrDefault(name) + tag.Count;
+                    tags[name] = tags.GetValueOrDefault(name) + tag.Count;
                 }
 
-                return new TagsSet(clone, version);
+                return new TagsSet(tags, version);
             }
 
             private static string NormalizeName(string name)
