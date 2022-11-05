@@ -33,11 +33,13 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             public bool Rebuild(TagsExport export)
             {
+                // Tags should never be null, but it might happen due of bugs.
                 if (export.Tags != null)
                 {
                     Tags = export.Tags;
                 }
 
+                // Alias can be null, because it was not part of the initial release.
                 if (export.Alias != null)
                 {
                     Alias = export.Alias;
@@ -96,6 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
                     // Remove the mapping to the old name.
                     Alias.Remove(alias.Key);
 
+                    // If the tag has been named back to the original name, we do not need the mapping anymore.
                     if (alias.Key != newName)
                     {
                         // Create a new mapping to the new name.
@@ -177,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             public TagsSet GetTags(long version)
             {
-                var tags = new Dictionary<string, int>();
+                var result = new Dictionary<string, int>();
 
                 foreach (var tag in Tags.Values)
                 {
@@ -185,10 +188,10 @@ namespace Squidex.Domain.Apps.Entities.Tags
                     var name = NormalizeName(tag.Name);
 
                     // An old bug could have produced duplicate names.
-                    tags[name] = tags.GetValueOrDefault(name) + tag.Count;
+                    result[name] = result.GetValueOrDefault(name) + tag.Count;
                 }
 
-                return new TagsSet(tags, version);
+                return new TagsSet(result, version);
             }
 
             private static string NormalizeName(string name)
