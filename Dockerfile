@@ -68,7 +68,7 @@ RUN cp -a build /build/
 #
 # Stage 3, Build runtime
 #
-FROM mcr.microsoft.com/dotnet/aspnet:6.0.0-bullseye-slim
+FROM mcr.microsoft.com/dotnet/aspnet:6.0.10-bullseye-slim
 
 # Curl for debugging and libc-dev for protobuf
 RUN apt-get update \
