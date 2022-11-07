@@ -3,20 +3,22 @@
         <div class="table-items-row table-items-row-summary" [class.field-invalid]="isInvalid | async" *ngIf="!(formModel.hiddenChanges | async)">
             <div class="languages-container">
                 <div class="languages-buttons">
-                    <button *ngIf="!formModel.field.isDisabled && isTranslatable" type="button" class="btn btn-text-secondary btn-sm me-1" title="i18n:contents.autotranslate" (click)="translate()" tabindex="-1">
-                        <i class="icon-translate"></i>
-                    </button>
+                    <div class="languages-inner">
+                        <button *ngIf="!formModel.field.isDisabled && isTranslatable" type="button" class="btn btn-text-secondary btn-sm me-1" title="i18n:contents.autotranslate" (click)="translate()" tabindex="-1">
+                            <i class="icon-translate"></i>
+                        </button>
+        
+                        <sqx-field-languages 
+                            [formModel]="formModel"
+                            (languageChange)="languageChange.emit($event)"
+                            [language]="language"
+                            [languages]="languages"
+                            [showAllControls]="showAllControls"
+                            (showAllControlsChange)="changeShowAllControls($event)">
+                        </sqx-field-languages>
     
-                    <sqx-field-languages 
-                        [formModel]="formModel"
-                        (languageChange)="languageChange.emit($event)"
-                        [language]="language"
-                        [languages]="languages"
-                        [showAllControls]="showAllControls"
-                        (showAllControlsChange)="changeShowAllControls($event)">
-                    </sqx-field-languages>
-
-                    <sqx-field-copy-button [formModel]="formModel" [languages]="languages"></sqx-field-copy-button>
+                        <sqx-field-copy-button [formModel]="formModel" [languages]="languages"></sqx-field-copy-button>
+                    </div>
                 </div>
             </div>
             
@@ -61,14 +63,16 @@
         <div class="table-items-row table-items-row-summary" *ngIf="!(formModelCompare!.hiddenChanges | async)">
             <div class="languages-container">
                 <div class="languages-buttons-compare">
-                    <sqx-field-languages
-                        [formModel]="formModelCompare!"
-                        (languageChange)="languageChange.emit($event)"
-                        [language]="language"
-                        [languages]="languages"
-                        [showAllControls]="showAllControls"
-                        (showAllControlsChange)="changeShowAllControls($event)">
-                    </sqx-field-languages>
+                    <div class="languages-inner">
+                        <sqx-field-languages
+                            [formModel]="formModelCompare!"
+                            (languageChange)="languageChange.emit($event)"
+                            [language]="language"
+                            [languages]="languages"
+                            [showAllControls]="showAllControls"
+                            (showAllControlsChange)="changeShowAllControls($event)">
+                        </sqx-field-languages>
+                    </div>
                 </div>
             </div>
 
