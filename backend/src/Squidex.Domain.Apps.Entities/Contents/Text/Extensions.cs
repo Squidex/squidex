@@ -8,6 +8,7 @@
 using System.Text;
 using NetTopologySuite.Geometries;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.ObjectPool;
@@ -116,11 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     languages[language] = sb;
                 }
 
-                if (sb.Length > 0)
-                {
-                    sb.Append(' ');
-                }
-
+                sb.AppendIfNotEmpty(' ');
                 sb.Append(text);
             }
         }

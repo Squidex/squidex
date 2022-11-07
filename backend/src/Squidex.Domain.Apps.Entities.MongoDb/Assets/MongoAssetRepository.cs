@@ -94,10 +94,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                         var filter = BuildFilter(appId, q.Ids.ToHashSet());
 
                         var assetEntities =
-                            await Collection.Find(filter).SortByDescending(x => x.LastModified).ThenBy(x => x.Id)
+                            await Collection.Find(filter)
+                                .SortByDescending(x => x.LastModified).ThenBy(x => x.Id)
                                 .QueryLimit(q.Query)
                                 .QuerySkip(q.Query)
-                                .ToListAsync(ct);
+                                .ToListRandomAsync(Collection, q.Query.Random, ct);
                         long assetTotal = assetEntities.Count;
 
                         if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
@@ -126,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                                 .QueryLimit(query)
                                 .QuerySkip(query)
                                 .QuerySort(query)
-                                .ToListAsync(ct);
+                                .ToListRandomAsync(Collection, query.Random, ct);
                         long assetTotal = assetEntities.Count;
 
                         if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)

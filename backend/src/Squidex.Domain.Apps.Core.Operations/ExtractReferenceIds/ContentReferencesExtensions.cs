@@ -123,11 +123,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
             void AddValue(object value)
             {
-                if (sb.Length > 0)
-                {
-                    sb.Append(separator);
-                }
-
+                sb.AppendIfNotEmpty(separator);
                 sb.Append(value);
             }
 

@@ -98,11 +98,7 @@ namespace Squidex.Infrastructure
 
             foreach (var item in source)
             {
-                if (bucket == null)
-                {
-                    bucket = new TSource[size];
-                }
-
+                bucket ??= new TSource[size];
                 bucket[bucketIndex++] = item;
 
                 if (bucketIndex != size)
@@ -179,9 +175,7 @@ namespace Squidex.Infrastructure
 
         public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> enumerable)
         {
-            var random = new Random();
-
-            return enumerable.OrderBy(x => random.Next()).ToList();
+            return enumerable.OrderBy(x => Random.Shared.Next()).ToList();
         }
 
         public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T>? source)
@@ -387,6 +381,45 @@ namespace Squidex.Infrastructure
                 action(item, index);
 
                 index++;
+            }
+        }
+
+        public static IEnumerable<T> TakeRandom<T>(this IEnumerable<T> source, long take)
+        {
+            var sourceList = new LinkedList<T>(source);
+
+            static LinkedListNode<T> TakeNode(LinkedList<T> source, int index)
+            {
+                var actual = source.First!;
+
+                for (var i = 0; i < index; i++)
+                {
+                    var next = actual?.Next;
+
+                    if (next == null)
+                    {
+                        return actual!;
+                    }
+
+                    actual = next;
+                }
+
+                return actual;
+            }
+
+            for (var i = 0; i < take; i++)
+            {
+                if (sourceList.Count == 0)
+                {
+                    break;
+                }
+
+                var takenIndex = Random.Shared.Next(sourceList.Count);
+                var takenElement = TakeNode(sourceList, takenIndex);
+
+                sourceList.Remove(takenElement);
+
+                yield return takenElement.Value;
             }
         }
     }

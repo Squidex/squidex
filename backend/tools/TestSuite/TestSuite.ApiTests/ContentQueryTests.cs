@@ -46,14 +46,15 @@ namespace TestSuite.ApiTests
         {
             var q = new ContentQuery { OrderBy = "data/number/iv asc" };
 
-            var itemsByQ = await _.Contents.GetAsync(q);
-            var itemsIds = itemsByQ.Items.Take(3).Select(x => x.Id).ToHashSet();
-            var itemsById = await _.Contents.GetAsync(new ContentQuery { Ids = itemsIds });
+            var items_0 = await _.Contents.GetAsync(q);
+            var itemsIds = items_0.Items.Take(3).Select(x => x.Id).ToHashSet();
 
-            Assert.Equal(3, itemsById.Items.Count);
-            Assert.Equal(3, itemsById.Total);
+            var items_1 = await _.Contents.GetAsync(new ContentQuery { Ids = itemsIds });
 
-            foreach (var item in itemsById.Items)
+            Assert.Equal(3, items_1.Items.Count);
+            Assert.Equal(3, items_1.Total);
+
+            foreach (var item in items_1.Items)
             {
                 Assert.Equal(_.AppName, item.AppName);
                 Assert.Equal(_.SchemaName, item.SchemaName);
@@ -65,14 +66,15 @@ namespace TestSuite.ApiTests
         {
             var q = new ContentQuery { OrderBy = "data/number/iv asc" };
 
-            var itemsByQ = await _.Contents.GetAsync(q);
-            var itemsIds = itemsByQ.Items.Take(3).Select(x => x.Id).ToHashSet();
-            var itemsById = await _.SharedContents.GetAsync(itemsIds);
+            var items_0 = await _.Contents.GetAsync(q);
+            var itemsIds = items_0.Items.Take(3).Select(x => x.Id).ToHashSet();
 
-            Assert.Equal(3, itemsById.Items.Count);
-            Assert.Equal(3, itemsById.Total);
+            var items_1 = await _.SharedContents.GetAsync(itemsIds);
 
-            foreach (var item in itemsById.Items)
+            Assert.Equal(3, items_1.Items.Count);
+            Assert.Equal(3, items_1.Total);
+
+            foreach (var item in items_1.Items)
             {
                 Assert.Equal(_.AppName, item.AppName);
                 Assert.Equal(_.SchemaName, item.SchemaName);
@@ -80,7 +82,43 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_all_with_odata()
+        public async Task Should_query_by_ids_filter()
+        {
+            var q0 = new ContentQuery { Filter = "data/number/iv gt 3 and data/number/iv lt 7", OrderBy = "data/number/iv asc" };
+
+            var items_0 = await _.Contents.GetAsync(q0);
+
+            var q1 = new ContentQuery
+            {
+                JsonQuery = new
+                {
+                    sort = new[]
+                    {
+                        new
+                        {
+                            path = "data.number.iv"
+                        }
+                    },
+                    filter = new
+                    {
+                        or = items_0.Items.Select(x => new
+                        {
+                            path = "id",
+                            op = "eq",
+                            value = x.Id
+                        }).ToArray()
+                    }
+                }
+            };
+
+            var items_1 = await _.Contents.GetAsync(q1);
+
+            AssertItems(items_0, 3, new[] { 4, 5, 6 });
+            AssertItems(items_1, 3, new[] { 4, 5, 6 });
+        }
+
+        [Fact]
+        public async Task Should_query_all_with_odata()
         {
             var q = new ContentQuery { OrderBy = "data/number/iv asc" };
 
@@ -90,7 +128,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_all_with_json()
+        public async Task Should_query_all_with_json()
         {
             var q = new ContentQuery
             {
@@ -112,7 +150,33 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_items_by_skip_with_odata()
+        public async Task Should_query_random_with_odata()
+        {
+            var q = new ContentQuery { Random = 5 };
+
+            var items = await _.Contents.GetAsync(q);
+
+            Assert.Equal(5, items.Items.Count);
+        }
+
+        [Fact]
+        public async Task Should_query_random_with_json()
+        {
+            var q = new ContentQuery
+            {
+                JsonQuery = new
+                {
+                    random = 5
+                }
+            };
+
+            var items = await _.Contents.GetAsync(q);
+
+            Assert.Equal(5, items.Items.Count);
+        }
+
+        [Fact]
+        public async Task Should_query_by_skip_with_odata()
         {
             var q = new ContentQuery { OrderBy = "data/number/iv asc", Skip = 5 };
 
@@ -122,7 +186,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_items_by_skip_with_json()
+        public async Task Should_query_by_skip_with_json()
         {
             var q = new ContentQuery
             {
@@ -145,7 +209,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_items_by_skip_and_top_with_odata()
+        public async Task Should_query_by_skip_and_top_with_odata()
         {
             var q = new ContentQuery { Skip = 2, Top = 5, OrderBy = "data/number/iv asc" };
 
@@ -155,7 +219,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_items_by_skip_and_top_with_json()
+        public async Task Should_query_by_skip_and_top_with_json()
         {
             var q = new ContentQuery
             {
@@ -179,7 +243,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_items_by_filter_with_odata()
+        public async Task Should_query_by_filter_with_odata()
         {
             var q = new ContentQuery { Filter = "data/number/iv gt 3 and data/number/iv lt 7", OrderBy = "data/number/iv asc" };
 
@@ -189,7 +253,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_items_by_filter_with_json()
+        public async Task Should_query_by_filter_with_json()
         {
             var q = new ContentQuery
             {
@@ -229,7 +293,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_items_by_json_filter_with_json()
+        public async Task Should_query_by_json_filter_with_json()
         {
             var q = new ContentQuery
             {
@@ -269,7 +333,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_items_by_full_text_with_odata()
+        public async Task Should_query_by_full_text_with_odata()
         {
             var q = new ContentQuery { Search = "2" };
 
@@ -279,7 +343,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_items_by_full_text_with_json()
+        public async Task Should_query_by_full_text_with_json()
         {
             var q = new ContentQuery
             {
@@ -295,7 +359,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_items_by_near_location_with_odata()
+        public async Task Should_query_by_near_location_with_odata()
         {
             var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(3 3)') lt 1000" };
 
@@ -305,7 +369,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_items_by_near_location_with_json()
+        public async Task Should_query_by_near_location_with_json()
         {
             var q = new ContentQuery
             {
@@ -331,7 +395,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_items_by_near_geoson_location_with_odata()
+        public async Task Should_query_by_near_geoson_location_with_odata()
         {
             var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(4 4)') lt 1000" };
 
@@ -390,7 +454,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_items_by_near_geoson_location_with_json()
+        public async Task Should_query_by_near_geoson_location_with_json()
         {
             var q = new ContentQuery
             {
@@ -445,42 +509,6 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_items_by_ids()
-        {
-            var q0 = new ContentQuery { Filter = "data/number/iv gt 3 and data/number/iv lt 7", OrderBy = "data/number/iv asc" };
-
-            var items_0 = await _.Contents.GetAsync(q0);
-
-            var q1 = new ContentQuery
-            {
-                JsonQuery = new
-                {
-                    sort = new[]
-                    {
-                        new
-                        {
-                            path = "data.number.iv"
-                        }
-                    },
-                    filter = new
-                    {
-                        or = items_0.Items.Select(x => new
-                        {
-                            path = "id",
-                            op = "eq",
-                            value = x.Id
-                        }).ToArray()
-                    }
-                }
-            };
-
-            var items_1 = await _.Contents.GetAsync(q1);
-
-            AssertItems(items_0, 3, new[] { 4, 5, 6 });
-            AssertItems(items_1, 3, new[] { 4, 5, 6 });
-        }
-
-        [Fact]
         public async Task Should_create_and_query_with_variable_graphql()
         {
             var query = new
@@ -516,7 +544,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_batch_query_items_with_graphql()
+        public async Task Should_query_with_graphql_batching()
         {
             var query1 = new
             {
@@ -566,7 +594,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_query_items_with_graphql()
+        public async Task Should_query_with_graphql()
         {
             var query = new
             {
@@ -594,7 +622,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_query_items_with_graphql_get()
+        public async Task Should_query_with_graphql_get()
         {
             var query = new
             {
@@ -622,7 +650,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_query_items_with_graphql_with_dynamic()
+        public async Task Should_query_with_graphql_with_dynamic()
         {
             var query = new
             {
@@ -646,7 +674,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_query_items_complex_search()
+        public async Task Should_query_with_grapqhl_complex_search()
         {
             var query = new
             {
@@ -671,7 +699,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_correct_content_type_for_graphql()
+        public async Task Should_query_correct_content_type_for_graphql()
         {
             var query = new
             {
@@ -694,13 +722,10 @@ namespace TestSuite.ApiTests
 
             using (var client = _.ClientManager.CreateHttpClient())
             {
+                // Create the request manually to check the content type.
                 var response = await client.PostAsync(_.ClientManager.GenerateUrl($"api/content/{_.AppName}/graphql/batch"), query.ToContent());
 
                 Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);
-
-                var result = await response.Content.ReadAsJsonAsync<GraphQlResponse<QueryResult>>();
-
-                Assert.Equal(result.Data.Items.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
             }
         }
 

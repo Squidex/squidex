@@ -17,8 +17,6 @@ namespace Squidex.Infrastructure.Tasks
         [Fact]
         public async Task Should_propagate_in_order()
         {
-            var random = new Random();
-
             var lists = new List<int>[Partitions];
 
             for (var i = 0; i < Partitions; i++)
@@ -28,7 +26,7 @@ namespace Squidex.Infrastructure.Tasks
 
             var block = new PartitionedActionBlock<(int P, int V)>(x =>
             {
-                random.Next(10);
+                Random.Shared.Next(10);
 
                 lists[x.P].Add(x.V);
 

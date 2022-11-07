@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text;
+
 namespace Squidex.Infrastructure.Queries
 {
     public class Query<TValue>
@@ -16,6 +18,8 @@ namespace Squidex.Infrastructure.Queries
         public long Skip { get; set; }
 
         public long Take { get; set; } = long.MaxValue;
+
+        public long Random { get; set; }
 
         public long Top
         {
@@ -43,34 +47,45 @@ namespace Squidex.Infrastructure.Queries
 
         public override string ToString()
         {
-            var parts = new List<string>();
+            var sb = new StringBuilder();
 
             if (Filter != null)
             {
-                parts.Add($"Filter: {Filter}");
+                sb.AppendIfNotEmpty("; ");
+                sb.Append($"Filter: {Filter}");
             }
 
             if (FullText != null)
             {
-                parts.Add($"FullText: '{FullText.Replace("'", "\'", StringComparison.Ordinal)}'");
+                sb.AppendIfNotEmpty("; ");
+                sb.Append($"FullText: '{FullText.Replace("'", "\'", StringComparison.Ordinal)}'");
             }
 
             if (Skip > 0)
             {
-                parts.Add($"Skip: {Skip}");
+                sb.AppendIfNotEmpty("; ");
+                sb.Append($"Skip: {Skip}");
             }
 
             if (Take < long.MaxValue)
             {
-                parts.Add($"Take: {Take}");
+                sb.AppendIfNotEmpty("; ");
+                sb.Append($"Take: {Take}");
+            }
+
+            if (Random > 0)
+            {
+                sb.AppendIfNotEmpty("; ");
+                sb.Append($"Random: {Random}");
             }
 
             if (Sort != null && Sort.Count > 0)
             {
-                parts.Add($"Sort: {string.Join(", ", Sort)}");
+                sb.AppendIfNotEmpty("; ");
+                sb.Append($"Sort: {string.Join(", ", Sort)}");
             }
 
-            return string.Join("; ", parts);
+            return sb.ToString();
         }
     }
 }

@@ -576,27 +576,59 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_parse_query()
+        public void Should_parse_filter()
         {
-            var json = new { skip = 10, take = 20, FullText = "Hello", Filter = new { path = "string", op = "eq", value = "Hello" } };
+            var json = new { Filter = new { path = "string", op = "eq", value = "Hello" } };
 
-            AssertQuery(json, "Filter: string == 'Hello'; FullText: 'Hello'; Skip: 10; Take: 20");
+            AssertQuery(json, "Filter: string == 'Hello'");
         }
 
         [Fact]
-        public void Should_parse_query_with_top()
+        public void Should_parse_fulltext()
         {
-            var json = new { skip = 10, top = 20, FullText = "Hello", Filter = new { path = "string", op = "eq", value = "Hello" } };
+            var json = new { FullText = "Hello" };
 
-            AssertQuery(json, "Filter: string == 'Hello'; FullText: 'Hello'; Skip: 10; Take: 20");
+            AssertQuery(json, "FullText: 'Hello'");
         }
 
         [Fact]
-        public void Should_parse_query_with_sorting()
+        public void Should_parse_sort()
         {
             var json = new { sort = new[] { new { path = "string", order = "ascending" } } };
 
             AssertQuery(json, "Sort: string Ascending");
+        }
+
+        [Fact]
+        public void Should_parse_top()
+        {
+            var json = new { top = 20 };
+
+            AssertQuery(json, "Take: 20");
+        }
+
+        [Fact]
+        public void Should_parse_take()
+        {
+            var json = new { take = 20 };
+
+            AssertQuery(json, "Take: 20");
+        }
+
+        [Fact]
+        public void Should_parse_skip()
+        {
+            var json = new { skip = 10 };
+
+            AssertQuery(json, "Skip: 10");
+        }
+
+        [Fact]
+        public void Should_parse_random()
+        {
+            var json = new { random = 4 };
+
+            AssertQuery(json, "Random: 4");
         }
 
         [Fact]

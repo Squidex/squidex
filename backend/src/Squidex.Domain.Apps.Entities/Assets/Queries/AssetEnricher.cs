@@ -99,11 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             {
                 if (!string.IsNullOrWhiteSpace(text))
                 {
-                    if (sb.Length > 0)
-                    {
-                        sb.Append(", ");
-                    }
-
+                    sb.AppendIfNotEmpty(", ");
                     sb.Append(text);
                 }
             }

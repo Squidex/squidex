@@ -24,7 +24,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 {
     public sealed class AssetsQueryFixture : IAsyncLifetime
     {
-        private readonly Random random = new Random();
         private readonly int numValues = 250;
         private readonly IMongoClient mongoClient;
         private readonly IMongoDatabase mongoDatabase;
@@ -103,8 +102,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
                         var asset = new AssetDomainObject.State
                         {
-                            Tags = new HashSet<string> { tag },
                             Id = DomainId.NewGuid(),
+                            AppId = appId,
                             Created = now,
                             CreatedBy = user,
                             FileHash = fileName,
@@ -117,6 +116,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
                             Metadata = new AssetMetadata
                             {
                                 ["value"] = JsonValue.Create(tag)
+                            },
+                            Tags = new HashSet<string>
+                            {
+                                tag
                             },
                             Slug = fileName
                         };
@@ -139,12 +142,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         public DomainId RandomAppId()
         {
-            return AppIds[random.Next(0, AppIds.Length)].Id;
+            return AppIds[Random.Shared.Next(AppIds.Length)].Id;
         }
 
         public string RandomValue()
         {
-            return random.Next(0, numValues).ToString(CultureInfo.InvariantCulture);
+            return Random.Shared.Next(numValues).ToString(CultureInfo.InvariantCulture);
         }
     }
 }

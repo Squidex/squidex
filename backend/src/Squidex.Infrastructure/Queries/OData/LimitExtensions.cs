@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using Microsoft.OData.UriParser;
 
 namespace Squidex.Infrastructure.Queries.OData
@@ -28,6 +29,22 @@ namespace Squidex.Infrastructure.Queries.OData
             if (skip != null)
             {
                 result.Skip = skip.Value;
+            }
+        }
+
+        public static void ParseRandom(this ODataUriParser query, ClrQuery result)
+        {
+            var customQueries = query.CustomQueryOptions;
+
+            var randomQuery = customQueries.FirstOrDefault(x =>
+                string.Equals(x.Key, "random", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(x.Key, "randomCount", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(x.Key, "$random", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(x.Key, "$randomCount", StringComparison.OrdinalIgnoreCase));
+
+            if (int.TryParse(randomQuery.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var random))
+            {
+                result.Random = random;
             }
         }
     }

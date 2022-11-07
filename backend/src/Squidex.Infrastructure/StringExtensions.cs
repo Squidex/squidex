@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Globalization;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -113,6 +114,26 @@ namespace Squidex.Infrastructure
             }
 
             return new string(span);
+        }
+
+        public static StringBuilder AppendIfNotEmpty(this StringBuilder sb, char separator)
+        {
+            if (sb.Length > 0)
+            {
+                sb.Append(separator);
+            }
+
+            return sb;
+        }
+
+        public static StringBuilder AppendIfNotEmpty(this StringBuilder sb, string separator)
+        {
+            if (sb.Length > 0)
+            {
+                sb.Append(separator);
+            }
+
+            return sb;
         }
     }
 }

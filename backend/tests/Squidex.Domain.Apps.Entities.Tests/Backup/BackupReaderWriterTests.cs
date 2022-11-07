@@ -163,7 +163,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
         [InlineData(BackupVersion.V2)]
         public async Task Should_write_and_read_events_to_backup(BackupVersion version)
         {
-            var randomGenerator = new Random();
             var randomDomainIds = new List<DomainId>();
 
             for (var i = 0; i < 100; i++)
@@ -173,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             DomainId RandomDomainId()
             {
-                return randomDomainIds[randomGenerator.Next(randomDomainIds.Count)];
+                return randomDomainIds[Random.Shared.Next(randomDomainIds.Count)];
             }
 
             var sourceEvents = new List<(string Stream, Envelope<MyEvent> Event)>();
