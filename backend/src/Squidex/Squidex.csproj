@@ -54,7 +54,6 @@
 	<PackageReference Include="Microsoft.IdentityModel.Logging" Version="6.14.1" />
 	<PackageReference Include="Microsoft.IdentityModel.Protocols" Version="6.14.1" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.11.0" />
-    <PackageReference Include="Namotion.Reflection" Version="2.0.10" />
     <PackageReference Include="MongoDB.Driver" Version="2.17.1" />
     <PackageReference Include="MongoDB.Driver.Core.Extensions.OpenTelemetry" Version="1.0.0" />
     <PackageReference Include="Namotion.Reflection" Version="2.1.1" ExcludeAssets="all" />

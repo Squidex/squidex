@@ -125,11 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                     if (!string.IsNullOrWhiteSpace(formatted))
                     {
-                        if (sb.Length > 0)
-                        {
-                            sb.Append(", ");
-                        }
-
+                        sb.AppendIfNotEmpty(", ");
                         sb.Append(formatted);
                     }
                 }

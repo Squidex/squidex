@@ -69,6 +69,7 @@ namespace Squidex.Infrastructure.Queries.OData
                 parser.ParseSkip(query);
                 parser.ParseFilter(query);
                 parser.ParseSort(query);
+                parser.ParseRandom(query);
             }
 
             return query;

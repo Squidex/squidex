@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 
@@ -44,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), q.Ids.ToHashSet());
 
-            var contentEntities = await FindContentsAsync(q.Query, filter);
+            var contentEntities = await FindContentsAsync(q.Query, filter, ct);
             var contentTotal = (long)contentEntities.Count;
 
             if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
@@ -62,13 +63,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return ResultList.Create(contentTotal, contentEntities);
         }
 
-        private async Task<List<MongoContentEntity>> FindContentsAsync(ClrQuery query, FilterDefinition<MongoContentEntity> filter)
+        private async Task<List<MongoContentEntity>> FindContentsAsync(ClrQuery query, FilterDefinition<MongoContentEntity> filter,
+            CancellationToken ct)
         {
             var result =
                 Collection.Find(filter)
                     .QueryLimit(query)
                     .QuerySkip(query)
-                    .ToListAsync();
+                    .ToListRandomAsync(Collection, query.Random, ct);
 
             return await result;
         }

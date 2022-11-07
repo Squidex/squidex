@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure;
 using System.Text;
 
 namespace Squidex.Pipeline.Squid
@@ -97,11 +98,7 @@ namespace Squidex.Pipeline.Squid
                     line.Clear();
                 }
 
-                if (line.Length > 0)
-                {
-                    line.Append(' ');
-                }
-
+                line.AppendIfNotEmpty(' ');
                 line.Append(word);
             }
 

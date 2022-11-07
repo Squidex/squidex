@@ -48,11 +48,7 @@ namespace Squidex.Web
 
             foreach (var (key, value) in this)
             {
-                if (sb.Length > 0)
-                {
-                    sb.Append(", ");
-                }
-
+                sb.AppendIfNotEmpty(", ");
                 sb.Append(key);
                 sb.Append(": ");
                 sb.Append(value);

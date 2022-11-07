@@ -217,5 +217,41 @@ namespace Squidex.Infrastructure.MongoDb
 
             return result;
         }
+
+        public static async Task<List<T>> ToListRandomAsync<T>(this IFindFluent<T, T> find, IMongoCollection<T> collection, long take,
+            CancellationToken ct = default)
+        {
+            if (take <= 0)
+            {
+                return await find.ToListAsync(ct);
+            }
+
+            var idDocuments = await find.Project<BsonDocument>(Builders<T>.Projection.Include("_id")).ToListAsync(ct);
+            var idValues = idDocuments.Select(x => x["_id"]);
+
+            var randomIds = idValues.TakeRandom(take);
+
+            var documents = await collection.Find(Builders<T>.Filter.In("_id", randomIds)).ToListAsync(ct);
+
+            return documents.Shuffle().ToList();
+        }
+
+        public static async Task<List<T>> ToListRandomAsync<T>(this IAggregateFluent<T> find, IMongoCollection<T> collection, long take,
+            CancellationToken ct = default)
+        {
+            if (take <= 0)
+            {
+                return await find.ToListAsync(ct);
+            }
+
+            var idDocuments = await find.Project<BsonDocument>(Builders<T>.Projection.Include("_id")).ToListAsync(ct);
+            var idValues = idDocuments.Select(x => x["_id"]);
+
+            var randomIds = idValues.TakeRandom(take);
+
+            var documents = await collection.Find(Builders<T>.Filter.In("_id", randomIds)).ToListAsync(ct);
+
+            return documents.Shuffle().ToList();
+        }
     }
 }

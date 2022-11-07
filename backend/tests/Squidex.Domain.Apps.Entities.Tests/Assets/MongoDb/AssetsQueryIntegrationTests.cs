@@ -31,6 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
             var asset = await _.AssetRepository.FindAssetBySlugAsync(_.RandomAppId(), random);
 
+            // The Slug is random here, as it does not really matter.
             Assert.NotNull(asset);
         }
 
@@ -41,6 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
             var assets = await _.AssetRepository.FindAssetByHashAsync(_.RandomAppId(), random, random, 1024);
 
+            // The Hash is random here, as it does not really matter.
             Assert.NotNull(assets);
         }
 
@@ -51,18 +53,35 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
             var assets = await _.AssetRepository.QueryIdsAsync(_.RandomAppId(), ids);
 
+            // The IDs are random here, as it does not really matter.
             Assert.NotNull(assets);
         }
 
         [Theory]
         [MemberData(nameof(ParentIds))]
-        public async Task Should_query_assets_by_default(DomainId? parentId)
+        public async Task Should_query_assets(DomainId? parentId)
         {
             var query = new ClrQuery();
 
             var assets = await QueryAsync(parentId, query);
 
-            Assert.NotNull(assets);
+            // Default page size is 1000.
+            Assert.Equal(1000, assets.Count);
+        }
+
+        [Theory]
+        [MemberData(nameof(ParentIds))]
+        public async Task Should_query_assets_with_random_count(DomainId? parentId)
+        {
+            var query = new ClrQuery
+            {
+                Random = 40
+            };
+
+            var assets = await QueryAsync(parentId, query);
+
+            // Default page size is 1000, so we expect less elements.
+            Assert.Equal(40, assets.Count);
         }
 
         [Theory]
@@ -78,12 +97,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
             var assets = await QueryAsync(parentId, query);
 
+            // The tag is random here, as it does not really matter.
             Assert.NotNull(assets);
         }
 
         [Theory]
         [MemberData(nameof(ParentIds))]
-        public async Task Should_query_assets_by_tags_and_name(DomainId? parentId)
+        public async Task Should_query_assets_by_tags_and_fileName(DomainId? parentId)
         {
             var random = _.RandomValue();
 
@@ -94,7 +114,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
             var assets = await QueryAsync(parentId, query);
 
-            Assert.NotNull(assets);
+            // The filter is a random value from the expected result set.
+            Assert.NotEmpty(assets);
         }
 
         [Theory]
@@ -110,7 +131,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
             var assets = await QueryAsync(parentId, query);
 
-            Assert.NotNull(assets);
+            // The filter is a random value from the expected result set.
+            Assert.NotEmpty(assets);
         }
 
         [Theory]
@@ -126,7 +148,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
             var assets = await QueryAsync(parentId, query);
 
-            Assert.NotNull(assets);
+            // The filter is a random value from the expected result set.
+            Assert.NotEmpty(assets);
         }
 
         public static IEnumerable<object?[]> ParentIds()

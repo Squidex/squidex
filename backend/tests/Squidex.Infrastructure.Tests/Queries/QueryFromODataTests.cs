@@ -442,16 +442,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_parse_filter_with_full_text_numbers()
-        {
-            var i = _Q("$search=\"33k\"");
-            var o = _C("FullText: '33k'");
-
-            Assert.Equal(o, i);
-        }
-
-        [Fact]
-        public void Should_parse_filter_with_full_text()
+        public void Should_full_text()
         {
             var i = _Q("$search=Duck");
             var o = _C("FullText: 'Duck'");
@@ -460,7 +451,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_parse_filter_with_full_text_and_multiple_terms()
+        public void Should_text_and_multiple_terms()
         {
             var i = _Q("$search=Dagobert or Donald");
             var o = _C("FullText: 'Dagobert or Donald'");
@@ -469,7 +460,16 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_make_orderby_with_single_field()
+        public void Should_full_text_numbers()
+        {
+            var i = _Q("$search=\"33k\"");
+            var o = _C("FullText: '33k'");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_parse_orderby()
         {
             var i = _Q("$orderby=age desc");
             var o = _C("Sort: age Descending");
@@ -478,7 +478,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_make_orderby_with_multiple_field()
+        public void Should_parse_orderby_with_multiple_field()
         {
             var i = _Q("$orderby=age, incomeMio desc");
             var o = _C("Sort: age Ascending, incomeMio Descending");
@@ -487,10 +487,28 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_parse_filter_and_take()
+        public void Should_parse_top()
         {
-            var i = _Q("$top=3&$skip=4");
-            var o = _C("Skip: 4; Take: 3");
+            var i = _Q("$top=3");
+            var o = _C("Take: 3");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_parse_skip()
+        {
+            var i = _Q("$skip=4");
+            var o = _C("Skip: 4");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_parse_random()
+        {
+            var i = _Q("$random=4");
+            var o = _C("Random: 4");
 
             Assert.Equal(o, i);
         }

@@ -9,6 +9,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 
@@ -55,8 +56,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 query.Sort[1].Order == SortOrder.Ascending;
         }
 
-        public static async Task<List<MongoContentEntity>> QueryContentsAsync(this IMongoCollection<MongoContentEntity> collection,
-            FilterDefinition<MongoContentEntity> filter, ClrQuery query,
+        public static async Task<List<MongoContentEntity>> QueryContentsAsync(this IMongoCollection<MongoContentEntity> collection, FilterDefinition<MongoContentEntity> filter, ClrQuery query,
             CancellationToken ct)
         {
             if (query.Skip > 0 && !query.IsSatisfiedByIndex())
@@ -68,6 +68,26 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 foreach (var field in query.GetAllFields())
                 {
                     projection = projection.Include(field);
+                }
+
+                if (query.Random > 0)
+                {
+                    var ids =
+                        await collection.Aggregate()
+                            .Match(filter)
+                            .Project<IdOnly>(projection)
+                            .QuerySort(query)
+                            .QuerySkip(query)
+                            .QueryLimit(query)
+                            .ToListAsync(ct);
+
+                    var randomIds = ids.Select(x => x.Id).TakeRandom(query.Random);
+
+                    var documents =
+                        await collection.Find(Builders<MongoContentEntity>.Filter.In(x => x.Id, randomIds))
+                            .ToListAsync(ct);
+
+                    return documents.Shuffle().ToList();
                 }
 
                 var joined =
@@ -88,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     .QuerySort(query)
                     .QueryLimit(query)
                     .QuerySkip(query)
-                    .ToListAsync(ct);
+                    .ToListRandomAsync(collection, query.Random, ct);
 
             return await result;
         }

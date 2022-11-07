@@ -49,7 +49,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
     public abstract class ContentsQueryFixtureBase : IAsyncLifetime
     {
-        private readonly Random random = new Random();
         private readonly int numValues = 10000;
         private readonly IMongoClient mongoClient;
         private readonly IMongoDatabase mongoDatabase;
@@ -196,15 +195,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var appProvider = A.Fake<IAppProvider>();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false, A<CancellationToken>._))
-                .ReturnsLazily(x => Task.FromResult<ISchemaEntity?>(CreateSchema(x.GetArgument<DomainId>(0)!, x.GetArgument<DomainId>(1)!)));
+            A.CallTo(() => appProvider.GetAppWithSchemaAsync(A<DomainId>._, A<DomainId>._, false, A<CancellationToken>._))
+                .ReturnsLazily(x =>
+                {
+                    var appId = x.GetArgument<DomainId>(0)!;
+
+                    return Task.FromResult<(IAppEntity?, ISchemaEntity?)>((
+                        CreateApp(appId),
+                        CreateSchema(appId, x.GetArgument<DomainId>(1)!)));
+                });
 
             return appProvider;
         }
 
         public DomainId RandomAppId()
         {
-            return AppIds[random.Next(0, AppIds.Length)].Id;
+            return AppIds[Random.Shared.Next(AppIds.Length)].Id;
         }
 
         public IAppEntity RandomApp()
@@ -214,7 +220,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         public DomainId RandomSchemaId()
         {
-            return SchemaIds[random.Next(0, SchemaIds.Length)].Id;
+            return SchemaIds[Random.Shared.Next(SchemaIds.Length)].Id;
         }
 
         public ISchemaEntity RandomSchema()
@@ -224,7 +230,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         public string RandomValue()
         {
-            return random.Next(0, numValues).ToString(CultureInfo.InvariantCulture);
+            return Random.Shared.Next(numValues).ToString(CultureInfo.InvariantCulture);
         }
 
         private static IAppEntity CreateApp(DomainId appId)
