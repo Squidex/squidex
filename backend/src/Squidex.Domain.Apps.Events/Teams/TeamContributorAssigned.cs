@@ -7,17 +7,16 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Teams
+namespace Squidex.Domain.Apps.Events.Teams;
+
+[EventType(nameof(TeamContributorAssigned))]
+public sealed class TeamContributorAssigned : TeamEvent
 {
-    [EventType(nameof(TeamContributorAssigned))]
-    public sealed class TeamContributorAssigned : TeamEvent
-    {
-        public string ContributorId { get; set; }
+    public string ContributorId { get; set; }
 
-        public string Role { get; set; }
+    public string Role { get; set; }
 
-        public bool IsCreated { get; set; }
+    public bool IsCreated { get; set; }
 
-        public bool IsAdded { get; set; }
-    }
+    public bool IsAdded { get; set; }
 }

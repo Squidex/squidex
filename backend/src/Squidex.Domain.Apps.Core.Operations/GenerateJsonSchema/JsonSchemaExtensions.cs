@@ -12,164 +12,163 @@ using Squidex.Text;
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
+namespace Squidex.Domain.Apps.Core.GenerateJsonSchema;
+
+public delegate (JsonSchema Reference, JsonSchema? Actual) JsonTypeFactory(string name);
+
+public static class JsonSchemaExtensions
 {
-    public delegate (JsonSchema Reference, JsonSchema? Actual) JsonTypeFactory(string name);
-
-    public static class JsonSchemaExtensions
+    private static readonly JsonTypeFactory DefaultFactory = _ =>
     {
-        private static readonly JsonTypeFactory DefaultFactory = _ =>
+        var schema = JsonTypeBuilder.Object();
+
+        return (schema, schema);
+    };
+
+    public static JsonSchema BuildJsonSchemaFlat(this Schema schema, PartitionResolver partitionResolver,
+        ResolvedComponents components,
+        JsonTypeFactory? factory = null,
+        bool withHidden = false,
+        bool withComponents = false)
+    {
+        Guard.NotNull(partitionResolver);
+        Guard.NotNull(components);
+
+        factory ??= DefaultFactory;
+
+        var jsonSchema = JsonTypeBuilder.Object();
+
+        foreach (var field in schema.Fields.ForApi(withHidden))
         {
-            var schema = JsonTypeBuilder.Object();
+            var property =
+                JsonTypeVisitor.BuildProperty(
+                    field, components, schema,
+                    factory,
+                    withHidden,
+                    withComponents);
 
-            return (schema, schema);
-        };
-
-        public static JsonSchema BuildJsonSchemaFlat(this Schema schema, PartitionResolver partitionResolver,
-            ResolvedComponents components,
-            JsonTypeFactory? factory = null,
-            bool withHidden = false,
-            bool withComponents = false)
-        {
-            Guard.NotNull(partitionResolver);
-            Guard.NotNull(components);
-
-            factory ??= DefaultFactory;
-
-            var jsonSchema = JsonTypeBuilder.Object();
-
-            foreach (var field in schema.Fields.ForApi(withHidden))
+            // Property is null for UI fields.
+            if (property != null)
             {
-                var property =
-                    JsonTypeVisitor.BuildProperty(
-                        field, components, schema,
-                        factory,
-                        withHidden,
-                        withComponents);
+                property.SetRequired(false);
+                property.SetDescription(field);
 
-                // Property is null for UI fields.
-                if (property != null)
-                {
-                    property.SetRequired(false);
-                    property.SetDescription(field);
-
-                    jsonSchema.Properties.Add(field.Name, property);
-                }
+                jsonSchema.Properties.Add(field.Name, property);
             }
-
-            return jsonSchema;
         }
 
-        public static JsonSchema BuildJsonSchemaDynamic(this Schema schema, PartitionResolver partitionResolver,
-            ResolvedComponents components,
-            JsonTypeFactory? factory = null,
-            bool withHidden = false,
-            bool withComponents = false)
+        return jsonSchema;
+    }
+
+    public static JsonSchema BuildJsonSchemaDynamic(this Schema schema, PartitionResolver partitionResolver,
+        ResolvedComponents components,
+        JsonTypeFactory? factory = null,
+        bool withHidden = false,
+        bool withComponents = false)
+    {
+        Guard.NotNull(partitionResolver);
+        Guard.NotNull(components);
+
+        factory ??= DefaultFactory;
+
+        var jsonSchema = JsonTypeBuilder.Object();
+
+        foreach (var field in schema.Fields.ForApi(withHidden))
         {
-            Guard.NotNull(partitionResolver);
-            Guard.NotNull(components);
+            var property =
+                JsonTypeVisitor.BuildProperty(
+                    field, components, schema,
+                    factory,
+                    withHidden,
+                    withComponents);
 
-            factory ??= DefaultFactory;
-
-            var jsonSchema = JsonTypeBuilder.Object();
-
-            foreach (var field in schema.Fields.ForApi(withHidden))
+            // Property is null for UI fields.
+            if (property != null)
             {
-                var property =
-                    JsonTypeVisitor.BuildProperty(
-                        field, components, schema,
-                        factory,
-                        withHidden,
-                        withComponents);
+                var propertyObj = JsonTypeBuilder.ObjectProperty(property);
 
-                // Property is null for UI fields.
-                if (property != null)
-                {
-                    var propertyObj = JsonTypeBuilder.ObjectProperty(property);
+                // Property is not required because not all languages might be required.
+                propertyObj.SetRequired(false);
+                propertyObj.SetDescription(field);
 
-                    // Property is not required because not all languages might be required.
-                    propertyObj.SetRequired(false);
-                    propertyObj.SetDescription(field);
-
-                    jsonSchema.Properties.Add(field.Name, propertyObj);
-                }
+                jsonSchema.Properties.Add(field.Name, propertyObj);
             }
-
-            return jsonSchema;
         }
 
-        public static JsonSchema BuildJsonSchema(this Schema schema, PartitionResolver partitionResolver,
-            ResolvedComponents components,
-            JsonTypeFactory? factory = null,
-            bool withHidden = false,
-            bool withComponents = false)
+        return jsonSchema;
+    }
+
+    public static JsonSchema BuildJsonSchema(this Schema schema, PartitionResolver partitionResolver,
+        ResolvedComponents components,
+        JsonTypeFactory? factory = null,
+        bool withHidden = false,
+        bool withComponents = false)
+    {
+        Guard.NotNull(partitionResolver);
+        Guard.NotNull(components);
+
+        factory ??= DefaultFactory;
+
+        var jsonSchema = JsonTypeBuilder.Object();
+
+        foreach (var field in schema.Fields.ForApi(withHidden))
         {
-            Guard.NotNull(partitionResolver);
-            Guard.NotNull(components);
+            var typeName = $"{schema.TypeName()}{field.Name.ToPascalCase()}PropertyDto";
 
-            factory ??= DefaultFactory;
+            // Create a reference to give it a nice name in code generation.
+            var (reference, actual) = factory(typeName);
 
-            var jsonSchema = JsonTypeBuilder.Object();
-
-            foreach (var field in schema.Fields.ForApi(withHidden))
+            if (actual != null)
             {
-                var typeName = $"{schema.TypeName()}{field.Name.ToPascalCase()}PropertyDto";
+                var partitioning = partitionResolver(field.Partitioning);
 
-                // Create a reference to give it a nice name in code generation.
-                var (reference, actual) = factory(typeName);
-
-                if (actual != null)
+                foreach (var partitionKey in partitioning.AllKeys)
                 {
-                    var partitioning = partitionResolver(field.Partitioning);
+                    var property =
+                        JsonTypeVisitor.BuildProperty(
+                            field, components, schema,
+                            factory,
+                            withHidden,
+                            withComponents);
 
-                    foreach (var partitionKey in partitioning.AllKeys)
+                    // Property is null for UI fields.
+                    if (property != null)
                     {
-                        var property =
-                            JsonTypeVisitor.BuildProperty(
-                                field, components, schema,
-                                factory,
-                                withHidden,
-                                withComponents);
+                        var isOptional = partitioning.IsOptional(partitionKey);
 
-                        // Property is null for UI fields.
-                        if (property != null)
-                        {
-                            var isOptional = partitioning.IsOptional(partitionKey);
+                        var name = partitioning.GetName(partitionKey);
 
-                            var name = partitioning.GetName(partitionKey);
+                        // Required if property is required and language/partitioning is not optional.
+                        property.SetRequired(field.RawProperties.IsRequired && !isOptional);
+                        property.SetDescription(name);
 
-                            // Required if property is required and language/partitioning is not optional.
-                            property.SetRequired(field.RawProperties.IsRequired && !isOptional);
-                            property.SetDescription(name);
-
-                            actual.Properties.Add(partitionKey, property);
-                        }
+                        actual.Properties.Add(partitionKey, property);
                     }
                 }
-
-                var propertyReference =
-                    JsonTypeBuilder.ReferenceProperty(reference)
-                        .SetDescription(field)
-                        .SetRequired(field.RawProperties.IsRequired);
-
-                jsonSchema.Properties.Add(field.Name, propertyReference);
             }
 
-            return jsonSchema;
+            var propertyReference =
+                JsonTypeBuilder.ReferenceProperty(reference)
+                    .SetDescription(field)
+                    .SetRequired(field.RawProperties.IsRequired);
+
+            jsonSchema.Properties.Add(field.Name, propertyReference);
         }
 
-        public static JsonSchemaProperty SetDescription(this JsonSchemaProperty jsonProperty, IField field)
+        return jsonSchema;
+    }
+
+    public static JsonSchemaProperty SetDescription(this JsonSchemaProperty jsonProperty, IField field)
+    {
+        if (!string.IsNullOrWhiteSpace(field.RawProperties.Hints))
         {
-            if (!string.IsNullOrWhiteSpace(field.RawProperties.Hints))
-            {
-                jsonProperty.Description = $"{field.Name} ({field.RawProperties.Hints})";
-            }
-            else
-            {
-                jsonProperty.Description = field.Name;
-            }
-
-            return jsonProperty;
+            jsonProperty.Description = $"{field.Name} ({field.RawProperties.Hints})";
         }
+        else
+        {
+            jsonProperty.Description = field.Name;
+        }
+
+        return jsonProperty;
     }
 }

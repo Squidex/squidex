@@ -10,35 +10,34 @@ using Jint;
 using Jint.Native;
 using Squidex.Domain.Apps.Core.Properties;
 
-namespace Squidex.Domain.Apps.Core.Scripting.Extensions
+namespace Squidex.Domain.Apps.Core.Scripting.Extensions;
+
+public sealed class DateTimeJintExtension : IJintExtension, IScriptDescriptor
 {
-    public sealed class DateTimeJintExtension : IJintExtension, IScriptDescriptor
+    private readonly Func<DateTime, string, JsValue> formatDate = (date, format) =>
     {
-        private readonly Func<DateTime, string, JsValue> formatDate = (date, format) =>
+        try
         {
-            try
-            {
-                return date.ToString(format, CultureInfo.InvariantCulture);
-            }
-            catch
-            {
-                return JsValue.Undefined;
-            }
-        };
-
-        public void Extend(Engine engine)
-        {
-            engine.SetValue("formatTime", formatDate);
-            engine.SetValue("formatDate", formatDate);
+            return date.ToString(format, CultureInfo.InvariantCulture);
         }
-
-        public void Describe(AddDescription describe, ScriptScope scope)
+        catch
         {
-            describe(JsonType.Function, "formatDate(data, pattern)",
-                Resources.ScriptingFormatDate);
-
-            describe(JsonType.Function, "formatTime(text)",
-                Resources.ScriptingFormatTime);
+            return JsValue.Undefined;
         }
+    };
+
+    public void Extend(Engine engine)
+    {
+        engine.SetValue("formatTime", formatDate);
+        engine.SetValue("formatDate", formatDate);
+    }
+
+    public void Describe(AddDescription describe, ScriptScope scope)
+    {
+        describe(JsonType.Function, "formatDate(data, pattern)",
+            Resources.ScriptingFormatDate);
+
+        describe(JsonType.Function, "formatTime(text)",
+            Resources.ScriptingFormatTime);
     }
 }

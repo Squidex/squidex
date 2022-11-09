@@ -16,164 +16,163 @@ using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Plans
+namespace Squidex.Domain.Apps.Entities.Apps.Plans;
+
+public sealed class RestrictAppsCommandMiddlewareTests
 {
-    public sealed class RestrictAppsCommandMiddlewareTests
+    private readonly CancellationTokenSource cts = new CancellationTokenSource();
+    private readonly CancellationToken ct;
+    private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
+    private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
+    private readonly RestrictAppsOptions options = new RestrictAppsOptions();
+    private readonly RestrictAppsCommandMiddleware sut;
+
+    public RestrictAppsCommandMiddlewareTests()
     {
-        private readonly CancellationTokenSource cts = new CancellationTokenSource();
-        private readonly CancellationToken ct;
-        private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-        private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-        private readonly RestrictAppsOptions options = new RestrictAppsOptions();
-        private readonly RestrictAppsCommandMiddleware sut;
+        ct = cts.Token;
 
-        public RestrictAppsCommandMiddlewareTests()
+        sut = new RestrictAppsCommandMiddleware(Options.Create(options), userResolver);
+    }
+
+    [Fact]
+    public async Task Should_throw_exception_if_number_of_apps_reached()
+    {
+        var userId = Guid.NewGuid().ToString();
+
+        var command = new CreateApp
         {
-            ct = cts.Token;
+            Actor = RefToken.User(userId)
+        };
 
-            sut = new RestrictAppsCommandMiddleware(Options.Create(options), userResolver);
-        }
+        var commandContext = new CommandContext(command, commandBus);
 
-        [Fact]
-        public async Task Should_throw_exception_if_number_of_apps_reached()
+        options.MaximumNumberOfApps = 3;
+
+        var user = A.Fake<IUser>();
+
+        A.CallTo(() => user.Id)
+            .Returns(userId);
+
+        A.CallTo(() => user.Claims)
+            .Returns(Enumerable.Repeat(new Claim(SquidexClaimTypes.TotalApps, "5"), 1).ToList());
+
+        A.CallTo(() => userResolver.FindByIdAsync(userId, ct))
+            .Returns(user);
+
+        var isNextCalled = false;
+
+        await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(commandContext, (c, ct) =>
         {
-            var userId = Guid.NewGuid().ToString();
+            isNextCalled = true;
 
-            var command = new CreateApp
-            {
-                Actor = RefToken.User(userId)
-            };
+            return Task.CompletedTask;
+        }, ct));
 
-            var commandContext = new CommandContext(command, commandBus);
+        Assert.False(isNextCalled);
+    }
 
-            options.MaximumNumberOfApps = 3;
+    [Fact]
+    public async Task Should_increment_total_apps_if_maximum_not_reached_and_completed()
+    {
+        var userId = Guid.NewGuid().ToString();
 
-            var user = A.Fake<IUser>();
-
-            A.CallTo(() => user.Id)
-                .Returns(userId);
-
-            A.CallTo(() => user.Claims)
-                .Returns(Enumerable.Repeat(new Claim(SquidexClaimTypes.TotalApps, "5"), 1).ToList());
-
-            A.CallTo(() => userResolver.FindByIdAsync(userId, ct))
-                .Returns(user);
-
-            var isNextCalled = false;
-
-            await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(commandContext, (c, ct) =>
-            {
-                isNextCalled = true;
-
-                return Task.CompletedTask;
-            }, ct));
-
-            Assert.False(isNextCalled);
-        }
-
-        [Fact]
-        public async Task Should_increment_total_apps_if_maximum_not_reached_and_completed()
+        var command = new CreateApp
         {
-            var userId = Guid.NewGuid().ToString();
+            Actor = RefToken.User(userId)
+        };
 
-            var command = new CreateApp
-            {
-                Actor = RefToken.User(userId)
-            };
+        var commandContext = new CommandContext(command, commandBus);
 
-            var commandContext = new CommandContext(command, commandBus);
+        options.MaximumNumberOfApps = 10;
 
-            options.MaximumNumberOfApps = 10;
+        var user = A.Fake<IUser>();
 
-            var user = A.Fake<IUser>();
+        A.CallTo(() => user.Id)
+            .Returns(userId);
 
-            A.CallTo(() => user.Id)
-                .Returns(userId);
+        A.CallTo(() => user.Claims)
+            .Returns(Enumerable.Repeat(new Claim(SquidexClaimTypes.TotalApps, "5"), 1).ToList());
 
-            A.CallTo(() => user.Claims)
-                .Returns(Enumerable.Repeat(new Claim(SquidexClaimTypes.TotalApps, "5"), 1).ToList());
+        A.CallTo(() => userResolver.FindByIdAsync(userId, ct))
+            .Returns(user);
 
-            A.CallTo(() => userResolver.FindByIdAsync(userId, ct))
-                .Returns(user);
-
-            await sut.HandleAsync(commandContext, (c, ct) =>
-            {
-                c.Complete(true);
-
-                return Task.CompletedTask;
-            }, ct);
-
-            A.CallTo(() => userResolver.SetClaimAsync(userId, SquidexClaimTypes.TotalApps, "6", true, default))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_not_check_usage_if_app_is_created_by_client()
+        await sut.HandleAsync(commandContext, (c, ct) =>
         {
-            var command = new CreateApp
-            {
-                Actor = RefToken.Client(Guid.NewGuid().ToString())
-            };
+            c.Complete(true);
 
-            var commandContext = new CommandContext(command, commandBus);
+            return Task.CompletedTask;
+        }, ct);
 
-            options.MaximumNumberOfApps = 10;
+        A.CallTo(() => userResolver.SetClaimAsync(userId, SquidexClaimTypes.TotalApps, "6", true, default))
+            .MustHaveHappened();
+    }
 
-            await sut.HandleAsync(commandContext, (c, ct) =>
-            {
-                c.Complete(true);
-
-                return Task.CompletedTask;
-            }, ct);
-
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
-                .MustNotHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_not_check_usage_if_no_maximum_configured()
+    [Fact]
+    public async Task Should_not_check_usage_if_app_is_created_by_client()
+    {
+        var command = new CreateApp
         {
-            var command = new CreateApp
-            {
-                Actor = RefToken.User(Guid.NewGuid().ToString())
-            };
+            Actor = RefToken.Client(Guid.NewGuid().ToString())
+        };
 
-            var commandContext = new CommandContext(command, commandBus);
+        var commandContext = new CommandContext(command, commandBus);
 
-            options.MaximumNumberOfApps = 0;
+        options.MaximumNumberOfApps = 10;
 
-            await sut.HandleAsync(commandContext, (c, ct) =>
-            {
-                c.Complete(true);
-
-                return Task.CompletedTask;
-            }, ct);
-
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
-                .MustNotHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_not_check_usage_for_other_commands()
+        await sut.HandleAsync(commandContext, (c, ct) =>
         {
-            var command = new UpdateApp
-            {
-                Actor = RefToken.User(Guid.NewGuid().ToString())
-            };
+            c.Complete(true);
 
-            var commandContext = new CommandContext(command, commandBus);
+            return Task.CompletedTask;
+        }, ct);
 
-            options.MaximumNumberOfApps = 10;
+        A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
 
-            await sut.HandleAsync(commandContext, (c, ct) =>
-            {
-                c.Complete(true);
+    [Fact]
+    public async Task Should_not_check_usage_if_no_maximum_configured()
+    {
+        var command = new CreateApp
+        {
+            Actor = RefToken.User(Guid.NewGuid().ToString())
+        };
 
-                return Task.CompletedTask;
-            }, ct);
+        var commandContext = new CommandContext(command, commandBus);
 
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
-                .MustNotHaveHappened();
-        }
+        options.MaximumNumberOfApps = 0;
+
+        await sut.HandleAsync(commandContext, (c, ct) =>
+        {
+            c.Complete(true);
+
+            return Task.CompletedTask;
+        }, ct);
+
+        A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_check_usage_for_other_commands()
+    {
+        var command = new UpdateApp
+        {
+            Actor = RefToken.User(Guid.NewGuid().ToString())
+        };
+
+        var commandContext = new CommandContext(command, commandBus);
+
+        options.MaximumNumberOfApps = 10;
+
+        await sut.HandleAsync(commandContext, (c, ct) =>
+        {
+            c.Complete(true);
+
+            return Task.CompletedTask;
+        }, ct);
+
+        A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
     }
 }

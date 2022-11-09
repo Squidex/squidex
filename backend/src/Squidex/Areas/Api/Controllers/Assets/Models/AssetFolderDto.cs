@@ -11,58 +11,57 @@ using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Assets.Models
+namespace Squidex.Areas.Api.Controllers.Assets.Models;
+
+public sealed class AssetFolderDto : Resource
 {
-    public sealed class AssetFolderDto : Resource
+    /// <summary>
+    /// The ID of the asset.
+    /// </summary>
+    public DomainId Id { get; set; }
+
+    /// <summary>
+    /// The ID of the parent folder. Empty for files without parent.
+    /// </summary>
+    public DomainId ParentId { get; set; }
+
+    /// <summary>
+    /// The folder name.
+    /// </summary>
+    [LocalizedRequired]
+    public string FolderName { get; set; }
+
+    /// <summary>
+    /// The version of the asset folder.
+    /// </summary>
+    public long Version { get; set; }
+
+    public static AssetFolderDto FromDomain(IAssetFolderEntity asset, Resources resources)
     {
-        /// <summary>
-        /// The ID of the asset.
-        /// </summary>
-        public DomainId Id { get; set; }
+        var result = SimpleMapper.Map(asset, new AssetFolderDto());
 
-        /// <summary>
-        /// The ID of the parent folder. Empty for files without parent.
-        /// </summary>
-        public DomainId ParentId { get; set; }
+        return result.CreateLinks(resources);
+    }
 
-        /// <summary>
-        /// The folder name.
-        /// </summary>
-        [LocalizedRequired]
-        public string FolderName { get; set; }
+    private AssetFolderDto CreateLinks(Resources resources)
+    {
+        var values = new { app = resources.App, id = Id };
 
-        /// <summary>
-        /// The version of the asset folder.
-        /// </summary>
-        public long Version { get; set; }
-
-        public static AssetFolderDto FromDomain(IAssetFolderEntity asset, Resources resources)
+        if (resources.CanUpdateAsset)
         {
-            var result = SimpleMapper.Map(asset, new AssetFolderDto());
+            AddPutLink("update",
+                resources.Url<AssetFoldersController>(x => nameof(x.PutAssetFolder), values));
 
-            return result.CreateLinks(resources);
+            AddPutLink("move",
+                resources.Url<AssetFoldersController>(x => nameof(x.PutAssetFolderParent), values));
         }
 
-        private AssetFolderDto CreateLinks(Resources resources)
+        if (resources.CanUpdateAsset)
         {
-            var values = new { app = resources.App, id = Id };
-
-            if (resources.CanUpdateAsset)
-            {
-                AddPutLink("update",
-                    resources.Url<AssetFoldersController>(x => nameof(x.PutAssetFolder), values));
-
-                AddPutLink("move",
-                    resources.Url<AssetFoldersController>(x => nameof(x.PutAssetFolderParent), values));
-            }
-
-            if (resources.CanUpdateAsset)
-            {
-                AddDeleteLink("delete",
-                    resources.Url<AssetFoldersController>(x => nameof(x.DeleteAssetFolder), values));
-            }
-
-            return this;
+            AddDeleteLink("delete",
+                resources.Url<AssetFoldersController>(x => nameof(x.DeleteAssetFolder), values));
         }
+
+        return this;
     }
 }

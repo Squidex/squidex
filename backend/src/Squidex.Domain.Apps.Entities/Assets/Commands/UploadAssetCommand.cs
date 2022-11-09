@@ -8,18 +8,17 @@
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 
-namespace Squidex.Domain.Apps.Entities.Assets.Commands
+namespace Squidex.Domain.Apps.Entities.Assets.Commands;
+
+public abstract class UploadAssetCommand : AssetCommand
 {
-    public abstract class UploadAssetCommand : AssetCommand
-    {
-        public HashSet<string> Tags { get; set; } = new HashSet<string>();
+    public HashSet<string> Tags { get; set; } = new HashSet<string>();
 
-        public AssetFile File { get; set; }
+    public AssetFile File { get; set; }
 
-        public AssetMetadata Metadata { get; } = new AssetMetadata();
+    public AssetMetadata Metadata { get; } = new AssetMetadata();
 
-        public AssetType Type { get; set; }
+    public AssetType Type { get; set; }
 
-        public string FileHash { get; set; }
-    }
+    public string FileHash { get; set; }
 }

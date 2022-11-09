@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas;
+
+public sealed class SchemaCreatedNestedField : SchemaCreatedFieldBase
 {
-    public sealed class SchemaCreatedNestedField : SchemaCreatedFieldBase
-    {
-    }
 }

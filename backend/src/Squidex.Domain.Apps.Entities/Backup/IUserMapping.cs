@@ -7,18 +7,17 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public interface IUserMapping
 {
-    public interface IUserMapping
-    {
-        RefToken Initiator { get; }
+    RefToken Initiator { get; }
 
-        void Backup(RefToken token);
+    void Backup(RefToken token);
 
-        void Backup(string userId);
+    void Backup(string userId);
 
-        bool TryMap(RefToken token, out RefToken result);
+    bool TryMap(RefToken token, out RefToken result);
 
-        bool TryMap(string userId, out RefToken result);
-    }
+    bool TryMap(string userId, out RefToken result);
 }

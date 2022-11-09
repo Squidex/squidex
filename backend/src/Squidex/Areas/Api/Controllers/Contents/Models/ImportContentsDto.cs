@@ -10,55 +10,54 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.Api.Controllers.Contents.Models
+namespace Squidex.Areas.Api.Controllers.Contents.Models;
+
+public sealed class ImportContentsDto
 {
-    public sealed class ImportContentsDto
+    /// <summary>
+    /// The data to import.
+    /// </summary>
+    [LocalizedRequired]
+    public List<ContentData> Datas { get; set; }
+
+    /// <summary>
+    /// True to automatically publish the content.
+    /// </summary>
+    [Obsolete("Use bulk endpoint now.")]
+    public bool Publish { get; set; }
+
+    /// <summary>
+    /// True to turn off scripting for faster inserts. Default: true.
+    /// </summary>
+    public bool DoNotScript { get; set; } = true;
+
+    /// <summary>
+    /// True to turn off costly validation: Unique checks, asset checks and reference checks. Default: true.
+    /// </summary>
+    public bool OptimizeValidation { get; set; } = true;
+
+    public BulkUpdateContents ToCommand()
     {
-        /// <summary>
-        /// The data to import.
-        /// </summary>
-        [LocalizedRequired]
-        public List<ContentData> Datas { get; set; }
+        var result = SimpleMapper.Map(this, new BulkUpdateContents());
 
-        /// <summary>
-        /// True to automatically publish the content.
-        /// </summary>
-        [Obsolete("Use bulk endpoint now.")]
-        public bool Publish { get; set; }
-
-        /// <summary>
-        /// True to turn off scripting for faster inserts. Default: true.
-        /// </summary>
-        public bool DoNotScript { get; set; } = true;
-
-        /// <summary>
-        /// True to turn off costly validation: Unique checks, asset checks and reference checks. Default: true.
-        /// </summary>
-        public bool OptimizeValidation { get; set; } = true;
-
-        public BulkUpdateContents ToCommand()
+        result.Jobs = Datas?.Select(x =>
         {
-            var result = SimpleMapper.Map(this, new BulkUpdateContents());
-
-            result.Jobs = Datas?.Select(x =>
+            var job = new BulkUpdateJob
             {
-                var job = new BulkUpdateJob
-                {
-                    Type = BulkUpdateContentType.Create,
-                    Data = x
-                };
+                Type = BulkUpdateContentType.Create,
+                Data = x
+            };
 
 #pragma warning disable CS0618 // Type or member is obsolete
-                if (Publish)
-                {
-                    job.Status = Status.Published;
-                }
+            if (Publish)
+            {
+                job.Status = Status.Published;
+            }
 #pragma warning restore CS0618 // Type or member is obsolete
 
-                return job;
-            }).ToArray();
+            return job;
+        }).ToArray();
 
-            return result;
-        }
+        return result;
     }
 }

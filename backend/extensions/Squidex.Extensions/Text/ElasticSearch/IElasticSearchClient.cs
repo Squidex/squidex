@@ -5,17 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Extensions.Text.ElasticSearch
+namespace Squidex.Extensions.Text.ElasticSearch;
+
+public interface IElasticSearchClient
 {
-    public interface IElasticSearchClient
-    {
-        Task CreateIndexAsync<T>(string indexName, T request,
-            CancellationToken ct);
+    Task CreateIndexAsync<T>(string indexName, T request,
+        CancellationToken ct);
 
-        Task BulkAsync<T>(List<T> requests,
-            CancellationToken ct);
+    Task BulkAsync<T>(List<T> requests,
+        CancellationToken ct);
 
-        Task<List<dynamic>> SearchAsync<T>(string indexName, T request,
-            CancellationToken ct);
-    }
+    Task<List<dynamic>> SearchAsync<T>(string indexName, T request,
+        CancellationToken ct);
 }

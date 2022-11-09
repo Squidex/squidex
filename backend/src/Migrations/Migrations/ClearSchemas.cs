@@ -9,21 +9,20 @@ using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 
-namespace Migrations.Migrations
+namespace Migrations.Migrations;
+
+public sealed class ClearSchemas : IMigration
 {
-    public sealed class ClearSchemas : IMigration
+    private readonly IStore<SchemaDomainObject.State> store;
+
+    public ClearSchemas(IStore<SchemaDomainObject.State> store)
     {
-        private readonly IStore<SchemaDomainObject.State> store;
+        this.store = store;
+    }
 
-        public ClearSchemas(IStore<SchemaDomainObject.State> store)
-        {
-            this.store = store;
-        }
-
-        public Task UpdateAsync(
-            CancellationToken ct)
-        {
-            return store.ClearSnapshotsAsync();
-        }
+    public Task UpdateAsync(
+        CancellationToken ct)
+    {
+        return store.ClearSnapshotsAsync();
     }
 }

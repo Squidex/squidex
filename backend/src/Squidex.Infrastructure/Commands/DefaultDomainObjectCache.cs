@@ -11,85 +11,84 @@ using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.ObjectPool;
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public sealed class DefaultDomainObjectCache : IDomainObjectCache
 {
-    public sealed class DefaultDomainObjectCache : IDomainObjectCache
+    private readonly DistributedCacheEntryOptions cacheOptions;
+    private readonly IMemoryCache cache;
+    private readonly IJsonSerializer serializer;
+    private readonly IDistributedCache distributedCache;
+
+    public DefaultDomainObjectCache(IMemoryCache cache, IJsonSerializer serializer, IDistributedCache distributedCache,
+        IOptions<DomainObjectCacheOptions> options)
     {
-        private readonly DistributedCacheEntryOptions cacheOptions;
-        private readonly IMemoryCache cache;
-        private readonly IJsonSerializer serializer;
-        private readonly IDistributedCache distributedCache;
+        this.cache = cache;
+        this.serializer = serializer;
+        this.distributedCache = distributedCache;
 
-        public DefaultDomainObjectCache(IMemoryCache cache, IJsonSerializer serializer, IDistributedCache distributedCache,
-            IOptions<DomainObjectCacheOptions> options)
+        cacheOptions = new DistributedCacheEntryOptions
         {
-            this.cache = cache;
-            this.serializer = serializer;
-            this.distributedCache = distributedCache;
+            AbsoluteExpirationRelativeToNow = options.Value.CacheDuration
+        };
+    }
 
-            cacheOptions = new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = options.Value.CacheDuration
-            };
+    public async Task<T> GetAsync<T>(DomainId id, long version,
+        CancellationToken ct = default)
+    {
+        var cacheKey = CacheKey(id, version);
+
+        if (cache.TryGetValue(cacheKey, out var found) && found is T typed)
+        {
+            return typed;
         }
 
-        public async Task<T> GetAsync<T>(DomainId id, long version,
-            CancellationToken ct = default)
+        var buffer = await distributedCache.GetAsync(cacheKey, ct);
+
+        if (buffer == null)
         {
-            var cacheKey = CacheKey(id, version);
-
-            if (cache.TryGetValue(cacheKey, out var found) && found is T typed)
-            {
-                return typed;
-            }
-
-            var buffer = await distributedCache.GetAsync(cacheKey, ct);
-
-            if (buffer == null)
-            {
-                return default!;
-            }
-
-            try
-            {
-                using (var stream = new MemoryStream(buffer))
-                {
-                    var result = serializer.Deserialize<T>(stream);
-
-                    return result;
-                }
-            }
-            catch
-            {
-                return default!;
-            }
+            return default!;
         }
 
-        public async Task SetAsync<T>(DomainId id, long version, T snapshot,
-            CancellationToken ct = default)
+        try
         {
-            var cacheKey = CacheKey(id, version);
-
-            cache.Set(cacheKey, snapshot, cacheOptions.AbsoluteExpirationRelativeToNow!.Value);
-
-            try
+            using (var stream = new MemoryStream(buffer))
             {
-                using (var stream = DefaultPools.MemoryStream.GetStream())
-                {
-                    serializer.Serialize(snapshot, stream, true);
+                var result = serializer.Deserialize<T>(stream);
 
-                    await distributedCache.SetAsync(cacheKey, stream.ToArray(), cacheOptions, ct);
-                }
-            }
-            catch
-            {
-                return;
+                return result;
             }
         }
-
-        private static string CacheKey(DomainId key, long version)
+        catch
         {
-            return $"{key}_{version}";
+            return default!;
         }
+    }
+
+    public async Task SetAsync<T>(DomainId id, long version, T snapshot,
+        CancellationToken ct = default)
+    {
+        var cacheKey = CacheKey(id, version);
+
+        cache.Set(cacheKey, snapshot, cacheOptions.AbsoluteExpirationRelativeToNow!.Value);
+
+        try
+        {
+            using (var stream = DefaultPools.MemoryStream.GetStream())
+            {
+                serializer.Serialize(snapshot, stream, true);
+
+                await distributedCache.SetAsync(cacheKey, stream.ToArray(), cacheOptions, ct);
+            }
+        }
+        catch
+        {
+            return;
+        }
+    }
+
+    private static string CacheKey(DomainId key, long version)
+    {
+        return $"{key}_{version}";
     }
 }

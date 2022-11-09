@@ -5,15 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Json.Objects
+namespace Squidex.Infrastructure.Json.Objects;
+
+public enum JsonValueType
 {
-    public enum JsonValueType
-    {
-        Array,
-        Boolean,
-        Null,
-        Number,
-        Object,
-        String
-    }
+    Array,
+    Boolean,
+    Null,
+    Number,
+    Object,
+    String
 }

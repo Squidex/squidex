@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.States
-{
-    public interface IBatchContext<T> : IAsyncDisposable, IPersistenceFactory<T>
-    {
-        Task CommitAsync();
+namespace Squidex.Infrastructure.States;
 
-        Task LoadAsync(IEnumerable<DomainId> ids);
-    }
+public interface IBatchContext<T> : IAsyncDisposable, IPersistenceFactory<T>
+{
+    Task CommitAsync();
+
+    Task LoadAsync(IEnumerable<DomainId> ids);
 }

@@ -9,19 +9,18 @@ using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.Api.Controllers.Teams.Models
-{
-    public sealed class CreateTeamDto
-    {
-        /// <summary>
-        /// The name of the team.
-        /// </summary>
-        [LocalizedRequired]
-        public string Name { get; set; }
+namespace Squidex.Areas.Api.Controllers.Teams.Models;
 
-        public CreateTeam ToCommand()
-        {
-            return SimpleMapper.Map(this, new CreateTeam());
-        }
+public sealed class CreateTeamDto
+{
+    /// <summary>
+    /// The name of the team.
+    /// </summary>
+    [LocalizedRequired]
+    public string Name { get; set; }
+
+    public CreateTeam ToCommand()
+    {
+        return SimpleMapper.Map(this, new CreateTeam());
     }
 }

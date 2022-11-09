@@ -8,16 +8,15 @@
 using Squidex.Infrastructure.Reflection;
 using Xunit;
 
-namespace Squidex.Infrastructure
-{
-    public class TypeNameAttributeTests
-    {
-        [Fact]
-        public void Should_instantiate()
-        {
-            var attribute = new TypeNameAttribute("MyTypeName");
+namespace Squidex.Infrastructure;
 
-            Assert.Equal("MyTypeName", attribute.TypeName);
-        }
+public class TypeNameAttributeTests
+{
+    [Fact]
+    public void Should_instantiate()
+    {
+        var attribute = new TypeNameAttribute("MyTypeName");
+
+        Assert.Equal("MyTypeName", attribute.TypeName);
     }
 }

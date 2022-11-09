@@ -12,103 +12,102 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Extensions.Samples.Middleware
+namespace Squidex.Extensions.Samples.Middleware;
+
+public sealed class DoubleLinkedContentMiddleware : ICustomCommandMiddleware
 {
-    public sealed class DoubleLinkedContentMiddleware : ICustomCommandMiddleware
+    private readonly IContentLoader contentLoader;
+
+    public DoubleLinkedContentMiddleware(IContentLoader contentLoader)
     {
-        private readonly IContentLoader contentLoader;
+        this.contentLoader = contentLoader;
+    }
 
-        public DoubleLinkedContentMiddleware(IContentLoader contentLoader)
+    public async Task HandleAsync(CommandContext context, NextDelegate next,
+        CancellationToken ct)
+    {
+        await next(context, ct);
+
+        if (context.Command is UpdateContent update && context.IsCompleted && update.SchemaId.Name == "source")
         {
-            this.contentLoader = contentLoader;
-        }
+            // After a change is made, the content is put to the command context.
+            var content = context.Result<IContentEntity>();
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next,
-            CancellationToken ct)
-        {
-            await next(context, ct);
+            var contentPrevious =
+                await contentLoader.GetAsync(
+                    content.AppId.Id,
+                    content.Id,
+                    content.Version - 1,
+                    ct);
 
-            if (context.Command is UpdateContent update && context.IsCompleted && update.SchemaId.Name == "source")
+            // The data might have been changed within the domain object. Therefore we do not use the data fro mthe command.
+            var oldReferenceId = GetReference(contentPrevious?.Data);
+            var newReferenceId = GetReference(content.Data);
+
+            // If nothing has been changed we can just stop here.
+            if (newReferenceId == oldReferenceId)
             {
-                // After a change is made, the content is put to the command context.
-                var content = context.Result<IContentEntity>();
+                return;
+            }
 
-                var contentPrevious =
-                    await contentLoader.GetAsync(
-                        content.AppId.Id,
-                        content.Id,
-                        content.Version - 1,
-                        ct);
+            if (oldReferenceId != null)
+            {
+                var oldReferenced = await contentLoader.GetAsync(content.AppId.Id, DomainId.Create(oldReferenceId), ct: ct);
 
-                // The data might have been changed within the domain object. Therefore we do not use the data fro mthe command.
-                var oldReferenceId = GetReference(contentPrevious?.Data);
-                var newReferenceId = GetReference(content.Data);
-
-                // If nothing has been changed we can just stop here.
-                if (newReferenceId == oldReferenceId)
+                if (oldReferenced != null)
                 {
-                    return;
+                    var data = oldReferenced.Data.Clone();
+
+                    // Remove the reference from the old referenced content.
+                    data.Remove("referencing");
+
+                    await UpdateReferencing(context, oldReferenced, data, ct);
                 }
+            }
 
-                if (oldReferenceId != null)
+            if (newReferenceId != null)
+            {
+                var newReferenced = await contentLoader.GetAsync(content.AppId.Id, DomainId.Create(newReferenceId), ct: ct);
+
+                if (newReferenced != null)
                 {
-                    var oldReferenced = await contentLoader.GetAsync(content.AppId.Id, DomainId.Create(oldReferenceId), ct: ct);
+                    var data = newReferenced.Data.Clone();
 
-                    if (oldReferenced != null)
+                    // Add the reference to the new referenced content.
+                    data["referencing"] = new ContentFieldData
                     {
-                        var data = oldReferenced.Data.Clone();
+                        ["iv"] = JsonValue.Array(content.Id)
+                    };
 
-                        // Remove the reference from the old referenced content.
-                        data.Remove("referencing");
-
-                        await UpdateReferencing(context, oldReferenced, data, ct);
-                    }
-                }
-
-                if (newReferenceId != null)
-                {
-                    var newReferenced = await contentLoader.GetAsync(content.AppId.Id, DomainId.Create(newReferenceId), ct: ct);
-
-                    if (newReferenced != null)
-                    {
-                        var data = newReferenced.Data.Clone();
-
-                        // Add the reference to the new referenced content.
-                        data["referencing"] = new ContentFieldData
-                        {
-                            ["iv"] = JsonValue.Array(content.Id)
-                        };
-
-                        await UpdateReferencing(context, newReferenced, data, ct);
-                    }
+                    await UpdateReferencing(context, newReferenced, data, ct);
                 }
             }
         }
+    }
 
-        private static async Task UpdateReferencing(CommandContext context, IContentEntity reference, ContentData data,
-            CancellationToken ct)
+    private static async Task UpdateReferencing(CommandContext context, IContentEntity reference, ContentData data,
+        CancellationToken ct)
+    {
+        // Also set the expected version, otherwise it will be overriden with the version from the request.
+        await context.CommandBus.PublishAsync(new UpdateContent
         {
-            // Also set the expected version, otherwise it will be overriden with the version from the request.
-            await context.CommandBus.PublishAsync(new UpdateContent
-            {
-                AppId = reference.AppId,
-                SchemaId = reference.SchemaId,
-                ContentId = reference.Id,
-                DoNotScript = true,
-                DoNotValidate = true,
-                Data = data,
-                ExpectedVersion = reference.Version
-            }, ct);
+            AppId = reference.AppId,
+            SchemaId = reference.SchemaId,
+            ContentId = reference.Id,
+            DoNotScript = true,
+            DoNotValidate = true,
+            Data = data,
+            ExpectedVersion = reference.Version
+        }, ct);
+    }
+
+    private static string GetReference(ContentData data)
+    {
+        if (data != null && data.TryGetValue("reference", out ContentFieldData fieldData))
+        {
+            return fieldData.Values.OfType<JsonArray>().SelectMany(x => x).SingleOrDefault().ToString();
         }
 
-        private static string GetReference(ContentData data)
-        {
-            if (data != null && data.TryGetValue("reference", out ContentFieldData fieldData))
-            {
-                return fieldData.Values.OfType<JsonArray>().SelectMany(x => x).SingleOrDefault().ToString();
-            }
-
-            return null;
-        }
+        return null;
     }
 }

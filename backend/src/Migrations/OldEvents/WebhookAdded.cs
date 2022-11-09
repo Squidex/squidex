@@ -8,16 +8,15 @@
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Migrations.OldEvents
+namespace Migrations.OldEvents;
+
+[EventType(nameof(WebhookAdded))]
+[Obsolete("New Event introduced")]
+public sealed class WebhookAdded : SchemaEvent
 {
-    [EventType(nameof(WebhookAdded))]
-    [Obsolete("New Event introduced")]
-    public sealed class WebhookAdded : SchemaEvent
-    {
-        public Guid Id { get; set; }
+    public Guid Id { get; set; }
 
-        public Uri Url { get; set; }
+    public Uri Url { get; set; }
 
-        public string SharedSecret { get; set; }
-    }
+    public string SharedSecret { get; set; }
 }

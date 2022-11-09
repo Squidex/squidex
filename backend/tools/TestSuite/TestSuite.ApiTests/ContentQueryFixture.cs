@@ -11,55 +11,54 @@ using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
 using TestSuite.Model;
 
-namespace TestSuite.ApiTests
+namespace TestSuite.ApiTests;
+
+public sealed class ContentQueryFixture : TestSchemaFixtureBase
 {
-    public sealed class ContentQueryFixture : TestSchemaFixtureBase
+    public ContentQueryFixture()
+        : base("my-reads")
     {
-        public ContentQueryFixture()
-            : base("my-reads")
+    }
+
+    public override async Task InitializeAsync()
+    {
+        await base.InitializeAsync();
+
+        await DisposeAsync();
+
+        for (var index = 10; index > 0; index--)
         {
-        }
-
-        public override async Task InitializeAsync()
-        {
-            await base.InitializeAsync();
-
-            await DisposeAsync();
-
-            for (var index = 10; index > 0; index--)
+            var data = new TestEntityData
             {
-                var data = new TestEntityData
+                Number = index,
+                Json = JObject.FromObject(new
                 {
-                    Number = index,
-                    Json = JObject.FromObject(new
+                    nested1 = new
                     {
-                        nested1 = new
-                        {
-                            nested2 = index
-                        }
-                    }),
-                    Geo = GeoJson.Point(index, index, oldFormat: index % 2 == 1),
-                    Localized = new Dictionary<string, string>
-                    {
-                        ["en"] = index.ToString(CultureInfo.InvariantCulture)
-                    },
-                    String = index.ToString(CultureInfo.InvariantCulture),
-                };
+                        nested2 = index
+                    }
+                }),
+                Geo = GeoJson.Point(index, index, oldFormat: index % 2 == 1),
+                Localized = new Dictionary<string, string>
+                {
+                    ["en"] = index.ToString(CultureInfo.InvariantCulture)
+                },
+                String = index.ToString(CultureInfo.InvariantCulture),
+            };
 
-                await Contents.CreateAsync(data, ContentCreateOptions.AsPublish);
-            }
+            await Contents.CreateAsync(data, ContentCreateOptions.AsPublish);
         }
+    }
 
-        public override async Task DisposeAsync()
+    public override async Task DisposeAsync()
+    {
+        await base.DisposeAsync();
+
+        var contents = await Contents.GetAsync();
+
+        foreach (var content in contents.Items)
         {
-            await base.DisposeAsync();
-
-            var contents = await Contents.GetAsync();
-
-            foreach (var content in contents.Items)
-            {
-                await Contents.DeleteAsync(content);
-            }
+            await Contents.DeleteAsync(content);
         }
     }
 }

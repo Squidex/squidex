@@ -11,43 +11,42 @@ using Namotion.Reflection;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 
-namespace Squidex.Areas.Api.Config.OpenApi
+namespace Squidex.Areas.Api.Config.OpenApi;
+
+public sealed class XmlTagProcessor : IDocumentProcessor
 {
-    public sealed class XmlTagProcessor : IDocumentProcessor
+    public void Process(DocumentProcessorContext context)
     {
-        public void Process(DocumentProcessorContext context)
+        try
         {
-            try
+            foreach (var controllerType in context.ControllerTypes)
             {
-                foreach (var controllerType in context.ControllerTypes)
+                var attribute = controllerType.GetCustomAttribute<ApiExplorerSettingsAttribute>();
+
+                if (attribute != null)
                 {
-                    var attribute = controllerType.GetCustomAttribute<ApiExplorerSettingsAttribute>();
+                    var tag = context.Document.Tags.FirstOrDefault(x => x.Name == attribute.GroupName);
 
-                    if (attribute != null)
+                    if (tag != null)
                     {
-                        var tag = context.Document.Tags.FirstOrDefault(x => x.Name == attribute.GroupName);
+                        var description = controllerType.GetXmlDocsSummary();
 
-                        if (tag != null)
+                        if (description != null)
                         {
-                            var description = controllerType.GetXmlDocsSummary();
+                            tag.Description ??= string.Empty;
 
-                            if (description != null)
+                            if (!tag.Description.Contains(description, StringComparison.Ordinal))
                             {
-                                tag.Description ??= string.Empty;
-
-                                if (!tag.Description.Contains(description, StringComparison.Ordinal))
-                                {
-                                    tag.Description += "\n\n" + description;
-                                }
+                                tag.Description += "\n\n" + description;
                             }
                         }
                     }
                 }
             }
-            finally
-            {
-                XmlDocs.ClearCache();
-            }
+        }
+        finally
+        {
+            XmlDocs.ClearCache();
         }
     }
 }

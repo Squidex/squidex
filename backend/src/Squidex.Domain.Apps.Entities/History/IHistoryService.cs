@@ -7,11 +7,10 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.History
+namespace Squidex.Domain.Apps.Entities.History;
+
+public interface IHistoryService
 {
-    public interface IHistoryService
-    {
-        Task<IReadOnlyList<ParsedHistoryEvent>> QueryByChannelAsync(DomainId ownerId, string channelPrefix, int count,
-            CancellationToken ct = default);
-    }
+    Task<IReadOnlyList<ParsedHistoryEvent>> QueryByChannelAsync(DomainId ownerId, string channelPrefix, int count,
+        CancellationToken ct = default);
 }

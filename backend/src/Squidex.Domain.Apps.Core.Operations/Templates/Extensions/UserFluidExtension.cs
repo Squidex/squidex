@@ -10,35 +10,34 @@ using Fluid.Values;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Core.Templates.Extensions
+namespace Squidex.Domain.Apps.Core.Templates.Extensions;
+
+public sealed class UserFluidExtension : IFluidExtension
 {
-    public sealed class UserFluidExtension : IFluidExtension
+    public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
     {
-        public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
+        memberAccessStrategy.Register<IUser, FluidValue>((user, name) =>
         {
-            memberAccessStrategy.Register<IUser, FluidValue>((user, name) =>
+            switch (name)
             {
-                switch (name)
-                {
-                    case "id":
-                        return new StringValue(user.Id);
-                    case "email":
-                        return new StringValue(user.Email);
-                    case "name":
-                        return new StringValue(user.Claims.DisplayName());
-                    default:
+                case "id":
+                    return new StringValue(user.Id);
+                case "email":
+                    return new StringValue(user.Email);
+                case "name":
+                    return new StringValue(user.Claims.DisplayName());
+                default:
+                    {
+                        var claim = user.Claims.FirstOrDefault(x => string.Equals(name, x.Type, StringComparison.OrdinalIgnoreCase));
+
+                        if (claim != null)
                         {
-                            var claim = user.Claims.FirstOrDefault(x => string.Equals(name, x.Type, StringComparison.OrdinalIgnoreCase));
-
-                            if (claim != null)
-                            {
-                                return new StringValue(claim.Value);
-                            }
-
-                            return NilValue.Instance;
+                            return new StringValue(claim.Value);
                         }
-                }
-            });
-        }
+
+                        return NilValue.Instance;
+                    }
+            }
+        });
     }
 }

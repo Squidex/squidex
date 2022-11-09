@@ -7,14 +7,13 @@
 
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.IdentityServer.Controllers.Profile
-{
-    public class SetPasswordModel
-    {
-        [LocalizedRequired]
-        public string Password { get; set; }
+namespace Squidex.Areas.IdentityServer.Controllers.Profile;
 
-        [LocalizedRequired]
-        public string PasswordConfirm { get; set; }
-    }
+public class SetPasswordModel
+{
+    [LocalizedRequired]
+    public string Password { get; set; }
+
+    [LocalizedRequired]
+    public string PasswordConfirm { get; set; }
 }

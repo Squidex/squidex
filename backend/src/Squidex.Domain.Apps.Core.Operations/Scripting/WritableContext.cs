@@ -10,35 +10,34 @@ using Jint.Native;
 using Jint.Native.Object;
 using Squidex.Text;
 
-namespace Squidex.Domain.Apps.Core.Scripting
+namespace Squidex.Domain.Apps.Core.Scripting;
+
+internal sealed class WritableContext : ObjectInstance
 {
-    internal sealed class WritableContext : ObjectInstance
+    private readonly ScriptVars vars;
+
+    public WritableContext(Engine engine, ScriptVars vars)
+        : base(engine)
     {
-        private readonly ScriptVars vars;
+        this.vars = vars;
 
-        public WritableContext(Engine engine, ScriptVars vars)
-            : base(engine)
+        foreach (var (key, value) in vars)
         {
-            this.vars = vars;
+            var property = key.ToCamelCase();
 
-            foreach (var (key, value) in vars)
+            if (value != null)
             {
-                var property = key.ToCamelCase();
-
-                if (value != null)
-                {
-                    FastAddProperty(property, FromObject(engine, value), true, true, true);
-                }
+                FastAddProperty(property, FromObject(engine, value), true, true, true);
             }
         }
+    }
 
-        public override bool Set(JsValue property, JsValue value, JsValue receiver)
-        {
-            var propertyName = property.AsString();
+    public override bool Set(JsValue property, JsValue value, JsValue receiver)
+    {
+        var propertyName = property.AsString();
 
-            vars[propertyName] = value.ToObject();
+        vars[propertyName] = value.ToObject();
 
-            return base.Set(property, value, receiver);
-        }
+        return base.Set(property, value, receiver);
     }
 }

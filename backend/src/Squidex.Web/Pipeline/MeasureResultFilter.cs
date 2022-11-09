@@ -8,24 +8,23 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Infrastructure;
 
-namespace Squidex.Web.Pipeline
-{
-    public sealed class MeasureResultFilter : IAsyncResultFilter, IAsyncActionFilter
-    {
-        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
-        {
-            using (Telemetry.Activities.StartActivity("ExecuteAction"))
-            {
-                await next();
-            }
-        }
+namespace Squidex.Web.Pipeline;
 
-        public async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
+public sealed class MeasureResultFilter : IAsyncResultFilter, IAsyncActionFilter
+{
+    public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    {
+        using (Telemetry.Activities.StartActivity("ExecuteAction"))
         {
-            using (Telemetry.Activities.StartActivity("ExecuteResult"))
-            {
-                await next();
-            }
+            await next();
+        }
+    }
+
+    public async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
+    {
+        using (Telemetry.Activities.StartActivity("ExecuteResult"))
+        {
+            await next();
         }
     }
 }

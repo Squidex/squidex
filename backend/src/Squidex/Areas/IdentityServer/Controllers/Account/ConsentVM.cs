@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Areas.IdentityServer.Controllers.Account
-{
-    public sealed class ConsentVM
-    {
-        public string? ReturnUrl { get; set; }
+namespace Squidex.Areas.IdentityServer.Controllers.Account;
 
-        public string? PrivacyUrl { get; set; }
-    }
+public sealed class ConsentVM
+{
+    public string? ReturnUrl { get; set; }
+
+    public string? PrivacyUrl { get; set; }
 }

@@ -7,36 +7,35 @@
 
 using System.Text;
 
-namespace Squidex.Domain.Apps.Core.ValidateContent
+namespace Squidex.Domain.Apps.Core.ValidateContent;
+
+public static class ObjectPath
 {
-    public static class ObjectPath
+    public static string ToPathString(this IEnumerable<string> path)
     {
-        public static string ToPathString(this IEnumerable<string> path)
+        var sb = new StringBuilder();
+
+        var index = 0;
+
+        foreach (var property in path)
         {
-            var sb = new StringBuilder();
-
-            var index = 0;
-
-            foreach (var property in path)
+            if (index == 0)
             {
-                if (index == 0)
+                sb.Append(property);
+            }
+            else
+            {
+                if (property[0] != '[')
                 {
-                    sb.Append(property);
-                }
-                else
-                {
-                    if (property[0] != '[')
-                    {
-                        sb.Append('.');
-                    }
-
-                    sb.Append(property);
+                    sb.Append('.');
                 }
 
-                index++;
+                sb.Append(property);
             }
 
-            return sb.ToString();
+            index++;
         }
+
+        return sb.ToString();
     }
 }

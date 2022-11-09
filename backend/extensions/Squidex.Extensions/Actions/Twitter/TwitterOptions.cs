@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Extensions.Actions.Twitter
-{
-    public sealed class TwitterOptions
-    {
-        public string ClientId { get; set; }
+namespace Squidex.Extensions.Actions.Twitter;
 
-        public string ClientSecret { get; set; }
-    }
+public sealed class TwitterOptions
+{
+    public string ClientId { get; set; }
+
+    public string ClientSecret { get; set; }
 }

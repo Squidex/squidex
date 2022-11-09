@@ -8,11 +8,10 @@
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps;
+
+[EventType(nameof(AppSettingsUpdated))]
+public sealed class AppSettingsUpdated : AppEvent
 {
-    [EventType(nameof(AppSettingsUpdated))]
-    public sealed class AppSettingsUpdated : AppEvent
-    {
-        public AppSettings Settings { get; set; }
-    }
+    public AppSettings Settings { get; set; }
 }

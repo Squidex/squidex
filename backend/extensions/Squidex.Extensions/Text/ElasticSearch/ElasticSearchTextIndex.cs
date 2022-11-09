@@ -13,219 +13,218 @@ using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 
-namespace Squidex.Extensions.Text.ElasticSearch
+namespace Squidex.Extensions.Text.ElasticSearch;
+
+public sealed class ElasticSearchTextIndex : ITextIndex, IInitializable
 {
-    public sealed class ElasticSearchTextIndex : ITextIndex, IInitializable
+    private static readonly Regex LanguageRegex = new Regex(@"[^\w]+([a-z\-_]{2,}):", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+    private static readonly Regex LanguageRegexStart = new Regex(@"$^([a-z\-_]{2,}):", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+    private readonly IJsonSerializer jsonSerializer;
+    private readonly IElasticSearchClient elasticClient;
+    private readonly QueryParser queryParser = new QueryParser(ElasticSearchIndexDefinition.GetFieldPath);
+    private readonly string indexName;
+
+    public ElasticSearchTextIndex(IElasticSearchClient elasticClient, string indexName, IJsonSerializer jsonSerializer)
     {
-        private static readonly Regex LanguageRegex = new Regex(@"[^\w]+([a-z\-_]{2,}):", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-        private static readonly Regex LanguageRegexStart = new Regex(@"$^([a-z\-_]{2,}):", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-        private readonly IJsonSerializer jsonSerializer;
-        private readonly IElasticSearchClient elasticClient;
-        private readonly QueryParser queryParser = new QueryParser(ElasticSearchIndexDefinition.GetFieldPath);
-        private readonly string indexName;
+        this.elasticClient = elasticClient;
+        this.indexName = indexName;
+        this.jsonSerializer = jsonSerializer;
+    }
 
-        public ElasticSearchTextIndex(IElasticSearchClient elasticClient, string indexName, IJsonSerializer jsonSerializer)
+    public Task InitializeAsync(
+        CancellationToken ct)
+    {
+        return ElasticSearchIndexDefinition.ApplyAsync(elasticClient, indexName, ct);
+    }
+
+    public Task ClearAsync(
+        CancellationToken ct = default)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task ExecuteAsync(IndexCommand[] commands,
+        CancellationToken ct = default)
+    {
+        var args = new List<object>();
+
+        foreach (var command in commands)
         {
-            this.elasticClient = elasticClient;
-            this.indexName = indexName;
-            this.jsonSerializer = jsonSerializer;
+            CommandFactory.CreateCommands(command, args, indexName);
         }
 
-        public Task InitializeAsync(
-            CancellationToken ct)
-        {
-            return ElasticSearchIndexDefinition.ApplyAsync(elasticClient, indexName, ct);
-        }
-
-        public Task ClearAsync(
-            CancellationToken ct = default)
+        if (args.Count == 0)
         {
             return Task.CompletedTask;
         }
 
-        public Task ExecuteAsync(IndexCommand[] commands,
-            CancellationToken ct = default)
+        return elasticClient.BulkAsync(args, ct);
+    }
+
+    public async Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(app);
+        Guard.NotNull(query);
+
+        var serveField = GetServeField(scope);
+
+        var elasticQuery = new
         {
-            var args = new List<object>();
-
-            foreach (var command in commands)
+            query = new
             {
-                CommandFactory.CreateCommands(command, args, indexName);
-            }
-
-            if (args.Count == 0)
-            {
-                return Task.CompletedTask;
-            }
-
-            return elasticClient.BulkAsync(args, ct);
-        }
-
-        public async Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
-            CancellationToken ct = default)
-        {
-            Guard.NotNull(app);
-            Guard.NotNull(query);
-
-            var serveField = GetServeField(scope);
-
-            var elasticQuery = new
-            {
-                query = new
+                @bool = new
                 {
-                    @bool = new
+                    filter = new object[]
                     {
-                        filter = new object[]
+                        new
                         {
-                            new
+                            term = new Dictionary<string, object>
                             {
-                                term = new Dictionary<string, object>
-                                {
-                                    ["schemaId.keyword"] = query.SchemaId.ToString()
-                                }
-                            },
-                            new
+                                ["schemaId.keyword"] = query.SchemaId.ToString()
+                            }
+                        },
+                        new
+                        {
+                            term = new Dictionary<string, string>
                             {
-                                term = new Dictionary<string, string>
-                                {
-                                    ["geoField.keyword"] = query.Field
-                                }
-                            },
-                            new
+                                ["geoField.keyword"] = query.Field
+                            }
+                        },
+                        new
+                        {
+                            term = new Dictionary<string, string>
                             {
-                                term = new Dictionary<string, string>
-                                {
-                                    [serveField] = "true"
-                                }
-                            },
-                            new
+                                [serveField] = "true"
+                            }
+                        },
+                        new
+                        {
+                            geo_distance = new
                             {
-                                geo_distance = new
+                                geoObject = new
                                 {
-                                    geoObject = new
-                                    {
-                                        lat = query.Latitude,
-                                        lon = query.Longitude
-                                    },
-                                    distance = $"{query.Radius}m"
-                                }
+                                    lat = query.Latitude,
+                                    lon = query.Longitude
+                                },
+                                distance = $"{query.Radius}m"
                             }
                         }
                     }
-                },
-                _source = new[]
-                {
-                    "contentId"
-                },
-                size = query.Take
-            };
+                }
+            },
+            _source = new[]
+            {
+                "contentId"
+            },
+            size = query.Take
+        };
 
-            return await SearchAsync(elasticQuery, ct);
+        return await SearchAsync(elasticQuery, ct);
+    }
+
+    public async Task<List<DomainId>> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(app);
+        Guard.NotNull(query);
+
+        var parsed = queryParser.Parse(query.Text);
+
+        if (parsed == null)
+        {
+            return null;
         }
 
-        public async Task<List<DomainId>> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
-            CancellationToken ct = default)
+        var serveField = GetServeField(scope);
+
+        var elasticQuery = new
         {
-            Guard.NotNull(app);
-            Guard.NotNull(query);
-
-            var parsed = queryParser.Parse(query.Text);
-
-            if (parsed == null)
+            query = new
             {
-                return null;
-            }
-
-            var serveField = GetServeField(scope);
-
-            var elasticQuery = new
-            {
-                query = new
+                @bool = new
                 {
-                    @bool = new
+                    filter = new List<object>
                     {
-                        filter = new List<object>
+                        new
                         {
-                            new
+                            term = new Dictionary<string, object>
                             {
-                                term = new Dictionary<string, object>
-                                {
-                                    ["appId.keyword"] = app.Id.ToString()
-                                }
-                            },
-                            new
-                            {
-                                term = new Dictionary<string, string>
-                                {
-                                    [serveField] = "true"
-                                }
+                                ["appId.keyword"] = app.Id.ToString()
                             }
                         },
-                        must = new
+                        new
                         {
-                            query_string = new
+                            term = new Dictionary<string, string>
                             {
-                                query = parsed.Text
+                                [serveField] = "true"
                             }
-                        },
-                        should = new List<object>()
-                    }
-                },
-                _source = new[]
+                        }
+                    },
+                    must = new
+                    {
+                        query_string = new
+                        {
+                            query = parsed.Text
+                        }
+                    },
+                    should = new List<object>()
+                }
+            },
+            _source = new[]
+            {
+                "contentId"
+            },
+            size = query.Take
+        };
+
+        if (query.RequiredSchemaIds?.Count > 0)
+        {
+            var bySchema = new
+            {
+                terms = new Dictionary<string, object>
                 {
-                    "contentId"
-                },
-                size = query.Take
+                    ["schemaId.keyword"] = query.RequiredSchemaIds.Select(x => x.ToString()).ToArray()
+                }
             };
 
-            if (query.RequiredSchemaIds?.Count > 0)
-            {
-                var bySchema = new
-                {
-                    terms = new Dictionary<string, object>
-                    {
-                        ["schemaId.keyword"] = query.RequiredSchemaIds.Select(x => x.ToString()).ToArray()
-                    }
-                };
-
-                elasticQuery.query.@bool.filter.Add(bySchema);
-            }
-            else if (query.PreferredSchemaId.HasValue)
-            {
-                var bySchema = new
-                {
-                    terms = new Dictionary<string, object>
-                    {
-                        ["schemaId.keyword"] = query.PreferredSchemaId.ToString()
-                    }
-                };
-
-                elasticQuery.query.@bool.should.Add(bySchema);
-            }
-
-            var json = jsonSerializer.Serialize(elasticQuery, true);
-
-            return await SearchAsync(elasticQuery, ct);
+            elasticQuery.query.@bool.filter.Add(bySchema);
         }
-
-        private async Task<List<DomainId>> SearchAsync(object query,
-            CancellationToken ct)
+        else if (query.PreferredSchemaId.HasValue)
         {
-            var hits = await elasticClient.SearchAsync(indexName, query, ct);
-
-            var ids = new List<DomainId>();
-
-            foreach (var item in hits)
+            var bySchema = new
             {
-                 ids.Add(DomainId.Create(item["_source"]["contentId"]));
-            }
+                terms = new Dictionary<string, object>
+                {
+                    ["schemaId.keyword"] = query.PreferredSchemaId.ToString()
+                }
+            };
 
-            return ids;
+            elasticQuery.query.@bool.should.Add(bySchema);
         }
 
-        private static string GetServeField(SearchScope scope)
+        var json = jsonSerializer.Serialize(elasticQuery, true);
+
+        return await SearchAsync(elasticQuery, ct);
+    }
+
+    private async Task<List<DomainId>> SearchAsync(object query,
+        CancellationToken ct)
+    {
+        var hits = await elasticClient.SearchAsync(indexName, query, ct);
+
+        var ids = new List<DomainId>();
+
+        foreach (var item in hits)
         {
-            return scope == SearchScope.Published ? "servePublished" : "serveAll";
+             ids.Add(DomainId.Create(item["_source"]["contentId"]));
         }
+
+        return ids;
+    }
+
+    private static string GetServeField(SearchScope scope)
+    {
+        return scope == SearchScope.Published ? "servePublished" : "serveAll";
     }
 }

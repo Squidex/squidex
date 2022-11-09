@@ -22,297 +22,296 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Shared.Users;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Comments
+namespace Squidex.Domain.Apps.Entities.Comments;
+
+public class CommentTriggerHandlerTests
 {
-    public class CommentTriggerHandlerTests
+    private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
+    private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
+    private readonly IRuleTriggerHandler sut;
+
+    public CommentTriggerHandlerTests()
     {
-        private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
-        private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-        private readonly IRuleTriggerHandler sut;
+        A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
+            .Returns(true);
 
-        public CommentTriggerHandlerTests()
+        A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default))
+            .Returns(false);
+
+        sut = new CommentTriggerHandler(scriptEngine, userResolver);
+    }
+
+    [Fact]
+    public void Should_return_false_if_asking_for_snapshot_support()
+    {
+        Assert.False(sut.CanCreateSnapshotEvents);
+    }
+
+    [Fact]
+    public void Should_handle_comment_event()
+    {
+        Assert.True(sut.Handles(new CommentCreated()));
+    }
+
+    [Fact]
+    public void Should_not_handle_comment_update_event()
+    {
+        Assert.False(sut.Handles(new CommentUpdated()));
+    }
+
+    [Fact]
+    public void Should_not_handle_other_event()
+    {
+        Assert.False(sut.Handles(new ContentCreated()));
+    }
+
+    [Fact]
+    public async Task Should_create_enriched_events()
+    {
+        var ctx = Context();
+
+        var user1 = UserMocks.User("1");
+        var user2 = UserMocks.User("2");
+
+        var users = new List<IUser> { user1, user2 };
+        var userIds = users.Select(x => x.Id).ToArray();
+
+        var @event = new CommentCreated { Mentions = userIds };
+        var envelope = Envelope.Create<AppEvent>(@event);
+
+        A.CallTo(() => userResolver.QueryManyAsync(userIds, default))
+            .Returns(users.ToDictionary(x => x.Id));
+
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+
+        Assert.Equal(2, actual.Count);
+
+        var enrichedEvent1 = actual[0] as EnrichedCommentEvent;
+        var enrichedEvent2 = actual[1] as EnrichedCommentEvent;
+
+        Assert.Equal(user1, enrichedEvent1!.MentionedUser);
+        Assert.Equal(user2, enrichedEvent2!.MentionedUser);
+        Assert.Equal("UserMentioned", enrichedEvent1.Name);
+        Assert.Equal("UserMentioned", enrichedEvent2.Name);
+    }
+
+    [Fact]
+    public async Task Should_not_create_enriched_events_if_users_cannot_be_resolved()
+    {
+        var ctx = Context();
+
+        var user1 = UserMocks.User("1");
+        var user2 = UserMocks.User("2");
+
+        var users = new List<IUser> { user1, user2 };
+        var userIds = users.Select(x => x.Id).ToArray();
+
+        var @event = new CommentCreated { Mentions = userIds };
+        var envelope = Envelope.Create<AppEvent>(@event);
+
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+
+        Assert.Empty(actual);
+    }
+
+    [Fact]
+    public async Task Should_not_create_enriched_events_if_mentions_is_null()
+    {
+        var ctx = Context();
+
+        var @event = new CommentCreated { Mentions = null };
+        var envelope = Envelope.Create<AppEvent>(@event);
+
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+
+        Assert.Empty(actual);
+
+        A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_create_enriched_events_if_mentions_is_empty()
+    {
+        var ctx = Context();
+
+        var @event = new CommentCreated { Mentions = Array.Empty<string>() };
+        var envelope = Envelope.Create<AppEvent>(@event);
+
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+
+        Assert.Empty(actual);
+
+        A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public void Should_trigger_precheck_if_event_type_correct()
+    {
+        TestForCondition(string.Empty, ctx =>
         {
-            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
-                .Returns(true);
+            var @event = new CommentCreated();
 
-            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default))
-                .Returns(false);
+            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
-            sut = new CommentTriggerHandler(scriptEngine, userResolver);
-        }
+            Assert.True(actual);
+        });
+    }
 
-        [Fact]
-        public void Should_return_false_if_asking_for_snapshot_support()
+    [Fact]
+    public void Should_trigger_check_if_condition_is_empty()
+    {
+        TestForCondition(string.Empty, ctx =>
         {
-            Assert.False(sut.CanCreateSnapshotEvents);
-        }
+            var @event = new EnrichedCommentEvent();
 
-        [Fact]
-        public void Should_handle_comment_event()
+            var actual = sut.Trigger(@event, ctx);
+
+            Assert.True(actual);
+        });
+    }
+
+    [Fact]
+    public void Should_trigger_check_if_condition_matchs()
+    {
+        TestForCondition("true", ctx =>
         {
-            Assert.True(sut.Handles(new CommentCreated()));
-        }
+            var @event = new EnrichedCommentEvent();
 
-        [Fact]
-        public void Should_not_handle_comment_update_event()
+            var actual = sut.Trigger(new EnrichedCommentEvent(), ctx);
+
+            Assert.True(actual);
+        });
+    }
+
+    [Fact]
+    public void Should_not_trigger_check_if_condition_does_not_match()
+    {
+        TestForCondition("false", ctx =>
         {
-            Assert.False(sut.Handles(new CommentUpdated()));
-        }
+            var @event = new EnrichedCommentEvent();
 
-        [Fact]
-        public void Should_not_handle_other_event()
+            var actual = sut.Trigger(@event, ctx);
+
+            Assert.False(actual);
+        });
+    }
+
+    [Fact]
+    public void Should_trigger_check_if_email_is_correct()
+    {
+        TestForRealCondition("event.mentionedUser.email == '1@email.com'", (handler, ctx) =>
         {
-            Assert.False(sut.Handles(new ContentCreated()));
-        }
+            var @event = new EnrichedCommentEvent
+            {
+                MentionedUser = UserMocks.User("1", "1@email.com")
+            };
 
-        [Fact]
-        public async Task Should_create_enriched_events()
+            var actual = handler.Trigger(@event, ctx);
+
+            Assert.True(actual);
+        });
+    }
+
+    [Fact]
+    public void Should_not_trigger_check_if_email_is_not_correct()
+    {
+        TestForRealCondition("event.mentionedUser.email == 'other@squidex.io'", (handler, ctx) =>
         {
-            var ctx = Context();
+            var @event = new EnrichedCommentEvent
+            {
+                MentionedUser = UserMocks.User("1", "1@email.com")
+            };
 
-            var user1 = UserMocks.User("1");
-            var user2 = UserMocks.User("2");
+            var actual = handler.Trigger(@event, ctx);
 
-            var users = new List<IUser> { user1, user2 };
-            var userIds = users.Select(x => x.Id).ToArray();
+            Assert.False(actual);
+        });
+    }
 
-            var @event = new CommentCreated { Mentions = userIds };
-            var envelope = Envelope.Create<AppEvent>(@event);
-
-            A.CallTo(() => userResolver.QueryManyAsync(userIds, default))
-                .Returns(users.ToDictionary(x => x.Id));
-
-            var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
-
-            Assert.Equal(2, actual.Count);
-
-            var enrichedEvent1 = actual[0] as EnrichedCommentEvent;
-            var enrichedEvent2 = actual[1] as EnrichedCommentEvent;
-
-            Assert.Equal(user1, enrichedEvent1!.MentionedUser);
-            Assert.Equal(user2, enrichedEvent2!.MentionedUser);
-            Assert.Equal("UserMentioned", enrichedEvent1.Name);
-            Assert.Equal("UserMentioned", enrichedEvent2.Name);
-        }
-
-        [Fact]
-        public async Task Should_not_create_enriched_events_if_users_cannot_be_resolved()
+    [Fact]
+    public void Should_trigger_check_if_text_is_urgent()
+    {
+        TestForRealCondition("event.text.indexOf('urgent') >= 0", (handler, ctx) =>
         {
-            var ctx = Context();
+            var @event = new EnrichedCommentEvent
+            {
+                Text = "very_urgent_text"
+            };
 
-            var user1 = UserMocks.User("1");
-            var user2 = UserMocks.User("2");
+            var actual = handler.Trigger(@event, ctx);
 
-            var users = new List<IUser> { user1, user2 };
-            var userIds = users.Select(x => x.Id).ToArray();
+            Assert.True(actual);
+        });
+    }
 
-            var @event = new CommentCreated { Mentions = userIds };
-            var envelope = Envelope.Create<AppEvent>(@event);
-
-            var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
-
-            Assert.Empty(actual);
-        }
-
-        [Fact]
-        public async Task Should_not_create_enriched_events_if_mentions_is_null()
+    [Fact]
+    public void Should_not_trigger_check_if_text_is_not_urgent()
+    {
+        TestForRealCondition("event.text.indexOf('urgent') >= 0", (handler, ctx) =>
         {
-            var ctx = Context();
+            var @event = new EnrichedCommentEvent
+            {
+                Text = "just_gossip"
+            };
 
-            var @event = new CommentCreated { Mentions = null };
-            var envelope = Envelope.Create<AppEvent>(@event);
+            var actual = handler.Trigger(@event, ctx);
 
-            var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+            Assert.False(actual);
+        });
+    }
 
-            Assert.Empty(actual);
+    private void TestForRealCondition(string condition, Action<IRuleTriggerHandler, RuleContext> action)
+    {
+        var trigger = new CommentTrigger
+        {
+            Condition = condition
+        };
 
-            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._, A<CancellationToken>._))
+        var realScriptEngine =
+            new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                Options.Create(new JintScriptOptions
+                {
+                    TimeoutScript = TimeSpan.FromSeconds(2),
+                    TimeoutExecution = TimeSpan.FromSeconds(10)
+                }));
+
+        var handler = new CommentTriggerHandler(realScriptEngine, userResolver);
+
+        action(handler, Context(trigger));
+    }
+
+    private void TestForCondition(string condition, Action<RuleContext> action)
+    {
+        var trigger = new CommentTrigger
+        {
+            Condition = condition
+        };
+
+        action(Context(trigger));
+
+        if (string.IsNullOrWhiteSpace(condition))
+        {
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
                 .MustNotHaveHappened();
         }
-
-        [Fact]
-        public async Task Should_not_create_enriched_events_if_mentions_is_empty()
+        else
         {
-            var ctx = Context();
-
-            var @event = new CommentCreated { Mentions = Array.Empty<string>() };
-            var envelope = Envelope.Create<AppEvent>(@event);
-
-            var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
-
-            Assert.Empty(actual);
-
-            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._, A<CancellationToken>._))
-                .MustNotHaveHappened();
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
+                .MustHaveHappened();
         }
+    }
 
-        [Fact]
-        public void Should_trigger_precheck_if_event_type_correct()
+    private static RuleContext Context(RuleTrigger? trigger = null)
+    {
+        trigger ??= new CommentTrigger();
+
+        return new RuleContext
         {
-            TestForCondition(string.Empty, ctx =>
-            {
-                var @event = new CommentCreated();
-
-                var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
-
-                Assert.True(actual);
-            });
-        }
-
-        [Fact]
-        public void Should_trigger_check_if_condition_is_empty()
-        {
-            TestForCondition(string.Empty, ctx =>
-            {
-                var @event = new EnrichedCommentEvent();
-
-                var actual = sut.Trigger(@event, ctx);
-
-                Assert.True(actual);
-            });
-        }
-
-        [Fact]
-        public void Should_trigger_check_if_condition_matchs()
-        {
-            TestForCondition("true", ctx =>
-            {
-                var @event = new EnrichedCommentEvent();
-
-                var actual = sut.Trigger(new EnrichedCommentEvent(), ctx);
-
-                Assert.True(actual);
-            });
-        }
-
-        [Fact]
-        public void Should_not_trigger_check_if_condition_does_not_match()
-        {
-            TestForCondition("false", ctx =>
-            {
-                var @event = new EnrichedCommentEvent();
-
-                var actual = sut.Trigger(@event, ctx);
-
-                Assert.False(actual);
-            });
-        }
-
-        [Fact]
-        public void Should_trigger_check_if_email_is_correct()
-        {
-            TestForRealCondition("event.mentionedUser.email == '1@email.com'", (handler, ctx) =>
-            {
-                var @event = new EnrichedCommentEvent
-                {
-                    MentionedUser = UserMocks.User("1", "1@email.com")
-                };
-
-                var actual = handler.Trigger(@event, ctx);
-
-                Assert.True(actual);
-            });
-        }
-
-        [Fact]
-        public void Should_not_trigger_check_if_email_is_not_correct()
-        {
-            TestForRealCondition("event.mentionedUser.email == 'other@squidex.io'", (handler, ctx) =>
-            {
-                var @event = new EnrichedCommentEvent
-                {
-                    MentionedUser = UserMocks.User("1", "1@email.com")
-                };
-
-                var actual = handler.Trigger(@event, ctx);
-
-                Assert.False(actual);
-            });
-        }
-
-        [Fact]
-        public void Should_trigger_check_if_text_is_urgent()
-        {
-            TestForRealCondition("event.text.indexOf('urgent') >= 0", (handler, ctx) =>
-            {
-                var @event = new EnrichedCommentEvent
-                {
-                    Text = "very_urgent_text"
-                };
-
-                var actual = handler.Trigger(@event, ctx);
-
-                Assert.True(actual);
-            });
-        }
-
-        [Fact]
-        public void Should_not_trigger_check_if_text_is_not_urgent()
-        {
-            TestForRealCondition("event.text.indexOf('urgent') >= 0", (handler, ctx) =>
-            {
-                var @event = new EnrichedCommentEvent
-                {
-                    Text = "just_gossip"
-                };
-
-                var actual = handler.Trigger(@event, ctx);
-
-                Assert.False(actual);
-            });
-        }
-
-        private void TestForRealCondition(string condition, Action<IRuleTriggerHandler, RuleContext> action)
-        {
-            var trigger = new CommentTrigger
-            {
-                Condition = condition
-            };
-
-            var realScriptEngine =
-                new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
-                    Options.Create(new JintScriptOptions
-                    {
-                        TimeoutScript = TimeSpan.FromSeconds(2),
-                        TimeoutExecution = TimeSpan.FromSeconds(10)
-                    }));
-
-            var handler = new CommentTriggerHandler(realScriptEngine, userResolver);
-
-            action(handler, Context(trigger));
-        }
-
-        private void TestForCondition(string condition, Action<RuleContext> action)
-        {
-            var trigger = new CommentTrigger
-            {
-                Condition = condition
-            };
-
-            action(Context(trigger));
-
-            if (string.IsNullOrWhiteSpace(condition))
-            {
-                A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
-                    .MustNotHaveHappened();
-            }
-            else
-            {
-                A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
-                    .MustHaveHappened();
-            }
-        }
-
-        private static RuleContext Context(RuleTrigger? trigger = null)
-        {
-            trigger ??= new CommentTrigger();
-
-            return new RuleContext
-            {
-                AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
-                Rule = new Rule(trigger, A.Fake<RuleAction>()),
-                RuleId = DomainId.NewGuid()
-            };
-        }
+            AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
+            Rule = new Rule(trigger, A.Fake<RuleAction>()),
+            RuleId = DomainId.NewGuid()
+        };
     }
 }

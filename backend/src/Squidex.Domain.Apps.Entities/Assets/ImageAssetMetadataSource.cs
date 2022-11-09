@@ -9,104 +9,103 @@ using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Assets;
+
+public sealed class ImageAssetMetadataSource : IAssetMetadataSource
 {
-    public sealed class ImageAssetMetadataSource : IAssetMetadataSource
+    private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
+
+    public ImageAssetMetadataSource(IAssetThumbnailGenerator assetThumbnailGenerator)
     {
-        private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
+        this.assetThumbnailGenerator = assetThumbnailGenerator;
+    }
 
-        public ImageAssetMetadataSource(IAssetThumbnailGenerator assetThumbnailGenerator)
+    public async Task EnhanceAsync(UploadAssetCommand command,
+        CancellationToken ct)
+    {
+        if (command.Type is AssetType.Unknown or AssetType.Image)
         {
-            this.assetThumbnailGenerator = assetThumbnailGenerator;
-        }
+            var mimeType = command.File.MimeType;
 
-        public async Task EnhanceAsync(UploadAssetCommand command,
-            CancellationToken ct)
-        {
-            if (command.Type is AssetType.Unknown or AssetType.Image)
+            ImageInfo? imageInfo;
+
+            await using (var uploadStream = command.File.OpenRead())
             {
-                var mimeType = command.File.MimeType;
-
-                ImageInfo? imageInfo;
-
-                await using (var uploadStream = command.File.OpenRead())
-                {
-                    imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream, mimeType, ct);
-                }
-
-                if (imageInfo != null)
-                {
-                    var isSwapped = imageInfo.Orientation > ImageOrientation.TopLeft;
-
-                    if (command.File != null && isSwapped)
-                    {
-                        var tempFile = TempAssetFile.Create(command.File);
-
-                        await using (var uploadStream = command.File.OpenRead())
-                        {
-                            await using (var tempStream = tempFile.OpenWrite())
-                            {
-                                await assetThumbnailGenerator.FixOrientationAsync(uploadStream, mimeType, tempStream, ct);
-                            }
-                        }
-
-                        await using (var tempStream = tempFile.OpenRead())
-                        {
-                            imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(tempStream, mimeType, ct) ?? imageInfo;
-                        }
-
-                        await command.File.DisposeAsync();
-
-                        command.File = tempFile;
-                    }
-
-                    if (command.Type == AssetType.Unknown || isSwapped)
-                    {
-                        command.Type = AssetType.Image;
-
-                        command.Metadata.SetPixelWidth(imageInfo.PixelWidth);
-                        command.Metadata.SetPixelHeight(imageInfo.PixelHeight);
-                    }
-                }
+                imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream, mimeType, ct);
             }
 
-            if (command.Tags == null)
+            if (imageInfo != null)
             {
-                return;
-            }
+                var isSwapped = imageInfo.Orientation > ImageOrientation.TopLeft;
 
-            if (command.Type == AssetType.Image)
-            {
-                command.Tags.Add("image");
-
-                var wh = command.Metadata.GetPixelWidth() + command.Metadata.GetPixelWidth();
-
-                if (wh > 2000)
+                if (command.File != null && isSwapped)
                 {
-                    command.Tags.Add("image/large");
+                    var tempFile = TempAssetFile.Create(command.File);
+
+                    await using (var uploadStream = command.File.OpenRead())
+                    {
+                        await using (var tempStream = tempFile.OpenWrite())
+                        {
+                            await assetThumbnailGenerator.FixOrientationAsync(uploadStream, mimeType, tempStream, ct);
+                        }
+                    }
+
+                    await using (var tempStream = tempFile.OpenRead())
+                    {
+                        imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(tempStream, mimeType, ct) ?? imageInfo;
+                    }
+
+                    await command.File.DisposeAsync();
+
+                    command.File = tempFile;
                 }
-                else if (wh > 1000)
+
+                if (command.Type == AssetType.Unknown || isSwapped)
                 {
-                    command.Tags.Add("image/medium");
-                }
-                else
-                {
-                    command.Tags.Add("image/small");
+                    command.Type = AssetType.Image;
+
+                    command.Metadata.SetPixelWidth(imageInfo.PixelWidth);
+                    command.Metadata.SetPixelHeight(imageInfo.PixelHeight);
                 }
             }
         }
 
-        public IEnumerable<string> Format(IAssetEntity asset)
+        if (command.Tags == null)
         {
-            if (asset.Type == AssetType.Image)
-            {
-                var w = asset.Metadata.GetPixelWidth();
-                var h = asset.Metadata.GetPixelHeight();
+            return;
+        }
 
-                if (w != null && h != null)
-                {
-                    yield return $"{w}x{h}px";
-                }
+        if (command.Type == AssetType.Image)
+        {
+            command.Tags.Add("image");
+
+            var wh = command.Metadata.GetPixelWidth() + command.Metadata.GetPixelWidth();
+
+            if (wh > 2000)
+            {
+                command.Tags.Add("image/large");
+            }
+            else if (wh > 1000)
+            {
+                command.Tags.Add("image/medium");
+            }
+            else
+            {
+                command.Tags.Add("image/small");
+            }
+        }
+    }
+
+    public IEnumerable<string> Format(IAssetEntity asset)
+    {
+        if (asset.Type == AssetType.Image)
+        {
+            var w = asset.Metadata.GetPixelWidth();
+            var h = asset.Metadata.GetPixelHeight();
+
+            if (w != null && h != null)
+            {
+                yield return $"{w}x{h}px";
             }
         }
     }

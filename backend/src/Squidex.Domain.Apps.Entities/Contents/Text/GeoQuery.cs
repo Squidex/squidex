@@ -9,7 +9,6 @@ using Squidex.Infrastructure;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
-{
-    public sealed record GeoQuery(DomainId SchemaId, string Field, double Latitude, double Longitude, double Radius, int Take);
-}
+namespace Squidex.Domain.Apps.Entities.Contents.Text;
+
+public sealed record GeoQuery(DomainId SchemaId, string Field, double Latitude, double Longitude, double Radius, int Take);

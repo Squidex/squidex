@@ -9,42 +9,41 @@ using System.Diagnostics;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 
-namespace Squidex.Infrastructure.Diagnostics
+namespace Squidex.Infrastructure.Diagnostics;
+
+public sealed class GCHealthCheck : IHealthCheck
 {
-    public sealed class GCHealthCheck : IHealthCheck
+    private readonly long threshold;
+
+    public GCHealthCheck(IOptions<GCHealthCheckOptions> options)
     {
-        private readonly long threshold;
+        threshold = 1024 * 1024 * options.Value.ThresholdInMB;
+    }
 
-        public GCHealthCheck(IOptions<GCHealthCheckOptions> options)
+    public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
+        CancellationToken cancellationToken = default)
+    {
+        var workingSet = Process.GetCurrentProcess().WorkingSet64;
+
+        var heapSize = GC.GetTotalMemory(false);
+
+        var data = new Dictionary<string, object>
         {
-            threshold = 1024 * 1024 * options.Value.ThresholdInMB;
-        }
+            { "Gen0CollectionCount", GC.CollectionCount(0) },
+            { "Gen1CollectionCount", GC.CollectionCount(1) },
+            { "Gen2CollectionCount", GC.CollectionCount(2) },
+            { "HeapSizeBytes", heapSize },
+            { "HeapSizeString", heapSize.ToReadableSize() },
+            { "WorkingSetBytes", workingSet },
+            { "WorkingSetString", workingSet.ToReadableSize() }
+        };
 
-        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
-            CancellationToken cancellationToken = default)
-        {
-            var workingSet = Process.GetCurrentProcess().WorkingSet64;
+        var status = workingSet < threshold ?
+            HealthStatus.Healthy :
+            HealthStatus.Unhealthy;
 
-            var heapSize = GC.GetTotalMemory(false);
+        var message = $"Application must consume less than {threshold.ToReadableSize()} memory.";
 
-            var data = new Dictionary<string, object>
-            {
-                { "Gen0CollectionCount", GC.CollectionCount(0) },
-                { "Gen1CollectionCount", GC.CollectionCount(1) },
-                { "Gen2CollectionCount", GC.CollectionCount(2) },
-                { "HeapSizeBytes", heapSize },
-                { "HeapSizeString", heapSize.ToReadableSize() },
-                { "WorkingSetBytes", workingSet },
-                { "WorkingSetString", workingSet.ToReadableSize() }
-            };
-
-            var status = workingSet < threshold ?
-                HealthStatus.Healthy :
-                HealthStatus.Unhealthy;
-
-            var message = $"Application must consume less than {threshold.ToReadableSize()} memory.";
-
-            return Task.FromResult(new HealthCheckResult(status, message, data: data));
-        }
+        return Task.FromResult(new HealthCheckResult(status, message, data: data));
     }
 }

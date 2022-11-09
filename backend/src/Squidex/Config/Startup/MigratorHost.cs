@@ -7,27 +7,26 @@
 
 using Squidex.Infrastructure.Migrations;
 
-namespace Squidex.Config.Startup
+namespace Squidex.Config.Startup;
+
+public sealed class MigratorHost : IHostedService
 {
-    public sealed class MigratorHost : IHostedService
+    private readonly Migrator migrator;
+
+    public MigratorHost(Migrator migrator)
     {
-        private readonly Migrator migrator;
+        this.migrator = migrator;
+    }
 
-        public MigratorHost(Migrator migrator)
-        {
-            this.migrator = migrator;
-        }
+    public Task StartAsync(
+        CancellationToken cancellationToken)
+    {
+        return migrator.MigrateAsync(cancellationToken);
+    }
 
-        public Task StartAsync(
-            CancellationToken cancellationToken)
-        {
-            return migrator.MigrateAsync(cancellationToken);
-        }
-
-        public Task StopAsync(
-            CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+    public Task StopAsync(
+        CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 }

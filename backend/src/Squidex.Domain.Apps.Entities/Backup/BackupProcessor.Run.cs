@@ -10,45 +10,44 @@ using Squidex.Infrastructure;
 
 #pragma warning disable MA0040 // Flow the cancellation token
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public sealed partial class BackupProcessor
 {
-    public sealed partial class BackupProcessor
+    // Use a run to store all state that is necessary for a single run.
+    private sealed class Run : IDisposable
     {
-        // Use a run to store all state that is necessary for a single run.
-        private sealed class Run : IDisposable
+        private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource cancellationLinked;
+
+        public IEnumerable<IBackupHandler> Handlers { get; init; }
+
+        public RefToken Actor { get; init; }
+
+        public BackupJob Job { get; init; }
+
+        public CancellationToken CancellationToken => cancellationLinked.Token;
+
+        public Run(CancellationToken ct)
         {
-            private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
-            private readonly CancellationTokenSource cancellationLinked;
+            cancellationLinked = CancellationTokenSource.CreateLinkedTokenSource(ct, cancellationSource.Token);
+        }
 
-            public IEnumerable<IBackupHandler> Handlers { get; init; }
+        public void Dispose()
+        {
+            cancellationSource.Dispose();
+            cancellationLinked.Dispose();
+        }
 
-            public RefToken Actor { get; init; }
-
-            public BackupJob Job { get; init; }
-
-            public CancellationToken CancellationToken => cancellationLinked.Token;
-
-            public Run(CancellationToken ct)
+        public void Cancel()
+        {
+            try
             {
-                cancellationLinked = CancellationTokenSource.CreateLinkedTokenSource(ct, cancellationSource.Token);
+                cancellationSource.Cancel();
             }
-
-            public void Dispose()
+            catch (ObjectDisposedException)
             {
-                cancellationSource.Dispose();
-                cancellationLinked.Dispose();
-            }
-
-            public void Cancel()
-            {
-                try
-                {
-                    cancellationSource.Cancel();
-                }
-                catch (ObjectDisposedException)
-                {
-                    // Cancellation token might have been disposed, if the run is completed.
-                }
+                // Cancellation token might have been disposed, if the run is completed.
             }
         }
     }

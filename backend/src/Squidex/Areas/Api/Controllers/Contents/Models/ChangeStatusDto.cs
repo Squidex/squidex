@@ -12,29 +12,28 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.Api.Controllers.Contents.Models
+namespace Squidex.Areas.Api.Controllers.Contents.Models;
+
+public sealed class ChangeStatusDto
 {
-    public sealed class ChangeStatusDto
+    /// <summary>
+    /// The new status.
+    /// </summary>
+    [LocalizedRequired]
+    public Status Status { get; set; }
+
+    /// <summary>
+    /// The due time.
+    /// </summary>
+    public Instant? DueTime { get; set; }
+
+    /// <summary>
+    /// True to check referrers of this content.
+    /// </summary>
+    public bool CheckReferrers { get; set; }
+
+    public ChangeContentStatus ToCommand(DomainId id)
     {
-        /// <summary>
-        /// The new status.
-        /// </summary>
-        [LocalizedRequired]
-        public Status Status { get; set; }
-
-        /// <summary>
-        /// The due time.
-        /// </summary>
-        public Instant? DueTime { get; set; }
-
-        /// <summary>
-        /// True to check referrers of this content.
-        /// </summary>
-        public bool CheckReferrers { get; set; }
-
-        public ChangeContentStatus ToCommand(DomainId id)
-        {
-            return SimpleMapper.Map(this, new ChangeContentStatus { ContentId = id });
-        }
+        return SimpleMapper.Map(this, new ChangeContentStatus { ContentId = id });
     }
 }

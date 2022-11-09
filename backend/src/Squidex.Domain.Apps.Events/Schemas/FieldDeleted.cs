@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas;
+
+[EventType(nameof(FieldDeleted))]
+public sealed class FieldDeleted : FieldEvent
 {
-    [EventType(nameof(FieldDeleted))]
-    public sealed class FieldDeleted : FieldEvent
-    {
-    }
 }

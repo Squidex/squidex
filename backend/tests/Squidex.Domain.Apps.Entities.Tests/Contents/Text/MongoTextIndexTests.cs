@@ -9,47 +9,46 @@ using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text;
+
+[Trait("Category", "Dependencies")]
+public class MongoTextIndexTests : TextIndexerTestsBase, IClassFixture<MongoTextIndexFixture>
 {
-    [Trait("Category", "Dependencies")]
-    public class MongoTextIndexTests : TextIndexerTestsBase, IClassFixture<MongoTextIndexFixture>
+    public override bool SupportsQuerySyntax => false;
+
+    public override bool SupportsGeo => true;
+
+    public MongoTextIndexFixture _ { get; }
+
+    public MongoTextIndexTests(MongoTextIndexFixture fixture)
     {
-        public override bool SupportsQuerySyntax => false;
+        _ = fixture;
+    }
 
-        public override bool SupportsGeo => true;
+    public override ITextIndex CreateIndex()
+    {
+        return _.Index;
+    }
 
-        public MongoTextIndexFixture _ { get; }
+    [Fact]
+    public async Task Should_retrieve_all_stopwords_for_english_query()
+    {
+        var both = ids2.Union(ids1).ToList();
 
-        public MongoTextIndexTests(MongoTextIndexFixture fixture)
-        {
-            _ = fixture;
-        }
+        await CreateTextAsync(ids1[0], "de", "and und");
+        await CreateTextAsync(ids2[0], "en", "and und");
 
-        public override ITextIndex CreateIndex()
-        {
-            return _.Index;
-        }
+        await SearchText(expected: both, text: "and");
+    }
 
-        [Fact]
-        public async Task Should_retrieve_all_stopwords_for_english_query()
-        {
-            var both = ids2.Union(ids1).ToList();
+    [Fact]
+    public async Task Should_retrieve_all_stopwords_for_german_query()
+    {
+        var both = ids2.Union(ids1).ToList();
 
-            await CreateTextAsync(ids1[0], "de", "and und");
-            await CreateTextAsync(ids2[0], "en", "and und");
+        await CreateTextAsync(ids1[0], "de", "and und");
+        await CreateTextAsync(ids2[0], "en", "and und");
 
-            await SearchText(expected: both, text: "and");
-        }
-
-        [Fact]
-        public async Task Should_retrieve_all_stopwords_for_german_query()
-        {
-            var both = ids2.Union(ids1).ToList();
-
-            await CreateTextAsync(ids1[0], "de", "and und");
-            await CreateTextAsync(ids2[0], "en", "and und");
-
-            await SearchText(expected: both, text: "und");
-        }
+        await SearchText(expected: both, text: "und");
     }
 }

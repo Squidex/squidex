@@ -9,20 +9,19 @@ using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Config.Domain
+namespace Squidex.Config.Domain;
+
+public static class HistoryServices
 {
-    public static class HistoryServices
+    public static void AddSquidexHistory(this IServiceCollection services, IConfiguration config)
     {
-        public static void AddSquidexHistory(this IServiceCollection services, IConfiguration config)
-        {
-            services.Configure<NotifoOptions>(
-                config.GetSection("notifo"));
+        services.Configure<NotifoOptions>(
+            config.GetSection("notifo"));
 
-            services.AddSingletonAs<NotifoService>()
-                .AsSelf().As<IUserEvents>();
+        services.AddSingletonAs<NotifoService>()
+            .AsSelf().As<IUserEvents>();
 
-            services.AddSingletonAs<HistoryService>()
-                .As<IEventConsumer>().As<IHistoryService>();
-        }
+        services.AddSingletonAs<HistoryService>()
+            .As<IEventConsumer>().As<IHistoryService>();
     }
 }

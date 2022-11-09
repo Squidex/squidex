@@ -11,63 +11,62 @@ using Xunit.Abstractions;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 
-namespace TestSuite.LoadTests
+namespace TestSuite.LoadTests;
+
+public class ReadingBenchmarks : IClassFixture<CreatedAppFixture>
 {
-    public class ReadingBenchmarks : IClassFixture<CreatedAppFixture>
+    private readonly ITestOutputHelper testOutput;
+
+    public CreatedAppFixture _ { get; }
+
+    public ReadingBenchmarks(CreatedAppFixture fixture, ITestOutputHelper testOutput)
     {
-        private readonly ITestOutputHelper testOutput;
+        this.testOutput = testOutput;
 
-        public CreatedAppFixture _ { get; }
+        _ = fixture;
+    }
 
-        public ReadingBenchmarks(CreatedAppFixture fixture, ITestOutputHelper testOutput)
+    public static IEnumerable<object[]> Loads()
+    {
+        int[] users =
         {
-            this.testOutput = testOutput;
+            1,
+            5,
+            10,
+            20,
+            50,
+            100
+        };
 
-            _ = fixture;
-        }
-
-        public static IEnumerable<object[]> Loads()
+        int[] loads =
         {
-            int[] users =
-            {
-                1,
-                5,
-                10,
-                20,
-                50,
-                100
-            };
+            1,
+            5,
+            10,
+            20,
+            50,
+            100,
+            1000
+        };
 
-            int[] loads =
+        foreach (var user in users)
+        {
+            foreach (var load in loads)
             {
-                1,
-                5,
-                10,
-                20,
-                50,
-                100,
-                1000
-            };
-
-            foreach (var user in users)
-            {
-                foreach (var load in loads)
-                {
-                    yield return new object[] { user, load };
-                }
+                yield return new object[] { user, load };
             }
-
-            yield return new object[] { 1, 20000 };
         }
 
-        [Theory]
-        [MemberData(nameof(Loads))]
-        public async Task Should_return_clients(int numUsers, int numIterationsPerUser)
+        yield return new object[] { 1, 20000 };
+    }
+
+    [Theory]
+    [MemberData(nameof(Loads))]
+    public async Task Should_return_clients(int numUsers, int numIterationsPerUser)
+    {
+        await Run.Parallel(numUsers, numIterationsPerUser, async () =>
         {
-            await Run.Parallel(numUsers, numIterationsPerUser, async () =>
-            {
-                await _.Apps.GetClientsAsync(_.AppName);
-            }, 100, testOutput);
-        }
+            await _.Apps.GetClientsAsync(_.AppName);
+        }, 100, testOutput);
     }
 }

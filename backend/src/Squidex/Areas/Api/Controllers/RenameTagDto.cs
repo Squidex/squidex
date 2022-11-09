@@ -7,14 +7,13 @@
 
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.Api.Controllers
+namespace Squidex.Areas.Api.Controllers;
+
+public sealed class RenameTagDto
 {
-    public sealed class RenameTagDto
-    {
-        /// <summary>
-        /// The new name for the tag.
-        /// </summary>
-        [LocalizedRequired]
-        public string TagName { get; set; }
-    }
+    /// <summary>
+    /// The new name for the tag.
+    /// </summary>
+    [LocalizedRequired]
+    public string TagName { get; set; }
 }

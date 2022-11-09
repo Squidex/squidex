@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Contents
+namespace Squidex.Domain.Apps.Core.Contents;
+
+public enum GeoJsonParseResult
 {
-    public enum GeoJsonParseResult
-    {
-        Success,
-        InvalidLatitude,
-        InvalidLongitude,
-        InvalidValue
-    }
+    Success,
+    InvalidLatitude,
+    InvalidLongitude,
+    InvalidValue
 }

@@ -7,15 +7,14 @@
 
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Assets;
+
+public interface IAssetMetadataSource
 {
-    public interface IAssetMetadataSource
-    {
-        int Order => 0;
+    int Order => 0;
 
-        Task EnhanceAsync(UploadAssetCommand command,
-            CancellationToken ct);
+    Task EnhanceAsync(UploadAssetCommand command,
+        CancellationToken ct);
 
-        IEnumerable<string> Format(IAssetEntity asset);
-    }
+    IEnumerable<string> Format(IAssetEntity asset);
 }

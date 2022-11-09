@@ -11,72 +11,71 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities;
+
+public abstract class DomainObjectState<T> : IDomainState<T> where T : class
 {
-    public abstract class DomainObjectState<T> : IDomainState<T> where T : class
+    public DomainId Id { get; set; }
+
+    public RefToken CreatedBy { get; set; }
+
+    public RefToken LastModifiedBy { get; set; }
+
+    public Instant Created { get; set; }
+
+    public Instant LastModified { get; set; }
+
+    public long Version { get; set; }
+
+    protected DomainObjectState()
     {
-        public DomainId Id { get; set; }
+        Version = EtagVersion.Empty;
+    }
 
-        public RefToken CreatedBy { get; set; }
+    public virtual bool ApplyEvent(IEvent @event, EnvelopeHeaders headers)
+    {
+        return ApplyEvent(@event);
+    }
 
-        public RefToken LastModifiedBy { get; set; }
+    public virtual bool ApplyEvent(IEvent @event)
+    {
+        return false;
+    }
 
-        public Instant Created { get; set; }
+    public T Copy()
+    {
+        return (T)MemberwiseClone();
+    }
 
-        public Instant LastModified { get; set; }
+    public T Apply(Envelope<IEvent> @event)
+    {
+        var payload = (SquidexEvent)@event.Payload;
 
-        public long Version { get; set; }
+        var clone = (DomainObjectState<T>)MemberwiseClone();
 
-        protected DomainObjectState()
+        if (!clone.ApplyEvent(@event.Payload, @event.Headers))
         {
-            Version = EtagVersion.Empty;
+            return (this as T)!;
         }
 
-        public virtual bool ApplyEvent(IEvent @event, EnvelopeHeaders headers)
+        var headers = @event.Headers;
+
+        if (clone.Id == DomainId.Empty)
         {
-            return ApplyEvent(@event);
+            clone.Id = headers.AggregateId();
         }
 
-        public virtual bool ApplyEvent(IEvent @event)
+        var timestamp = headers.Timestamp();
+
+        if (clone.CreatedBy == null)
         {
-            return false;
+            clone.Created = timestamp;
+            clone.CreatedBy = payload.Actor;
         }
 
-        public T Copy()
-        {
-            return (T)MemberwiseClone();
-        }
+        clone.LastModified = timestamp;
+        clone.LastModifiedBy = payload.Actor;
 
-        public T Apply(Envelope<IEvent> @event)
-        {
-            var payload = (SquidexEvent)@event.Payload;
-
-            var clone = (DomainObjectState<T>)MemberwiseClone();
-
-            if (!clone.ApplyEvent(@event.Payload, @event.Headers))
-            {
-                return (this as T)!;
-            }
-
-            var headers = @event.Headers;
-
-            if (clone.Id == DomainId.Empty)
-            {
-                clone.Id = headers.AggregateId();
-            }
-
-            var timestamp = headers.Timestamp();
-
-            if (clone.CreatedBy == null)
-            {
-                clone.Created = timestamp;
-                clone.CreatedBy = payload.Actor;
-            }
-
-            clone.LastModified = timestamp;
-            clone.LastModifiedBy = payload.Actor;
-
-            return (clone as T)!;
-        }
+        return (clone as T)!;
     }
 }

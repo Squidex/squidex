@@ -7,14 +7,13 @@
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+public delegate IEventSubscription EventSubscriptionSource<T>(IEventSubscriber<T> target);
+
+public interface IEventSubscriber<T>
 {
-    public delegate IEventSubscription EventSubscriptionSource<T>(IEventSubscriber<T> target);
+    ValueTask OnNextAsync(IEventSubscription subscription, T @event);
 
-    public interface IEventSubscriber<T>
-    {
-        ValueTask OnNextAsync(IEventSubscription subscription, T @event);
-
-        ValueTask OnErrorAsync(IEventSubscription subscription, Exception exception);
-    }
+    ValueTask OnErrorAsync(IEventSubscription subscription, Exception exception);
 }

@@ -7,20 +7,19 @@
 
 using System.Diagnostics;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+public static class Telemetry
 {
-    public static class Telemetry
+    public static readonly ActivitySource Activities = new ActivitySource("Squidex");
+
+    public static Activity? StartSubActivity(this ActivitySource activity, string name)
     {
-        public static readonly ActivitySource Activities = new ActivitySource("Squidex");
-
-        public static Activity? StartSubActivity(this ActivitySource activity, string name)
+        if (Activity.Current == null)
         {
-            if (Activity.Current == null)
-            {
-                return null;
-            }
-
-            return activity.StartActivity(name);
+            return null;
         }
+
+        return activity.StartActivity(name);
     }
 }

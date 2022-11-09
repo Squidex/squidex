@@ -12,42 +12,41 @@ using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
+namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators;
+
+public class NoValueValidatorTests : IClassFixture<TranslationsFixture>
 {
-    public class NoValueValidatorTests : IClassFixture<TranslationsFixture>
+    private readonly List<string> errors = new List<string>();
+
+    [Fact]
+    public async Task Should_not_add_error_if_value_is_undefined()
     {
-        private readonly List<string> errors = new List<string>();
+        var sut = NoValueValidator.Instance;
 
-        [Fact]
-        public async Task Should_not_add_error_if_value_is_undefined()
-        {
-            var sut = NoValueValidator.Instance;
+        await sut.ValidateAsync(Undefined.Value, errors);
 
-            await sut.ValidateAsync(Undefined.Value, errors);
+        Assert.Empty(errors);
+    }
 
-            Assert.Empty(errors);
-        }
+    [Fact]
+    public async Task Should_add_error_if_value_is_json_null()
+    {
+        var sut = NoValueValidator.Instance;
 
-        [Fact]
-        public async Task Should_add_error_if_value_is_json_null()
-        {
-            var sut = NoValueValidator.Instance;
+        await sut.ValidateAsync(JsonValue.Null, errors);
 
-            await sut.ValidateAsync(JsonValue.Null, errors);
+        errors.Should().BeEquivalentTo(
+            new[] { "Value must not be defined." });
+    }
 
-            errors.Should().BeEquivalentTo(
-                new[] { "Value must not be defined." });
-        }
+    [Fact]
+    public async Task Should_add_error_if_value_is_valid()
+    {
+        var sut = NoValueValidator.Instance;
 
-        [Fact]
-        public async Task Should_add_error_if_value_is_valid()
-        {
-            var sut = NoValueValidator.Instance;
+        await sut.ValidateAsync(JsonValue.True, errors);
 
-            await sut.ValidateAsync(JsonValue.True, errors);
-
-            errors.Should().BeEquivalentTo(
-                new[] { "Value must not be defined." });
-        }
+        errors.Should().BeEquivalentTo(
+            new[] { "Value must not be defined." });
     }
 }

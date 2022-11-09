@@ -11,58 +11,57 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 
-namespace Squidex.Infrastructure.MongoDb
+namespace Squidex.Infrastructure.MongoDb;
+
+public static class BsonJsonConvention
 {
-    public static class BsonJsonConvention
+    private static bool isRegistered;
+
+    public static JsonSerializerOptions Options { get; private set; } = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+
+    public static BsonType Representation { get; private set; } = BsonType.Document;
+
+    public static void Register(JsonSerializerOptions? options = null, BsonType? representation = null)
     {
-        private static bool isRegistered;
-
-        public static JsonSerializerOptions Options { get; private set; } = new JsonSerializerOptions(JsonSerializerDefaults.Web);
-
-        public static BsonType Representation { get; private set; } = BsonType.Document;
-
-        public static void Register(JsonSerializerOptions? options = null, BsonType? representation = null)
+        try
         {
-            try
+            if (options != null)
             {
-                if (options != null)
-                {
-                    Options = options;
-                }
-
-                if (representation != null)
-                {
-                    Representation = representation.Value;
-                }
-
-                if (isRegistered)
-                {
-                    return;
-                }
-
-                var pack = new ConventionPack();
-
-                pack.AddMemberMapConvention("JsonBson", memberMap =>
-                {
-                    var attributes = memberMap.MemberInfo.GetCustomAttributes();
-
-                    if (attributes.OfType<BsonJsonAttribute>().Any())
-                    {
-                        var bsonSerializerType = typeof(BsonJsonSerializer<>).MakeGenericType(memberMap.MemberType);
-                        var bsonSerializer = Activator.CreateInstance(bsonSerializerType);
-
-                        memberMap.SetSerializer((IBsonSerializer)bsonSerializer!);
-                    }
-                });
-
-                ConventionRegistry.Register("json", pack, t => true);
-
-                isRegistered = true;
+                Options = options;
             }
-            catch (BsonSerializationException)
+
+            if (representation != null)
+            {
+                Representation = representation.Value;
+            }
+
+            if (isRegistered)
             {
                 return;
             }
+
+            var pack = new ConventionPack();
+
+            pack.AddMemberMapConvention("JsonBson", memberMap =>
+            {
+                var attributes = memberMap.MemberInfo.GetCustomAttributes();
+
+                if (attributes.OfType<BsonJsonAttribute>().Any())
+                {
+                    var bsonSerializerType = typeof(BsonJsonSerializer<>).MakeGenericType(memberMap.MemberType);
+                    var bsonSerializer = Activator.CreateInstance(bsonSerializerType);
+
+                    memberMap.SetSerializer((IBsonSerializer)bsonSerializer!);
+                }
+            });
+
+            ConventionRegistry.Register("json", pack, t => true);
+
+            isRegistered = true;
+        }
+        catch (BsonSerializationException)
+        {
+            return;
         }
     }
 }

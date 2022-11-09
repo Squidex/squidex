@@ -10,59 +10,58 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Core.Contents
+namespace Squidex.Domain.Apps.Core.Contents;
+
+public class TranslationStatus : Dictionary<string, int>
 {
-    public class TranslationStatus : Dictionary<string, int>
+    public TranslationStatus()
     {
-        public TranslationStatus()
+    }
+
+    public TranslationStatus(int capacity)
+        : base(capacity)
+    {
+    }
+
+    public static TranslationStatus Create(ContentData data, Schema schema, LanguagesConfig languages)
+    {
+        Guard.NotNull(data);
+        Guard.NotNull(schema);
+        Guard.NotNull(languages);
+
+        var result = new TranslationStatus(languages.Languages.Count);
+
+        var localizedFields = schema.Fields.Where(x => x.Partitioning == Partitioning.Language).ToList();
+
+        foreach (var language in languages.AllKeys)
         {
-        }
+            var percent = 0;
 
-        public TranslationStatus(int capacity)
-            : base(capacity)
-        {
-        }
-
-        public static TranslationStatus Create(ContentData data, Schema schema, LanguagesConfig languages)
-        {
-            Guard.NotNull(data);
-            Guard.NotNull(schema);
-            Guard.NotNull(languages);
-
-            var result = new TranslationStatus(languages.Languages.Count);
-
-            var localizedFields = schema.Fields.Where(x => x.Partitioning == Partitioning.Language).ToList();
-
-            foreach (var language in languages.AllKeys)
+            foreach (var field in localizedFields)
             {
-                var percent = 0;
-
-                foreach (var field in localizedFields)
+                if (IsValidValue(data.GetValueOrDefault(field.Name)?.GetValueOrDefault(language)))
                 {
-                    if (IsValidValue(data.GetValueOrDefault(field.Name)?.GetValueOrDefault(language)))
-                    {
-                        percent++;
-                    }
+                    percent++;
                 }
-
-                if (localizedFields.Count > 0)
-                {
-                    percent = (int)Math.Round(100 * (double)percent / localizedFields.Count);
-                }
-                else
-                {
-                    percent = 100;
-                }
-
-                result[language] = percent;
             }
 
-            return result;
+            if (localizedFields.Count > 0)
+            {
+                percent = (int)Math.Round(100 * (double)percent / localizedFields.Count);
+            }
+            else
+            {
+                percent = 100;
+            }
+
+            result[language] = percent;
         }
 
-        private static bool IsValidValue(JsonValue? value)
-        {
-            return value != null && value.Value.Type != JsonValueType.Null;
-        }
+        return result;
+    }
+
+    private static bool IsValidValue(JsonValue? value)
+    {
+        return value != null && value.Value.Type != JsonValueType.Null;
     }
 }

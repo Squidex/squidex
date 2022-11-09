@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Assets
+namespace Squidex.Domain.Apps.Core.Assets;
+
+public enum AssetType
 {
-    public enum AssetType
-    {
-        Unknown,
-        Image,
-        Audio,
-        Video
-    }
+    Unknown,
+    Image,
+    Audio,
+    Video
 }

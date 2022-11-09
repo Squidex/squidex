@@ -11,38 +11,37 @@ using OpenTelemetry.Trace;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.APM.Otlp
+namespace Squidex.Extensions.APM.Otlp;
+
+public sealed class OtlpPlugin : IPlugin
 {
-    public sealed class OtlpPlugin : IPlugin
+    private sealed class Configurator : ITelemetryConfigurator
     {
-        private sealed class Configurator : ITelemetryConfigurator
+        private readonly IConfiguration config;
+
+        public Configurator(IConfiguration config)
         {
-            private readonly IConfiguration config;
-
-            public Configurator(IConfiguration config)
-            {
-                this.config = config;
-            }
-
-            public void Configure(TracerProviderBuilder builder)
-            {
-                // See: https://docs.microsoft.com/aspnet/core/grpc/troubleshoot#call-insecure-grpc-services-with-net-core-client
-                AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-
-                builder.AddOtlpExporter(options =>
-                {
-                    config.GetSection("logging:otlp").Bind(options);
-                });
-            }
+            this.config = config;
         }
 
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
+        public void Configure(TracerProviderBuilder builder)
         {
-            if (config.GetValue<bool>("logging:otlp:enabled"))
+            // See: https://docs.microsoft.com/aspnet/core/grpc/troubleshoot#call-insecure-grpc-services-with-net-core-client
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
+            builder.AddOtlpExporter(options =>
             {
-                services.AddSingleton<ITelemetryConfigurator,
-                    Configurator>();
-            }
+                config.GetSection("logging:otlp").Bind(options);
+            });
+        }
+    }
+
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
+    {
+        if (config.GetValue<bool>("logging:otlp:enabled"))
+        {
+            services.AddSingleton<ITelemetryConfigurator,
+                Configurator>();
         }
     }
 }

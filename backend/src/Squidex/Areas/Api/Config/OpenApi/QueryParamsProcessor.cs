@@ -9,27 +9,26 @@ using NSwag;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 
-namespace Squidex.Areas.Api.Config.OpenApi
+namespace Squidex.Areas.Api.Config.OpenApi;
+
+public sealed class QueryParamsProcessor : IOperationProcessor
 {
-    public sealed class QueryParamsProcessor : IOperationProcessor
+    private readonly string path;
+
+    public QueryParamsProcessor(string path)
     {
-        private readonly string path;
+        this.path = path;
+    }
 
-        public QueryParamsProcessor(string path)
+    public bool Process(OperationProcessorContext context)
+    {
+        if (context.OperationDescription.Path == path && context.OperationDescription.Method == OpenApiOperationMethod.Get)
         {
-            this.path = path;
+            var operation = context.OperationDescription.Operation;
+
+            operation.AddQuery(false);
         }
 
-        public bool Process(OperationProcessorContext context)
-        {
-            if (context.OperationDescription.Path == path && context.OperationDescription.Method == OpenApiOperationMethod.Get)
-            {
-                var operation = context.OperationDescription.Operation;
-
-                operation.AddQuery(false);
-            }
-
-            return true;
-        }
+        return true;
     }
 }

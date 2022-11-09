@@ -7,26 +7,25 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public abstract class BackupContextBase
 {
-    public abstract class BackupContextBase
+    public IUserMapping UserMapping { get; }
+
+    public DomainId AppId { get; set; }
+
+    public RefToken Initiator
     {
-        public IUserMapping UserMapping { get; }
+        get => UserMapping.Initiator;
+    }
 
-        public DomainId AppId { get; set; }
+    protected BackupContextBase(DomainId appId, IUserMapping userMapping)
+    {
+        Guard.NotNull(userMapping);
 
-        public RefToken Initiator
-        {
-            get => UserMapping.Initiator;
-        }
+        AppId = appId;
 
-        protected BackupContextBase(DomainId appId, IUserMapping userMapping)
-        {
-            Guard.NotNull(userMapping);
-
-            AppId = appId;
-
-            UserMapping = userMapping;
-        }
+        UserMapping = userMapping;
     }
 }

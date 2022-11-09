@@ -7,14 +7,13 @@
 
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Core.Rules.Triggers
+namespace Squidex.Domain.Apps.Core.Rules.Triggers;
+
+[TypeName(nameof(ManualTrigger))]
+public sealed record ManualTrigger : RuleTrigger
 {
-    [TypeName(nameof(ManualTrigger))]
-    public sealed record ManualTrigger : RuleTrigger
+    public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
     {
-        public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
-        {
-            return visitor.Visit(this);
-        }
+        return visitor.Visit(this);
     }
 }

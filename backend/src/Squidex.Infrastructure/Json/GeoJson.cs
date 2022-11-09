@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Json
+namespace Squidex.Infrastructure.Json;
+
+public static class GeoJson
 {
-    public static class GeoJson
-    {
-        public const string Format = "geo-json";
-    }
+    public const string Format = "geo-json";
 }

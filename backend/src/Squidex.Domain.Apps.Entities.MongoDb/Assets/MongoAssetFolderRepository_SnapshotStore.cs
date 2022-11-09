@@ -14,81 +14,80 @@ using Squidex.Infrastructure.States;
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
+namespace Squidex.Domain.Apps.Entities.MongoDb.Assets;
+
+public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFolderDomainObject.State>, IDeleter
 {
-    public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFolderDomainObject.State>, IDeleter
+    Task IDeleter.DeleteAppAsync(IAppEntity app,
+        CancellationToken ct)
     {
-        Task IDeleter.DeleteAppAsync(IAppEntity app,
-            CancellationToken ct)
-        {
-            return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, app.Id), ct);
-        }
+        return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, app.Id), ct);
+    }
 
-        IAsyncEnumerable<SnapshotResult<AssetFolderDomainObject.State>> ISnapshotStore<AssetFolderDomainObject.State>.ReadAllAsync(
-            CancellationToken ct)
-        {
-            return Collection.Find(FindAll, Batching.Options).ToAsyncEnumerable(ct)
-                .Select(x => new SnapshotResult<AssetFolderDomainObject.State>(x.DocumentId, x.ToState(), x.Version, true));
-        }
+    IAsyncEnumerable<SnapshotResult<AssetFolderDomainObject.State>> ISnapshotStore<AssetFolderDomainObject.State>.ReadAllAsync(
+        CancellationToken ct)
+    {
+        return Collection.Find(FindAll, Batching.Options).ToAsyncEnumerable(ct)
+            .Select(x => new SnapshotResult<AssetFolderDomainObject.State>(x.DocumentId, x.ToState(), x.Version, true));
+    }
 
-        async Task<SnapshotResult<AssetFolderDomainObject.State>> ISnapshotStore<AssetFolderDomainObject.State>.ReadAsync(DomainId key,
-            CancellationToken ct)
+    async Task<SnapshotResult<AssetFolderDomainObject.State>> ISnapshotStore<AssetFolderDomainObject.State>.ReadAsync(DomainId key,
+        CancellationToken ct)
+    {
+        using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/ReadAsync"))
         {
-            using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/ReadAsync"))
+            var existing =
+                await Collection.Find(x => x.DocumentId == key)
+                    .FirstOrDefaultAsync(ct);
+
+            if (existing != null)
             {
-                var existing =
-                    await Collection.Find(x => x.DocumentId == key)
-                        .FirstOrDefaultAsync(ct);
+                return new SnapshotResult<AssetFolderDomainObject.State>(existing.DocumentId, existing.ToState(), existing.Version);
+            }
 
-                if (existing != null)
+            return new SnapshotResult<AssetFolderDomainObject.State>(default, null!, EtagVersion.Empty);
+        }
+    }
+
+    async Task ISnapshotStore<AssetFolderDomainObject.State>.WriteAsync(SnapshotWriteJob<AssetFolderDomainObject.State> job,
+        CancellationToken ct)
+    {
+        using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/WriteAsync"))
+        {
+            var entityJob = job.As(MongoAssetFolderEntity.Create(job));
+
+            await Collection.UpsertVersionedAsync(entityJob, ct);
+        }
+    }
+
+    async Task ISnapshotStore<AssetFolderDomainObject.State>.WriteManyAsync(IEnumerable<SnapshotWriteJob<AssetFolderDomainObject.State>> jobs,
+        CancellationToken ct)
+    {
+        using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/WriteManyAsync"))
+        {
+            var updates = jobs.Select(MongoAssetFolderEntity.Create).Select(x =>
+                new ReplaceOneModel<MongoAssetFolderEntity>(
+                    Filter.Eq(y => y.DocumentId, x.DocumentId),
+                    x)
                 {
-                    return new SnapshotResult<AssetFolderDomainObject.State>(existing.DocumentId, existing.ToState(), existing.Version);
-                }
+                    IsUpsert = true
+                }).ToList();
 
-                return new SnapshotResult<AssetFolderDomainObject.State>(default, null!, EtagVersion.Empty);
-            }
-        }
-
-        async Task ISnapshotStore<AssetFolderDomainObject.State>.WriteAsync(SnapshotWriteJob<AssetFolderDomainObject.State> job,
-            CancellationToken ct)
-        {
-            using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/WriteAsync"))
+            if (updates.Count == 0)
             {
-                var entityJob = job.As(MongoAssetFolderEntity.Create(job));
-
-                await Collection.UpsertVersionedAsync(entityJob, ct);
+                return;
             }
+
+            await Collection.BulkWriteAsync(updates, BulkUnordered, ct);
         }
+    }
 
-        async Task ISnapshotStore<AssetFolderDomainObject.State>.WriteManyAsync(IEnumerable<SnapshotWriteJob<AssetFolderDomainObject.State>> jobs,
-            CancellationToken ct)
+    async Task ISnapshotStore<AssetFolderDomainObject.State>.RemoveAsync(DomainId key,
+        CancellationToken ct)
+    {
+        using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/RemoveAsync"))
         {
-            using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/WriteManyAsync"))
-            {
-                var updates = jobs.Select(MongoAssetFolderEntity.Create).Select(x =>
-                    new ReplaceOneModel<MongoAssetFolderEntity>(
-                        Filter.Eq(y => y.DocumentId, x.DocumentId),
-                        x)
-                    {
-                        IsUpsert = true
-                    }).ToList();
-
-                if (updates.Count == 0)
-                {
-                    return;
-                }
-
-                await Collection.BulkWriteAsync(updates, BulkUnordered, ct);
-            }
-        }
-
-        async Task ISnapshotStore<AssetFolderDomainObject.State>.RemoveAsync(DomainId key,
-            CancellationToken ct)
-        {
-            using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/RemoveAsync"))
-            {
-                await Collection.DeleteOneAsync(x => x.DocumentId == key, ct);
-            }
+            await Collection.DeleteOneAsync(x => x.DocumentId == key, ct);
         }
     }
 }

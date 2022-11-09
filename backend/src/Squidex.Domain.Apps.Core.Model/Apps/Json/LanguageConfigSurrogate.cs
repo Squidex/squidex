@@ -8,31 +8,30 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Core.Apps.Json
+namespace Squidex.Domain.Apps.Core.Apps.Json;
+
+public sealed class LanguageConfigSurrogate : ISurrogate<LanguageConfig>
 {
-    public sealed class LanguageConfigSurrogate : ISurrogate<LanguageConfig>
+    public Language[]? Fallback { get; set; }
+
+    public bool IsOptional { get; set; }
+
+    public void FromSource(LanguageConfig source)
     {
-        public Language[]? Fallback { get; set; }
+        IsOptional = source.IsOptional;
 
-        public bool IsOptional { get; set; }
+        Fallback = source.Fallbacks.ToArray();
+    }
 
-        public void FromSource(LanguageConfig source)
+    public LanguageConfig ToSource()
+    {
+        if (!IsOptional && (Fallback == null || Fallback.Length == 0))
         {
-            IsOptional = source.IsOptional;
-
-            Fallback = source.Fallbacks.ToArray();
+            return LanguageConfig.Default;
         }
-
-        public LanguageConfig ToSource()
+        else
         {
-            if (!IsOptional && (Fallback == null || Fallback.Length == 0))
-            {
-                return LanguageConfig.Default;
-            }
-            else
-            {
-                return new LanguageConfig(IsOptional, ReadonlyList.Create(Fallback));
-            }
+            return new LanguageConfig(IsOptional, ReadonlyList.Create(Fallback));
         }
     }
 }

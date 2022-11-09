@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public enum JobStatus
 {
-    public enum JobStatus
-    {
-        Created,
-        Started,
-        Completed,
-        Failed
-    }
+    Created,
+    Started,
+    Completed,
+    Failed
 }

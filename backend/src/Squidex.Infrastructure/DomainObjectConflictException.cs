@@ -8,26 +8,25 @@
 using System.Runtime.Serialization;
 using Squidex.Infrastructure.Translations;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+[Serializable]
+public class DomainObjectConflictException : DomainObjectException
 {
-    [Serializable]
-    public class DomainObjectConflictException : DomainObjectException
+    private const string ExposedErrorCode = "OBJECT_CONFLICT";
+
+    public DomainObjectConflictException(string id, Exception? inner = null)
+        : base(FormatMessage(id), id, ExposedErrorCode, inner)
     {
-        private const string ExposedErrorCode = "OBJECT_CONFLICT";
+    }
 
-        public DomainObjectConflictException(string id, Exception? inner = null)
-            : base(FormatMessage(id), id, ExposedErrorCode, inner)
-        {
-        }
+    protected DomainObjectConflictException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
+    {
+    }
 
-        protected DomainObjectConflictException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
-
-        private static string FormatMessage(string id)
-        {
-            return T.Get("exceptions.domainObjectConflict", new { id });
-        }
+    private static string FormatMessage(string id)
+    {
+        return T.Get("exceptions.domainObjectConflict", new { id });
     }
 }

@@ -9,19 +9,18 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Notifications
+namespace Squidex.Domain.Apps.Entities.Notifications;
+
+public interface IUserNotifications
 {
-    public interface IUserNotifications
-    {
-        bool IsActive { get; }
+    bool IsActive { get; }
 
-        Task SendUsageAsync(IUser user, IAppEntity app, long usage, long usageLimit,
-            CancellationToken ct = default);
+    Task SendUsageAsync(IUser user, IAppEntity app, long usage, long usageLimit,
+        CancellationToken ct = default);
 
-        Task SendInviteAsync(IUser assigner, IUser user, IAppEntity app,
-            CancellationToken ct = default);
+    Task SendInviteAsync(IUser assigner, IUser user, IAppEntity app,
+        CancellationToken ct = default);
 
-        Task SendInviteAsync(IUser assigner, IUser user, ITeamEntity team,
-            CancellationToken ct = default);
-    }
+    Task SendInviteAsync(IUser assigner, IUser user, ITeamEntity team,
+        CancellationToken ct = default);
 }

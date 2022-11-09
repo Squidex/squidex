@@ -7,33 +7,32 @@
 
 using Squidex.Infrastructure.Translations;
 
-namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
+namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
+
+public class RequiredStringValidator : IValidator
 {
-    public class RequiredStringValidator : IValidator
+    private readonly bool validateEmptyStrings;
+
+    public RequiredStringValidator(bool validateEmptyStrings = false)
     {
-        private readonly bool validateEmptyStrings;
+        this.validateEmptyStrings = validateEmptyStrings;
+    }
 
-        public RequiredStringValidator(bool validateEmptyStrings = false)
+    public void Validate(object? value, ValidationContext context)
+    {
+        if (context.IsOptional)
         {
-            this.validateEmptyStrings = validateEmptyStrings;
+            return;
         }
 
-        public void Validate(object? value, ValidationContext context)
+        if (value.IsNullOrUndefined() || IsEmptyString(value))
         {
-            if (context.IsOptional)
-            {
-                return;
-            }
-
-            if (value.IsNullOrUndefined() || IsEmptyString(value))
-            {
-                context.AddError(context.Path, T.Get("contents.validation.required"));
-            }
+            context.AddError(context.Path, T.Get("contents.validation.required"));
         }
+    }
 
-        private bool IsEmptyString(object? value)
-        {
-            return value is string typed && validateEmptyStrings && string.IsNullOrWhiteSpace(typed);
-        }
+    private bool IsEmptyString(object? value)
+    {
+        return value is string typed && validateEmptyStrings && string.IsNullOrWhiteSpace(typed);
     }
 }

@@ -11,20 +11,19 @@ using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 using AppClientUpdatedV2 = Squidex.Domain.Apps.Events.Apps.AppClientUpdated;
 
-namespace Migrations.OldEvents
+namespace Migrations.OldEvents;
+
+[EventType(nameof(AppClientRenamed))]
+public sealed class AppClientRenamed : AppEvent, IMigrated<IEvent>
 {
-    [EventType(nameof(AppClientRenamed))]
-    public sealed class AppClientRenamed : AppEvent, IMigrated<IEvent>
+    public string Id { get; set; }
+
+    public string Name { get; set; }
+
+    public IEvent Migrate()
     {
-        public string Id { get; set; }
+        var result = SimpleMapper.Map(this, new AppClientUpdatedV2());
 
-        public string Name { get; set; }
-
-        public IEvent Migrate()
-        {
-            var result = SimpleMapper.Map(this, new AppClientUpdatedV2());
-
-            return result;
-        }
+        return result;
     }
 }

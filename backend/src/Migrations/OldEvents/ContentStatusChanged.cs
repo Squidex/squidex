@@ -12,35 +12,34 @@ using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 using ContentStatusChangedV2 = Squidex.Domain.Apps.Events.Contents.ContentStatusChanged;
 
-namespace Migrations.OldEvents
+namespace Migrations.OldEvents;
+
+[EventType(nameof(ContentStatusChanged))]
+[Obsolete("New Event introduced")]
+public sealed class ContentStatusChanged : ContentEvent, IMigrated<IEvent>
 {
-    [EventType(nameof(ContentStatusChanged))]
-    [Obsolete("New Event introduced")]
-    public sealed class ContentStatusChanged : ContentEvent, IMigrated<IEvent>
+    public string Change { get; set; }
+
+    public Status Status { get; set; }
+
+    public IEvent Migrate()
     {
-        public string Change { get; set; }
+        var migrated = SimpleMapper.Map(this, new ContentStatusChangedV2());
 
-        public Status Status { get; set; }
-
-        public IEvent Migrate()
+        if (migrated.Status == default)
         {
-            var migrated = SimpleMapper.Map(this, new ContentStatusChangedV2());
-
-            if (migrated.Status == default)
-            {
-                migrated.Status = Status.Draft;
-            }
-
-            if (Enum.TryParse<StatusChange>(Change, out var result))
-            {
-                migrated.Change = result;
-            }
-            else
-            {
-                migrated.Change = StatusChange.Change;
-            }
-
-            return migrated;
+            migrated.Status = Status.Draft;
         }
+
+        if (Enum.TryParse<StatusChange>(Change, out var result))
+        {
+            migrated.Change = result;
+        }
+        else
+        {
+            migrated.Change = StatusChange.Change;
+        }
+
+        return migrated;
     }
 }

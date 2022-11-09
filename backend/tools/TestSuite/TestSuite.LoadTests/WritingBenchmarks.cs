@@ -11,62 +11,61 @@ using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 
-namespace TestSuite.LoadTests
+namespace TestSuite.LoadTests;
+
+public class WritingBenchmarks : IClassFixture<WritingFixture>
 {
-    public class WritingBenchmarks : IClassFixture<WritingFixture>
+    public WritingFixture _ { get; }
+
+    public WritingBenchmarks(WritingFixture fixture)
     {
-        public WritingFixture _ { get; }
+        _ = fixture;
+    }
 
-        public WritingBenchmarks(WritingFixture fixture)
+    public static IEnumerable<object[]> Loads()
+    {
+        int[] users =
         {
-            _ = fixture;
-        }
+            1,
+            5,
+            10,
+            20,
+            50,
+            100
+        };
 
-        public static IEnumerable<object[]> Loads()
+        int[] loads =
         {
-            int[] users =
-            {
-                1,
-                5,
-                10,
-                20,
-                50,
-                100
-            };
+            5,
+            10,
+            20,
+            50,
+            100
+        };
 
-            int[] loads =
+        foreach (var user in users)
+        {
+            foreach (var load in loads)
             {
-                5,
-                10,
-                20,
-                50,
-                100
-            };
-
-            foreach (var user in users)
-            {
-                foreach (var load in loads)
-                {
-                    yield return new object[] { user, load };
-                }
+                yield return new object[] { user, load };
             }
-
-            yield return new object[] { 1, 50000 };
         }
 
-        [Theory]
-        [MemberData(nameof(Loads))]
-        public async Task Should_create_items(int numUsers, int numIterationsPerUser)
+        yield return new object[] { 1, 50000 };
+    }
+
+    [Theory]
+    [MemberData(nameof(Loads))]
+    public async Task Should_create_items(int numUsers, int numIterationsPerUser)
+    {
+        var random = new Random();
+
+        await Run.Parallel(numUsers, numIterationsPerUser, async () =>
         {
-            var random = new Random();
-
-            await Run.Parallel(numUsers, numIterationsPerUser, async () =>
+            await _.Contents.CreateAsync(new TestEntityData
             {
-                await _.Contents.CreateAsync(new TestEntityData
-                {
-                    Number = random.Next()
-                }, ContentCreateOptions.AsPublish);
-            });
-        }
+                Number = random.Next()
+            }, ContentCreateOptions.AsPublish);
+        });
     }
 }

@@ -7,34 +7,33 @@
 
 using System.Globalization;
 
-namespace Squidex.Infrastructure.Translations
+namespace Squidex.Infrastructure.Translations;
+
+public static class T
 {
-    public static class T
+    private static ILocalizer? localizer;
+
+    public static void Setup(ILocalizer newLocalizer)
     {
-        private static ILocalizer? localizer;
+        localizer = newLocalizer;
+    }
 
-        public static void Setup(ILocalizer newLocalizer)
+    public static string Get(string key, object? args = null)
+    {
+        return Get(key, key, args);
+    }
+
+    public static string Get(string key, string fallback, object? args = null)
+    {
+        Guard.NotNullOrEmpty(key);
+
+        if (localizer == null)
         {
-            localizer = newLocalizer;
+            return key;
         }
 
-        public static string Get(string key, object? args = null)
-        {
-            return Get(key, key, args);
-        }
+        var (result, _) = localizer.Get(CultureInfo.CurrentUICulture, key, fallback, args);
 
-        public static string Get(string key, string fallback, object? args = null)
-        {
-            Guard.NotNullOrEmpty(key);
-
-            if (localizer == null)
-            {
-                return key;
-            }
-
-            var (result, _) = localizer.Get(CultureInfo.CurrentUICulture, key, fallback, args);
-
-            return result;
-        }
+        return result;
     }
 }

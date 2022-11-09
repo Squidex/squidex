@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities;
+
+public interface IEntityWithVersion
 {
-    public interface IEntityWithVersion
-    {
-        long Version { get; }
-    }
+    long Version { get; }
 }

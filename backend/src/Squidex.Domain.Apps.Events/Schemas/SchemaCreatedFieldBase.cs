@@ -7,18 +7,17 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Domain.Apps.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas;
+
+public abstract class SchemaCreatedFieldBase : IFieldSettings
 {
-    public abstract class SchemaCreatedFieldBase : IFieldSettings
-    {
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public bool IsHidden { get; set; }
+    public bool IsHidden { get; set; }
 
-        public bool IsLocked { get; set; }
+    public bool IsLocked { get; set; }
 
-        public bool IsDisabled { get; set; }
+    public bool IsDisabled { get; set; }
 
-        public FieldProperties Properties { get; set; }
-    }
+    public FieldProperties Properties { get; set; }
 }

@@ -10,102 +10,101 @@ using MongoDB.Driver;
 using Squidex.Hosting;
 using Squidex.Hosting.Configuration;
 
-namespace Squidex.Infrastructure.MongoDb
+namespace Squidex.Infrastructure.MongoDb;
+
+public abstract class MongoRepositoryBase<T> : MongoBase<T>, IInitializable
 {
-    public abstract class MongoRepositoryBase<T> : MongoBase<T>, IInitializable
+    private readonly IMongoDatabase mongoDatabase;
+    private IMongoCollection<T> mongoCollection;
+
+    protected IMongoCollection<T> Collection
     {
-        private readonly IMongoDatabase mongoDatabase;
-        private IMongoCollection<T> mongoCollection;
-
-        protected IMongoCollection<T> Collection
+        get
         {
-            get
+            if (mongoCollection == null)
             {
-                if (mongoCollection == null)
-                {
-                    InitializeAsync(default).Wait();
-                }
+                InitializeAsync(default).Wait();
+            }
 
-                if (mongoCollection == null)
-                {
-                    ThrowHelper.InvalidOperationException("Collection has not been initialized yet.");
-                    return default!;
-                }
+            if (mongoCollection == null)
+            {
+                ThrowHelper.InvalidOperationException("Collection has not been initialized yet.");
+                return default!;
+            }
 
-                return mongoCollection;
+            return mongoCollection;
+        }
+    }
+
+    protected IMongoDatabase Database
+    {
+        get => mongoDatabase;
+    }
+
+    protected MongoRepositoryBase(IMongoDatabase database)
+    {
+        Guard.NotNull(database);
+
+        mongoDatabase = database;
+    }
+
+    protected virtual MongoCollectionSettings CollectionSettings()
+    {
+        return new MongoCollectionSettings();
+    }
+
+    protected virtual string CollectionName()
+    {
+        return string.Format(CultureInfo.InvariantCulture, "{0}Set", typeof(T).Name);
+    }
+
+    protected virtual Task SetupCollectionAsync(IMongoCollection<T> collection,
+        CancellationToken ct)
+    {
+        return Task.CompletedTask;
+    }
+
+    public virtual async Task ClearAsync(
+        CancellationToken ct = default)
+    {
+        try
+        {
+            await Database.DropCollectionAsync(CollectionName(), ct);
+        }
+        catch (MongoCommandException ex)
+        {
+            if (ex.Code != 26)
+            {
+                throw;
             }
         }
 
-        protected IMongoDatabase Database
+        await InitializeAsync(ct);
+    }
+
+    public async Task InitializeAsync(
+        CancellationToken ct)
+    {
+        try
         {
-            get => mongoDatabase;
-        }
+            CreateCollection();
 
-        protected MongoRepositoryBase(IMongoDatabase database)
+            await SetupCollectionAsync(Collection, ct);
+        }
+        catch (Exception ex)
         {
-            Guard.NotNull(database);
+            var databaseName = Database.DatabaseNamespace.DatabaseName;
 
-            mongoDatabase = database;
+            var error = new ConfigurationError($"MongoDb connection failed to connect to database {databaseName}.");
+
+            throw new ConfigurationException(error, ex);
         }
+    }
 
-        protected virtual MongoCollectionSettings CollectionSettings()
-        {
-            return new MongoCollectionSettings();
-        }
-
-        protected virtual string CollectionName()
-        {
-            return string.Format(CultureInfo.InvariantCulture, "{0}Set", typeof(T).Name);
-        }
-
-        protected virtual Task SetupCollectionAsync(IMongoCollection<T> collection,
-            CancellationToken ct)
-        {
-            return Task.CompletedTask;
-        }
-
-        public virtual async Task ClearAsync(
-            CancellationToken ct = default)
-        {
-            try
-            {
-                await Database.DropCollectionAsync(CollectionName(), ct);
-            }
-            catch (MongoCommandException ex)
-            {
-                if (ex.Code != 26)
-                {
-                    throw;
-                }
-            }
-
-            await InitializeAsync(ct);
-        }
-
-        public async Task InitializeAsync(
-            CancellationToken ct)
-        {
-            try
-            {
-                CreateCollection();
-
-                await SetupCollectionAsync(Collection, ct);
-            }
-            catch (Exception ex)
-            {
-                var databaseName = Database.DatabaseNamespace.DatabaseName;
-
-                var error = new ConfigurationError($"MongoDb connection failed to connect to database {databaseName}.");
-
-                throw new ConfigurationException(error, ex);
-            }
-        }
-
-        private void CreateCollection()
-        {
-            mongoCollection = mongoDatabase.GetCollection<T>(
-                CollectionName(),
-                CollectionSettings() ?? new MongoCollectionSettings());
-        }
+    private void CreateCollection()
+    {
+        mongoCollection = mongoDatabase.GetCollection<T>(
+            CollectionName(),
+            CollectionSettings() ?? new MongoCollectionSettings());
     }
 }

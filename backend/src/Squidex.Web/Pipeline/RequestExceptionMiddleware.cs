@@ -13,75 +13,74 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 
-namespace Squidex.Web.Pipeline
+namespace Squidex.Web.Pipeline;
+
+public sealed class RequestExceptionMiddleware
 {
-    public sealed class RequestExceptionMiddleware
+    private static readonly ActionDescriptor EmptyActionDescriptor = new ActionDescriptor();
+    private static readonly RouteData EmptyRouteData = new RouteData();
+    private readonly RequestDelegate next;
+
+    public RequestExceptionMiddleware(RequestDelegate next)
     {
-        private static readonly ActionDescriptor EmptyActionDescriptor = new ActionDescriptor();
-        private static readonly RouteData EmptyRouteData = new RouteData();
-        private readonly RequestDelegate next;
+        this.next = next;
+    }
 
-        public RequestExceptionMiddleware(RequestDelegate next)
+    public async Task InvokeAsync(HttpContext context, IActionResultExecutor<ObjectResult> writer,
+        ILogger<RequestExceptionMiddleware> log)
+    {
+        if (TryGetErrorCode(context, out var statusCode) && IsErrorStatusCode(statusCode))
         {
-            this.next = next;
+            var (error, _) = ApiExceptionConverter.ToErrorDto(statusCode, context);
+
+            await WriteErrorAsync(context, error, writer);
+            return;
         }
 
-        public async Task InvokeAsync(HttpContext context, IActionResultExecutor<ObjectResult> writer,
-            ILogger<RequestExceptionMiddleware> log)
+        try
         {
-            if (TryGetErrorCode(context, out var statusCode) && IsErrorStatusCode(statusCode))
+            await next(context);
+        }
+        catch (Exception ex)
+        {
+            log.LogError(ex, "An unexpected exception has occurred.");
+
+            if (!context.Response.HasStarted)
             {
-                var (error, _) = ApiExceptionConverter.ToErrorDto(statusCode, context);
-
-                await WriteErrorAsync(context, error, writer);
-                return;
-            }
-
-            try
-            {
-                await next(context);
-            }
-            catch (Exception ex)
-            {
-                log.LogError(ex, "An unexpected exception has occurred.");
-
-                if (!context.Response.HasStarted)
-                {
-                    var (error, _) = ex.ToErrorDto(context);
-
-                    await WriteErrorAsync(context, error, writer);
-                }
-            }
-
-            if (IsErrorStatusCode(context.Response.StatusCode) && !context.Response.HasStarted)
-            {
-                var (error, _) = ApiExceptionConverter.ToErrorDto(context.Response.StatusCode, context);
+                var (error, _) = ex.ToErrorDto(context);
 
                 await WriteErrorAsync(context, error, writer);
             }
         }
 
-        private static async Task WriteErrorAsync(HttpContext context, ErrorDto error, IActionResultExecutor<ObjectResult> writer)
+        if (IsErrorStatusCode(context.Response.StatusCode) && !context.Response.HasStarted)
         {
-            var actionRouteData = context.GetRouteData() ?? EmptyRouteData;
-            var actionContext = new ActionContext(context, actionRouteData, EmptyActionDescriptor);
+            var (error, _) = ApiExceptionConverter.ToErrorDto(context.Response.StatusCode, context);
 
-            await writer.ExecuteAsync(actionContext, new ObjectResult(error)
-            {
-                StatusCode = error.StatusCode
-            });
+            await WriteErrorAsync(context, error, writer);
         }
+    }
 
-        private static bool TryGetErrorCode(HttpContext context, out int statusCode)
+    private static async Task WriteErrorAsync(HttpContext context, ErrorDto error, IActionResultExecutor<ObjectResult> writer)
+    {
+        var actionRouteData = context.GetRouteData() ?? EmptyRouteData;
+        var actionContext = new ActionContext(context, actionRouteData, EmptyActionDescriptor);
+
+        await writer.ExecuteAsync(actionContext, new ObjectResult(error)
         {
-            statusCode = 0;
+            StatusCode = error.StatusCode
+        });
+    }
 
-            return context.Request.Query.TryGetValue("error", out var header) && int.TryParse(header, NumberStyles.Integer, CultureInfo.InvariantCulture, out statusCode);
-        }
+    private static bool TryGetErrorCode(HttpContext context, out int statusCode)
+    {
+        statusCode = 0;
 
-        private static bool IsErrorStatusCode(int statusCode)
-        {
-            return statusCode is >= 400 and < 600;
-        }
+        return context.Request.Query.TryGetValue("error", out var header) && int.TryParse(header, NumberStyles.Integer, CultureInfo.InvariantCulture, out statusCode);
+    }
+
+    private static bool IsErrorStatusCode(int statusCode)
+    {
+        return statusCode is >= 400 and < 600;
     }
 }

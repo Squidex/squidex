@@ -9,13 +9,12 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Contents
-{
-    [EventType(nameof(ContentStatusScheduled))]
-    public sealed class ContentStatusScheduled : ContentEvent
-    {
-        public Status Status { get; set; }
+namespace Squidex.Domain.Apps.Events.Contents;
 
-        public Instant DueTime { get; set; }
-    }
+[EventType(nameof(ContentStatusScheduled))]
+public sealed class ContentStatusScheduled : ContentEvent
+{
+    public Status Status { get; set; }
+
+    public Instant DueTime { get; set; }
 }

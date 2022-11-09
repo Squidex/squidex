@@ -5,11 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Search
+namespace Squidex.Domain.Apps.Entities.Search;
+
+public interface ISearchSource
 {
-    public interface ISearchSource
-    {
-        Task<SearchResults> SearchAsync(string query, Context context,
-            CancellationToken ct);
-    }
+    Task<SearchResults> SearchAsync(string query, Context context,
+        CancellationToken ct);
 }

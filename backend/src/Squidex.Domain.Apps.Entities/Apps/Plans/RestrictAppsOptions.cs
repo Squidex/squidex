@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Plans
+namespace Squidex.Domain.Apps.Entities.Apps.Plans;
+
+public sealed class RestrictAppsOptions
 {
-    public sealed class RestrictAppsOptions
-    {
-        public int MaximumNumberOfApps { get; set; } = 0;
-    }
+    public int MaximumNumberOfApps { get; set; } = 0;
 }

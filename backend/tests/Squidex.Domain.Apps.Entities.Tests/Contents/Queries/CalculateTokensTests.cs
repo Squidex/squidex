@@ -15,58 +15,57 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Queries
+namespace Squidex.Domain.Apps.Entities.Contents.Queries;
+
+public class CalculateTokensTests
 {
-    public class CalculateTokensTests
+    private readonly ISchemaEntity schema;
+    private readonly IJsonSerializer serializer = A.Fake<IJsonSerializer>();
+    private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
+    private readonly Context requestContext;
+    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+    private readonly ProvideSchema schemaProvider;
+    private readonly CalculateTokens sut;
+
+    public CalculateTokensTests()
     {
-        private readonly ISchemaEntity schema;
-        private readonly IJsonSerializer serializer = A.Fake<IJsonSerializer>();
-        private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
-        private readonly Context requestContext;
-        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-        private readonly ProvideSchema schemaProvider;
-        private readonly CalculateTokens sut;
+        requestContext = new Context(Mocks.ApiUser(), Mocks.App(appId));
 
-        public CalculateTokensTests()
-        {
-            requestContext = new Context(Mocks.ApiUser(), Mocks.App(appId));
+        schema = Mocks.Schema(appId, schemaId);
+        schemaProvider = x => Task.FromResult((schema, ResolvedComponents.Empty));
 
-            schema = Mocks.Schema(appId, schemaId);
-            schemaProvider = x => Task.FromResult((schema, ResolvedComponents.Empty));
+        sut = new CalculateTokens(urlGenerator, serializer);
+    }
 
-            sut = new CalculateTokens(urlGenerator, serializer);
-        }
+    [Fact]
+    public async Task Should_compute_ui_tokens()
+    {
+        var source = CreateContent();
 
-        [Fact]
-        public async Task Should_compute_ui_tokens()
-        {
-            var source = CreateContent();
+        await sut.EnrichAsync(requestContext, new[] { source }, schemaProvider, default);
 
-            await sut.EnrichAsync(requestContext, new[] { source }, schemaProvider, default);
+        Assert.NotNull(source.EditToken);
 
-            Assert.NotNull(source.EditToken);
+        A.CallTo(() => urlGenerator.Root())
+            .MustHaveHappened();
+    }
 
-            A.CallTo(() => urlGenerator.Root())
-                .MustHaveHappened();
-        }
+    [Fact]
+    public async Task Should_also_compute_ui_tokens_for_frontend()
+    {
+        var source = CreateContent();
 
-        [Fact]
-        public async Task Should_also_compute_ui_tokens_for_frontend()
-        {
-            var source = CreateContent();
+        await sut.EnrichAsync(new Context(Mocks.FrontendUser(), Mocks.App(appId)), new[] { source }, schemaProvider, default);
 
-            await sut.EnrichAsync(new Context(Mocks.FrontendUser(), Mocks.App(appId)), new[] { source }, schemaProvider, default);
+        Assert.NotNull(source.EditToken);
 
-            Assert.NotNull(source.EditToken);
+        A.CallTo(() => urlGenerator.Root())
+            .MustHaveHappened();
+    }
 
-            A.CallTo(() => urlGenerator.Root())
-                .MustHaveHappened();
-        }
-
-        private ContentEntity CreateContent()
-        {
-            return new ContentEntity { AppId = appId, SchemaId = schemaId };
-        }
+    private ContentEntity CreateContent()
+    {
+        return new ContentEntity { AppId = appId, SchemaId = schemaId };
     }
 }

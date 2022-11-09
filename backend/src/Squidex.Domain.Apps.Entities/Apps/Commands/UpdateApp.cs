@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands
-{
-    public sealed class UpdateApp : AppCommand
-    {
-        public string? Label { get; set; }
+namespace Squidex.Domain.Apps.Entities.Apps.Commands;
 
-        public string? Description { get; set; }
-    }
+public sealed class UpdateApp : AppCommand
+{
+    public string? Label { get; set; }
+
+    public string? Description { get; set; }
 }

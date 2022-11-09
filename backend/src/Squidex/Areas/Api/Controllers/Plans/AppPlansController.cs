@@ -16,117 +16,116 @@ using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Plans
+namespace Squidex.Areas.Api.Controllers.Plans;
+
+/// <summary>
+/// Update and query plans.
+/// </summary>
+[ApiExplorerSettings(GroupName = nameof(Plans))]
+public sealed class AppPlansController : ApiController
 {
-    /// <summary>
-    /// Update and query plans.
-    /// </summary>
-    [ApiExplorerSettings(GroupName = nameof(Plans))]
-    public sealed class AppPlansController : ApiController
+    private readonly IBillingPlans billingPlans;
+    private readonly IBillingManager billingManager;
+    private readonly IUsageGate usageGate;
+
+    public AppPlansController(ICommandBus commandBus,
+        IUsageGate usageGate,
+        IBillingPlans billingPlans,
+        IBillingManager billingManager)
+        : base(commandBus)
     {
-        private readonly IBillingPlans billingPlans;
-        private readonly IBillingManager billingManager;
-        private readonly IUsageGate usageGate;
+        this.billingPlans = billingPlans;
+        this.billingManager = billingManager;
+        this.usageGate = usageGate;
+    }
 
-        public AppPlansController(ICommandBus commandBus,
-            IUsageGate usageGate,
-            IBillingPlans billingPlans,
-            IBillingManager billingManager)
-            : base(commandBus)
+    /// <summary>
+    /// Get app plan information.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <returns>
+    /// 200 => App plan information returned.
+    /// 404 => App not found.
+    /// </returns>
+    [HttpGet]
+    [Route("apps/{app}/plans/")]
+    [ProducesResponseType(typeof(PlansDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppPlansRead)]
+    [ApiCosts(0)]
+    public IActionResult GetPlans(string app)
+    {
+        var response = Deferred.AsyncResponse(async () =>
         {
-            this.billingPlans = billingPlans;
-            this.billingManager = billingManager;
-            this.usageGate = usageGate;
-        }
+            var plans = billingPlans.GetAvailablePlans();
 
-        /// <summary>
-        /// Get app plan information.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <returns>
-        /// 200 => App plan information returned.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/{app}/plans/")]
-        [ProducesResponseType(typeof(PlansDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(PermissionIds.AppPlansRead)]
-        [ApiCosts(0)]
-        public IActionResult GetPlans(string app)
-        {
-            var response = Deferred.AsyncResponse(async () =>
+            var (plan, link, referral) =
+                await AsyncHelper.WhenAll(
+                    usageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted),
+                    billingManager.GetPortalLinkAsync(UserId, App, HttpContext.RequestAborted),
+                    billingManager.GetReferralInfoAsync(UserId, App, HttpContext.RequestAborted));
+
+            var planOwner = App.Plan?.Owner.Identifier;
+
+            PlansLockedReason GetLocked()
             {
-                var plans = billingPlans.GetAvailablePlans();
-
-                var (plan, link, referral) =
-                    await AsyncHelper.WhenAll(
-                        usageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted),
-                        billingManager.GetPortalLinkAsync(UserId, App, HttpContext.RequestAborted),
-                        billingManager.GetReferralInfoAsync(UserId, App, HttpContext.RequestAborted));
-
-                var planOwner = App.Plan?.Owner.Identifier;
-
-                PlansLockedReason GetLocked()
+                if (plan.TeamId != null)
                 {
-                    if (plan.TeamId != null)
-                    {
-                        return PlansLockedReason.ManagedByTeam;
-                    }
-                    else if (!Resources.CanChangePlan)
-                    {
-                        return PlansLockedReason.NoPermission;
-                    }
-                    else if (planOwner != null && !string.Equals(planOwner, UserId, StringComparison.Ordinal))
-                    {
-                        return PlansLockedReason.NotOwner;
-                    }
-
-                    return PlansLockedReason.None;
+                    return PlansLockedReason.ManagedByTeam;
+                }
+                else if (!Resources.CanChangePlan)
+                {
+                    return PlansLockedReason.NoPermission;
+                }
+                else if (planOwner != null && !string.Equals(planOwner, UserId, StringComparison.Ordinal))
+                {
+                    return PlansLockedReason.NotOwner;
                 }
 
-                return PlansDto.FromDomain(
-                    plans.ToArray(),
-                    planOwner,
-                    plan.PlanId,
-                    referral,
-                    link,
-                    GetLocked());
-            });
-
-            Response.Headers[HeaderNames.ETag] = App.ToEtag();
-
-            return Ok(response);
-        }
-
-        /// <summary>
-        /// Change the app plan.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="request">Plan object that needs to be changed.</param>
-        /// <returns>
-        /// 200 => Plan changed or redirect url returned.
-        /// 400 => Plan not owned by user.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpPut]
-        [Route("apps/{app}/plan/")]
-        [ProducesResponseType(typeof(PlanChangedDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(PermissionIds.AppPlansChange)]
-        [ApiCosts(0)]
-        public async Task<IActionResult> PutPlan(string app, [FromBody] ChangePlanDto request)
-        {
-            var command = SimpleMapper.Map(request, new ChangePlan());
-
-            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
-
-            string? redirectUri = null;
-
-            if (context.PlainResult is PlanChangedResult result)
-            {
-                redirectUri = result.RedirectUri?.ToString();
+                return PlansLockedReason.None;
             }
 
-            return Ok(new PlanChangedDto { RedirectUri = redirectUri });
+            return PlansDto.FromDomain(
+                plans.ToArray(),
+                planOwner,
+                plan.PlanId,
+                referral,
+                link,
+                GetLocked());
+        });
+
+        Response.Headers[HeaderNames.ETag] = App.ToEtag();
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Change the app plan.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="request">Plan object that needs to be changed.</param>
+    /// <returns>
+    /// 200 => Plan changed or redirect url returned.
+    /// 400 => Plan not owned by user.
+    /// 404 => App not found.
+    /// </returns>
+    [HttpPut]
+    [Route("apps/{app}/plan/")]
+    [ProducesResponseType(typeof(PlanChangedDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppPlansChange)]
+    [ApiCosts(0)]
+    public async Task<IActionResult> PutPlan(string app, [FromBody] ChangePlanDto request)
+    {
+        var command = SimpleMapper.Map(request, new ChangePlan());
+
+        var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
+
+        string? redirectUri = null;
+
+        if (context.PlainResult is PlanChangedResult result)
+        {
+            redirectUri = result.RedirectUri?.ToString();
         }
+
+        return Ok(new PlanChangedDto { RedirectUri = redirectUri });
     }
 }

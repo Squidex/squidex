@@ -13,32 +13,31 @@ using Squidex.Domain.Apps.Entities.MongoDb.Text;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text;
+
+public sealed class AtlasTextIndexFixture : IAsyncLifetime
 {
-    public sealed class AtlasTextIndexFixture : IAsyncLifetime
+    public AtlasTextIndex Index { get; }
+
+    public AtlasTextIndexFixture()
     {
-        public AtlasTextIndex Index { get; }
+        TestUtils.SetupBson();
 
-        public AtlasTextIndexFixture()
-        {
-            TestUtils.SetupBson();
+        var mongoClient = new MongoClient(TestConfig.Configuration["atlas:configuration"]);
+        var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["atlas:database"]);
 
-            var mongoClient = new MongoClient(TestConfig.Configuration["atlas:configuration"]);
-            var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["atlas:database"]);
+        var options = TestConfig.Configuration.GetSection("atlas").Get<AtlasOptions>();
 
-            var options = TestConfig.Configuration.GetSection("atlas").Get<AtlasOptions>();
+        Index = new AtlasTextIndex(mongoDatabase, Options.Create(options));
+    }
 
-            Index = new AtlasTextIndex(mongoDatabase, Options.Create(options));
-        }
+    public Task InitializeAsync()
+    {
+        return Index.InitializeAsync(default);
+    }
 
-        public Task InitializeAsync()
-        {
-            return Index.InitializeAsync(default);
-        }
-
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
-        }
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 }

@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Events
+namespace Squidex.Domain.Apps.Events;
+
+public abstract class SchemaEvent : AppEvent
 {
-    public abstract class SchemaEvent : AppEvent
-    {
-        public NamedId<DomainId> SchemaId { get; set; }
-    }
+    public NamedId<DomainId> SchemaId { get; set; }
 }

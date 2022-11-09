@@ -15,253 +15,252 @@ using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Translations;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
+namespace Squidex.Domain.Apps.Entities.MongoDb.Assets;
+
+public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
 {
-    public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
+    private readonly MongoCountCollection countCollection;
+
+    public MongoAssetRepository(IMongoDatabase database)
+        : base(database)
     {
-        private readonly MongoCountCollection countCollection;
+        countCollection = new MongoCountCollection(database, CollectionName());
+    }
 
-        public MongoAssetRepository(IMongoDatabase database)
-            : base(database)
-        {
-            countCollection = new MongoCountCollection(database, CollectionName());
-        }
+    public IMongoCollection<MongoAssetEntity> GetInternalCollection()
+    {
+        return Collection;
+    }
 
-        public IMongoCollection<MongoAssetEntity> GetInternalCollection()
-        {
-            return Collection;
-        }
+    protected override string CollectionName()
+    {
+        return "States_Assets2";
+    }
 
-        protected override string CollectionName()
+    protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection,
+        CancellationToken ct)
+    {
+        return collection.Indexes.CreateManyAsync(new[]
         {
-            return "States_Assets2";
-        }
+            new CreateIndexModel<MongoAssetEntity>(
+                Index
+                    .Descending(x => x.LastModified)
+                    .Ascending(x => x.Id)
+                    .Ascending(x => x.IndexedAppId)
+                    .Ascending(x => x.IsDeleted)
+                    .Ascending(x => x.ParentId)
+                    .Ascending(x => x.Tags)),
+            new CreateIndexModel<MongoAssetEntity>(
+                Index
+                    .Ascending(x => x.IndexedAppId)
+                    .Ascending(x => x.Slug)),
+            new CreateIndexModel<MongoAssetEntity>(
+                Index
+                    .Ascending(x => x.IndexedAppId)
+                    .Ascending(x => x.FileHash)),
+            new CreateIndexModel<MongoAssetEntity>(
+                Index
+                    .Ascending(x => x.Id)
+                    .Ascending(x => x.IsDeleted))
+        }, ct);
+    }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection,
-            CancellationToken ct)
+    public async IAsyncEnumerable<IAssetEntity> StreamAll(DomainId appId,
+        [EnumeratorCancellation] CancellationToken ct = default)
+    {
+        var find = Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted);
+
+        using (var cursor = await find.ToCursorAsync(ct))
         {
-            return collection.Indexes.CreateManyAsync(new[]
+            while (await cursor.MoveNextAsync(ct))
             {
-                new CreateIndexModel<MongoAssetEntity>(
-                    Index
-                        .Descending(x => x.LastModified)
-                        .Ascending(x => x.Id)
-                        .Ascending(x => x.IndexedAppId)
-                        .Ascending(x => x.IsDeleted)
-                        .Ascending(x => x.ParentId)
-                        .Ascending(x => x.Tags)),
-                new CreateIndexModel<MongoAssetEntity>(
-                    Index
-                        .Ascending(x => x.IndexedAppId)
-                        .Ascending(x => x.Slug)),
-                new CreateIndexModel<MongoAssetEntity>(
-                    Index
-                        .Ascending(x => x.IndexedAppId)
-                        .Ascending(x => x.FileHash)),
-                new CreateIndexModel<MongoAssetEntity>(
-                    Index
-                        .Ascending(x => x.Id)
-                        .Ascending(x => x.IsDeleted))
-            }, ct);
-        }
-
-        public async IAsyncEnumerable<IAssetEntity> StreamAll(DomainId appId,
-            [EnumeratorCancellation] CancellationToken ct = default)
-        {
-            var find = Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted);
-
-            using (var cursor = await find.ToCursorAsync(ct))
-            {
-                while (await cursor.MoveNextAsync(ct))
+                foreach (var entity in cursor.Current)
                 {
-                    foreach (var entity in cursor.Current)
-                    {
-                        yield return entity;
-                    }
+                    yield return entity;
                 }
             }
         }
+    }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, DomainId? parentId, Q q,
-            CancellationToken ct = default)
+    public async Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, DomainId? parentId, Q q,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("MongoAssetRepository/QueryAsync"))
         {
-            using (Telemetry.Activities.StartActivity("MongoAssetRepository/QueryAsync"))
+            try
             {
-                try
+                if (q.Ids is { Count: > 0 })
                 {
-                    if (q.Ids is { Count: > 0 })
+                    var filter = BuildFilter(appId, q.Ids.ToHashSet());
+
+                    var assetEntities =
+                        await Collection.Find(filter)
+                            .SortByDescending(x => x.LastModified).ThenBy(x => x.Id)
+                            .QueryLimit(q.Query)
+                            .QuerySkip(q.Query)
+                            .ToListRandomAsync(Collection, q.Query.Random, ct);
+                    long assetTotal = assetEntities.Count;
+
+                    if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
                     {
-                        var filter = BuildFilter(appId, q.Ids.ToHashSet());
-
-                        var assetEntities =
-                            await Collection.Find(filter)
-                                .SortByDescending(x => x.LastModified).ThenBy(x => x.Id)
-                                .QueryLimit(q.Query)
-                                .QuerySkip(q.Query)
-                                .ToListRandomAsync(Collection, q.Query.Random, ct);
-                        long assetTotal = assetEntities.Count;
-
-                        if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
+                        if (q.NoTotal)
                         {
-                            if (q.NoTotal)
-                            {
-                                assetTotal = -1;
-                            }
-                            else
-                            {
-                                assetTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
-                            }
+                            assetTotal = -1;
                         }
-
-                        return ResultList.Create(assetTotal, assetEntities.OfType<IAssetEntity>());
-                    }
-                    else
-                    {
-                        var query = q.Query.AdjustToModel(appId);
-
-                        // Default means that no other filters are applied and we only query by app.
-                        var (filter, isDefault) = query.BuildFilter(appId, parentId);
-
-                        var assetEntities =
-                            await Collection.Find(filter)
-                                .QueryLimit(query)
-                                .QuerySkip(query)
-                                .QuerySort(query)
-                                .ToListRandomAsync(Collection, query.Random, ct);
-                        long assetTotal = assetEntities.Count;
-
-                        if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
+                        else
                         {
-                            var isDefaultQuery = q.Query.Filter == null;
-
-                            if (q.NoTotal || (q.NoSlowTotal && !isDefaultQuery))
-                            {
-                                assetTotal = -1;
-                            }
-                            else if (isDefaultQuery)
-                            {
-                                // Cache total count by app and asset folder because no other filters are applied (aka default).
-                                var totalKey = $"{appId}_{parentId}";
-
-                                assetTotal = await countCollection.GetOrAddAsync(totalKey, ct => Collection.Find(filter).CountDocumentsAsync(ct), ct);
-                            }
-                            else
-                            {
-                                assetTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
-                            }
+                            assetTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
                         }
-
-                        return ResultList.Create<IAssetEntity>(assetTotal, assetEntities);
                     }
+
+                    return ResultList.Create(assetTotal, assetEntities.OfType<IAssetEntity>());
                 }
-                catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
+                else
                 {
-                    throw new DomainException(T.Get("common.resultTooLarge"));
+                    var query = q.Query.AdjustToModel(appId);
+
+                    // Default means that no other filters are applied and we only query by app.
+                    var (filter, isDefault) = query.BuildFilter(appId, parentId);
+
+                    var assetEntities =
+                        await Collection.Find(filter)
+                            .QueryLimit(query)
+                            .QuerySkip(query)
+                            .QuerySort(query)
+                            .ToListRandomAsync(Collection, query.Random, ct);
+                    long assetTotal = assetEntities.Count;
+
+                    if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
+                    {
+                        var isDefaultQuery = q.Query.Filter == null;
+
+                        if (q.NoTotal || (q.NoSlowTotal && !isDefaultQuery))
+                        {
+                            assetTotal = -1;
+                        }
+                        else if (isDefaultQuery)
+                        {
+                            // Cache total count by app and asset folder because no other filters are applied (aka default).
+                            var totalKey = $"{appId}_{parentId}";
+
+                            assetTotal = await countCollection.GetOrAddAsync(totalKey, ct => Collection.Find(filter).CountDocumentsAsync(ct), ct);
+                        }
+                        else
+                        {
+                            assetTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
+                        }
+                    }
+
+                    return ResultList.Create<IAssetEntity>(assetTotal, assetEntities);
                 }
             }
-        }
-
-        public async Task<IReadOnlyList<DomainId>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids,
-            CancellationToken ct = default)
-        {
-            using (Telemetry.Activities.StartActivity("MongoAssetRepository/QueryIdsAsync"))
+            catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
             {
-                var assetEntities =
-                    await Collection.Find(BuildFilter(appId, ids)).Only(x => x.Id)
-                        .ToListAsync(ct);
-
-                var field = Field.Of<MongoAssetFolderEntity>(x => nameof(x.Id));
-
-                return assetEntities.Select(x => DomainId.Create(x[field].AsString)).ToList();
+                throw new DomainException(T.Get("common.resultTooLarge"));
             }
         }
+    }
 
-        public async Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId,
-            CancellationToken ct = default)
+    public async Task<IReadOnlyList<DomainId>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("MongoAssetRepository/QueryIdsAsync"))
         {
-            using (Telemetry.Activities.StartActivity("MongoAssetRepository/QueryChildIdsAsync"))
-            {
-                var assetEntities =
-                    await Collection.Find(BuildFilter(appId, parentId)).Only(x => x.Id)
-                        .ToListAsync(ct);
+            var assetEntities =
+                await Collection.Find(BuildFilter(appId, ids)).Only(x => x.Id)
+                    .ToListAsync(ct);
 
-                var field = Field.Of<MongoAssetFolderEntity>(x => nameof(x.Id));
+            var field = Field.Of<MongoAssetFolderEntity>(x => nameof(x.Id));
 
-                return assetEntities.Select(x => DomainId.Create(x[field].AsString)).ToList();
-            }
+            return assetEntities.Select(x => DomainId.Create(x[field].AsString)).ToList();
         }
+    }
 
-        public async Task<IAssetEntity?> FindAssetByHashAsync(DomainId appId, string hash, string fileName, long fileSize,
-            CancellationToken ct = default)
+    public async Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("MongoAssetRepository/QueryChildIdsAsync"))
         {
-            using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetByHashAsync"))
-            {
-                var assetEntity =
-                    await Collection.Find(x => x.IndexedAppId == appId && x.FileHash == hash && !x.IsDeleted && x.FileSize == fileSize && x.FileName == fileName)
-                        .FirstOrDefaultAsync(ct);
+            var assetEntities =
+                await Collection.Find(BuildFilter(appId, parentId)).Only(x => x.Id)
+                    .ToListAsync(ct);
 
-                return assetEntity;
-            }
+            var field = Field.Of<MongoAssetFolderEntity>(x => nameof(x.Id));
+
+            return assetEntities.Select(x => DomainId.Create(x[field].AsString)).ToList();
         }
+    }
 
-        public async Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug,
-            CancellationToken ct = default)
+    public async Task<IAssetEntity?> FindAssetByHashAsync(DomainId appId, string hash, string fileName, long fileSize,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetByHashAsync"))
         {
-            using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetBySlugAsync"))
-            {
-                var assetEntity =
-                    await Collection.Find(x => x.IndexedAppId == appId && x.Slug == slug && !x.IsDeleted)
-                        .FirstOrDefaultAsync(ct);
+            var assetEntity =
+                await Collection.Find(x => x.IndexedAppId == appId && x.FileHash == hash && !x.IsDeleted && x.FileSize == fileSize && x.FileName == fileName)
+                    .FirstOrDefaultAsync(ct);
 
-                return assetEntity;
-            }
+            return assetEntity;
         }
+    }
 
-        public async Task<IAssetEntity?> FindAssetAsync(DomainId appId, DomainId id,
-            CancellationToken ct = default)
+    public async Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetBySlugAsync"))
         {
-            using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetAsync"))
-            {
-                var documentId = DomainId.Combine(appId, id);
+            var assetEntity =
+                await Collection.Find(x => x.IndexedAppId == appId && x.Slug == slug && !x.IsDeleted)
+                    .FirstOrDefaultAsync(ct);
 
-                var assetEntity =
-                    await Collection.Find(x => x.DocumentId == documentId && !x.IsDeleted)
-                        .FirstOrDefaultAsync(ct);
-
-                return assetEntity;
-            }
+            return assetEntity;
         }
+    }
 
-        public async Task<IAssetEntity?> FindAssetAsync(DomainId id,
-            CancellationToken ct = default)
+    public async Task<IAssetEntity?> FindAssetAsync(DomainId appId, DomainId id,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetAsync"))
         {
-            using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetAsync"))
-            {
-                var assetEntity =
-                    await Collection.Find(x => x.Id == id && !x.IsDeleted)
-                        .FirstOrDefaultAsync(ct);
+            var documentId = DomainId.Combine(appId, id);
 
-                return assetEntity;
-            }
+            var assetEntity =
+                await Collection.Find(x => x.DocumentId == documentId && !x.IsDeleted)
+                    .FirstOrDefaultAsync(ct);
+
+            return assetEntity;
         }
+    }
 
-        private static FilterDefinition<MongoAssetEntity> BuildFilter(DomainId appId, HashSet<DomainId> ids)
+    public async Task<IAssetEntity?> FindAssetAsync(DomainId id,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetAsync"))
         {
-            var documentIds = ids.Select(x => DomainId.Combine(appId, x));
+            var assetEntity =
+                await Collection.Find(x => x.Id == id && !x.IsDeleted)
+                    .FirstOrDefaultAsync(ct);
 
-            return Filter.And(
-                Filter.In(x => x.DocumentId, documentIds),
-                Filter.Ne(x => x.IsDeleted, true));
+            return assetEntity;
         }
+    }
 
-        private static FilterDefinition<MongoAssetEntity> BuildFilter(DomainId appId, DomainId parentId)
-        {
-            return Filter.And(
-                Filter.Gt(x => x.LastModified, default),
-                Filter.Gt(x => x.Id, DomainId.Create(string.Empty)),
-                Filter.Eq(x => x.IndexedAppId, appId),
-                Filter.Ne(x => x.IsDeleted, true),
-                Filter.Eq(x => x.ParentId, parentId));
-        }
+    private static FilterDefinition<MongoAssetEntity> BuildFilter(DomainId appId, HashSet<DomainId> ids)
+    {
+        var documentIds = ids.Select(x => DomainId.Combine(appId, x));
+
+        return Filter.And(
+            Filter.In(x => x.DocumentId, documentIds),
+            Filter.Ne(x => x.IsDeleted, true));
+    }
+
+    private static FilterDefinition<MongoAssetEntity> BuildFilter(DomainId appId, DomainId parentId)
+    {
+        return Filter.And(
+            Filter.Gt(x => x.LastModified, default),
+            Filter.Gt(x => x.Id, DomainId.Create(string.Empty)),
+            Filter.Eq(x => x.IndexedAppId, appId),
+            Filter.Ne(x => x.IsDeleted, true),
+            Filter.Eq(x => x.ParentId, parentId));
     }
 }

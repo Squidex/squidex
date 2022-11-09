@@ -7,22 +7,21 @@
 
 using Microsoft.Extensions.Configuration;
 
-namespace Squidex.Infrastructure.TestHelpers
+namespace Squidex.Infrastructure.TestHelpers;
+
+public static class TestConfig
 {
-    public static class TestConfig
+    public static IConfiguration Configuration { get; }
+
+    static TestConfig()
     {
-        public static IConfiguration Configuration { get; }
+        var basePath = Path.GetFullPath("../../../");
 
-        static TestConfig()
-        {
-            var basePath = Path.GetFullPath("../../../");
-
-            Configuration = new ConfigurationBuilder()
-                .SetBasePath(basePath)
-                .AddJsonFile("appsettings.json", true)
-                .AddJsonFile("appsettings.Development.json", true)
-                .AddEnvironmentVariables()
-                .Build();
-        }
+        Configuration = new ConfigurationBuilder()
+            .SetBasePath(basePath)
+            .AddJsonFile("appsettings.json", true)
+            .AddJsonFile("appsettings.Development.json", true)
+            .AddEnvironmentVariables()
+            .Build();
     }
 }

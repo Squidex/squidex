@@ -7,38 +7,37 @@
 
 using Microsoft.OData.UriParser;
 
-namespace Squidex.Infrastructure.Queries.OData
+namespace Squidex.Infrastructure.Queries.OData;
+
+public static class SortBuilder
 {
-    public static class SortBuilder
+    public static void ParseSort(this ODataUriParser query, ClrQuery result)
     {
-        public static void ParseSort(this ODataUriParser query, ClrQuery result)
+        var orderBy = query.ParseOrderBy();
+
+        if (orderBy != null)
         {
-            var orderBy = query.ParseOrderBy();
-
-            if (orderBy != null)
+            while (orderBy != null)
             {
-                while (orderBy != null)
-                {
-                    result.Sort ??= new List<SortNode>();
-                    result.Sort.Add(OrderBy(orderBy));
+                result.Sort ??= new List<SortNode>();
+                result.Sort.Add(OrderBy(orderBy));
 
-                    orderBy = orderBy.ThenBy;
-                }
+                orderBy = orderBy.ThenBy;
             }
         }
+    }
 
-        public static SortNode OrderBy(OrderByClause clause)
+    public static SortNode OrderBy(OrderByClause clause)
+    {
+        var path = PropertyPathVisitor.Visit(clause.Expression);
+
+        if (clause.Direction == OrderByDirection.Ascending)
         {
-            var path = PropertyPathVisitor.Visit(clause.Expression);
-
-            if (clause.Direction == OrderByDirection.Ascending)
-            {
-                return new SortNode(path, SortOrder.Ascending);
-            }
-            else
-            {
-                return new SortNode(path, SortOrder.Descending);
-            }
+            return new SortNode(path, SortOrder.Ascending);
+        }
+        else
+        {
+            return new SortNode(path, SortOrder.Descending);
         }
     }
 }

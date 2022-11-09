@@ -7,51 +7,50 @@
 
 using Squidex.Domain.Apps.Entities.Backup.State;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public sealed partial class RestoreProcessor
 {
-    public sealed partial class RestoreProcessor
+    // Use a run to store all state that is necessary for a single run.
+    private sealed class Run : IDisposable
     {
-        // Use a run to store all state that is necessary for a single run.
-        private sealed class Run : IDisposable
+        private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource cancellationLinked;
+
+        public IEnumerable<IBackupHandler> Handlers { get; init; }
+
+        public IBackupReader Reader { get; set; }
+
+        public RestoreJob Job { get; init; }
+
+        public RestoreContext Context { get; set; }
+
+        public StreamMapper StreamMapper { get; set; }
+
+        public CancellationToken CancellationToken => cancellationLinked.Token;
+
+        public Run(CancellationToken ct)
         {
-            private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
-            private readonly CancellationTokenSource cancellationLinked;
+            cancellationLinked = CancellationTokenSource.CreateLinkedTokenSource(ct, cancellationSource.Token);
+        }
 
-            public IEnumerable<IBackupHandler> Handlers { get; init; }
+        public void Dispose()
+        {
+            Reader?.Dispose();
 
-            public IBackupReader Reader { get; set; }
+            cancellationSource.Dispose();
+            cancellationLinked.Dispose();
+        }
 
-            public RestoreJob Job { get; init; }
-
-            public RestoreContext Context { get; set; }
-
-            public StreamMapper StreamMapper { get; set; }
-
-            public CancellationToken CancellationToken => cancellationLinked.Token;
-
-            public Run(CancellationToken ct)
+        public void Cancel()
+        {
+            try
             {
-                cancellationLinked = CancellationTokenSource.CreateLinkedTokenSource(ct, cancellationSource.Token);
+                cancellationSource.Cancel();
             }
-
-            public void Dispose()
+            catch (ObjectDisposedException)
             {
-                Reader?.Dispose();
-
-                cancellationSource.Dispose();
-                cancellationLinked.Dispose();
-            }
-
-            public void Cancel()
-            {
-                try
-                {
-                    cancellationSource.Cancel();
-                }
-                catch (ObjectDisposedException)
-                {
-                    // Cancellation token might have been disposed, if the run is completed.
-                }
+                // Cancellation token might have been disposed, if the run is completed.
             }
         }
     }

@@ -8,91 +8,90 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Squidex.Infrastructure.Collections
+namespace Squidex.Infrastructure.Collections;
+
+public class ReadonlyDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>, IEquatable<ReadonlyDictionary<TKey, TValue>> where TKey : notnull
 {
-    public class ReadonlyDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>, IEquatable<ReadonlyDictionary<TKey, TValue>> where TKey : notnull
+    private static readonly Dictionary<TKey, TValue> EmptyInner = new Dictionary<TKey, TValue>();
+    private readonly IDictionary<TKey, TValue> inner;
+
+    public TValue this[TKey key]
     {
-        private static readonly Dictionary<TKey, TValue> EmptyInner = new Dictionary<TKey, TValue>();
-        private readonly IDictionary<TKey, TValue> inner;
-
-        public TValue this[TKey key]
+        get
         {
-            get
+            if (!TryGetValue(key, out var value))
             {
-                if (!TryGetValue(key, out var value))
-                {
-                    throw new KeyNotFoundException();
-                }
-
-                return value;
+                throw new KeyNotFoundException();
             }
-        }
 
-        public IEnumerable<TKey> Keys
-        {
-            get => inner.Keys;
+            return value;
         }
+    }
 
-        public IEnumerable<TValue> Values
-        {
-            get => inner.Values;
-        }
+    public IEnumerable<TKey> Keys
+    {
+        get => inner.Keys;
+    }
 
-        public int Count
-        {
-            get => inner.Count;
-        }
+    public IEnumerable<TValue> Values
+    {
+        get => inner.Values;
+    }
 
-        public ReadonlyDictionary()
-            : this(EmptyInner)
-        {
-        }
+    public int Count
+    {
+        get => inner.Count;
+    }
 
-        public ReadonlyDictionary(IDictionary<TKey, TValue> inner)
-        {
-            Guard.NotNull(inner);
+    public ReadonlyDictionary()
+        : this(EmptyInner)
+    {
+    }
 
-            this.inner = inner;
-        }
+    public ReadonlyDictionary(IDictionary<TKey, TValue> inner)
+    {
+        Guard.NotNull(inner);
 
-        public bool ContainsKey(TKey key)
-        {
-            return inner.ContainsKey(key);
-        }
+        this.inner = inner;
+    }
 
-        public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
-        {
-            return inner.TryGetValue(key, out value);
-        }
+    public bool ContainsKey(TKey key)
+    {
+        return inner.ContainsKey(key);
+    }
 
-        IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
-        {
-            return GetEnumerable(inner).GetEnumerator();
-        }
+    public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
+    {
+        return inner.TryGetValue(key, out value);
+    }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return inner.GetEnumerator();
-        }
+    IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
+    {
+        return GetEnumerable(inner).GetEnumerator();
+    }
 
-        private static IEnumerable<TItem> GetEnumerable<TItem>(IEnumerable<TItem> collection)
-        {
-            return collection;
-        }
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return inner.GetEnumerator();
+    }
 
-        public override bool Equals(object? obj)
-        {
-            return Equals(obj as ReadonlyDictionary<TKey, TValue>);
-        }
+    private static IEnumerable<TItem> GetEnumerable<TItem>(IEnumerable<TItem> collection)
+    {
+        return collection;
+    }
 
-        public bool Equals(ReadonlyDictionary<TKey, TValue>? other)
-        {
-            return this.EqualsDictionary(other);
-        }
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as ReadonlyDictionary<TKey, TValue>);
+    }
 
-        public override int GetHashCode()
-        {
-            return this.DictionaryHashCode();
-        }
+    public bool Equals(ReadonlyDictionary<TKey, TValue>? other)
+    {
+        return this.EqualsDictionary(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return this.DictionaryHashCode();
     }
 }

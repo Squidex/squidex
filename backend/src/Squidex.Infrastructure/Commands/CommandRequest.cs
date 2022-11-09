@@ -7,63 +7,62 @@
 
 using System.Globalization;
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public sealed class CommandRequest
 {
-    public sealed class CommandRequest
+    public IAggregateCommand Command { get; }
+
+    public string Culture { get; }
+
+    public string CultureUI { get; }
+
+    public CommandRequest(IAggregateCommand command, string culture, string cultureUI)
     {
-        public IAggregateCommand Command { get; }
+        Command = command;
 
-        public string Culture { get; }
+        Culture = culture;
+        CultureUI = cultureUI;
+    }
 
-        public string CultureUI { get; }
+    public static CommandRequest Create(IAggregateCommand command)
+    {
+        return new CommandRequest(command,
+            CultureInfo.CurrentCulture.Name,
+            CultureInfo.CurrentUICulture.Name);
+    }
 
-        public CommandRequest(IAggregateCommand command, string culture, string cultureUI)
+    public void ApplyContext()
+    {
+        var culture = GetCulture(Culture);
+
+        if (culture != null)
         {
-            Command = command;
-
-            Culture = culture;
-            CultureUI = cultureUI;
+            CultureInfo.CurrentCulture = culture;
         }
 
-        public static CommandRequest Create(IAggregateCommand command)
+        var uiCulture = GetCulture(CultureUI);
+
+        if (uiCulture != null)
         {
-            return new CommandRequest(command,
-                CultureInfo.CurrentCulture.Name,
-                CultureInfo.CurrentUICulture.Name);
+            CultureInfo.CurrentUICulture = uiCulture;
+        }
+    }
+
+    private static CultureInfo? GetCulture(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return null;
         }
 
-        public void ApplyContext()
+        try
         {
-            var culture = GetCulture(Culture);
-
-            if (culture != null)
-            {
-                CultureInfo.CurrentCulture = culture;
-            }
-
-            var uiCulture = GetCulture(CultureUI);
-
-            if (uiCulture != null)
-            {
-                CultureInfo.CurrentUICulture = uiCulture;
-            }
+            return CultureInfo.GetCultureInfo(name);
         }
-
-        private static CultureInfo? GetCulture(string name)
+        catch (CultureNotFoundException)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return null;
-            }
-
-            try
-            {
-                return CultureInfo.GetCultureInfo(name);
-            }
-            catch (CultureNotFoundException)
-            {
-                return null;
-            }
+            return null;
         }
     }
 }

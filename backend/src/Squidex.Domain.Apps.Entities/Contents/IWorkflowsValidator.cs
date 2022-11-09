@@ -8,10 +8,9 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents;
+
+public interface IWorkflowsValidator
 {
-    public interface IWorkflowsValidator
-    {
-        Task<IReadOnlyList<string>> ValidateAsync(DomainId appId, Workflows workflows);
-    }
+    Task<IReadOnlyList<string>> ValidateAsync(DomainId appId, Workflows workflows);
 }

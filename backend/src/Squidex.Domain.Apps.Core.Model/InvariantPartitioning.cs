@@ -5,63 +5,62 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core
+namespace Squidex.Domain.Apps.Core;
+
+public sealed class InvariantPartitioning : IFieldPartitioning
 {
-    public sealed class InvariantPartitioning : IFieldPartitioning
+    public static readonly InvariantPartitioning Instance = new InvariantPartitioning();
+    public static readonly string Key = "iv";
+    public static readonly string Name = "Invariant";
+    public static readonly string Description = "invariant value";
+
+    public string Master
     {
-        public static readonly InvariantPartitioning Instance = new InvariantPartitioning();
-        public static readonly string Key = "iv";
-        public static readonly string Name = "Invariant";
-        public static readonly string Description = "invariant value";
+        get => Key;
+    }
 
-        public string Master
+    public IEnumerable<string> AllKeys
+    {
+        get { yield return Key; }
+    }
+
+    public string? GetName(string key)
+    {
+        if (Contains(key))
         {
-            get => Key;
+            return Name;
         }
 
-        public IEnumerable<string> AllKeys
+        return null;
+    }
+
+    public IEnumerable<string> GetPriorities(string key)
+    {
+        if (Contains(key))
         {
-            get { yield return Key; }
+            yield return Key;
         }
 
-        public string? GetName(string key)
-        {
-            if (Contains(key))
-            {
-                return Name;
-            }
+        yield break;
+    }
 
-            return null;
-        }
+    public bool Contains(string key)
+    {
+        return Equals(Key, key);
+    }
 
-        public IEnumerable<string> GetPriorities(string key)
-        {
-            if (Contains(key))
-            {
-                yield return Key;
-            }
+    public bool IsMaster(string key)
+    {
+        return Contains(key);
+    }
 
-            yield break;
-        }
+    public bool IsOptional(string key)
+    {
+        return false;
+    }
 
-        public bool Contains(string key)
-        {
-            return Equals(Key, key);
-        }
-
-        public bool IsMaster(string key)
-        {
-            return Contains(key);
-        }
-
-        public bool IsOptional(string key)
-        {
-            return false;
-        }
-
-        public override string ToString()
-        {
-            return Description;
-        }
+    public override string ToString()
+    {
+        return Description;
     }
 }

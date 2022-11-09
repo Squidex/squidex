@@ -5,11 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public enum BackupVersion
 {
-    public enum BackupVersion
-    {
-        V2,
-        V1
-    }
+    V2,
+    V1
 }

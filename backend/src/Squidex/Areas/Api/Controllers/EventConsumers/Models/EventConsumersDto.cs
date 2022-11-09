@@ -8,30 +8,29 @@
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.EventConsumers.Models
+namespace Squidex.Areas.Api.Controllers.EventConsumers.Models;
+
+public sealed class EventConsumersDto : Resource
 {
-    public sealed class EventConsumersDto : Resource
+    /// <summary>
+    /// The event consumers.
+    /// </summary>
+    public EventConsumerDto[] Items { get; set; }
+
+    public static EventConsumersDto FromDomain(IEnumerable<EventConsumerInfo> items, Resources resources)
     {
-        /// <summary>
-        /// The event consumers.
-        /// </summary>
-        public EventConsumerDto[] Items { get; set; }
-
-        public static EventConsumersDto FromDomain(IEnumerable<EventConsumerInfo> items, Resources resources)
+        var result = new EventConsumersDto
         {
-            var result = new EventConsumersDto
-            {
-                Items = items.Select(x => EventConsumerDto.FromDomain(x, resources)).ToArray()
-            };
+            Items = items.Select(x => EventConsumerDto.FromDomain(x, resources)).ToArray()
+        };
 
-            return result.CreateLinks(resources);
-        }
+        return result.CreateLinks(resources);
+    }
 
-        private EventConsumersDto CreateLinks(Resources resources)
-        {
-            AddSelfLink(resources.Url<EventConsumersController>(c => nameof(c.GetEventConsumers)));
+    private EventConsumersDto CreateLinks(Resources resources)
+    {
+        AddSelfLink(resources.Url<EventConsumersController>(c => nameof(c.GetEventConsumers)));
 
-            return this;
-        }
+        return this;
     }
 }

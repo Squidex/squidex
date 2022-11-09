@@ -8,52 +8,51 @@
 using FakeItEasy;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public class BackupCompatibilityTests
 {
-    public class BackupCompatibilityTests
+    [Fact]
+    public async Task Should_writer_version()
     {
-        [Fact]
-        public async Task Should_writer_version()
-        {
-            var writer = A.Fake<IBackupWriter>();
+        var writer = A.Fake<IBackupWriter>();
 
-            await writer.WriteVersionAsync();
+        await writer.WriteVersionAsync();
 
-            A.CallTo(() => writer.WriteJsonAsync(A<string>._, A<CompatibilityExtensions.FileVersion>.That.Matches(x => x.Major == 5), default))
-                .MustHaveHappened();
-        }
+        A.CallTo(() => writer.WriteJsonAsync(A<string>._, A<CompatibilityExtensions.FileVersion>.That.Matches(x => x.Major == 5), default))
+            .MustHaveHappened();
+    }
 
-        [Fact]
-        public async Task Should_not_throw_exception_if_backup_has_correct_version()
-        {
-            var reader = A.Fake<IBackupReader>();
+    [Fact]
+    public async Task Should_not_throw_exception_if_backup_has_correct_version()
+    {
+        var reader = A.Fake<IBackupReader>();
 
-            A.CallTo(() => reader.ReadJsonAsync<CompatibilityExtensions.FileVersion>(A<string>._, default))
-                .Returns(new CompatibilityExtensions.FileVersion { Major = 5 });
+        A.CallTo(() => reader.ReadJsonAsync<CompatibilityExtensions.FileVersion>(A<string>._, default))
+            .Returns(new CompatibilityExtensions.FileVersion { Major = 5 });
 
-            await reader.CheckCompatibilityAsync();
-        }
+        await reader.CheckCompatibilityAsync();
+    }
 
-        [Fact]
-        public async Task Should_throw_exception_if_backup_has_wrong_version()
-        {
-            var reader = A.Fake<IBackupReader>();
+    [Fact]
+    public async Task Should_throw_exception_if_backup_has_wrong_version()
+    {
+        var reader = A.Fake<IBackupReader>();
 
-            A.CallTo(() => reader.ReadJsonAsync<CompatibilityExtensions.FileVersion>(A<string>._, default))
-                .Returns(new CompatibilityExtensions.FileVersion { Major = 3 });
+        A.CallTo(() => reader.ReadJsonAsync<CompatibilityExtensions.FileVersion>(A<string>._, default))
+            .Returns(new CompatibilityExtensions.FileVersion { Major = 3 });
 
-            await Assert.ThrowsAsync<BackupRestoreException>(() => reader.CheckCompatibilityAsync());
-        }
+        await Assert.ThrowsAsync<BackupRestoreException>(() => reader.CheckCompatibilityAsync());
+    }
 
-        [Fact]
-        public async Task Should_not_throw_exception_if_backup_has_no_version()
-        {
-            var reader = A.Fake<IBackupReader>();
+    [Fact]
+    public async Task Should_not_throw_exception_if_backup_has_no_version()
+    {
+        var reader = A.Fake<IBackupReader>();
 
-            A.CallTo(() => reader.ReadJsonAsync<CompatibilityExtensions.FileVersion>(A<string>._, default))
-                .Throws(new FileNotFoundException());
+        A.CallTo(() => reader.ReadJsonAsync<CompatibilityExtensions.FileVersion>(A<string>._, default))
+            .Throws(new FileNotFoundException());
 
-            await reader.CheckCompatibilityAsync();
-        }
+        await reader.CheckCompatibilityAsync();
     }
 }

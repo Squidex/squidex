@@ -7,27 +7,26 @@
 
 using Migrations;
 
-namespace Squidex.Config.Startup
+namespace Squidex.Config.Startup;
+
+public sealed class MigrationRebuilderHost : IHostedService
 {
-    public sealed class MigrationRebuilderHost : IHostedService
+    private readonly RebuildRunner rebuildRunner;
+
+    public MigrationRebuilderHost(RebuildRunner rebuildRunner)
     {
-        private readonly RebuildRunner rebuildRunner;
+        this.rebuildRunner = rebuildRunner;
+    }
 
-        public MigrationRebuilderHost(RebuildRunner rebuildRunner)
-        {
-            this.rebuildRunner = rebuildRunner;
-        }
+    public Task StartAsync(
+        CancellationToken cancellationToken)
+    {
+        return rebuildRunner.RunAsync(cancellationToken);
+    }
 
-        public Task StartAsync(
-            CancellationToken cancellationToken)
-        {
-            return rebuildRunner.RunAsync(cancellationToken);
-        }
-
-        public Task StopAsync(
-            CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+    public Task StopAsync(
+        CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 }

@@ -7,13 +7,12 @@
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.Infrastructure.Commands
-{
-    public delegate Task NextDelegate(CommandContext context, CancellationToken ct);
+namespace Squidex.Infrastructure.Commands;
 
-    public interface ICommandMiddleware
-    {
-        Task HandleAsync(CommandContext context, NextDelegate next,
-            CancellationToken ct);
-    }
+public delegate Task NextDelegate(CommandContext context, CancellationToken ct);
+
+public interface ICommandMiddleware
+{
+    Task HandleAsync(CommandContext context, NextDelegate next,
+        CancellationToken ct);
 }

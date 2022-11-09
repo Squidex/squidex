@@ -11,156 +11,155 @@ using TestSuite.Fixtures;
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
-namespace TestSuite.ApiTests
+namespace TestSuite.ApiTests;
+
+[UsesVerify]
+public class RuleTests : IClassFixture<ClientFixture>
 {
-    [UsesVerify]
-    public class RuleTests : IClassFixture<ClientFixture>
+    private readonly string appName = Guid.NewGuid().ToString();
+    private readonly string ruleName = Guid.NewGuid().ToString();
+
+    public ClientFixture _ { get; }
+
+    public RuleTests(ClientFixture fixture)
     {
-        private readonly string appName = Guid.NewGuid().ToString();
-        private readonly string ruleName = Guid.NewGuid().ToString();
+        _ = fixture;
+    }
 
-        public ClientFixture _ { get; }
+    [Fact]
+    public async Task Should_create_rule()
+    {
+        // STEP 0: Create app.
+        await CreateAppAsync();
 
-        public RuleTests(ClientFixture fixture)
+
+        // STEP 1: Create rule
+        var createRule = new CreateRuleDto
         {
-            _ = fixture;
-        }
-
-        [Fact]
-        public async Task Should_create_rule()
-        {
-            // STEP 0: Create app.
-            await CreateAppAsync();
-
-
-            // STEP 1: Create rule
-            var createRule = new CreateRuleDto
+            Action = new WebhookRuleActionDto
             {
-                Action = new WebhookRuleActionDto
-                {
-                    Method = WebhookMethod.POST,
-                    Payload = null,
-                    PayloadType = null,
-                    Url = new Uri("http://squidex.io")
-                },
-                Trigger = new ContentChangedRuleTriggerDto
-                {
-                    HandleAll = true
-                }
-            };
-
-            var rule = await _.Rules.PostRuleAsync(appName, createRule);
-
-            Assert.IsType<WebhookRuleActionDto>(rule.Action);
-
-            await Verify(rule);
-        }
-
-        [Fact]
-        public async Task Should_update_rule()
-        {
-            // STEP 0: Create app.
-            await CreateAppAsync();
-
-
-            // STEP 1: Create rule
-            var createRequest = new CreateRuleDto
+                Method = WebhookMethod.POST,
+                Payload = null,
+                PayloadType = null,
+                Url = new Uri("http://squidex.io")
+            },
+            Trigger = new ContentChangedRuleTriggerDto
             {
-                Action = new WebhookRuleActionDto
-                {
-                    Method = WebhookMethod.POST,
-                    Payload = null,
-                    PayloadType = null,
-                    Url = new Uri("http://squidex.io")
-                },
-                Trigger = new ContentChangedRuleTriggerDto
-                {
-                    HandleAll = true
-                }
-            };
+                HandleAll = true
+            }
+        };
 
-            var rule_0 = await _.Rules.PostRuleAsync(appName, createRequest);
+        var rule = await _.Rules.PostRuleAsync(appName, createRule);
+
+        Assert.IsType<WebhookRuleActionDto>(rule.Action);
+
+        await Verify(rule);
+    }
+
+    [Fact]
+    public async Task Should_update_rule()
+    {
+        // STEP 0: Create app.
+        await CreateAppAsync();
 
 
-            // STEP 2: Update rule
-            var updateRequest = new UpdateRuleDto
+        // STEP 1: Create rule
+        var createRequest = new CreateRuleDto
+        {
+            Action = new WebhookRuleActionDto
             {
-                Name = ruleName
-            };
-
-            var rule_1 = await _.Rules.PutRuleAsync(appName, rule_0.Id, updateRequest);
-
-            Assert.Equal(ruleName, rule_1.Name);
-
-            await Verify(rule_1);
-        }
-
-        [Fact]
-        public async Task Should_delete_rule()
-        {
-            // STEP 0: Create app.
-            await CreateAppAsync();
-
-
-            // STEP 1: Create rule
-            var createRequest = new CreateRuleDto
+                Method = WebhookMethod.POST,
+                Payload = null,
+                PayloadType = null,
+                Url = new Uri("http://squidex.io")
+            },
+            Trigger = new ContentChangedRuleTriggerDto
             {
-                Action = new WebhookRuleActionDto
-                {
-                    Method = WebhookMethod.POST,
-                    Payload = null,
-                    PayloadType = null,
-                    Url = new Uri("http://squidex.io")
-                },
-                Trigger = new ContentChangedRuleTriggerDto
-                {
-                    HandleAll = true
-                }
-            };
+                HandleAll = true
+            }
+        };
 
-            var rule = await _.Rules.PostRuleAsync(appName, createRequest);
+        var rule_0 = await _.Rules.PostRuleAsync(appName, createRequest);
 
 
-            // STEP 2: Delete rule
-            await _.Rules.DeleteRuleAsync(appName, rule.Id);
-
-            var rules = await _.Rules.GetRulesAsync(appName);
-
-            Assert.DoesNotContain(rules.Items, x => x.Id == rule.Id);
-        }
-
-        [Fact]
-        public async Task Should_get_actions()
+        // STEP 2: Update rule
+        var updateRequest = new UpdateRuleDto
         {
-            var actions = await _.Rules.GetActionsAsync();
+            Name = ruleName
+        };
 
-            Assert.NotEmpty(actions);
-        }
+        var rule_1 = await _.Rules.PutRuleAsync(appName, rule_0.Id, updateRequest);
 
-        [Fact]
-        public async Task Should_get_event_schemas()
+        Assert.Equal(ruleName, rule_1.Name);
+
+        await Verify(rule_1);
+    }
+
+    [Fact]
+    public async Task Should_delete_rule()
+    {
+        // STEP 0: Create app.
+        await CreateAppAsync();
+
+
+        // STEP 1: Create rule
+        var createRequest = new CreateRuleDto
         {
-            var schema = await _.Rules.GetEventSchemaAsync("EnrichedContentEvent");
-
-            Assert.NotNull(schema);
-        }
-
-        [Fact]
-        public async Task Should_get_event_types()
-        {
-            var eventTypes = await _.Rules.GetEventTypesAsync();
-
-            Assert.NotEmpty(eventTypes);
-        }
-
-        private async Task CreateAppAsync()
-        {
-            var createRequest = new CreateAppDto
+            Action = new WebhookRuleActionDto
             {
-                Name = appName
-            };
+                Method = WebhookMethod.POST,
+                Payload = null,
+                PayloadType = null,
+                Url = new Uri("http://squidex.io")
+            },
+            Trigger = new ContentChangedRuleTriggerDto
+            {
+                HandleAll = true
+            }
+        };
 
-            await _.Apps.PostAppAsync(createRequest);
-        }
+        var rule = await _.Rules.PostRuleAsync(appName, createRequest);
+
+
+        // STEP 2: Delete rule
+        await _.Rules.DeleteRuleAsync(appName, rule.Id);
+
+        var rules = await _.Rules.GetRulesAsync(appName);
+
+        Assert.DoesNotContain(rules.Items, x => x.Id == rule.Id);
+    }
+
+    [Fact]
+    public async Task Should_get_actions()
+    {
+        var actions = await _.Rules.GetActionsAsync();
+
+        Assert.NotEmpty(actions);
+    }
+
+    [Fact]
+    public async Task Should_get_event_schemas()
+    {
+        var schema = await _.Rules.GetEventSchemaAsync("EnrichedContentEvent");
+
+        Assert.NotNull(schema);
+    }
+
+    [Fact]
+    public async Task Should_get_event_types()
+    {
+        var eventTypes = await _.Rules.GetEventTypesAsync();
+
+        Assert.NotEmpty(eventTypes);
+    }
+
+    private async Task CreateAppAsync()
+    {
+        var createRequest = new CreateAppDto
+        {
+            Name = appName
+        };
+
+        await _.Apps.PostAppAsync(createRequest);
     }
 }

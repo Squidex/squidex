@@ -11,50 +11,49 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
+namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
+
+public sealed class ContentOperation : OperationContextBase<ContentCommand, IContentEntity>
 {
-    public sealed class ContentOperation : OperationContextBase<ContentCommand, IContentEntity>
+    public ISchemaEntity Schema { get; init; }
+
+    public ResolvedComponents Components { get; init; }
+
+    public Schema SchemaDef
     {
-        public ISchemaEntity Schema { get; init; }
+        get => Schema.SchemaDef;
+    }
 
-        public ResolvedComponents Components { get; init; }
+    public ContentOperation(IServiceProvider serviceProvider, Func<IContentEntity> snapshot)
+        : base(serviceProvider, snapshot)
+    {
+    }
 
-        public Schema SchemaDef
+    public static async Task<ContentOperation> CreateAsync(IServiceProvider services, ContentCommand command, Func<IContentEntity> snapshot)
+    {
+        var appProvider = services.GetRequiredService<IAppProvider>();
+
+        var (app, schema) = await appProvider.GetAppWithSchemaAsync(command.AppId.Id, command.SchemaId.Id);
+
+        if (app == null)
         {
-            get => Schema.SchemaDef;
+            throw new DomainObjectNotFoundException(command.AppId.Id.ToString());
         }
 
-        public ContentOperation(IServiceProvider serviceProvider, Func<IContentEntity> snapshot)
-            : base(serviceProvider, snapshot)
+        if (schema == null)
         {
+            throw new DomainObjectNotFoundException(command.SchemaId.Id.ToString());
         }
 
-        public static async Task<ContentOperation> CreateAsync(IServiceProvider services, ContentCommand command, Func<IContentEntity> snapshot)
+        var components = await appProvider.GetComponentsAsync(schema);
+
+        return new ContentOperation(services, snapshot)
         {
-            var appProvider = services.GetRequiredService<IAppProvider>();
-
-            var (app, schema) = await appProvider.GetAppWithSchemaAsync(command.AppId.Id, command.SchemaId.Id);
-
-            if (app == null)
-            {
-                throw new DomainObjectNotFoundException(command.AppId.Id.ToString());
-            }
-
-            if (schema == null)
-            {
-                throw new DomainObjectNotFoundException(command.SchemaId.Id.ToString());
-            }
-
-            var components = await appProvider.GetComponentsAsync(schema);
-
-            return new ContentOperation(services, snapshot)
-            {
-                App = app,
-                Command = command,
-                CommandId = command.ContentId,
-                Components = components,
-                Schema = schema
-            };
-        }
+            App = app,
+            Command = command,
+            CommandId = command.ContentId,
+            Components = components,
+            Schema = schema
+        };
     }
 }

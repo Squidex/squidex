@@ -7,26 +7,25 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public interface IBackupService
 {
-    public interface IBackupService
-    {
-        Task StartBackupAsync(DomainId appId, RefToken actor,
-            CancellationToken ct = default);
+    Task StartBackupAsync(DomainId appId, RefToken actor,
+        CancellationToken ct = default);
 
-        Task StartRestoreAsync(RefToken actor, Uri url, string? newAppName,
-            CancellationToken ct = default);
+    Task StartRestoreAsync(RefToken actor, Uri url, string? newAppName,
+        CancellationToken ct = default);
 
-        Task<IRestoreJob> GetRestoreAsync(
-            CancellationToken ct = default);
+    Task<IRestoreJob> GetRestoreAsync(
+        CancellationToken ct = default);
 
-        Task<List<IBackupJob>> GetBackupsAsync(DomainId appId,
-            CancellationToken ct = default);
+    Task<List<IBackupJob>> GetBackupsAsync(DomainId appId,
+        CancellationToken ct = default);
 
-        Task<IBackupJob?> GetBackupAsync(DomainId appId, DomainId backupId,
-            CancellationToken ct = default);
+    Task<IBackupJob?> GetBackupAsync(DomainId appId, DomainId backupId,
+        CancellationToken ct = default);
 
-        Task DeleteBackupAsync(DomainId appId, DomainId backupId,
-            CancellationToken ct = default);
-    }
+    Task DeleteBackupAsync(DomainId appId, DomainId backupId,
+        CancellationToken ct = default);
 }

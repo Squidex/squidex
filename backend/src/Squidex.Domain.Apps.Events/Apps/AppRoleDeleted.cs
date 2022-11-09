@@ -7,11 +7,10 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps;
+
+[EventType(nameof(AppRoleDeleted))]
+public sealed class AppRoleDeleted : AppEvent
 {
-    [EventType(nameof(AppRoleDeleted))]
-    public sealed class AppRoleDeleted : AppEvent
-    {
-        public string Name { get; set; }
-    }
+    public string Name { get; set; }
 }

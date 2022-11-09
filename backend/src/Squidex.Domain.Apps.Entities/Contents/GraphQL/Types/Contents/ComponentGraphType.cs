@@ -10,67 +10,66 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
+
+internal sealed class ComponentGraphType : ObjectGraphType<JsonObject>
 {
-    internal sealed class ComponentGraphType : ObjectGraphType<JsonObject>
+    public ComponentGraphType(SchemaInfo schemaInfo)
     {
-        public ComponentGraphType(SchemaInfo schemaInfo)
+        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
+        Name = schemaInfo.ComponentType;
+
+        IsTypeOf = CheckType(schemaInfo.Schema.Id.ToString());
+    }
+
+    public void Initialize(Builder builder, SchemaInfo schemaInfo)
+    {
+        Description = $"The structure of the {schemaInfo.DisplayName} component schema.";
+
+        AddField(ContentFields.SchemaId);
+
+        foreach (var fieldInfo in schemaInfo.Fields)
         {
-            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-            Name = schemaInfo.ComponentType;
-
-            IsTypeOf = CheckType(schemaInfo.Schema.Id.ToString());
-        }
-
-        public void Initialize(Builder builder, SchemaInfo schemaInfo)
-        {
-            Description = $"The structure of the {schemaInfo.DisplayName} component schema.";
-
-            AddField(ContentFields.SchemaId);
-
-            foreach (var fieldInfo in schemaInfo.Fields)
+            if (fieldInfo.Field.IsComponentLike())
             {
-                if (fieldInfo.Field.IsComponentLike())
+                AddField(new FieldType
                 {
-                    AddField(new FieldType
-                    {
-                        Name = fieldInfo.FieldNameDynamic,
-                        Arguments = ContentActions.Json.Arguments,
-                        ResolvedType = Scalars.Json,
-                        Resolver = FieldVisitor.JsonPath,
-                        Description = fieldInfo.Field.RawProperties.Hints
-                    }).WithSourceName(fieldInfo);
-                }
-
-                var (resolvedType, resolver, args) = builder.GetGraphType(fieldInfo);
-
-                if (resolvedType != null && resolver != null)
-                {
-                    AddField(new FieldType
-                    {
-                        Name = fieldInfo.FieldName,
-                        Arguments = args,
-                        ResolvedType = resolvedType,
-                        Resolver = resolver,
-                        Description = fieldInfo.Field.RawProperties.Hints
-                    }).WithSourceName(fieldInfo);
-                }
+                    Name = fieldInfo.FieldNameDynamic,
+                    Arguments = ContentActions.Json.Arguments,
+                    ResolvedType = Scalars.Json,
+                    Resolver = FieldVisitor.JsonPath,
+                    Description = fieldInfo.Field.RawProperties.Hints
+                }).WithSourceName(fieldInfo);
             }
 
-            AddResolvedInterface(builder.ComponentInterface);
-        }
+            var (resolvedType, resolver, args) = builder.GetGraphType(fieldInfo);
 
-        private static Func<object, bool> CheckType(string schemaId)
-        {
-            return value =>
+            if (resolvedType != null && resolver != null)
             {
-                if (value is not JsonObject json)
+                AddField(new FieldType
                 {
-                    return false;
-                }
-
-                return Component.IsValid(json, out var discriminator) && discriminator == schemaId;
-            };
+                    Name = fieldInfo.FieldName,
+                    Arguments = args,
+                    ResolvedType = resolvedType,
+                    Resolver = resolver,
+                    Description = fieldInfo.Field.RawProperties.Hints
+                }).WithSourceName(fieldInfo);
+            }
         }
+
+        AddResolvedInterface(builder.ComponentInterface);
+    }
+
+    private static Func<object, bool> CheckType(string schemaId)
+    {
+        return value =>
+        {
+            if (value is not JsonObject json)
+            {
+                return false;
+            }
+
+            return Component.IsValid(json, out var discriminator) && discriminator == schemaId;
+        };
     }
 }

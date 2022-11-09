@@ -9,7 +9,6 @@ using Squidex.Domain.Apps.Entities.Teams;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Web.Pipeline
-{
-    public sealed record TeamFeature(ITeamEntity Team) : ITeamFeature;
-}
+namespace Squidex.Web.Pipeline;
+
+public sealed record TeamFeature(ITeamEntity Team) : ITeamFeature;

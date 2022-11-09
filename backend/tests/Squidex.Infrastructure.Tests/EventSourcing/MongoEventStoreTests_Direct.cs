@@ -9,21 +9,20 @@ using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+[Trait("Category", "Dependencies")]
+public class MongoEventStoreTests_Direct : EventStoreTests<MongoEventStore>, IClassFixture<MongoEventStoreDirectFixture>
 {
-    [Trait("Category", "Dependencies")]
-    public class MongoEventStoreTests_Direct : EventStoreTests<MongoEventStore>, IClassFixture<MongoEventStoreDirectFixture>
+    public MongoEventStoreFixture _ { get; }
+
+    public MongoEventStoreTests_Direct(MongoEventStoreDirectFixture fixture)
     {
-        public MongoEventStoreFixture _ { get; }
+        _ = fixture;
+    }
 
-        public MongoEventStoreTests_Direct(MongoEventStoreDirectFixture fixture)
-        {
-            _ = fixture;
-        }
-
-        public override MongoEventStore CreateStore()
-        {
-            return _.EventStore;
-        }
+    public override MongoEventStore CreateStore()
+    {
+        return _.EventStore;
     }
 }

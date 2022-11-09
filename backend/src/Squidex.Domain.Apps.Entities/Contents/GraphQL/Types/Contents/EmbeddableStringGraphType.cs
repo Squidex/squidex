@@ -11,54 +11,53 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
+
+internal sealed class EmbeddableStringGraphType : ObjectGraphType<string>
 {
-    internal sealed class EmbeddableStringGraphType : ObjectGraphType<string>
+    public EmbeddableStringGraphType(Builder builder, FieldInfo fieldInfo, StringFieldProperties properties)
     {
-        public EmbeddableStringGraphType(Builder builder, FieldInfo fieldInfo, StringFieldProperties properties)
+        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
+        Name = fieldInfo.EmbeddableStringType;
+
+        AddField(ContentFields.StringFieldText);
+        AddField(ContentFields.StringFieldAssets);
+
+        var referenceType = ResolveReferences(builder, fieldInfo, properties.SchemaIds);
+
+        if (referenceType != null)
         {
-            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-            Name = fieldInfo.EmbeddableStringType;
-
-            AddField(ContentFields.StringFieldText);
-            AddField(ContentFields.StringFieldAssets);
-
-            var referenceType = ResolveReferences(builder, fieldInfo, properties.SchemaIds);
-
-            if (referenceType != null)
+            AddField(new FieldType
             {
-                AddField(new FieldType
-                {
-                    Name = "contents",
-                    ResolvedType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(referenceType))),
-                    Resolver = ContentFields.ResolveStringFieldContents,
-                    Description = FieldDescriptions.StringFieldReferences
-                });
-            }
+                Name = "contents",
+                ResolvedType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(referenceType))),
+                Resolver = ContentFields.ResolveStringFieldContents,
+                Description = FieldDescriptions.StringFieldReferences
+            });
+        }
+    }
+
+    private static IGraphType? ResolveReferences(Builder builder, FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)
+    {
+        IGraphType? contentType = null;
+
+        if (schemaIds?.Count == 1)
+        {
+            contentType = builder.GetContentType(schemaIds[0]);
         }
 
-        private static IGraphType? ResolveReferences(Builder builder, FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)
+        if (contentType == null)
         {
-            IGraphType? contentType = null;
+            var union = builder.GetReferenceUnion(fieldInfo, schemaIds);
 
-            if (schemaIds?.Count == 1)
+            if (!union.HasType)
             {
-                contentType = builder.GetContentType(schemaIds[0]);
+                return default;
             }
 
-            if (contentType == null)
-            {
-                var union = builder.GetReferenceUnion(fieldInfo, schemaIds);
-
-                if (!union.HasType)
-                {
-                    return default;
-                }
-
-                contentType = union;
-            }
-
-            return contentType;
+            contentType = union;
         }
+
+        return contentType;
     }
 }

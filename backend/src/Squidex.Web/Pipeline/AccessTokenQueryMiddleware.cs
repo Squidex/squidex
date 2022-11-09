@@ -8,32 +8,31 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 
-namespace Squidex.Web.Pipeline
+namespace Squidex.Web.Pipeline;
+
+public sealed class AccessTokenQueryMiddleware
 {
-    public sealed class AccessTokenQueryMiddleware
+    private readonly RequestDelegate next;
+
+    public AccessTokenQueryMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate next;
+        this.next = next;
+    }
 
-        public AccessTokenQueryMiddleware(RequestDelegate next)
+    public Task InvokeAsync(HttpContext context)
+    {
+        var request = context.Request;
+
+        if (HasNoAuthHeader(request) && request.Query.TryGetValue("access_token", out var token))
         {
-            this.next = next;
+            request.Headers[HeaderNames.Authorization] = $"Bearer {token}";
         }
 
-        public Task InvokeAsync(HttpContext context)
-        {
-            var request = context.Request;
+        return next(context);
+    }
 
-            if (HasNoAuthHeader(request) && request.Query.TryGetValue("access_token", out var token))
-            {
-                request.Headers[HeaderNames.Authorization] = $"Bearer {token}";
-            }
-
-            return next(context);
-        }
-
-        private static bool HasNoAuthHeader(HttpRequest request)
-        {
-            return string.IsNullOrWhiteSpace(request.Headers[HeaderNames.Authorization]);
-        }
+    private static bool HasNoAuthHeader(HttpRequest request)
+    {
+        return string.IsNullOrWhiteSpace(request.Headers[HeaderNames.Authorization]);
     }
 }

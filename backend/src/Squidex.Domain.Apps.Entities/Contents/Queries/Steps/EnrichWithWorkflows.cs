@@ -8,104 +8,103 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
+namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
+
+public sealed class EnrichWithWorkflows : IContentEnricherStep
 {
-    public sealed class EnrichWithWorkflows : IContentEnricherStep
+    private const string DefaultColor = StatusColors.Draft;
+
+    private readonly IContentWorkflow contentWorkflow;
+
+    public EnrichWithWorkflows(IContentWorkflow contentWorkflow)
     {
-        private const string DefaultColor = StatusColors.Draft;
+        this.contentWorkflow = contentWorkflow;
+    }
 
-        private readonly IContentWorkflow contentWorkflow;
+    public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+        CancellationToken ct)
+    {
+        var cache = new Dictionary<(DomainId, Status), StatusInfo>();
 
-        public EnrichWithWorkflows(IContentWorkflow contentWorkflow)
+        foreach (var content in contents)
         {
-            this.contentWorkflow = contentWorkflow;
-        }
+            ct.ThrowIfCancellationRequested();
 
-        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
-            CancellationToken ct)
-        {
-            var cache = new Dictionary<(DomainId, Status), StatusInfo>();
+            await EnrichColorAsync(content, content, cache);
 
-            foreach (var content in contents)
+            if (ShouldEnrichWithStatuses(context))
             {
-                ct.ThrowIfCancellationRequested();
-
-                await EnrichColorAsync(content, content, cache);
-
-                if (ShouldEnrichWithStatuses(context))
-                {
-                    await EnrichNextsAsync(content, context);
-                    await EnrichCanUpdateAsync(content, context);
-                }
+                await EnrichNextsAsync(content, context);
+                await EnrichCanUpdateAsync(content, context);
             }
         }
+    }
 
-        private async Task EnrichNextsAsync(ContentEntity content, Context context)
+    private async Task EnrichNextsAsync(ContentEntity content, Context context)
+    {
+        var editingStatus = content.NewStatus ?? content.Status;
+
+        if (content.IsSingleton)
         {
-            var editingStatus = content.NewStatus ?? content.Status;
-
-            if (content.IsSingleton)
+            if (editingStatus == Status.Draft)
             {
-                if (editingStatus == Status.Draft)
+                content.NextStatuses = new[]
                 {
-                    content.NextStatuses = new[]
-                    {
-                        new StatusInfo(Status.Published, StatusColors.Published)
-                    };
-                }
-                else
-                {
-                    content.NextStatuses = Array.Empty<StatusInfo>();
-                }
+                    new StatusInfo(Status.Published, StatusColors.Published)
+                };
             }
             else
             {
-                content.NextStatuses = await contentWorkflow.GetNextAsync(content, editingStatus, context.UserPrincipal);
+                content.NextStatuses = Array.Empty<StatusInfo>();
             }
         }
-
-        private async Task EnrichCanUpdateAsync(ContentEntity content, Context context)
+        else
         {
-            var editingStatus = content.NewStatus ?? content.Status;
+            content.NextStatuses = await contentWorkflow.GetNextAsync(content, editingStatus, context.UserPrincipal);
+        }
+    }
 
-            content.CanUpdate = await contentWorkflow.CanUpdateAsync(content, editingStatus, context.UserPrincipal);
+    private async Task EnrichCanUpdateAsync(ContentEntity content, Context context)
+    {
+        var editingStatus = content.NewStatus ?? content.Status;
+
+        content.CanUpdate = await contentWorkflow.CanUpdateAsync(content, editingStatus, context.UserPrincipal);
+    }
+
+    private async Task EnrichColorAsync(ContentEntity content, ContentEntity result, Dictionary<(DomainId, Status), StatusInfo> cache)
+    {
+        result.StatusColor = await GetColorAsync(content, content.Status, cache);
+
+        if (content.NewStatus != null)
+        {
+            result.NewStatusColor = await GetColorAsync(content, content.NewStatus.Value, cache);
         }
 
-        private async Task EnrichColorAsync(ContentEntity content, ContentEntity result, Dictionary<(DomainId, Status), StatusInfo> cache)
+        if (content.ScheduleJob != null)
         {
-            result.StatusColor = await GetColorAsync(content, content.Status, cache);
+            result.ScheduledStatusColor = await GetColorAsync(content, content.ScheduleJob.Status, cache);
+        }
+    }
 
-            if (content.NewStatus != null)
+    private async Task<string> GetColorAsync(IContentEntity content, Status status, Dictionary<(DomainId, Status), StatusInfo> cache)
+    {
+        if (!cache.TryGetValue((content.SchemaId.Id, status), out var info))
+        {
+            info = await contentWorkflow.GetInfoAsync(content, status);
+
+            if (info == null)
             {
-                result.NewStatusColor = await GetColorAsync(content, content.NewStatus.Value, cache);
+                info = new StatusInfo(status, DefaultColor);
             }
 
-            if (content.ScheduleJob != null)
-            {
-                result.ScheduledStatusColor = await GetColorAsync(content, content.ScheduleJob.Status, cache);
-            }
+            cache[(content.SchemaId.Id, status)] = info;
         }
 
-        private async Task<string> GetColorAsync(IContentEntity content, Status status, Dictionary<(DomainId, Status), StatusInfo> cache)
-        {
-            if (!cache.TryGetValue((content.SchemaId.Id, status), out var info))
-            {
-                info = await contentWorkflow.GetInfoAsync(content, status);
+        return info.Color;
+    }
 
-                if (info == null)
-                {
-                    info = new StatusInfo(status, DefaultColor);
-                }
-
-                cache[(content.SchemaId.Id, status)] = info;
-            }
-
-            return info.Color;
-        }
-
-        private static bool ShouldEnrichWithStatuses(Context context)
-        {
-            return context.IsFrontendClient || context.ShouldResolveFlow();
-        }
+    private static bool ShouldEnrichWithStatuses(Context context)
+    {
+        return context.IsFrontendClient || context.ShouldResolveFlow();
     }
 }

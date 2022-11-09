@@ -8,15 +8,14 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events
+namespace Squidex.Domain.Apps.Events;
+
+[EventType(nameof(AppUsageExceeded))]
+public sealed class AppUsageExceeded : AppEvent
 {
-    [EventType(nameof(AppUsageExceeded))]
-    public sealed class AppUsageExceeded : AppEvent
-    {
-        public long CallsCurrent { get; set; }
+    public long CallsCurrent { get; set; }
 
-        public long CallsLimit { get; set; }
+    public long CallsLimit { get; set; }
 
-        public DomainId RuleId { get; set; }
-    }
+    public DomainId RuleId { get; set; }
 }

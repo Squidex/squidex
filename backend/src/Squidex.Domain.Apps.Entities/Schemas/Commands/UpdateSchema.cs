@@ -7,10 +7,9 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands;
+
+public sealed class UpdateSchema : SchemaCommand
 {
-    public sealed class UpdateSchema : SchemaCommand
-    {
-        public SchemaProperties Properties { get; set; }
-    }
+    public SchemaProperties Properties { get; set; }
 }

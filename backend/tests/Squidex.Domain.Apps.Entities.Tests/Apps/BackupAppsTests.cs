@@ -18,312 +18,311 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Domain.Apps.Entities.Apps;
+
+public class BackupAppsTests
 {
-    public class BackupAppsTests
+    private readonly CancellationTokenSource cts = new CancellationTokenSource();
+    private readonly CancellationToken ct;
+    private readonly Rebuilder rebuilder = A.Fake<Rebuilder>();
+    private readonly IAppsIndex appsIndex = A.Fake<IAppsIndex>();
+    private readonly IAppUISettings appUISettings = A.Fake<IAppUISettings>();
+    private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
+    private readonly DomainId appId = DomainId.NewGuid();
+    private readonly RefToken actor = RefToken.User("123");
+    private readonly BackupApps sut;
+
+    public BackupAppsTests()
     {
-        private readonly CancellationTokenSource cts = new CancellationTokenSource();
-        private readonly CancellationToken ct;
-        private readonly Rebuilder rebuilder = A.Fake<Rebuilder>();
-        private readonly IAppsIndex appsIndex = A.Fake<IAppsIndex>();
-        private readonly IAppUISettings appUISettings = A.Fake<IAppUISettings>();
-        private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
-        private readonly DomainId appId = DomainId.NewGuid();
-        private readonly RefToken actor = RefToken.User("123");
-        private readonly BackupApps sut;
+        ct = cts.Token;
 
-        public BackupAppsTests()
+        sut = new BackupApps(rebuilder, appImageStore, appsIndex, appUISettings);
+    }
+
+    [Fact]
+    public void Should_provide_name()
+    {
+        Assert.Equal("Apps", sut.Name);
+    }
+
+    [Fact]
+    public async Task Should_reserve_app_name()
+    {
+        const string appName = "my-app";
+
+        var context = CreateRestoreContext();
+
+        A.CallTo(() => appsIndex.ReserveAsync(appId, appName, A<CancellationToken>._))
+            .Returns("Reservation");
+
+        await sut.RestoreEventAsync(Envelope.Create(new AppCreated
         {
-            ct = cts.Token;
+            Name = appName
+        }), context, ct);
 
-            sut = new BackupApps(rebuilder, appImageStore, appsIndex, appUISettings);
-        }
+        A.CallTo(() => appsIndex.ReserveAsync(appId, appName, A<CancellationToken>._))
+            .MustHaveHappened();
+    }
 
-        [Fact]
-        public void Should_provide_name()
+    [Fact]
+    public async Task Should_complete_reservation_with_previous_token()
+    {
+        const string appName = "my-app";
+
+        var context = CreateRestoreContext();
+
+        A.CallTo(() => appsIndex.ReserveAsync(appId, appName, ct))
+            .Returns("Reservation");
+
+        await sut.RestoreEventAsync(Envelope.Create(new AppCreated
         {
-            Assert.Equal("Apps", sut.Name);
-        }
+            Name = appName
+        }), context, ct);
 
-        [Fact]
-        public async Task Should_reserve_app_name()
+        await sut.CompleteRestoreAsync(context, appName);
+
+        A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", default))
+            .MustHaveHappened();
+
+        A.CallTo(() => rebuilder.InsertManyAsync<AppDomainObject, AppDomainObject.State>(A<IEnumerable<DomainId>>.That.Is(appId), 1, default))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_cleanup_reservation_with_previous_token()
+    {
+        const string appName = "my-app";
+
+        var context = CreateRestoreContext();
+
+        A.CallTo(() => appsIndex.ReserveAsync(appId, appName, ct))
+            .Returns("Reservation");
+
+        await sut.RestoreEventAsync(Envelope.Create(new AppCreated
         {
-            const string appName = "my-app";
+            Name = appName
+        }), context, ct);
 
-            var context = CreateRestoreContext();
+        await sut.CleanupRestoreErrorAsync(appId);
 
-            A.CallTo(() => appsIndex.ReserveAsync(appId, appName, A<CancellationToken>._))
-                .Returns("Reservation");
+        A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", default))
+            .MustHaveHappened();
+    }
 
-            await sut.RestoreEventAsync(Envelope.Create(new AppCreated
-            {
-                Name = appName
-            }), context, ct);
+    [Fact]
+    public async Task Should_throw_exception_if_no_reservation_token_returned()
+    {
+        const string appName = "my-app";
 
-            A.CallTo(() => appsIndex.ReserveAsync(appId, appName, A<CancellationToken>._))
-                .MustHaveHappened();
-        }
+        var context = CreateRestoreContext();
 
-        [Fact]
-        public async Task Should_complete_reservation_with_previous_token()
+        A.CallTo(() => appsIndex.ReserveAsync(appId, appName, ct))
+            .Returns(Task.FromResult<string?>(null));
+
+        var @event = Envelope.Create(new AppCreated
         {
-            const string appName = "my-app";
+            Name = appName
+        });
 
-            var context = CreateRestoreContext();
+        await Assert.ThrowsAsync<BackupRestoreException>(() => sut.RestoreEventAsync(@event, context, ct));
+    }
 
-            A.CallTo(() => appsIndex.ReserveAsync(appId, appName, ct))
-                .Returns("Reservation");
+    [Fact]
+    public async Task Should_not_cleanup_reservation_if_no_reservation_token_hold()
+    {
+        await sut.CleanupRestoreErrorAsync(appId);
 
-            await sut.RestoreEventAsync(Envelope.Create(new AppCreated
-            {
-                Name = appName
-            }), context, ct);
+        A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
 
-            await sut.CompleteRestoreAsync(context, appName);
+    [Fact]
+    public async Task Should_write_user_settings()
+    {
+        var settings = new JsonObject();
 
-            A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", default))
-                .MustHaveHappened();
+        var context = CreateBackupContext();
 
-            A.CallTo(() => rebuilder.InsertManyAsync<AppDomainObject, AppDomainObject.State>(A<IEnumerable<DomainId>>.That.Is(appId), 1, default))
-                .MustHaveHappened();
-        }
+        A.CallTo(() => appUISettings.GetAsync(appId, null, ct))
+            .Returns(settings);
 
-        [Fact]
-        public async Task Should_cleanup_reservation_with_previous_token()
+        await sut.BackupAsync(context, ct);
+
+        A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, settings, ct))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_read_user_settings()
+    {
+        var settings = new JsonObject();
+
+        var context = CreateRestoreContext();
+
+        A.CallTo(() => context.Reader.ReadJsonAsync<JsonObject>(A<string>._, ct))
+            .Returns(settings);
+
+        await sut.RestoreAsync(context, ct);
+
+        A.CallTo(() => appUISettings.SetAsync(appId, null, settings, ct))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_map_contributor_id_if_assigned()
+    {
+        var context = CreateRestoreContext();
+
+        var @event = Envelope.Create(new AppContributorAssigned
         {
-            const string appName = "my-app";
+            ContributorId = "found"
+        });
 
-            var context = CreateRestoreContext();
+        var actual = await sut.RestoreEventAsync(@event, context, ct);
 
-            A.CallTo(() => appsIndex.ReserveAsync(appId, appName, ct))
-                .Returns("Reservation");
+        Assert.True(actual);
+        Assert.Equal("found_mapped", @event.Payload.ContributorId);
+    }
 
-            await sut.RestoreEventAsync(Envelope.Create(new AppCreated
-            {
-                Name = appName
-            }), context, ct);
+    [Fact]
+    public async Task Should_ignore_contributor_event_if_assigned_user_not_mapped()
+    {
+        var context = CreateRestoreContext();
 
-            await sut.CleanupRestoreErrorAsync(appId);
-
-            A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", default))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_throw_exception_if_no_reservation_token_returned()
+        var @event = Envelope.Create(new AppContributorAssigned
         {
-            const string appName = "my-app";
+            ContributorId = "unknown"
+        });
 
-            var context = CreateRestoreContext();
+        var actual = await sut.RestoreEventAsync(@event, context, ct);
 
-            A.CallTo(() => appsIndex.ReserveAsync(appId, appName, ct))
-                .Returns(Task.FromResult<string?>(null));
+        Assert.False(actual);
+        Assert.Equal("unknown", @event.Payload.ContributorId);
+    }
 
-            var @event = Envelope.Create(new AppCreated
-            {
-                Name = appName
-            });
+    [Fact]
+    public async Task Should_map_contributor_id_if_revoked()
+    {
+        var context = CreateRestoreContext();
 
-            await Assert.ThrowsAsync<BackupRestoreException>(() => sut.RestoreEventAsync(@event, context, ct));
-        }
-
-        [Fact]
-        public async Task Should_not_cleanup_reservation_if_no_reservation_token_hold()
+        var @event = Envelope.Create(new AppContributorRemoved
         {
-            await sut.CleanupRestoreErrorAsync(appId);
+            ContributorId = "found"
+        });
 
-            A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", A<CancellationToken>._))
-                .MustNotHaveHappened();
-        }
+        var actual = await sut.RestoreEventAsync(@event, context, ct);
 
-        [Fact]
-        public async Task Should_write_user_settings()
+        Assert.True(actual);
+        Assert.Equal("found_mapped", @event.Payload.ContributorId);
+    }
+
+    [Fact]
+    public async Task Should_ignore_contributor_event_if_removed_user_not_mapped()
+    {
+        var context = CreateRestoreContext();
+
+        var @event = Envelope.Create(new AppContributorRemoved
         {
-            var settings = new JsonObject();
+            ContributorId = "unknown"
+        });
 
-            var context = CreateBackupContext();
+        var actual = await sut.RestoreEventAsync(@event, context, ct);
 
-            A.CallTo(() => appUISettings.GetAsync(appId, null, ct))
-                .Returns(settings);
+        Assert.False(actual);
+        Assert.Equal("unknown", @event.Payload.ContributorId);
+    }
 
-            await sut.BackupAsync(context, ct);
+    [Fact]
+    public async Task Should_ignore_exception_if_app_image_to_backup_does_not_exist()
+    {
+        var imageStream = new MemoryStream();
 
-            A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, settings, ct))
-                .MustHaveHappened();
-        }
+        var context = CreateBackupContext();
 
-        [Fact]
-        public async Task Should_read_user_settings()
-        {
-            var settings = new JsonObject();
+        A.CallTo(() => context.Writer.OpenBlobAsync(A<string>._, ct))
+            .Returns(imageStream);
 
-            var context = CreateRestoreContext();
+        A.CallTo(() => appImageStore.DownloadAsync(appId, imageStream, ct))
+            .Throws(new AssetNotFoundException("Image"));
 
-            A.CallTo(() => context.Reader.ReadJsonAsync<JsonObject>(A<string>._, ct))
-                .Returns(settings);
+        await sut.BackupEventAsync(Envelope.Create(new AppImageUploaded()), context, ct);
+    }
 
-            await sut.RestoreAsync(context, ct);
+    [Fact]
+    public async Task Should_backup_app_image()
+    {
+        var imageStream = new MemoryStream();
 
-            A.CallTo(() => appUISettings.SetAsync(appId, null, settings, ct))
-                .MustHaveHappened();
-        }
+        var context = CreateBackupContext();
 
-        [Fact]
-        public async Task Should_map_contributor_id_if_assigned()
-        {
-            var context = CreateRestoreContext();
+        A.CallTo(() => context.Writer.OpenBlobAsync(A<string>._, ct))
+            .Returns(imageStream);
 
-            var @event = Envelope.Create(new AppContributorAssigned
-            {
-                ContributorId = "found"
-            });
+        await sut.BackupEventAsync(Envelope.Create(new AppImageUploaded()), context, ct);
 
-            var actual = await sut.RestoreEventAsync(@event, context, ct);
+        A.CallTo(() => appImageStore.DownloadAsync(appId, imageStream, ct))
+            .MustHaveHappened();
+    }
 
-            Assert.True(actual);
-            Assert.Equal("found_mapped", @event.Payload.ContributorId);
-        }
+    [Fact]
+    public async Task Should_restore_app_image()
+    {
+        var imageStream = new MemoryStream();
 
-        [Fact]
-        public async Task Should_ignore_contributor_event_if_assigned_user_not_mapped()
-        {
-            var context = CreateRestoreContext();
+        var context = CreateRestoreContext();
 
-            var @event = Envelope.Create(new AppContributorAssigned
-            {
-                ContributorId = "unknown"
-            });
+        A.CallTo(() => context.Reader.OpenBlobAsync(A<string>._, ct))
+            .Returns(imageStream);
 
-            var actual = await sut.RestoreEventAsync(@event, context, ct);
+        await sut.RestoreEventAsync(Envelope.Create(new AppImageUploaded()), context, ct);
 
-            Assert.False(actual);
-            Assert.Equal("unknown", @event.Payload.ContributorId);
-        }
+        A.CallTo(() => appImageStore.UploadAsync(appId, imageStream, ct))
+            .MustHaveHappened();
+    }
 
-        [Fact]
-        public async Task Should_map_contributor_id_if_revoked()
-        {
-            var context = CreateRestoreContext();
+    [Fact]
+    public async Task Should_ignore_exception_if_app_image_cannot_be_overriden()
+    {
+        var imageStream = new MemoryStream();
 
-            var @event = Envelope.Create(new AppContributorRemoved
-            {
-                ContributorId = "found"
-            });
+        var context = CreateRestoreContext();
 
-            var actual = await sut.RestoreEventAsync(@event, context, ct);
+        A.CallTo(() => context.Reader.OpenBlobAsync(A<string>._, ct))
+            .Returns(imageStream);
 
-            Assert.True(actual);
-            Assert.Equal("found_mapped", @event.Payload.ContributorId);
-        }
+        A.CallTo(() => appImageStore.UploadAsync(appId, imageStream, ct))
+            .Throws(new AssetAlreadyExistsException("Image"));
 
-        [Fact]
-        public async Task Should_ignore_contributor_event_if_removed_user_not_mapped()
-        {
-            var context = CreateRestoreContext();
+        await sut.RestoreEventAsync(Envelope.Create(new AppImageUploaded()), context, ct);
+    }
 
-            var @event = Envelope.Create(new AppContributorRemoved
-            {
-                ContributorId = "unknown"
-            });
+    private BackupContext CreateBackupContext()
+    {
+        return new BackupContext(appId, CreateUserMapping(), A.Fake<IBackupWriter>());
+    }
 
-            var actual = await sut.RestoreEventAsync(@event, context, ct);
+    private RestoreContext CreateRestoreContext()
+    {
+        return new RestoreContext(appId, CreateUserMapping(), A.Fake<IBackupReader>(), DomainId.NewGuid());
+    }
 
-            Assert.False(actual);
-            Assert.Equal("unknown", @event.Payload.ContributorId);
-        }
+    private IUserMapping CreateUserMapping()
+    {
+        var mapping = A.Fake<IUserMapping>();
 
-        [Fact]
-        public async Task Should_ignore_exception_if_app_image_to_backup_does_not_exist()
-        {
-            var imageStream = new MemoryStream();
+        A.CallTo(() => mapping.Initiator).Returns(actor);
 
-            var context = CreateBackupContext();
+        RefToken mapped;
 
-            A.CallTo(() => context.Writer.OpenBlobAsync(A<string>._, ct))
-                .Returns(imageStream);
+        A.CallTo(() => mapping.TryMap(A<string>.That.Matches(x => x.StartsWith("found", StringComparison.OrdinalIgnoreCase)), out mapped))
+            .Returns(true)
+            .AssignsOutAndRefParametersLazily(
+                new Func<string, RefToken, object[]>((x, _) =>
+                    new[] { RefToken.User($"{x}_mapped") }));
 
-            A.CallTo(() => appImageStore.DownloadAsync(appId, imageStream, ct))
-                .Throws(new AssetNotFoundException("Image"));
+        A.CallTo(() => mapping.TryMap("notfound", out mapped))
+            .Returns(false);
 
-            await sut.BackupEventAsync(Envelope.Create(new AppImageUploaded()), context, ct);
-        }
-
-        [Fact]
-        public async Task Should_backup_app_image()
-        {
-            var imageStream = new MemoryStream();
-
-            var context = CreateBackupContext();
-
-            A.CallTo(() => context.Writer.OpenBlobAsync(A<string>._, ct))
-                .Returns(imageStream);
-
-            await sut.BackupEventAsync(Envelope.Create(new AppImageUploaded()), context, ct);
-
-            A.CallTo(() => appImageStore.DownloadAsync(appId, imageStream, ct))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_restore_app_image()
-        {
-            var imageStream = new MemoryStream();
-
-            var context = CreateRestoreContext();
-
-            A.CallTo(() => context.Reader.OpenBlobAsync(A<string>._, ct))
-                .Returns(imageStream);
-
-            await sut.RestoreEventAsync(Envelope.Create(new AppImageUploaded()), context, ct);
-
-            A.CallTo(() => appImageStore.UploadAsync(appId, imageStream, ct))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_ignore_exception_if_app_image_cannot_be_overriden()
-        {
-            var imageStream = new MemoryStream();
-
-            var context = CreateRestoreContext();
-
-            A.CallTo(() => context.Reader.OpenBlobAsync(A<string>._, ct))
-                .Returns(imageStream);
-
-            A.CallTo(() => appImageStore.UploadAsync(appId, imageStream, ct))
-                .Throws(new AssetAlreadyExistsException("Image"));
-
-            await sut.RestoreEventAsync(Envelope.Create(new AppImageUploaded()), context, ct);
-        }
-
-        private BackupContext CreateBackupContext()
-        {
-            return new BackupContext(appId, CreateUserMapping(), A.Fake<IBackupWriter>());
-        }
-
-        private RestoreContext CreateRestoreContext()
-        {
-            return new RestoreContext(appId, CreateUserMapping(), A.Fake<IBackupReader>(), DomainId.NewGuid());
-        }
-
-        private IUserMapping CreateUserMapping()
-        {
-            var mapping = A.Fake<IUserMapping>();
-
-            A.CallTo(() => mapping.Initiator).Returns(actor);
-
-            RefToken mapped;
-
-            A.CallTo(() => mapping.TryMap(A<string>.That.Matches(x => x.StartsWith("found", StringComparison.OrdinalIgnoreCase)), out mapped))
-                .Returns(true)
-                .AssignsOutAndRefParametersLazily(
-                    new Func<string, RefToken, object[]>((x, _) =>
-                        new[] { RefToken.User($"{x}_mapped") }));
-
-            A.CallTo(() => mapping.TryMap("notfound", out mapped))
-                .Returns(false);
-
-            return mapping;
-        }
+        return mapping;
     }
 }

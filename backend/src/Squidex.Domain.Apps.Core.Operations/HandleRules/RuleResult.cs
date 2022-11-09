@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Domain.Apps.Core.HandleRules;
+
+public enum RuleResult
 {
-    public enum RuleResult
-    {
-        Pending,
-        Success,
-        Failed,
-        Timeout
-    }
+    Pending,
+    Success,
+    Failed,
+    Timeout
 }

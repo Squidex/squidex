@@ -7,44 +7,43 @@
 
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public sealed record TagsFieldProperties : FieldProperties
 {
-    public sealed record TagsFieldProperties : FieldProperties
+    public ReadonlyList<string>? AllowedValues { get; init; }
+
+    public LocalizedValue<ReadonlyList<string>?> DefaultValues { get; init; }
+
+    public ReadonlyList<string>? DefaultValue { get; init; }
+
+    public int? MinItems { get; init; }
+
+    public int? MaxItems { get; init; }
+
+    public bool CreateEnum { get; init; }
+
+    public TagsFieldEditor Editor { get; init; }
+
+    public TagsFieldNormalization Normalization { get; init; }
+
+    public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
     {
-        public ReadonlyList<string>? AllowedValues { get; init; }
+        return visitor.Visit(this, args);
+    }
 
-        public LocalizedValue<ReadonlyList<string>?> DefaultValues { get; init; }
+    public override T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, IField field, TArgs args)
+    {
+        return visitor.Visit((IField<TagsFieldProperties>)field, args);
+    }
 
-        public ReadonlyList<string>? DefaultValue { get; init; }
+    public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
+    {
+        return Fields.Tags(id, name, partitioning, this, settings);
+    }
 
-        public int? MinItems { get; init; }
-
-        public int? MaxItems { get; init; }
-
-        public bool CreateEnum { get; init; }
-
-        public TagsFieldEditor Editor { get; init; }
-
-        public TagsFieldNormalization Normalization { get; init; }
-
-        public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
-        {
-            return visitor.Visit(this, args);
-        }
-
-        public override T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, IField field, TArgs args)
-        {
-            return visitor.Visit((IField<TagsFieldProperties>)field, args);
-        }
-
-        public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
-        {
-            return Fields.Tags(id, name, partitioning, this, settings);
-        }
-
-        public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)
-        {
-            return Fields.Tags(id, name, this, settings);
-        }
+    public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)
+    {
+        return Fields.Tags(id, name, this, settings);
     }
 }

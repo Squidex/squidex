@@ -8,29 +8,28 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using MongoDB.Driver;
 
-namespace Squidex.Infrastructure.Diagnostics
+namespace Squidex.Infrastructure.Diagnostics;
+
+public sealed class MongoHealthCheck : IHealthCheck
 {
-    public sealed class MongoHealthCheck : IHealthCheck
+    private readonly IMongoDatabase mongoDatabase;
+
+    public MongoHealthCheck(IMongoDatabase mongoDatabase)
     {
-        private readonly IMongoDatabase mongoDatabase;
+        this.mongoDatabase = mongoDatabase;
+    }
 
-        public MongoHealthCheck(IMongoDatabase mongoDatabase)
-        {
-            this.mongoDatabase = mongoDatabase;
-        }
+    public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
+        CancellationToken cancellationToken = default)
+    {
+        var collectionNames = await mongoDatabase.ListCollectionNamesAsync(cancellationToken: cancellationToken);
 
-        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
-            CancellationToken cancellationToken = default)
-        {
-            var collectionNames = await mongoDatabase.ListCollectionNamesAsync(cancellationToken: cancellationToken);
+        var result = await collectionNames.AnyAsync(cancellationToken);
 
-            var result = await collectionNames.AnyAsync(cancellationToken);
+        var status = result ?
+            HealthStatus.Healthy :
+            HealthStatus.Unhealthy;
 
-            var status = result ?
-                HealthStatus.Healthy :
-                HealthStatus.Unhealthy;
-
-            return new HealthCheckResult(status, "Application must query data from MongoDB");
-        }
+        return new HealthCheckResult(status, "Application must query data from MongoDB");
     }
 }

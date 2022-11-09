@@ -8,28 +8,27 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents;
+
+public interface IEnrichedContentEntity : IContentEntity
 {
-    public interface IEnrichedContentEntity : IContentEntity
-    {
-        bool CanUpdate { get; }
+    bool CanUpdate { get; }
 
-        bool IsSingleton { get; }
+    bool IsSingleton { get; }
 
-        string StatusColor { get; }
+    string StatusColor { get; }
 
-        string? NewStatusColor { get; }
+    string? NewStatusColor { get; }
 
-        string? ScheduledStatusColor { get; }
+    string? ScheduledStatusColor { get; }
 
-        string SchemaDisplayName { get; }
+    string SchemaDisplayName { get; }
 
-        string? EditToken { get; }
+    string? EditToken { get; }
 
-        RootField[]? ReferenceFields { get; }
+    RootField[]? ReferenceFields { get; }
 
-        StatusInfo[]? NextStatuses { get; }
+    StatusInfo[]? NextStatuses { get; }
 
-        ContentData? ReferenceData { get; }
-    }
+    ContentData? ReferenceData { get; }
 }

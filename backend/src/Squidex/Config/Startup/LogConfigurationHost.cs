@@ -7,47 +7,46 @@
 
 using Squidex.Log;
 
-namespace Squidex.Config.Startup
+namespace Squidex.Config.Startup;
+
+public sealed class LogConfigurationHost : IHostedService
 {
-    public sealed class LogConfigurationHost : IHostedService
+    private readonly IConfiguration configuration;
+    private readonly ISemanticLog log;
+
+    public LogConfigurationHost(IConfiguration configuration, ISemanticLog log)
     {
-        private readonly IConfiguration configuration;
-        private readonly ISemanticLog log;
+        this.configuration = configuration;
 
-        public LogConfigurationHost(IConfiguration configuration, ISemanticLog log)
-        {
-            this.configuration = configuration;
+        this.log = log;
+    }
 
-            this.log = log;
-        }
+    public Task StartAsync(
+        CancellationToken cancellationToken)
+    {
+        log.LogInformation(w => w
+            .WriteProperty("message", "Application started")
+            .WriteObject("environment", c =>
+            {
+                var logged = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        public Task StartAsync(
-            CancellationToken cancellationToken)
-        {
-            log.LogInformation(w => w
-                .WriteProperty("message", "Application started")
-                .WriteObject("environment", c =>
+                var orderedConfigs = configuration.AsEnumerable().Where(kvp => kvp.Value != null).OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase);
+
+                foreach (var (key, val) in orderedConfigs)
                 {
-                    var logged = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-                    var orderedConfigs = configuration.AsEnumerable().Where(kvp => kvp.Value != null).OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase);
-
-                    foreach (var (key, val) in orderedConfigs)
+                    if (logged.Add(key))
                     {
-                        if (logged.Add(key))
-                        {
-                            c.WriteProperty(key.ToLowerInvariant(), val);
-                        }
+                        c.WriteProperty(key.ToLowerInvariant(), val);
                     }
-                }));
+                }
+            }));
 
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
+    }
 
-        public Task StopAsync(
-            CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+    public Task StopAsync(
+        CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 }

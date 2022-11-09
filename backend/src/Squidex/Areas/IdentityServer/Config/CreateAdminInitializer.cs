@@ -15,101 +15,100 @@ using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 
-namespace Squidex.Areas.IdentityServer.Config
+namespace Squidex.Areas.IdentityServer.Config;
+
+public sealed class CreateAdminInitializer : IInitializable
 {
-    public sealed class CreateAdminInitializer : IInitializable
+    private readonly IServiceProvider serviceProvider;
+    private readonly MyIdentityOptions identityOptions;
+
+    public int Order => int.MaxValue;
+
+    public CreateAdminInitializer(IServiceProvider serviceProvider, IOptions<MyIdentityOptions> identityOptions)
     {
-        private readonly IServiceProvider serviceProvider;
-        private readonly MyIdentityOptions identityOptions;
+        this.serviceProvider = serviceProvider;
 
-        public int Order => int.MaxValue;
+        this.identityOptions = identityOptions.Value;
+    }
 
-        public CreateAdminInitializer(IServiceProvider serviceProvider, IOptions<MyIdentityOptions> identityOptions)
+    public async Task InitializeAsync(
+        CancellationToken ct)
+    {
+        IdentityModelEventSource.ShowPII = identityOptions.ShowPII;
+
+        if (identityOptions.IsAdminConfigured())
         {
-            this.serviceProvider = serviceProvider;
-
-            this.identityOptions = identityOptions.Value;
-        }
-
-        public async Task InitializeAsync(
-            CancellationToken ct)
-        {
-            IdentityModelEventSource.ShowPII = identityOptions.ShowPII;
-
-            if (identityOptions.IsAdminConfigured())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
-                await using (var scope = serviceProvider.CreateAsyncScope())
+                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+
+                var adminEmail = identityOptions.AdminEmail;
+                var adminPass = identityOptions.AdminPassword;
+
+                var isEmpty = await IsEmptyAsync(userService);
+
+                if (isEmpty || identityOptions.AdminRecreate)
                 {
-                    var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-
-                    var adminEmail = identityOptions.AdminEmail;
-                    var adminPass = identityOptions.AdminPassword;
-
-                    var isEmpty = await IsEmptyAsync(userService);
-
-                    if (isEmpty || identityOptions.AdminRecreate)
+                    try
                     {
-                        try
+                        var user = await userService.FindByEmailAsync(adminEmail, ct);
+
+                        if (user != null)
                         {
-                            var user = await userService.FindByEmailAsync(adminEmail, ct);
-
-                            if (user != null)
+                            if (identityOptions.AdminRecreate)
                             {
-                                if (identityOptions.AdminRecreate)
-                                {
-                                    var permissions = CreatePermissions(user.Claims.Permissions());
-
-                                    var values = new UserValues
-                                    {
-                                        Password = adminPass,
-                                        Permissions = permissions
-                                    };
-
-                                    await userService.UpdateAsync(user.Id, values, ct: ct);
-                                }
-                            }
-                            else
-                            {
-                                var permissions = CreatePermissions(PermissionSet.Empty);
+                                var permissions = CreatePermissions(user.Claims.Permissions());
 
                                 var values = new UserValues
                                 {
                                     Password = adminPass,
-                                    Permissions = permissions,
-                                    DisplayName = adminEmail
+                                    Permissions = permissions
                                 };
 
-                                await userService.CreateAsync(adminEmail, values, ct: ct);
+                                await userService.UpdateAsync(user.Id, values, ct: ct);
                             }
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            var log = serviceProvider.GetRequiredService<ILogger<CreateAdminInitializer>>();
+                            var permissions = CreatePermissions(PermissionSet.Empty);
 
-                            log.LogError(ex, "Failed to create administrator.");
+                            var values = new UserValues
+                            {
+                                Password = adminPass,
+                                Permissions = permissions,
+                                DisplayName = adminEmail
+                            };
+
+                            await userService.CreateAsync(adminEmail, values, ct: ct);
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        var log = serviceProvider.GetRequiredService<ILogger<CreateAdminInitializer>>();
+
+                        log.LogError(ex, "Failed to create administrator.");
                     }
                 }
             }
         }
+    }
 
-        private PermissionSet CreatePermissions(PermissionSet permissions)
+    private PermissionSet CreatePermissions(PermissionSet permissions)
+    {
+        permissions = permissions.Add(PermissionIds.Admin);
+
+        foreach (var app in identityOptions.AdminApps.OrEmpty())
         {
-            permissions = permissions.Add(PermissionIds.Admin);
-
-            foreach (var app in identityOptions.AdminApps.OrEmpty())
-            {
-                permissions = permissions.Add(PermissionIds.ForApp(PermissionIds.AppAdmin, app));
-            }
-
-            return permissions;
+            permissions = permissions.Add(PermissionIds.ForApp(PermissionIds.AppAdmin, app));
         }
 
-        private static async Task<bool> IsEmptyAsync(IUserService userService)
-        {
-            var users = await userService.QueryAsync(take: 1);
+        return permissions;
+    }
 
-            return users.Total == 0;
-        }
+    private static async Task<bool> IsEmptyAsync(IUserService userService)
+    {
+        var users = await userService.QueryAsync(take: 1);
+
+        return users.Total == 0;
     }
 }

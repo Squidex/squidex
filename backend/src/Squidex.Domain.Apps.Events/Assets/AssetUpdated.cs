@@ -8,21 +8,20 @@
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Assets
+namespace Squidex.Domain.Apps.Events.Assets;
+
+[EventType(nameof(AssetUpdated), 2)]
+public sealed class AssetUpdated : AssetEvent
 {
-    [EventType(nameof(AssetUpdated), 2)]
-    public sealed class AssetUpdated : AssetEvent
-    {
-        public string MimeType { get; set; }
+    public string MimeType { get; set; }
 
-        public string FileHash { get; set; }
+    public string FileHash { get; set; }
 
-        public long FileSize { get; set; }
+    public long FileSize { get; set; }
 
-        public long FileVersion { get; set; }
+    public long FileVersion { get; set; }
 
-        public AssetType Type { get; set; }
+    public AssetType Type { get; set; }
 
-        public AssetMetadata Metadata { get; set; }
-    }
+    public AssetMetadata Metadata { get; set; }
 }

@@ -12,257 +12,234 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text;
+
+public sealed class TextIndexingProcess : IEventConsumer
 {
-    public sealed class TextIndexingProcess : IEventConsumer
+    private const string NotFound = "<404>";
+    private readonly IJsonSerializer serializer;
+    private readonly ITextIndex textIndex;
+    private readonly ITextIndexerState textIndexerState;
+
+    public int BatchSize
     {
-        private const string NotFound = "<404>";
+        get => 1000;
+    }
+
+    public int BatchDelay
+    {
+        get => 1000;
+    }
+
+    public string Name
+    {
+        get => "TextIndexer5";
+    }
+
+    public string EventsFilter
+    {
+        get => "^content-";
+    }
+
+    public ITextIndex TextIndex
+    {
+        get => textIndex;
+    }
+
+    private sealed class Updates
+    {
+        private readonly Dictionary<DomainId, TextContentState> states;
         private readonly IJsonSerializer serializer;
-        private readonly ITextIndex textIndex;
-        private readonly ITextIndexerState textIndexerState;
+        private readonly Dictionary<DomainId, TextContentState> updates = new Dictionary<DomainId, TextContentState>();
+        private readonly Dictionary<string, IndexCommand> commands = new Dictionary<string, IndexCommand>();
 
-        public int BatchSize
+        public Updates(Dictionary<DomainId, TextContentState> states, IJsonSerializer serializer)
         {
-            get => 1000;
+            this.states = states;
+            this.serializer = serializer;
         }
 
-        public int BatchDelay
+        public async Task WriteAsync(ITextIndex textIndex, ITextIndexerState textIndexerState)
         {
-            get => 1000;
-        }
-
-        public string Name
-        {
-            get => "TextIndexer5";
-        }
-
-        public string EventsFilter
-        {
-            get => "^content-";
-        }
-
-        public ITextIndex TextIndex
-        {
-            get => textIndex;
-        }
-
-        private sealed class Updates
-        {
-            private readonly Dictionary<DomainId, TextContentState> states;
-            private readonly IJsonSerializer serializer;
-            private readonly Dictionary<DomainId, TextContentState> updates = new Dictionary<DomainId, TextContentState>();
-            private readonly Dictionary<string, IndexCommand> commands = new Dictionary<string, IndexCommand>();
-
-            public Updates(Dictionary<DomainId, TextContentState> states, IJsonSerializer serializer)
+            if (commands.Count > 0)
             {
-                this.states = states;
-                this.serializer = serializer;
+                await textIndex.ExecuteAsync(commands.Values.ToArray());
             }
 
-            public async Task WriteAsync(ITextIndex textIndex, ITextIndexerState textIndexerState)
+            if (updates.Count > 0)
             {
-                if (commands.Count > 0)
-                {
-                    await textIndex.ExecuteAsync(commands.Values.ToArray());
-                }
-
-                if (updates.Count > 0)
-                {
-                    await textIndexerState.SetAsync(updates.Values.ToList());
-                }
+                await textIndexerState.SetAsync(updates.Values.ToList());
             }
+        }
 
-            public void On(Envelope<IEvent> @event)
+        public void On(Envelope<IEvent> @event)
+        {
+            switch (@event.Payload)
             {
-                switch (@event.Payload)
-                {
-                    case ContentCreated created:
-                        Create(created, created.Data);
-                        break;
-                    case ContentUpdated updated:
-                        Update(updated, updated.Data);
-                        break;
-                    case ContentStatusChanged statusChanged when statusChanged.Status == Status.Published:
-                        Publish(statusChanged);
-                        break;
-                    case ContentStatusChanged statusChanged:
-                        Unpublish(statusChanged);
-                        break;
-                    case ContentDraftDeleted draftDelted:
-                        DeleteDraft(draftDelted);
-                        break;
-                    case ContentDeleted deleted:
-                        Delete(deleted);
-                        break;
-                    case ContentDraftCreated draftCreated:
-                        {
-                            CreateDraft(draftCreated);
-
-                            if (draftCreated.MigratedData != null)
-                            {
-                                Update(draftCreated, draftCreated.MigratedData);
-                            }
-                        }
-
-                        break;
-                }
-            }
-
-            private void Create(ContentEvent @event, ContentData data)
-            {
-                var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
-
-                var state = new TextContentState
-                {
-                    AppId = @event.AppId.Id,
-                    UniqueContentId = uniqueId
-                };
-
-                state.GenerateDocIdCurrent();
-
-                Index(@event,
-                    new UpsertIndexEntry
+                case ContentCreated created:
+                    Create(created, created.Data);
+                    break;
+                case ContentUpdated updated:
+                    Update(updated, updated.Data);
+                    break;
+                case ContentStatusChanged statusChanged when statusChanged.Status == Status.Published:
+                    Publish(statusChanged);
+                    break;
+                case ContentStatusChanged statusChanged:
+                    Unpublish(statusChanged);
+                    break;
+                case ContentDraftDeleted draftDelted:
+                    DeleteDraft(draftDelted);
+                    break;
+                case ContentDeleted deleted:
+                    Delete(deleted);
+                    break;
+                case ContentDraftCreated draftCreated:
                     {
-                        ContentId = @event.ContentId,
-                        DocId = state.DocIdCurrent,
-                        GeoObjects = data.ToGeo(serializer),
-                        ServeAll = true,
-                        ServePublished = false,
-                        Texts = data.ToTexts(),
-                        IsNew = true
-                    });
+                        CreateDraft(draftCreated);
 
-                states[state.UniqueContentId] = state;
+                        if (draftCreated.MigratedData != null)
+                        {
+                            Update(draftCreated, draftCreated.MigratedData);
+                        }
+                    }
+
+                    break;
+            }
+        }
+
+        private void Create(ContentEvent @event, ContentData data)
+        {
+            var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+
+            var state = new TextContentState
+            {
+                AppId = @event.AppId.Id,
+                UniqueContentId = uniqueId
+            };
+
+            state.GenerateDocIdCurrent();
+
+            Index(@event,
+                new UpsertIndexEntry
+                {
+                    ContentId = @event.ContentId,
+                    DocId = state.DocIdCurrent,
+                    GeoObjects = data.ToGeo(serializer),
+                    ServeAll = true,
+                    ServePublished = false,
+                    Texts = data.ToTexts(),
+                    IsNew = true
+                });
+
+            states[state.UniqueContentId] = state;
+
+            updates[state.UniqueContentId] = state;
+        }
+
+        private void CreateDraft(ContentEvent @event)
+        {
+            var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+
+            if (states.TryGetValue(uniqueId, out var state))
+            {
+                state.GenerateDocIdNew();
 
                 updates[state.UniqueContentId] = state;
             }
+        }
 
-            private void CreateDraft(ContentEvent @event)
+        private void Unpublish(ContentEvent @event)
+        {
+            var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+
+            if (states.TryGetValue(uniqueId, out var state) && state.DocIdForPublished != null)
             {
-                var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+                Index(@event,
+                    new UpdateIndexEntry
+                    {
+                        DocId = state.DocIdForPublished,
+                        ServeAll = true,
+                        ServePublished = false
+                    });
 
-                if (states.TryGetValue(uniqueId, out var state))
+                state.DocIdForPublished = null;
+
+                updates[state.UniqueContentId] = state;
+            }
+        }
+
+        private void Update(ContentEvent @event, ContentData data)
+        {
+            var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+
+            if (states.TryGetValue(uniqueId, out var state))
+            {
+                if (state.DocIdNew != null)
                 {
-                    state.GenerateDocIdNew();
+                    Index(@event,
+                        new UpsertIndexEntry
+                        {
+                            ContentId = @event.ContentId,
+                            DocId = state.DocIdNew,
+                            GeoObjects = data.ToGeo(serializer),
+                            ServeAll = true,
+                            ServePublished = false,
+                            Texts = data.ToTexts()
+                        });
 
-                    updates[state.UniqueContentId] = state;
+                    Index(@event,
+                        new UpdateIndexEntry
+                        {
+                            DocId = state.DocIdCurrent,
+                            ServeAll = false,
+                            ServePublished = true
+                        });
+                }
+                else
+                {
+                    var isPublished = state.DocIdCurrent == state.DocIdForPublished;
+
+                    Index(@event,
+                        new UpsertIndexEntry
+                        {
+                            ContentId = @event.ContentId,
+                            DocId = state.DocIdCurrent,
+                            GeoObjects = data.ToGeo(serializer),
+                            ServeAll = true,
+                            ServePublished = isPublished,
+                            Texts = data.ToTexts()
+                        });
                 }
             }
+        }
 
-            private void Unpublish(ContentEvent @event)
+        private void Publish(ContentEvent @event)
+        {
+            var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+
+            if (states.TryGetValue(uniqueId, out var state))
             {
-                var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
-
-                if (states.TryGetValue(uniqueId, out var state) && state.DocIdForPublished != null)
+                if (state.DocIdNew != null)
                 {
                     Index(@event,
                         new UpdateIndexEntry
                         {
-                            DocId = state.DocIdForPublished,
+                            DocId = state.DocIdNew,
                             ServeAll = true,
-                            ServePublished = false
+                            ServePublished = true
                         });
 
-                    state.DocIdForPublished = null;
+                    Index(@event,
+                        new DeleteIndexEntry
+                        {
+                            DocId = state.DocIdCurrent
+                        });
 
-                    updates[state.UniqueContentId] = state;
+                    state.DocIdForPublished = state.DocIdNew;
+                    state.DocIdCurrent = state.DocIdNew;
                 }
-            }
-
-            private void Update(ContentEvent @event, ContentData data)
-            {
-                var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
-
-                if (states.TryGetValue(uniqueId, out var state))
-                {
-                    if (state.DocIdNew != null)
-                    {
-                        Index(@event,
-                            new UpsertIndexEntry
-                            {
-                                ContentId = @event.ContentId,
-                                DocId = state.DocIdNew,
-                                GeoObjects = data.ToGeo(serializer),
-                                ServeAll = true,
-                                ServePublished = false,
-                                Texts = data.ToTexts()
-                            });
-
-                        Index(@event,
-                            new UpdateIndexEntry
-                            {
-                                DocId = state.DocIdCurrent,
-                                ServeAll = false,
-                                ServePublished = true
-                            });
-                    }
-                    else
-                    {
-                        var isPublished = state.DocIdCurrent == state.DocIdForPublished;
-
-                        Index(@event,
-                            new UpsertIndexEntry
-                            {
-                                ContentId = @event.ContentId,
-                                DocId = state.DocIdCurrent,
-                                GeoObjects = data.ToGeo(serializer),
-                                ServeAll = true,
-                                ServePublished = isPublished,
-                                Texts = data.ToTexts()
-                            });
-                    }
-                }
-            }
-
-            private void Publish(ContentEvent @event)
-            {
-                var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
-
-                if (states.TryGetValue(uniqueId, out var state))
-                {
-                    if (state.DocIdNew != null)
-                    {
-                        Index(@event,
-                            new UpdateIndexEntry
-                            {
-                                DocId = state.DocIdNew,
-                                ServeAll = true,
-                                ServePublished = true
-                            });
-
-                        Index(@event,
-                            new DeleteIndexEntry
-                            {
-                                DocId = state.DocIdCurrent
-                            });
-
-                        state.DocIdForPublished = state.DocIdNew;
-                        state.DocIdCurrent = state.DocIdNew;
-                    }
-                    else
-                    {
-                        Index(@event,
-                            new UpdateIndexEntry
-                            {
-                                DocId = state.DocIdCurrent,
-                                ServeAll = true,
-                                ServePublished = true
-                            });
-
-                        state.DocIdForPublished = state.DocIdCurrent;
-                    }
-
-                    state.DocIdNew = null;
-
-                    updates[state.UniqueContentId] = state;
-                }
-            }
-
-            private void DeleteDraft(ContentEvent @event)
-            {
-                var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
-
-                if (states.TryGetValue(uniqueId, out var state) && state.DocIdNew != null)
+                else
                 {
                     Index(@event,
                         new UpdateIndexEntry
@@ -272,100 +249,122 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                             ServePublished = true
                         });
 
-                    Index(@event,
-                        new DeleteIndexEntry
-                        {
-                            DocId = state.DocIdNew
-                        });
-
-                    state.DocIdNew = null;
-
-                    updates[state.UniqueContentId] = state;
+                    state.DocIdForPublished = state.DocIdCurrent;
                 }
-            }
 
-            private void Delete(ContentEvent @event)
+                state.DocIdNew = null;
+
+                updates[state.UniqueContentId] = state;
+            }
+        }
+
+        private void DeleteDraft(ContentEvent @event)
+        {
+            var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+
+            if (states.TryGetValue(uniqueId, out var state) && state.DocIdNew != null)
             {
-                var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+                Index(@event,
+                    new UpdateIndexEntry
+                    {
+                        DocId = state.DocIdCurrent,
+                        ServeAll = true,
+                        ServePublished = true
+                    });
 
-                if (states.TryGetValue(uniqueId, out var state))
-                {
-                    Index(@event,
-                        new DeleteIndexEntry
-                        {
-                            DocId = state.DocIdCurrent
-                        });
+                Index(@event,
+                    new DeleteIndexEntry
+                    {
+                        DocId = state.DocIdNew
+                    });
 
-                    Index(@event,
-                        new DeleteIndexEntry
-                        {
-                            DocId = state.DocIdNew ?? NotFound
-                        });
+                state.DocIdNew = null;
 
-                    state.IsDeleted = true;
-
-                    updates[state.UniqueContentId] = state;
-                }
+                updates[state.UniqueContentId] = state;
             }
+        }
 
-            private void Index(ContentEvent @event, IndexCommand command)
+        private void Delete(ContentEvent @event)
+        {
+            var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+
+            if (states.TryGetValue(uniqueId, out var state))
             {
-                command.AppId = @event.AppId;
-                command.SchemaId = @event.SchemaId;
+                Index(@event,
+                    new DeleteIndexEntry
+                    {
+                        DocId = state.DocIdCurrent
+                    });
 
-                if (command is UpdateIndexEntry update &&
-                    commands.TryGetValue(command.DocId, out var existing) &&
-                    existing is UpsertIndexEntry upsert)
-                {
-                    upsert.ServeAll = update.ServeAll;
-                    upsert.ServePublished = update.ServePublished;
-                }
-                else
-                {
-                    commands[command.DocId] = command;
-                }
+                Index(@event,
+                    new DeleteIndexEntry
+                    {
+                        DocId = state.DocIdNew ?? NotFound
+                    });
+
+                state.IsDeleted = true;
+
+                updates[state.UniqueContentId] = state;
             }
         }
 
-        public TextIndexingProcess(
-            IJsonSerializer serializer,
-            ITextIndex textIndex,
-            ITextIndexerState textIndexerState)
+        private void Index(ContentEvent @event, IndexCommand command)
         {
-            this.serializer = serializer;
-            this.textIndex = textIndex;
-            this.textIndexerState = textIndexerState;
-        }
+            command.AppId = @event.AppId;
+            command.SchemaId = @event.SchemaId;
 
-        public async Task ClearAsync()
-        {
-            await textIndex.ClearAsync();
-            await textIndexerState.ClearAsync();
-        }
-
-        public async Task On(IEnumerable<Envelope<IEvent>> events)
-        {
-            var states = await QueryStatesAsync(events);
-
-            var updates = new Updates(states, serializer);
-
-            foreach (var @event in events)
+            if (command is UpdateIndexEntry update &&
+                commands.TryGetValue(command.DocId, out var existing) &&
+                existing is UpsertIndexEntry upsert)
             {
-                updates.On(@event);
+                upsert.ServeAll = update.ServeAll;
+                upsert.ServePublished = update.ServePublished;
             }
-
-            await updates.WriteAsync(textIndex, textIndexerState);
+            else
+            {
+                commands[command.DocId] = command;
+            }
         }
+    }
 
-        private Task<Dictionary<DomainId, TextContentState>> QueryStatesAsync(IEnumerable<Envelope<IEvent>> events)
+    public TextIndexingProcess(
+        IJsonSerializer serializer,
+        ITextIndex textIndex,
+        ITextIndexerState textIndexerState)
+    {
+        this.serializer = serializer;
+        this.textIndex = textIndex;
+        this.textIndexerState = textIndexerState;
+    }
+
+    public async Task ClearAsync()
+    {
+        await textIndex.ClearAsync();
+        await textIndexerState.ClearAsync();
+    }
+
+    public async Task On(IEnumerable<Envelope<IEvent>> events)
+    {
+        var states = await QueryStatesAsync(events);
+
+        var updates = new Updates(states, serializer);
+
+        foreach (var @event in events)
         {
-            var ids =
-                events
-                    .Select(x => x.Payload).OfType<ContentEvent>()
-                    .Select(x => DomainId.Combine(x.AppId, x.ContentId))
-                    .ToHashSet();
-
-            return textIndexerState.GetAsync(ids);
+            updates.On(@event);
         }
+
+        await updates.WriteAsync(textIndex, textIndexerState);
+    }
+
+    private Task<Dictionary<DomainId, TextContentState>> QueryStatesAsync(IEnumerable<Envelope<IEvent>> events)
+    {
+        var ids =
+            events
+                .Select(x => x.Payload).OfType<ContentEvent>()
+                .Select(x => DomainId.Combine(x.AppId, x.ContentId))
+                .ToHashSet();
+
+        return textIndexerState.GetAsync(ids);
     }
 }

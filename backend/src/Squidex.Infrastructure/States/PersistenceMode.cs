@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Infrastructure.States;
+
+[Flags]
+public enum PersistenceMode
 {
-    [Flags]
-    public enum PersistenceMode
-    {
-        EventSourcing = 1,
-        Snapshots = 2,
-        SnapshotsAndEventSourcing = 3
-    }
+    EventSourcing = 1,
+    Snapshots = 2,
+    SnapshotsAndEventSourcing = 3
 }

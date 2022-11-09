@@ -7,14 +7,13 @@
 
 using Squidex.Domain.Apps.Core.Contents;
 
-namespace Squidex.Domain.Apps.Core.Scripting
+namespace Squidex.Domain.Apps.Core.Scripting;
+
+public class DataScriptVars : ScriptVars
 {
-    public class DataScriptVars : ScriptVars
+    public virtual ContentData? Data
     {
-        public virtual ContentData? Data
-        {
-            get => GetValue<ContentData?>();
-            set => SetValue(value);
-        }
+        get => GetValue<ContentData?>();
+        set => SetValue(value);
     }
 }

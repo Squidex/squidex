@@ -5,16 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Diagnostics
+namespace Squidex.Infrastructure.Diagnostics;
+
+public sealed class DiagnoserOptions
 {
-    public sealed class DiagnoserOptions
-    {
-        public string? GcDumpTool { get; set; }
+    public string? GcDumpTool { get; set; }
 
-        public string? DumpTool { get; set; }
+    public string? DumpTool { get; set; }
 
-        public int GCDumpTriggerInMB { get; set; }
+    public int GCDumpTriggerInMB { get; set; }
 
-        public int DumpTriggerInMB { get; set; }
-    }
+    public int DumpTriggerInMB { get; set; }
 }

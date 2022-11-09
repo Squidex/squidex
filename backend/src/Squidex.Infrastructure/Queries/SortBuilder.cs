@@ -5,18 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Queries
-{
-    public static class SortBuilder
-    {
-        public static SortNode Ascending(string path)
-        {
-            return new SortNode(path.Split('.', '/').ToList(), SortOrder.Ascending);
-        }
+namespace Squidex.Infrastructure.Queries;
 
-        public static SortNode Descending(string path)
-        {
-            return new SortNode(path.Split('.', '/').ToList(), SortOrder.Descending);
-        }
+public static class SortBuilder
+{
+    public static SortNode Ascending(string path)
+    {
+        return new SortNode(path.Split('.', '/').ToList(), SortOrder.Ascending);
+    }
+
+    public static SortNode Descending(string path)
+    {
+        return new SortNode(path.Split('.', '/').ToList(), SortOrder.Descending);
     }
 }

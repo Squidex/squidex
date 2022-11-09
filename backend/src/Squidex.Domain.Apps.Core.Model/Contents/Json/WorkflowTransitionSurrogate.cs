@@ -7,33 +7,32 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Contents.Json
+namespace Squidex.Domain.Apps.Core.Contents.Json;
+
+public sealed class WorkflowTransitionSurrogate : ISurrogate<WorkflowTransition>
 {
-    public sealed class WorkflowTransitionSurrogate : ISurrogate<WorkflowTransition>
+    public string? Expression { get; set; }
+
+    public string? Role { get; set; }
+
+    public string[]? Roles { get; set; }
+
+    public void FromSource(WorkflowTransition source)
     {
-        public string? Expression { get; set; }
+        Roles = source.Roles?.ToArray();
 
-        public string? Role { get; set; }
+        Expression = source.Expression;
+    }
 
-        public string[]? Roles { get; set; }
+    public WorkflowTransition ToSource()
+    {
+        var roles = Roles;
 
-        public void FromSource(WorkflowTransition source)
+        if (!string.IsNullOrEmpty(Role))
         {
-            Roles = source.Roles?.ToArray();
-
-            Expression = source.Expression;
+            roles = new[] { Role };
         }
 
-        public WorkflowTransition ToSource()
-        {
-            var roles = Roles;
-
-            if (!string.IsNullOrEmpty(Role))
-            {
-                roles = new[] { Role };
-            }
-
-            return WorkflowTransition.When(Expression, roles);
-        }
+        return WorkflowTransition.When(Expression, roles);
     }
 }

@@ -8,12 +8,11 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands
-{
-    public sealed class UpdateWorkflow : AppCommand
-    {
-        public DomainId WorkflowId { get; set; }
+namespace Squidex.Domain.Apps.Entities.Apps.Commands;
 
-        public Workflow Workflow { get; set; }
-    }
+public sealed class UpdateWorkflow : AppCommand
+{
+    public DomainId WorkflowId { get; set; }
+
+    public Workflow Workflow { get; set; }
 }

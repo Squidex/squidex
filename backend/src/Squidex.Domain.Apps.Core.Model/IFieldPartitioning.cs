@@ -5,22 +5,21 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core
+namespace Squidex.Domain.Apps.Core;
+
+public interface IFieldPartitioning
 {
-    public interface IFieldPartitioning
-    {
-        string Master { get; }
+    string Master { get; }
 
-        IEnumerable<string> AllKeys { get; }
+    IEnumerable<string> AllKeys { get; }
 
-        IEnumerable<string> GetPriorities(string key);
+    IEnumerable<string> GetPriorities(string key);
 
-        bool IsMaster(string key);
+    bool IsMaster(string key);
 
-        bool IsOptional(string key);
+    bool IsOptional(string key);
 
-        bool Contains(string key);
+    bool Contains(string key);
 
-        string? GetName(string key);
-    }
+    string? GetName(string key);
 }

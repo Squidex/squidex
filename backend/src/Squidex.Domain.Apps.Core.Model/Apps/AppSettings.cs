@@ -7,18 +7,17 @@
 
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Core.Apps
+namespace Squidex.Domain.Apps.Core.Apps;
+
+public sealed record AppSettings
 {
-    public sealed record AppSettings
-    {
-        public static readonly AppSettings Empty = new AppSettings();
+    public static readonly AppSettings Empty = new AppSettings();
 
-        public ReadonlyList<Pattern> Patterns { get; init; } = ReadonlyList.Empty<Pattern>();
+    public ReadonlyList<Pattern> Patterns { get; init; } = ReadonlyList.Empty<Pattern>();
 
-        public ReadonlyList<Editor> Editors { get; init; } = ReadonlyList.Empty<Editor>();
+    public ReadonlyList<Editor> Editors { get; init; } = ReadonlyList.Empty<Editor>();
 
-        public bool HideScheduler { get; init; }
+    public bool HideScheduler { get; init; }
 
-        public bool HideDateTimeModeButton { get; init; }
-    }
+    public bool HideDateTimeModeButton { get; init; }
 }

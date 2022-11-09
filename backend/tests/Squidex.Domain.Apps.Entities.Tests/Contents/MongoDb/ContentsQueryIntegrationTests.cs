@@ -7,14 +7,13 @@
 
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
+namespace Squidex.Domain.Apps.Entities.Contents.MongoDb;
+
+[Trait("Category", "Dependencies")]
+public class ContentsQueryIntegrationTests : ContentsQueryTestsBase, IClassFixture<ContentsQueryFixture>
 {
-    [Trait("Category", "Dependencies")]
-    public class ContentsQueryIntegrationTests : ContentsQueryTestsBase, IClassFixture<ContentsQueryFixture>
+    public ContentsQueryIntegrationTests(ContentsQueryFixture fixture)
+        : base(fixture)
     {
-        public ContentsQueryIntegrationTests(ContentsQueryFixture fixture)
-            : base(fixture)
-        {
-        }
     }
 }

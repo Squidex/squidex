@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Infrastructure.TestHelpers
+namespace Squidex.Infrastructure.TestHelpers;
+
+internal sealed class MyEvent : IEvent
 {
-    internal sealed class MyEvent : IEvent
-    {
-        public string MyProperty { get; set; }
-    }
+    public string MyProperty { get; set; }
 }

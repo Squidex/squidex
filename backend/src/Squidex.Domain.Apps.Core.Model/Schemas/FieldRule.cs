@@ -7,40 +7,39 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public sealed record FieldRule
 {
-    public sealed record FieldRule
+    public FieldRuleAction Action { get; }
+
+    public string Field { get; }
+
+    public string? Condition { get; init; }
+
+    public FieldRule(FieldRuleAction action, string field)
     {
-        public FieldRuleAction Action { get; }
+        Guard.Enum(action);
+        Guard.NotNullOrEmpty(field);
 
-        public string Field { get; }
+        Action = action;
 
-        public string? Condition { get; init; }
+        Field = field;
+    }
 
-        public FieldRule(FieldRuleAction action, string field)
+    public static FieldRule Disable(string field, string? condition = null)
+    {
+        return new FieldRule(FieldRuleAction.Disable, field)
         {
-            Guard.Enum(action);
-            Guard.NotNullOrEmpty(field);
+            Condition = condition
+        };
+    }
 
-            Action = action;
-
-            Field = field;
-        }
-
-        public static FieldRule Disable(string field, string? condition = null)
+    public static FieldRule Hide(string field, string? condition = null)
+    {
+        return new FieldRule(FieldRuleAction.Hide, field)
         {
-            return new FieldRule(FieldRuleAction.Disable, field)
-            {
-                Condition = condition
-            };
-        }
-
-        public static FieldRule Hide(string field, string? condition = null)
-        {
-            return new FieldRule(FieldRuleAction.Hide, field)
-            {
-                Condition = condition
-            };
-        }
+            Condition = condition
+        };
     }
 }

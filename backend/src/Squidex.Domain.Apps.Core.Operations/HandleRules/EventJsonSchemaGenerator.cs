@@ -10,51 +10,50 @@ using NJsonSchema.Generation;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Domain.Apps.Core.HandleRules;
+
+public sealed class EventJsonSchemaGenerator
 {
-    public sealed class EventJsonSchemaGenerator
+    private readonly Lazy<Dictionary<string, JsonSchema>> schemas;
+    private readonly JsonSchemaGenerator schemaGenerator;
+
+    public IReadOnlyCollection<string> AllTypes
     {
-        private readonly Lazy<Dictionary<string, JsonSchema>> schemas;
-        private readonly JsonSchemaGenerator schemaGenerator;
+        get => schemas.Value.Keys;
+    }
 
-        public IReadOnlyCollection<string> AllTypes
+    public EventJsonSchemaGenerator(JsonSchemaGenerator schemaGenerator)
+    {
+        this.schemaGenerator = schemaGenerator;
+
+        schemas = new Lazy<Dictionary<string, JsonSchema>>(GenerateSchemas);
+    }
+
+    public JsonSchema? GetSchema(string typeName)
+    {
+        Guard.NotNull(typeName);
+
+        return schemas.Value.GetValueOrDefault(typeName);
+    }
+
+    private Dictionary<string, JsonSchema> GenerateSchemas()
+    {
+        var result = new Dictionary<string, JsonSchema>(StringComparer.OrdinalIgnoreCase);
+
+        var baseType = typeof(EnrichedEvent);
+
+        var assembly = baseType.Assembly;
+
+        foreach (var type in assembly.GetTypes())
         {
-            get => schemas.Value.Keys;
-        }
-
-        public EventJsonSchemaGenerator(JsonSchemaGenerator schemaGenerator)
-        {
-            this.schemaGenerator = schemaGenerator;
-
-            schemas = new Lazy<Dictionary<string, JsonSchema>>(GenerateSchemas);
-        }
-
-        public JsonSchema? GetSchema(string typeName)
-        {
-            Guard.NotNull(typeName);
-
-            return schemas.Value.GetValueOrDefault(typeName);
-        }
-
-        private Dictionary<string, JsonSchema> GenerateSchemas()
-        {
-            var result = new Dictionary<string, JsonSchema>(StringComparer.OrdinalIgnoreCase);
-
-            var baseType = typeof(EnrichedEvent);
-
-            var assembly = baseType.Assembly;
-
-            foreach (var type in assembly.GetTypes())
+            if (!type.IsAbstract && type.IsAssignableTo(baseType))
             {
-                if (!type.IsAbstract && type.IsAssignableTo(baseType))
-                {
-                    var schema = schemaGenerator.Generate(type);
+                var schema = schemaGenerator.Generate(type);
 
-                    result[type.Name] = schema!;
-                }
+                result[type.Name] = schema!;
             }
-
-            return result;
         }
+
+        return result;
     }
 }

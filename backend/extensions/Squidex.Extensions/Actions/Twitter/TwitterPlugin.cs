@@ -9,16 +9,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.Twitter
-{
-    public sealed class TwitterPlugin : IPlugin
-    {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.Configure<TwitterOptions>(
-                config.GetSection("twitter"));
+namespace Squidex.Extensions.Actions.Twitter;
 
-            services.AddRuleAction<TweetAction, TweetActionHandler>();
-        }
+public sealed class TwitterPlugin : IPlugin
+{
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
+    {
+        services.Configure<TwitterOptions>(
+            config.GetSection("twitter"));
+
+        services.AddRuleAction<TweetAction, TweetActionHandler>();
     }
 }

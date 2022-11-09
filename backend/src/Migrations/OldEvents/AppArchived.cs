@@ -11,14 +11,13 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 
-namespace Migrations.OldEvents
+namespace Migrations.OldEvents;
+
+[EventType(nameof(AppArchived))]
+public sealed class AppArchived : AppEvent, IMigrated<IEvent>
 {
-    [EventType(nameof(AppArchived))]
-    public sealed class AppArchived : AppEvent, IMigrated<IEvent>
+    public IEvent Migrate()
     {
-        public IEvent Migrate()
-        {
-            return SimpleMapper.Map(this, new AppDeleted());
-        }
+        return SimpleMapper.Map(this, new AppDeleted());
     }
 }

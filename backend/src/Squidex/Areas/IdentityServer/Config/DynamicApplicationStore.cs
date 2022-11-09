@@ -18,219 +18,218 @@ using Squidex.Shared.Users;
 using Squidex.Web;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace Squidex.Areas.IdentityServer.Config
+namespace Squidex.Areas.IdentityServer.Config;
+
+public class DynamicApplicationStore : InMemoryApplicationStore
 {
-    public class DynamicApplicationStore : InMemoryApplicationStore
+    private readonly IServiceProvider serviceProvider;
+
+    public DynamicApplicationStore(IServiceProvider serviceProvider)
+        : base(CreateStaticClients(serviceProvider))
     {
-        private readonly IServiceProvider serviceProvider;
+        this.serviceProvider = serviceProvider;
+    }
 
-        public DynamicApplicationStore(IServiceProvider serviceProvider)
-            : base(CreateStaticClients(serviceProvider))
+    public override async ValueTask<ImmutableApplication?> FindByIdAsync(string identifier,
+        CancellationToken cancellationToken)
+    {
+        var application = await base.FindByIdAsync(identifier, cancellationToken);
+
+        if (application == null)
         {
-            this.serviceProvider = serviceProvider;
+            application = await GetDynamicAsync(identifier);
         }
 
-        public override async ValueTask<ImmutableApplication?> FindByIdAsync(string identifier,
-            CancellationToken cancellationToken)
-        {
-            var application = await base.FindByIdAsync(identifier, cancellationToken);
+        return application;
+    }
 
-            if (application == null)
+    public override async ValueTask<ImmutableApplication?> FindByClientIdAsync(string identifier,
+        CancellationToken cancellationToken)
+    {
+        var application = await base.FindByClientIdAsync(identifier, cancellationToken);
+
+        if (application == null)
+        {
+            application = await GetDynamicAsync(identifier);
+        }
+
+        return application;
+    }
+
+    private async Task<ImmutableApplication?> GetDynamicAsync(string clientId)
+    {
+        var (appName, appClientId) = clientId.GetClientParts();
+
+        var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
+
+        if (!string.IsNullOrWhiteSpace(appName) && !string.IsNullOrWhiteSpace(appClientId))
+        {
+            var app = await appProvider.GetAppAsync(appName, true);
+
+            var appClient = app?.Clients.GetValueOrDefault(appClientId);
+
+            if (appClient != null)
             {
-                application = await GetDynamicAsync(identifier);
+                return CreateClientFromApp(clientId, appClient);
+            }
+        }
+
+        await using (var scope = serviceProvider.CreateAsyncScope())
+        {
+            var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+
+            var user = await userService.FindByIdAsync(clientId);
+
+            if (user == null)
+            {
+                return null;
             }
 
-            return application;
-        }
+            var secret = user.Claims.ClientSecret();
 
-        public override async ValueTask<ImmutableApplication?> FindByClientIdAsync(string identifier,
-            CancellationToken cancellationToken)
-        {
-            var application = await base.FindByClientIdAsync(identifier, cancellationToken);
-
-            if (application == null)
+            if (!string.IsNullOrWhiteSpace(secret))
             {
-                application = await GetDynamicAsync(identifier);
+                return CreateClientFromUser(user, secret);
             }
-
-            return application;
         }
 
-        private async Task<ImmutableApplication?> GetDynamicAsync(string clientId)
+        return null;
+    }
+
+    private static ImmutableApplication CreateClientFromUser(IUser user, string secret)
+    {
+        return new ImmutableApplication(user.Id, new OpenIddictApplicationDescriptor
         {
-            var (appName, appClientId) = clientId.GetClientParts();
-
-            var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
-
-            if (!string.IsNullOrWhiteSpace(appName) && !string.IsNullOrWhiteSpace(appClientId))
+            DisplayName = $"{user.Email} Client",
+            ClientId = user.Id,
+            ClientSecret = secret,
+            Permissions =
             {
-                var app = await appProvider.GetAppAsync(appName, true);
-
-                var appClient = app?.Clients.GetValueOrDefault(appClientId);
-
-                if (appClient != null)
-                {
-                    return CreateClientFromApp(clientId, appClient);
-                }
+                Permissions.Endpoints.Token,
+                Permissions.GrantTypes.ClientCredentials,
+                Permissions.ResponseTypes.Token,
+                Permissions.Scopes.Email,
+                Permissions.Scopes.Profile,
+                Permissions.Scopes.Roles,
+                Permissions.Prefixes.Scope + Constants.ScopeApi,
+                Permissions.Prefixes.Scope + Constants.ScopePermissions
             }
+        }.CopyClaims(user));
+    }
 
-            await using (var scope = serviceProvider.CreateAsyncScope())
+    private static ImmutableApplication CreateClientFromApp(string id, AppClient appClient)
+    {
+        return new ImmutableApplication(id, new OpenIddictApplicationDescriptor
+        {
+            DisplayName = id,
+            ClientId = id,
+            ClientSecret = appClient.Secret,
+            Permissions =
             {
-                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-
-                var user = await userService.FindByIdAsync(clientId);
-
-                if (user == null)
-                {
-                    return null;
-                }
-
-                var secret = user.Claims.ClientSecret();
-
-                if (!string.IsNullOrWhiteSpace(secret))
-                {
-                    return CreateClientFromUser(user, secret);
-                }
+                Permissions.Endpoints.Token,
+                Permissions.GrantTypes.ClientCredentials,
+                Permissions.ResponseTypes.Token,
+                Permissions.Scopes.Email,
+                Permissions.Scopes.Profile,
+                Permissions.Scopes.Roles,
+                Permissions.Prefixes.Scope + Constants.ScopeApi,
+                Permissions.Prefixes.Scope + Constants.ScopePermissions
             }
+        });
+    }
 
-            return null;
+    private static IEnumerable<(string, OpenIddictApplicationDescriptor)> CreateStaticClients(IServiceProvider serviceProvider)
+    {
+        var identityOptions = serviceProvider.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
+
+        var urlGenerator = serviceProvider.GetRequiredService<IUrlGenerator>();
+
+        var frontendId = Constants.ClientFrontendId;
+
+        yield return (frontendId, new OpenIddictApplicationDescriptor
+        {
+            DisplayName = "Frontend Client",
+            ClientId = frontendId,
+            ClientSecret = null,
+            RedirectUris =
+            {
+                new Uri(urlGenerator.BuildUrl("login;")),
+                new Uri(urlGenerator.BuildUrl("client-callback-silent.html", false)),
+                new Uri(urlGenerator.BuildUrl("client-callback-popup.html", false))
+            },
+            PostLogoutRedirectUris =
+            {
+                new Uri(urlGenerator.BuildUrl("logout", false))
+            },
+            Permissions =
+            {
+                Permissions.Endpoints.Authorization,
+                Permissions.Endpoints.Logout,
+                Permissions.Endpoints.Token,
+                Permissions.GrantTypes.AuthorizationCode,
+                Permissions.GrantTypes.RefreshToken,
+                Permissions.ResponseTypes.Code,
+                Permissions.Scopes.Email,
+                Permissions.Scopes.Profile,
+                Permissions.Scopes.Roles,
+                Permissions.Prefixes.Scope + Constants.ScopeApi,
+                Permissions.Prefixes.Scope + Constants.ScopePermissions
+            },
+            Type = ClientTypes.Public
+        });
+
+        var internalClientId = Constants.ClientInternalId;
+
+        yield return (internalClientId, new OpenIddictApplicationDescriptor
+        {
+            DisplayName = "Internal Client",
+            ClientId = internalClientId,
+            ClientSecret = Constants.ClientInternalSecret,
+            RedirectUris =
+            {
+                new Uri(urlGenerator.BuildUrl("/signin-internal", false))
+            },
+            Permissions =
+            {
+                Permissions.Endpoints.Authorization,
+                Permissions.Endpoints.Logout,
+                Permissions.Endpoints.Token,
+                Permissions.GrantTypes.Implicit,
+                Permissions.ResponseTypes.IdToken,
+                Permissions.ResponseTypes.IdTokenToken,
+                Permissions.ResponseTypes.Token,
+                Permissions.Scopes.Email,
+                Permissions.Scopes.Profile,
+                Permissions.Scopes.Roles,
+                Permissions.Prefixes.Scope + Constants.ScopeApi,
+                Permissions.Prefixes.Scope + Constants.ScopePermissions
+            },
+            Type = ClientTypes.Public
+        });
+
+        if (!identityOptions.IsAdminClientConfigured())
+        {
+            yield break;
         }
 
-        private static ImmutableApplication CreateClientFromUser(IUser user, string secret)
+        var adminClientId = identityOptions.AdminClientId;
+
+        yield return (adminClientId, new OpenIddictApplicationDescriptor
         {
-            return new ImmutableApplication(user.Id, new OpenIddictApplicationDescriptor
+            DisplayName = "Admin Client",
+            ClientId = adminClientId,
+            ClientSecret = identityOptions.AdminClientSecret,
+            Permissions =
             {
-                DisplayName = $"{user.Email} Client",
-                ClientId = user.Id,
-                ClientSecret = secret,
-                Permissions =
-                {
-                    Permissions.Endpoints.Token,
-                    Permissions.GrantTypes.ClientCredentials,
-                    Permissions.ResponseTypes.Token,
-                    Permissions.Scopes.Email,
-                    Permissions.Scopes.Profile,
-                    Permissions.Scopes.Roles,
-                    Permissions.Prefixes.Scope + Constants.ScopeApi,
-                    Permissions.Prefixes.Scope + Constants.ScopePermissions
-                }
-            }.CopyClaims(user));
-        }
-
-        private static ImmutableApplication CreateClientFromApp(string id, AppClient appClient)
-        {
-            return new ImmutableApplication(id, new OpenIddictApplicationDescriptor
-            {
-                DisplayName = id,
-                ClientId = id,
-                ClientSecret = appClient.Secret,
-                Permissions =
-                {
-                    Permissions.Endpoints.Token,
-                    Permissions.GrantTypes.ClientCredentials,
-                    Permissions.ResponseTypes.Token,
-                    Permissions.Scopes.Email,
-                    Permissions.Scopes.Profile,
-                    Permissions.Scopes.Roles,
-                    Permissions.Prefixes.Scope + Constants.ScopeApi,
-                    Permissions.Prefixes.Scope + Constants.ScopePermissions
-                }
-            });
-        }
-
-        private static IEnumerable<(string, OpenIddictApplicationDescriptor)> CreateStaticClients(IServiceProvider serviceProvider)
-        {
-            var identityOptions = serviceProvider.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
-
-            var urlGenerator = serviceProvider.GetRequiredService<IUrlGenerator>();
-
-            var frontendId = Constants.ClientFrontendId;
-
-            yield return (frontendId, new OpenIddictApplicationDescriptor
-            {
-                DisplayName = "Frontend Client",
-                ClientId = frontendId,
-                ClientSecret = null,
-                RedirectUris =
-                {
-                    new Uri(urlGenerator.BuildUrl("login;")),
-                    new Uri(urlGenerator.BuildUrl("client-callback-silent.html", false)),
-                    new Uri(urlGenerator.BuildUrl("client-callback-popup.html", false))
-                },
-                PostLogoutRedirectUris =
-                {
-                    new Uri(urlGenerator.BuildUrl("logout", false))
-                },
-                Permissions =
-                {
-                    Permissions.Endpoints.Authorization,
-                    Permissions.Endpoints.Logout,
-                    Permissions.Endpoints.Token,
-                    Permissions.GrantTypes.AuthorizationCode,
-                    Permissions.GrantTypes.RefreshToken,
-                    Permissions.ResponseTypes.Code,
-                    Permissions.Scopes.Email,
-                    Permissions.Scopes.Profile,
-                    Permissions.Scopes.Roles,
-                    Permissions.Prefixes.Scope + Constants.ScopeApi,
-                    Permissions.Prefixes.Scope + Constants.ScopePermissions
-                },
-                Type = ClientTypes.Public
-            });
-
-            var internalClientId = Constants.ClientInternalId;
-
-            yield return (internalClientId, new OpenIddictApplicationDescriptor
-            {
-                DisplayName = "Internal Client",
-                ClientId = internalClientId,
-                ClientSecret = Constants.ClientInternalSecret,
-                RedirectUris =
-                {
-                    new Uri(urlGenerator.BuildUrl("/signin-internal", false))
-                },
-                Permissions =
-                {
-                    Permissions.Endpoints.Authorization,
-                    Permissions.Endpoints.Logout,
-                    Permissions.Endpoints.Token,
-                    Permissions.GrantTypes.Implicit,
-                    Permissions.ResponseTypes.IdToken,
-                    Permissions.ResponseTypes.IdTokenToken,
-                    Permissions.ResponseTypes.Token,
-                    Permissions.Scopes.Email,
-                    Permissions.Scopes.Profile,
-                    Permissions.Scopes.Roles,
-                    Permissions.Prefixes.Scope + Constants.ScopeApi,
-                    Permissions.Prefixes.Scope + Constants.ScopePermissions
-                },
-                Type = ClientTypes.Public
-            });
-
-            if (!identityOptions.IsAdminClientConfigured())
-            {
-                yield break;
+                Permissions.Endpoints.Token,
+                Permissions.GrantTypes.ClientCredentials,
+                Permissions.ResponseTypes.Token,
+                Permissions.Scopes.Email,
+                Permissions.Scopes.Profile,
+                Permissions.Scopes.Roles,
+                Permissions.Prefixes.Scope + Constants.ScopeApi,
+                Permissions.Prefixes.Scope + Constants.ScopePermissions
             }
-
-            var adminClientId = identityOptions.AdminClientId;
-
-            yield return (adminClientId, new OpenIddictApplicationDescriptor
-            {
-                DisplayName = "Admin Client",
-                ClientId = adminClientId,
-                ClientSecret = identityOptions.AdminClientSecret,
-                Permissions =
-                {
-                    Permissions.Endpoints.Token,
-                    Permissions.GrantTypes.ClientCredentials,
-                    Permissions.ResponseTypes.Token,
-                    Permissions.Scopes.Email,
-                    Permissions.Scopes.Profile,
-                    Permissions.Scopes.Roles,
-                    Permissions.Prefixes.Scope + Constants.ScopeApi,
-                    Permissions.Prefixes.Scope + Constants.ScopePermissions
-                }
-            }.SetAdmin());
-        }
+        }.SetAdmin());
     }
 }

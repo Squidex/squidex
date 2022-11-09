@@ -9,31 +9,30 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 
-namespace Squidex.Domain.Apps.Events.Rules
+namespace Squidex.Domain.Apps.Events.Rules;
+
+[EventType(nameof(RuleUpdated))]
+public sealed class RuleUpdated : RuleEvent, IMigrated<IEvent>
 {
-    [EventType(nameof(RuleUpdated))]
-    public sealed class RuleUpdated : RuleEvent, IMigrated<IEvent>
+    public string? Name { get; set; }
+
+    public RuleTrigger? Trigger { get; set; }
+
+    public RuleAction? Action { get; set; }
+
+    public bool? IsEnabled { get; set; }
+
+    public IEvent Migrate()
     {
-        public string? Name { get; set; }
-
-        public RuleTrigger? Trigger { get; set; }
-
-        public RuleAction? Action { get; set; }
-
-        public bool? IsEnabled { get; set; }
-
-        public IEvent Migrate()
+        if (Trigger is IMigrated<RuleTrigger> migrated)
         {
-            if (Trigger is IMigrated<RuleTrigger> migrated)
-            {
-                var clone = (RuleUpdated)MemberwiseClone();
+            var clone = (RuleUpdated)MemberwiseClone();
 
-                clone.Trigger = migrated.Migrate();
+            clone.Trigger = migrated.Migrate();
 
-                return clone;
-            }
-
-            return this;
+            return clone;
         }
+
+        return this;
     }
 }

@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities;
+
+public interface IEntityWithLastModifiedBy
 {
-    public interface IEntityWithLastModifiedBy
-    {
-        RefToken LastModifiedBy { get; set; }
-    }
+    RefToken LastModifiedBy { get; set; }
 }

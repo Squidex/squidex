@@ -7,18 +7,17 @@
 
 using NodaTime;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public interface IRestoreJob
 {
-    public interface IRestoreJob
-    {
-        Uri Url { get; }
+    Uri Url { get; }
 
-        Instant Started { get; }
+    Instant Started { get; }
 
-        Instant? Stopped { get; }
+    Instant? Stopped { get; }
 
-        List<string> Log { get; }
+    List<string> Log { get; }
 
-        JobStatus Status { get; }
-    }
+    JobStatus Status { get; }
 }

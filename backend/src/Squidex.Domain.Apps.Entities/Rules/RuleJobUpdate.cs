@@ -8,20 +8,19 @@
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 
-namespace Squidex.Domain.Apps.Entities.Rules
+namespace Squidex.Domain.Apps.Entities.Rules;
+
+public sealed class RuleJobUpdate
 {
-    public sealed class RuleJobUpdate
-    {
-        public string? ExecutionDump { get; set; }
+    public string? ExecutionDump { get; set; }
 
-        public RuleResult ExecutionResult { get; set; }
+    public RuleResult ExecutionResult { get; set; }
 
-        public RuleJobResult JobResult { get; set; }
+    public RuleJobResult JobResult { get; set; }
 
-        public TimeSpan Elapsed { get; set; }
+    public TimeSpan Elapsed { get; set; }
 
-        public Instant Finished { get; set; }
+    public Instant Finished { get; set; }
 
-        public Instant? JobNext { get; set; }
-    }
+    public Instant? JobNext { get; set; }
 }

@@ -7,11 +7,10 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Comments
+namespace Squidex.Domain.Apps.Entities.Comments;
+
+public interface ICommentsLoader
 {
-    public interface ICommentsLoader
-    {
-        Task<CommentsResult> GetCommentsAsync(DomainId id, long version = EtagVersion.Any,
-            CancellationToken ct = default);
-    }
+    Task<CommentsResult> GetCommentsAsync(DomainId id, long version = EtagVersion.Any,
+        CancellationToken ct = default);
 }

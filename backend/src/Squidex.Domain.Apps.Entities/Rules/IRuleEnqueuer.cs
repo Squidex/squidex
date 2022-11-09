@@ -9,10 +9,9 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Entities.Rules
+namespace Squidex.Domain.Apps.Entities.Rules;
+
+public interface IRuleEnqueuer
 {
-    public interface IRuleEnqueuer
-    {
-        Task EnqueueAsync(Rule rule, DomainId ruleId, Envelope<IEvent> @event);
-    }
+    Task EnqueueAsync(Rule rule, DomainId ruleId, Envelope<IEvent> @event);
 }

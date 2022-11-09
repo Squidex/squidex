@@ -13,50 +13,49 @@ using Xunit;
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+public abstract class MongoEventStoreFixture : IAsyncLifetime
 {
-    public abstract class MongoEventStoreFixture : IAsyncLifetime
+    private readonly IMongoClient mongoClient;
+    private readonly IMongoDatabase mongoDatabase;
+    private readonly IEventNotifier notifier = A.Fake<IEventNotifier>();
+
+    public MongoEventStore EventStore { get; }
+
+    protected MongoEventStoreFixture(string connectionString)
     {
-        private readonly IMongoClient mongoClient;
-        private readonly IMongoDatabase mongoDatabase;
-        private readonly IEventNotifier notifier = A.Fake<IEventNotifier>();
+        mongoClient = new MongoClient(connectionString);
+        mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
-        public MongoEventStore EventStore { get; }
+        BsonJsonConvention.Register(TestUtils.DefaultOptions());
 
-        protected MongoEventStoreFixture(string connectionString)
-        {
-            mongoClient = new MongoClient(connectionString);
-            mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
-
-            BsonJsonConvention.Register(TestUtils.DefaultOptions());
-
-            EventStore = new MongoEventStore(mongoDatabase, notifier);
-        }
-
-        public Task InitializeAsync()
-        {
-            return EventStore.InitializeAsync(default);
-        }
-
-        public Task DisposeAsync()
-        {
-            return mongoClient.DropDatabaseAsync(mongoDatabase.DatabaseNamespace.DatabaseName);
-        }
+        EventStore = new MongoEventStore(mongoDatabase, notifier);
     }
 
-    public sealed class MongoEventStoreDirectFixture : MongoEventStoreFixture
+    public Task InitializeAsync()
     {
-        public MongoEventStoreDirectFixture()
-            : base(TestConfig.Configuration["mongodb:configuration"])
-        {
-        }
+        return EventStore.InitializeAsync(default);
     }
 
-    public sealed class MongoEventStoreReplicaSetFixture : MongoEventStoreFixture
+    public Task DisposeAsync()
     {
-        public MongoEventStoreReplicaSetFixture()
-            : base(TestConfig.Configuration["mongodb:configurationReplica"])
-        {
-        }
+        return mongoClient.DropDatabaseAsync(mongoDatabase.DatabaseNamespace.DatabaseName);
+    }
+}
+
+public sealed class MongoEventStoreDirectFixture : MongoEventStoreFixture
+{
+    public MongoEventStoreDirectFixture()
+        : base(TestConfig.Configuration["mongodb:configuration"])
+    {
+    }
+}
+
+public sealed class MongoEventStoreReplicaSetFixture : MongoEventStoreFixture
+{
+    public MongoEventStoreReplicaSetFixture()
+        : base(TestConfig.Configuration["mongodb:configurationReplica"])
+    {
     }
 }

@@ -7,17 +7,16 @@
 
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Core.Schemas
-{
-    public sealed class LocalizedValue<T> : ReadonlyDictionary<string, T>
-    {
-        public LocalizedValue()
-        {
-        }
+namespace Squidex.Domain.Apps.Core.Schemas;
 
-        public LocalizedValue(IDictionary<string, T> inner)
-            : base(inner)
-        {
-        }
+public sealed class LocalizedValue<T> : ReadonlyDictionary<string, T>
+{
+    public LocalizedValue()
+    {
+    }
+
+    public LocalizedValue(IDictionary<string, T> inner)
+        : base(inner)
+    {
     }
 }

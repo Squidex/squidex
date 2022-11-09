@@ -7,23 +7,22 @@
 
 using System.ComponentModel;
 
-namespace Squidex.Infrastructure.Queries
+namespace Squidex.Infrastructure.Queries;
+
+[TypeConverter(typeof(CompareOperatorTypeConverter))]
+public enum CompareOperator
 {
-    [TypeConverter(typeof(CompareOperatorTypeConverter))]
-    public enum CompareOperator
-    {
-        Contains,
-        Empty,
-        Exists,
-        EndsWith,
-        Equals,
-        GreaterThan,
-        GreaterThanOrEqual,
-        In,
-        LessThan,
-        LessThanOrEqual,
-        Matchs,
-        NotEquals,
-        StartsWith
-    }
+    Contains,
+    Empty,
+    Exists,
+    EndsWith,
+    Equals,
+    GreaterThan,
+    GreaterThanOrEqual,
+    In,
+    LessThan,
+    LessThanOrEqual,
+    Matchs,
+    NotEquals,
+    StartsWith
 }

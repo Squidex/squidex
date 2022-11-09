@@ -7,10 +7,9 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands;
+
+public sealed class ConfigureScripts : SchemaCommand
 {
-    public sealed class ConfigureScripts : SchemaCommand
-    {
-        public SchemaScripts? Scripts { get; set; }
-    }
+    public SchemaScripts? Scripts { get; set; }
 }

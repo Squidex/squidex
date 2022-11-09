@@ -5,29 +5,28 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Queries
+namespace Squidex.Infrastructure.Queries;
+
+public sealed class SortNode
 {
-    public sealed class SortNode
+    public PropertyPath Path { get; }
+
+    public SortOrder Order { get; set; }
+
+    public SortNode(PropertyPath path, SortOrder order)
     {
-        public PropertyPath Path { get; }
+        Guard.NotNull(path);
+        Guard.Enum(order);
 
-        public SortOrder Order { get; set; }
+        Path = path;
 
-        public SortNode(PropertyPath path, SortOrder order)
-        {
-            Guard.NotNull(path);
-            Guard.Enum(order);
+        Order = order;
+    }
 
-            Path = path;
+    public override string ToString()
+    {
+        var path = string.Join(".", Path);
 
-            Order = order;
-        }
-
-        public override string ToString()
-        {
-            var path = string.Join(".", Path);
-
-            return $"{path} {Order}";
-        }
+        return $"{path} {Order}";
     }
 }

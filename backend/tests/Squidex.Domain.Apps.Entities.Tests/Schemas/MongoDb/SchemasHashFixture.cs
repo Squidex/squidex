@@ -10,27 +10,26 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.MongoDb.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.MongoDb
+namespace Squidex.Domain.Apps.Entities.Schemas.MongoDb;
+
+public sealed class SchemasHashFixture
 {
-    public sealed class SchemasHashFixture
+    public MongoSchemasHash SchemasHash { get; }
+
+    public SchemasHashFixture()
     {
-        public MongoSchemasHash SchemasHash { get; }
+        TestUtils.SetupBson();
 
-        public SchemasHashFixture()
+        var mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
+        var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
+
+        var schemasHash = new MongoSchemasHash(mongoDatabase);
+
+        Task.Run(async () =>
         {
-            TestUtils.SetupBson();
+            await schemasHash.InitializeAsync(default);
+        }).Wait();
 
-            var mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
-            var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
-
-            var schemasHash = new MongoSchemasHash(mongoDatabase);
-
-            Task.Run(async () =>
-            {
-                await schemasHash.InitializeAsync(default);
-            }).Wait();
-
-            SchemasHash = schemasHash;
-        }
+        SchemasHash = schemasHash;
     }
 }

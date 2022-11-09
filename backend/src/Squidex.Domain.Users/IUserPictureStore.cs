@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Users
-{
-    public interface IUserPictureStore
-    {
-        Task UploadAsync(string userId, Stream stream,
-            CancellationToken ct = default);
+namespace Squidex.Domain.Users;
 
-        Task DownloadAsync(string userId, Stream stream,
-            CancellationToken ct = default);
-    }
+public interface IUserPictureStore
+{
+    Task UploadAsync(string userId, Stream stream,
+        CancellationToken ct = default);
+
+    Task DownloadAsync(string userId, Stream stream,
+        CancellationToken ct = default);
 }

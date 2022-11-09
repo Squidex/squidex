@@ -7,21 +7,20 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
+namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+
+public sealed class EnrichedSchemaEvent : EnrichedSchemaEventBase, IEnrichedEntityEvent
 {
-    public sealed class EnrichedSchemaEvent : EnrichedSchemaEventBase, IEnrichedEntityEvent
+    [FieldDescription(nameof(FieldDescriptions.EventType))]
+    public EnrichedSchemaEventType Type { get; set; }
+
+    public DomainId Id
     {
-        [FieldDescription(nameof(FieldDescriptions.EventType))]
-        public EnrichedSchemaEventType Type { get; set; }
+        get => SchemaId.Id;
+    }
 
-        public DomainId Id
-        {
-            get => SchemaId.Id;
-        }
-
-        public override long Partition
-        {
-            get => SchemaId?.GetHashCode() ?? 0;
-        }
+    public override long Partition
+    {
+        get => SchemaId?.GetHashCode() ?? 0;
     }
 }

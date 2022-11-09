@@ -12,100 +12,99 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.Extensions.Actions.SignalR
+namespace Squidex.Extensions.Actions.SignalR;
+
+public sealed class SignalRActionHandler : RuleActionHandler<SignalRAction, SignalRJob>
 {
-    public sealed class SignalRActionHandler : RuleActionHandler<SignalRAction, SignalRJob>
+    private readonly ClientPool<(string ConnectionString, string HubName), ServiceManager> clients;
+
+    public SignalRActionHandler(RuleEventFormatter formatter)
+        : base(formatter)
     {
-        private readonly ClientPool<(string ConnectionString, string HubName), ServiceManager> clients;
-
-        public SignalRActionHandler(RuleEventFormatter formatter)
-            : base(formatter)
+        clients = new ClientPool<(string ConnectionString, string HubName), ServiceManager>(key =>
         {
-            clients = new ClientPool<(string ConnectionString, string HubName), ServiceManager>(key =>
-            {
-                var serviceManager = new ServiceManagerBuilder()
-                    .WithOptions(option =>
-                    {
-                        option.ConnectionString = key.ConnectionString;
-                        option.ServiceTransportType = ServiceTransportType.Transient;
-                    })
-                    .BuildServiceManager();
-
-                return serviceManager;
-            });
-        }
-
-        protected override async Task<(string Description, SignalRJob Data)> CreateJobAsync(EnrichedEvent @event, SignalRAction action)
-        {
-            var hubName = await FormatAsync(action.HubName, @event);
-
-            string requestBody;
-
-            if (!string.IsNullOrWhiteSpace(action.Payload))
-            {
-                requestBody = await FormatAsync(action.Payload, @event);
-            }
-            else
-            {
-                requestBody = ToEnvelopeJson(@event);
-            }
-
-            var target = (await FormatAsync(action.Target, @event)) ?? string.Empty;
-
-            var ruleDescription = $"Send SignalRJob to signalR hub '{hubName}'";
-
-            var ruleJob = new SignalRJob
-            {
-                Action = action.Action,
-                ConnectionString = action.ConnectionString,
-                HubName = hubName,
-                MethodName = action.MethodName,
-                MethodPayload = requestBody,
-                Targets = target.Split("\n")
-            };
-
-            return (ruleDescription, ruleJob);
-        }
-
-        protected override async Task<Result> ExecuteJobAsync(SignalRJob job,
-            CancellationToken ct = default)
-        {
-            var signalR = await clients.GetClientAsync((job.ConnectionString, job.HubName));
-
-            await using (var signalRContext = await signalR.CreateHubContextAsync(job.HubName, cancellationToken: ct))
-            {
-                var methodeName = !string.IsNullOrWhiteSpace(job.MethodName) ? job.MethodName : "push";
-
-                switch (job.Action)
+            var serviceManager = new ServiceManagerBuilder()
+                .WithOptions(option =>
                 {
-                    case ActionTypeEnum.Broadcast:
-                        await signalRContext.Clients.All.SendAsync(methodeName, job.MethodPayload, ct);
-                        break;
-                    case ActionTypeEnum.User:
-                        await signalRContext.Clients.Users(job.Targets).SendAsync(methodeName, job.MethodPayload, ct);
-                        break;
-                    case ActionTypeEnum.Group:
-                        await signalRContext.Clients.Groups(job.Targets).SendAsync(methodeName, job.MethodPayload, ct);
-                        break;
-                }
-            }
+                    option.ConnectionString = key.ConnectionString;
+                    option.ServiceTransportType = ServiceTransportType.Transient;
+                })
+                .BuildServiceManager();
 
-            return Result.Complete();
-        }
+            return serviceManager;
+        });
     }
 
-    public sealed class SignalRJob
+    protected override async Task<(string Description, SignalRJob Data)> CreateJobAsync(EnrichedEvent @event, SignalRAction action)
     {
-        public string ConnectionString { get; set; }
+        var hubName = await FormatAsync(action.HubName, @event);
 
-        public string HubName { get; set; }
+        string requestBody;
 
-        public ActionTypeEnum Action { get; set; }
+        if (!string.IsNullOrWhiteSpace(action.Payload))
+        {
+            requestBody = await FormatAsync(action.Payload, @event);
+        }
+        else
+        {
+            requestBody = ToEnvelopeJson(@event);
+        }
 
-        public string MethodName { get; set; }
+        var target = (await FormatAsync(action.Target, @event)) ?? string.Empty;
 
-        public string MethodPayload { get; set; }
+        var ruleDescription = $"Send SignalRJob to signalR hub '{hubName}'";
 
-        public string[] Targets { get; set; }
+        var ruleJob = new SignalRJob
+        {
+            Action = action.Action,
+            ConnectionString = action.ConnectionString,
+            HubName = hubName,
+            MethodName = action.MethodName,
+            MethodPayload = requestBody,
+            Targets = target.Split("\n")
+        };
+
+        return (ruleDescription, ruleJob);
     }
+
+    protected override async Task<Result> ExecuteJobAsync(SignalRJob job,
+        CancellationToken ct = default)
+    {
+        var signalR = await clients.GetClientAsync((job.ConnectionString, job.HubName));
+
+        await using (var signalRContext = await signalR.CreateHubContextAsync(job.HubName, cancellationToken: ct))
+        {
+            var methodeName = !string.IsNullOrWhiteSpace(job.MethodName) ? job.MethodName : "push";
+
+            switch (job.Action)
+            {
+                case ActionTypeEnum.Broadcast:
+                    await signalRContext.Clients.All.SendAsync(methodeName, job.MethodPayload, ct);
+                    break;
+                case ActionTypeEnum.User:
+                    await signalRContext.Clients.Users(job.Targets).SendAsync(methodeName, job.MethodPayload, ct);
+                    break;
+                case ActionTypeEnum.Group:
+                    await signalRContext.Clients.Groups(job.Targets).SendAsync(methodeName, job.MethodPayload, ct);
+                    break;
+            }
+        }
+
+        return Result.Complete();
+    }
+}
+
+public sealed class SignalRJob
+{
+    public string ConnectionString { get; set; }
+
+    public string HubName { get; set; }
+
+    public ActionTypeEnum Action { get; set; }
+
+    public string MethodName { get; set; }
+
+    public string MethodPayload { get; set; }
+
+    public string[] Targets { get; set; }
 }

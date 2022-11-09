@@ -7,7 +7,6 @@
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Infrastructure.EventSourcing
-{
-    public sealed record EventData(string Type, EnvelopeHeaders Headers, string Payload);
-}
+namespace Squidex.Infrastructure.EventSourcing;
+
+public sealed record EventData(string Type, EnvelopeHeaders Headers, string Payload);

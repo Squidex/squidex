@@ -7,18 +7,17 @@
 
 using NodaTime;
 
-namespace Squidex.Infrastructure
-{
-    public static class InstantExtensions
-    {
-        public static Instant WithoutMs(this Instant value)
-        {
-            return Instant.FromUnixTimeSeconds(value.ToUnixTimeSeconds());
-        }
+namespace Squidex.Infrastructure;
 
-        public static Instant WithoutNs(this Instant value)
-        {
-            return Instant.FromUnixTimeMilliseconds(value.ToUnixTimeMilliseconds());
-        }
+public static class InstantExtensions
+{
+    public static Instant WithoutMs(this Instant value)
+    {
+        return Instant.FromUnixTimeSeconds(value.ToUnixTimeSeconds());
+    }
+
+    public static Instant WithoutNs(this Instant value)
+    {
+        return Instant.FromUnixTimeMilliseconds(value.ToUnixTimeMilliseconds());
     }
 }

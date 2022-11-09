@@ -8,20 +8,19 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Squidex.Infrastructure.Migrations
+namespace Squidex.Infrastructure.Migrations;
+
+public sealed class MongoMigrationEntity
 {
-    public sealed class MongoMigrationEntity
-    {
-        [BsonId]
-        [BsonElement("_id")]
-        public string Id { get; set; }
+    [BsonId]
+    [BsonElement("_id")]
+    public string Id { get; set; }
 
-        [BsonRequired]
-        [BsonElement(nameof(IsLocked))]
-        public bool IsLocked { get; set; }
+    [BsonRequired]
+    [BsonElement(nameof(IsLocked))]
+    public bool IsLocked { get; set; }
 
-        [BsonElement]
-        [BsonRequired]
-        public int Version { get; set; }
-    }
+    [BsonElement]
+    [BsonRequired]
+    public int Version { get; set; }
 }

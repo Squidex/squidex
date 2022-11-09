@@ -15,71 +15,70 @@ using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Config.Domain
+namespace Squidex.Config.Domain;
+
+public static class AppsServices
 {
-    public static class AppsServices
+    public static void AddSquidexApps(this IServiceCollection services, IConfiguration config)
     {
-        public static void AddSquidexApps(this IServiceCollection services, IConfiguration config)
+        if (config.GetValue<bool>("apps:deletePermanent"))
         {
-            if (config.GetValue<bool>("apps:deletePermanent"))
+            services.AddSingletonAs<AppPermanentDeleter>()
+                .As<IEventConsumer>();
+        }
+
+        services.AddSingletonAs<RolePermissionsProvider>()
+            .AsSelf();
+
+        services.AddSingletonAs<AppEventDeleter>()
+            .As<IDeleter>();
+
+        services.AddSingletonAs<AppUsageDeleter>()
+            .As<IDeleter>();
+
+        services.AddSingletonAs<DefaultAppLogStore>()
+            .As<IAppLogStore>().As<IDeleter>();
+
+        services.AddSingletonAs<AppHistoryEventsCreator>()
+            .As<IHistoryEventsCreator>();
+
+        services.AddSingletonAs<DefaultAppImageStore>()
+            .As<IAppImageStore>();
+
+        services.AddSingletonAs<AppProvider>()
+            .As<IAppProvider>();
+
+        services.AddSingletonAs<AppUISettings>()
+            .As<IAppUISettings>().As<IDeleter>();
+
+        services.AddSingletonAs<AppSettingsSearchSource>()
+            .As<ISearchSource>();
+
+        services.AddSingleton(c =>
+        {
+            var uiOptions = c.GetRequiredService<IOptions<MyUIOptions>>().Value;
+
+            var patterns = new List<Pattern>();
+
+            if (uiOptions.RegexSuggestions != null)
             {
-                services.AddSingletonAs<AppPermanentDeleter>()
-                    .As<IEventConsumer>();
-            }
-
-            services.AddSingletonAs<RolePermissionsProvider>()
-                .AsSelf();
-
-            services.AddSingletonAs<AppEventDeleter>()
-                .As<IDeleter>();
-
-            services.AddSingletonAs<AppUsageDeleter>()
-                .As<IDeleter>();
-
-            services.AddSingletonAs<DefaultAppLogStore>()
-                .As<IAppLogStore>().As<IDeleter>();
-
-            services.AddSingletonAs<AppHistoryEventsCreator>()
-                .As<IHistoryEventsCreator>();
-
-            services.AddSingletonAs<DefaultAppImageStore>()
-                .As<IAppImageStore>();
-
-            services.AddSingletonAs<AppProvider>()
-                .As<IAppProvider>();
-
-            services.AddSingletonAs<AppUISettings>()
-                .As<IAppUISettings>().As<IDeleter>();
-
-            services.AddSingletonAs<AppSettingsSearchSource>()
-                .As<ISearchSource>();
-
-            services.AddSingleton(c =>
-            {
-                var uiOptions = c.GetRequiredService<IOptions<MyUIOptions>>().Value;
-
-                var patterns = new List<Pattern>();
-
-                if (uiOptions.RegexSuggestions != null)
+                foreach (var (key, value) in uiOptions.RegexSuggestions)
                 {
-                    foreach (var (key, value) in uiOptions.RegexSuggestions)
+                    if (!string.IsNullOrWhiteSpace(key) &&
+                        !string.IsNullOrWhiteSpace(value))
                     {
-                        if (!string.IsNullOrWhiteSpace(key) &&
-                            !string.IsNullOrWhiteSpace(value))
-                        {
-                            patterns.Add(new Pattern(key, value));
-                        }
+                        patterns.Add(new Pattern(key, value));
                     }
                 }
+            }
 
-                return new InitialSettings
+            return new InitialSettings
+            {
+                Settings = new AppSettings
                 {
-                    Settings = new AppSettings
-                    {
-                        Patterns = patterns.ToReadonlyList()
-                    }
-                };
-            });
-        }
+                    Patterns = patterns.ToReadonlyList()
+                }
+            };
+        });
     }
 }

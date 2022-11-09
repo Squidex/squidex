@@ -7,13 +7,12 @@
 
 using Microsoft.AspNetCore.Authorization;
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public class ApiPermissionOrAnonymousAttribute : ApiPermissionAttribute, IAllowAnonymous
 {
-    public class ApiPermissionOrAnonymousAttribute : ApiPermissionAttribute, IAllowAnonymous
+    public ApiPermissionOrAnonymousAttribute(params string[] ids)
+        : base(ids)
     {
-        public ApiPermissionOrAnonymousAttribute(params string[] ids)
-            : base(ids)
-        {
-        }
     }
 }

@@ -8,11 +8,10 @@
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas;
+
+[EventType(nameof(SchemaCreated), 2)]
+public sealed class SchemaCreated : SchemaEvent
 {
-    [EventType(nameof(SchemaCreated), 2)]
-    public sealed class SchemaCreated : SchemaEvent
-    {
-        public Schema Schema { get; set; }
-    }
+    public Schema Schema { get; set; }
 }

@@ -8,19 +8,18 @@
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.Api.Controllers.Apps.Models
-{
-    public sealed class AddWorkflowDto
-    {
-        /// <summary>
-        /// The name of the workflow.
-        /// </summary>
-        [LocalizedRequired]
-        public string Name { get; set; }
+namespace Squidex.Areas.Api.Controllers.Apps.Models;
 
-        public AddWorkflow ToCommand()
-        {
-            return new AddWorkflow { Name = Name };
-        }
+public sealed class AddWorkflowDto
+{
+    /// <summary>
+    /// The name of the workflow.
+    /// </summary>
+    [LocalizedRequired]
+    public string Name { get; set; }
+
+    public AddWorkflow ToCommand()
+    {
+        return new AddWorkflow { Name = Name };
     }
 }

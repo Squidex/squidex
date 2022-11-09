@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands;
+
+public sealed class ReorderFields : ParentFieldCommand
 {
-    public sealed class ReorderFields : ParentFieldCommand
-    {
-        public long[] FieldIds { get; set; }
-    }
+    public long[] FieldIds { get; set; }
 }

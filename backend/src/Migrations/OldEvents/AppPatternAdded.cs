@@ -15,39 +15,38 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
-namespace Migrations.OldEvents
+namespace Migrations.OldEvents;
+
+[EventType(nameof(AppPatternAdded))]
+[Obsolete("New Event introduced")]
+public sealed class AppPatternAdded : AppEvent, IMigratedStateEvent<AppDomainObject.State>
 {
-    [EventType(nameof(AppPatternAdded))]
-    [Obsolete("New Event introduced")]
-    public sealed class AppPatternAdded : AppEvent, IMigratedStateEvent<AppDomainObject.State>
+    public DomainId PatternId { get; set; }
+
+    public string Name { get; set; }
+
+    public string Pattern { get; set; }
+
+    public string? Message { get; set; }
+
+    public IEvent Migrate(AppDomainObject.State state)
     {
-        public DomainId PatternId { get; set; }
-
-        public string Name { get; set; }
-
-        public string Pattern { get; set; }
-
-        public string? Message { get; set; }
-
-        public IEvent Migrate(AppDomainObject.State state)
+        var newSettings = state.Settings with
         {
-            var newSettings = state.Settings with
+            Patterns = new List<Pattern>(state.Settings.Patterns.Where(x => x.Name != Name || x.Regex != Pattern))
             {
-                Patterns = new List<Pattern>(state.Settings.Patterns.Where(x => x.Name != Name || x.Regex != Pattern))
+                new Pattern(Name, Pattern)
                 {
-                    new Pattern(Name, Pattern)
-                    {
-                        Message = Message
-                    }
-                }.ToReadonlyList()
-            };
+                    Message = Message
+                }
+            }.ToReadonlyList()
+        };
 
-            var newEvent = new AppSettingsUpdated
-            {
-                Settings = newSettings
-            };
+        var newEvent = new AppSettingsUpdated
+        {
+            Settings = newSettings
+        };
 
-            return SimpleMapper.Map(this, newEvent);
-        }
+        return SimpleMapper.Map(this, newEvent);
     }
 }

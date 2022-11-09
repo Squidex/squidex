@@ -7,11 +7,10 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Rules.Indexes
+namespace Squidex.Domain.Apps.Entities.Rules.Indexes;
+
+public interface IRulesIndex
 {
-    public interface IRulesIndex
-    {
-        Task<List<IRuleEntity>> GetRulesAsync(DomainId appId,
-            CancellationToken ct = default);
-    }
+    Task<List<IRuleEntity>> GetRulesAsync(DomainId appId,
+        CancellationToken ct = default);
 }

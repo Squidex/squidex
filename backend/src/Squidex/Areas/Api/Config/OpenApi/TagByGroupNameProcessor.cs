@@ -10,24 +10,23 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 
-namespace Squidex.Areas.Api.Config.OpenApi
+namespace Squidex.Areas.Api.Config.OpenApi;
+
+public sealed class TagByGroupNameProcessor : IOperationProcessor
 {
-    public sealed class TagByGroupNameProcessor : IOperationProcessor
+    public bool Process(OperationProcessorContext context)
     {
-        public bool Process(OperationProcessorContext context)
+        var groupName = context.ControllerType.GetCustomAttribute<ApiExplorerSettingsAttribute>()?.GroupName;
+
+        if (!string.IsNullOrWhiteSpace(groupName))
         {
-            var groupName = context.ControllerType.GetCustomAttribute<ApiExplorerSettingsAttribute>()?.GroupName;
+            context.OperationDescription.Operation.Tags = new List<string> { groupName };
 
-            if (!string.IsNullOrWhiteSpace(groupName))
-            {
-                context.OperationDescription.Operation.Tags = new List<string> { groupName };
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 }

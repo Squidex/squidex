@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Tags
-{
-    public sealed record Tag
-    {
-        public string Name { get; set; }
+namespace Squidex.Domain.Apps.Core.Tags;
 
-        public int Count { get; set; }
-    }
+public sealed record Tag
+{
+    public string Name { get; set; }
+
+    public int Count { get; set; }
 }

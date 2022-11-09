@@ -9,36 +9,35 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Users
+namespace Squidex.Domain.Users;
+
+internal sealed class UserWithClaims : IUser
 {
-    internal sealed class UserWithClaims : IUser
+    public IdentityUser Identity { get; }
+
+    public string Id
     {
-        public IdentityUser Identity { get; }
+        get => Identity.Id;
+    }
 
-        public string Id
-        {
-            get => Identity.Id;
-        }
+    public string Email
+    {
+        get => Identity.Email;
+    }
 
-        public string Email
-        {
-            get => Identity.Email;
-        }
+    public bool IsLocked
+    {
+        get => Identity.LockoutEnd > DateTime.UtcNow;
+    }
 
-        public bool IsLocked
-        {
-            get => Identity.LockoutEnd > DateTime.UtcNow;
-        }
+    public IReadOnlyList<Claim> Claims { get; }
 
-        public IReadOnlyList<Claim> Claims { get; }
+    object IUser.Identity => Identity;
 
-        object IUser.Identity => Identity;
+    public UserWithClaims(IdentityUser user, IReadOnlyList<Claim> claims)
+    {
+        Identity = user;
 
-        public UserWithClaims(IdentityUser user, IReadOnlyList<Claim> claims)
-        {
-            Identity = user;
-
-            Claims = claims;
-        }
+        Claims = claims;
     }
 }

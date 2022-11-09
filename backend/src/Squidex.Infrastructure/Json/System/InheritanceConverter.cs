@@ -7,47 +7,46 @@
 
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Infrastructure.Json.System
+namespace Squidex.Infrastructure.Json.System;
+
+public sealed class InheritanceConverter<T> : InheritanceConverterBase<T> where T : notnull
 {
-    public sealed class InheritanceConverter<T> : InheritanceConverterBase<T> where T : notnull
+    private readonly TypeNameRegistry typeNameRegistry;
+
+    public InheritanceConverter(TypeNameRegistry typeNameRegistry)
+        : base("$type")
     {
-        private readonly TypeNameRegistry typeNameRegistry;
+        this.typeNameRegistry = typeNameRegistry;
+    }
 
-        public InheritanceConverter(TypeNameRegistry typeNameRegistry)
-            : base("$type")
+    public override Type GetDiscriminatorType(string name, Type typeToConvert)
+    {
+        var typeInfo = typeNameRegistry.GetTypeOrNull(name);
+
+        if (typeInfo == null)
         {
-            this.typeNameRegistry = typeNameRegistry;
+            typeInfo = Type.GetType(name);
         }
 
-        public override Type GetDiscriminatorType(string name, Type typeToConvert)
+        if (typeInfo == null)
         {
-            var typeInfo = typeNameRegistry.GetTypeOrNull(name);
-
-            if (typeInfo == null)
-            {
-                typeInfo = Type.GetType(name);
-            }
-
-            if (typeInfo == null)
-            {
-                ThrowHelper.JsonException($"Object has invalid discriminator '{name}'.");
-                return default!;
-            }
-
-            return typeInfo;
+            ThrowHelper.JsonException($"Object has invalid discriminator '{name}'.");
+            return default!;
         }
 
-        public override string GetDiscriminatorValue(Type type)
+        return typeInfo;
+    }
+
+    public override string GetDiscriminatorValue(Type type)
+    {
+        var typeName = typeNameRegistry.GetNameOrNull(type);
+
+        if (typeName == null)
         {
-            var typeName = typeNameRegistry.GetNameOrNull(type);
-
-            if (typeName == null)
-            {
-                // Use the type name as a fallback.
-                typeName = type.AssemblyQualifiedName!;
-            }
-
-            return typeName;
+            // Use the type name as a fallback.
+            typeName = type.AssemblyQualifiedName!;
         }
+
+        return typeName;
     }
 }

@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Migrations.OldEvents
+namespace Migrations.OldEvents;
+
+[Obsolete("New Event introduced")]
+public enum AppClientPermission
 {
-    [Obsolete("New Event introduced")]
-    public enum AppClientPermission
-    {
-        Developer,
-        Editor,
-        Reader
-    }
+    Developer,
+    Editor,
+    Reader
 }

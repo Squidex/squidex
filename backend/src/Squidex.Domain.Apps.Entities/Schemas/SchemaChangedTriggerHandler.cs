@@ -15,78 +15,77 @@ using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Entities.Schemas
+namespace Squidex.Domain.Apps.Entities.Schemas;
+
+public sealed class SchemaChangedTriggerHandler : IRuleTriggerHandler
 {
-    public sealed class SchemaChangedTriggerHandler : IRuleTriggerHandler
+    private readonly IScriptEngine scriptEngine;
+
+    public Type TriggerType => typeof(SchemaChangedTrigger);
+
+    public SchemaChangedTriggerHandler(IScriptEngine scriptEngine)
     {
-        private readonly IScriptEngine scriptEngine;
+        this.scriptEngine = scriptEngine;
+    }
 
-        public Type TriggerType => typeof(SchemaChangedTrigger);
+    public bool Handles(AppEvent appEvent)
+    {
+        return appEvent is SchemaEvent;
+    }
 
-        public SchemaChangedTriggerHandler(IScriptEngine scriptEngine)
+    public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+        [EnumeratorCancellation] CancellationToken ct)
+    {
+        var result = new EnrichedSchemaEvent();
+
+        // Use the concrete event to map properties that are not part of app event.
+        SimpleMapper.Map((SchemaEvent)@event.Payload, result);
+
+        switch (@event.Payload)
         {
-            this.scriptEngine = scriptEngine;
+            case FieldEvent:
+            case SchemaPreviewUrlsConfigured:
+            case SchemaScriptsConfigured:
+            case SchemaUpdated:
+            case ParentFieldEvent:
+                result.Type = EnrichedSchemaEventType.Updated;
+                break;
+            case SchemaCreated:
+                result.Type = EnrichedSchemaEventType.Created;
+                break;
+            case SchemaPublished:
+                result.Type = EnrichedSchemaEventType.Published;
+                break;
+            case SchemaUnpublished:
+                result.Type = EnrichedSchemaEventType.Unpublished;
+                break;
+            case SchemaDeleted:
+                result.Type = EnrichedSchemaEventType.Deleted;
+                break;
+            default:
+                yield break;
         }
 
-        public bool Handles(AppEvent appEvent)
+        await Task.Yield();
+
+        yield return result;
+    }
+
+    public bool Trigger(EnrichedEvent @event, RuleContext context)
+    {
+        var trigger = (SchemaChangedTrigger)context.Rule.Trigger;
+
+        if (string.IsNullOrWhiteSpace(trigger.Condition))
         {
-            return appEvent is SchemaEvent;
+            return true;
         }
 
-        public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
-            [EnumeratorCancellation] CancellationToken ct)
+        // Script vars are just wrappers over dictionaries for better performance.
+        var vars = new EventScriptVars
         {
-            var result = new EnrichedSchemaEvent();
+            ["event"] = @event
+        };
 
-            // Use the concrete event to map properties that are not part of app event.
-            SimpleMapper.Map((SchemaEvent)@event.Payload, result);
-
-            switch (@event.Payload)
-            {
-                case FieldEvent:
-                case SchemaPreviewUrlsConfigured:
-                case SchemaScriptsConfigured:
-                case SchemaUpdated:
-                case ParentFieldEvent:
-                    result.Type = EnrichedSchemaEventType.Updated;
-                    break;
-                case SchemaCreated:
-                    result.Type = EnrichedSchemaEventType.Created;
-                    break;
-                case SchemaPublished:
-                    result.Type = EnrichedSchemaEventType.Published;
-                    break;
-                case SchemaUnpublished:
-                    result.Type = EnrichedSchemaEventType.Unpublished;
-                    break;
-                case SchemaDeleted:
-                    result.Type = EnrichedSchemaEventType.Deleted;
-                    break;
-                default:
-                    yield break;
-            }
-
-            await Task.Yield();
-
-            yield return result;
-        }
-
-        public bool Trigger(EnrichedEvent @event, RuleContext context)
-        {
-            var trigger = (SchemaChangedTrigger)context.Rule.Trigger;
-
-            if (string.IsNullOrWhiteSpace(trigger.Condition))
-            {
-                return true;
-            }
-
-            // Script vars are just wrappers over dictionaries for better performance.
-            var vars = new EventScriptVars
-            {
-                ["event"] = @event
-            };
-
-            return scriptEngine.Evaluate(vars, trigger.Condition);
-        }
+        return scriptEngine.Evaluate(vars, trigger.Condition);
     }
 }

@@ -13,166 +13,165 @@ using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Tasks;
 
-namespace Migrations.Migrations.MongoDb
+namespace Migrations.Migrations.MongoDb;
+
+public sealed class ConvertDocumentIds : MongoBase<BsonDocument>, IMigration
 {
-    public sealed class ConvertDocumentIds : MongoBase<BsonDocument>, IMigration
+    private readonly IMongoDatabase database;
+    private readonly IMongoDatabase databaseContent;
+    private Scope scope;
+
+    private enum Scope
     {
-        private readonly IMongoDatabase database;
-        private readonly IMongoDatabase databaseContent;
-        private Scope scope;
+        None,
+        Assets,
+        Contents
+    }
 
-        private enum Scope
+    public ConvertDocumentIds(IMongoDatabase database, IMongoDatabase databaseContent)
+    {
+        this.database = database;
+        this.databaseContent = databaseContent;
+    }
+
+    public override string ToString()
+    {
+        return $"{base.ToString()}({scope})";
+    }
+
+    public ConvertDocumentIds ForContents()
+    {
+        scope = Scope.Contents;
+
+        return this;
+    }
+
+    public ConvertDocumentIds ForAssets()
+    {
+        scope = Scope.Assets;
+
+        return this;
+    }
+
+    public async Task UpdateAsync(
+        CancellationToken ct)
+    {
+        switch (scope)
         {
-            None,
-            Assets,
-            Contents
+            case Scope.Assets:
+                await RebuildAsync(database, ConvertParentId, "States_Assets", ct);
+                await RebuildAsync(database, ConvertParentId, "States_AssetFolders", ct);
+                break;
+            case Scope.Contents:
+                await RebuildAsync(databaseContent, null, "State_Contents_All", ct);
+                await RebuildAsync(databaseContent, null, "State_Contents_Published", ct);
+                break;
+        }
+    }
+
+    private static async Task RebuildAsync(IMongoDatabase database, Action<BsonDocument>? extraAction, string collectionNameV1,
+        CancellationToken ct)
+    {
+        const int SizeOfBatch = 1000;
+        const int SizeOfQueue = 10;
+
+        string collectionNameV2;
+
+        collectionNameV2 = $"{collectionNameV1}2";
+        collectionNameV2 = collectionNameV2.Replace("State_", "States_", StringComparison.Ordinal);
+
+        // Do not resolve in constructor, because most of the time it is not executed anyway.
+        var collectionV1 = database.GetCollection<BsonDocument>(collectionNameV1);
+        var collectionV2 = database.GetCollection<BsonDocument>(collectionNameV2);
+
+        if (!await collectionV1.AnyAsync(ct: ct))
+        {
+            return;
         }
 
-        public ConvertDocumentIds(IMongoDatabase database, IMongoDatabase databaseContent)
+        await collectionV2.DeleteManyAsync(FindAll, ct);
+
+        var batchBlock = new BatchBlock<BsonDocument>(SizeOfBatch, new GroupingDataflowBlockOptions
         {
-            this.database = database;
-            this.databaseContent = databaseContent;
-        }
+            BoundedCapacity = SizeOfQueue * SizeOfBatch
+        });
 
-        public override string ToString()
+        var writeOptions = new BulkWriteOptions
         {
-            return $"{base.ToString()}({scope})";
-        }
+            IsOrdered = false
+        };
 
-        public ConvertDocumentIds ForContents()
+        var actionBlock = new ActionBlock<BsonDocument[]>(async batch =>
         {
-            scope = Scope.Contents;
-
-            return this;
-        }
-
-        public ConvertDocumentIds ForAssets()
-        {
-            scope = Scope.Assets;
-
-            return this;
-        }
-
-        public async Task UpdateAsync(
-            CancellationToken ct)
-        {
-            switch (scope)
+            try
             {
-                case Scope.Assets:
-                    await RebuildAsync(database, ConvertParentId, "States_Assets", ct);
-                    await RebuildAsync(database, ConvertParentId, "States_AssetFolders", ct);
-                    break;
-                case Scope.Contents:
-                    await RebuildAsync(databaseContent, null, "State_Contents_All", ct);
-                    await RebuildAsync(databaseContent, null, "State_Contents_Published", ct);
-                    break;
-            }
-        }
+                var writes = new List<WriteModel<BsonDocument>>();
 
-        private static async Task RebuildAsync(IMongoDatabase database, Action<BsonDocument>? extraAction, string collectionNameV1,
-            CancellationToken ct)
-        {
-            const int SizeOfBatch = 1000;
-            const int SizeOfQueue = 10;
-
-            string collectionNameV2;
-
-            collectionNameV2 = $"{collectionNameV1}2";
-            collectionNameV2 = collectionNameV2.Replace("State_", "States_", StringComparison.Ordinal);
-
-            // Do not resolve in constructor, because most of the time it is not executed anyway.
-            var collectionV1 = database.GetCollection<BsonDocument>(collectionNameV1);
-            var collectionV2 = database.GetCollection<BsonDocument>(collectionNameV2);
-
-            if (!await collectionV1.AnyAsync(ct: ct))
-            {
-                return;
-            }
-
-            await collectionV2.DeleteManyAsync(FindAll, ct);
-
-            var batchBlock = new BatchBlock<BsonDocument>(SizeOfBatch, new GroupingDataflowBlockOptions
-            {
-                BoundedCapacity = SizeOfQueue * SizeOfBatch
-            });
-
-            var writeOptions = new BulkWriteOptions
-            {
-                IsOrdered = false
-            };
-
-            var actionBlock = new ActionBlock<BsonDocument[]>(async batch =>
-            {
-                try
+                foreach (var document in batch)
                 {
-                    var writes = new List<WriteModel<BsonDocument>>();
+                    var appId = document["_ai"].AsString;
 
-                    foreach (var document in batch)
+                    var documentIdOld = document["_id"].AsString;
+
+                    if (documentIdOld.Contains("--", StringComparison.OrdinalIgnoreCase))
                     {
-                        var appId = document["_ai"].AsString;
+                        var index = documentIdOld.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
 
-                        var documentIdOld = document["_id"].AsString;
-
-                        if (documentIdOld.Contains("--", StringComparison.OrdinalIgnoreCase))
-                        {
-                            var index = documentIdOld.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
-
-                            documentIdOld = documentIdOld[(index + 2)..];
-                        }
-
-                        var documentIdNew = DomainId.Combine(DomainId.Create(appId), DomainId.Create(documentIdOld)).ToString();
-
-                        document["id"] = documentIdOld;
-                        document["_id"] = documentIdNew;
-
-                        extraAction?.Invoke(document);
-
-                        var filter = Filter.Eq("_id", documentIdNew);
-
-                        writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
-                        {
-                            IsUpsert = true
-                        });
+                        documentIdOld = documentIdOld[(index + 2)..];
                     }
 
-                    if (writes.Count > 0)
+                    var documentIdNew = DomainId.Combine(DomainId.Create(appId), DomainId.Create(documentIdOld)).ToString();
+
+                    document["id"] = documentIdOld;
+                    document["_id"] = documentIdNew;
+
+                    extraAction?.Invoke(document);
+
+                    var filter = Filter.Eq("_id", documentIdNew);
+
+                    writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
                     {
-                        await collectionV2.BulkWriteAsync(writes, writeOptions, ct);
-                    }
+                        IsUpsert = true
+                    });
                 }
-                catch (OperationCanceledException ex)
-                {
-                    // Dataflow swallows operation cancelled exception.
-                    throw new AggregateException(ex);
-                }
-            }, new ExecutionDataflowBlockOptions
-            {
-                MaxDegreeOfParallelism = Environment.ProcessorCount * 2,
-                MaxMessagesPerTask = 1,
-                BoundedCapacity = SizeOfQueue
-            });
 
-            batchBlock.BidirectionalLinkTo(actionBlock);
-
-            await foreach (var document in collectionV1.Find(FindAll).ToAsyncEnumerable(ct: ct))
-            {
-                if (!await batchBlock.SendAsync(document, ct))
+                if (writes.Count > 0)
                 {
-                    break;
+                    await collectionV2.BulkWriteAsync(writes, writeOptions, ct);
                 }
             }
+            catch (OperationCanceledException ex)
+            {
+                // Dataflow swallows operation cancelled exception.
+                throw new AggregateException(ex);
+            }
+        }, new ExecutionDataflowBlockOptions
+        {
+            MaxDegreeOfParallelism = Environment.ProcessorCount * 2,
+            MaxMessagesPerTask = 1,
+            BoundedCapacity = SizeOfQueue
+        });
 
-            batchBlock.Complete();
+        batchBlock.BidirectionalLinkTo(actionBlock);
 
-            await actionBlock.Completion;
+        await foreach (var document in collectionV1.Find(FindAll).ToAsyncEnumerable(ct: ct))
+        {
+            if (!await batchBlock.SendAsync(document, ct))
+            {
+                break;
+            }
         }
 
-        private static void ConvertParentId(BsonDocument document)
+        batchBlock.Complete();
+
+        await actionBlock.Completion;
+    }
+
+    private static void ConvertParentId(BsonDocument document)
+    {
+        if (document.Contains("pi"))
         {
-            if (document.Contains("pi"))
-            {
-                document["pi"] = document["pi"].AsGuid.ToString();
-            }
+            document["pi"] = document["pi"].AsGuid.ToString();
         }
     }
 }

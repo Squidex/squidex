@@ -11,72 +11,71 @@ using EventStore.Client;
 using Squidex.Infrastructure.Json;
 using EventStoreData = EventStore.Client.EventData;
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+public static class Formatter
 {
-    public static class Formatter
+    private static readonly HashSet<string> PrivateHeaders = new HashSet<string> { "$v", "$p", "$c", "$causedBy" };
+
+    public static StoredEvent Read(ResolvedEvent resolvedEvent, string? prefix, IJsonSerializer serializer)
     {
-        private static readonly HashSet<string> PrivateHeaders = new HashSet<string> { "$v", "$p", "$c", "$causedBy" };
+        var @event = resolvedEvent.Event;
 
-        public static StoredEvent Read(ResolvedEvent resolvedEvent, string? prefix, IJsonSerializer serializer)
+        var eventPayload = Encoding.UTF8.GetString(@event.Data.Span);
+        var eventHeaders = GetHeaders(serializer, @event);
+
+        var eventData = new EventData(@event.EventType, eventHeaders, eventPayload);
+
+        var streamName = GetStreamName(prefix, @event);
+
+        return new StoredEvent(
+            streamName,
+            resolvedEvent.OriginalEventNumber.ToInt64().ToString(CultureInfo.InvariantCulture),
+            resolvedEvent.Event.EventNumber.ToInt64(),
+            eventData);
+    }
+
+    private static string GetStreamName(string? prefix, EventRecord @event)
+    {
+        var streamName = @event.EventStreamId;
+
+        if (prefix != null && streamName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
         {
-            var @event = resolvedEvent.Event;
-
-            var eventPayload = Encoding.UTF8.GetString(@event.Data.Span);
-            var eventHeaders = GetHeaders(serializer, @event);
-
-            var eventData = new EventData(@event.EventType, eventHeaders, eventPayload);
-
-            var streamName = GetStreamName(prefix, @event);
-
-            return new StoredEvent(
-                streamName,
-                resolvedEvent.OriginalEventNumber.ToInt64().ToString(CultureInfo.InvariantCulture),
-                resolvedEvent.Event.EventNumber.ToInt64(),
-                eventData);
+            streamName = streamName[(prefix.Length + 1)..];
         }
 
-        private static string GetStreamName(string? prefix, EventRecord @event)
-        {
-            var streamName = @event.EventStreamId;
+        return streamName;
+    }
 
-            if (prefix != null && streamName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+    private static EnvelopeHeaders GetHeaders(IJsonSerializer serializer, EventRecord @event)
+    {
+        var headers = Deserialize<EnvelopeHeaders>(serializer, @event.Metadata);
+
+        foreach (var key in headers.Keys.ToList())
+        {
+            if (PrivateHeaders.Contains(key))
             {
-                streamName = streamName[(prefix.Length + 1)..];
+                headers.Remove(key);
             }
-
-            return streamName;
         }
 
-        private static EnvelopeHeaders GetHeaders(IJsonSerializer serializer, EventRecord @event)
-        {
-            var headers = Deserialize<EnvelopeHeaders>(serializer, @event.Metadata);
+        return headers;
+    }
 
-            foreach (var key in headers.Keys.ToList())
-            {
-                if (PrivateHeaders.Contains(key))
-                {
-                    headers.Remove(key);
-                }
-            }
+    private static T Deserialize<T>(IJsonSerializer serializer, ReadOnlyMemory<byte> source)
+    {
+        var json = Encoding.UTF8.GetString(source.Span);
 
-            return headers;
-        }
+        return serializer.Deserialize<T>(json);
+    }
 
-        private static T Deserialize<T>(IJsonSerializer serializer, ReadOnlyMemory<byte> source)
-        {
-            var json = Encoding.UTF8.GetString(source.Span);
+    public static EventStoreData Write(EventData eventData, IJsonSerializer serializer)
+    {
+        var payload = Encoding.UTF8.GetBytes(eventData.Payload);
 
-            return serializer.Deserialize<T>(json);
-        }
+        var headersJson = serializer.Serialize(eventData.Headers);
+        var headersBytes = Encoding.UTF8.GetBytes(headersJson);
 
-        public static EventStoreData Write(EventData eventData, IJsonSerializer serializer)
-        {
-            var payload = Encoding.UTF8.GetBytes(eventData.Payload);
-
-            var headersJson = serializer.Serialize(eventData.Headers);
-            var headersBytes = Encoding.UTF8.GetBytes(headersJson);
-
-            return new EventStoreData(Uuid.FromGuid(Guid.NewGuid()), eventData.Type, payload, headersBytes);
-        }
+        return new EventStoreData(Uuid.FromGuid(Guid.NewGuid()), eventData.Type, payload, headersBytes);
     }
 }

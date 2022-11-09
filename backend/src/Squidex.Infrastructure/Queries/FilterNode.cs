@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Queries
+namespace Squidex.Infrastructure.Queries;
+
+public abstract record FilterNode<TValue>
 {
-    public abstract record FilterNode<TValue>
-    {
-        public abstract T Accept<T, TArgs>(FilterNodeVisitor<T, TValue, TArgs> visitor, TArgs args);
+    public abstract T Accept<T, TArgs>(FilterNodeVisitor<T, TValue, TArgs> visitor, TArgs args);
 
-        public abstract void AddFields(HashSet<string> fields);
+    public abstract void AddFields(HashSet<string> fields);
 
-        public abstract override string ToString();
-    }
+    public abstract override string ToString();
 }

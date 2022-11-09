@@ -5,17 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Translator.State
-{
-    public sealed class TranslatedTexts : SortedDictionary<string, string>
-    {
-        public TranslatedTexts()
-        {
-        }
+namespace Squidex.Translator.State;
 
-        public TranslatedTexts(TranslatedTexts source)
-            : base(source)
-        {
-        }
+public sealed class TranslatedTexts : SortedDictionary<string, string>
+{
+    public TranslatedTexts()
+    {
+    }
+
+    public TranslatedTexts(TranslatedTexts source)
+        : base(source)
+    {
     }
 }

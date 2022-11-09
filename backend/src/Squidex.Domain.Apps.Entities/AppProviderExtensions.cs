@@ -10,88 +10,87 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities;
+
+public static class AppProviderExtensions
 {
-    public static class AppProviderExtensions
+    public static async Task<ResolvedComponents> GetComponentsAsync(this IAppProvider appProvider, ISchemaEntity schema,
+        CancellationToken ct = default)
     {
-        public static async Task<ResolvedComponents> GetComponentsAsync(this IAppProvider appProvider, ISchemaEntity schema,
-            CancellationToken ct = default)
+        Dictionary<DomainId, Schema>? result = null;
+
+        var appId = schema.AppId.Id;
+
+        async Task ResolveWithIdsAsync(IField field, ReadonlyList<DomainId>? schemaIds)
         {
-            Dictionary<DomainId, Schema>? result = null;
-
-            var appId = schema.AppId.Id;
-
-            async Task ResolveWithIdsAsync(IField field, ReadonlyList<DomainId>? schemaIds)
+            if (schemaIds == null)
             {
-                if (schemaIds == null)
-                {
-                    return;
-                }
+                return;
+            }
 
-                foreach (var schemaId in schemaIds)
+            foreach (var schemaId in schemaIds)
+            {
+                if (schemaId == schema.Id)
                 {
-                    if (schemaId == schema.Id)
+                    result ??= new Dictionary<DomainId, Schema>();
+                    result[schemaId] = schema.SchemaDef;
+                }
+                else if (result == null || !result.TryGetValue(schemaId, out _))
+                {
+                    var resolvedEntity = await appProvider.GetSchemaAsync(appId, schemaId, false, ct);
+
+                    if (resolvedEntity != null)
                     {
                         result ??= new Dictionary<DomainId, Schema>();
-                        result[schemaId] = schema.SchemaDef;
-                    }
-                    else if (result == null || !result.TryGetValue(schemaId, out _))
-                    {
-                        var resolvedEntity = await appProvider.GetSchemaAsync(appId, schemaId, false, ct);
+                        result[schemaId] = resolvedEntity.SchemaDef;
 
-                        if (resolvedEntity != null)
-                        {
-                            result ??= new Dictionary<DomainId, Schema>();
-                            result[schemaId] = resolvedEntity.SchemaDef;
-
-                            await ResolveSchemaAsync(resolvedEntity);
-                        }
+                        await ResolveSchemaAsync(resolvedEntity);
                     }
                 }
             }
-
-            async Task ResolveArrayAsync(IArrayField arrayField)
-            {
-                foreach (var nestedField in arrayField.Fields)
-                {
-                    await ResolveFieldAsync(nestedField);
-                }
-            }
-
-            async Task ResolveFieldAsync(IField field)
-            {
-                switch (field)
-                {
-                    case IField<ComponentFieldProperties> component:
-                        await ResolveWithIdsAsync(field, component.Properties.SchemaIds);
-                        break;
-
-                    case IField<ComponentsFieldProperties> components:
-                        await ResolveWithIdsAsync(field, components.Properties.SchemaIds);
-                        break;
-
-                    case IArrayField arrayField:
-                        await ResolveArrayAsync(arrayField);
-                        break;
-                }
-            }
-
-            async Task ResolveSchemaAsync(ISchemaEntity schema)
-            {
-                foreach (var field in schema.SchemaDef.Fields)
-                {
-                    await ResolveFieldAsync(field);
-                }
-            }
-
-            await ResolveSchemaAsync(schema);
-
-            if (result == null)
-            {
-                return ResolvedComponents.Empty;
-            }
-
-            return new ResolvedComponents(result);
         }
+
+        async Task ResolveArrayAsync(IArrayField arrayField)
+        {
+            foreach (var nestedField in arrayField.Fields)
+            {
+                await ResolveFieldAsync(nestedField);
+            }
+        }
+
+        async Task ResolveFieldAsync(IField field)
+        {
+            switch (field)
+            {
+                case IField<ComponentFieldProperties> component:
+                    await ResolveWithIdsAsync(field, component.Properties.SchemaIds);
+                    break;
+
+                case IField<ComponentsFieldProperties> components:
+                    await ResolveWithIdsAsync(field, components.Properties.SchemaIds);
+                    break;
+
+                case IArrayField arrayField:
+                    await ResolveArrayAsync(arrayField);
+                    break;
+            }
+        }
+
+        async Task ResolveSchemaAsync(ISchemaEntity schema)
+        {
+            foreach (var field in schema.SchemaDef.Fields)
+            {
+                await ResolveFieldAsync(field);
+            }
+        }
+
+        await ResolveSchemaAsync(schema);
+
+        if (result == null)
+        {
+            return ResolvedComponents.Empty;
+        }
+
+        return new ResolvedComponents(result);
     }
 }

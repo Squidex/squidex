@@ -7,14 +7,13 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Teams.Indexes
-{
-    public interface ITeamsIndex
-    {
-        Task<ITeamEntity?> GetTeamAsync(DomainId id,
-            CancellationToken ct = default);
+namespace Squidex.Domain.Apps.Entities.Teams.Indexes;
 
-        Task<List<ITeamEntity>> GetTeamsAsync(string userId,
-            CancellationToken ct = default);
-    }
+public interface ITeamsIndex
+{
+    Task<ITeamEntity?> GetTeamAsync(DomainId id,
+        CancellationToken ct = default);
+
+    Task<List<ITeamEntity>> GetTeamsAsync(string userId,
+        CancellationToken ct = default);
 }

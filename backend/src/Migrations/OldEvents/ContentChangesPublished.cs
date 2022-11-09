@@ -12,19 +12,18 @@ using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 using ContentStatusChangedV2 = Squidex.Domain.Apps.Events.Contents.ContentStatusChanged;
 
-namespace Migrations.OldEvents
+namespace Migrations.OldEvents;
+
+[EventType(nameof(ContentChangesPublished))]
+[Obsolete("New Event introduced")]
+public sealed class ContentChangesPublished : ContentEvent, IMigrated<IEvent>
 {
-    [EventType(nameof(ContentChangesPublished))]
-    [Obsolete("New Event introduced")]
-    public sealed class ContentChangesPublished : ContentEvent, IMigrated<IEvent>
+    public IEvent Migrate()
     {
-        public IEvent Migrate()
+        return SimpleMapper.Map(this, new ContentStatusChangedV2
         {
-            return SimpleMapper.Map(this, new ContentStatusChangedV2
-            {
-                Status = Status.Published,
-                Change = StatusChange.Published
-            });
-        }
+            Status = Status.Published,
+            Change = StatusChange.Published
+        });
     }
 }

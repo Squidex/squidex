@@ -7,14 +7,13 @@
 
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.IdentityServer.Controllers.Profile
-{
-    public class RemoveLoginModel
-    {
-        [LocalizedRequired]
-        public string LoginProvider { get; set; }
+namespace Squidex.Areas.IdentityServer.Controllers.Profile;
 
-        [LocalizedRequired]
-        public string ProviderKey { get; set; }
-    }
+public class RemoveLoginModel
+{
+    [LocalizedRequired]
+    public string LoginProvider { get; set; }
+
+    [LocalizedRequired]
+    public string ProviderKey { get; set; }
 }

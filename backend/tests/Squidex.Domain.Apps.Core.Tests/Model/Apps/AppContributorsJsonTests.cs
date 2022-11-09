@@ -9,22 +9,21 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Core.Model.Apps
+namespace Squidex.Domain.Apps.Core.Model.Apps;
+
+public class AppContributorsJsonTests
 {
-    public class AppContributorsJsonTests
+    [Fact]
+    public void Should_serialize_and_deserialize()
     {
-        [Fact]
-        public void Should_serialize_and_deserialize()
-        {
-            var contributors = Contributors.Empty;
+        var contributors = Contributors.Empty;
 
-            contributors = contributors.Assign("1", Role.Developer);
-            contributors = contributors.Assign("2", Role.Editor);
-            contributors = contributors.Assign("3", Role.Owner);
+        contributors = contributors.Assign("1", Role.Developer);
+        contributors = contributors.Assign("2", Role.Editor);
+        contributors = contributors.Assign("3", Role.Owner);
 
-            var serialized = contributors.SerializeAndDeserialize();
+        var serialized = contributors.SerializeAndDeserialize();
 
-            Assert.Equal(contributors, serialized);
-        }
+        Assert.Equal(contributors, serialized);
     }
 }

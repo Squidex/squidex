@@ -9,10 +9,9 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Contents
+namespace Squidex.Domain.Apps.Core.Contents;
+
+public sealed record StatusInfo(Status Status, string Color)
 {
-    public sealed record StatusInfo(Status Status, string Color)
-    {
-        public string Color { get; } = Guard.NotNullOrEmpty(Color);
-    }
+    public string Color { get; } = Guard.NotNullOrEmpty(Color);
 }

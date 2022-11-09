@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.States
-{
-    public interface IStore<T> : IPersistenceFactory<T>
-    {
-        IBatchContext<T> WithBatchContext(Type owner);
+namespace Squidex.Infrastructure.States;
 
-        Task ClearSnapshotsAsync();
-    }
+public interface IStore<T> : IPersistenceFactory<T>
+{
+    IBatchContext<T> WithBatchContext(Type owner);
+
+    Task ClearSnapshotsAsync();
 }

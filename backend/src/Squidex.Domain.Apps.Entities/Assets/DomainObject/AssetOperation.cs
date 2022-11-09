@@ -9,35 +9,34 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
+namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
+
+public sealed class AssetOperation : OperationContextBase<AssetCommand, IAssetEntity>
 {
-    public sealed class AssetOperation : OperationContextBase<AssetCommand, IAssetEntity>
+    public AssetOperation(IServiceProvider serviceProvider, Func<IAssetEntity> snapshot)
+        : base(serviceProvider, snapshot)
     {
-        public AssetOperation(IServiceProvider serviceProvider, Func<IAssetEntity> snapshot)
-            : base(serviceProvider, snapshot)
+        Guard.NotNull(serviceProvider);
+    }
+
+    public static async Task<AssetOperation> CreateAsync(IServiceProvider services, AssetCommand command, Func<IAssetEntity> snapshot)
+    {
+        var appProvider = services.GetRequiredService<IAppProvider>();
+
+        var app = await appProvider.GetAppAsync(command.AppId.Id);
+
+        if (app == null)
         {
-            Guard.NotNull(serviceProvider);
+            throw new DomainObjectNotFoundException(command.AppId.Id.ToString());
         }
 
-        public static async Task<AssetOperation> CreateAsync(IServiceProvider services, AssetCommand command, Func<IAssetEntity> snapshot)
+        var id = command.AssetId;
+
+        return new AssetOperation(services, snapshot)
         {
-            var appProvider = services.GetRequiredService<IAppProvider>();
-
-            var app = await appProvider.GetAppAsync(command.AppId.Id);
-
-            if (app == null)
-            {
-                throw new DomainObjectNotFoundException(command.AppId.Id.ToString());
-            }
-
-            var id = command.AssetId;
-
-            return new AssetOperation(services, snapshot)
-            {
-                App = app,
-                Command = command,
-                CommandId = id
-            };
-        }
+            App = app,
+            Command = command,
+            CommandId = id
+        };
     }
 }

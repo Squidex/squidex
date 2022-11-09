@@ -9,50 +9,49 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Domain.Apps.Core.ConvertContent
-{
-    public sealed class ResolveInvariant : IContentFieldAfterConverter
-    {
-        private readonly LanguagesConfig languages;
+namespace Squidex.Domain.Apps.Core.ConvertContent;
 
-        public ResolveInvariant(LanguagesConfig languages)
+public sealed class ResolveInvariant : IContentFieldAfterConverter
+{
+    private readonly LanguagesConfig languages;
+
+    public ResolveInvariant(LanguagesConfig languages)
+    {
+        this.languages = languages;
+    }
+
+    public ContentFieldData? ConvertFieldAfter(IRootField field, ContentFieldData source)
+    {
+        if (!field.Partitioning.Equals(Partitioning.Invariant))
         {
-            this.languages = languages;
+            return source;
         }
 
-        public ContentFieldData? ConvertFieldAfter(IRootField field, ContentFieldData source)
+        if (source.TryGetNonNull(InvariantPartitioning.Key, out _))
         {
-            if (!field.Partitioning.Equals(Partitioning.Invariant))
-            {
-                return source;
-            }
+            return source;
+        }
 
-            if (source.TryGetNonNull(InvariantPartitioning.Key, out _))
-            {
-                return source;
-            }
-
-            if (source.TryGetNonNull(languages.Master, out var value))
-            {
-                source.Clear();
-                source[InvariantPartitioning.Key] = value;
-
-                return source;
-            }
-
-            if (source.Count > 0)
-            {
-                var first = source.First().Value;
-
-                source.Clear();
-                source[InvariantPartitioning.Key] = first;
-
-                return source;
-            }
-
+        if (source.TryGetNonNull(languages.Master, out var value))
+        {
             source.Clear();
+            source[InvariantPartitioning.Key] = value;
 
             return source;
         }
+
+        if (source.Count > 0)
+        {
+            var first = source.First().Value;
+
+            source.Clear();
+            source[InvariantPartitioning.Key] = first;
+
+            return source;
+        }
+
+        source.Clear();
+
+        return source;
     }
 }

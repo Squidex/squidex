@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Areas.Api.Controllers.Assets.Models
+namespace Squidex.Areas.Api.Controllers.Assets.Models;
+
+public enum AssetFolderScope
 {
-    public enum AssetFolderScope
-    {
-        PathAndItems,
-        Path,
-        Items
-    }
+    PathAndItems,
+    Path,
+    Items
 }

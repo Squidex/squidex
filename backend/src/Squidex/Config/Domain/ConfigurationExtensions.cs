@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Config.Domain
+namespace Squidex.Config.Domain;
+
+public static class ConfigurationExtensions
 {
-    public static class ConfigurationExtensions
+    public static void ConfigureForSquidex(this IConfigurationBuilder builder)
     {
-        public static void ConfigureForSquidex(this IConfigurationBuilder builder)
-        {
-            builder.AddJsonFile("appsettings.Custom.json", true);
-        }
+        builder.AddJsonFile("appsettings.Custom.json", true);
     }
 }

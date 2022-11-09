@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities;
+
+public interface IEntityWithTags
 {
-    public interface IEntityWithTags
-    {
-        HashSet<string> Tags { get; }
-    }
+    HashSet<string> Tags { get; }
 }

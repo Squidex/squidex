@@ -5,24 +5,23 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Search
+namespace Squidex.Domain.Apps.Entities.Search;
+
+public sealed class SearchResults : List<SearchResult>
 {
-    public sealed class SearchResults : List<SearchResult>
+    public SearchResults()
     {
-        public SearchResults()
-        {
-        }
+    }
 
-        public SearchResults(IEnumerable<SearchResult> source)
-            : base(source)
-        {
-        }
+    public SearchResults(IEnumerable<SearchResult> source)
+        : base(source)
+    {
+    }
 
-        public SearchResults Add(string name, SearchResultType type, string url, string? label = null)
-        {
-            Add(new SearchResult { Name = name, Type = type, Label = label, Url = url });
+    public SearchResults Add(string name, SearchResultType type, string url, string? label = null)
+    {
+        Add(new SearchResult { Name = name, Type = type, Label = label, Url = url });
 
-            return this;
-        }
+        return this;
     }
 }

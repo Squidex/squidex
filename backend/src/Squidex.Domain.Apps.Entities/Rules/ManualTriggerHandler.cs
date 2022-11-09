@@ -14,33 +14,32 @@ using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Entities.Rules
+namespace Squidex.Domain.Apps.Entities.Rules;
+
+public sealed class ManualTriggerHandler : IRuleTriggerHandler
 {
-    public sealed class ManualTriggerHandler : IRuleTriggerHandler
+    public Type TriggerType => typeof(ManualTrigger);
+
+    public bool Handles(AppEvent appEvent)
     {
-        public Type TriggerType => typeof(ManualTrigger);
+        return appEvent is RuleManuallyTriggered;
+    }
 
-        public bool Handles(AppEvent appEvent)
-        {
-            return appEvent is RuleManuallyTriggered;
-        }
+    public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+        [EnumeratorCancellation] CancellationToken ct)
+    {
+        var result = new EnrichedManualEvent();
 
-        public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
-            [EnumeratorCancellation] CancellationToken ct)
-        {
-            var result = new EnrichedManualEvent();
+        // Use the concrete event to map properties that are not part of app event.
+        SimpleMapper.Map((RuleManuallyTriggered)@event.Payload, result);
 
-            // Use the concrete event to map properties that are not part of app event.
-            SimpleMapper.Map((RuleManuallyTriggered)@event.Payload, result);
+        await Task.Yield();
 
-            await Task.Yield();
+        yield return result;
+    }
 
-            yield return result;
-        }
-
-        public string? GetName(AppEvent @event)
-        {
-            return "Manual";
-        }
+    public string? GetName(AppEvent @event)
+    {
+        return "Manual";
     }
 }

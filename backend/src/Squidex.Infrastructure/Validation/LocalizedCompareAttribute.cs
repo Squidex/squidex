@@ -9,22 +9,21 @@ using System.ComponentModel.DataAnnotations;
 using Squidex.Infrastructure.Translations;
 using Squidex.Text;
 
-namespace Squidex.Infrastructure.Validation
+namespace Squidex.Infrastructure.Validation;
+
+public sealed class LocalizedCompareAttribute : CompareAttribute
 {
-    public sealed class LocalizedCompareAttribute : CompareAttribute
+    public LocalizedCompareAttribute(string otherProperty)
+        : base(otherProperty)
     {
-        public LocalizedCompareAttribute(string otherProperty)
-            : base(otherProperty)
-        {
-        }
+    }
 
-        public override string FormatErrorMessage(string name)
-        {
-            var property = T.Get($"common.{name.ToCamelCase()}", name);
+    public override string FormatErrorMessage(string name)
+    {
+        var property = T.Get($"common.{name.ToCamelCase()}", name);
 
-            var other = T.Get($"common.{OtherProperty.ToCamelCase()}", OtherProperty);
+        var other = T.Get($"common.{OtherProperty.ToCamelCase()}", OtherProperty);
 
-            return T.Get("annotations_Compare", base.FormatErrorMessage(name), new { name = property, other });
-        }
+        return T.Get("annotations_Compare", base.FormatErrorMessage(name), new { name = property, other });
     }
 }

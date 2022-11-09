@@ -9,86 +9,85 @@ using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Core.Contents
+namespace Squidex.Domain.Apps.Core.Contents;
+
+public sealed class ContentFieldData : Dictionary<string, JsonValue>, IEquatable<ContentFieldData>
 {
-    public sealed class ContentFieldData : Dictionary<string, JsonValue>, IEquatable<ContentFieldData>
+    public ContentFieldData()
+        : base(0, StringComparer.OrdinalIgnoreCase)
     {
-        public ContentFieldData()
-            : base(0, StringComparer.OrdinalIgnoreCase)
-        {
-        }
+    }
 
-        public ContentFieldData(int capacity)
-            : base(capacity, StringComparer.OrdinalIgnoreCase)
-        {
-        }
+    public ContentFieldData(int capacity)
+        : base(capacity, StringComparer.OrdinalIgnoreCase)
+    {
+    }
 
-        public ContentFieldData(ContentFieldData source)
-            : base(source.Count, StringComparer.OrdinalIgnoreCase)
-        {
-            foreach (var (key, value) in source)
-            {
-                this[key] = value;
-            }
-        }
-
-        public bool TryGetNonNull(string key, [MaybeNullWhen(false)] out JsonValue result)
-        {
-            result = JsonValue.Null;
-
-            if (TryGetValue(key, out var found) && found != default)
-            {
-                result = found;
-                return true;
-            }
-
-            return false;
-        }
-
-        public ContentFieldData AddInvariant(JsonValue value)
-        {
-            this[InvariantPartitioning.Key] = value;
-
-            return this;
-        }
-
-        public ContentFieldData AddLocalized(string key, JsonValue value)
+    public ContentFieldData(ContentFieldData source)
+        : base(source.Count, StringComparer.OrdinalIgnoreCase)
+    {
+        foreach (var (key, value) in source)
         {
             this[key] = value;
-
-            return this;
         }
+    }
 
-        public ContentFieldData Clone()
+    public bool TryGetNonNull(string key, [MaybeNullWhen(false)] out JsonValue result)
+    {
+        result = JsonValue.Null;
+
+        if (TryGetValue(key, out var found) && found != default)
         {
-            var clone = new ContentFieldData(Count);
-
-            foreach (var (key, value) in this)
-            {
-                clone[key] = value.Clone()!;
-            }
-
-            return clone;
+            result = found;
+            return true;
         }
 
-        public override bool Equals(object? obj)
+        return false;
+    }
+
+    public ContentFieldData AddInvariant(JsonValue value)
+    {
+        this[InvariantPartitioning.Key] = value;
+
+        return this;
+    }
+
+    public ContentFieldData AddLocalized(string key, JsonValue value)
+    {
+        this[key] = value;
+
+        return this;
+    }
+
+    public ContentFieldData Clone()
+    {
+        var clone = new ContentFieldData(Count);
+
+        foreach (var (key, value) in this)
         {
-            return Equals(obj as ContentFieldData);
+            clone[key] = value.Clone()!;
         }
 
-        public bool Equals(ContentFieldData? other)
-        {
-            return other != null && (ReferenceEquals(this, other) || this.EqualsDictionary(other));
-        }
+        return clone;
+    }
 
-        public override int GetHashCode()
-        {
-            return this.DictionaryHashCode();
-        }
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as ContentFieldData);
+    }
 
-        public override string ToString()
-        {
-            return $"{{{string.Join(", ", this.Select(x => $"\"{x.Key}\":{x.Value}"))}}}";
-        }
+    public bool Equals(ContentFieldData? other)
+    {
+        return other != null && (ReferenceEquals(this, other) || this.EqualsDictionary(other));
+    }
+
+    public override int GetHashCode()
+    {
+        return this.DictionaryHashCode();
+    }
+
+    public override string ToString()
+    {
+        return $"{{{string.Join(", ", this.Select(x => $"\"{x.Key}\":{x.Value}"))}}}";
     }
 }

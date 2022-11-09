@@ -7,14 +7,13 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands;
+
+public sealed class AddField : ParentFieldCommand
 {
-    public sealed class AddField : ParentFieldCommand
-    {
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public string Partitioning { get; set; }
+    public string Partitioning { get; set; }
 
-        public FieldProperties Properties { get; set; }
-    }
+    public FieldProperties Properties { get; set; }
 }

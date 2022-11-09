@@ -7,14 +7,13 @@
 
 using NodaTime;
 
-namespace Squidex.Domain.Apps.Entities.Rules
+namespace Squidex.Domain.Apps.Entities.Rules;
+
+public interface IEnrichedRuleEntity : IRuleEntity
 {
-    public interface IEnrichedRuleEntity : IRuleEntity
-    {
-        int NumSucceeded { get; }
+    int NumSucceeded { get; }
 
-        int NumFailed { get; }
+    int NumFailed { get; }
 
-        Instant? LastExecuted { get; set; }
-    }
+    Instant? LastExecuted { get; set; }
 }

@@ -9,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.Algolia
+namespace Squidex.Extensions.Actions.Algolia;
+
+public sealed class AlgoliaPlugin : IPlugin
 {
-    public sealed class AlgoliaPlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddRuleAction<AlgoliaAction, AlgoliaActionHandler>();
-        }
+        services.AddRuleAction<AlgoliaAction, AlgoliaActionHandler>();
     }
 }

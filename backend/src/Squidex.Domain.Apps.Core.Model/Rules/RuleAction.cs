@@ -8,35 +8,34 @@
 using System.ComponentModel.DataAnnotations;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Domain.Apps.Core.Rules
-{
-    public abstract record RuleAction
-    {
-        public IEnumerable<ValidationError> Validate()
-        {
-            var context = new ValidationContext(this);
-            var errors = new List<ValidationResult>();
+namespace Squidex.Domain.Apps.Core.Rules;
 
-            if (!Validator.TryValidateObject(this, context, errors, true))
+public abstract record RuleAction
+{
+    public IEnumerable<ValidationError> Validate()
+    {
+        var context = new ValidationContext(this);
+        var errors = new List<ValidationResult>();
+
+        if (!Validator.TryValidateObject(this, context, errors, true))
+        {
+            foreach (var error in errors)
             {
-                foreach (var error in errors)
+                if (!string.IsNullOrWhiteSpace(error.ErrorMessage))
                 {
-                    if (!string.IsNullOrWhiteSpace(error.ErrorMessage))
-                    {
-                        yield return new ValidationError(error.ErrorMessage, error.MemberNames.ToArray());
-                    }
+                    yield return new ValidationError(error.ErrorMessage, error.MemberNames.ToArray());
                 }
             }
-
-            foreach (var error in CustomValidate())
-            {
-                yield return error;
-            }
         }
 
-        protected virtual IEnumerable<ValidationError> CustomValidate()
+        foreach (var error in CustomValidate())
         {
-            yield break;
+            yield return error;
         }
+    }
+
+    protected virtual IEnumerable<ValidationError> CustomValidate()
+    {
+        yield break;
     }
 }

@@ -8,20 +8,19 @@
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
+namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
+
+public abstract class OperationBase : MongoBase<MongoContentEntity>
 {
-    public abstract class OperationBase : MongoBase<MongoContentEntity>
+    public IMongoCollection<MongoContentEntity> Collection { get; private set; }
+
+    public void Setup(IMongoCollection<MongoContentEntity> collection)
     {
-        public IMongoCollection<MongoContentEntity> Collection { get; private set; }
+        Collection = collection;
+    }
 
-        public void Setup(IMongoCollection<MongoContentEntity> collection)
-        {
-            Collection = collection;
-        }
-
-        public virtual IEnumerable<CreateIndexModel<MongoContentEntity>> CreateIndexes()
-        {
-            yield break;
-        }
+    public virtual IEnumerable<CreateIndexModel<MongoContentEntity>> CreateIndexes()
+    {
+        yield break;
     }
 }

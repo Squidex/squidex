@@ -10,38 +10,37 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Domain.Apps.Core.Scripting
+namespace Squidex.Domain.Apps.Core.Scripting;
+
+internal static class ScriptOperations
 {
-    internal static class ScriptOperations
+    private delegate void MessageDelegate(string? message);
+
+    private static readonly MessageDelegate Disallow = message =>
     {
-        private delegate void MessageDelegate(string? message);
+        message = !string.IsNullOrWhiteSpace(message) ? message : T.Get("common.jsNotAllowed");
 
-        private static readonly MessageDelegate Disallow = message =>
-        {
-            message = !string.IsNullOrWhiteSpace(message) ? message : T.Get("common.jsNotAllowed");
+        throw new DomainForbiddenException(message);
+    };
 
-            throw new DomainForbiddenException(message);
-        };
+    private static readonly MessageDelegate Reject = message =>
+    {
+        message = !string.IsNullOrWhiteSpace(message) ? message : T.Get("common.jsRejected");
 
-        private static readonly MessageDelegate Reject = message =>
-        {
-            message = !string.IsNullOrWhiteSpace(message) ? message : T.Get("common.jsRejected");
+        throw new ValidationException(message);
+    };
 
-            throw new ValidationException(message);
-        };
+    public static Engine AddDisallow(this Engine engine)
+    {
+        engine.SetValue("disallow", Disallow);
 
-        public static Engine AddDisallow(this Engine engine)
-        {
-            engine.SetValue("disallow", Disallow);
+        return engine;
+    }
 
-            return engine;
-        }
+    public static Engine AddReject(this Engine engine)
+    {
+        engine.SetValue("reject", Reject);
 
-        public static Engine AddReject(this Engine engine)
-        {
-            engine.SetValue("reject", Reject);
-
-            return engine;
-        }
+        return engine;
     }
 }

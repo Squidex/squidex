@@ -8,50 +8,49 @@
 using System.Security.Claims;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Scripting
+namespace Squidex.Domain.Apps.Core.Scripting;
+
+public sealed class AssetScriptVars : ScriptVars
 {
-    public sealed class AssetScriptVars : ScriptVars
+    [FieldDescription(nameof(FieldDescriptions.AppId))]
+    public DomainId AppId
     {
-        [FieldDescription(nameof(FieldDescriptions.AppId))]
-        public DomainId AppId
-        {
-            set => SetValue(value);
-        }
+        set => SetValue(value);
+    }
 
-        [FieldDescription(nameof(FieldDescriptions.EntityId))]
-        public DomainId AssetId
-        {
-            set => SetValue(value);
-        }
+    [FieldDescription(nameof(FieldDescriptions.EntityId))]
+    public DomainId AssetId
+    {
+        set => SetValue(value);
+    }
 
-        [FieldDescription(nameof(FieldDescriptions.AppName))]
-        public string AppName
-        {
-            set => SetValue(value);
-        }
+    [FieldDescription(nameof(FieldDescriptions.AppName))]
+    public string AppName
+    {
+        set => SetValue(value);
+    }
 
-        [FieldDescription(nameof(FieldDescriptions.Operation))]
-        public string Operation
-        {
-            set => SetValue(value);
-        }
+    [FieldDescription(nameof(FieldDescriptions.Operation))]
+    public string Operation
+    {
+        set => SetValue(value);
+    }
 
-        [FieldDescription(nameof(FieldDescriptions.Command))]
-        public AssetCommandScriptVars Command
-        {
-            set => SetValue(value);
-        }
+    [FieldDescription(nameof(FieldDescriptions.Command))]
+    public AssetCommandScriptVars Command
+    {
+        set => SetValue(value);
+    }
 
-        [FieldDescription(nameof(FieldDescriptions.Asset))]
-        public AssetEntityScriptVars Asset
-        {
-            set => SetValue(value);
-        }
+    [FieldDescription(nameof(FieldDescriptions.Asset))]
+    public AssetEntityScriptVars Asset
+    {
+        set => SetValue(value);
+    }
 
-        [FieldDescription(nameof(FieldDescriptions.User))]
-        public ClaimsPrincipal? User
-        {
-            set => SetValue(value);
-        }
+    [FieldDescription(nameof(FieldDescriptions.User))]
+    public ClaimsPrincipal? User
+    {
+        set => SetValue(value);
     }
 }

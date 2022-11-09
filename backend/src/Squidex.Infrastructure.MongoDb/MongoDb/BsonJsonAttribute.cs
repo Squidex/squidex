@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.MongoDb
+namespace Squidex.Infrastructure.MongoDb;
+
+[AttributeUsage(AttributeTargets.Property)]
+public sealed class BsonJsonAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Property)]
-    public sealed class BsonJsonAttribute : Attribute
-    {
-    }
 }

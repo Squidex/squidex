@@ -5,11 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Migrations
+namespace Squidex.Infrastructure.Migrations;
+
+public interface IMigration
 {
-    public interface IMigration
-    {
-        Task UpdateAsync(
-            CancellationToken ct);
-    }
+    Task UpdateAsync(
+        CancellationToken ct);
 }

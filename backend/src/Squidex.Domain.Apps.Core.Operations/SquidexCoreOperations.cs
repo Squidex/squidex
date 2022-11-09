@@ -7,10 +7,9 @@
 
 using System.Reflection;
 
-namespace Squidex.Domain.Apps.Core
+namespace Squidex.Domain.Apps.Core;
+
+public static class SquidexCoreOperations
 {
-    public static class SquidexCoreOperations
-    {
-        public static readonly Assembly Assembly = typeof(SquidexCoreOperations).Assembly;
-    }
+    public static readonly Assembly Assembly = typeof(SquidexCoreOperations).Assembly;
 }

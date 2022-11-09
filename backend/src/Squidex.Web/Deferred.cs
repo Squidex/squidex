@@ -7,34 +7,33 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public readonly struct Deferred
 {
-    public readonly struct Deferred
+    private readonly Lazy<Task<object>> value;
+
+    public Task<object> Value
     {
-        private readonly Lazy<Task<object>> value;
+        get => value.Value;
+    }
 
-        public Task<object> Value
-        {
-            get => value.Value;
-        }
+    private Deferred(Func<Task<object>> value)
+    {
+        this.value = new Lazy<Task<object>>(value);
+    }
 
-        private Deferred(Func<Task<object>> value)
-        {
-            this.value = new Lazy<Task<object>>(value);
-        }
+    public static Deferred Response(Func<object> factory)
+    {
+        Guard.NotNull(factory);
 
-        public static Deferred Response(Func<object> factory)
-        {
-            Guard.NotNull(factory);
+        return new Deferred(() => Task.FromResult(factory()));
+    }
 
-            return new Deferred(() => Task.FromResult(factory()));
-        }
+    public static Deferred AsyncResponse<T>(Func<Task<T>> factory)
+    {
+        Guard.NotNull(factory);
 
-        public static Deferred AsyncResponse<T>(Func<Task<T>> factory)
-        {
-            Guard.NotNull(factory);
-
-            return new Deferred(async () => (await factory())!);
-        }
+        return new Deferred(async () => (await factory())!);
     }
 }

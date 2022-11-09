@@ -5,16 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents.Commands
+namespace Squidex.Domain.Apps.Entities.Contents.Commands;
+
+public enum BulkUpdateContentType
 {
-    public enum BulkUpdateContentType
-    {
-        Upsert,
-        ChangeStatus,
-        Create,
-        Delete,
-        Patch,
-        Update,
-        Validate
-    }
+    Upsert,
+    ChangeStatus,
+    Create,
+    Delete,
+    Patch,
+    Update,
+    Validate
 }

@@ -7,17 +7,16 @@
 
 using Squidex.Domain.Apps.Entities.Comments;
 
-namespace Squidex.Config.Domain
-{
-    public static class CommentsServices
-    {
-        public static void AddSquidexComments(this IServiceCollection services)
-        {
-            services.AddSingletonAs<CommentsLoader>()
-                .As<ICommentsLoader>();
+namespace Squidex.Config.Domain;
 
-            services.AddSingletonAs<WatchingService>()
-                .As<IWatchingService>();
-        }
+public static class CommentsServices
+{
+    public static void AddSquidexComments(this IServiceCollection services)
+    {
+        services.AddSingletonAs<CommentsLoader>()
+            .As<ICommentsLoader>();
+
+        services.AddSingletonAs<WatchingService>()
+            .As<IWatchingService>();
     }
 }

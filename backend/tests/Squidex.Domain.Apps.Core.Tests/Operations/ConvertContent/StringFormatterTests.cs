@@ -10,376 +10,375 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
+namespace Squidex.Domain.Apps.Core.Operations.ConvertContent;
+
+public sealed class StringFormatterTests
 {
-    public sealed class StringFormatterTests
+    [Fact]
+    public void Should_format_null_value()
     {
-        [Fact]
-        public void Should_format_null_value()
-        {
-            var field = Fields.Array(1, "field", Partitioning.Invariant);
+        var field = Fields.Array(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, default);
+        var formatted = StringFormatter.Format(field, default);
 
-            Assert.Empty(formatted);
-        }
+        Assert.Empty(formatted);
+    }
 
-        [Fact]
-        public void Should_format_null_json_value()
-        {
-            var field = Fields.Array(1, "field", Partitioning.Invariant);
+    [Fact]
+    public void Should_format_null_json_value()
+    {
+        var field = Fields.Array(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, JsonValue.Null);
+        var formatted = StringFormatter.Format(field, JsonValue.Null);
 
-            Assert.Empty(formatted);
-        }
+        Assert.Empty(formatted);
+    }
 
-        [Fact]
-        public void Should_format_array_field_without_items()
-        {
-            var value = new JsonArray();
+    [Fact]
+    public void Should_format_array_field_without_items()
+    {
+        var value = new JsonArray();
 
-            var field = Fields.Array(1, "field", Partitioning.Invariant);
+        var field = Fields.Array(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("0 Items", formatted);
-        }
+        Assert.Equal("0 Items", formatted);
+    }
 
-        [Fact]
-        public void Should_format_array_field_with_single_item()
-        {
-            var value = JsonValue.Array(new JsonObject());
+    [Fact]
+    public void Should_format_array_field_with_single_item()
+    {
+        var value = JsonValue.Array(new JsonObject());
 
-            var field = Fields.Array(1, "field", Partitioning.Invariant);
+        var field = Fields.Array(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("1 Item", formatted);
-        }
+        Assert.Equal("1 Item", formatted);
+    }
 
-        [Fact]
-        public void Should_format_array_field_with_multiple_items()
-        {
-            var value = JsonValue.Array(new JsonObject(), new JsonObject());
+    [Fact]
+    public void Should_format_array_field_with_multiple_items()
+    {
+        var value = JsonValue.Array(new JsonObject(), new JsonObject());
 
-            var field = Fields.Array(1, "field", Partitioning.Invariant);
+        var field = Fields.Array(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("2 Items", formatted);
-        }
+        Assert.Equal("2 Items", formatted);
+    }
 
-        [Fact]
-        public void Should_format_array_field_with_wrong_type()
-        {
-            var value = JsonValue.True;
+    [Fact]
+    public void Should_format_array_field_with_wrong_type()
+    {
+        var value = JsonValue.True;
 
-            var field = Fields.Array(1, "field", Partitioning.Invariant);
+        var field = Fields.Array(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("0 Items", formatted);
-        }
+        Assert.Equal("0 Items", formatted);
+    }
 
-        [Fact]
-        public void Should_format_assets_field_without_items()
-        {
-            var value = new JsonArray();
+    [Fact]
+    public void Should_format_assets_field_without_items()
+    {
+        var value = new JsonArray();
 
-            var field = Fields.Assets(1, "field", Partitioning.Invariant);
+        var field = Fields.Assets(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("0 Assets", formatted);
-        }
+        Assert.Equal("0 Assets", formatted);
+    }
 
-        [Fact]
-        public void Should_format_assets_field_with_single_item()
-        {
-            var value = JsonValue.Array(new JsonObject());
+    [Fact]
+    public void Should_format_assets_field_with_single_item()
+    {
+        var value = JsonValue.Array(new JsonObject());
 
-            var field = Fields.Assets(1, "field", Partitioning.Invariant);
+        var field = Fields.Assets(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("1 Asset", formatted);
-        }
+        Assert.Equal("1 Asset", formatted);
+    }
 
-        [Fact]
-        public void Should_format_assets_field_with_multiple_items()
-        {
-            var value = JsonValue.Array(new JsonObject(), new JsonObject());
+    [Fact]
+    public void Should_format_assets_field_with_multiple_items()
+    {
+        var value = JsonValue.Array(new JsonObject(), new JsonObject());
 
-            var field = Fields.Assets(1, "field", Partitioning.Invariant);
+        var field = Fields.Assets(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("2 Assets", formatted);
-        }
+        Assert.Equal("2 Assets", formatted);
+    }
 
-        [Fact]
-        public void Should_format_assets_field_with_wrong_type()
-        {
-            var value = JsonValue.True;
+    [Fact]
+    public void Should_format_assets_field_with_wrong_type()
+    {
+        var value = JsonValue.True;
 
-            var field = Fields.Assets(1, "field", Partitioning.Invariant);
+        var field = Fields.Assets(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("0 Assets", formatted);
-        }
+        Assert.Equal("0 Assets", formatted);
+    }
 
-        [Fact]
-        public void Should_format_boolean_field_with_true()
-        {
-            var value = JsonValue.True;
+    [Fact]
+    public void Should_format_boolean_field_with_true()
+    {
+        var value = JsonValue.True;
 
-            var field = Fields.Boolean(1, "field", Partitioning.Invariant);
+        var field = Fields.Boolean(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("Yes", formatted);
-        }
+        Assert.Equal("Yes", formatted);
+    }
 
-        [Fact]
-        public void Should_format_boolean_field_with_false()
-        {
-            var value = JsonValue.False;
+    [Fact]
+    public void Should_format_boolean_field_with_false()
+    {
+        var value = JsonValue.False;
 
-            var field = Fields.Boolean(1, "field", Partitioning.Invariant);
+        var field = Fields.Boolean(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("No", formatted);
-        }
+        Assert.Equal("No", formatted);
+    }
 
-        [Fact]
-        public void Should_format_boolean_field_with_wrong_type()
-        {
-            var value = JsonValue.Zero;
+    [Fact]
+    public void Should_format_boolean_field_with_wrong_type()
+    {
+        var value = JsonValue.Zero;
 
-            var field = Fields.Boolean(1, "field", Partitioning.Invariant);
+        var field = Fields.Boolean(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("No", formatted);
-        }
+        Assert.Equal("No", formatted);
+    }
 
-        [Fact]
-        public void Should_format_component_field()
-        {
-            var value = new JsonObject();
+    [Fact]
+    public void Should_format_component_field()
+    {
+        var value = new JsonObject();
 
-            var field = Fields.Component(1, "field", Partitioning.Invariant);
+        var field = Fields.Component(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("{ Component }", formatted);
-        }
+        Assert.Equal("{ Component }", formatted);
+    }
 
-        [Fact]
-        public void Should_format_components_field_without_items()
-        {
-            var value = new JsonArray();
+    [Fact]
+    public void Should_format_components_field_without_items()
+    {
+        var value = new JsonArray();
 
-            var field = Fields.Components(1, "field", Partitioning.Invariant);
+        var field = Fields.Components(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("0 Components", formatted);
-        }
+        Assert.Equal("0 Components", formatted);
+    }
 
-        [Fact]
-        public void Should_format_components_field_with_single_item()
-        {
-            var value = JsonValue.Array(new JsonObject());
+    [Fact]
+    public void Should_format_components_field_with_single_item()
+    {
+        var value = JsonValue.Array(new JsonObject());
 
-            var field = Fields.Components(1, "field", Partitioning.Invariant);
+        var field = Fields.Components(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("1 Component", formatted);
-        }
+        Assert.Equal("1 Component", formatted);
+    }
 
-        [Fact]
-        public void Should_format_components_field_with_multiple_items()
-        {
-            var value = JsonValue.Array(new JsonObject(), new JsonObject());
+    [Fact]
+    public void Should_format_components_field_with_multiple_items()
+    {
+        var value = JsonValue.Array(new JsonObject(), new JsonObject());
 
-            var field = Fields.Components(1, "field", Partitioning.Invariant);
+        var field = Fields.Components(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("2 Components", formatted);
-        }
+        Assert.Equal("2 Components", formatted);
+    }
 
-        [Fact]
-        public void Should_format_datetime_field()
-        {
-            var value = JsonValue.Create("2019-01-19T12:00:00Z");
+    [Fact]
+    public void Should_format_datetime_field()
+    {
+        var value = JsonValue.Create("2019-01-19T12:00:00Z");
 
-            var field = Fields.DateTime(1, "field", Partitioning.Invariant);
+        var field = Fields.DateTime(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("2019-01-19T12:00:00Z", formatted);
-        }
+        Assert.Equal("2019-01-19T12:00:00Z", formatted);
+    }
 
-        [Fact]
-        public void Should_format_geolocation_field_with_correct_data()
-        {
-            var value = new JsonObject().Add("latitude", 18.9).Add("longitude", 10.9);
+    [Fact]
+    public void Should_format_geolocation_field_with_correct_data()
+    {
+        var value = new JsonObject().Add("latitude", 18.9).Add("longitude", 10.9);
 
-            var field = Fields.Geolocation(1, "field", Partitioning.Invariant);
+        var field = Fields.Geolocation(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("18.9, 10.9", formatted);
-        }
+        Assert.Equal("18.9, 10.9", formatted);
+    }
 
-        [Fact]
-        public void Should_format_geolocation_field_with_missing_property()
-        {
-            var value = new JsonObject().Add("latitude", 18.9);
+    [Fact]
+    public void Should_format_geolocation_field_with_missing_property()
+    {
+        var value = new JsonObject().Add("latitude", 18.9);
 
-            var field = Fields.Geolocation(1, "field", Partitioning.Invariant);
+        var field = Fields.Geolocation(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Empty(formatted);
-        }
+        Assert.Empty(formatted);
+    }
 
-        [Fact]
-        public void Should_format_geolocation_field_with_invalid_type()
-        {
-            var value = JsonValue.Zero;
+    [Fact]
+    public void Should_format_geolocation_field_with_invalid_type()
+    {
+        var value = JsonValue.Zero;
 
-            var field = Fields.Geolocation(1, "field", Partitioning.Invariant);
+        var field = Fields.Geolocation(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Empty(formatted);
-        }
+        Assert.Empty(formatted);
+    }
 
-        [Fact]
-        public void Should_format_json_field()
-        {
-            var value = new JsonObject();
+    [Fact]
+    public void Should_format_json_field()
+    {
+        var value = new JsonObject();
 
-            var field = Fields.Json(1, "field", Partitioning.Invariant);
+        var field = Fields.Json(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("<Json />", formatted);
-        }
+        Assert.Equal("<Json />", formatted);
+    }
 
-        [Fact]
-        public void Should_format_number_field()
-        {
-            var value = JsonValue.Create(123);
+    [Fact]
+    public void Should_format_number_field()
+    {
+        var value = JsonValue.Create(123);
 
-            var field = Fields.Number(1, "field", Partitioning.Invariant);
+        var field = Fields.Number(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("123", formatted);
-        }
+        Assert.Equal("123", formatted);
+    }
 
-        [Fact]
-        public void Should_format_references_field_without_items()
-        {
-            var value = new JsonArray();
+    [Fact]
+    public void Should_format_references_field_without_items()
+    {
+        var value = new JsonArray();
 
-            var field = Fields.References(1, "field", Partitioning.Invariant);
+        var field = Fields.References(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("0 References", formatted);
-        }
+        Assert.Equal("0 References", formatted);
+    }
 
-        [Fact]
-        public void Should_format_references_field_with_single_item()
-        {
-            var value = JsonValue.Array(new JsonObject());
+    [Fact]
+    public void Should_format_references_field_with_single_item()
+    {
+        var value = JsonValue.Array(new JsonObject());
 
-            var field = Fields.References(1, "field", Partitioning.Invariant);
+        var field = Fields.References(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("1 Reference", formatted);
-        }
+        Assert.Equal("1 Reference", formatted);
+    }
 
-        [Fact]
-        public void Should_format_references_field_with_multiple_items()
-        {
-            var value = JsonValue.Array(new JsonObject(), new JsonObject());
+    [Fact]
+    public void Should_format_references_field_with_multiple_items()
+    {
+        var value = JsonValue.Array(new JsonObject(), new JsonObject());
 
-            var field = Fields.References(1, "field", Partitioning.Invariant);
+        var field = Fields.References(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("2 References", formatted);
-        }
+        Assert.Equal("2 References", formatted);
+    }
 
-        [Fact]
-        public void Should_format_references_field_with_wrong_type()
-        {
-            var value = JsonValue.True;
+    [Fact]
+    public void Should_format_references_field_with_wrong_type()
+    {
+        var value = JsonValue.True;
 
-            var field = Fields.References(1, "field", Partitioning.Invariant);
+        var field = Fields.References(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("0 References", formatted);
-        }
+        Assert.Equal("0 References", formatted);
+    }
 
-        [Fact]
-        public void Should_format_string_field()
-        {
-            var value = JsonValue.Create("hello");
+    [Fact]
+    public void Should_format_string_field()
+    {
+        var value = JsonValue.Create("hello");
 
-            var field = Fields.String(1, "field", Partitioning.Invariant);
+        var field = Fields.String(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("hello", formatted);
-        }
+        Assert.Equal("hello", formatted);
+    }
 
-        [Fact]
-        public void Should_format_string_field_with_photo_editor()
-        {
-            var value = JsonValue.Create("hello");
+    [Fact]
+    public void Should_format_string_field_with_photo_editor()
+    {
+        var value = JsonValue.Create("hello");
 
-            var field = Fields.String(1, "field", Partitioning.Invariant, new StringFieldProperties { Editor = StringFieldEditor.StockPhoto });
+        var field = Fields.String(1, "field", Partitioning.Invariant, new StringFieldProperties { Editor = StringFieldEditor.StockPhoto });
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("[Photo]", formatted);
-        }
+        Assert.Equal("[Photo]", formatted);
+    }
 
-        [Fact]
-        public void Should_format_tags_field()
-        {
-            var value = JsonValue.Array("hello", "squidex", "and", "team");
+    [Fact]
+    public void Should_format_tags_field()
+    {
+        var value = JsonValue.Array("hello", "squidex", "and", "team");
 
-            var field = Fields.Tags(1, "field", Partitioning.Invariant);
+        var field = Fields.Tags(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Equal("hello, squidex, and, team", formatted);
-        }
+        Assert.Equal("hello, squidex, and, team", formatted);
+    }
 
-        [Fact]
-        public void Should_format_tags_field_with_invalid_type()
-        {
-            var value = JsonValue.Zero;
+    [Fact]
+    public void Should_format_tags_field_with_invalid_type()
+    {
+        var value = JsonValue.Zero;
 
-            var field = Fields.Tags(1, "field", Partitioning.Invariant);
+        var field = Fields.Tags(1, "field", Partitioning.Invariant);
 
-            var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(field, value);
 
-            Assert.Empty(formatted);
-        }
+        Assert.Empty(formatted);
     }
 }

@@ -11,29 +11,28 @@ using Squidex.Infrastructure.Json.Objects;
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.Domain.Apps.Core.ConvertContent
+namespace Squidex.Domain.Apps.Core.ConvertContent;
+
+public interface IConverter
 {
-    public interface IConverter
-    {
-    }
+}
 
-    public interface IContentFieldAfterConverter : IConverter
-    {
-        ContentFieldData? ConvertFieldAfter(IRootField field, ContentFieldData source);
-    }
+public interface IContentFieldAfterConverter : IConverter
+{
+    ContentFieldData? ConvertFieldAfter(IRootField field, ContentFieldData source);
+}
 
-    public interface IContentFieldConverter : IConverter
-    {
-        ContentFieldData? ConvertField(IRootField field, ContentFieldData source);
-    }
+public interface IContentFieldConverter : IConverter
+{
+    ContentFieldData? ConvertField(IRootField field, ContentFieldData source);
+}
 
-    public interface IContentItemConverter : IConverter
-    {
-        JsonObject ConvertItem(IField field, JsonObject source);
-    }
+public interface IContentItemConverter : IConverter
+{
+    JsonObject ConvertItem(IField field, JsonObject source);
+}
 
-    public interface IContentValueConverter : IConverter
-    {
-        (bool Remove, JsonValue) ConvertValue(IField field, JsonValue source, IField? parent);
-    }
+public interface IContentValueConverter : IConverter
+{
+    (bool Remove, JsonValue) ConvertValue(IField field, JsonValue source, IField? parent);
 }

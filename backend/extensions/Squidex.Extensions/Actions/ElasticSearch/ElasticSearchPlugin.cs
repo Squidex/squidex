@@ -9,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.ElasticSearch
+namespace Squidex.Extensions.Actions.ElasticSearch;
+
+public sealed class ElasticSearchPlugin : IPlugin
 {
-    public sealed class ElasticSearchPlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddRuleAction<ElasticSearchAction, ElasticSearchActionHandler>();
-        }
+        services.AddRuleAction<ElasticSearchAction, ElasticSearchActionHandler>();
     }
 }

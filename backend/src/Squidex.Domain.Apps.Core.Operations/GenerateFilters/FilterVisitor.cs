@@ -14,204 +14,203 @@ using Squidex.Infrastructure.Queries;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Domain.Apps.Core.GenerateFilters
+namespace Squidex.Domain.Apps.Core.GenerateFilters;
+
+internal sealed class FilterVisitor : IFieldVisitor<FilterSchema?, FilterVisitor.Args>
 {
-    internal sealed class FilterVisitor : IFieldVisitor<FilterSchema?, FilterVisitor.Args>
+    private const int MaxDepth = 3;
+    private static readonly FilterVisitor Instance = new FilterVisitor();
+
+    public record struct Args(ResolvedComponents Components, int Level = 0);
+
+    private FilterVisitor()
     {
-        private const int MaxDepth = 3;
-        private static readonly FilterVisitor Instance = new FilterVisitor();
+    }
 
-        public record struct Args(ResolvedComponents Components, int Level = 0);
+    public static FilterSchema? BuildProperty(IField field, ResolvedComponents components)
+    {
+        var args = new Args(components);
 
-        private FilterVisitor()
+        return field.Accept(Instance, args);
+    }
+
+    public FilterSchema? Visit(IArrayField field, Args args)
+    {
+        if (args.Level >= MaxDepth)
         {
+            return null;
         }
 
-        public static FilterSchema? BuildProperty(IField field, ResolvedComponents components)
-        {
-            var args = new Args(components);
+        var fields = new List<FilterField>();
 
-            return field.Accept(Instance, args);
-        }
+        var nestedArgs = args with { Level = args.Level + 1 };
 
-        public FilterSchema? Visit(IArrayField field, Args args)
+        foreach (var nestedField in field.Fields.ForApi(true))
         {
-            if (args.Level >= MaxDepth)
+            var nestedSchema = nestedField.Accept(this, nestedArgs);
+
+            if (nestedSchema != null)
             {
-                return null;
+                var filterableField = new FilterField(
+                    nestedSchema,
+                    nestedField.Name,
+                    ArrayFieldDescription(nestedField),
+                    true);
+
+                fields.Add(filterableField);
             }
+        }
 
-            var fields = new List<FilterField>();
+        return new FilterSchema(FilterSchemaType.ObjectArray)
+        {
+            Fields = fields.ToReadonlyList()
+        };
+    }
 
-            var nestedArgs = args with { Level = args.Level + 1 };
+    public FilterSchema? Visit(IField<AssetsFieldProperties> field, Args args)
+    {
+        return FilterSchema.StringArray;
+    }
 
-            foreach (var nestedField in field.Fields.ForApi(true))
+    public FilterSchema? Visit(IField<BooleanFieldProperties> field, Args args)
+    {
+        return FilterSchema.Boolean;
+    }
+
+    public FilterSchema? Visit(IField<GeolocationFieldProperties> field, Args args)
+    {
+        return FilterSchema.GeoObject;
+    }
+
+    public FilterSchema? Visit(IField<JsonFieldProperties> field, Args args)
+    {
+        return FilterSchema.Any;
+    }
+
+    public FilterSchema? Visit(IField<NumberFieldProperties> field, Args args)
+    {
+        return FilterSchema.Number;
+    }
+
+    public FilterSchema? Visit(IField<StringFieldProperties> field, Args args)
+    {
+        if (field.Properties.AllowedValues?.Count > 0)
+        {
+            return new FilterSchema(FilterSchemaType.String)
             {
-                var nestedSchema = nestedField.Accept(this, nestedArgs);
+                Extra = new
+                {
+                    options = field.Properties.AllowedValues
+                }
+            };
+        }
 
-                if (nestedSchema != null)
+        return FilterSchema.String;
+    }
+
+    public FilterSchema? Visit(IField<TagsFieldProperties> field, Args args)
+    {
+        return FilterSchema.StringArray;
+    }
+
+    public FilterSchema? Visit(IField<UIFieldProperties> field, Args args)
+    {
+        return null;
+    }
+
+    public FilterSchema? Visit(IField<ComponentFieldProperties> field, Args args)
+    {
+        if (args.Level >= MaxDepth)
+        {
+            return null;
+        }
+
+        return new FilterSchema(FilterSchemaType.Object)
+        {
+            Fields = BuildComponent(field.Properties.SchemaIds, args)
+        };
+    }
+
+    public FilterSchema? Visit(IField<ComponentsFieldProperties> field, Args args)
+    {
+        if (args.Level >= MaxDepth)
+        {
+            return null;
+        }
+
+        return new FilterSchema(FilterSchemaType.Object)
+        {
+            Fields = BuildComponent(field.Properties.SchemaIds, args)
+        };
+    }
+
+    public FilterSchema? Visit(IField<DateTimeFieldProperties> field, Args args)
+    {
+        if (field.Properties.Editor == DateTimeFieldEditor.Date)
+        {
+            return SharedSchemas.Date;
+        }
+
+        return SharedSchemas.DateTime;
+    }
+
+    public FilterSchema? Visit(IField<ReferencesFieldProperties> field, Args args)
+    {
+        return new FilterSchema(FilterSchemaType.StringArray)
+        {
+            Extra = new
+            {
+                schemaIds = field.Properties.SchemaIds
+            }
+        };
+    }
+
+    private ReadonlyList<FilterField> BuildComponent(ReadonlyList<DomainId>? schemaIds, Args args)
+    {
+        var fields = new List<FilterField>();
+
+        var nestedArgs = args with { Level = args.Level + 1 };
+
+        foreach (var (_, schema) in args.Components.Resolve(schemaIds))
+        {
+            var componentName = schema.DisplayName();
+
+            foreach (var field in schema.Fields.ForApi(true))
+            {
+                var fieldSchema = field.Accept(this, nestedArgs);
+
+                if (fieldSchema != null)
                 {
                     var filterableField = new FilterField(
-                        nestedSchema,
-                        nestedField.Name,
-                        ArrayFieldDescription(nestedField),
+                        fieldSchema,
+                        field.Name,
+                        ComponentFieldDescription(componentName, field),
                         true);
 
                     fields.Add(filterableField);
                 }
             }
 
-            return new FilterSchema(FilterSchemaType.ObjectArray)
+            fields.Add(new FilterField(FilterSchema.String, Component.Discriminator)
             {
-                Fields = fields.ToReadonlyList()
-            };
+                Description = FieldDescriptions.ComponentSchemaId
+            });
         }
 
-        public FilterSchema? Visit(IField<AssetsFieldProperties> field, Args args)
-        {
-            return FilterSchema.StringArray;
-        }
+        return fields.ToReadonlyList();
+    }
 
-        public FilterSchema? Visit(IField<BooleanFieldProperties> field, Args args)
-        {
-            return FilterSchema.Boolean;
-        }
+    private static string ArrayFieldDescription(IField field)
+    {
+        var name = field.DisplayName();
 
-        public FilterSchema? Visit(IField<GeolocationFieldProperties> field, Args args)
-        {
-            return FilterSchema.GeoObject;
-        }
+        return string.Format(CultureInfo.InvariantCulture, FieldDescriptions.ContentArrayField, name);
+    }
 
-        public FilterSchema? Visit(IField<JsonFieldProperties> field, Args args)
-        {
-            return FilterSchema.Any;
-        }
+    private static string ComponentFieldDescription(string componentName, RootField field)
+    {
+        var name = field.DisplayName();
 
-        public FilterSchema? Visit(IField<NumberFieldProperties> field, Args args)
-        {
-            return FilterSchema.Number;
-        }
-
-        public FilterSchema? Visit(IField<StringFieldProperties> field, Args args)
-        {
-            if (field.Properties.AllowedValues?.Count > 0)
-            {
-                return new FilterSchema(FilterSchemaType.String)
-                {
-                    Extra = new
-                    {
-                        options = field.Properties.AllowedValues
-                    }
-                };
-            }
-
-            return FilterSchema.String;
-        }
-
-        public FilterSchema? Visit(IField<TagsFieldProperties> field, Args args)
-        {
-            return FilterSchema.StringArray;
-        }
-
-        public FilterSchema? Visit(IField<UIFieldProperties> field, Args args)
-        {
-            return null;
-        }
-
-        public FilterSchema? Visit(IField<ComponentFieldProperties> field, Args args)
-        {
-            if (args.Level >= MaxDepth)
-            {
-                return null;
-            }
-
-            return new FilterSchema(FilterSchemaType.Object)
-            {
-                Fields = BuildComponent(field.Properties.SchemaIds, args)
-            };
-        }
-
-        public FilterSchema? Visit(IField<ComponentsFieldProperties> field, Args args)
-        {
-            if (args.Level >= MaxDepth)
-            {
-                return null;
-            }
-
-            return new FilterSchema(FilterSchemaType.Object)
-            {
-                Fields = BuildComponent(field.Properties.SchemaIds, args)
-            };
-        }
-
-        public FilterSchema? Visit(IField<DateTimeFieldProperties> field, Args args)
-        {
-            if (field.Properties.Editor == DateTimeFieldEditor.Date)
-            {
-                return SharedSchemas.Date;
-            }
-
-            return SharedSchemas.DateTime;
-        }
-
-        public FilterSchema? Visit(IField<ReferencesFieldProperties> field, Args args)
-        {
-            return new FilterSchema(FilterSchemaType.StringArray)
-            {
-                Extra = new
-                {
-                    schemaIds = field.Properties.SchemaIds
-                }
-            };
-        }
-
-        private ReadonlyList<FilterField> BuildComponent(ReadonlyList<DomainId>? schemaIds, Args args)
-        {
-            var fields = new List<FilterField>();
-
-            var nestedArgs = args with { Level = args.Level + 1 };
-
-            foreach (var (_, schema) in args.Components.Resolve(schemaIds))
-            {
-                var componentName = schema.DisplayName();
-
-                foreach (var field in schema.Fields.ForApi(true))
-                {
-                    var fieldSchema = field.Accept(this, nestedArgs);
-
-                    if (fieldSchema != null)
-                    {
-                        var filterableField = new FilterField(
-                            fieldSchema,
-                            field.Name,
-                            ComponentFieldDescription(componentName, field),
-                            true);
-
-                        fields.Add(filterableField);
-                    }
-                }
-
-                fields.Add(new FilterField(FilterSchema.String, Component.Discriminator)
-                {
-                    Description = FieldDescriptions.ComponentSchemaId
-                });
-            }
-
-            return fields.ToReadonlyList();
-        }
-
-        private static string ArrayFieldDescription(IField field)
-        {
-            var name = field.DisplayName();
-
-            return string.Format(CultureInfo.InvariantCulture, FieldDescriptions.ContentArrayField, name);
-        }
-
-        private static string ComponentFieldDescription(string componentName, RootField field)
-        {
-            var name = field.DisplayName();
-
-            return string.Format(CultureInfo.InvariantCulture, FieldDescriptions.ComponentField, name, componentName);
-        }
+        return string.Format(CultureInfo.InvariantCulture, FieldDescriptions.ComponentField, name, componentName);
     }
 }

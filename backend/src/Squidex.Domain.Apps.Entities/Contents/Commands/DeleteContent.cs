@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents.Commands
-{
-    public sealed class DeleteContent : ContentCommand
-    {
-        public bool CheckReferrers { get; set; }
+namespace Squidex.Domain.Apps.Entities.Contents.Commands;
 
-        public bool Permanent { get; set; }
-    }
+public sealed class DeleteContent : ContentCommand
+{
+    public bool CheckReferrers { get; set; }
+
+    public bool Permanent { get; set; }
 }

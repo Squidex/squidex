@@ -7,20 +7,19 @@
 
 using GraphQL.Types;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
+
+internal abstract class SharedObjectGraphType<T> : ObjectGraphType<T>
 {
-    internal abstract class SharedObjectGraphType<T> : ObjectGraphType<T>
+    public override void Initialize(ISchema schema)
     {
-        public override void Initialize(ISchema schema)
+        try
         {
-            try
-            {
-                base.Initialize(schema);
-            }
-            catch (InvalidOperationException)
-            {
-                return;
-            }
+            base.Initialize(schema);
+        }
+        catch (InvalidOperationException)
+        {
+            return;
         }
     }
 }

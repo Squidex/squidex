@@ -9,23 +9,22 @@ using TestSuite.Fixtures;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 
-namespace TestSuite.ApiTests
+namespace TestSuite.ApiTests;
+
+public class LanguagesTests : IClassFixture<ClientFixture>
 {
-    public class LanguagesTests : IClassFixture<ClientFixture>
+    public ClientFixture _ { get; }
+
+    public LanguagesTests(ClientFixture fixture)
     {
-        public ClientFixture _ { get; }
+        _ = fixture;
+    }
 
-        public LanguagesTests(ClientFixture fixture)
-        {
-            _ = fixture;
-        }
+    [Fact]
+    public async Task Should_provide_languages()
+    {
+        var languages = await _.Languages.GetLanguagesAsync();
 
-        [Fact]
-        public async Task Should_provide_languages()
-        {
-            var languages = await _.Languages.GetLanguagesAsync();
-
-            Assert.True(languages.Count > 100);
-        }
+        Assert.True(languages.Count > 100);
     }
 }

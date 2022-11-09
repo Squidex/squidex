@@ -8,27 +8,26 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.Api.Controllers.Contents.Models
+namespace Squidex.Areas.Api.Controllers.Contents.Models;
+
+public sealed class StatusInfoDto
 {
-    public sealed class StatusInfoDto
+    /// <summary>
+    /// The name of the status.
+    /// </summary>
+    [LocalizedRequired]
+    public Status Status { get; set; }
+
+    /// <summary>
+    /// The color of the status.
+    /// </summary>
+    [LocalizedRequired]
+    public string Color { get; set; }
+
+    public static StatusInfoDto FromDomain(StatusInfo statusInfo)
     {
-        /// <summary>
-        /// The name of the status.
-        /// </summary>
-        [LocalizedRequired]
-        public Status Status { get; set; }
+        var result = new StatusInfoDto { Status = statusInfo.Status, Color = statusInfo.Color };
 
-        /// <summary>
-        /// The color of the status.
-        /// </summary>
-        [LocalizedRequired]
-        public string Color { get; set; }
-
-        public static StatusInfoDto FromDomain(StatusInfo statusInfo)
-        {
-            var result = new StatusInfoDto { Status = statusInfo.Status, Color = statusInfo.Color };
-
-            return result;
-        }
+        return result;
     }
 }

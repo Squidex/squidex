@@ -9,19 +9,18 @@ using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure.Commands;
 using Squidex.Web;
 
-namespace Squidex.Extensions.Samples.Controllers
-{
-    public sealed class PluginController : ApiController
-    {
-        public PluginController(ICommandBus commandBus)
-            : base(commandBus)
-        {
-        }
+namespace Squidex.Extensions.Samples.Controllers;
 
-        [Route("plugins/sample")]
-        public IActionResult Test()
-        {
-            return Ok(new { text = "I am Plugin" });
-        }
+public sealed class PluginController : ApiController
+{
+    public PluginController(ICommandBus commandBus)
+        : base(commandBus)
+    {
+    }
+
+    [Route("plugins/sample")]
+    public IActionResult Test()
+    {
+        return Ok(new { text = "I am Plugin" });
     }
 }

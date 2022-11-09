@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+public static class EtagVersion
 {
-    public static class EtagVersion
-    {
-        public const long Auto = -3;
+    public const long Auto = -3;
 
-        public const long Any = -2;
+    public const long Any = -2;
 
-        public const long Empty = -1;
-    }
+    public const long Empty = -1;
 }

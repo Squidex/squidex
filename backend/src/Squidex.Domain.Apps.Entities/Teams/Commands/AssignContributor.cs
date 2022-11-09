@@ -7,18 +7,17 @@
 
 using Roles = Squidex.Domain.Apps.Core.Apps.Role;
 
-namespace Squidex.Domain.Apps.Entities.Teams.Commands
+namespace Squidex.Domain.Apps.Entities.Teams.Commands;
+
+public sealed class AssignContributor : TeamCommand
 {
-    public sealed class AssignContributor : TeamCommand
-    {
-        public string ContributorId { get; set; }
+    public string ContributorId { get; set; }
 
-        public string Role { get; set; } = Roles.Owner;
+    public string Role { get; set; } = Roles.Owner;
 
-        public bool IgnoreActor { get; set; }
+    public bool IgnoreActor { get; set; }
 
-        public bool IgnorePlans { get; set; }
+    public bool IgnorePlans { get; set; }
 
-        public bool Invite { get; set; }
-    }
+    public bool Invite { get; set; }
 }

@@ -8,43 +8,42 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public sealed class ResolvedComponents : ReadonlyDictionary<DomainId, Schema>
 {
-    public sealed class ResolvedComponents : ReadonlyDictionary<DomainId, Schema>
+    public static readonly ResolvedComponents Empty = new ResolvedComponents();
+
+    private ResolvedComponents()
     {
-        public static readonly ResolvedComponents Empty = new ResolvedComponents();
+    }
 
-        private ResolvedComponents()
+    public ResolvedComponents(IDictionary<DomainId, Schema> inner)
+        : base(inner)
+    {
+    }
+
+    public ResolvedComponents Resolve(IEnumerable<DomainId>? schemaIds)
+    {
+        var result = (Dictionary<DomainId, Schema>?)null;
+
+        if (schemaIds != null)
         {
-        }
-
-        public ResolvedComponents(IDictionary<DomainId, Schema> inner)
-            : base(inner)
-        {
-        }
-
-        public ResolvedComponents Resolve(IEnumerable<DomainId>? schemaIds)
-        {
-            var result = (Dictionary<DomainId, Schema>?)null;
-
-            if (schemaIds != null)
+            foreach (var schemaId in schemaIds)
             {
-                foreach (var schemaId in schemaIds)
+                if (TryGetValue(schemaId, out var schema))
                 {
-                    if (TryGetValue(schemaId, out var schema))
-                    {
-                        result ??= new Dictionary<DomainId, Schema>();
-                        result[schemaId] = schema;
-                    }
+                    result ??= new Dictionary<DomainId, Schema>();
+                    result[schemaId] = schema;
                 }
             }
-
-            if (result == null)
-            {
-                return Empty;
-            }
-
-            return new ResolvedComponents(result);
         }
+
+        if (result == null)
+        {
+            return Empty;
+        }
+
+        return new ResolvedComponents(result);
     }
 }

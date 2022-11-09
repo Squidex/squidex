@@ -11,25 +11,24 @@ using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 
-namespace Migrations.OldTriggers
+namespace Migrations.OldTriggers;
+
+[TypeName(nameof(ContentChangedTrigger))]
+public sealed record ContentChangedTrigger : RuleTrigger, IMigrated<RuleTrigger>
 {
-    [TypeName(nameof(ContentChangedTrigger))]
-    public sealed record ContentChangedTrigger : RuleTrigger, IMigrated<RuleTrigger>
+    public ReadonlyList<ContentChangedTriggerSchema> Schemas { get; set; }
+
+    public bool HandleAll { get; set; }
+
+    public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
     {
-        public ReadonlyList<ContentChangedTriggerSchema> Schemas { get; set; }
+        throw new NotSupportedException();
+    }
 
-        public bool HandleAll { get; set; }
+    public RuleTrigger Migrate()
+    {
+        var schemas = Schemas.Select(x => x.Migrate()).ToReadonlyList();
 
-        public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
-        {
-            throw new NotSupportedException();
-        }
-
-        public RuleTrigger Migrate()
-        {
-            var schemas = Schemas.Select(x => x.Migrate()).ToReadonlyList();
-
-            return new ContentChangedTriggerV2 { HandleAll = HandleAll, Schemas = schemas };
-        }
+        return new ContentChangedTriggerV2 { HandleAll = HandleAll, Schemas = schemas };
     }
 }

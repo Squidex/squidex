@@ -12,60 +12,59 @@ using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Config.OpenApi
+namespace Squidex.Areas.Api.Config.OpenApi;
+
+public sealed class ErrorDtoProcessor : IDocumentProcessor
 {
-    public sealed class ErrorDtoProcessor : IDocumentProcessor
+    public void Process(DocumentProcessorContext context)
     {
-        public void Process(DocumentProcessorContext context)
+        var errorSchema = GetErrorSchema(context);
+
+        foreach (var operation in context.Document.Paths.Values.SelectMany(x => x.Values))
         {
-            var errorSchema = GetErrorSchema(context);
+            AddErrorResponses(operation, errorSchema);
 
-            foreach (var operation in context.Document.Paths.Values.SelectMany(x => x.Values))
-            {
-                AddErrorResponses(operation, errorSchema);
+            CleanupResponses(operation);
+        }
+    }
 
-                CleanupResponses(operation);
-            }
+    private static void AddErrorResponses(OpenApiOperation operation, JsonSchema errorSchema)
+    {
+        if (!operation.Responses.ContainsKey("500"))
+        {
+            const string description = "Operation failed.";
+
+            var response = new OpenApiResponse { Description = description, Schema = errorSchema };
+
+            operation.Responses["500"] = response;
         }
 
-        private static void AddErrorResponses(OpenApiOperation operation, JsonSchema errorSchema)
+        foreach (var (code, response) in operation.Responses)
         {
-            if (!operation.Responses.ContainsKey("500"))
+            if (code != "404" && code.StartsWith("4", StringComparison.OrdinalIgnoreCase) && response.Schema == null)
             {
-                const string description = "Operation failed.";
-
-                var response = new OpenApiResponse { Description = description, Schema = errorSchema };
-
-                operation.Responses["500"] = response;
-            }
-
-            foreach (var (code, response) in operation.Responses)
-            {
-                if (code != "404" && code.StartsWith("4", StringComparison.OrdinalIgnoreCase) && response.Schema == null)
-                {
-                    response.Schema = errorSchema;
-                }
+                response.Schema = errorSchema;
             }
         }
+    }
 
-        private static void CleanupResponses(OpenApiOperation operation)
+    private static void CleanupResponses(OpenApiOperation operation)
+    {
+        foreach (var (code, response) in operation.Responses.ToList())
         {
-            foreach (var (code, response) in operation.Responses.ToList())
+            if (string.IsNullOrWhiteSpace(response.Description) ||
+                response.Description?.Contains("=&gt;", StringComparison.Ordinal) == true ||
+                response.Description?.Contains("=>", StringComparison.Ordinal) == true)
             {
-                if (string.IsNullOrWhiteSpace(response.Description) ||
-                    response.Description?.Contains("=&gt;", StringComparison.Ordinal) == true ||
-                    response.Description?.Contains("=>", StringComparison.Ordinal) == true)
-                {
-                    operation.Responses.Remove(code);
-                }
+                operation.Responses.Remove(code);
             }
         }
+    }
 
-        private static JsonSchema GetErrorSchema(DocumentProcessorContext context)
-        {
-            var errorType = typeof(ErrorDto).ToContextualType();
+    private static JsonSchema GetErrorSchema(DocumentProcessorContext context)
+    {
+        var errorType = typeof(ErrorDto).ToContextualType();
 
-            return context.SchemaGenerator.GenerateWithReference<JsonSchema>(errorType, context.SchemaResolver);
-        }
+        return context.SchemaGenerator.GenerateWithReference<JsonSchema>(errorType, context.SchemaResolver);
     }
 }

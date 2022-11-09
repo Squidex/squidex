@@ -7,11 +7,10 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas;
+
+[EventType(nameof(SchemaFieldsReordered))]
+public sealed class SchemaFieldsReordered : ParentFieldEvent
 {
-    [EventType(nameof(SchemaFieldsReordered))]
-    public sealed class SchemaFieldsReordered : ParentFieldEvent
-    {
-        public long[] FieldIds { get; set; }
-    }
+    public long[] FieldIds { get; set; }
 }

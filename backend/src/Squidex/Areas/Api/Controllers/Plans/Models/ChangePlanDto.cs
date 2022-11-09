@@ -7,14 +7,13 @@
 
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.Api.Controllers.Plans.Models
+namespace Squidex.Areas.Api.Controllers.Plans.Models;
+
+public sealed class ChangePlanDto
 {
-    public sealed class ChangePlanDto
-    {
-        /// <summary>
-        /// The new plan id.
-        /// </summary>
-        [LocalizedRequired]
-        public string PlanId { get; set; }
-    }
+    /// <summary>
+    /// The new plan id.
+    /// </summary>
+    [LocalizedRequired]
+    public string PlanId { get; set; }
 }

@@ -9,7 +9,6 @@ using Squidex.Domain.Apps.Entities.Apps;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Web.Pipeline
-{
-    public sealed record AppFeature(IAppEntity App) : IAppFeature;
-}
+namespace Squidex.Web.Pipeline;
+
+public sealed record AppFeature(IAppEntity App) : IAppFeature;

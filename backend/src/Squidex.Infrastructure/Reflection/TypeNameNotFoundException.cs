@@ -7,19 +7,18 @@
 
 using System.Runtime.Serialization;
 
-namespace Squidex.Infrastructure.Reflection
-{
-    [Serializable]
-    public class TypeNameNotFoundException : Exception
-    {
-        public TypeNameNotFoundException(string? message = null, Exception? inner = null)
-            : base(message, inner)
-        {
-        }
+namespace Squidex.Infrastructure.Reflection;
 
-        protected TypeNameNotFoundException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
+[Serializable]
+public class TypeNameNotFoundException : Exception
+{
+    public TypeNameNotFoundException(string? message = null, Exception? inner = null)
+        : base(message, inner)
+    {
+    }
+
+    protected TypeNameNotFoundException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
+    {
     }
 }

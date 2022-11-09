@@ -7,14 +7,13 @@
 
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.IdentityServer.Controllers.Account
-{
-    public sealed class LoginModel
-    {
-        [LocalizedRequired]
-        public string Email { get; set; }
+namespace Squidex.Areas.IdentityServer.Controllers.Account;
 
-        [LocalizedRequired]
-        public string Password { get; set; }
-    }
+public sealed class LoginModel
+{
+    [LocalizedRequired]
+    public string Email { get; set; }
+
+    [LocalizedRequired]
+    public string Password { get; set; }
 }

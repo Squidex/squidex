@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Translator.State.Old
+namespace Squidex.Translator.State.Old;
+
+public class OldTranslationState
 {
-    public class OldTranslationState
-    {
-        public SortedDictionary<string, OldTranslatedText> Texts { get; set;  } = new SortedDictionary<string, OldTranslatedText>();
+    public SortedDictionary<string, OldTranslatedText> Texts { get; set;  } = new SortedDictionary<string, OldTranslatedText>();
 
-        public HashSet<string> Ignores { get; set; } = new HashSet<string>();
+    public HashSet<string> Ignores { get; set; } = new HashSet<string>();
 
-        public SortedDictionary<string, SortedSet<string>> Todos { get; set; } = new SortedDictionary<string, SortedSet<string>>();
-    }
+    public SortedDictionary<string, SortedSet<string>> Todos { get; set; } = new SortedDictionary<string, SortedSet<string>>();
 }

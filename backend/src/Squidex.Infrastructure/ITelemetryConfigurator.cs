@@ -7,12 +7,11 @@
 
 using OpenTelemetry.Trace;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+public interface ITelemetryConfigurator
 {
-    public interface ITelemetryConfigurator
+    void Configure(TracerProviderBuilder builder)
     {
-        void Configure(TracerProviderBuilder builder)
-        {
-        }
     }
 }

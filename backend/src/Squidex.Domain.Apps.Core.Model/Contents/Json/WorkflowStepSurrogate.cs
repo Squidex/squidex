@@ -10,51 +10,50 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Core.Contents.Json
+namespace Squidex.Domain.Apps.Core.Contents.Json;
+
+public sealed class WorkflowStepSurrogate : ISurrogate<WorkflowStep>
 {
-    public sealed class WorkflowStepSurrogate : ISurrogate<WorkflowStep>
+    public Dictionary<Status, WorkflowTransitionSurrogate> Transitions { get; set; }
+
+    [JsonPropertyName("noUpdateRules")]
+    public NoUpdate? NoUpdate { get; set; }
+
+    [JsonPropertyName("noUpdate")]
+    public bool NoUpdateFlag { get; set; }
+
+    public bool Validate { get; set; }
+
+    public string? Color { get; set; }
+
+    public void FromSource(WorkflowStep source)
     {
-        public Dictionary<Status, WorkflowTransitionSurrogate> Transitions { get; set; }
+        SimpleMapper.Map(source, this);
 
-        [JsonPropertyName("noUpdateRules")]
-        public NoUpdate? NoUpdate { get; set; }
-
-        [JsonPropertyName("noUpdate")]
-        public bool NoUpdateFlag { get; set; }
-
-        public bool Validate { get; set; }
-
-        public string? Color { get; set; }
-
-        public void FromSource(WorkflowStep source)
+        Transitions = source.Transitions.ToDictionary(x => x.Key, source =>
         {
-            SimpleMapper.Map(source, this);
+            var surrogate = new WorkflowTransitionSurrogate();
 
-            Transitions = source.Transitions.ToDictionary(x => x.Key, source =>
-            {
-                var surrogate = new WorkflowTransitionSurrogate();
+            surrogate.FromSource(source.Value);
 
-                surrogate.FromSource(source.Value);
+            return surrogate;
+        });
+    }
 
-                return surrogate;
-            });
+    public WorkflowStep ToSource()
+    {
+        var noUpdate = NoUpdate;
+
+        if (NoUpdateFlag)
+        {
+            noUpdate = NoUpdate.Always;
         }
 
-        public WorkflowStep ToSource()
-        {
-            var noUpdate = NoUpdate;
+        var transitions =
+            Transitions?.ToReadonlyDictionary(
+                x => x.Key,
+                x => x.Value.ToSource());
 
-            if (NoUpdateFlag)
-            {
-                noUpdate = NoUpdate.Always;
-            }
-
-            var transitions =
-                Transitions?.ToReadonlyDictionary(
-                    x => x.Key,
-                    x => x.Value.ToSource());
-
-            return new WorkflowStep(transitions, Color, noUpdate, Validate);
-        }
+        return new WorkflowStep(transitions, Color, noUpdate, Validate);
     }
 }

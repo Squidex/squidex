@@ -8,13 +8,12 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Assets
-{
-    [EventType(nameof(AssetFolderCreated))]
-    public sealed class AssetFolderCreated : AssetFolderEvent
-    {
-        public DomainId ParentId { get; set; }
+namespace Squidex.Domain.Apps.Events.Assets;
 
-        public string FolderName { get; set; }
-    }
+[EventType(nameof(AssetFolderCreated))]
+public sealed class AssetFolderCreated : AssetFolderEvent
+{
+    public DomainId ParentId { get; set; }
+
+    public string FolderName { get; set; }
 }

@@ -10,28 +10,27 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Extensions.Text.ElasticSearch;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text;
+
+public sealed class ElasticSearchTextIndexFixture : IAsyncLifetime
 {
-    public sealed class ElasticSearchTextIndexFixture : IAsyncLifetime
+    public ElasticSearchTextIndex Index { get; }
+
+    public ElasticSearchTextIndexFixture()
     {
-        public ElasticSearchTextIndex Index { get; }
+        Index = new ElasticSearchTextIndex(
+            new ElasticSearchClient(TestConfig.Configuration["elastic:configuration"]),
+            TestConfig.Configuration["elastic:indexName"],
+            TestUtils.DefaultSerializer);
+    }
 
-        public ElasticSearchTextIndexFixture()
-        {
-            Index = new ElasticSearchTextIndex(
-                new ElasticSearchClient(TestConfig.Configuration["elastic:configuration"]),
-                TestConfig.Configuration["elastic:indexName"],
-                TestUtils.DefaultSerializer);
-        }
+    public Task InitializeAsync()
+    {
+        return Index.InitializeAsync(default);
+    }
 
-        public Task InitializeAsync()
-        {
-            return Index.InitializeAsync(default);
-        }
-
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
-        }
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 }

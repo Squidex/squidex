@@ -12,19 +12,18 @@ using Squidex.Shared.Users;
 #pragma warning disable CA1822 // Mark members as static
 #pragma warning disable SA1133 // Do not combine attributes
 
-namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
+namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+
+public abstract class EnrichedUserEventBase : EnrichedEvent
 {
-    public abstract class EnrichedUserEventBase : EnrichedEvent
+    [FieldDescription(nameof(FieldDescriptions.Actor))]
+    public RefToken Actor { get; set; }
+
+    [FieldDescription(nameof(FieldDescriptions.User)), JsonIgnore]
+    public IUser? User { get; set; }
+
+    public bool ShouldSerializeUser()
     {
-        [FieldDescription(nameof(FieldDescriptions.Actor))]
-        public RefToken Actor { get; set; }
-
-        [FieldDescription(nameof(FieldDescriptions.User)), JsonIgnore]
-        public IUser? User { get; set; }
-
-        public bool ShouldSerializeUser()
-        {
-            return false;
-        }
+        return false;
     }
 }

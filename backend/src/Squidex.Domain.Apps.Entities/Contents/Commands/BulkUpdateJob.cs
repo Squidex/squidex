@@ -11,30 +11,29 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Commands
+namespace Squidex.Domain.Apps.Entities.Contents.Commands;
+
+public sealed class BulkUpdateJob
 {
-    public sealed class BulkUpdateJob
-    {
-        public Query<JsonValue>? Query { get; set; }
+    public Query<JsonValue>? Query { get; set; }
 
-        public DomainId? Id { get; set; }
+    public DomainId? Id { get; set; }
 
-        public Status? Status { get; set; }
+    public Status? Status { get; set; }
 
-        public Instant? DueTime { get; set; }
+    public Instant? DueTime { get; set; }
 
-        public BulkUpdateContentType Type { get; set; }
+    public BulkUpdateContentType Type { get; set; }
 
-        public ContentData? Data { get; set; }
+    public ContentData? Data { get; set; }
 
-        public string? Schema { get; set; }
+    public string? Schema { get; set; }
 
-        public bool Patch { get; set; }
+    public bool Patch { get; set; }
 
-        public bool Permanent { get; set; }
+    public bool Permanent { get; set; }
 
-        public long ExpectedCount { get; set; } = 1;
+    public long ExpectedCount { get; set; } = 1;
 
-        public long ExpectedVersion { get; set; } = EtagVersion.Any;
-    }
+    public long ExpectedVersion { get; set; } = EtagVersion.Any;
 }

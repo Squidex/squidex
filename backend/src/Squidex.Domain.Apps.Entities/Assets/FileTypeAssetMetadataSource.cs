@@ -8,29 +8,28 @@
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Assets;
+
+public sealed class FileTypeAssetMetadataSource : IAssetMetadataSource
 {
-    public sealed class FileTypeAssetMetadataSource : IAssetMetadataSource
+    public Task EnhanceAsync(UploadAssetCommand command,
+        CancellationToken ct)
     {
-        public Task EnhanceAsync(UploadAssetCommand command,
-            CancellationToken ct)
+        if (command.Tags != null)
         {
-            if (command.Tags != null)
+            var extension = command.File?.FileName?.FileType();
+
+            if (!string.IsNullOrWhiteSpace(extension))
             {
-                var extension = command.File?.FileName?.FileType();
-
-                if (!string.IsNullOrWhiteSpace(extension))
-                {
-                    command.Tags.Add($"type/{extension.ToLowerInvariant()}");
-                }
+                command.Tags.Add($"type/{extension.ToLowerInvariant()}");
             }
-
-            return Task.CompletedTask;
         }
 
-        public IEnumerable<string> Format(IAssetEntity asset)
-        {
-            yield break;
-        }
+        return Task.CompletedTask;
+    }
+
+    public IEnumerable<string> Format(IAssetEntity asset)
+    {
+        yield break;
     }
 }

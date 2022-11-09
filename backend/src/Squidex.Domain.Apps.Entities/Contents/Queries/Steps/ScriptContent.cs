@@ -7,95 +7,94 @@
 
 using Squidex.Domain.Apps.Core.Scripting;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
+namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
+
+public sealed class ScriptContent : IContentEnricherStep
 {
-    public sealed class ScriptContent : IContentEnricherStep
+    private readonly IScriptEngine scriptEngine;
+
+    public ScriptContent(IScriptEngine scriptEngine)
     {
-        private readonly IScriptEngine scriptEngine;
+        this.scriptEngine = scriptEngine;
+    }
 
-        public ScriptContent(IScriptEngine scriptEngine)
+    public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+        CancellationToken ct)
+    {
+        if (!ShouldEnrich(context))
         {
-            this.scriptEngine = scriptEngine;
+            return;
         }
 
-        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
-            CancellationToken ct)
+        foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
         {
-            if (!ShouldEnrich(context))
+            var (schema, _) = await schemas(group.Key);
+
+            var script = schema.SchemaDef.Scripts.Query;
+
+            if (string.IsNullOrWhiteSpace(script))
             {
-                return;
+                continue;
             }
 
-            foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
-            {
-                var (schema, _) = await schemas(group.Key);
-
-                var script = schema.SchemaDef.Scripts.Query;
-
-                if (string.IsNullOrWhiteSpace(script))
-                {
-                    continue;
-                }
-
-                var vars = new ContentScriptVars
-                {
-                    AppId = schema.AppId.Id,
-                    AppName = schema.AppId.Name,
-                    SchemaId = schema.Id,
-                    SchemaName = schema.SchemaDef.Name,
-                    User = context.UserPrincipal
-                };
-
-                var preScript = schema.SchemaDef.Scripts.QueryPre;
-
-                if (!string.IsNullOrWhiteSpace(preScript))
-                {
-                    var options = new ScriptOptions
-                    {
-                        AsContext = true
-                    };
-
-                    await scriptEngine.ExecuteAsync(vars, preScript, options, ct);
-                }
-
-                foreach (var content in group)
-                {
-                    await TransformAsync(vars, script, content, ct);
-                }
-            }
-        }
-
-        private async Task TransformAsync(ContentScriptVars sharedVars, string script, ContentEntity content,
-            CancellationToken ct)
-        {
             var vars = new ContentScriptVars
             {
-                ContentId = content.Id,
-                Data = content.Data,
-                DataOld = default,
-                Status = content.Status,
-                StatusOld = default
+                AppId = schema.AppId.Id,
+                AppName = schema.AppId.Name,
+                SchemaId = schema.Id,
+                SchemaName = schema.SchemaDef.Name,
+                User = context.UserPrincipal
             };
 
-            foreach (var (key, value) in sharedVars)
+            var preScript = schema.SchemaDef.Scripts.QueryPre;
+
+            if (!string.IsNullOrWhiteSpace(preScript))
             {
-                if (!vars.ContainsKey(key))
+                var options = new ScriptOptions
                 {
-                    vars[key] = value;
-                }
+                    AsContext = true
+                };
+
+                await scriptEngine.ExecuteAsync(vars, preScript, options, ct);
             }
 
-            var options = new ScriptOptions
+            foreach (var content in group)
             {
-                AsContext = true
-            };
-
-            content.Data = await scriptEngine.TransformAsync(vars, script, options, ct);
+                await TransformAsync(vars, script, content, ct);
+            }
         }
+    }
 
-        private static bool ShouldEnrich(Context context)
+    private async Task TransformAsync(ContentScriptVars sharedVars, string script, ContentEntity content,
+        CancellationToken ct)
+    {
+        var vars = new ContentScriptVars
         {
-            return !context.IsFrontendClient;
+            ContentId = content.Id,
+            Data = content.Data,
+            DataOld = default,
+            Status = content.Status,
+            StatusOld = default
+        };
+
+        foreach (var (key, value) in sharedVars)
+        {
+            if (!vars.ContainsKey(key))
+            {
+                vars[key] = value;
+            }
         }
+
+        var options = new ScriptOptions
+        {
+            AsContext = true
+        };
+
+        content.Data = await scriptEngine.TransformAsync(vars, script, options, ct);
+    }
+
+    private static bool ShouldEnrich(Context context)
+    {
+        return !context.IsFrontendClient;
     }
 }

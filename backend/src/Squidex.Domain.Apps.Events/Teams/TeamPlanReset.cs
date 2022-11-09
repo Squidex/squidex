@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Teams
+namespace Squidex.Domain.Apps.Events.Teams;
+
+[EventType(nameof(TeamPlanReset))]
+public sealed class TeamPlanReset : TeamEvent
 {
-    [EventType(nameof(TeamPlanReset))]
-    public sealed class TeamPlanReset : TeamEvent
-    {
-    }
 }

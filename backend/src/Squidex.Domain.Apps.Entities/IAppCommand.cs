@@ -8,10 +8,9 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities;
+
+public interface IAppCommand : ICommand
 {
-    public interface IAppCommand : ICommand
-    {
-        NamedId<DomainId> AppId { get; set; }
-    }
+    NamedId<DomainId> AppId { get; set; }
 }

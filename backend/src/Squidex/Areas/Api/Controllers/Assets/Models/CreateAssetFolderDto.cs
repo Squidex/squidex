@@ -10,24 +10,23 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.Api.Controllers.Assets.Models
+namespace Squidex.Areas.Api.Controllers.Assets.Models;
+
+public sealed class CreateAssetFolderDto
 {
-    public sealed class CreateAssetFolderDto
+    /// <summary>
+    /// The name of the folder.
+    /// </summary>
+    [LocalizedRequired]
+    public string FolderName { get; set; }
+
+    /// <summary>
+    /// The ID of the parent folder.
+    /// </summary>
+    public DomainId ParentId { get; set; }
+
+    public CreateAssetFolder ToCommand()
     {
-        /// <summary>
-        /// The name of the folder.
-        /// </summary>
-        [LocalizedRequired]
-        public string FolderName { get; set; }
-
-        /// <summary>
-        /// The ID of the parent folder.
-        /// </summary>
-        public DomainId ParentId { get; set; }
-
-        public CreateAssetFolder ToCommand()
-        {
-            return SimpleMapper.Map(this, new CreateAssetFolder());
-        }
+        return SimpleMapper.Map(this, new CreateAssetFolder());
     }
 }

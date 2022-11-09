@@ -7,12 +7,11 @@
 
 using Microsoft.AspNetCore.Identity;
 
-namespace Squidex.Domain.Users
-{
-    public interface IUserFactory
-    {
-        IdentityUser Create(string email);
+namespace Squidex.Domain.Users;
 
-        bool IsId(string id);
-    }
+public interface IUserFactory
+{
+    IdentityUser Create(string email);
+
+    bool IsId(string id);
 }

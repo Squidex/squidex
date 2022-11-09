@@ -8,35 +8,34 @@
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Assets;
 
-namespace Squidex.Areas.Api.Controllers.Statistics.Models
+namespace Squidex.Areas.Api.Controllers.Statistics.Models;
+
+public sealed class StorageUsagePerDateDto
 {
-    public sealed class StorageUsagePerDateDto
+    /// <summary>
+    /// The date when the usage was tracked.
+    /// </summary>
+    public LocalDate Date { get; set; }
+
+    /// <summary>
+    /// The number of assets.
+    /// </summary>
+    public long TotalCount { get; set; }
+
+    /// <summary>
+    /// The size in bytes.
+    /// </summary>
+    public long TotalSize { get; set; }
+
+    public static StorageUsagePerDateDto FromDomain(AssetStats stats)
     {
-        /// <summary>
-        /// The date when the usage was tracked.
-        /// </summary>
-        public LocalDate Date { get; set; }
-
-        /// <summary>
-        /// The number of assets.
-        /// </summary>
-        public long TotalCount { get; set; }
-
-        /// <summary>
-        /// The size in bytes.
-        /// </summary>
-        public long TotalSize { get; set; }
-
-        public static StorageUsagePerDateDto FromDomain(AssetStats stats)
+        var result = new StorageUsagePerDateDto
         {
-            var result = new StorageUsagePerDateDto
-            {
-                Date = LocalDate.FromDateTime(DateTime.SpecifyKind(stats.Date, DateTimeKind.Utc)),
-                TotalCount = stats.TotalCount,
-                TotalSize = stats.TotalSize
-            };
+            Date = LocalDate.FromDateTime(DateTime.SpecifyKind(stats.Date, DateTimeKind.Utc)),
+            TotalCount = stats.TotalCount,
+            TotalSize = stats.TotalSize
+        };
 
-            return result;
-        }
+        return result;
     }
 }

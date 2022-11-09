@@ -7,10 +7,9 @@
 
 using Squidex.Domain.Apps.Entities.Apps;
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public interface IAppFeature
 {
-    public interface IAppFeature
-    {
-        IAppEntity App { get; }
-    }
+    IAppEntity App { get; }
 }

@@ -8,17 +8,16 @@
 using Squidex.Infrastructure.Queries;
 using Squidex.Text;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
+namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
+
+public static class FirstPascalPathExtension
 {
-    public static class FirstPascalPathExtension
+    public static PropertyPath ToFirstPascalCase(this PropertyPath path)
     {
-        public static PropertyPath ToFirstPascalCase(this PropertyPath path)
-        {
-            var result = path.ToList();
+        var result = path.ToList();
 
-            result[0] = result[0].ToPascalCase();
+        result[0] = result[0].ToPascalCase();
 
-            return new PropertyPath(result);
-        }
+        return new PropertyPath(result);
     }
 }

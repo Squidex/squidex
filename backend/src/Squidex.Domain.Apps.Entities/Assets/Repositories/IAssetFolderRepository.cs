@@ -7,17 +7,16 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Assets.Repositories
+namespace Squidex.Domain.Apps.Entities.Assets.Repositories;
+
+public interface IAssetFolderRepository
 {
-    public interface IAssetFolderRepository
-    {
-        Task<IResultList<IAssetFolderEntity>> QueryAsync(DomainId appId, DomainId parentId,
-            CancellationToken ct = default);
+    Task<IResultList<IAssetFolderEntity>> QueryAsync(DomainId appId, DomainId parentId,
+        CancellationToken ct = default);
 
-        Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId,
-            CancellationToken ct = default);
+    Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId,
+        CancellationToken ct = default);
 
-        Task<IAssetFolderEntity?> FindAssetFolderAsync(DomainId appId, DomainId id,
-            CancellationToken ct = default);
-    }
+    Task<IAssetFolderEntity?> FindAssetFolderAsync(DomainId appId, DomainId id,
+        CancellationToken ct = default);
 }

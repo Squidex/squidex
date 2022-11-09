@@ -10,52 +10,51 @@ using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Text;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Assets;
+
+public sealed class SvgAssetMetadataSource : IAssetMetadataSource
 {
-    public sealed class SvgAssetMetadataSource : IAssetMetadataSource
+    private const int FileSizeLimit = 2 * 1024 * 1024; // 2MB
+
+    public async Task EnhanceAsync(UploadAssetCommand command,
+        CancellationToken ct)
     {
-        private const int FileSizeLimit = 2 * 1024 * 1024; // 2MB
+        var isSvg =
+            command.File.MimeType == "image/svg+xml" ||
+            command.File.FileName.EndsWith(".svg", StringComparison.OrdinalIgnoreCase);
 
-        public async Task EnhanceAsync(UploadAssetCommand command,
-            CancellationToken ct)
+        if (isSvg)
         {
-            var isSvg =
-                command.File.MimeType == "image/svg+xml" ||
-                command.File.FileName.EndsWith(".svg", StringComparison.OrdinalIgnoreCase);
+            command.Tags.Add("image");
 
-            if (isSvg)
+            if (command.File.FileSize < FileSizeLimit)
             {
-                command.Tags.Add("image");
-
-                if (command.File.FileSize < FileSizeLimit)
+                try
                 {
-                    try
+                    using (var reader = new StreamReader(command.File.OpenRead()))
                     {
-                        using (var reader = new StreamReader(command.File.OpenRead()))
-                        {
-                            var text = await reader.ReadToEndAsync();
+                        var text = await reader.ReadToEndAsync();
 
-                            if (!text.IsValidSvg())
-                            {
-                                throw new ValidationException(T.Get("validation.notAnValidSvg"));
-                            }
+                        if (!text.IsValidSvg())
+                        {
+                            throw new ValidationException(T.Get("validation.notAnValidSvg"));
                         }
                     }
-                    catch (ValidationException)
-                    {
-                        throw;
-                    }
-                    catch
-                    {
-                        return;
-                    }
+                }
+                catch (ValidationException)
+                {
+                    throw;
+                }
+                catch
+                {
+                    return;
                 }
             }
         }
+    }
 
-        public IEnumerable<string> Format(IAssetEntity asset)
-        {
-            yield break;
-        }
+    public IEnumerable<string> Format(IAssetEntity asset)
+    {
+        yield break;
     }
 }

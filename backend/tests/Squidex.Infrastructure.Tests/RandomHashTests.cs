@@ -7,25 +7,24 @@
 
 using Xunit;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+public class RandomHashTests
 {
-    public class RandomHashTests
+    [Fact]
+    public void Should_create_long_hash()
     {
-        [Fact]
-        public void Should_create_long_hash()
-        {
-            var hash = RandomHash.New();
+        var hash = RandomHash.New();
 
-            Assert.Equal(44, hash.Length);
-        }
+        Assert.Equal(44, hash.Length);
+    }
 
-        [Fact]
-        public void Should_create_new_hashs()
-        {
-            var hash1 = RandomHash.New();
-            var hash2 = RandomHash.New();
+    [Fact]
+    public void Should_create_new_hashs()
+    {
+        var hash1 = RandomHash.New();
+        var hash2 = RandomHash.New();
 
-            Assert.NotEqual(hash1, hash2);
-        }
+        Assert.NotEqual(hash1, hash2);
     }
 }

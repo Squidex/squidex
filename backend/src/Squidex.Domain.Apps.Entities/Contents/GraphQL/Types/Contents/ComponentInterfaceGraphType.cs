@@ -8,18 +8,17 @@
 using GraphQL.Types;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
+
+internal sealed class ComponentInterfaceGraphType : InterfaceGraphType<JsonObject>
 {
-    internal sealed class ComponentInterfaceGraphType : InterfaceGraphType<JsonObject>
+    public ComponentInterfaceGraphType()
     {
-        public ComponentInterfaceGraphType()
-        {
-            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-            Name = "Component";
+        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
+        Name = "Component";
 
-            AddField(ContentFields.SchemaId);
+        AddField(ContentFields.SchemaId);
 
-            Description = "The structure of all content types.";
-        }
+        Description = "The structure of all content types.";
     }
 }

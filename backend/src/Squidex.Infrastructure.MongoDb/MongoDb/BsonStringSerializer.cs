@@ -10,52 +10,51 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 
-namespace Squidex.Infrastructure.MongoDb
+namespace Squidex.Infrastructure.MongoDb;
+
+public sealed class BsonStringSerializer<T> : SerializerBase<T>
 {
-    public sealed class BsonStringSerializer<T> : SerializerBase<T>
+    private readonly TypeConverter typeConverter = TypeDescriptor.GetConverter(typeof(T));
+
+    public static void Register()
     {
-        private readonly TypeConverter typeConverter = TypeDescriptor.GetConverter(typeof(T));
-
-        public static void Register()
+        try
         {
-            try
-            {
-                BsonSerializer.RegisterSerializer(new BsonStringSerializer<T>());
-            }
-            catch (BsonSerializationException)
-            {
-                return;
-            }
+            BsonSerializer.RegisterSerializer(new BsonStringSerializer<T>());
         }
-
-        public override T Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+        catch (BsonSerializationException)
         {
-            if (context.Reader.CurrentBsonType == BsonType.Null)
-            {
-                context.Reader.ReadNull();
-
-                return default!;
-            }
-            else
-            {
-                var value = context.Reader.ReadString();
-
-                return (T)typeConverter.ConvertFromInvariantString(value)!;
-            }
+            return;
         }
+    }
 
-        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, T value)
+    public override T Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+    {
+        if (context.Reader.CurrentBsonType == BsonType.Null)
         {
-            var text = value?.ToString();
+            context.Reader.ReadNull();
 
-            if (text != null)
-            {
-                context.Writer.WriteString(text);
-            }
-            else
-            {
-                context.Writer.WriteNull();
-            }
+            return default!;
+        }
+        else
+        {
+            var value = context.Reader.ReadString();
+
+            return (T)typeConverter.ConvertFromInvariantString(value)!;
+        }
+    }
+
+    public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, T value)
+    {
+        var text = value?.ToString();
+
+        if (text != null)
+        {
+            context.Writer.WriteString(text);
+        }
+        else
+        {
+            context.Writer.WriteNull();
         }
     }
 }

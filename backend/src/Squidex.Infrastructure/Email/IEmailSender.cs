@@ -5,11 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Email
+namespace Squidex.Infrastructure.Email;
+
+public interface IEmailSender
 {
-    public interface IEmailSender
-    {
-        Task SendAsync(string recipient, string subject, string body,
-            CancellationToken ct = default);
-    }
+    Task SendAsync(string recipient, string subject, string body,
+        CancellationToken ct = default);
 }

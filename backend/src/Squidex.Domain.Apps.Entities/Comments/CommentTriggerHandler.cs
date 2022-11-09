@@ -16,76 +16,75 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Comments
+namespace Squidex.Domain.Apps.Entities.Comments;
+
+public sealed class CommentTriggerHandler : IRuleTriggerHandler
 {
-    public sealed class CommentTriggerHandler : IRuleTriggerHandler
+    private readonly IScriptEngine scriptEngine;
+    private readonly IUserResolver userResolver;
+
+    public Type TriggerType => typeof(CommentTrigger);
+
+    public CommentTriggerHandler(IScriptEngine scriptEngine, IUserResolver userResolver)
     {
-        private readonly IScriptEngine scriptEngine;
-        private readonly IUserResolver userResolver;
+        this.scriptEngine = scriptEngine;
 
-        public Type TriggerType => typeof(CommentTrigger);
+        this.userResolver = userResolver;
+    }
 
-        public CommentTriggerHandler(IScriptEngine scriptEngine, IUserResolver userResolver)
+    public bool Handles(AppEvent @event)
+    {
+        return @event is CommentCreated;
+    }
+
+    public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+        [EnumeratorCancellation] CancellationToken ct)
+    {
+        var commentCreated = (CommentCreated)@event.Payload;
+
+        if (!(commentCreated.Mentions?.Length > 0))
         {
-            this.scriptEngine = scriptEngine;
-
-            this.userResolver = userResolver;
+            yield break;
         }
 
-        public bool Handles(AppEvent @event)
+        var users = await userResolver.QueryManyAsync(commentCreated.Mentions, ct);
+
+        if (users.Count <= 0)
         {
-            return @event is CommentCreated;
+            yield break;
         }
 
-        public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
-            [EnumeratorCancellation] CancellationToken ct)
+        foreach (var user in users.Values)
         {
-            var commentCreated = (CommentCreated)@event.Payload;
-
-            if (!(commentCreated.Mentions?.Length > 0))
+            var enrichedEvent = new EnrichedCommentEvent
             {
-                yield break;
-            }
-
-            var users = await userResolver.QueryManyAsync(commentCreated.Mentions, ct);
-
-            if (users.Count <= 0)
-            {
-                yield break;
-            }
-
-            foreach (var user in users.Values)
-            {
-                var enrichedEvent = new EnrichedCommentEvent
-                {
-                    MentionedUser = user
-                };
-
-                enrichedEvent.Name = "UserMentioned";
-
-                // Use the concrete event to map properties that are not part of app event.
-                SimpleMapper.Map(commentCreated, enrichedEvent);
-
-                yield return enrichedEvent;
-            }
-        }
-
-        public bool Trigger(EnrichedEvent @event, RuleContext context)
-        {
-            var trigger = (CommentTrigger)context.Rule.Trigger;
-
-            if (string.IsNullOrWhiteSpace(trigger.Condition))
-            {
-                return true;
-            }
-
-            // Script vars are just wrappers over dictionaries for better performance.
-            var vars = new EventScriptVars
-            {
-                Event = @event
+                MentionedUser = user
             };
 
-            return scriptEngine.Evaluate(vars, trigger.Condition);
+            enrichedEvent.Name = "UserMentioned";
+
+            // Use the concrete event to map properties that are not part of app event.
+            SimpleMapper.Map(commentCreated, enrichedEvent);
+
+            yield return enrichedEvent;
         }
+    }
+
+    public bool Trigger(EnrichedEvent @event, RuleContext context)
+    {
+        var trigger = (CommentTrigger)context.Rule.Trigger;
+
+        if (string.IsNullOrWhiteSpace(trigger.Condition))
+        {
+            return true;
+        }
+
+        // Script vars are just wrappers over dictionaries for better performance.
+        var vars = new EventScriptVars
+        {
+            Event = @event
+        };
+
+        return scriptEngine.Evaluate(vars, trigger.Condition);
     }
 }

@@ -7,11 +7,10 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Assets
+namespace Squidex.Domain.Apps.Events.Assets;
+
+[EventType(nameof(AssetFolderRenamed))]
+public sealed class AssetFolderRenamed : AssetFolderEvent
 {
-    [EventType(nameof(AssetFolderRenamed))]
-    public sealed class AssetFolderRenamed : AssetFolderEvent
-    {
-        public string FolderName { get; set; }
-    }
+    public string FolderName { get; set; }
 }

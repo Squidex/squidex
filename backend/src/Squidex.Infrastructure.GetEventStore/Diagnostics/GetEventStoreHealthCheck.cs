@@ -8,24 +8,23 @@
 using EventStore.Client;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace Squidex.Infrastructure.Diagnostics
+namespace Squidex.Infrastructure.Diagnostics;
+
+public sealed class GetEventStoreHealthCheck : IHealthCheck
 {
-    public sealed class GetEventStoreHealthCheck : IHealthCheck
+    private readonly EventStoreClient client;
+
+    public GetEventStoreHealthCheck(EventStoreClientSettings settings)
     {
-        private readonly EventStoreClient client;
+        client = new EventStoreClient(settings);
+    }
 
-        public GetEventStoreHealthCheck(EventStoreClientSettings settings)
-        {
-            client = new EventStoreClient(settings);
-        }
+    public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
+        CancellationToken cancellationToken = default)
+    {
+        await client.ReadStreamAsync(Direction.Forwards, "test", default, cancellationToken: cancellationToken)
+            .FirstOrDefaultAsync(cancellationToken);
 
-        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
-            CancellationToken cancellationToken = default)
-        {
-            await client.ReadStreamAsync(Direction.Forwards, "test", default, cancellationToken: cancellationToken)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            return HealthCheckResult.Healthy("Application must query data from EventStore.");
-        }
+        return HealthCheckResult.Healthy("Application must query data from EventStore.");
     }
 }
