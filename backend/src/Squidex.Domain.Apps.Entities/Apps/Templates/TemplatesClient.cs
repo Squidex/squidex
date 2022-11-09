@@ -37,7 +37,7 @@ public sealed class TemplatesClient
 
                 var text = await httpClient.GetStringAsync(url, ct);
 
-                foreach (Match match in Regex.Matches(text))
+                foreach (Match match in Regex.Matches(text).OfType<Match>())
                 {
                     var currentName = match.Groups["Name"].Value;
 
@@ -65,7 +65,7 @@ public sealed class TemplatesClient
 
                 var text = await httpClient.GetStringAsync(url, ct);
 
-                foreach (Match match in Regex.Matches(text))
+                foreach (Match match in Regex.Matches(text).OfType<Match>())
                 {
                     var title = match.Groups["Title"].Value;
 

@@ -53,7 +53,7 @@ public sealed class ConvertEventStoreAppId : MongoBase<BsonDocument>, IMigration
 
                 var index = 0;
 
-                foreach (BsonDocument @event in commit["Events"].AsBsonArray)
+                foreach (BsonDocument @event in commit["Events"].AsBsonArray.OfType<BsonDocument>())
                 {
                     var data = BsonDocument.Parse(@event["Payload"].AsString);
 

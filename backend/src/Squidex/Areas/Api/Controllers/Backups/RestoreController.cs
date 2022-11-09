@@ -66,7 +66,7 @@ public class RestoreController : ApiController
     [ApiPermission(PermissionIds.AdminRestore)]
     public async Task<IActionResult> PostRestoreJob([FromBody] RestoreRequestDto request)
     {
-        await backupService.StartRestoreAsync(User.Token()!, request.Url, request.Name);
+        await backupService.StartRestoreAsync(User.Token()!, request.Url, request.Name, HttpContext.RequestAborted);
 
         return NoContent();
     }

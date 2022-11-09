@@ -14,7 +14,6 @@ using Xunit;
 using F = Squidex.Infrastructure.Queries.ClrFilter;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
-#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Domain.Apps.Entities.Contents.MongoDb;
 

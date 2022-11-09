@@ -88,13 +88,6 @@ public sealed class PropertyPath : ReadonlyList<string>
         return string.Join(".", this);
     }
 
-    private static string Unescape(string source)
-    {
-        return source
-            .Replace("\\/", "/", StringComparison.OrdinalIgnoreCase)
-            .Replace("\\.", ".", StringComparison.OrdinalIgnoreCase);
-    }
-
     private static PropertyPath Create(IEnumerable<string>? source)
     {
         var inner = source?.ToList();

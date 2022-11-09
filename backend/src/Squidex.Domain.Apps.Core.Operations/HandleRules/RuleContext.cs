@@ -10,7 +10,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.HandleRules;
 
-public struct RuleContext
+public readonly struct RuleContext
 {
     public NamedId<DomainId> AppId { get; init; }
 

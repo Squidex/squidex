@@ -48,7 +48,7 @@ public sealed class ConvertEventStore : MongoBase<BsonDocument>, IMigration
 
             await collection.Find(FindAll).ForEachAsync(async commit =>
             {
-                foreach (BsonDocument @event in commit["Events"].AsBsonArray)
+                foreach (BsonDocument @event in commit["Events"].AsBsonArray.OfType<BsonDocument>())
                 {
                     var meta = BsonDocument.Parse(@event["Metadata"].AsString);
 

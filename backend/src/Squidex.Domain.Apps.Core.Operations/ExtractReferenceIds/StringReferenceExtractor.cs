@@ -80,7 +80,7 @@ public sealed class StringReferenceExtractor
 
         foreach (var pattern in contentsPatterns)
         {
-            foreach (Match match in pattern.Matches(text))
+            foreach (Match match in pattern.Matches(text).OfType<Match>())
             {
                 yield return DomainId.Create(match.Groups["Id"].Value);
             }
@@ -96,7 +96,7 @@ public sealed class StringReferenceExtractor
 
         foreach (var pattern in assetsPatterns)
         {
-            foreach (Match match in pattern.Matches(text))
+            foreach (Match match in pattern.Matches(text).OfType<Match>())
             {
                 yield return DomainId.Create(match.Groups["Id"].Value);
             }
