@@ -20,6 +20,7 @@ using Squidex.Infrastructure.Json.System;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
+using Squidex.Infrastructure.Reflection;
 
 #pragma warning disable SYSLIB0011 // Type or member is obsolete
 
@@ -81,6 +82,7 @@ public static class TestUtils
         options.Converters.Add(new StringConverter<Language>());
         options.Converters.Add(new StringConverter<RefToken>());
         options.Converters.Add(new JsonStringEnumConverter());
+        options.TypeInfoResolver = new PolymorphicTypeResolver(new TypeNameRegistry());
         configure?.Invoke(options);
 
         return options;

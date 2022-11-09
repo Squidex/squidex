@@ -207,7 +207,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
 
         var type = FindDataType(graphQLSchema, "MySchema");
 
-        Assert.Contains(type?.Fields, x => x.Name == "content");
+        Assert.Contains(type?.Fields!, x => x.Name == "content");
     }
 
     [Fact]
@@ -223,7 +223,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
 
         var type = FindDataType(graphQLSchema, "MySchema");
 
-        Assert.Contains(type?.Fields, x => x.Name == "gql_2Field");
+        Assert.Contains(type?.Fields!, x => x.Name == "gql_2Field");
     }
 
     [Fact]
@@ -240,8 +240,8 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
 
         var type = FindDataType(graphQLSchema, "MySchema");
 
-        Assert.Contains(type?.Fields, x => x.Name == "myField");
-        Assert.Contains(type?.Fields, x => x.Name == "myField2");
+        Assert.Contains(type?.Fields!, x => x.Name == "myField");
+        Assert.Contains(type?.Fields!, x => x.Name == "myField2");
     }
 
     [Fact]
@@ -259,7 +259,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
 
         var type = FindDataType(graphQLSchema, "MySchema");
 
-        Assert.DoesNotContain(type?.Fields, x => x.Name == "myComponent");
+        Assert.DoesNotContain(type?.Fields!, x => x.Name == "myComponent");
     }
 
     [Fact]
@@ -277,7 +277,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
 
         var type = FindDataType(graphQLSchema, "MySchema");
 
-        Assert.DoesNotContain(type?.Fields, x => x.Name == "myComponents");
+        Assert.DoesNotContain(type?.Fields!, x => x.Name == "myComponents");
     }
 
     [Fact]
@@ -295,7 +295,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
 
         var type = FindDataType(graphQLSchema, "MySchema");
 
-        Assert.DoesNotContain(type?.Fields, x => x.Name == "myReferences");
+        Assert.DoesNotContain(type?.Fields!, x => x.Name == "myReferences");
     }
 
     private static IObjectGraphType? FindDataType(GraphQLSchema graphQLSchema, string schema)

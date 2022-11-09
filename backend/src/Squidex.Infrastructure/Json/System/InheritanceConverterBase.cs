@@ -7,11 +7,10 @@
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Infrastructure.Json.System;
 
-public abstract class InheritanceConverterBase<T> : JsonConverter<T> where T : notnull
+public abstract class InheritanceConverterBase<T> : JsonConverter<T>, IInheritanceConverter where T : notnull
 {
     private readonly JsonEncodedText discriminatorProperty;
 
@@ -20,7 +19,6 @@ public abstract class InheritanceConverterBase<T> : JsonConverter<T> where T : n
     protected InheritanceConverterBase(string discriminatorName)
     {
         discriminatorProperty = JsonEncodedText.Encode(discriminatorName);
-
         DiscriminatorName = discriminatorName;
     }
 
@@ -38,57 +36,51 @@ public abstract class InheritanceConverterBase<T> : JsonConverter<T> where T : n
             throw new JsonException();
         }
 
-        if (!typeReader.Read() || typeReader.TokenType != JsonTokenType.PropertyName)
+        while (typeReader.Read())
         {
-            throw new JsonException();
-        }
-
-        var propertyName = typeReader.GetString();
-
-        if (typeReader.Read() && typeReader.TokenType == JsonTokenType.String && propertyName == DiscriminatorName)
-        {
-            var type = GetDiscriminatorType(typeReader.GetString()!, typeToConvert);
-
-            return (T?)JsonSerializer.Deserialize(ref reader, type, options);
-        }
-        else
-        {
-            using var document = JsonDocument.ParseValue(ref reader);
-
-            if (!document.RootElement.TryGetProperty(DiscriminatorName, out var discriminator))
+            if (typeReader.TokenType == JsonTokenType.PropertyName &&
+                typeReader.ValueTextEquals(discriminatorProperty.EncodedUtf8Bytes))
             {
-                ThrowHelper.JsonException($"Object has no discriminator '{DiscriminatorName}.");
-                return default!;
+                // Advance the reader to the property value
+                typeReader.Read();
+
+                if (typeReader.TokenType != JsonTokenType.String)
+                {
+                    ThrowHelper.JsonException($"Expected string discriminator value, got '{reader.TokenType}'");
+                    return default!;
+                }
+
+                // Resolve the type from the discriminator value.
+                var type = GetDiscriminatorType(typeReader.GetString()!, typeToConvert);
+
+                // Perform the actual deserialization with the original reader
+                return (T)JsonSerializer.Deserialize(ref reader, type, options)!;
             }
-
-            var type = GetDiscriminatorType(discriminator.GetString()!, typeToConvert);
-
-            using var bufferWriter = DefaultPools.MemoryStream.GetStream();
-
-            using (var writer = new Utf8JsonWriter(bufferWriter))
+            else if (typeReader.TokenType == JsonTokenType.StartObject || typeReader.TokenType == JsonTokenType.StartArray)
             {
-                document.RootElement.WriteTo(writer);
+                if (!typeReader.TrySkip())
+                {
+                    typeReader.Skip();
+                }
             }
-
-            return (T?)JsonSerializer.Deserialize(bufferWriter.ToArray(), type, options);
         }
+
+        ThrowHelper.JsonException($"Object has no discriminator '{DiscriminatorName}.");
+        return default!;
     }
 
     public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
     {
-        var name = GetDiscriminatorValue(value.GetType());
+        EnsureTypeResolver(options);
 
-        writer.WriteStartObject();
-        writer.WriteString(discriminatorProperty, name);
+        JsonSerializer.Serialize<object>(writer, value!, options);
+    }
 
-        using (var document = JsonSerializer.SerializeToDocument(value, value.GetType(), options))
+    private static void EnsureTypeResolver(JsonSerializerOptions options)
+    {
+        if (options.TypeInfoResolver is not PolymorphicTypeResolver)
         {
-            foreach (var property in document.RootElement.EnumerateObject())
-            {
-                property.WriteTo(writer);
-            }
+            ThrowHelper.JsonException($"TypeInfoResolver must be of type PolymorphicTypeResolver.");
         }
-
-        writer.WriteEndObject();
     }
 }

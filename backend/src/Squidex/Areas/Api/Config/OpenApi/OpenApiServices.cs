@@ -52,6 +52,9 @@ public static class OpenApiServices
         services.AddSingletonAs<XmlResponseTypesProcessor>()
             .As<IOperationProcessor>();
 
+        services.AddSingletonAs<InheritanceProcessor>()
+            .As<ISchemaProcessor>();
+
         services.AddSingletonAs<JsonSchemaGenerator>()
             .AsSelf();
 

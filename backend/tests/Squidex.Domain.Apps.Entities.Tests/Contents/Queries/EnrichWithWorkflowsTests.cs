@@ -70,7 +70,7 @@ public class EnrichWithWorkflowsTests
 
         await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
 
-        Assert.Empty(content.NextStatuses);
+        Assert.Empty(content.NextStatuses!);
 
         A.CallTo(() => workflow.GetNextAsync(content, A<Status>._, requestContext.UserPrincipal))
             .MustNotHaveHappened();

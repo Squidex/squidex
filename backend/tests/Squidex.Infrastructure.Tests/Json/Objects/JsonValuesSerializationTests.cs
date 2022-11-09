@@ -19,7 +19,7 @@ public class JsonValuesSerializationTests
         Bson
     }
 
-    private static IEnumerable<object[]> Serializers()
+    public static IEnumerable<object[]> Serializers()
     {
         yield return new object[] { SerializerMode.Json };
         yield return new object[] { SerializerMode.Bson };

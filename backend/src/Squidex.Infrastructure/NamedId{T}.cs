@@ -9,29 +9,19 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 #pragma warning disable MA0048 // File name must match type name
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
 namespace Squidex.Infrastructure;
 
 public delegate bool Parser<T>(ReadOnlySpan<char> input, out T result);
 
 [TypeConverter(typeof(NamedIdTypeConverter))]
-public sealed record NamedId<T> where T : notnull
+public sealed record NamedId<T>(T Id, string Name) where T : notnull
+#pragma warning restore SA1313 // Parameter names should begin with lower-case letter
 {
     private static readonly int GuidLength = Guid.Empty.ToString().Length;
 
-    public T Id { get; }
-
-    public string Name { get; }
-
-    public NamedId(T id, string name)
-    {
-        Guard.NotNull(id);
-        Guard.NotNull(name);
-
-        Id = id;
-
-        Name = name;
-    }
+    public string Name { get; } = Guard.NotNull(Name);
 
     public override string ToString()
     {

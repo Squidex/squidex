@@ -7,7 +7,7 @@
 @functions {
 public string ErrorClass(string error)
 {
-    return ViewData.ModelState[error]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid ? "border-danger" : "";
+return ViewData.ModelState[error]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid ? "border-danger" : "";
 }
 }
 

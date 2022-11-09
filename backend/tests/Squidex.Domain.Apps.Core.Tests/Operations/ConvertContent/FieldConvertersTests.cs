@@ -20,7 +20,7 @@ public class FieldConvertersTests
 {
     private readonly LanguagesConfig languages = LanguagesConfig.English.Set(Language.DE);
 
-    private static IEnumerable<object?[]> InvalidValues()
+    public static IEnumerable<object?[]> InvalidValues()
     {
         yield return new object?[] { JsonValue.Null };
         yield return new object?[] { JsonValue.Create(false) }; // Undefined
