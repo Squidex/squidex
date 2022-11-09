@@ -10,51 +10,50 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Squidex.Infrastructure;
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public sealed class ExposedValues : Dictionary<string, string>
 {
-    public sealed class ExposedValues : Dictionary<string, string>
+    public ExposedValues()
     {
-        public ExposedValues()
+    }
+
+    public ExposedValues(ExposedConfiguration configured, IConfiguration configuration, Assembly? assembly = null)
+    {
+        Guard.NotNull(configured);
+        Guard.NotNull(configuration);
+
+        foreach (var kvp in configured)
         {
-        }
+            var value = configuration.GetValue<string>(kvp.Value);
 
-        public ExposedValues(ExposedConfiguration configured, IConfiguration configuration, Assembly? assembly = null)
-        {
-            Guard.NotNull(configured);
-            Guard.NotNull(configuration);
-
-            foreach (var kvp in configured)
+            if (!string.IsNullOrWhiteSpace(value))
             {
-                var value = configuration.GetValue<string>(kvp.Value);
-
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    this[kvp.Key] = value;
-                }
-            }
-
-            if (assembly != null)
-            {
-                if (!ContainsKey("version"))
-                {
-                    this["version"] = assembly.GetName()!.Version!.ToString();
-                }
+                this[kvp.Key] = value;
             }
         }
 
-        public override string ToString()
+        if (assembly != null)
         {
-            var sb = new StringBuilder();
-
-            foreach (var (key, value) in this)
+            if (!ContainsKey("version"))
             {
-                sb.AppendIfNotEmpty(", ");
-                sb.Append(key);
-                sb.Append(": ");
-                sb.Append(value);
+                this["version"] = assembly.GetName()!.Version!.ToString();
             }
-
-            return sb.ToString();
         }
+    }
+
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+
+        foreach (var (key, value) in this)
+        {
+            sb.AppendIfNotEmpty(", ");
+            sb.Append(key);
+            sb.Append(": ");
+            sb.Append(value);
+        }
+
+        return sb.ToString();
     }
 }

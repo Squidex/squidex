@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Events.Schemas
-{
-    public sealed class SchemaCreatedField : SchemaCreatedFieldBase
-    {
-        public string Partitioning { get; set; }
+namespace Squidex.Domain.Apps.Events.Schemas;
 
-        public SchemaCreatedNestedField[] Nested { get; set; }
-    }
+public sealed class SchemaCreatedField : SchemaCreatedFieldBase
+{
+    public string Partitioning { get; set; }
+
+    public SchemaCreatedNestedField[] Nested { get; set; }
 }

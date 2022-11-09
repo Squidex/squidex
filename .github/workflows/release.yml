@@ -93,7 +93,7 @@ jobs:
         working-directory: backend/tests
 
       - name: RUN TEST
-        uses: kohlerdominik/docker-run-action@v1.0.2
+        uses: kohlerdominik/docker-run-action@v1.1.0
         with:
           image: squidex/build
           environment: |
@@ -107,7 +107,7 @@ jobs:
           run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
       - name: RUN TEST on path
-        uses: kohlerdominik/docker-run-action@v1.0.2
+        uses: kohlerdominik/docker-run-action@v1.1.0
         with:
           image: squidex/build
           environment: |
@@ -121,7 +121,7 @@ jobs:
           run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
       - name: RUN TEST with dedicated collections
-        uses: kohlerdominik/docker-run-action@v1.0.2
+        uses: kohlerdominik/docker-run-action@v1.1.0
         with:
           image: squidex/build
           environment: |

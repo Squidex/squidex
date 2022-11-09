@@ -9,54 +9,53 @@ using NodaTime;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Domain.Apps.Entities.Comments
+namespace Squidex.Domain.Apps.Entities.Comments;
+
+public sealed class WatchingService : IWatchingService
 {
-    public sealed class WatchingService : IWatchingService
+    private readonly IPersistenceFactory<State> persistenceFactory;
+
+    [CollectionName("Watches")]
+    public sealed class State
     {
-        private readonly IPersistenceFactory<State> persistenceFactory;
+        private static readonly Duration Timeout = Duration.FromMinutes(1);
 
-        [CollectionName("Watches")]
-        public sealed class State
+        public Dictionary<string, Instant> Users { get; } = new Dictionary<string, Instant>();
+
+        public (bool, string[]) Add(string watcherId, IClock clock)
         {
-            private static readonly Duration Timeout = Duration.FromMinutes(1);
+            var now = clock.GetCurrentInstant();
 
-            public Dictionary<string, Instant> Users { get; } = new Dictionary<string, Instant>();
-
-            public (bool, string[]) Add(string watcherId, IClock clock)
+            foreach (var (userId, lastSeen) in Users.ToList())
             {
-                var now = clock.GetCurrentInstant();
+                var timeSinceLastSeen = now - lastSeen;
 
-                foreach (var (userId, lastSeen) in Users.ToList())
+                if (timeSinceLastSeen > Timeout)
                 {
-                    var timeSinceLastSeen = now - lastSeen;
-
-                    if (timeSinceLastSeen > Timeout)
-                    {
-                        Users.Remove(userId);
-                    }
+                    Users.Remove(userId);
                 }
-
-                Users[watcherId] = now;
-
-                return (true, Users.Keys.ToArray());
             }
+
+            Users[watcherId] = now;
+
+            return (true, Users.Keys.ToArray());
         }
+    }
 
-        public IClock Clock { get; set; } = SystemClock.Instance;
+    public IClock Clock { get; set; } = SystemClock.Instance;
 
-        public WatchingService(IPersistenceFactory<State> persistenceFactory)
-        {
-            this.persistenceFactory = persistenceFactory;
-        }
+    public WatchingService(IPersistenceFactory<State> persistenceFactory)
+    {
+        this.persistenceFactory = persistenceFactory;
+    }
 
-        public async Task<string[]> GetWatchingUsersAsync(DomainId appId, string? resource, string userId,
-            CancellationToken ct = default)
-        {
-            var state = new SimpleState<State>(persistenceFactory, GetType(), $"{appId}_{resource}");
+    public async Task<string[]> GetWatchingUsersAsync(DomainId appId, string? resource, string userId,
+        CancellationToken ct = default)
+    {
+        var state = new SimpleState<State>(persistenceFactory, GetType(), $"{appId}_{resource}");
 
-            await state.LoadAsync(ct);
+        await state.LoadAsync(ct);
 
-            return await state.UpdateAsync(x => x.Add(userId, Clock), ct: ct);
-        }
+        return await state.UpdateAsync(x => x.Add(userId, Clock), ct: ct);
     }
 }

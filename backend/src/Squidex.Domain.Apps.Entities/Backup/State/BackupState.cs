@@ -8,23 +8,22 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 
-namespace Squidex.Domain.Apps.Entities.Backup.State
+namespace Squidex.Domain.Apps.Entities.Backup.State;
+
+public sealed class BackupState
 {
-    public sealed class BackupState
+    public List<BackupJob> Jobs { get; set;  } = new List<BackupJob>();
+
+    public void EnsureCanStart()
     {
-        public List<BackupJob> Jobs { get; set;  } = new List<BackupJob>();
-
-        public void EnsureCanStart()
+        if (Jobs.Any(x => x.Status == JobStatus.Started))
         {
-            if (Jobs.Any(x => x.Status == JobStatus.Started))
-            {
-                throw new DomainException(T.Get("backups.alreadyRunning"));
-            }
+            throw new DomainException(T.Get("backups.alreadyRunning"));
+        }
 
-            if (Jobs.Count >= 10)
-            {
-                throw new DomainException(T.Get("backups.maxReached", new { max = 10 }));
-            }
+        if (Jobs.Count >= 10)
+        {
+            throw new DomainException(T.Get("backups.maxReached", new { max = 10 }));
         }
     }
 }

@@ -7,72 +7,71 @@
 
 using OpenSearch.Net;
 
-namespace Squidex.Extensions.Text.ElasticSearch
+namespace Squidex.Extensions.Text.ElasticSearch;
+
+public sealed class OpenSearchClient : IElasticSearchClient
 {
-    public sealed class OpenSearchClient : IElasticSearchClient
+    private readonly IOpenSearchLowLevelClient openSearch;
+
+    public OpenSearchClient(string configurationString)
     {
-        private readonly IOpenSearchLowLevelClient openSearch;
+        var config = new ConnectionConfiguration(new Uri(configurationString));
 
-        public OpenSearchClient(string configurationString)
+        openSearch = new OpenSearchLowLevelClient(config);
+    }
+
+    public async Task CreateIndexAsync<T>(string indexName, T request,
+        CancellationToken ct)
+    {
+        var result = await openSearch.Indices.PutMappingAsync<StringResponse>(indexName, CreatePost(request), ctx: ct);
+
+        if (!result.Success)
         {
-            var config = new ConnectionConfiguration(new Uri(configurationString));
+            throw new InvalidOperationException($"Failed with ${result.Body}", result.OriginalException);
+        }
+    }
 
-            openSearch = new OpenSearchLowLevelClient(config);
+    public async Task BulkAsync<T>(List<T> requests,
+        CancellationToken ct)
+    {
+        var result = await openSearch.BulkAsync<StringResponse>(CreatePost(requests), ctx: ct);
+
+        if (!result.Success)
+        {
+            throw new InvalidOperationException($"Failed with ${result.Body}", result.OriginalException);
+        }
+    }
+
+    public async Task<List<dynamic>> SearchAsync<T>(string indexName, T request,
+        CancellationToken ct)
+    {
+        var result = await openSearch.SearchAsync<DynamicResponse>(indexName, CreatePost(request), ctx: ct);
+
+        if (!result.Success)
+        {
+            throw result.OriginalException;
         }
 
-        public async Task CreateIndexAsync<T>(string indexName, T request,
-            CancellationToken ct)
-        {
-            var result = await openSearch.Indices.PutMappingAsync<StringResponse>(indexName, CreatePost(request), ctx: ct);
+        var hits = new List<dynamic>();
 
-            if (!result.Success)
+        foreach (var item in result.Body.hits.hits)
+        {
+            if (item != null)
             {
-                throw new InvalidOperationException($"Failed with ${result.Body}", result.OriginalException);
+                hits.Add(item);
             }
         }
 
-        public async Task BulkAsync<T>(List<T> requests,
-            CancellationToken ct)
-        {
-            var result = await openSearch.BulkAsync<StringResponse>(CreatePost(requests), ctx: ct);
+        return hits;
+    }
 
-            if (!result.Success)
-            {
-                throw new InvalidOperationException($"Failed with ${result.Body}", result.OriginalException);
-            }
-        }
+    private static PostData CreatePost<T>(List<T> requests)
+    {
+        return PostData.MultiJson(requests.OfType<object>());
+    }
 
-        public async Task<List<dynamic>> SearchAsync<T>(string indexName, T request,
-            CancellationToken ct)
-        {
-            var result = await openSearch.SearchAsync<DynamicResponse>(indexName, CreatePost(request), ctx: ct);
-
-            if (!result.Success)
-            {
-                throw result.OriginalException;
-            }
-
-            var hits = new List<dynamic>();
-
-            foreach (var item in result.Body.hits.hits)
-            {
-                if (item != null)
-                {
-                    hits.Add(item);
-                }
-            }
-
-            return hits;
-        }
-
-        private static PostData CreatePost<T>(List<T> requests)
-        {
-            return PostData.MultiJson(requests.OfType<object>());
-        }
-
-        private static PostData CreatePost<T>(T data)
-        {
-            return new SerializableData<T>(data);
-        }
+    private static PostData CreatePost<T>(T data)
+    {
+        return new SerializableData<T>(data);
     }
 }

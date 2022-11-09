@@ -8,26 +8,25 @@
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Translations;
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public sealed class ReadonlyCommandMiddleware : ICommandMiddleware
 {
-    public sealed class ReadonlyCommandMiddleware : ICommandMiddleware
+    private readonly ReadonlyOptions options;
+
+    public ReadonlyCommandMiddleware(IOptions<ReadonlyOptions> options)
     {
-        private readonly ReadonlyOptions options;
+        this.options = options.Value;
+    }
 
-        public ReadonlyCommandMiddleware(IOptions<ReadonlyOptions> options)
+    public Task HandleAsync(CommandContext context, NextDelegate next,
+        CancellationToken ct)
+    {
+        if (options.IsReadonly)
         {
-            this.options = options.Value;
+            throw new DomainException(T.Get("common.readonlyMode"));
         }
 
-        public Task HandleAsync(CommandContext context, NextDelegate next,
-            CancellationToken ct)
-        {
-            if (options.IsReadonly)
-            {
-                throw new DomainException(T.Get("common.readonlyMode"));
-            }
-
-            return next(context, ct);
-        }
+        return next(context, ct);
     }
 }

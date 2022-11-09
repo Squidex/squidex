@@ -9,14 +9,13 @@ using System.Text;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.IO;
 
-namespace Squidex.Infrastructure.ObjectPool
-{
-    public static class DefaultPools
-    {
-        public static readonly RecyclableMemoryStreamManager MemoryStream =
-            new RecyclableMemoryStreamManager();
+namespace Squidex.Infrastructure.ObjectPool;
 
-        public static readonly ObjectPool<StringBuilder> StringBuilder =
-            new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
-    }
+public static class DefaultPools
+{
+    public static readonly RecyclableMemoryStreamManager MemoryStream =
+        new RecyclableMemoryStreamManager();
+
+    public static readonly ObjectPool<StringBuilder> StringBuilder =
+        new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
 }

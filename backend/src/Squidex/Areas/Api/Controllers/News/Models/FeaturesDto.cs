@@ -7,19 +7,18 @@
 
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.Api.Controllers.News.Models
-{
-    public class FeaturesDto
-    {
-        /// <summary>
-        /// The latest features.
-        /// </summary>
-        [LocalizedRequired]
-        public List<FeatureDto> Features { get; } = new List<FeatureDto>();
+namespace Squidex.Areas.Api.Controllers.News.Models;
 
-        /// <summary>
-        /// The recent version.
-        /// </summary>
-        public int Version { get; set; }
-    }
+public class FeaturesDto
+{
+    /// <summary>
+    /// The latest features.
+    /// </summary>
+    [LocalizedRequired]
+    public List<FeatureDto> Features { get; } = new List<FeatureDto>();
+
+    /// <summary>
+    /// The recent version.
+    /// </summary>
+    public int Version { get; set; }
 }

@@ -7,10 +7,9 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands;
+
+public sealed class UpdateField : FieldCommand
 {
-    public sealed class UpdateField : FieldCommand
-    {
-        public FieldProperties Properties { get; set; }
-    }
+    public FieldProperties Properties { get; set; }
 }

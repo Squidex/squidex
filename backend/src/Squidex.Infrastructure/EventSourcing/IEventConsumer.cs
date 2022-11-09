@@ -5,43 +5,42 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+public interface IEventConsumer
 {
-    public interface IEventConsumer
+    int BatchDelay => 500;
+
+    int BatchSize => 1;
+
+    string Name { get; }
+
+    string EventsFilter => ".*";
+
+    bool StartLatest => false;
+
+    bool CanClear => true;
+
+    bool Handles(StoredEvent @event)
     {
-        int BatchDelay => 500;
+        return true;
+    }
 
-        int BatchSize => 1;
+    Task ClearAsync()
+    {
+        return Task.CompletedTask;
+    }
 
-        string Name { get; }
+    Task On(Envelope<IEvent> @event)
+    {
+        return Task.CompletedTask;
+    }
 
-        string EventsFilter => ".*";
-
-        bool StartLatest => false;
-
-        bool CanClear => true;
-
-        bool Handles(StoredEvent @event)
+    async Task On(IEnumerable<Envelope<IEvent>> events)
+    {
+        foreach (var @event in events)
         {
-            return true;
-        }
-
-        Task ClearAsync()
-        {
-            return Task.CompletedTask;
-        }
-
-        Task On(Envelope<IEvent> @event)
-        {
-            return Task.CompletedTask;
-        }
-
-        async Task On(IEnumerable<Envelope<IEvent>> events)
-        {
-            foreach (var @event in events)
-            {
-                await On(@event);
-            }
+            await On(@event);
         }
     }
 }

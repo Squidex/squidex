@@ -14,76 +14,75 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
+namespace Squidex.Domain.Apps.Entities.Assets.MongoDb;
+
+public class AssetMappingTests
 {
-    public class AssetMappingTests
+    [Fact]
+    public void Should_map_asset()
     {
-        [Fact]
-        public void Should_map_asset()
+        var user = RefToken.User("1");
+
+        var time = SystemClock.Instance.GetCurrentInstant();
+
+        var source = new AssetDomainObject.State
         {
-            var user = RefToken.User("1");
+            Id = DomainId.NewGuid(),
+            AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
+            Created = time,
+            CreatedBy = user,
+            FileHash = "my-hash",
+            FileName = "my-image.png",
+            FileSize = 1024,
+            FileVersion = 13,
+            IsDeleted = true,
+            IsProtected = true,
+            LastModified = time,
+            LastModifiedBy = user,
+            Metadata = new AssetMetadata().SetPixelHeight(600),
+            MimeType = "image/png",
+            ParentId = DomainId.NewGuid(),
+            Slug = "my-image",
+            Tags = new HashSet<string> { "image" },
+            TotalSize = 1024 * 2,
+            Type = AssetType.Image,
+            Version = 42
+        };
 
-            var time = SystemClock.Instance.GetCurrentInstant();
+        var snapshotJob = new SnapshotWriteJob<AssetDomainObject.State>(source.UniqueId, source, source.Version);
+        var snapshot = MongoAssetEntity.Create(snapshotJob);
 
-            var source = new AssetDomainObject.State
-            {
-                Id = DomainId.NewGuid(),
-                AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
-                Created = time,
-                CreatedBy = user,
-                FileHash = "my-hash",
-                FileName = "my-image.png",
-                FileSize = 1024,
-                FileVersion = 13,
-                IsDeleted = true,
-                IsProtected = true,
-                LastModified = time,
-                LastModifiedBy = user,
-                Metadata = new AssetMetadata().SetPixelHeight(600),
-                MimeType = "image/png",
-                ParentId = DomainId.NewGuid(),
-                Slug = "my-image",
-                Tags = new HashSet<string> { "image" },
-                TotalSize = 1024 * 2,
-                Type = AssetType.Image,
-                Version = 42
-            };
+        var mapped = snapshot.ToState();
 
-            var snapshotJob = new SnapshotWriteJob<AssetDomainObject.State>(source.UniqueId, source, source.Version);
-            var snapshot = MongoAssetEntity.Create(snapshotJob);
+        mapped.Should().BeEquivalentTo(source);
+    }
 
-            var mapped = snapshot.ToState();
+    [Fact]
+    public void Should_map_asset_folder()
+    {
+        var user = RefToken.User("1");
 
-            mapped.Should().BeEquivalentTo(source);
-        }
+        var time = SystemClock.Instance.GetCurrentInstant();
 
-        [Fact]
-        public void Should_map_asset_folder()
+        var source = new AssetFolderDomainObject.State
         {
-            var user = RefToken.User("1");
+            Id = DomainId.NewGuid(),
+            AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
+            Created = time,
+            CreatedBy = user,
+            FolderName = "my-folder",
+            IsDeleted = true,
+            LastModified = time,
+            LastModifiedBy = user,
+            ParentId = DomainId.NewGuid(),
+            Version = 42
+        };
 
-            var time = SystemClock.Instance.GetCurrentInstant();
+        var snapshotJob = new SnapshotWriteJob<AssetFolderDomainObject.State>(source.UniqueId, source, source.Version);
+        var snapshot = MongoAssetFolderEntity.Create(snapshotJob);
 
-            var source = new AssetFolderDomainObject.State
-            {
-                Id = DomainId.NewGuid(),
-                AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
-                Created = time,
-                CreatedBy = user,
-                FolderName = "my-folder",
-                IsDeleted = true,
-                LastModified = time,
-                LastModifiedBy = user,
-                ParentId = DomainId.NewGuid(),
-                Version = 42
-            };
+        var mapped = snapshot.ToState();
 
-            var snapshotJob = new SnapshotWriteJob<AssetFolderDomainObject.State>(source.UniqueId, source, source.Version);
-            var snapshot = MongoAssetFolderEntity.Create(snapshotJob);
-
-            var mapped = snapshot.ToState();
-
-            mapped.Should().BeEquivalentTo(source);
-        }
+        mapped.Should().BeEquivalentTo(source);
     }
 }

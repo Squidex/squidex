@@ -5,11 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.ValidateContent
+namespace Squidex.Domain.Apps.Core.ValidateContent;
+
+public enum ValidationAction
 {
-    public enum ValidationAction
-    {
-        Upsert,
-        Publish
-    }
+    Upsert,
+    Publish
 }

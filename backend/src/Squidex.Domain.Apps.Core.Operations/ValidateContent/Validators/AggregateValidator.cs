@@ -7,35 +7,34 @@
 
 using Squidex.Infrastructure.Translations;
 
-namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
-{
-    public sealed class AggregateValidator : IValidator
-    {
-        private readonly IValidator[]? validators;
+namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
 
-        public AggregateValidator(IEnumerable<IValidator>? validators)
+public sealed class AggregateValidator : IValidator
+{
+    private readonly IValidator[]? validators;
+
+    public AggregateValidator(IEnumerable<IValidator>? validators)
+    {
+        this.validators = validators?.ToArray();
+    }
+
+    public void Validate(object? value, ValidationContext context)
+    {
+        if (validators == null || validators.Length == 0)
         {
-            this.validators = validators?.ToArray();
+            return;
         }
 
-        public void Validate(object? value, ValidationContext context)
+        try
         {
-            if (validators == null || validators.Length == 0)
+            foreach (var validator in validators)
             {
-                return;
+                validator.Validate(value, context);
             }
-
-            try
-            {
-                foreach (var validator in validators)
-                {
-                    validator.Validate(value, context);
-                }
-            }
-            catch
-            {
-                context.AddError(context.Path, T.Get("contents.validation.error"));
-            }
+        }
+        catch
+        {
+            context.AddError(context.Path, T.Get("contents.validation.error"));
         }
     }
 }

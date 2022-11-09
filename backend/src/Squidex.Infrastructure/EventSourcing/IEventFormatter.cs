@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+public interface IEventFormatter
 {
-    public interface IEventFormatter
-    {
-        Envelope<IEvent> Parse(StoredEvent storedEvent);
+    Envelope<IEvent> Parse(StoredEvent storedEvent);
 
-        Envelope<IEvent>? ParseIfKnown(StoredEvent storedEvent);
+    Envelope<IEvent>? ParseIfKnown(StoredEvent storedEvent);
 
-        EventData ToEventData(Envelope<IEvent> envelope, Guid commitId, bool migrate = true);
-    }
+    EventData ToEventData(Envelope<IEvent> envelope, Guid commitId, bool migrate = true);
 }

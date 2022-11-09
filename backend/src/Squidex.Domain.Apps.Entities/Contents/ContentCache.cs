@@ -10,13 +10,12 @@ using Microsoft.Extensions.Options;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents;
+
+public sealed class ContentCache : QueryCache<DomainId, IEnrichedContentEntity>, IContentCache
 {
-    public sealed class ContentCache : QueryCache<DomainId, IEnrichedContentEntity>, IContentCache
+    public ContentCache(IMemoryCache? memoryCache, IOptions<ContentOptions> options)
+        : base(options.Value.CanCache ? memoryCache : null)
     {
-        public ContentCache(IMemoryCache? memoryCache, IOptions<ContentOptions> options)
-            : base(options.Value.CanCache ? memoryCache : null)
-        {
-        }
     }
 }

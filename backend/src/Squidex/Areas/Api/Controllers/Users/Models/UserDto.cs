@@ -11,91 +11,90 @@ using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Users.Models
+namespace Squidex.Areas.Api.Controllers.Users.Models;
+
+public sealed class UserDto : Resource
 {
-    public sealed class UserDto : Resource
+    /// <summary>
+    /// The ID of the user.
+    /// </summary>
+    [LocalizedRequired]
+    public string Id { get; set; }
+
+    /// <summary>
+    /// The email of the user. Unique value.
+    /// </summary>
+    [LocalizedRequired]
+    public string Email { get; set; }
+
+    /// <summary>
+    /// The display name (usually first name and last name) of the user.
+    /// </summary>
+    [LocalizedRequired]
+    public string DisplayName { get; set; }
+
+    /// <summary>
+    /// Determines if the user is locked.
+    /// </summary>
+    [LocalizedRequired]
+    public bool IsLocked { get; set; }
+
+    /// <summary>
+    /// Additional permissions for the user.
+    /// </summary>
+    [LocalizedRequired]
+    public IEnumerable<string> Permissions { get; set; }
+
+    public static UserDto FromDomain(IUser user, Resources resources)
     {
-        /// <summary>
-        /// The ID of the user.
-        /// </summary>
-        [LocalizedRequired]
-        public string Id { get; set; }
+        var result = SimpleMapper.Map(user, new UserDto());
 
-        /// <summary>
-        /// The email of the user. Unique value.
-        /// </summary>
-        [LocalizedRequired]
-        public string Email { get; set; }
+        result.DisplayName = user.Claims.DisplayName()!;
+        result.Permissions = user.Claims.Permissions().ToIds();
 
-        /// <summary>
-        /// The display name (usually first name and last name) of the user.
-        /// </summary>
-        [LocalizedRequired]
-        public string DisplayName { get; set; }
+        return result.CreateLinks(resources);
+    }
 
-        /// <summary>
-        /// Determines if the user is locked.
-        /// </summary>
-        [LocalizedRequired]
-        public bool IsLocked { get; set; }
+    private UserDto CreateLinks(Resources resources)
+    {
+        var values = new { id = Id };
 
-        /// <summary>
-        /// Additional permissions for the user.
-        /// </summary>
-        [LocalizedRequired]
-        public IEnumerable<string> Permissions { get; set; }
-
-        public static UserDto FromDomain(IUser user, Resources resources)
+        if (resources.Controller is UserManagementController)
         {
-            var result = SimpleMapper.Map(user, new UserDto());
-
-            result.DisplayName = user.Claims.DisplayName()!;
-            result.Permissions = user.Claims.Permissions().ToIds();
-
-            return result.CreateLinks(resources);
+            AddSelfLink(resources.Url<UserManagementController>(c => nameof(c.GetUser), values));
+        }
+        else
+        {
+            AddSelfLink(resources.Url<UsersController>(c => nameof(c.GetUser), values));
         }
 
-        private UserDto CreateLinks(Resources resources)
+        if (!resources.Controller.IsUser(Id))
         {
-            var values = new { id = Id };
-
-            if (resources.Controller is UserManagementController)
+            if (resources.CanLockUser && !IsLocked)
             {
-                AddSelfLink(resources.Url<UserManagementController>(c => nameof(c.GetUser), values));
-            }
-            else
-            {
-                AddSelfLink(resources.Url<UsersController>(c => nameof(c.GetUser), values));
+                AddPutLink("lock",
+                    resources.Url<UserManagementController>(c => nameof(c.LockUser), values));
             }
 
-            if (!resources.Controller.IsUser(Id))
+            if (resources.CanUnlockUser && IsLocked)
             {
-                if (resources.CanLockUser && !IsLocked)
-                {
-                    AddPutLink("lock",
-                        resources.Url<UserManagementController>(c => nameof(c.LockUser), values));
-                }
-
-                if (resources.CanUnlockUser && IsLocked)
-                {
-                    AddPutLink("unlock",
-                        resources.Url<UserManagementController>(c => nameof(c.UnlockUser), values));
-                }
-
-                AddDeleteLink("delete",
-                    resources.Url<UserManagementController>(x => nameof(x.DeleteUser), values));
+                AddPutLink("unlock",
+                    resources.Url<UserManagementController>(c => nameof(c.UnlockUser), values));
             }
 
-            if (resources.CanUpdateUser)
-            {
-                AddPutLink("update",
-                    resources.Url<UserManagementController>(c => nameof(c.PutUser), values));
-            }
-
-            AddGetLink("picture",
-                resources.Url<UsersController>(c => nameof(c.GetUserPicture), values));
-
-            return this;
+            AddDeleteLink("delete",
+                resources.Url<UserManagementController>(x => nameof(x.DeleteUser), values));
         }
+
+        if (resources.CanUpdateUser)
+        {
+            AddPutLink("update",
+                resources.Url<UserManagementController>(c => nameof(c.PutUser), values));
+        }
+
+        AddGetLink("picture",
+            resources.Url<UsersController>(c => nameof(c.GetUserPicture), values));
+
+        return this;
     }
 }

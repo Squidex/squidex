@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public sealed class ExposedConfiguration : Dictionary<string, string>
 {
-    public sealed class ExposedConfiguration : Dictionary<string, string>
-    {
-    }
 }

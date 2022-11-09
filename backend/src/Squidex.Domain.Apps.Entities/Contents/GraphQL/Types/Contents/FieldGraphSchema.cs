@@ -10,7 +10,6 @@ using GraphQL.Types;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
-{
-    public record struct FieldGraphSchema(IGraphType? Type, IFieldResolver? Resolver, QueryArguments? Arguments);
-}
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
+
+public record struct FieldGraphSchema(IGraphType? Type, IFieldResolver? Resolver, QueryArguments? Arguments);

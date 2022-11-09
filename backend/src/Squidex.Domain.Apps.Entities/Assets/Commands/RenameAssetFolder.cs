@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Assets.Commands
+namespace Squidex.Domain.Apps.Entities.Assets.Commands;
+
+public sealed class RenameAssetFolder : AssetFolderCommand
 {
-    public sealed class RenameAssetFolder : AssetFolderCommand
-    {
-        public string FolderName { get; set; }
-    }
+    public string FolderName { get; set; }
 }

@@ -7,18 +7,17 @@
 
 using Jint.Runtime.Descriptors;
 
-namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
+namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
+
+public abstract class CustomProperty : PropertyDescriptor
 {
-    public abstract class CustomProperty : PropertyDescriptor
+    protected CustomProperty()
+        : base(PropertyFlag.CustomJsValue)
     {
-        protected CustomProperty()
-            : base(PropertyFlag.CustomJsValue)
-        {
-            Enumerable = true;
+        Enumerable = true;
 
-            Writable = true;
+        Writable = true;
 
-            Configurable = true;
-        }
+        Configurable = true;
     }
 }

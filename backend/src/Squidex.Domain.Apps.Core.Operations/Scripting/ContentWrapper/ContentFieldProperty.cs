@@ -9,60 +9,59 @@ using System.Diagnostics;
 using Jint.Native;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
+namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
+
+public sealed class ContentFieldProperty : CustomProperty
 {
-    public sealed class ContentFieldProperty : CustomProperty
+    private readonly ContentFieldObject contentField;
+    private JsonValue contentValue;
+    private JsValue? value;
+    private bool isChanged;
+
+    [DebuggerHidden]
+    protected override JsValue? CustomValue
     {
-        private readonly ContentFieldObject contentField;
-        private JsonValue contentValue;
-        private JsValue? value;
-        private bool isChanged;
-
-        [DebuggerHidden]
-        protected override JsValue? CustomValue
+        get
         {
-            get
+            if (value == null)
             {
-                if (value == null)
+                if (contentValue != default)
                 {
-                    if (contentValue != default)
-                    {
-                        value = JsonMapper.Map(contentValue, contentField.Engine);
-                    }
-                }
-
-                return value;
-            }
-            set
-            {
-                var newContentValue = JsonMapper.Map(value);
-
-                if (!Equals(contentValue, newContentValue))
-                {
-                    this.value = value;
-
-                    contentValue = newContentValue;
-                    contentField.MarkChanged();
-
-                    isChanged = true;
+                    value = JsonMapper.Map(contentValue, contentField.Engine);
                 }
             }
-        }
 
-        public JsonValue ContentValue
-        {
-            get => contentValue;
+            return value;
         }
+        set
+        {
+            var newContentValue = JsonMapper.Map(value);
 
-        public bool IsChanged
-        {
-            get => isChanged;
-        }
+            if (!Equals(contentValue, newContentValue))
+            {
+                this.value = value;
 
-        public ContentFieldProperty(ContentFieldObject contentField, JsonValue contentValue = default)
-        {
-            this.contentField = contentField;
-            this.contentValue = contentValue;
+                contentValue = newContentValue;
+                contentField.MarkChanged();
+
+                isChanged = true;
+            }
         }
+    }
+
+    public JsonValue ContentValue
+    {
+        get => contentValue;
+    }
+
+    public bool IsChanged
+    {
+        get => isChanged;
+    }
+
+    public ContentFieldProperty(ContentFieldObject contentField, JsonValue contentValue = default)
+    {
+        this.contentField = contentField;
+        this.contentValue = contentValue;
     }
 }

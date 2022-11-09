@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Contents
+namespace Squidex.Domain.Apps.Core.Contents;
+
+public enum StatusChange
 {
-    public enum StatusChange
-    {
-        Change,
-        Published,
-        Unpublished
-    }
+    Change,
+    Published,
+    Unpublished
 }

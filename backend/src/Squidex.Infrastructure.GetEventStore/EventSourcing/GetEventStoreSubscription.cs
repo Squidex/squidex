@@ -9,82 +9,81 @@ using EventStore.Client;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+internal sealed class GetEventStoreSubscription : IEventSubscription
 {
-    internal sealed class GetEventStoreSubscription : IEventSubscription
+    private readonly CancellationTokenSource cts = new CancellationTokenSource();
+    private StreamSubscription subscription;
+
+    public GetEventStoreSubscription(
+        IEventSubscriber<StoredEvent> eventSubscriber,
+        EventStoreClient client,
+        EventStoreProjectionClient projectionClient,
+        IJsonSerializer serializer,
+        string? position,
+        string? prefix,
+        string? streamFilter)
     {
-        private readonly CancellationTokenSource cts = new CancellationTokenSource();
-        private StreamSubscription subscription;
-
-        public GetEventStoreSubscription(
-            IEventSubscriber<StoredEvent> eventSubscriber,
-            EventStoreClient client,
-            EventStoreProjectionClient projectionClient,
-            IJsonSerializer serializer,
-            string? position,
-            string? prefix,
-            string? streamFilter)
+        Task.Run(async () =>
         {
-            Task.Run(async () =>
+            var ct = cts.Token;
+
+            var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
+
+            async Task OnEvent(StreamSubscription subscription, ResolvedEvent @event,
+                CancellationToken ct)
             {
-                var ct = cts.Token;
+                var storedEvent = Formatter.Read(@event, prefix, serializer);
 
-                var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
+                await eventSubscriber.OnNextAsync(this, storedEvent);
+            }
 
-                async Task OnEvent(StreamSubscription subscription, ResolvedEvent @event,
-                    CancellationToken ct)
+            void OnError(StreamSubscription subscription, SubscriptionDroppedReason reason, Exception? ex)
+            {
+                if (reason != SubscriptionDroppedReason.Disposed &&
+                    reason != SubscriptionDroppedReason.SubscriberError)
                 {
-                    var storedEvent = Formatter.Read(@event, prefix, serializer);
+                    ex ??= new InvalidOperationException($"Subscription closed with reason {reason}.");
 
-                    await eventSubscriber.OnNextAsync(this, storedEvent);
+                    eventSubscriber.OnErrorAsync(this, ex).AsTask().Forget();
                 }
+            }
 
-                void OnError(StreamSubscription subscription, SubscriptionDroppedReason reason, Exception? ex)
-                {
-                    if (reason != SubscriptionDroppedReason.Disposed &&
-                        reason != SubscriptionDroppedReason.SubscriberError)
-                    {
-                        ex ??= new InvalidOperationException($"Subscription closed with reason {reason}.");
+            if (!string.IsNullOrWhiteSpace(position))
+            {
+                var from = FromStream.After(position.ToPosition(true));
 
-                        eventSubscriber.OnErrorAsync(this, ex).AsTask().Forget();
-                    }
-                }
+                subscription = await client.SubscribeToStreamAsync(streamName, from,
+                    OnEvent, true,
+                    OnError,
+                    cancellationToken: ct);
+            }
+            else
+            {
+                var from = FromStream.Start;
 
-                if (!string.IsNullOrWhiteSpace(position))
-                {
-                    var from = FromStream.After(position.ToPosition(true));
+                subscription = await client.SubscribeToStreamAsync(streamName, from,
+                    OnEvent, true,
+                    OnError,
+                    cancellationToken: ct);
+            }
+        }, cts.Token);
+    }
 
-                    subscription = await client.SubscribeToStreamAsync(streamName, from,
-                        OnEvent, true,
-                        OnError,
-                        cancellationToken: ct);
-                }
-                else
-                {
-                    var from = FromStream.Start;
+    public void Dispose()
+    {
+        subscription?.Dispose();
 
-                    subscription = await client.SubscribeToStreamAsync(streamName, from,
-                        OnEvent, true,
-                        OnError,
-                        cancellationToken: ct);
-                }
-            }, cts.Token);
-        }
+        cts.Cancel();
+    }
 
-        public void Dispose()
-        {
-            subscription?.Dispose();
+    public ValueTask CompleteAsync()
+    {
+        return default;
+    }
 
-            cts.Cancel();
-        }
-
-        public ValueTask CompleteAsync()
-        {
-            return default;
-        }
-
-        public void WakeUp()
-        {
-        }
+    public void WakeUp()
+    {
     }
 }

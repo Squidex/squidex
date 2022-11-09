@@ -8,24 +8,23 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Entities.Assets.Commands
+namespace Squidex.Domain.Apps.Entities.Assets.Commands;
+
+public sealed class CreateAsset : UploadAssetCommand, IMoveAssetCommand
 {
-    public sealed class CreateAsset : UploadAssetCommand, IMoveAssetCommand
+    public DomainId ParentId { get; set; }
+
+    public bool Duplicate { get; set; }
+
+    public bool OptimizeValidation { get; set; }
+
+    public CreateAsset()
     {
-        public DomainId ParentId { get; set; }
+        AssetId = DomainId.NewGuid();
+    }
 
-        public bool Duplicate { get; set; }
-
-        public bool OptimizeValidation { get; set; }
-
-        public CreateAsset()
-        {
-            AssetId = DomainId.NewGuid();
-        }
-
-        public MoveAsset AsMove()
-        {
-            return SimpleMapper.Map(this, new MoveAsset());
-        }
+    public MoveAsset AsMove()
+    {
+        return SimpleMapper.Map(this, new MoveAsset());
     }
 }

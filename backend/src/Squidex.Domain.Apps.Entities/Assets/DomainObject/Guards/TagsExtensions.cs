@@ -8,24 +8,23 @@
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
+namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
+
+public static class TagsExtensions
 {
-    public static class TagsExtensions
+    public static async Task<HashSet<string>> GetTagIdsAsync(this AssetOperation operation, HashSet<string>? names)
     {
-        public static async Task<HashSet<string>> GetTagIdsAsync(this AssetOperation operation, HashSet<string>? names)
+        var result = new HashSet<string>(names?.Count ?? 0);
+
+        if (names != null)
         {
-            var result = new HashSet<string>(names?.Count ?? 0);
+            var tagService = operation.Resolve<ITagService>();
 
-            if (names != null)
-            {
-                var tagService = operation.Resolve<ITagService>();
+            var normalized = await tagService.GetTagIdsAsync(operation.App.Id, TagGroups.Assets, names);
 
-                var normalized = await tagService.GetTagIdsAsync(operation.App.Id, TagGroups.Assets, names);
-
-                result.AddRange(normalized.Values);
-            }
-
-            return result;
+            result.AddRange(normalized.Values);
         }
+
+        return result;
     }
 }

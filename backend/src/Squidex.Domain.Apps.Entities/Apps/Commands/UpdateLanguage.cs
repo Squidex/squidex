@@ -7,16 +7,15 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands
+namespace Squidex.Domain.Apps.Entities.Apps.Commands;
+
+public sealed class UpdateLanguage : AppCommand
 {
-    public sealed class UpdateLanguage : AppCommand
-    {
-        public Language Language { get; set; }
+    public Language Language { get; set; }
 
-        public bool IsOptional { get; set; }
+    public bool IsOptional { get; set; }
 
-        public bool IsMaster { get; set; }
+    public bool IsMaster { get; set; }
 
-        public Language[]? Fallback { get; set; }
-    }
+    public Language[]? Fallback { get; set; }
 }

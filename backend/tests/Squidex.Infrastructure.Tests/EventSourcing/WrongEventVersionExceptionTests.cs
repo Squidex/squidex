@@ -8,20 +8,19 @@
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+public class WrongEventVersionExceptionTests
 {
-    public class WrongEventVersionExceptionTests
+    [Fact]
+    public void Should_serialize_and_deserialize()
     {
-        [Fact]
-        public void Should_serialize_and_deserialize()
-        {
-            var source = new WrongEventVersionException(100, 200);
-            var actual = source.SerializeAndDeserializeBinary();
+        var source = new WrongEventVersionException(100, 200);
+        var actual = source.SerializeAndDeserializeBinary();
 
-            Assert.Equal(actual.ExpectedVersion, source.ExpectedVersion);
-            Assert.Equal(actual.CurrentVersion, source.CurrentVersion);
+        Assert.Equal(actual.ExpectedVersion, source.ExpectedVersion);
+        Assert.Equal(actual.CurrentVersion, source.CurrentVersion);
 
-            Assert.Equal(actual.Message, source.Message);
-        }
+        Assert.Equal(actual.Message, source.Message);
     }
 }

@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Assets;
+
+public interface IEnrichedAssetEntity : IAssetEntity
 {
-    public interface IEnrichedAssetEntity : IAssetEntity
-    {
-        HashSet<string> TagNames { get; }
+    HashSet<string> TagNames { get; }
 
-        string MetadataText { get; }
+    string MetadataText { get; }
 
-        string? EditToken { get; set; }
-    }
+    string? EditToken { get; set; }
 }

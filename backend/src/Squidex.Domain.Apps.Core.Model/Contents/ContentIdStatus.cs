@@ -9,9 +9,8 @@ using Squidex.Infrastructure;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Domain.Apps.Core.Contents
+namespace Squidex.Domain.Apps.Core.Contents;
+
+public record struct ContentIdStatus(DomainId SchemaId, DomainId Id, Status Status)
 {
-    public record struct ContentIdStatus(DomainId SchemaId, DomainId Id, Status Status)
-    {
-    }
 }

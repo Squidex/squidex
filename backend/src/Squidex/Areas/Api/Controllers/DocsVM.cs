@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Areas.Api.Controllers
+namespace Squidex.Areas.Api.Controllers;
+
+public sealed class DocsVM
 {
-    public sealed class DocsVM
-    {
-        public string Specification { get; set; }
-    }
+    public string Specification { get; set; }
 }

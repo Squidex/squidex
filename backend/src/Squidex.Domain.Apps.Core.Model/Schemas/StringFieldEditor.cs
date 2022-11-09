@@ -5,19 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public enum StringFieldEditor
 {
-    public enum StringFieldEditor
-    {
-        Input,
-        Color,
-        Markdown,
-        Dropdown,
-        Html,
-        Radio,
-        RichText,
-        Slug,
-        StockPhoto,
-        TextArea
-    }
+    Input,
+    Color,
+    Markdown,
+    Dropdown,
+    Html,
+    Radio,
+    RichText,
+    Slug,
+    StockPhoto,
+    TextArea
 }

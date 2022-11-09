@@ -8,24 +8,23 @@
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.ValidateContent
+namespace Squidex.Domain.Apps.Core.ValidateContent;
+
+public interface IAssetInfo
 {
-    public interface IAssetInfo
-    {
-        DomainId AssetId { get; }
+    DomainId AssetId { get; }
 
-        long FileSize { get; }
+    long FileSize { get; }
 
-        string FileName { get; }
+    string FileName { get; }
 
-        string FileHash { get; }
+    string FileHash { get; }
 
-        string MimeType { get; }
+    string MimeType { get; }
 
-        string Slug { get; }
+    string Slug { get; }
 
-        AssetMetadata Metadata { get; }
+    AssetMetadata Metadata { get; }
 
-        AssetType Type { get; }
-    }
+    AssetType Type { get; }
 }

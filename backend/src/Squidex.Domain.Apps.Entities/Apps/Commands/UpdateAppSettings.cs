@@ -7,10 +7,9 @@
 
 using Squidex.Domain.Apps.Core.Apps;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands
+namespace Squidex.Domain.Apps.Entities.Apps.Commands;
+
+public sealed class UpdateAppSettings : AppCommand
 {
-    public sealed class UpdateAppSettings : AppCommand
-    {
-        public AppSettings Settings { get; set; }
-    }
+    public AppSettings Settings { get; set; }
 }

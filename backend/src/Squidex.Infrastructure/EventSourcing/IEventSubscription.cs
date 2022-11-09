@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.EventSourcing
-{
-    public interface IEventSubscription : IDisposable
-    {
-        void WakeUp();
+namespace Squidex.Infrastructure.EventSourcing;
 
-        ValueTask CompleteAsync();
-    }
+public interface IEventSubscription : IDisposable
+{
+    void WakeUp();
+
+    ValueTask CompleteAsync();
 }

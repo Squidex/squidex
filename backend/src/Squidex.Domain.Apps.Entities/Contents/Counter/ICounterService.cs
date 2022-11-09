@@ -7,14 +7,13 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Counter
-{
-    public interface ICounterService
-    {
-        Task<long> IncrementAsync(DomainId appId, string name,
-            CancellationToken ct = default);
+namespace Squidex.Domain.Apps.Entities.Contents.Counter;
 
-        Task<long> ResetAsync(DomainId appId, string name, long value,
-            CancellationToken ct = default);
-    }
+public interface ICounterService
+{
+    Task<long> IncrementAsync(DomainId appId, string name,
+        CancellationToken ct = default);
+
+    Task<long> ResetAsync(DomainId appId, string name, long value,
+        CancellationToken ct = default);
 }

@@ -5,16 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core
-{
-    [AttributeUsage(AttributeTargets.Property)]
-    public sealed class FieldDescriptionAttribute : Attribute
-    {
-        public string Name { get; }
+namespace Squidex.Domain.Apps.Core;
 
-        public FieldDescriptionAttribute(string name)
-        {
-            Name = name;
-        }
+[AttributeUsage(AttributeTargets.Property)]
+public sealed class FieldDescriptionAttribute : Attribute
+{
+    public string Name { get; }
+
+    public FieldDescriptionAttribute(string name)
+    {
+        Name = name;
     }
 }

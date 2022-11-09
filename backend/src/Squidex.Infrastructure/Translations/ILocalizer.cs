@@ -7,10 +7,9 @@
 
 using System.Globalization;
 
-namespace Squidex.Infrastructure.Translations
+namespace Squidex.Infrastructure.Translations;
+
+public interface ILocalizer
 {
-    public interface ILocalizer
-    {
-        (string Result, bool Found) Get(CultureInfo culture, string key, string fallback, object? args = null);
-    }
+    (string Result, bool Found) Get(CultureInfo culture, string key, string fallback, object? args = null);
 }

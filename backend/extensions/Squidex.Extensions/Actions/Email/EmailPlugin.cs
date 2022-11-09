@@ -9,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.Email
+namespace Squidex.Extensions.Actions.Email;
+
+public sealed class EmailPlugin : IPlugin
 {
-    public sealed class EmailPlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddRuleAction<EmailAction, EmailActionHandler>();
-        }
+        services.AddRuleAction<EmailAction, EmailActionHandler>();
     }
 }

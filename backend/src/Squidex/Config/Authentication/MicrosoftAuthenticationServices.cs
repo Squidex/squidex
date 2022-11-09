@@ -7,33 +7,32 @@
 
 using Microsoft.AspNetCore.Authentication;
 
-namespace Squidex.Config.Authentication
+namespace Squidex.Config.Authentication;
+
+public static class MicrosoftAuthenticationServices
 {
-    public static class MicrosoftAuthenticationServices
+    public static AuthenticationBuilder AddSquidexExternalMicrosoftAuthentication(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions)
     {
-        public static AuthenticationBuilder AddSquidexExternalMicrosoftAuthentication(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions)
+        if (identityOptions.IsMicrosoftAuthConfigured())
         {
-            if (identityOptions.IsMicrosoftAuthConfigured())
+            authBuilder.AddMicrosoftAccount(options =>
             {
-                authBuilder.AddMicrosoftAccount(options =>
+                options.ClientId = identityOptions.MicrosoftClient;
+                options.ClientSecret = identityOptions.MicrosoftSecret;
+                options.Events = new MicrosoftHandler();
+
+                var tenantId = identityOptions.MicrosoftTenant;
+
+                if (!string.IsNullOrEmpty(tenantId))
                 {
-                    options.ClientId = identityOptions.MicrosoftClient;
-                    options.ClientSecret = identityOptions.MicrosoftSecret;
-                    options.Events = new MicrosoftHandler();
+                    var resource = "https://graph.microsoft.com";
 
-                    var tenantId = identityOptions.MicrosoftTenant;
-
-                    if (!string.IsNullOrEmpty(tenantId))
-                    {
-                        var resource = "https://graph.microsoft.com";
-
-                        options.AuthorizationEndpoint = $"https://login.microsoftonline.com/{tenantId}/oauth2/authorize?resource={resource}";
-                        options.TokenEndpoint = $"https://login.microsoftonline.com/{tenantId}/oauth2/token?resource={resource}";
-                    }
-                });
-            }
-
-            return authBuilder;
+                    options.AuthorizationEndpoint = $"https://login.microsoftonline.com/{tenantId}/oauth2/authorize?resource={resource}";
+                    options.TokenEndpoint = $"https://login.microsoftonline.com/{tenantId}/oauth2/token?resource={resource}";
+                }
+            });
         }
+
+        return authBuilder;
     }
 }

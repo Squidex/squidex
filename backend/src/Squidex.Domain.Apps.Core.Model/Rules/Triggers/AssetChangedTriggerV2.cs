@@ -7,16 +7,15 @@
 
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Core.Rules.Triggers
-{
-    [TypeName(nameof(AssetChangedTriggerV2))]
-    public sealed record AssetChangedTriggerV2 : RuleTrigger
-    {
-        public string Condition { get; init; }
+namespace Squidex.Domain.Apps.Core.Rules.Triggers;
 
-        public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
-        {
-            return visitor.Visit(this);
-        }
+[TypeName(nameof(AssetChangedTriggerV2))]
+public sealed record AssetChangedTriggerV2 : RuleTrigger
+{
+    public string Condition { get; init; }
+
+    public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
+    {
+        return visitor.Visit(this);
     }
 }

@@ -7,19 +7,18 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands
+namespace Squidex.Domain.Apps.Entities.Apps.Commands;
+
+public sealed class AttachClient : AppCommand
 {
-    public sealed class AttachClient : AppCommand
+    public string Id { get; set; }
+
+    public string Secret { get; set; }
+
+    public string? Role { get; set; }
+
+    public AttachClient()
     {
-        public string Id { get; set; }
-
-        public string Secret { get; set; }
-
-        public string? Role { get; set; }
-
-        public AttachClient()
-        {
-            Secret = RandomHash.New();
-        }
+        Secret = RandomHash.New();
     }
 }

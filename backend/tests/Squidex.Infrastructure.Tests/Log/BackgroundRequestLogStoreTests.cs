@@ -11,130 +11,129 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace Squidex.Infrastructure.Log
+namespace Squidex.Infrastructure.Log;
+
+public class BackgroundRequestLogStoreTests
 {
-    public class BackgroundRequestLogStoreTests
+    private readonly CancellationTokenSource cts = new CancellationTokenSource();
+    private readonly CancellationToken ct;
+    private readonly IRequestLogRepository requestLogRepository = A.Fake<IRequestLogRepository>();
+    private readonly RequestLogStoreOptions options = new RequestLogStoreOptions();
+    private readonly BackgroundRequestLogStore sut;
+
+    public BackgroundRequestLogStoreTests()
     {
-        private readonly CancellationTokenSource cts = new CancellationTokenSource();
-        private readonly CancellationToken ct;
-        private readonly IRequestLogRepository requestLogRepository = A.Fake<IRequestLogRepository>();
-        private readonly RequestLogStoreOptions options = new RequestLogStoreOptions();
-        private readonly BackgroundRequestLogStore sut;
+        ct = cts.Token;
 
-        public BackgroundRequestLogStoreTests()
+        options.StoreEnabled = true;
+
+        var log = A.Fake<ILogger<BackgroundRequestLogStore>>();
+
+        sut = new BackgroundRequestLogStore(Options.Create(options), requestLogRepository, log)
         {
-            ct = cts.Token;
+            ForceWrite = true
+        };
+    }
 
-            options.StoreEnabled = true;
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void Should_provide_disabled_from_options(bool enabled)
+    {
+        options.StoreEnabled = enabled;
 
-            var log = A.Fake<ILogger<BackgroundRequestLogStore>>();
+        Assert.Equal(enabled, sut.IsEnabled);
+    }
 
-            sut = new BackgroundRequestLogStore(Options.Create(options), requestLogRepository, log)
-            {
-                ForceWrite = true
-            };
+    [Fact]
+    public async Task Should_forward_delete_call()
+    {
+        await sut.DeleteAsync("my-key", ct);
+
+        A.CallTo(() => requestLogRepository.DeleteAsync("my-key", ct))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_log_if_disabled()
+    {
+        options.StoreEnabled = false;
+
+        for (var i = 0; i < 2500; i++)
+        {
+            await sut.LogAsync(new Request { Key = i.ToString(CultureInfo.InvariantCulture) }, ct);
         }
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void Should_provide_disabled_from_options(bool enabled)
-        {
-            options.StoreEnabled = enabled;
+        sut.Next();
+        sut.Dispose();
 
-            Assert.Equal(enabled, sut.IsEnabled);
+        // Wait for the timer to not trigger.
+        await Task.Delay(500, ct);
+
+        A.CallTo(() => requestLogRepository.InsertManyAsync(A<IEnumerable<Request>>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_provide_actuals_from_repository()
+    {
+        var key = "my-key";
+
+        var dateFrom = DateTime.Today;
+        var dateTo = dateFrom.AddDays(4);
+
+        A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, ct))
+            .Returns(AsyncEnumerable.Repeat(new Request { Key = key }, 1));
+
+        var actuals = await sut.QueryAllAsync(key, dateFrom, dateTo, ct).ToListAsync(ct);
+
+        Assert.NotEmpty(actuals);
+    }
+
+    [Fact]
+    public async Task Should_not_provide_actuals_from_repository_if_disabled()
+    {
+        options.StoreEnabled = false;
+
+        var key = "my-key";
+
+        var dateFrom = DateTime.Today;
+        var dateTo = dateFrom.AddDays(4);
+
+        var actuals = await sut.QueryAllAsync(key, dateFrom, dateTo, ct).ToListAsync(ct);
+
+        Assert.Empty(actuals);
+
+        A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_write_logs_in_batches()
+    {
+        for (var i = 0; i < 2500; i++)
+        {
+            await sut.LogAsync(new Request { Key = i.ToString(CultureInfo.InvariantCulture) }, ct);
         }
 
-        [Fact]
-        public async Task Should_forward_delete_call()
-        {
-            await sut.DeleteAsync("my-key", ct);
+        sut.Next();
+        sut.Dispose();
 
-            A.CallTo(() => requestLogRepository.DeleteAsync("my-key", ct))
-                .MustHaveHappened();
-        }
+        // Wait for the timer to trigger.
+        await Task.Delay(500, ct);
 
-        [Fact]
-        public async Task Should_not_log_if_disabled()
-        {
-            options.StoreEnabled = false;
+        A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("0", "999"), A<CancellationToken>._))
+            .MustHaveHappened();
 
-            for (var i = 0; i < 2500; i++)
-            {
-                await sut.LogAsync(new Request { Key = i.ToString(CultureInfo.InvariantCulture) }, ct);
-            }
+        A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("1000", "1999"), A<CancellationToken>._))
+            .MustHaveHappened();
 
-            sut.Next();
-            sut.Dispose();
+        A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("2000", "2499"), A<CancellationToken>._))
+            .MustHaveHappened();
+    }
 
-            // Wait for the timer to not trigger.
-            await Task.Delay(500, ct);
-
-            A.CallTo(() => requestLogRepository.InsertManyAsync(A<IEnumerable<Request>>._, A<CancellationToken>._))
-                .MustNotHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_provide_actuals_from_repository()
-        {
-            var key = "my-key";
-
-            var dateFrom = DateTime.Today;
-            var dateTo = dateFrom.AddDays(4);
-
-            A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, ct))
-                .Returns(AsyncEnumerable.Repeat(new Request { Key = key }, 1));
-
-            var actuals = await sut.QueryAllAsync(key, dateFrom, dateTo, ct).ToListAsync(ct);
-
-            Assert.NotEmpty(actuals);
-        }
-
-        [Fact]
-        public async Task Should_not_provide_actuals_from_repository_if_disabled()
-        {
-            options.StoreEnabled = false;
-
-            var key = "my-key";
-
-            var dateFrom = DateTime.Today;
-            var dateTo = dateFrom.AddDays(4);
-
-            var actuals = await sut.QueryAllAsync(key, dateFrom, dateTo, ct).ToListAsync(ct);
-
-            Assert.Empty(actuals);
-
-            A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, A<CancellationToken>._))
-                .MustNotHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_write_logs_in_batches()
-        {
-            for (var i = 0; i < 2500; i++)
-            {
-                await sut.LogAsync(new Request { Key = i.ToString(CultureInfo.InvariantCulture) }, ct);
-            }
-
-            sut.Next();
-            sut.Dispose();
-
-            // Wait for the timer to trigger.
-            await Task.Delay(500, ct);
-
-            A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("0", "999"), A<CancellationToken>._))
-                .MustHaveHappened();
-
-            A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("1000", "1999"), A<CancellationToken>._))
-                .MustHaveHappened();
-
-            A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("2000", "2499"), A<CancellationToken>._))
-                .MustHaveHappened();
-        }
-
-        private static IEnumerable<Request> Batch(string from, string to)
-        {
-            return A<IEnumerable<Request>>.That.Matches(x => x.First().Key == from && x.Last().Key == to);
-        }
+    private static IEnumerable<Request> Batch(string from, string to)
+    {
+        return A<IEnumerable<Request>>.That.Matches(x => x.First().Key == from && x.Last().Key == to);
     }
 }

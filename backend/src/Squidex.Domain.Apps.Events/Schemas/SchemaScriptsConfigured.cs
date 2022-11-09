@@ -8,11 +8,10 @@
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas;
+
+[EventType(nameof(SchemaScriptsConfigured))]
+public sealed class SchemaScriptsConfigured : SchemaEvent
 {
-    [EventType(nameof(SchemaScriptsConfigured))]
-    public sealed class SchemaScriptsConfigured : SchemaEvent
-    {
-        public SchemaScripts? Scripts { get; set; }
-    }
+    public SchemaScripts? Scripts { get; set; }
 }

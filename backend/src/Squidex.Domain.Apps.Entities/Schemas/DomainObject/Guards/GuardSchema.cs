@@ -13,317 +13,316 @@ using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Text;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
+namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards;
+
+public static class GuardSchema
 {
-    public static class GuardSchema
+    public static void CanCreate(CreateSchema command)
     {
-        public static void CanCreate(CreateSchema command)
+        Guard.NotNull(command);
+
+        Validate.It(e =>
         {
-            Guard.NotNull(command);
-
-            Validate.It(e =>
+            if (!command.Name.IsSlug())
             {
-                if (!command.Name.IsSlug())
-                {
-                    e(Not.ValidSlug(nameof(command.Name)), nameof(command.Name));
-                }
-
-                ValidateUpsert(command, e);
-            });
-        }
-
-        public static void CanSynchronize(SynchronizeSchema command)
-        {
-            Guard.NotNull(command);
-
-            Validate.It(e =>
-            {
-                ValidateUpsert(command, e);
-            });
-        }
-
-        public static void CanReorder(ReorderFields command, Schema schema)
-        {
-            Guard.NotNull(command);
-
-            IArrayField? arrayField = null;
-
-            if (command.ParentFieldId != null)
-            {
-                arrayField = GuardHelper.GetArrayFieldOrThrow(schema, command.ParentFieldId.Value, false);
+                e(Not.ValidSlug(nameof(command.Name)), nameof(command.Name));
             }
 
-            Validate.It(e =>
-            {
-                if (command.FieldIds == null)
-                {
-                    e(Not.Defined(nameof(command.FieldIds)), nameof(command.FieldIds));
-                }
+            ValidateUpsert(command, e);
+        });
+    }
 
-                if (arrayField == null)
-                {
-                    ValidateFieldIds(command, schema.FieldsById, e);
-                }
-                else
-                {
-                    ValidateFieldIds(command, arrayField.FieldsById, e);
-                }
-            });
+    public static void CanSynchronize(SynchronizeSchema command)
+    {
+        Guard.NotNull(command);
+
+        Validate.It(e =>
+        {
+            ValidateUpsert(command, e);
+        });
+    }
+
+    public static void CanReorder(ReorderFields command, Schema schema)
+    {
+        Guard.NotNull(command);
+
+        IArrayField? arrayField = null;
+
+        if (command.ParentFieldId != null)
+        {
+            arrayField = GuardHelper.GetArrayFieldOrThrow(schema, command.ParentFieldId.Value, false);
         }
 
-        public static void CanConfigurePreviewUrls(ConfigurePreviewUrls command)
+        Validate.It(e =>
         {
-            Guard.NotNull(command);
-
-            Validate.It(e =>
+            if (command.FieldIds == null)
             {
-                if (command.PreviewUrls == null)
+                e(Not.Defined(nameof(command.FieldIds)), nameof(command.FieldIds));
+            }
+
+            if (arrayField == null)
+            {
+                ValidateFieldIds(command, schema.FieldsById, e);
+            }
+            else
+            {
+                ValidateFieldIds(command, arrayField.FieldsById, e);
+            }
+        });
+    }
+
+    public static void CanConfigurePreviewUrls(ConfigurePreviewUrls command)
+    {
+        Guard.NotNull(command);
+
+        Validate.It(e =>
+        {
+            if (command.PreviewUrls == null)
+            {
+                e(Not.Defined(nameof(command.PreviewUrls)), nameof(command.PreviewUrls));
+            }
+        });
+    }
+
+    public static void CanConfigureUIFields(ConfigureUIFields command, Schema schema)
+    {
+        Guard.NotNull(command);
+
+        Validate.It(e =>
+        {
+            ValidateFieldNames(schema, command.FieldsInLists, nameof(command.FieldsInLists), e, IsMetaField);
+            ValidateFieldNames(schema, command.FieldsInReferences, nameof(command.FieldsInReferences), e, IsNotAllowed);
+        });
+    }
+
+    public static void CanConfigureFieldRules(ConfigureFieldRules command)
+    {
+        Guard.NotNull(command);
+
+        Validate.It(e =>
+        {
+            ValidateFieldRules(command.FieldRules, nameof(command.FieldRules), e);
+        });
+    }
+
+    private static void ValidateUpsert(IUpsertCommand command, AddValidation e)
+    {
+        if (command.Fields?.Length > 0)
+        {
+            command.Fields.Foreach((field, fieldIndex) =>
+            {
+                var fieldPrefix = $"Fields[{fieldIndex}]";
+
+                ValidateRootField(field, fieldPrefix, e);
+            });
+
+            foreach (var fieldName in command.Fields.Duplicates(x => x.Name))
+            {
+                if (fieldName.IsPropertyName())
                 {
-                    e(Not.Defined(nameof(command.PreviewUrls)), nameof(command.PreviewUrls));
+                    e(T.Get("schemas.duplicateFieldName", new { field = fieldName }), nameof(command.Fields));
                 }
-            });
+            }
         }
 
-        public static void CanConfigureUIFields(ConfigureUIFields command, Schema schema)
-        {
-            Guard.NotNull(command);
+        ValidateFieldNames(command, command.FieldsInLists, nameof(command.FieldsInLists), e, IsMetaField);
+        ValidateFieldNames(command, command.FieldsInReferences, nameof(command.FieldsInReferences), e, IsNotAllowed);
 
-            Validate.It(e =>
-            {
-                ValidateFieldNames(schema, command.FieldsInLists, nameof(command.FieldsInLists), e, IsMetaField);
-                ValidateFieldNames(schema, command.FieldsInReferences, nameof(command.FieldsInReferences), e, IsNotAllowed);
-            });
+        ValidateFieldRules(command.FieldRules, nameof(command.FieldRules), e);
+    }
+
+    private static void ValidateRootField(UpsertSchemaField field, string prefix, AddValidation e)
+    {
+        if (field == null)
+        {
+            e(Not.Defined("Field"), prefix);
         }
-
-        public static void CanConfigureFieldRules(ConfigureFieldRules command)
+        else
         {
-            Guard.NotNull(command);
-
-            Validate.It(e =>
+            if (!field.Partitioning.IsValidPartitioning())
             {
-                ValidateFieldRules(command.FieldRules, nameof(command.FieldRules), e);
-            });
-        }
+                e(Not.Valid(nameof(field.Partitioning)), $"{prefix}.{nameof(field.Partitioning)}");
+            }
 
-        private static void ValidateUpsert(IUpsertCommand command, AddValidation e)
-        {
-            if (command.Fields?.Length > 0)
+            ValidateField(field, prefix, e);
+
+            if (field.Nested?.Length > 0)
             {
-                command.Fields.Foreach((field, fieldIndex) =>
+                if (field.Properties is ArrayFieldProperties)
                 {
-                    var fieldPrefix = $"Fields[{fieldIndex}]";
+                    field.Nested.Foreach((nestedField, nestedIndex) =>
+                    {
+                        var nestedPrefix = $"{prefix}.Nested[{nestedIndex}]";
 
-                    ValidateRootField(field, fieldPrefix, e);
-                });
+                        ValidateNestedField(nestedField, nestedPrefix, e);
+                    });
+                }
+                else if (field.Nested.Length > 0)
+                {
+                    e(T.Get("schemas.onlyArraysHaveNested"), $"{prefix}.{nameof(field.Partitioning)}");
+                }
 
-                foreach (var fieldName in command.Fields.Duplicates(x => x.Name))
+                foreach (var fieldName in field.Nested.Duplicates(x => x.Name))
                 {
                     if (fieldName.IsPropertyName())
                     {
-                        e(T.Get("schemas.duplicateFieldName", new { field = fieldName }), nameof(command.Fields));
-                    }
-                }
-            }
-
-            ValidateFieldNames(command, command.FieldsInLists, nameof(command.FieldsInLists), e, IsMetaField);
-            ValidateFieldNames(command, command.FieldsInReferences, nameof(command.FieldsInReferences), e, IsNotAllowed);
-
-            ValidateFieldRules(command.FieldRules, nameof(command.FieldRules), e);
-        }
-
-        private static void ValidateRootField(UpsertSchemaField field, string prefix, AddValidation e)
-        {
-            if (field == null)
-            {
-                e(Not.Defined("Field"), prefix);
-            }
-            else
-            {
-                if (!field.Partitioning.IsValidPartitioning())
-                {
-                    e(Not.Valid(nameof(field.Partitioning)), $"{prefix}.{nameof(field.Partitioning)}");
-                }
-
-                ValidateField(field, prefix, e);
-
-                if (field.Nested?.Length > 0)
-                {
-                    if (field.Properties is ArrayFieldProperties)
-                    {
-                        field.Nested.Foreach((nestedField, nestedIndex) =>
-                        {
-                            var nestedPrefix = $"{prefix}.Nested[{nestedIndex}]";
-
-                            ValidateNestedField(nestedField, nestedPrefix, e);
-                        });
-                    }
-                    else if (field.Nested.Length > 0)
-                    {
-                        e(T.Get("schemas.onlyArraysHaveNested"), $"{prefix}.{nameof(field.Partitioning)}");
-                    }
-
-                    foreach (var fieldName in field.Nested.Duplicates(x => x.Name))
-                    {
-                        if (fieldName.IsPropertyName())
-                        {
-                            e(T.Get("schemas.duplicateFieldName", new { field = fieldName }), $"{prefix}.Nested");
-                        }
+                        e(T.Get("schemas.duplicateFieldName", new { field = fieldName }), $"{prefix}.Nested");
                     }
                 }
             }
         }
+    }
 
-        private static void ValidateNestedField(UpsertSchemaNestedField nestedField, string prefix, AddValidation e)
+    private static void ValidateNestedField(UpsertSchemaNestedField nestedField, string prefix, AddValidation e)
+    {
+        if (nestedField == null)
         {
-            if (nestedField == null)
+            e(Not.Defined("Field"), prefix);
+        }
+        else
+        {
+            if (nestedField.Properties is ArrayFieldProperties)
             {
-                e(Not.Defined("Field"), prefix);
+                e(T.Get("schemas.onylArraysInRoot"), $"{prefix}.{nameof(nestedField.Properties)}");
             }
-            else
-            {
-                if (nestedField.Properties is ArrayFieldProperties)
-                {
-                    e(T.Get("schemas.onylArraysInRoot"), $"{prefix}.{nameof(nestedField.Properties)}");
-                }
 
-                ValidateField(nestedField, prefix, e);
-            }
+            ValidateField(nestedField, prefix, e);
+        }
+    }
+
+    private static void ValidateField(UpsertSchemaFieldBase field, string prefix, AddValidation e)
+    {
+        if (!field.Name.IsPropertyName())
+        {
+            e(Not.ValidJavascriptName(nameof(field.Name)), $"{prefix}.{nameof(field.Name)}");
         }
 
-        private static void ValidateField(UpsertSchemaFieldBase field, string prefix, AddValidation e)
+        if (field.Properties == null)
         {
-            if (!field.Name.IsPropertyName())
-            {
-                e(Not.ValidJavascriptName(nameof(field.Name)), $"{prefix}.{nameof(field.Name)}");
-            }
-
-            if (field.Properties == null)
-            {
-                e(Not.Defined(nameof(field.Properties)), $"{prefix}.{nameof(field.Properties)}");
-            }
-            else
-            {
-                if (field.Properties.IsUIProperty())
-                {
-                    if (field.IsHidden)
-                    {
-                        e(T.Get("schemas.uiFieldCannotBeHidden"), $"{prefix}.{nameof(field.IsHidden)}");
-                    }
-
-                    if (field.IsDisabled)
-                    {
-                        e(T.Get("schemas.uiFieldCannotBeDisabled"), $"{prefix}.{nameof(field.IsDisabled)}");
-                    }
-                }
-
-                var errors = FieldPropertiesValidator.Validate(field.Properties);
-
-                errors.Foreach((x, _) => x.WithPrefix($"{prefix}.{nameof(field.Properties)}").AddTo(e));
-            }
+            e(Not.Defined(nameof(field.Properties)), $"{prefix}.{nameof(field.Properties)}");
         }
-
-        private static void ValidateFieldNames(Schema schema, FieldNames? fields, string path, AddValidation e, Func<string, bool> isAllowed)
+        else
         {
-            if (fields != null)
+            if (field.Properties.IsUIProperty())
             {
-                fields.Foreach((fieldName, fieldIndex) =>
+                if (field.IsHidden)
                 {
-                    var fieldPrefix = $"{path}[{fieldIndex}]";
+                    e(T.Get("schemas.uiFieldCannotBeHidden"), $"{prefix}.{nameof(field.IsHidden)}");
+                }
 
-                    var field = schema.FieldsByName.GetValueOrDefault(fieldName ?? string.Empty);
-
-                    if (string.IsNullOrWhiteSpace(fieldName))
-                    {
-                        e(Not.Defined("Field"), fieldPrefix);
-                    }
-                    else if (field == null && !isAllowed(fieldName))
-                    {
-                        e(T.Get("schemas.fieldNotInSchema"), fieldPrefix);
-                    }
-                    else if (field?.IsUI() == true)
-                    {
-                        e(T.Get("schemas.fieldCannotBeUIField"), fieldPrefix);
-                    }
-                });
-
-                foreach (var duplicate in fields.Duplicates())
+                if (field.IsDisabled)
                 {
-                    if (!string.IsNullOrWhiteSpace(duplicate))
-                    {
-                        e(T.Get("schemas.duplicateFieldName", new { field = duplicate }), path);
-                    }
+                    e(T.Get("schemas.uiFieldCannotBeDisabled"), $"{prefix}.{nameof(field.IsDisabled)}");
                 }
             }
+
+            var errors = FieldPropertiesValidator.Validate(field.Properties);
+
+            errors.Foreach((x, _) => x.WithPrefix($"{prefix}.{nameof(field.Properties)}").AddTo(e));
         }
+    }
 
-        private static void ValidateFieldRules(FieldRuleCommand[]? fieldRules, string path, AddValidation e)
+    private static void ValidateFieldNames(Schema schema, FieldNames? fields, string path, AddValidation e, Func<string, bool> isAllowed)
+    {
+        if (fields != null)
         {
-            fieldRules?.Foreach((rule, ruleIndex) =>
+            fields.Foreach((fieldName, fieldIndex) =>
             {
-                var rulePrefix = $"{path}[{ruleIndex}]";
+                var fieldPrefix = $"{path}[{fieldIndex}]";
 
-                if (string.IsNullOrWhiteSpace(rule.Field))
+                var field = schema.FieldsByName.GetValueOrDefault(fieldName ?? string.Empty);
+
+                if (string.IsNullOrWhiteSpace(fieldName))
                 {
-                    e(Not.Defined(nameof(rule.Field)), $"{rulePrefix}.{nameof(rule.Field)}");
+                    e(Not.Defined("Field"), fieldPrefix);
                 }
-
-                if (!rule.Action.IsEnumValue())
+                else if (field == null && !isAllowed(fieldName))
                 {
-                    e(Not.Valid(nameof(rule.Action)), $"{rulePrefix}.{nameof(rule.Action)}");
+                    e(T.Get("schemas.fieldNotInSchema"), fieldPrefix);
+                }
+                else if (field?.IsUI() == true)
+                {
+                    e(T.Get("schemas.fieldCannotBeUIField"), fieldPrefix);
                 }
             });
-        }
 
-        private static void ValidateFieldNames(IUpsertCommand command, FieldNames? fields, string path, AddValidation e, Func<string, bool> isAllowed)
-        {
-            if (fields != null)
+            foreach (var duplicate in fields.Duplicates())
             {
-                fields.Foreach((fieldName, fieldIndex) =>
+                if (!string.IsNullOrWhiteSpace(duplicate))
                 {
-                    var fieldPrefix = $"{path}[{fieldIndex}]";
-
-                    var field = command?.Fields?.FirstOrDefault(x => x.Name == fieldName);
-
-                    if (string.IsNullOrWhiteSpace(fieldName))
-                    {
-                        e(Not.Defined("Field"), fieldPrefix);
-                    }
-                    else if (field == null && !isAllowed(fieldName))
-                    {
-                        e(T.Get("schemas.fieldNotInSchema"), fieldPrefix);
-                    }
-                    else if (field?.Properties?.IsUIProperty() == true)
-                    {
-                        e(T.Get("schemas.fieldCannotBeUIField"), fieldPrefix);
-                    }
-                });
-
-                foreach (var duplicate in fields.Duplicates())
-                {
-                    if (!string.IsNullOrWhiteSpace(duplicate))
-                    {
-                        e(T.Get("schemas.duplicateFieldName", new { field = duplicate }), path);
-                    }
+                    e(T.Get("schemas.duplicateFieldName", new { field = duplicate }), path);
                 }
             }
         }
+    }
 
-        private static bool IsMetaField(string field)
+    private static void ValidateFieldRules(FieldRuleCommand[]? fieldRules, string path, AddValidation e)
+    {
+        fieldRules?.Foreach((rule, ruleIndex) =>
         {
-            return field.StartsWith("meta.", StringComparison.Ordinal);
-        }
+            var rulePrefix = $"{path}[{ruleIndex}]";
 
-        private static bool IsNotAllowed(string field)
-        {
-            return false;
-        }
-
-        private static void ValidateFieldIds<TField>(ReorderFields c, IReadOnlyDictionary<long, TField> fields, AddValidation e)
-        {
-            if (c.FieldIds != null && (c.FieldIds.Length != fields.Count || c.FieldIds.Any(x => !fields.ContainsKey(x))))
+            if (string.IsNullOrWhiteSpace(rule.Field))
             {
-                e(T.Get("schemas.fieldsNotCovered"), nameof(c.FieldIds));
+                e(Not.Defined(nameof(rule.Field)), $"{rulePrefix}.{nameof(rule.Field)}");
             }
+
+            if (!rule.Action.IsEnumValue())
+            {
+                e(Not.Valid(nameof(rule.Action)), $"{rulePrefix}.{nameof(rule.Action)}");
+            }
+        });
+    }
+
+    private static void ValidateFieldNames(IUpsertCommand command, FieldNames? fields, string path, AddValidation e, Func<string, bool> isAllowed)
+    {
+        if (fields != null)
+        {
+            fields.Foreach((fieldName, fieldIndex) =>
+            {
+                var fieldPrefix = $"{path}[{fieldIndex}]";
+
+                var field = command?.Fields?.FirstOrDefault(x => x.Name == fieldName);
+
+                if (string.IsNullOrWhiteSpace(fieldName))
+                {
+                    e(Not.Defined("Field"), fieldPrefix);
+                }
+                else if (field == null && !isAllowed(fieldName))
+                {
+                    e(T.Get("schemas.fieldNotInSchema"), fieldPrefix);
+                }
+                else if (field?.Properties?.IsUIProperty() == true)
+                {
+                    e(T.Get("schemas.fieldCannotBeUIField"), fieldPrefix);
+                }
+            });
+
+            foreach (var duplicate in fields.Duplicates())
+            {
+                if (!string.IsNullOrWhiteSpace(duplicate))
+                {
+                    e(T.Get("schemas.duplicateFieldName", new { field = duplicate }), path);
+                }
+            }
+        }
+    }
+
+    private static bool IsMetaField(string field)
+    {
+        return field.StartsWith("meta.", StringComparison.Ordinal);
+    }
+
+    private static bool IsNotAllowed(string field)
+    {
+        return false;
+    }
+
+    private static void ValidateFieldIds<TField>(ReorderFields c, IReadOnlyDictionary<long, TField> fields, AddValidation e)
+    {
+        if (c.FieldIds != null && (c.FieldIds.Length != fields.Count || c.FieldIds.Any(x => !fields.ContainsKey(x))))
+        {
+            e(T.Get("schemas.fieldsNotCovered"), nameof(c.FieldIds));
         }
     }
 }

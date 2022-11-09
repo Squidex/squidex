@@ -11,45 +11,44 @@ using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure.Queries;
 using Squidex.Shared;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Assets;
+
+public sealed class AssetsSearchSource : ISearchSource
 {
-    public sealed class AssetsSearchSource : ISearchSource
+    private readonly IAssetQueryService assetQuery;
+    private readonly IUrlGenerator urlGenerator;
+
+    public AssetsSearchSource(IAssetQueryService assetQuery, IUrlGenerator urlGenerator)
     {
-        private readonly IAssetQueryService assetQuery;
-        private readonly IUrlGenerator urlGenerator;
+        this.assetQuery = assetQuery;
 
-        public AssetsSearchSource(IAssetQueryService assetQuery, IUrlGenerator urlGenerator)
+        this.urlGenerator = urlGenerator;
+    }
+
+    public async Task<SearchResults> SearchAsync(string query, Context context,
+        CancellationToken ct)
+    {
+        var result = new SearchResults();
+
+        if (context.UserPermissions.Allows(PermissionIds.AppAssetsRead, context.App.Name))
         {
-            this.assetQuery = assetQuery;
+            var filter = ClrFilter.Contains("fileName", query);
 
-            this.urlGenerator = urlGenerator;
-        }
+            var clrQuery = new ClrQuery { Filter = filter, Take = 5 };
 
-        public async Task<SearchResults> SearchAsync(string query, Context context,
-            CancellationToken ct)
-        {
-            var result = new SearchResults();
+            var assets = await assetQuery.QueryAsync(context, null, Q.Empty.WithQuery(clrQuery), ct);
 
-            if (context.UserPermissions.Allows(PermissionIds.AppAssetsRead, context.App.Name))
+            if (assets.Count > 0)
             {
-                var filter = ClrFilter.Contains("fileName", query);
-
-                var clrQuery = new ClrQuery { Filter = filter, Take = 5 };
-
-                var assets = await assetQuery.QueryAsync(context, null, Q.Empty.WithQuery(clrQuery), ct);
-
-                if (assets.Count > 0)
+                foreach (var asset in assets)
                 {
-                    foreach (var asset in assets)
-                    {
-                        var url = urlGenerator.AssetsUI(context.App.NamedId(), asset.Id.ToString());
+                    var url = urlGenerator.AssetsUI(context.App.NamedId(), asset.Id.ToString());
 
-                        result.Add(asset.FileName, SearchResultType.Asset, url);
-                    }
+                    result.Add(asset.FileName, SearchResultType.Asset, url);
                 }
             }
-
-            return result;
         }
+
+        return result;
     }
 }

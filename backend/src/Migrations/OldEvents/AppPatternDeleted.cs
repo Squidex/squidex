@@ -13,22 +13,21 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
-namespace Migrations.OldEvents
+namespace Migrations.OldEvents;
+
+[EventType(nameof(AppPatternDeleted))]
+[Obsolete("New Event introduced")]
+public sealed class AppPatternDeleted : AppEvent, IMigratedStateEvent<AppDomainObject.State>
 {
-    [EventType(nameof(AppPatternDeleted))]
-    [Obsolete("New Event introduced")]
-    public sealed class AppPatternDeleted : AppEvent, IMigratedStateEvent<AppDomainObject.State>
+    public DomainId PatternId { get; set; }
+
+    public IEvent Migrate(AppDomainObject.State state)
     {
-        public DomainId PatternId { get; set; }
-
-        public IEvent Migrate(AppDomainObject.State state)
+        var newEvent = new AppSettingsUpdated
         {
-            var newEvent = new AppSettingsUpdated
-            {
-                Settings = state.Settings
-            };
+            Settings = state.Settings
+        };
 
-            return SimpleMapper.Map(this, newEvent);
-        }
+        return SimpleMapper.Map(this, newEvent);
     }
 }

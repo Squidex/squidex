@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Rules
+namespace Squidex.Domain.Apps.Events.Rules;
+
+[EventType(nameof(RuleDeleted))]
+public sealed class RuleDeleted : RuleEvent
 {
-    [EventType(nameof(RuleDeleted))]
-    public sealed class RuleDeleted : RuleEvent
-    {
-    }
 }

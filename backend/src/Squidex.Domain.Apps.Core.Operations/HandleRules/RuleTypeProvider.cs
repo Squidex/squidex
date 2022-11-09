@@ -14,226 +14,225 @@ using Squidex.Text;
 
 #pragma warning disable RECS0033 // Convert 'if' to '||' expression
 
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Domain.Apps.Core.HandleRules;
+
+public sealed class RuleTypeProvider : ITypeProvider
 {
-    public sealed class RuleTypeProvider : ITypeProvider
+    private const string ActionSuffix = "Action";
+    private const string ActionSuffixV2 = "ActionV2";
+    private readonly Dictionary<string, RuleActionDefinition> actionTypes = new Dictionary<string, RuleActionDefinition>();
+
+    public IReadOnlyDictionary<string, RuleActionDefinition> Actions
     {
-        private const string ActionSuffix = "Action";
-        private const string ActionSuffixV2 = "ActionV2";
-        private readonly Dictionary<string, RuleActionDefinition> actionTypes = new Dictionary<string, RuleActionDefinition>();
+        get => actionTypes;
+    }
 
-        public IReadOnlyDictionary<string, RuleActionDefinition> Actions
+    public RuleTypeProvider(IEnumerable<RuleActionRegistration>? registrations = null)
+    {
+        if (registrations != null)
         {
-            get => actionTypes;
-        }
-
-        public RuleTypeProvider(IEnumerable<RuleActionRegistration>? registrations = null)
-        {
-            if (registrations != null)
+            foreach (var registration in registrations)
             {
-                foreach (var registration in registrations)
-                {
-                    Add(registration.ActionType);
-                }
+                Add(registration.ActionType);
             }
         }
+    }
 
-        public void Add<T>() where T : RuleAction
+    public void Add<T>() where T : RuleAction
+    {
+        Add(typeof(T));
+    }
+
+    private void Add(Type actionType)
+    {
+        var metadata = actionType.GetCustomAttribute<RuleActionAttribute>();
+
+        if (metadata == null)
         {
-            Add(typeof(T));
+            return;
         }
 
-        private void Add(Type actionType)
-        {
-            var metadata = actionType.GetCustomAttribute<RuleActionAttribute>();
+        var name = GetActionName(actionType);
 
-            if (metadata == null)
+        var definition =
+            new RuleActionDefinition
             {
-                return;
-            }
+                Type = actionType,
+                Title = metadata.Title,
+                Display = metadata.Display,
+                Description = metadata.Description,
+                IconColor = metadata.IconColor,
+                IconImage = metadata.IconImage,
+                ReadMore = metadata.ReadMore
+            };
 
-            var name = GetActionName(actionType);
-
-            var definition =
-                new RuleActionDefinition
+        foreach (var property in actionType.GetProperties())
+        {
+            if (property.CanRead && property.CanWrite)
+            {
+                var actionProperty = new RuleActionProperty
                 {
-                    Type = actionType,
-                    Title = metadata.Title,
-                    Display = metadata.Display,
-                    Description = metadata.Description,
-                    IconColor = metadata.IconColor,
-                    IconImage = metadata.IconImage,
-                    ReadMore = metadata.ReadMore
+                    Name = property.Name.ToCamelCase()
                 };
 
-            foreach (var property in actionType.GetProperties())
-            {
-                if (property.CanRead && property.CanWrite)
+                var display = property.GetCustomAttribute<DisplayAttribute>();
+
+                if (!string.IsNullOrWhiteSpace(display?.Name))
                 {
-                    var actionProperty = new RuleActionProperty
-                    {
-                        Name = property.Name.ToCamelCase()
-                    };
-
-                    var display = property.GetCustomAttribute<DisplayAttribute>();
-
-                    if (!string.IsNullOrWhiteSpace(display?.Name))
-                    {
-                        actionProperty.Display = display.Name;
-                    }
-                    else
-                    {
-                        actionProperty.Display = property.Name;
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(display?.Description))
-                    {
-                        actionProperty.Description = display.Description;
-                    }
-
-                    var type = GetType(property);
-
-                    if (!IsNullable(property.PropertyType))
-                    {
-                        if (GetDataAttribute<RequiredAttribute>(property) != null)
-                        {
-                            actionProperty.IsRequired = true;
-                        }
-
-                        if (type.IsValueType && !IsBoolean(type) && !type.IsEnum)
-                        {
-                            actionProperty.IsRequired = true;
-                        }
-                    }
-
-                    if (property.GetCustomAttribute<FormattableAttribute>() != null)
-                    {
-                        actionProperty.IsFormattable = true;
-                    }
-
-                    if (type.IsEnum)
-                    {
-                        var values = Enum.GetNames(type);
-
-                        actionProperty.Options = values;
-                        actionProperty.Editor = RuleFieldEditor.Dropdown;
-                    }
-                    else if (IsBoolean(type))
-                    {
-                        actionProperty.Editor = RuleFieldEditor.Checkbox;
-                    }
-                    else if (IsNumericType(type))
-                    {
-                        actionProperty.Editor = RuleFieldEditor.Number;
-                    }
-                    else
-                    {
-                        actionProperty.Editor = GetEditor(property);
-                    }
-
-                    definition.Properties.Add(actionProperty);
+                    actionProperty.Display = display.Name;
                 }
-            }
-
-            actionTypes[name] = definition;
-        }
-
-        private static T? GetDataAttribute<T>(PropertyInfo property) where T : ValidationAttribute
-        {
-            var result = property.GetCustomAttribute<T>();
-
-            result?.IsValid(null);
-
-            return result;
-        }
-
-        private static RuleFieldEditor GetEditor(PropertyInfo property)
-        {
-            return property.GetCustomAttribute<EditorAttribute>()?.Editor ?? RuleFieldEditor.Text;
-        }
-
-        private static bool IsNullable(Type type)
-        {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
-        }
-
-        private static bool IsBoolean(Type type)
-        {
-            switch (Type.GetTypeCode(type))
-            {
-                case TypeCode.Boolean:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        private static bool IsNumericType(Type type)
-        {
-            switch (Type.GetTypeCode(type))
-            {
-                case TypeCode.Byte:
-                case TypeCode.SByte:
-                case TypeCode.UInt16:
-                case TypeCode.UInt32:
-                case TypeCode.UInt64:
-                case TypeCode.Int16:
-                case TypeCode.Int32:
-                case TypeCode.Int64:
-                case TypeCode.Decimal:
-                case TypeCode.Double:
-                case TypeCode.Single:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        private static Type GetType(PropertyInfo property)
-        {
-            var type = property.PropertyType;
-
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
-                type = type.GetGenericArguments()[0];
-            }
-
-            return type;
-        }
-
-        private static string GetActionName(Type type)
-        {
-            return type.TypeName(false, ActionSuffix, ActionSuffixV2);
-        }
-
-        public void Map(TypeNameRegistry typeNameRegistry)
-        {
-            foreach (var (_, actionType) in actionTypes)
-            {
-                typeNameRegistry.Map(actionType.Type, actionType.Type.Name);
-            }
-
-            var addedTypes = new HashSet<Type>();
-
-            static IEnumerable<Type> FindTypes(Type baseType)
-            {
-                return baseType.Assembly.GetTypes().Where(x => baseType.IsAssignableFrom(x) && !x.IsAbstract);
-            }
-
-            foreach (var type in FindTypes(typeof(EnrichedEvent)))
-            {
-                if (addedTypes.Add(type))
+                else
                 {
-                    typeNameRegistry.Map(type, type.Name);
+                    actionProperty.Display = property.Name;
                 }
-            }
 
-            foreach (var type in FindTypes(typeof(RuleTrigger)))
-            {
-                if (addedTypes.Add(type))
+                if (!string.IsNullOrWhiteSpace(display?.Description))
                 {
-                    typeNameRegistry.Map(type, type.Name);
+                    actionProperty.Description = display.Description;
                 }
+
+                var type = GetType(property);
+
+                if (!IsNullable(property.PropertyType))
+                {
+                    if (GetDataAttribute<RequiredAttribute>(property) != null)
+                    {
+                        actionProperty.IsRequired = true;
+                    }
+
+                    if (type.IsValueType && !IsBoolean(type) && !type.IsEnum)
+                    {
+                        actionProperty.IsRequired = true;
+                    }
+                }
+
+                if (property.GetCustomAttribute<FormattableAttribute>() != null)
+                {
+                    actionProperty.IsFormattable = true;
+                }
+
+                if (type.IsEnum)
+                {
+                    var values = Enum.GetNames(type);
+
+                    actionProperty.Options = values;
+                    actionProperty.Editor = RuleFieldEditor.Dropdown;
+                }
+                else if (IsBoolean(type))
+                {
+                    actionProperty.Editor = RuleFieldEditor.Checkbox;
+                }
+                else if (IsNumericType(type))
+                {
+                    actionProperty.Editor = RuleFieldEditor.Number;
+                }
+                else
+                {
+                    actionProperty.Editor = GetEditor(property);
+                }
+
+                definition.Properties.Add(actionProperty);
+            }
+        }
+
+        actionTypes[name] = definition;
+    }
+
+    private static T? GetDataAttribute<T>(PropertyInfo property) where T : ValidationAttribute
+    {
+        var result = property.GetCustomAttribute<T>();
+
+        result?.IsValid(null);
+
+        return result;
+    }
+
+    private static RuleFieldEditor GetEditor(PropertyInfo property)
+    {
+        return property.GetCustomAttribute<EditorAttribute>()?.Editor ?? RuleFieldEditor.Text;
+    }
+
+    private static bool IsNullable(Type type)
+    {
+        return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+    }
+
+    private static bool IsBoolean(Type type)
+    {
+        switch (Type.GetTypeCode(type))
+        {
+            case TypeCode.Boolean:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private static bool IsNumericType(Type type)
+    {
+        switch (Type.GetTypeCode(type))
+        {
+            case TypeCode.Byte:
+            case TypeCode.SByte:
+            case TypeCode.UInt16:
+            case TypeCode.UInt32:
+            case TypeCode.UInt64:
+            case TypeCode.Int16:
+            case TypeCode.Int32:
+            case TypeCode.Int64:
+            case TypeCode.Decimal:
+            case TypeCode.Double:
+            case TypeCode.Single:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private static Type GetType(PropertyInfo property)
+    {
+        var type = property.PropertyType;
+
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+        {
+            type = type.GetGenericArguments()[0];
+        }
+
+        return type;
+    }
+
+    private static string GetActionName(Type type)
+    {
+        return type.TypeName(false, ActionSuffix, ActionSuffixV2);
+    }
+
+    public void Map(TypeNameRegistry typeNameRegistry)
+    {
+        foreach (var (_, actionType) in actionTypes)
+        {
+            typeNameRegistry.Map(actionType.Type, actionType.Type.Name);
+        }
+
+        var addedTypes = new HashSet<Type>();
+
+        static IEnumerable<Type> FindTypes(Type baseType)
+        {
+            return baseType.Assembly.GetTypes().Where(x => baseType.IsAssignableFrom(x) && !x.IsAbstract);
+        }
+
+        foreach (var type in FindTypes(typeof(EnrichedEvent)))
+        {
+            if (addedTypes.Add(type))
+            {
+                typeNameRegistry.Map(type, type.Name);
+            }
+        }
+
+        foreach (var type in FindTypes(typeof(RuleTrigger)))
+        {
+            if (addedTypes.Add(type))
+            {
+                typeNameRegistry.Map(type, type.Name);
             }
         }
     }

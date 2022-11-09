@@ -7,42 +7,41 @@
 
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public sealed class FieldNames : ReadonlyList<string>
 {
-    public sealed class FieldNames : ReadonlyList<string>
+    public static readonly FieldNames Empty = new FieldNames(new List<string>());
+
+    public FieldNames()
     {
-        public static readonly FieldNames Empty = new FieldNames(new List<string>());
+    }
 
-        public FieldNames()
-        {
-        }
+    public FieldNames(IList<string> list)
+        : base(list)
+    {
+    }
 
-        public FieldNames(IList<string> list)
-            : base(list)
-        {
-        }
+    public static FieldNames Create(params string[] names)
+    {
+        return new FieldNames(names.ToList());
+    }
 
-        public static FieldNames Create(params string[] names)
-        {
-            return new FieldNames(names.ToList());
-        }
+    public FieldNames Add(string field)
+    {
+        var list = this.ToList();
 
-        public FieldNames Add(string field)
-        {
-            var list = this.ToList();
+        list.Add(field);
 
-            list.Add(field);
+        return new FieldNames(list);
+    }
 
-            return new FieldNames(list);
-        }
+    public FieldNames Remove(string field)
+    {
+        var list = this.ToList();
 
-        public FieldNames Remove(string field)
-        {
-            var list = this.ToList();
+        list.Remove(field);
 
-            list.Remove(field);
-
-            return new FieldNames(list);
-        }
+        return new FieldNames(list);
     }
 }

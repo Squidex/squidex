@@ -8,13 +8,12 @@
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Schemas
-{
-    [EventType(nameof(SchemaUIFieldsConfigured))]
-    public sealed class SchemaUIFieldsConfigured : SchemaEvent
-    {
-        public FieldNames? FieldsInLists { get; set; }
+namespace Squidex.Domain.Apps.Events.Schemas;
 
-        public FieldNames? FieldsInReferences { get; set; }
-    }
+[EventType(nameof(SchemaUIFieldsConfigured))]
+public sealed class SchemaUIFieldsConfigured : SchemaEvent
+{
+    public FieldNames? FieldsInLists { get; set; }
+
+    public FieldNames? FieldsInReferences { get; set; }
 }

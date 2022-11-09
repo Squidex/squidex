@@ -14,50 +14,49 @@ using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
+namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators;
+
+public class ComponentValidatorTests : IClassFixture<TranslationsFixture>
 {
-    public class ComponentValidatorTests : IClassFixture<TranslationsFixture>
+    private readonly List<string> errors = new List<string>();
+
+    [Fact]
+    public async Task Should_create_validator_from_component_and_invoke()
     {
-        private readonly List<string> errors = new List<string>();
+        var validator = A.Fake<IValidator>();
 
-        [Fact]
-        public async Task Should_create_validator_from_component_and_invoke()
+        var componentData = new JsonObject();
+        var componentObject = new Component("type", componentData, new Schema("my-schema"));
+
+        var isFactoryCalled = false;
+
+        var sut = new ComponentValidator(_ =>
         {
-            var validator = A.Fake<IValidator>();
+            isFactoryCalled = true;
+            return validator;
+        });
 
-            var componentData = new JsonObject();
-            var componentObject = new Component("type", componentData, new Schema("my-schema"));
+        await sut.ValidateAsync(componentObject, errors);
 
-            var isFactoryCalled = false;
+        Assert.True(isFactoryCalled);
 
-            var sut = new ComponentValidator(_ =>
-            {
-                isFactoryCalled = true;
-                return validator;
-            });
+        A.CallTo(() => validator.Validate(componentData, A<ValidationContext>._))
+            .MustHaveHappened();
+    }
 
-            await sut.ValidateAsync(componentObject, errors);
+    [Fact]
+    public async Task Should_do_nothing_if_value_is_not_a_component()
+    {
+        var isFactoryCalled = false;
 
-            Assert.True(isFactoryCalled);
-
-            A.CallTo(() => validator.Validate(componentData, A<ValidationContext>._))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_do_nothing_if_value_is_not_a_component()
+        var sut = new ComponentValidator(_ =>
         {
-            var isFactoryCalled = false;
+            isFactoryCalled = true;
+            return null!;
+        });
 
-            var sut = new ComponentValidator(_ =>
-            {
-                isFactoryCalled = true;
-                return null!;
-            });
+        await sut.ValidateAsync(1, errors);
 
-            await sut.ValidateAsync(1, errors);
-
-            Assert.False(isFactoryCalled);
-        }
+        Assert.False(isFactoryCalled);
     }
 }

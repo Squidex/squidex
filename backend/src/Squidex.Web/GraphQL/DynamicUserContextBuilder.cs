@@ -11,17 +11,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 
-namespace Squidex.Web.GraphQL
+namespace Squidex.Web.GraphQL;
+
+public sealed class DynamicUserContextBuilder : IUserContextBuilder
 {
-    public sealed class DynamicUserContextBuilder : IUserContextBuilder
+    private readonly ObjectFactory factory = ActivatorUtilities.CreateFactory(typeof(GraphQLExecutionContext), new[] { typeof(Context) });
+
+    public ValueTask<IDictionary<string, object?>?> BuildUserContextAsync(HttpContext context, object? payload)
     {
-        private readonly ObjectFactory factory = ActivatorUtilities.CreateFactory(typeof(GraphQLExecutionContext), new[] { typeof(Context) });
+        var executionContext = (GraphQLExecutionContext)factory(context.RequestServices, new object[] { context.Context() });
 
-        public ValueTask<IDictionary<string, object?>?> BuildUserContextAsync(HttpContext context, object? payload)
-        {
-            var executionContext = (GraphQLExecutionContext)factory(context.RequestServices, new object[] { context.Context() });
-
-            return new ValueTask<IDictionary<string, object?>?>(executionContext);
-        }
+        return new ValueTask<IDictionary<string, object?>?>(executionContext);
     }
 }

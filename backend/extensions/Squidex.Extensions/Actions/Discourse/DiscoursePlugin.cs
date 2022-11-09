@@ -9,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.Discourse
+namespace Squidex.Extensions.Actions.Discourse;
+
+public sealed class DiscoursePlugin : IPlugin
 {
-    public sealed class DiscoursePlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddRuleAction<DiscourseAction, DiscourseActionHandler>();
-        }
+        services.AddRuleAction<DiscourseAction, DiscourseActionHandler>();
     }
 }

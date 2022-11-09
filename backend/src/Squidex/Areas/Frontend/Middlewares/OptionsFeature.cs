@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Areas.Frontend.Middlewares
+namespace Squidex.Areas.Frontend.Middlewares;
+
+public sealed class OptionsFeature
 {
-    public sealed class OptionsFeature
-    {
-        public Dictionary<string, object> Options { get; } = new Dictionary<string, object>();
-    }
+    public Dictionary<string, object> Options { get; } = new Dictionary<string, object>();
 }

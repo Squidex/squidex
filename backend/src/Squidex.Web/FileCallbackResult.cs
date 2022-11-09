@@ -13,34 +13,33 @@ using Squidex.Web.Pipeline;
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public delegate Task FileCallback(Stream body, BytesRange range,
+    CancellationToken ct);
+
+public sealed class FileCallbackResult : FileResult
 {
-    public delegate Task FileCallback(Stream body, BytesRange range,
-        CancellationToken ct);
+    public bool ErrorAs404 { get; set; }
 
-    public sealed class FileCallbackResult : FileResult
+    public bool SendInline { get; set; }
+
+    public long? FileSize { get; set; }
+
+    public FileCallback Callback { get; }
+
+    public FileCallbackResult(string contentType, FileCallback callback)
+        : base(contentType)
     {
-        public bool ErrorAs404 { get; set; }
+        Guard.NotNull(callback);
 
-        public bool SendInline { get; set; }
+        Callback = callback;
+    }
 
-        public long? FileSize { get; set; }
+    public override Task ExecuteResultAsync(ActionContext context)
+    {
+        var executor = context.HttpContext.RequestServices.GetRequiredService<FileCallbackResultExecutor>();
 
-        public FileCallback Callback { get; }
-
-        public FileCallbackResult(string contentType, FileCallback callback)
-            : base(contentType)
-        {
-            Guard.NotNull(callback);
-
-            Callback = callback;
-        }
-
-        public override Task ExecuteResultAsync(ActionContext context)
-        {
-            var executor = context.HttpContext.RequestServices.GetRequiredService<FileCallbackResultExecutor>();
-
-            return executor.ExecuteAsync(context, this);
-        }
+        return executor.ExecuteAsync(context, this);
     }
 }

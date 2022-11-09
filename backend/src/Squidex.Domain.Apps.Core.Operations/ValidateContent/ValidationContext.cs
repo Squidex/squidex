@@ -9,71 +9,70 @@ using System.Collections.Immutable;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Domain.Apps.Core.ValidateContent
+namespace Squidex.Domain.Apps.Core.ValidateContent;
+
+public sealed record ValidationContext(RootContext Root)
 {
-    public sealed record ValidationContext(RootContext Root)
+    public ImmutableQueue<string> Path { get; init; } = ImmutableQueue<string>.Empty;
+
+    public bool IsOptional { get; init; }
+
+    public ValidationMode Mode { get; init; }
+
+    public ValidationAction Action { get; init; }
+
+    public void AddError(IEnumerable<string> path, string message)
     {
-        public ImmutableQueue<string> Path { get; init; } = ImmutableQueue<string>.Empty;
+        Root.AddError(path, message);
+    }
 
-        public bool IsOptional { get; init; }
+    public ValidationContext Optimized(bool optimized = true)
+    {
+        return WithMode(optimized ? ValidationMode.Optimized : ValidationMode.Default);
+    }
 
-        public ValidationMode Mode { get; init; }
+    public ValidationContext AsPublishing(bool publish = true)
+    {
+        return WithAction(publish ? ValidationAction.Publish : ValidationAction.Upsert);
+    }
 
-        public ValidationAction Action { get; init; }
-
-        public void AddError(IEnumerable<string> path, string message)
+    public ValidationContext Optional(bool isOptional = true)
+    {
+        if (IsOptional == isOptional)
         {
-            Root.AddError(path, message);
+            return this;
         }
 
-        public ValidationContext Optimized(bool optimized = true)
+        return this with { IsOptional = isOptional };
+    }
+
+    public ValidationContext WithAction(ValidationAction action)
+    {
+        if (Action == action)
         {
-            return WithMode(optimized ? ValidationMode.Optimized : ValidationMode.Default);
+            return this;
         }
 
-        public ValidationContext AsPublishing(bool publish = true)
+        return this with { Action = action };
+    }
+
+    public ValidationContext WithMode(ValidationMode mode)
+    {
+        if (Mode == mode)
         {
-            return WithAction(publish ? ValidationAction.Publish : ValidationAction.Upsert);
+            return this;
         }
 
-        public ValidationContext Optional(bool isOptional = true)
-        {
-            if (IsOptional == isOptional)
-            {
-                return this;
-            }
+        return this with { Mode = mode };
+    }
 
-            return this with { IsOptional = isOptional };
-        }
+    public ValidationContext Nested(string property)
+    {
+        return this with { Path = Path.Enqueue(property) };
+    }
 
-        public ValidationContext WithAction(ValidationAction action)
-        {
-            if (Action == action)
-            {
-                return this;
-            }
-
-            return this with { Action = action };
-        }
-
-        public ValidationContext WithMode(ValidationMode mode)
-        {
-            if (Mode == mode)
-            {
-                return this;
-            }
-
-            return this with { Mode = mode };
-        }
-
-        public ValidationContext Nested(string property)
-        {
-            return this with { Path = Path.Enqueue(property) };
-        }
-
-        public ValidationContext Nested(string property, bool isOptional)
-        {
-            return this with { Path = Path.Enqueue(property), IsOptional = isOptional };
-        }
+    public ValidationContext Nested(string property, bool isOptional)
+    {
+        return this with { Path = Path.Enqueue(property), IsOptional = isOptional };
     }
 }

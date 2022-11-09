@@ -10,52 +10,51 @@ using Microsoft.AspNetCore.DataProtection.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Domain.Users
+namespace Squidex.Domain.Users;
+
+public sealed class DefaultXmlRepository : IXmlRepository
 {
-    public sealed class DefaultXmlRepository : IXmlRepository
+    private readonly ISnapshotStore<State> store;
+
+    [CollectionName("Identity_Xml")]
+    public sealed class State
     {
-        private readonly ISnapshotStore<State> store;
+        public string Xml { get; set; }
 
-        [CollectionName("Identity_Xml")]
-        public sealed class State
+        public State()
         {
-            public string Xml { get; set; }
-
-            public State()
-            {
-            }
-
-            public State(XElement xml)
-            {
-                Xml = xml.ToString();
-            }
-
-            public XElement ToXml()
-            {
-                return XElement.Parse(Xml);
-            }
         }
 
-        public DefaultXmlRepository(ISnapshotStore<State> store)
+        public State(XElement xml)
         {
-            this.store = store;
+            Xml = xml.ToString();
         }
 
-        public IReadOnlyCollection<XElement> GetAllElements()
+        public XElement ToXml()
         {
-            return GetAllElementsAsync().Result;
+            return XElement.Parse(Xml);
         }
+    }
 
-        public void StoreElement(XElement element, string friendlyName)
-        {
-            var state = new State(element);
+    public DefaultXmlRepository(ISnapshotStore<State> store)
+    {
+        this.store = store;
+    }
 
-            store.WriteAsync(new SnapshotWriteJob<State>(DomainId.Create(friendlyName), state, 0));
-        }
+    public IReadOnlyCollection<XElement> GetAllElements()
+    {
+        return GetAllElementsAsync().Result;
+    }
 
-        private async Task<IReadOnlyCollection<XElement>> GetAllElementsAsync()
-        {
-            return await store.ReadAllAsync().Select(x => x.Value.ToXml()).ToListAsync();
-        }
+    public void StoreElement(XElement element, string friendlyName)
+    {
+        var state = new State(element);
+
+        store.WriteAsync(new SnapshotWriteJob<State>(DomainId.Create(friendlyName), state, 0));
+    }
+
+    private async Task<IReadOnlyCollection<XElement>> GetAllElementsAsync()
+    {
+        return await store.ReadAllAsync().Select(x => x.Value.ToXml()).ToListAsync();
     }
 }

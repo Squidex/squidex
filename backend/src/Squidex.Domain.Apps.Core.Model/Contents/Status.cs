@@ -7,60 +7,59 @@
 
 using System.ComponentModel;
 
-namespace Squidex.Domain.Apps.Core.Contents
+namespace Squidex.Domain.Apps.Core.Contents;
+
+[TypeConverter(typeof(StatusTypeConverter))]
+public readonly struct Status : IEquatable<Status>, IComparable<Status>
 {
-    [TypeConverter(typeof(StatusTypeConverter))]
-    public readonly struct Status : IEquatable<Status>, IComparable<Status>
+    public static readonly Status Archived = new Status("Archived");
+    public static readonly Status Draft = new Status("Draft");
+    public static readonly Status Published = new Status("Published");
+
+    private readonly string? name;
+
+    public string Name
     {
-        public static readonly Status Archived = new Status("Archived");
-        public static readonly Status Draft = new Status("Draft");
-        public static readonly Status Published = new Status("Published");
+        get => name ?? "Unknown";
+    }
 
-        private readonly string? name;
+    public Status(string? name)
+    {
+        this.name = name;
+    }
 
-        public string Name
-        {
-            get => name ?? "Unknown";
-        }
+    public override bool Equals(object? obj)
+    {
+        return obj is Status status && Equals(status);
+    }
 
-        public Status(string? name)
-        {
-            this.name = name;
-        }
+    public bool Equals(Status other)
+    {
+        return string.Equals(Name, other.Name, StringComparison.Ordinal);
+    }
 
-        public override bool Equals(object? obj)
-        {
-            return obj is Status status && Equals(status);
-        }
+    public override int GetHashCode()
+    {
+        return Name.GetHashCode(StringComparison.Ordinal);
+    }
 
-        public bool Equals(Status other)
-        {
-            return string.Equals(Name, other.Name, StringComparison.Ordinal);
-        }
+    public override string ToString()
+    {
+        return Name;
+    }
 
-        public override int GetHashCode()
-        {
-            return Name.GetHashCode(StringComparison.Ordinal);
-        }
+    public int CompareTo(Status other)
+    {
+        return string.Compare(Name, other.Name, StringComparison.Ordinal);
+    }
 
-        public override string ToString()
-        {
-            return Name;
-        }
+    public static bool operator ==(Status lhs, Status rhs)
+    {
+        return lhs.Equals(rhs);
+    }
 
-        public int CompareTo(Status other)
-        {
-            return string.Compare(Name, other.Name, StringComparison.Ordinal);
-        }
-
-        public static bool operator ==(Status lhs, Status rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        public static bool operator !=(Status lhs, Status rhs)
-        {
-            return !lhs.Equals(rhs);
-        }
+    public static bool operator !=(Status lhs, Status rhs)
+    {
+        return !lhs.Equals(rhs);
     }
 }

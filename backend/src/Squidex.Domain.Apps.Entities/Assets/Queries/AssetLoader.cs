@@ -9,57 +9,56 @@ using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Assets.Queries
+namespace Squidex.Domain.Apps.Entities.Assets.Queries;
+
+public sealed class AssetLoader : IAssetLoader
 {
-    public sealed class AssetLoader : IAssetLoader
+    private readonly IDomainObjectFactory domainObjectFactory;
+    private readonly IDomainObjectCache domainObjectCache;
+
+    public AssetLoader(IDomainObjectFactory domainObjectFactory, IDomainObjectCache domainObjectCache)
     {
-        private readonly IDomainObjectFactory domainObjectFactory;
-        private readonly IDomainObjectCache domainObjectCache;
+        this.domainObjectFactory = domainObjectFactory;
+        this.domainObjectCache = domainObjectCache;
+    }
 
-        public AssetLoader(IDomainObjectFactory domainObjectFactory, IDomainObjectCache domainObjectCache)
+    public async Task<IAssetEntity?> GetAsync(DomainId appId, DomainId id, long version = EtagVersion.Any,
+        CancellationToken ct = default)
+    {
+        var uniqueId = DomainId.Combine(appId, id);
+
+        var asset = await GetCachedAsync(uniqueId, version, ct);
+
+        if (asset == null)
         {
-            this.domainObjectFactory = domainObjectFactory;
-            this.domainObjectCache = domainObjectCache;
+            asset = await GetAsync(uniqueId, version, ct);
         }
 
-        public async Task<IAssetEntity?> GetAsync(DomainId appId, DomainId id, long version = EtagVersion.Any,
-            CancellationToken ct = default)
+        if (asset is not { Version: > EtagVersion.Empty } || (version > EtagVersion.Any && asset.Version != version))
         {
-            var uniqueId = DomainId.Combine(appId, id);
-
-            var asset = await GetCachedAsync(uniqueId, version, ct);
-
-            if (asset == null)
-            {
-                asset = await GetAsync(uniqueId, version, ct);
-            }
-
-            if (asset is not { Version: > EtagVersion.Empty } || (version > EtagVersion.Any && asset.Version != version))
-            {
-                return null;
-            }
-
-            return asset;
+            return null;
         }
 
-        private async Task<AssetDomainObject.State?> GetCachedAsync(DomainId uniqueId, long version,
-            CancellationToken ct)
+        return asset;
+    }
+
+    private async Task<AssetDomainObject.State?> GetCachedAsync(DomainId uniqueId, long version,
+        CancellationToken ct)
+    {
+        using (Telemetry.Activities.StartActivity("AssetLoader/GetCachedAsync"))
         {
-            using (Telemetry.Activities.StartActivity("AssetLoader/GetCachedAsync"))
-            {
-                return await domainObjectCache.GetAsync<AssetDomainObject.State>(uniqueId, version, ct);
-            }
+            return await domainObjectCache.GetAsync<AssetDomainObject.State>(uniqueId, version, ct);
         }
+    }
 
-        private async Task<AssetDomainObject.State> GetAsync(DomainId uniqueId, long version,
-            CancellationToken ct)
+    private async Task<AssetDomainObject.State> GetAsync(DomainId uniqueId, long version,
+        CancellationToken ct)
+    {
+        using (Telemetry.Activities.StartActivity("AssetLoader/GetAsync"))
         {
-            using (Telemetry.Activities.StartActivity("AssetLoader/GetAsync"))
-            {
-                var contentObject = domainObjectFactory.Create<AssetDomainObject>(uniqueId);
+            var contentObject = domainObjectFactory.Create<AssetDomainObject>(uniqueId);
 
-                return await contentObject.GetSnapshotAsync(version, ct);
-            }
+            return await contentObject.GetSnapshotAsync(version, ct);
         }
     }
 }

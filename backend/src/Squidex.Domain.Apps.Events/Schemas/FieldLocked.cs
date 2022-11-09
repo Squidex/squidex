@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas;
+
+[EventType(nameof(FieldLocked))]
+public sealed class FieldLocked : FieldEvent
 {
-    [EventType(nameof(FieldLocked))]
-    public sealed class FieldLocked : FieldEvent
-    {
-    }
 }

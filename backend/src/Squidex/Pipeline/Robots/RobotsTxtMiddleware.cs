@@ -7,37 +7,36 @@
 
 using Microsoft.Extensions.Options;
 
-namespace Squidex.Pipeline.Robots
+namespace Squidex.Pipeline.Robots;
+
+public sealed class RobotsTxtMiddleware
 {
-    public sealed class RobotsTxtMiddleware
+    private readonly RequestDelegate next;
+
+    public RobotsTxtMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate next;
+        this.next = next;
+    }
 
-        public RobotsTxtMiddleware(RequestDelegate next)
+    public async Task InvokeAsync(HttpContext context, IOptions<RobotsTxtOptions> robotsTxtOptions)
+    {
+        var text = robotsTxtOptions.Value.Text;
+
+        if (CanServeRequest(context.Request) && !string.IsNullOrWhiteSpace(text))
         {
-            this.next = next;
-        }
+            context.Response.ContentType = "text/plain";
+            context.Response.StatusCode = 200;
 
-        public async Task InvokeAsync(HttpContext context, IOptions<RobotsTxtOptions> robotsTxtOptions)
+            await context.Response.WriteAsync(text, context.RequestAborted);
+        }
+        else
         {
-            var text = robotsTxtOptions.Value.Text;
-
-            if (CanServeRequest(context.Request) && !string.IsNullOrWhiteSpace(text))
-            {
-                context.Response.ContentType = "text/plain";
-                context.Response.StatusCode = 200;
-
-                await context.Response.WriteAsync(text, context.RequestAborted);
-            }
-            else
-            {
-                await next(context);
-            }
+            await next(context);
         }
+    }
 
-        private static bool CanServeRequest(HttpRequest request)
-        {
-            return HttpMethods.IsGet(request.Method) && string.IsNullOrEmpty(request.Path);
-        }
+    private static bool CanServeRequest(HttpRequest request)
+    {
+        return HttpMethods.IsGet(request.Method) && string.IsNullOrEmpty(request.Path);
     }
 }

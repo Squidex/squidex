@@ -7,26 +7,25 @@
 
 using Xunit;
 
-namespace Squidex.Infrastructure.Timers
+namespace Squidex.Infrastructure.Timers;
+
+public class CompletionTimerTests
 {
-    public class CompletionTimerTests
+    [Fact]
+    public void Should_invoke_once_even_with_delay()
     {
-        [Fact]
-        public void Should_invoke_once_even_with_delay()
+        var called = false;
+
+        var timer = new CompletionTimer(2000, ct =>
         {
-            var called = false;
+            called = true;
 
-            var timer = new CompletionTimer(2000, ct =>
-            {
-                called = true;
+            return Task.CompletedTask;
+        }, 2000);
 
-                return Task.CompletedTask;
-            }, 2000);
+        timer.SkipCurrentDelay();
+        timer.StopAsync().Wait();
 
-            timer.SkipCurrentDelay();
-            timer.StopAsync().Wait();
-
-            Assert.True(called);
-        }
+        Assert.True(called);
     }
 }

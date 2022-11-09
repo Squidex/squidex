@@ -9,32 +9,31 @@ using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
+
+internal sealed class ContentResultGraphType : ObjectGraphType<IResultList<IContentEntity>>
 {
-    internal sealed class ContentResultGraphType : ObjectGraphType<IResultList<IContentEntity>>
+    public ContentResultGraphType(ContentGraphType contentType, SchemaInfo schemaInfo)
     {
-        public ContentResultGraphType(ContentGraphType contentType, SchemaInfo schemaInfo)
+        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
+        Name = schemaInfo.ContentResultType;
+
+        AddField(new FieldType
         {
-            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-            Name = schemaInfo.ContentResultType;
+            Name = "total",
+            ResolvedType = Scalars.NonNullInt,
+            Resolver = ContentResolvers.ListTotal,
+            Description = FieldDescriptions.ContentsTotal
+        });
 
-            AddField(new FieldType
-            {
-                Name = "total",
-                ResolvedType = Scalars.NonNullInt,
-                Resolver = ContentResolvers.ListTotal,
-                Description = FieldDescriptions.ContentsTotal
-            });
+        AddField(new FieldType
+        {
+            Name = "items",
+            ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
+            Resolver = ContentResolvers.ListItems,
+            Description = FieldDescriptions.ContentsItems
+        });
 
-            AddField(new FieldType
-            {
-                Name = "items",
-                ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
-                Resolver = ContentResolvers.ListItems,
-                Description = FieldDescriptions.ContentsItems
-            });
-
-            Description = $"List of {schemaInfo.DisplayName} items and total count.";
-        }
+        Description = $"List of {schemaInfo.DisplayName} items and total count.";
     }
 }

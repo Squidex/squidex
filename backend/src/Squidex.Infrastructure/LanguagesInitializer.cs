@@ -8,34 +8,33 @@
 using Microsoft.Extensions.Options;
 using Squidex.Hosting;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+public sealed class LanguagesInitializer : IInitializable
 {
-    public sealed class LanguagesInitializer : IInitializable
+    private readonly LanguagesOptions options;
+
+    public LanguagesInitializer(IOptions<LanguagesOptions> options)
     {
-        private readonly LanguagesOptions options;
+        Guard.NotNull(options);
 
-        public LanguagesInitializer(IOptions<LanguagesOptions> options)
+        this.options = options.Value;
+    }
+
+    public Task InitializeAsync(
+        CancellationToken ct)
+    {
+        foreach (var (key, value) in options)
         {
-            Guard.NotNull(options);
-
-            this.options = options.Value;
-        }
-
-        public Task InitializeAsync(
-            CancellationToken ct)
-        {
-            foreach (var (key, value) in options)
+            if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(value))
             {
-                if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(value))
+                if (!Language.TryGetLanguage(key, out _))
                 {
-                    if (!Language.TryGetLanguage(key, out _))
-                    {
-                        Language.AddLanguage(key, value, value);
-                    }
+                    Language.AddLanguage(key, value, value);
                 }
             }
-
-            return Task.CompletedTask;
         }
+
+        return Task.CompletedTask;
     }
 }

@@ -24,154 +24,153 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 using static OpenIddict.Server.OpenIddictServerEvents;
 using static OpenIddict.Server.OpenIddictServerHandlers;
 
-namespace Squidex.Areas.IdentityServer.Config
+namespace Squidex.Areas.IdentityServer.Config;
+
+public static class IdentityServerServices
 {
-    public static class IdentityServerServices
+    public static void AddSquidexIdentityServer(this IServiceCollection services)
     {
-        public static void AddSquidexIdentityServer(this IServiceCollection services)
+        services.Configure<KeyManagementOptions>((c, options) =>
         {
-            services.Configure<KeyManagementOptions>((c, options) =>
+            options.XmlRepository = c.GetRequiredService<IXmlRepository>();
+        });
+
+        services.AddDataProtection()
+            .SetApplicationName("Squidex");
+
+        services.AddIdentity<IdentityUser, IdentityRole>()
+            .AddDefaultTokenProviders();
+
+        services.AddSingletonAs<DefaultXmlRepository>()
+            .As<IXmlRepository>();
+
+        services.AddScopedAs<DefaultUserService>()
+            .As<IUserService>();
+
+        services.AddScopedAs<UserClaimsPrincipalFactoryWithEmail>()
+            .As<IUserClaimsPrincipalFactory<IdentityUser>>();
+
+        services.AddSingletonAs<ApiPermissionUnifier>()
+            .As<IClaimsTransformation>();
+
+        services.AddSingletonAs<TokenStoreInitializer>()
+            .AsSelf();
+
+        services.AddSingletonAs<CreateAdminInitializer>()
+            .AsSelf();
+
+        services.ConfigureOptions<DefaultKeyStore>();
+
+        services.Configure<IdentityOptions>(options =>
+        {
+            options.ClaimsIdentity.UserIdClaimType = Claims.Subject;
+            options.ClaimsIdentity.UserNameClaimType = Claims.Name;
+            options.ClaimsIdentity.RoleClaimType = Claims.Role;
+        });
+
+        services.AddOpenIddict()
+            .AddCore(builder =>
             {
-                options.XmlRepository = c.GetRequiredService<IXmlRepository>();
-            });
+                builder.Services.AddSingletonAs<IdentityServerConfiguration.Scopes>()
+                    .As<IOpenIddictScopeStore<ImmutableScope>>();
 
-            services.AddDataProtection()
-                .SetApplicationName("Squidex");
+                builder.Services.AddSingletonAs<DynamicApplicationStore>()
+                    .As<IOpenIddictApplicationStore<ImmutableApplication>>();
 
-            services.AddIdentity<IdentityUser, IdentityRole>()
-                .AddDefaultTokenProviders();
-
-            services.AddSingletonAs<DefaultXmlRepository>()
-                .As<IXmlRepository>();
-
-            services.AddScopedAs<DefaultUserService>()
-                .As<IUserService>();
-
-            services.AddScopedAs<UserClaimsPrincipalFactoryWithEmail>()
-                .As<IUserClaimsPrincipalFactory<IdentityUser>>();
-
-            services.AddSingletonAs<ApiPermissionUnifier>()
-                .As<IClaimsTransformation>();
-
-            services.AddSingletonAs<TokenStoreInitializer>()
-                .AsSelf();
-
-            services.AddSingletonAs<CreateAdminInitializer>()
-                .AsSelf();
-
-            services.ConfigureOptions<DefaultKeyStore>();
-
-            services.Configure<IdentityOptions>(options =>
+                builder.ReplaceApplicationManager(typeof(ApplicationManager<>));
+            })
+            .AddServer(builder =>
             {
-                options.ClaimsIdentity.UserIdClaimType = Claims.Subject;
-                options.ClaimsIdentity.UserNameClaimType = Claims.Name;
-                options.ClaimsIdentity.RoleClaimType = Claims.Role;
-            });
-
-            services.AddOpenIddict()
-                .AddCore(builder =>
+                builder.AddEventHandler<ProcessSignInContext>(builder =>
                 {
-                    builder.Services.AddSingletonAs<IdentityServerConfiguration.Scopes>()
-                        .As<IOpenIddictScopeStore<ImmutableScope>>();
-
-                    builder.Services.AddSingletonAs<DynamicApplicationStore>()
-                        .As<IOpenIddictApplicationStore<ImmutableApplication>>();
-
-                    builder.ReplaceApplicationManager(typeof(ApplicationManager<>));
-                })
-                .AddServer(builder =>
-                {
-                    builder.AddEventHandler<ProcessSignInContext>(builder =>
-                    {
-                        builder.UseSingletonHandler<AlwaysAddTokenHandler>()
-                            .SetOrder(AttachTokenParameters.Descriptor.Order + 1);
-                    });
-
-                    builder.SetAccessTokenLifetime(TimeSpan.FromDays(30));
-
-                    builder.DisableAccessTokenEncryption();
-
-                    builder.RegisterScopes(
-                        Scopes.Email,
-                        Scopes.Profile,
-                        Scopes.Roles,
-                        Constants.ScopeApi,
-                        Constants.ScopePermissions);
-
-                    builder.AllowClientCredentialsFlow();
-                    builder.AllowImplicitFlow();
-                    builder.AllowAuthorizationCodeFlow();
-
-                    builder.UseAspNetCore()
-                        .DisableTransportSecurityRequirement()
-                        .EnableAuthorizationEndpointPassthrough()
-                        .EnableLogoutEndpointPassthrough()
-                        .EnableStatusCodePagesIntegration()
-                        .EnableTokenEndpointPassthrough()
-                        .EnableUserinfoEndpointPassthrough();
-                })
-                .AddValidation(options =>
-                {
-                    options.UseLocalServer();
-                    options.UseAspNetCore();
+                    builder.UseSingletonHandler<AlwaysAddTokenHandler>()
+                        .SetOrder(AttachTokenParameters.Descriptor.Order + 1);
                 });
 
-            services.Configure<AntiforgeryOptions>((c, options) =>
-            {
-                var identityOptions = c.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
+                builder.SetAccessTokenLifetime(TimeSpan.FromDays(30));
 
-                options.SuppressXFrameOptionsHeader = identityOptions.SuppressXFrameOptionsHeader;
+                builder.DisableAccessTokenEncryption();
+
+                builder.RegisterScopes(
+                    Scopes.Email,
+                    Scopes.Profile,
+                    Scopes.Roles,
+                    Constants.ScopeApi,
+                    Constants.ScopePermissions);
+
+                builder.AllowClientCredentialsFlow();
+                builder.AllowImplicitFlow();
+                builder.AllowAuthorizationCodeFlow();
+
+                builder.UseAspNetCore()
+                    .DisableTransportSecurityRequirement()
+                    .EnableAuthorizationEndpointPassthrough()
+                    .EnableLogoutEndpointPassthrough()
+                    .EnableStatusCodePagesIntegration()
+                    .EnableTokenEndpointPassthrough()
+                    .EnableUserinfoEndpointPassthrough();
+            })
+            .AddValidation(options =>
+            {
+                options.UseLocalServer();
+                options.UseAspNetCore();
             });
 
-            services.Configure<OpenIddictServerOptions>((c, options) =>
-            {
-                var urlGenerator = c.GetRequiredService<IUrlGenerator>();
-
-                var identityPrefix = Constants.PrefixIdentityServer;
-                var identityOptions = c.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
-
-                Func<string, Uri> buildUrl;
-
-                if (identityOptions.MultipleDomains)
-                {
-                    buildUrl = url => new Uri($"{identityPrefix}{url}", UriKind.Relative);
-
-                    options.Issuer = new Uri(urlGenerator.BuildUrl());
-                }
-                else
-                {
-                    buildUrl = url => new Uri(urlGenerator.BuildUrl($"{identityPrefix}{url}", false));
-
-                    options.Issuer = new Uri(urlGenerator.BuildUrl(identityPrefix, false));
-                }
-
-                options.AuthorizationEndpointUris.SetEndpoint(
-                    buildUrl("/connect/authorize"));
-
-                options.IntrospectionEndpointUris.SetEndpoint(
-                    buildUrl("/connect/introspect"));
-
-                options.LogoutEndpointUris.SetEndpoint(
-                    buildUrl("/connect/logout"));
-
-                options.TokenEndpointUris.SetEndpoint(
-                    buildUrl("/connect/token"));
-
-                options.UserinfoEndpointUris.SetEndpoint(
-                    buildUrl("/connect/userinfo"));
-
-                options.CryptographyEndpointUris.SetEndpoint(
-                    buildUrl("/.well-known/jwks"));
-
-                options.ConfigurationEndpointUris.SetEndpoint(
-                    buildUrl("/.well-known/openid-configuration"));
-            });
-        }
-
-        private static void SetEndpoint(this List<Uri> endpointUris, Uri uri)
+        services.Configure<AntiforgeryOptions>((c, options) =>
         {
-            endpointUris.Clear();
-            endpointUris.Add(uri);
-        }
+            var identityOptions = c.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
+
+            options.SuppressXFrameOptionsHeader = identityOptions.SuppressXFrameOptionsHeader;
+        });
+
+        services.Configure<OpenIddictServerOptions>((c, options) =>
+        {
+            var urlGenerator = c.GetRequiredService<IUrlGenerator>();
+
+            var identityPrefix = Constants.PrefixIdentityServer;
+            var identityOptions = c.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
+
+            Func<string, Uri> buildUrl;
+
+            if (identityOptions.MultipleDomains)
+            {
+                buildUrl = url => new Uri($"{identityPrefix}{url}", UriKind.Relative);
+
+                options.Issuer = new Uri(urlGenerator.BuildUrl());
+            }
+            else
+            {
+                buildUrl = url => new Uri(urlGenerator.BuildUrl($"{identityPrefix}{url}", false));
+
+                options.Issuer = new Uri(urlGenerator.BuildUrl(identityPrefix, false));
+            }
+
+            options.AuthorizationEndpointUris.SetEndpoint(
+                buildUrl("/connect/authorize"));
+
+            options.IntrospectionEndpointUris.SetEndpoint(
+                buildUrl("/connect/introspect"));
+
+            options.LogoutEndpointUris.SetEndpoint(
+                buildUrl("/connect/logout"));
+
+            options.TokenEndpointUris.SetEndpoint(
+                buildUrl("/connect/token"));
+
+            options.UserinfoEndpointUris.SetEndpoint(
+                buildUrl("/connect/userinfo"));
+
+            options.CryptographyEndpointUris.SetEndpoint(
+                buildUrl("/.well-known/jwks"));
+
+            options.ConfigurationEndpointUris.SetEndpoint(
+                buildUrl("/.well-known/openid-configuration"));
+        });
+    }
+
+    private static void SetEndpoint(this List<Uri> endpointUris, Uri uri)
+    {
+        endpointUris.Clear();
+        endpointUris.Add(uri);
     }
 }

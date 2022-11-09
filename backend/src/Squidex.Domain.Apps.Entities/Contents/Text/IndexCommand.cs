@@ -7,14 +7,13 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text;
+
+public abstract class IndexCommand
 {
-    public abstract class IndexCommand
-    {
-        public NamedId<DomainId> AppId { get; set; }
+    public NamedId<DomainId> AppId { get; set; }
 
-        public NamedId<DomainId> SchemaId { get; set; }
+    public NamedId<DomainId> SchemaId { get; set; }
 
-        public string DocId { get; set; }
-    }
+    public string DocId { get; set; }
 }

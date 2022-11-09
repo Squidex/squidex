@@ -9,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.SignalR
+namespace Squidex.Extensions.Actions.SignalR;
+
+public sealed class SignalRPlugin : IPlugin
 {
-    public sealed class SignalRPlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddRuleAction<SignalRAction, SignalRActionHandler>();
-        }
+        services.AddRuleAction<SignalRAction, SignalRActionHandler>();
     }
 }

@@ -9,62 +9,61 @@ using FakeItEasy;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public class StreamMapperTests
 {
-    public class StreamMapperTests
+    private readonly DomainId appIdOld = DomainId.NewGuid();
+    private readonly DomainId appId = DomainId.NewGuid();
+    private readonly StreamMapper sut;
+
+    public StreamMapperTests()
     {
-        private readonly DomainId appIdOld = DomainId.NewGuid();
-        private readonly DomainId appId = DomainId.NewGuid();
-        private readonly StreamMapper sut;
+        sut = new StreamMapper(new RestoreContext(appId,
+            A.Fake<IUserMapping>(),
+            A.Fake<IBackupReader>(),
+            appIdOld));
+    }
 
-        public StreamMapperTests()
-        {
-            sut = new StreamMapper(new RestoreContext(appId,
-                A.Fake<IUserMapping>(),
-                A.Fake<IBackupReader>(),
-                appIdOld));
-        }
+    [Fact]
+    public void Should_map_old_app_id()
+    {
+        var actual = sut.Map($"app-{appIdOld}");
 
-        [Fact]
-        public void Should_map_old_app_id()
-        {
-            var actual = sut.Map($"app-{appIdOld}");
+        Assert.Equal(($"app-{appId}", appId), actual);
+    }
 
-            Assert.Equal(($"app-{appId}", appId), actual);
-        }
+    [Fact]
+    public void Should_map_old_app_broken_id()
+    {
+        var actual = sut.Map($"app-{appIdOld}--{appIdOld}");
 
-        [Fact]
-        public void Should_map_old_app_broken_id()
-        {
-            var actual = sut.Map($"app-{appIdOld}--{appIdOld}");
+        Assert.Equal(($"app-{appId}", appId), actual);
+    }
 
-            Assert.Equal(($"app-{appId}", appId), actual);
-        }
+    [Fact]
+    public void Should_map_non_app_id()
+    {
+        var actual = sut.Map($"content-{appIdOld}--123");
 
-        [Fact]
-        public void Should_map_non_app_id()
-        {
-            var actual = sut.Map($"content-{appIdOld}--123");
+        Assert.Equal(($"content-{appId}--123", DomainId.Create($"{appId}--123")), actual);
+    }
 
-            Assert.Equal(($"content-{appId}--123", DomainId.Create($"{appId}--123")), actual);
-        }
+    [Fact]
+    public void Should_map_non_app_id_with_double_slash()
+    {
+        var actual = sut.Map($"content-{appIdOld}--other--id");
 
-        [Fact]
-        public void Should_map_non_app_id_with_double_slash()
-        {
-            var actual = sut.Map($"content-{appIdOld}--other--id");
+        Assert.Equal(($"content-{appId}--other--id", DomainId.Create($"{appId}--other--id")), actual);
+    }
 
-            Assert.Equal(($"content-{appId}--other--id", DomainId.Create($"{appId}--other--id")), actual);
-        }
+    [Fact]
+    public void Should_map_non_combined_id()
+    {
+        var id = DomainId.NewGuid();
 
-        [Fact]
-        public void Should_map_non_combined_id()
-        {
-            var id = DomainId.NewGuid();
+        var actual = sut.Map($"content-{id}");
 
-            var actual = sut.Map($"content-{id}");
-
-            Assert.Equal(($"content-{appId}--{id}", DomainId.Create($"{appId}--{id}")), actual);
-        }
+        Assert.Equal(($"content-{appId}--{id}", DomainId.Create($"{appId}--{id}")), actual);
     }
 }

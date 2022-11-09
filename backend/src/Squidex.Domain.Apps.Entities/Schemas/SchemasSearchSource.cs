@@ -13,78 +13,77 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 
-namespace Squidex.Domain.Apps.Entities.Schemas
+namespace Squidex.Domain.Apps.Entities.Schemas;
+
+public sealed class SchemasSearchSource : ISearchSource
 {
-    public sealed class SchemasSearchSource : ISearchSource
+    private readonly IAppProvider appProvider;
+    private readonly IUrlGenerator urlGenerator;
+
+    public SchemasSearchSource(IAppProvider appProvider, IUrlGenerator urlGenerator)
     {
-        private readonly IAppProvider appProvider;
-        private readonly IUrlGenerator urlGenerator;
+        this.appProvider = appProvider;
 
-        public SchemasSearchSource(IAppProvider appProvider, IUrlGenerator urlGenerator)
+        this.urlGenerator = urlGenerator;
+    }
+
+    public async Task<SearchResults> SearchAsync(string query, Context context,
+        CancellationToken ct)
+    {
+        var result = new SearchResults();
+
+        var schemas = await appProvider.GetSchemasAsync(context.App.Id, ct);
+
+        if (schemas.Count > 0)
         {
-            this.appProvider = appProvider;
+            var appId = context.App.NamedId();
 
-            this.urlGenerator = urlGenerator;
-        }
-
-        public async Task<SearchResults> SearchAsync(string query, Context context,
-            CancellationToken ct)
-        {
-            var result = new SearchResults();
-
-            var schemas = await appProvider.GetSchemasAsync(context.App.Id, ct);
-
-            if (schemas.Count > 0)
+            foreach (var schema in schemas)
             {
-                var appId = context.App.NamedId();
+                var schemaId = schema.NamedId();
 
-                foreach (var schema in schemas)
+                var name = schema.SchemaDef.DisplayNameUnchanged();
+
+                if (name.Contains(query, StringComparison.OrdinalIgnoreCase))
                 {
-                    var schemaId = schema.NamedId();
+                    AddSchemaUrl(result, appId, schemaId, name);
 
-                    var name = schema.SchemaDef.DisplayNameUnchanged();
-
-                    if (name.Contains(query, StringComparison.OrdinalIgnoreCase))
+                    if (schema.SchemaDef.Type != SchemaType.Component && HasPermission(context, schemaId))
                     {
-                        AddSchemaUrl(result, appId, schemaId, name);
-
-                        if (schema.SchemaDef.Type != SchemaType.Component && HasPermission(context, schemaId))
-                        {
-                            AddContentsUrl(result, appId, schema, schemaId, name);
-                        }
+                        AddContentsUrl(result, appId, schema, schemaId, name);
                     }
                 }
             }
-
-            return result;
         }
 
-        private void AddSchemaUrl(SearchResults result, NamedId<DomainId> appId, NamedId<DomainId> schemaId, string name)
+        return result;
+    }
+
+    private void AddSchemaUrl(SearchResults result, NamedId<DomainId> appId, NamedId<DomainId> schemaId, string name)
+    {
+        var schemaUrl = urlGenerator.SchemaUI(appId, schemaId);
+
+        result.Add(T.Get("search.schemaResult", new { name }), SearchResultType.Schema, schemaUrl);
+    }
+
+    private void AddContentsUrl(SearchResults result, NamedId<DomainId> appId, ISchemaEntity schema, NamedId<DomainId> schemaId, string name)
+    {
+        if (schema.SchemaDef.Type == SchemaType.Singleton)
         {
-            var schemaUrl = urlGenerator.SchemaUI(appId, schemaId);
+            var contentUrl = urlGenerator.ContentUI(appId, schemaId, schemaId.Id);
 
-            result.Add(T.Get("search.schemaResult", new { name }), SearchResultType.Schema, schemaUrl);
+            result.Add(T.Get("search.contentResult", new { name }), SearchResultType.Content, contentUrl, name);
         }
-
-        private void AddContentsUrl(SearchResults result, NamedId<DomainId> appId, ISchemaEntity schema, NamedId<DomainId> schemaId, string name)
+        else
         {
-            if (schema.SchemaDef.Type == SchemaType.Singleton)
-            {
-                var contentUrl = urlGenerator.ContentUI(appId, schemaId, schemaId.Id);
+            var contentUrl = urlGenerator.ContentsUI(appId, schemaId);
 
-                result.Add(T.Get("search.contentResult", new { name }), SearchResultType.Content, contentUrl, name);
-            }
-            else
-            {
-                var contentUrl = urlGenerator.ContentsUI(appId, schemaId);
-
-                result.Add(T.Get("search.contentsResult", new { name }), SearchResultType.Content, contentUrl, name);
-            }
+            result.Add(T.Get("search.contentsResult", new { name }), SearchResultType.Content, contentUrl, name);
         }
+    }
 
-        private static bool HasPermission(Context context, NamedId<DomainId> schemaId)
-        {
-            return context.Allows(PermissionIds.AppContentsReadOwn, schemaId.Name);
-        }
+    private static bool HasPermission(Context context, NamedId<DomainId> schemaId)
+    {
+        return context.Allows(PermissionIds.AppContentsReadOwn, schemaId.Name);
     }
 }

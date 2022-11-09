@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Rules
+namespace Squidex.Domain.Apps.Events.Rules;
+
+[EventType(nameof(RuleEnabled))]
+public sealed class RuleEnabled : RuleEvent
 {
-    [EventType(nameof(RuleEnabled))]
-    public sealed class RuleEnabled : RuleEvent
-    {
-    }
 }

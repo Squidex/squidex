@@ -19,197 +19,196 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents;
+
+public class BackupContentsTests
 {
-    public class BackupContentsTests
+    private readonly CancellationTokenSource cts = new CancellationTokenSource();
+    private readonly CancellationToken ct;
+    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+    private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
+    private readonly Rebuilder rebuilder = A.Fake<Rebuilder>();
+    private readonly BackupContents sut;
+
+    public BackupContentsTests()
     {
-        private readonly CancellationTokenSource cts = new CancellationTokenSource();
-        private readonly CancellationToken ct;
-        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
-        private readonly Rebuilder rebuilder = A.Fake<Rebuilder>();
-        private readonly BackupContents sut;
+        ct = cts.Token;
 
-        public BackupContentsTests()
+        sut = new BackupContents(rebuilder, urlGenerator);
+    }
+
+    [Fact]
+    public void Should_provide_name()
+    {
+        Assert.Equal("Contents", sut.Name);
+    }
+
+    [Fact]
+    public async Task Should_write_asset_urls()
+    {
+        var me = RefToken.User("123");
+
+        var assetsUrl = "https://old.squidex.com/api/assets/";
+        var assetsUrlApp = "https://old.squidex.com/api/assets/my-app";
+
+        A.CallTo(() => urlGenerator.AssetContentBase())
+            .Returns(assetsUrl);
+
+        A.CallTo(() => urlGenerator.AssetContentBase(appId.Name))
+            .Returns(assetsUrlApp);
+
+        var writer = A.Fake<IBackupWriter>();
+
+        var context = new BackupContext(appId.Id, new UserMapping(me), writer);
+
+        await sut.BackupEventAsync(Envelope.Create(new AppCreated
         {
-            ct = cts.Token;
+            Name = appId.Name
+        }), context, ct);
 
-            sut = new BackupContents(rebuilder, urlGenerator);
-        }
+        A.CallTo(() => writer.WriteJsonAsync(A<string>._,
+            A<BackupContents.Urls>.That.Matches(x =>
+                x.Assets == assetsUrl &&
+                x.AssetsApp == assetsUrlApp), ct))
+            .MustHaveHappened();
+    }
 
-        [Fact]
-        public void Should_provide_name()
+    [Fact]
+    public async Task Should_replace_asset_url_in_content()
+    {
+        var me = RefToken.User("123");
+
+        var newAssetsUrl = "https://new.squidex.com/api/assets";
+        var newAssetsUrlApp = "https://old.squidex.com/api/assets/my-new-app";
+
+        var oldAssetsUrl = "https://old.squidex.com/api/assets";
+        var oldAssetsUrlApp = "https://old.squidex.com/api/assets/my-old-app";
+
+        var reader = A.Fake<IBackupReader>();
+
+        A.CallTo(() => urlGenerator.AssetContentBase())
+            .Returns(newAssetsUrl);
+
+        A.CallTo(() => urlGenerator.AssetContentBase(appId.Name))
+            .Returns(newAssetsUrlApp);
+
+        A.CallTo(() => reader.ReadJsonAsync<BackupContents.Urls>(A<string>._, ct))
+            .Returns(new BackupContents.Urls
+            {
+                Assets = oldAssetsUrl,
+                AssetsApp = oldAssetsUrlApp
+            });
+
+        var data =
+            new ContentData()
+                .AddField("asset",
+                    new ContentFieldData()
+                        .AddLocalized("en", $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")
+                        .AddLocalized("it", $"Asset: {oldAssetsUrl}/my-asset.jpg."))
+                .AddField("assetsInArray",
+                    new ContentFieldData()
+                        .AddLocalized("iv",
+                            JsonValue.Array(
+                                $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")))
+                .AddField("assetsInObj",
+                    new ContentFieldData()
+                        .AddLocalized("iv",
+                            new JsonObject()
+                                .Add("asset", $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")));
+
+        var updateData =
+            new ContentData()
+                .AddField("asset",
+                    new ContentFieldData()
+                        .AddLocalized("en", $"Asset: {newAssetsUrlApp}/my-asset.jpg.")
+                        .AddLocalized("it", $"Asset: {newAssetsUrl}/my-asset.jpg."))
+                .AddField("assetsInArray",
+                    new ContentFieldData()
+                        .AddLocalized("iv",
+                            JsonValue.Array(
+                                $"Asset: {newAssetsUrlApp}/my-asset.jpg.")))
+                .AddField("assetsInObj",
+                    new ContentFieldData()
+                        .AddLocalized("iv",
+                            new JsonObject()
+                                .Add("asset", $"Asset: {newAssetsUrlApp}/my-asset.jpg.")));
+
+        var context = new RestoreContext(appId.Id, new UserMapping(me), reader, DomainId.NewGuid());
+
+        await sut.RestoreEventAsync(Envelope.Create(new AppCreated
         {
-            Assert.Equal("Contents", sut.Name);
-        }
+            Name = appId.Name
+        }), context, ct);
 
-        [Fact]
-        public async Task Should_write_asset_urls()
+        await sut.RestoreEventAsync(Envelope.Create(new ContentUpdated
         {
-            var me = RefToken.User("123");
+            Data = data
+        }), context, ct);
 
-            var assetsUrl = "https://old.squidex.com/api/assets/";
-            var assetsUrlApp = "https://old.squidex.com/api/assets/my-app";
+        Assert.Equal(updateData, data);
+    }
 
-            A.CallTo(() => urlGenerator.AssetContentBase())
-                .Returns(assetsUrl);
+    [Fact]
+    public async Task Should_restore_states_for_all_contents()
+    {
+        var me = RefToken.User("123");
 
-            A.CallTo(() => urlGenerator.AssetContentBase(appId.Name))
-                .Returns(assetsUrlApp);
+        var schemaId1 = NamedId.Of(DomainId.NewGuid(), "my-schema1");
+        var schemaId2 = NamedId.Of(DomainId.NewGuid(), "my-schema2");
 
-            var writer = A.Fake<IBackupWriter>();
+        var contentId1 = DomainId.NewGuid();
+        var contentId2 = DomainId.NewGuid();
+        var contentId3 = DomainId.NewGuid();
 
-            var context = new BackupContext(appId.Id, new UserMapping(me), writer);
+        var context = new RestoreContext(appId.Id, new UserMapping(me), A.Fake<IBackupReader>(), DomainId.NewGuid());
 
-            await sut.BackupEventAsync(Envelope.Create(new AppCreated
-            {
-                Name = appId.Name
-            }), context, ct);
-
-            A.CallTo(() => writer.WriteJsonAsync(A<string>._,
-                A<BackupContents.Urls>.That.Matches(x =>
-                    x.Assets == assetsUrl &&
-                    x.AssetsApp == assetsUrlApp), ct))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_replace_asset_url_in_content()
+        await sut.RestoreEventAsync(ContentEvent(new ContentCreated
         {
-            var me = RefToken.User("123");
+            ContentId = contentId1,
+            SchemaId = schemaId1
+        }), context, ct);
 
-            var newAssetsUrl = "https://new.squidex.com/api/assets";
-            var newAssetsUrlApp = "https://old.squidex.com/api/assets/my-new-app";
-
-            var oldAssetsUrl = "https://old.squidex.com/api/assets";
-            var oldAssetsUrlApp = "https://old.squidex.com/api/assets/my-old-app";
-
-            var reader = A.Fake<IBackupReader>();
-
-            A.CallTo(() => urlGenerator.AssetContentBase())
-                .Returns(newAssetsUrl);
-
-            A.CallTo(() => urlGenerator.AssetContentBase(appId.Name))
-                .Returns(newAssetsUrlApp);
-
-            A.CallTo(() => reader.ReadJsonAsync<BackupContents.Urls>(A<string>._, ct))
-                .Returns(new BackupContents.Urls
-                {
-                    Assets = oldAssetsUrl,
-                    AssetsApp = oldAssetsUrlApp
-                });
-
-            var data =
-                new ContentData()
-                    .AddField("asset",
-                        new ContentFieldData()
-                            .AddLocalized("en", $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")
-                            .AddLocalized("it", $"Asset: {oldAssetsUrl}/my-asset.jpg."))
-                    .AddField("assetsInArray",
-                        new ContentFieldData()
-                            .AddLocalized("iv",
-                                JsonValue.Array(
-                                    $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")))
-                    .AddField("assetsInObj",
-                        new ContentFieldData()
-                            .AddLocalized("iv",
-                                new JsonObject()
-                                    .Add("asset", $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")));
-
-            var updateData =
-                new ContentData()
-                    .AddField("asset",
-                        new ContentFieldData()
-                            .AddLocalized("en", $"Asset: {newAssetsUrlApp}/my-asset.jpg.")
-                            .AddLocalized("it", $"Asset: {newAssetsUrl}/my-asset.jpg."))
-                    .AddField("assetsInArray",
-                        new ContentFieldData()
-                            .AddLocalized("iv",
-                                JsonValue.Array(
-                                    $"Asset: {newAssetsUrlApp}/my-asset.jpg.")))
-                    .AddField("assetsInObj",
-                        new ContentFieldData()
-                            .AddLocalized("iv",
-                                new JsonObject()
-                                    .Add("asset", $"Asset: {newAssetsUrlApp}/my-asset.jpg.")));
-
-            var context = new RestoreContext(appId.Id, new UserMapping(me), reader, DomainId.NewGuid());
-
-            await sut.RestoreEventAsync(Envelope.Create(new AppCreated
-            {
-                Name = appId.Name
-            }), context, ct);
-
-            await sut.RestoreEventAsync(Envelope.Create(new ContentUpdated
-            {
-                Data = data
-            }), context, ct);
-
-            Assert.Equal(updateData, data);
-        }
-
-        [Fact]
-        public async Task Should_restore_states_for_all_contents()
+        await sut.RestoreEventAsync(ContentEvent(new ContentCreated
         {
-            var me = RefToken.User("123");
+            ContentId = contentId2,
+            SchemaId = schemaId1
+        }), context, ct);
 
-            var schemaId1 = NamedId.Of(DomainId.NewGuid(), "my-schema1");
-            var schemaId2 = NamedId.Of(DomainId.NewGuid(), "my-schema2");
-
-            var contentId1 = DomainId.NewGuid();
-            var contentId2 = DomainId.NewGuid();
-            var contentId3 = DomainId.NewGuid();
-
-            var context = new RestoreContext(appId.Id, new UserMapping(me), A.Fake<IBackupReader>(), DomainId.NewGuid());
-
-            await sut.RestoreEventAsync(ContentEvent(new ContentCreated
-            {
-                ContentId = contentId1,
-                SchemaId = schemaId1
-            }), context, ct);
-
-            await sut.RestoreEventAsync(ContentEvent(new ContentCreated
-            {
-                ContentId = contentId2,
-                SchemaId = schemaId1
-            }), context, ct);
-
-            await sut.RestoreEventAsync(ContentEvent(new ContentCreated
-            {
-                ContentId = contentId3,
-                SchemaId = schemaId2
-            }), context, ct);
-
-            await sut.RestoreEventAsync(ContentEvent(new ContentDeleted
-            {
-                ContentId = contentId2,
-                SchemaId = schemaId1
-            }), context, ct);
-
-            await sut.RestoreEventAsync(Envelope.Create(new SchemaDeleted
-            {
-                SchemaId = schemaId2
-            }), context, ct);
-
-            var rebuildContents = new HashSet<DomainId>();
-
-            A.CallTo(() => rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, ct))
-                .Invokes(x => rebuildContents.AddRange(x.GetArgument<IEnumerable<DomainId>>(0)!));
-
-            await sut.RestoreAsync(context, ct);
-
-            Assert.Equal(new HashSet<DomainId>
-            {
-                DomainId.Combine(appId, contentId1),
-                DomainId.Combine(appId, contentId2)
-            }, rebuildContents);
-        }
-
-        private Envelope<ContentEvent> ContentEvent(ContentEvent @event)
+        await sut.RestoreEventAsync(ContentEvent(new ContentCreated
         {
-            @event.AppId = appId;
+            ContentId = contentId3,
+            SchemaId = schemaId2
+        }), context, ct);
 
-            return Envelope.Create(@event).SetAggregateId(DomainId.Combine(appId, @event.ContentId));
-        }
+        await sut.RestoreEventAsync(ContentEvent(new ContentDeleted
+        {
+            ContentId = contentId2,
+            SchemaId = schemaId1
+        }), context, ct);
+
+        await sut.RestoreEventAsync(Envelope.Create(new SchemaDeleted
+        {
+            SchemaId = schemaId2
+        }), context, ct);
+
+        var rebuildContents = new HashSet<DomainId>();
+
+        A.CallTo(() => rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, ct))
+            .Invokes(x => rebuildContents.AddRange(x.GetArgument<IEnumerable<DomainId>>(0)!));
+
+        await sut.RestoreAsync(context, ct);
+
+        Assert.Equal(new HashSet<DomainId>
+        {
+            DomainId.Combine(appId, contentId1),
+            DomainId.Combine(appId, contentId2)
+        }, rebuildContents);
+    }
+
+    private Envelope<ContentEvent> ContentEvent(ContentEvent @event)
+    {
+        @event.AppId = appId;
+
+        return Envelope.Create(@event).SetAggregateId(DomainId.Combine(appId, @event.ContentId));
     }
 }

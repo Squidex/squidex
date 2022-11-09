@@ -8,14 +8,13 @@
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Teams.Entities.Teams;
 
-namespace Squidex.Config.Domain
+namespace Squidex.Config.Domain;
+
+public static class TeamServices
 {
-    public static class TeamServices
+    public static void AddSquidexTeams(this IServiceCollection services)
     {
-        public static void AddSquidexTeams(this IServiceCollection services)
-        {
-            services.AddSingletonAs<TeamHistoryEventsCreator>()
-                .As<IHistoryEventsCreator>();
-        }
+        services.AddSingletonAs<TeamHistoryEventsCreator>()
+            .As<IHistoryEventsCreator>();
     }
 }

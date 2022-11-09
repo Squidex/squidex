@@ -7,100 +7,99 @@
 
 using Microsoft.Extensions.Logging;
 
-namespace Squidex.Infrastructure.Migrations
+namespace Squidex.Infrastructure.Migrations;
+
+public sealed class Migrator
 {
-    public sealed class Migrator
+    private readonly IMigrationStatus migrationStatus;
+    private readonly IMigrationPath migrationPath;
+    private readonly ILogger<Migrator> log;
+
+    public int LockWaitMs { get; set; } = 500;
+
+    public Migrator(IMigrationStatus migrationStatus, IMigrationPath migrationPath,
+        ILogger<Migrator> log)
     {
-        private readonly IMigrationStatus migrationStatus;
-        private readonly IMigrationPath migrationPath;
-        private readonly ILogger<Migrator> log;
+        this.migrationStatus = migrationStatus;
+        this.migrationPath = migrationPath;
 
-        public int LockWaitMs { get; set; } = 500;
+        this.log = log;
+    }
 
-        public Migrator(IMigrationStatus migrationStatus, IMigrationPath migrationPath,
-            ILogger<Migrator> log)
+    public async Task MigrateAsync(
+        CancellationToken ct = default)
+    {
+        if (!await TryLockAsync(ct))
         {
-            this.migrationStatus = migrationStatus;
-            this.migrationPath = migrationPath;
-
-            this.log = log;
+            return;
         }
 
-        public async Task MigrateAsync(
-            CancellationToken ct = default)
+        try
         {
-            if (!await TryLockAsync(ct))
-            {
-                return;
-            }
+            var version = await migrationStatus.GetVersionAsync(ct);
 
-            try
+            while (!ct.IsCancellationRequested)
             {
-                var version = await migrationStatus.GetVersionAsync(ct);
+                var (newVersion, migrations) = migrationPath.GetNext(version);
 
-                while (!ct.IsCancellationRequested)
+                if (migrations == null || !migrations.Any())
                 {
-                    var (newVersion, migrations) = migrationPath.GetNext(version);
-
-                    if (migrations == null || !migrations.Any())
-                    {
-                        break;
-                    }
-
-                    foreach (var migration in migrations)
-                    {
-                        var name = migration.ToString()!;
-
-                        log.LogInformation("Migration {migration} started.", name);
-
-                        try
-                        {
-                            var watch = ValueStopwatch.StartNew();
-
-                            await migration.UpdateAsync(ct);
-
-                            log.LogInformation("Migration {migration} completed after {time}ms.", name, watch.Stop());
-                        }
-                        catch (Exception ex)
-                        {
-                            log.LogCritical(ex, "Migration {migration} failed.", name);
-                            throw new MigrationFailedException(name, ex);
-                        }
-                    }
-
-                    version = newVersion;
-
-                    await migrationStatus.CompleteAsync(newVersion, ct);
+                    break;
                 }
-            }
-            finally
-            {
-                await UnlockAsync();
-            }
-        }
 
-        private async Task<bool> TryLockAsync(
-            CancellationToken ct)
-        {
-            try
-            {
-                while (!await migrationStatus.TryLockAsync(ct))
+                foreach (var migration in migrations)
                 {
-                    log.LogInformation("Could not acquire lock to start migrating. Tryping again in {time}ms.", LockWaitMs);
-                    await Task.Delay(LockWaitMs, ct);
+                    var name = migration.ToString()!;
+
+                    log.LogInformation("Migration {migration} started.", name);
+
+                    try
+                    {
+                        var watch = ValueStopwatch.StartNew();
+
+                        await migration.UpdateAsync(ct);
+
+                        log.LogInformation("Migration {migration} completed after {time}ms.", name, watch.Stop());
+                    }
+                    catch (Exception ex)
+                    {
+                        log.LogCritical(ex, "Migration {migration} failed.", name);
+                        throw new MigrationFailedException(name, ex);
+                    }
                 }
-            }
-            catch (OperationCanceledException)
-            {
-                return false;
-            }
 
-            return true;
+                version = newVersion;
+
+                await migrationStatus.CompleteAsync(newVersion, ct);
+            }
         }
-
-        private Task UnlockAsync()
+        finally
         {
-            return migrationStatus.UnlockAsync();
+            await UnlockAsync();
         }
+    }
+
+    private async Task<bool> TryLockAsync(
+        CancellationToken ct)
+    {
+        try
+        {
+            while (!await migrationStatus.TryLockAsync(ct))
+            {
+                log.LogInformation("Could not acquire lock to start migrating. Tryping again in {time}ms.", LockWaitMs);
+                await Task.Delay(LockWaitMs, ct);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private Task UnlockAsync()
+    {
+        return migrationStatus.UnlockAsync();
     }
 }

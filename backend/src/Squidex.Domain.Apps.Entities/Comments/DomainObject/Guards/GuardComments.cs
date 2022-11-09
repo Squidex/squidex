@@ -12,77 +12,76 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards
+namespace Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards;
+
+public static class GuardComments
 {
-    public static class GuardComments
+    public static void CanCreate(CreateComment command)
     {
-        public static void CanCreate(CreateComment command)
-        {
-            Guard.NotNull(command);
+        Guard.NotNull(command);
 
-            Validate.It(e =>
+        Validate.It(e =>
+        {
+            if (string.IsNullOrWhiteSpace(command.Text))
             {
-                if (string.IsNullOrWhiteSpace(command.Text))
-                {
-                    e(Not.Defined(nameof(command.Text)), nameof(command.Text));
-                }
-            });
+                e(Not.Defined(nameof(command.Text)), nameof(command.Text));
+            }
+        });
+    }
+
+    public static void CanUpdate(UpdateComment command, string commentsId, List<Envelope<CommentsEvent>> events)
+    {
+        Guard.NotNull(command);
+
+        var comment = FindComment(events, command.CommentId);
+
+        if (!string.Equals(commentsId, command.Actor.Identifier, StringComparison.Ordinal) && !comment.Payload.Actor.Equals(command.Actor))
+        {
+            throw new DomainException(T.Get("comments.notUserComment"));
         }
 
-        public static void CanUpdate(UpdateComment command, string commentsId, List<Envelope<CommentsEvent>> events)
+        Validate.It(e =>
         {
-            Guard.NotNull(command);
-
-            var comment = FindComment(events, command.CommentId);
-
-            if (!string.Equals(commentsId, command.Actor.Identifier, StringComparison.Ordinal) && !comment.Payload.Actor.Equals(command.Actor))
+            if (string.IsNullOrWhiteSpace(command.Text))
             {
-                throw new DomainException(T.Get("comments.notUserComment"));
+                e(Not.Defined(nameof(command.Text)), nameof(command.Text));
             }
+        });
+    }
 
-            Validate.It(e =>
+    public static void CanDelete(DeleteComment command, string commentsId, List<Envelope<CommentsEvent>> events)
+    {
+        Guard.NotNull(command);
+
+        var comment = FindComment(events, command.CommentId);
+
+        if (!string.Equals(commentsId, command.Actor.Identifier, StringComparison.Ordinal) && !comment.Payload.Actor.Equals(command.Actor))
+        {
+            throw new DomainException(T.Get("comments.notUserComment"));
+        }
+    }
+
+    private static Envelope<CommentCreated> FindComment(List<Envelope<CommentsEvent>> events, DomainId commentId)
+    {
+        Envelope<CommentCreated>? result = null;
+
+        foreach (var @event in events)
+        {
+            if (@event.Payload is CommentCreated created && created.CommentId == commentId)
             {
-                if (string.IsNullOrWhiteSpace(command.Text))
-                {
-                    e(Not.Defined(nameof(command.Text)), nameof(command.Text));
-                }
-            });
+                result = @event.To<CommentCreated>();
+            }
+            else if (@event.Payload is CommentDeleted deleted && deleted.CommentId == commentId)
+            {
+                result = null;
+            }
         }
 
-        public static void CanDelete(DeleteComment command, string commentsId, List<Envelope<CommentsEvent>> events)
+        if (result == null)
         {
-            Guard.NotNull(command);
-
-            var comment = FindComment(events, command.CommentId);
-
-            if (!string.Equals(commentsId, command.Actor.Identifier, StringComparison.Ordinal) && !comment.Payload.Actor.Equals(command.Actor))
-            {
-                throw new DomainException(T.Get("comments.notUserComment"));
-            }
+            throw new DomainObjectNotFoundException(commentId.ToString());
         }
 
-        private static Envelope<CommentCreated> FindComment(List<Envelope<CommentsEvent>> events, DomainId commentId)
-        {
-            Envelope<CommentCreated>? result = null;
-
-            foreach (var @event in events)
-            {
-                if (@event.Payload is CommentCreated created && created.CommentId == commentId)
-                {
-                    result = @event.To<CommentCreated>();
-                }
-                else if (@event.Payload is CommentDeleted deleted && deleted.CommentId == commentId)
-                {
-                    result = null;
-                }
-            }
-
-            if (result == null)
-            {
-                throw new DomainObjectNotFoundException(commentId.ToString());
-            }
-
-            return result;
-        }
+        return result;
     }
 }

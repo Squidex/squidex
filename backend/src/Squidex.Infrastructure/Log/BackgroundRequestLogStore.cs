@@ -10,114 +10,113 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Timers;
 
-namespace Squidex.Infrastructure.Log
+namespace Squidex.Infrastructure.Log;
+
+public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLogStore
 {
-    public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLogStore
+    private readonly IRequestLogRepository logRepository;
+    private readonly ILogger<BackgroundRequestLogStore> log;
+    private readonly CompletionTimer timer;
+    private readonly RequestLogStoreOptions options;
+    private ConcurrentQueue<Request> jobs = new ConcurrentQueue<Request>();
+
+    public bool ForceWrite { get; set; }
+
+    public bool IsEnabled => options.StoreEnabled;
+
+    public BackgroundRequestLogStore(IOptions<RequestLogStoreOptions> options,
+        IRequestLogRepository logRepository, ILogger<BackgroundRequestLogStore> log)
     {
-        private readonly IRequestLogRepository logRepository;
-        private readonly ILogger<BackgroundRequestLogStore> log;
-        private readonly CompletionTimer timer;
-        private readonly RequestLogStoreOptions options;
-        private ConcurrentQueue<Request> jobs = new ConcurrentQueue<Request>();
+        this.options = options.Value;
 
-        public bool ForceWrite { get; set; }
+        this.logRepository = logRepository;
 
-        public bool IsEnabled => options.StoreEnabled;
+        timer = new CompletionTimer(options.Value.WriteIntervall, TrackAsync, options.Value.WriteIntervall);
 
-        public BackgroundRequestLogStore(IOptions<RequestLogStoreOptions> options,
-            IRequestLogRepository logRepository, ILogger<BackgroundRequestLogStore> log)
+        this.log = log;
+    }
+
+    protected override void DisposeObject(bool disposing)
+    {
+        if (disposing)
         {
-            this.options = options.Value;
+            timer.StopAsync().Wait();
+        }
+    }
 
-            this.logRepository = logRepository;
+    public void Next()
+    {
+        ThrowIfDisposed();
 
-            timer = new CompletionTimer(options.Value.WriteIntervall, TrackAsync, options.Value.WriteIntervall);
+        timer.SkipCurrentDelay();
+    }
 
-            this.log = log;
+    private async Task TrackAsync(
+        CancellationToken ct)
+    {
+        if (!IsEnabled)
+        {
+            return;
         }
 
-        protected override void DisposeObject(bool disposing)
+        try
         {
-            if (disposing)
+            var batchSize = options.BatchSize;
+
+            var localJobs = Interlocked.Exchange(ref jobs, new ConcurrentQueue<Request>());
+
+            if (!localJobs.IsEmpty)
             {
-                timer.StopAsync().Wait();
-            }
-        }
+                var pages = (int)Math.Ceiling((double)localJobs.Count / batchSize);
 
-        public void Next()
-        {
-            ThrowIfDisposed();
-
-            timer.SkipCurrentDelay();
-        }
-
-        private async Task TrackAsync(
-            CancellationToken ct)
-        {
-            if (!IsEnabled)
-            {
-                return;
-            }
-
-            try
-            {
-                var batchSize = options.BatchSize;
-
-                var localJobs = Interlocked.Exchange(ref jobs, new ConcurrentQueue<Request>());
-
-                if (!localJobs.IsEmpty)
+                for (var i = 0; i < pages; i++)
                 {
-                    var pages = (int)Math.Ceiling((double)localJobs.Count / batchSize);
+                    var batch = localJobs.Skip(i * batchSize).Take(batchSize);
 
-                    for (var i = 0; i < pages; i++)
+                    if (ForceWrite)
                     {
-                        var batch = localJobs.Skip(i * batchSize).Take(batchSize);
-
-                        if (ForceWrite)
-                        {
-                            ct = default;
-                        }
-
-                        await logRepository.InsertManyAsync(batch, ct);
+                        ct = default;
                     }
+
+                    await logRepository.InsertManyAsync(batch, ct);
                 }
             }
-            catch (Exception ex)
-            {
-                log.LogError(ex, "Failed to track usage in background.");
-            }
+        }
+        catch (Exception ex)
+        {
+            log.LogError(ex, "Failed to track usage in background.");
+        }
+    }
+
+    public Task DeleteAsync(string key,
+        CancellationToken ct = default)
+    {
+        return logRepository.DeleteAsync(key, ct);
+    }
+
+    public IAsyncEnumerable<Request> QueryAllAsync(string key, DateTime fromDate, DateTime toDate,
+        CancellationToken ct = default)
+    {
+        if (!IsEnabled)
+        {
+            return AsyncEnumerable.Empty<Request>();
         }
 
-        public Task DeleteAsync(string key,
-            CancellationToken ct = default)
+        return logRepository.QueryAllAsync(key, fromDate, toDate, ct);
+    }
+
+    public Task LogAsync(Request request,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(request);
+
+        if (!IsEnabled)
         {
-            return logRepository.DeleteAsync(key, ct);
-        }
-
-        public IAsyncEnumerable<Request> QueryAllAsync(string key, DateTime fromDate, DateTime toDate,
-            CancellationToken ct = default)
-        {
-            if (!IsEnabled)
-            {
-                return AsyncEnumerable.Empty<Request>();
-            }
-
-            return logRepository.QueryAllAsync(key, fromDate, toDate, ct);
-        }
-
-        public Task LogAsync(Request request,
-            CancellationToken ct = default)
-        {
-            Guard.NotNull(request);
-
-            if (!IsEnabled)
-            {
-                return Task.CompletedTask;
-            }
-
-            jobs.Enqueue(request);
-
             return Task.CompletedTask;
         }
+
+        jobs.Enqueue(request);
+
+        return Task.CompletedTask;
     }
 }

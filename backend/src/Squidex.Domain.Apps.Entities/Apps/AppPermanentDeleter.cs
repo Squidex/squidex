@@ -12,97 +12,96 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Domain.Apps.Entities.Apps;
+
+public sealed class AppPermanentDeleter : IEventConsumer
 {
-    public sealed class AppPermanentDeleter : IEventConsumer
+    private readonly IEnumerable<IDeleter> deleters;
+    private readonly IDomainObjectFactory factory;
+    private readonly HashSet<string> consumingTypes;
+
+    public string Name
     {
-        private readonly IEnumerable<IDeleter> deleters;
-        private readonly IDomainObjectFactory factory;
-        private readonly HashSet<string> consumingTypes;
+        get => GetType().Name;
+    }
 
-        public string Name
+    public string EventsFilter
+    {
+        get => "^app-";
+    }
+
+    public AppPermanentDeleter(IEnumerable<IDeleter> deleters, IDomainObjectFactory factory, TypeNameRegistry typeNameRegistry)
+    {
+        this.deleters = deleters.OrderBy(x => x.Order).ToList();
+        this.factory = factory;
+
+        // Compute the event types names once for performance reasons and use hashset for extensibility.
+        consumingTypes = new HashSet<string>
         {
-            get => GetType().Name;
+            typeNameRegistry.GetName<AppDeleted>(),
+            typeNameRegistry.GetName<AppContributorRemoved>()
+        };
+    }
+
+    public bool Handles(StoredEvent @event)
+    {
+        return consumingTypes.Contains(@event.Data.Type);
+    }
+
+    public async Task On(Envelope<IEvent> @event)
+    {
+        if (@event.Headers.Restored())
+        {
+            return;
         }
 
-        public string EventsFilter
+        switch (@event.Payload)
         {
-            get => "^app-";
+            case AppDeleted appArchived:
+                await OnArchiveAsync(appArchived);
+                break;
+            case AppContributorRemoved appContributorRemoved:
+                await OnAppContributorRemoved(appContributorRemoved);
+                break;
         }
+    }
 
-        public AppPermanentDeleter(IEnumerable<IDeleter> deleters, IDomainObjectFactory factory, TypeNameRegistry typeNameRegistry)
+    private async Task OnAppContributorRemoved(AppContributorRemoved appContributorRemoved)
+    {
+        using (Telemetry.Activities.StartActivity("RemoveContributorFromSystem"))
         {
-            this.deleters = deleters.OrderBy(x => x.Order).ToList();
-            this.factory = factory;
+            var appId = appContributorRemoved.AppId.Id;
 
-            // Compute the event types names once for performance reasons and use hashset for extensibility.
-            consumingTypes = new HashSet<string>
+            foreach (var deleter in deleters)
             {
-                typeNameRegistry.GetName<AppDeleted>(),
-                typeNameRegistry.GetName<AppContributorRemoved>()
-            };
+                using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
+                {
+                    await deleter.DeleteContributorAsync(appId, appContributorRemoved.ContributorId, default);
+                }
+            }
         }
+    }
 
-        public bool Handles(StoredEvent @event)
+    private async Task OnArchiveAsync(AppDeleted appArchived)
+    {
+        using (Telemetry.Activities.StartActivity("RemoveAppFromSystem"))
         {
-            return consumingTypes.Contains(@event.Data.Type);
-        }
+            // Bypass our normal app resolve process, so that we can also retrieve the deleted app.
+            var app = factory.Create<AppDomainObject>(appArchived.AppId.Id);
 
-        public async Task On(Envelope<IEvent> @event)
-        {
-            if (@event.Headers.Restored())
+            await app.EnsureLoadedAsync();
+
+            // If the app does not exist, the version is lower than zero.
+            if (app.Version < 0)
             {
                 return;
             }
 
-            switch (@event.Payload)
+            foreach (var deleter in deleters)
             {
-                case AppDeleted appArchived:
-                    await OnArchiveAsync(appArchived);
-                    break;
-                case AppContributorRemoved appContributorRemoved:
-                    await OnAppContributorRemoved(appContributorRemoved);
-                    break;
-            }
-        }
-
-        private async Task OnAppContributorRemoved(AppContributorRemoved appContributorRemoved)
-        {
-            using (Telemetry.Activities.StartActivity("RemoveContributorFromSystem"))
-            {
-                var appId = appContributorRemoved.AppId.Id;
-
-                foreach (var deleter in deleters)
+                using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
                 {
-                    using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
-                    {
-                        await deleter.DeleteContributorAsync(appId, appContributorRemoved.ContributorId, default);
-                    }
-                }
-            }
-        }
-
-        private async Task OnArchiveAsync(AppDeleted appArchived)
-        {
-            using (Telemetry.Activities.StartActivity("RemoveAppFromSystem"))
-            {
-                // Bypass our normal app resolve process, so that we can also retrieve the deleted app.
-                var app = factory.Create<AppDomainObject>(appArchived.AppId.Id);
-
-                await app.EnsureLoadedAsync();
-
-                // If the app does not exist, the version is lower than zero.
-                if (app.Version < 0)
-                {
-                    return;
-                }
-
-                foreach (var deleter in deleters)
-                {
-                    using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
-                    {
-                        await deleter.DeleteAppAsync(app.Snapshot, default);
-                    }
+                    await deleter.DeleteAppAsync(app.Snapshot, default);
                 }
             }
         }

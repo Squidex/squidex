@@ -7,13 +7,12 @@
 
 using GraphQL.Types;
 
-namespace Squidex.Web.GraphQL
+namespace Squidex.Web.GraphQL;
+
+public sealed class DummySchema : Schema
 {
-    public sealed class DummySchema : Schema
+    public DummySchema()
     {
-        public DummySchema()
-        {
-            Query = new ObjectGraphType();
-        }
+        Query = new ObjectGraphType();
     }
 }

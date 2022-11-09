@@ -7,17 +7,16 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.History.Repositories
+namespace Squidex.Domain.Apps.Entities.History.Repositories;
+
+public interface IHistoryEventRepository
 {
-    public interface IHistoryEventRepository
-    {
-        Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(DomainId appId, string channelPrefix, int count,
-            CancellationToken ct = default);
+    Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(DomainId appId, string channelPrefix, int count,
+        CancellationToken ct = default);
 
-        Task InsertManyAsync(IEnumerable<HistoryEvent> historyEvents,
-            CancellationToken ct = default);
+    Task InsertManyAsync(IEnumerable<HistoryEvent> historyEvents,
+        CancellationToken ct = default);
 
-        Task ClearAsync(
-            CancellationToken ct = default);
-    }
+    Task ClearAsync(
+        CancellationToken ct = default);
 }

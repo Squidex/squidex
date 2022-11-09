@@ -12,182 +12,181 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities;
+
+public class AppProviderExtensionsTests
 {
-    public class AppProviderExtensionsTests
+    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
+    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+    private readonly NamedId<DomainId> componentId1 = NamedId.Of(DomainId.NewGuid(), "my-schema");
+    private readonly NamedId<DomainId> componentId2 = NamedId.Of(DomainId.NewGuid(), "my-schema");
+
+    [Fact]
+    public async Task Should_do_nothing_if_no_component_found()
     {
-        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-        private readonly NamedId<DomainId> componentId1 = NamedId.Of(DomainId.NewGuid(), "my-schema");
-        private readonly NamedId<DomainId> componentId2 = NamedId.Of(DomainId.NewGuid(), "my-schema");
+        var schema = Mocks.Schema(appId, schemaId);
 
-        [Fact]
-        public async Task Should_do_nothing_if_no_component_found()
-        {
-            var schema = Mocks.Schema(appId, schemaId);
+        var components = await appProvider.GetComponentsAsync(schema);
 
-            var components = await appProvider.GetComponentsAsync(schema);
+        Assert.Empty(components);
 
-            Assert.Empty(components);
+        A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
 
-            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false, A<CancellationToken>._))
-                .MustNotHaveHappened();
-        }
+    [Fact]
+    public async Task Should_resolve_self_as_component()
+    {
+        var schema =
+            Mocks.Schema(appId, schemaId,
+                new Schema(schemaId.Name)
+                    .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
+                    {
+                        SchemaId = schemaId.Id
+                    }));
 
-        [Fact]
-        public async Task Should_resolve_self_as_component()
-        {
-            var schema =
-                Mocks.Schema(appId, schemaId,
-                    new Schema(schemaId.Name)
-                        .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
-                        {
-                            SchemaId = schemaId.Id
-                        }));
+        var components = await appProvider.GetComponentsAsync(schema);
 
-            var components = await appProvider.GetComponentsAsync(schema);
+        Assert.Single(components);
+        Assert.Same(schema.SchemaDef, components[schemaId.Id]);
 
-            Assert.Single(components);
-            Assert.Same(schema.SchemaDef, components[schemaId.Id]);
+        A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
 
-            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false, A<CancellationToken>._))
-                .MustNotHaveHappened();
-        }
+    [Fact]
+    public async Task Should_resolve_from_component()
+    {
+        var component = Mocks.Schema(appId, componentId1);
 
-        [Fact]
-        public async Task Should_resolve_from_component()
-        {
-            var component = Mocks.Schema(appId, componentId1);
+        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false, default))
+            .Returns(component);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false, default))
-                .Returns(component);
+        var schema =
+            Mocks.Schema(appId, schemaId,
+                new Schema(schemaId.Name)
+                    .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
+                    {
+                        SchemaId = componentId1.Id
+                    }));
 
-            var schema =
-                Mocks.Schema(appId, schemaId,
-                    new Schema(schemaId.Name)
-                        .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
-                        {
-                            SchemaId = componentId1.Id
-                        }));
+        var components = await appProvider.GetComponentsAsync(schema);
 
-            var components = await appProvider.GetComponentsAsync(schema);
+        Assert.Single(components);
+        Assert.Same(component.SchemaDef, components[componentId1.Id]);
+    }
 
-            Assert.Single(components);
-            Assert.Same(component.SchemaDef, components[componentId1.Id]);
-        }
+    [Fact]
+    public async Task Should_resolve_from_components()
+    {
+        var component = Mocks.Schema(appId, componentId1);
 
-        [Fact]
-        public async Task Should_resolve_from_components()
-        {
-            var component = Mocks.Schema(appId, componentId1);
+        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false, default))
+            .Returns(component);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false, default))
-                .Returns(component);
+        var schema =
+            Mocks.Schema(appId, schemaId,
+                new Schema(schemaId.Name)
+                    .AddComponents(1, "1", Partitioning.Invariant, new ComponentsFieldProperties
+                    {
+                        SchemaId = componentId1.Id
+                    }));
 
-            var schema =
-                Mocks.Schema(appId, schemaId,
-                    new Schema(schemaId.Name)
-                        .AddComponents(1, "1", Partitioning.Invariant, new ComponentsFieldProperties
-                        {
-                            SchemaId = componentId1.Id
-                        }));
+        var components = await appProvider.GetComponentsAsync(schema);
 
-            var components = await appProvider.GetComponentsAsync(schema);
+        Assert.Single(components);
+        Assert.Same(component.SchemaDef, components[componentId1.Id]);
+    }
 
-            Assert.Single(components);
-            Assert.Same(component.SchemaDef, components[componentId1.Id]);
-        }
+    [Fact]
+    public async Task Should_resolve_from_array()
+    {
+        var component = Mocks.Schema(appId, componentId1);
 
-        [Fact]
-        public async Task Should_resolve_from_array()
-        {
-            var component = Mocks.Schema(appId, componentId1);
+        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false, default))
+            .Returns(component);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false, default))
-                .Returns(component);
-
-            var schema =
-                Mocks.Schema(appId, schemaId,
-                    new Schema(schemaId.Name)
-                        .AddArray(1, "1", Partitioning.Invariant, a => a
-                            .AddComponent(2, "2", new ComponentFieldProperties
-                            {
-                                SchemaId = componentId1.Id
-                            })));
-
-            var components = await appProvider.GetComponentsAsync(schema);
-
-            Assert.Single(components);
-            Assert.Same(component.SchemaDef, components[componentId1.Id]);
-        }
-
-        [Fact]
-        public async Task Should_resolve_self_referencing_component()
-        {
-            var component =
-                Mocks.Schema(appId, componentId1,
-                    new Schema(componentId1.Name)
-                        .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
+        var schema =
+            Mocks.Schema(appId, schemaId,
+                new Schema(schemaId.Name)
+                    .AddArray(1, "1", Partitioning.Invariant, a => a
+                        .AddComponent(2, "2", new ComponentFieldProperties
                         {
                             SchemaId = componentId1.Id
-                        }));
+                        })));
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false, default))
-                .Returns(component);
+        var components = await appProvider.GetComponentsAsync(schema);
 
-            var schema =
-                Mocks.Schema(appId, schemaId,
-                    new Schema(schemaId.Name)
-                        .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
-                        {
-                            SchemaId = componentId1.Id
-                        }));
+        Assert.Single(components);
+        Assert.Same(component.SchemaDef, components[componentId1.Id]);
+    }
 
-            var components = await appProvider.GetComponentsAsync(schema);
+    [Fact]
+    public async Task Should_resolve_self_referencing_component()
+    {
+        var component =
+            Mocks.Schema(appId, componentId1,
+                new Schema(componentId1.Name)
+                    .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
+                    {
+                        SchemaId = componentId1.Id
+                    }));
 
-            Assert.Single(components);
-            Assert.Same(component.SchemaDef, components[componentId1.Id]);
-        }
+        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false, default))
+            .Returns(component);
 
-        [Fact]
-        public async Task Should_resolve_component_of_component()
-        {
-            var component1 =
-                Mocks.Schema(appId, componentId1,
-                    new Schema(componentId1.Name)
-                        .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
-                        {
-                            SchemaId = componentId2.Id
-                        }));
+        var schema =
+            Mocks.Schema(appId, schemaId,
+                new Schema(schemaId.Name)
+                    .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
+                    {
+                        SchemaId = componentId1.Id
+                    }));
 
-            var component2 =
-                Mocks.Schema(appId, componentId2,
-                    new Schema(componentId2.Name)
-                        .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
-                        {
-                            SchemaId = componentId2.Id
-                        }));
+        var components = await appProvider.GetComponentsAsync(schema);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false, default))
-                .Returns(component1);
+        Assert.Single(components);
+        Assert.Same(component.SchemaDef, components[componentId1.Id]);
+    }
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId2.Id, false, default))
-                .Returns(component2);
+    [Fact]
+    public async Task Should_resolve_component_of_component()
+    {
+        var component1 =
+            Mocks.Schema(appId, componentId1,
+                new Schema(componentId1.Name)
+                    .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
+                    {
+                        SchemaId = componentId2.Id
+                    }));
 
-            var schema =
-                Mocks.Schema(appId, schemaId,
-                    new Schema(schemaId.Name)
-                        .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
-                        {
-                            SchemaId = componentId1.Id
-                        }));
+        var component2 =
+            Mocks.Schema(appId, componentId2,
+                new Schema(componentId2.Name)
+                    .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
+                    {
+                        SchemaId = componentId2.Id
+                    }));
 
-            var components = await appProvider.GetComponentsAsync(schema);
+        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false, default))
+            .Returns(component1);
 
-            Assert.Equal(2, components.Count);
-            Assert.Same(component1.SchemaDef, components[componentId1.Id]);
-            Assert.Same(component2.SchemaDef, components[componentId2.Id]);
-        }
+        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId2.Id, false, default))
+            .Returns(component2);
+
+        var schema =
+            Mocks.Schema(appId, schemaId,
+                new Schema(schemaId.Name)
+                    .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
+                    {
+                        SchemaId = componentId1.Id
+                    }));
+
+        var components = await appProvider.GetComponentsAsync(schema);
+
+        Assert.Equal(2, components.Count);
+        Assert.Same(component1.SchemaDef, components[componentId1.Id]);
+        Assert.Same(component2.SchemaDef, components[componentId2.Id]);
     }
 }

@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public sealed class DomainObjectCacheOptions
 {
-    public sealed class DomainObjectCacheOptions
-    {
-        public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
-    }
+    public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
 }

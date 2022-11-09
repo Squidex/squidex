@@ -10,34 +10,33 @@ using MongoDB.Driver;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.MongoDb;
 
-namespace Migrations.Migrations.MongoDb
-{
-    public sealed class RestructureContentCollection : MongoBase<BsonDocument>, IMigration
-    {
-        private readonly IMongoDatabase contentDatabase;
+namespace Migrations.Migrations.MongoDb;
 
-        public RestructureContentCollection(IMongoDatabase contentDatabase)
+public sealed class RestructureContentCollection : MongoBase<BsonDocument>, IMigration
+{
+    private readonly IMongoDatabase contentDatabase;
+
+    public RestructureContentCollection(IMongoDatabase contentDatabase)
+    {
+        this.contentDatabase = contentDatabase;
+    }
+
+    public async Task UpdateAsync(
+        CancellationToken ct)
+    {
+        if (await contentDatabase.CollectionExistsAsync("State_Content_Draft", ct))
         {
-            this.contentDatabase = contentDatabase;
+            await contentDatabase.DropCollectionAsync("State_Contents", ct);
+            await contentDatabase.DropCollectionAsync("State_Content_Published", ct);
+
+            await contentDatabase.RenameCollectionAsync("State_Content_Draft", "State_Contents", cancellationToken: ct);
         }
 
-        public async Task UpdateAsync(
-            CancellationToken ct)
+        if (await contentDatabase.CollectionExistsAsync("State_Contents", ct))
         {
-            if (await contentDatabase.CollectionExistsAsync("State_Content_Draft", ct))
-            {
-                await contentDatabase.DropCollectionAsync("State_Contents", ct);
-                await contentDatabase.DropCollectionAsync("State_Content_Published", ct);
+            var collection = contentDatabase.GetCollection<BsonDocument>("State_Contents");
 
-                await contentDatabase.RenameCollectionAsync("State_Content_Draft", "State_Contents", cancellationToken: ct);
-            }
-
-            if (await contentDatabase.CollectionExistsAsync("State_Contents", ct))
-            {
-                var collection = contentDatabase.GetCollection<BsonDocument>("State_Contents");
-
-                await collection.UpdateManyAsync(FindAll, Update.Unset("dt"), cancellationToken: ct);
-            }
+            await collection.UpdateManyAsync(FindAll, Update.Unset("dt"), cancellationToken: ct);
         }
     }
 }

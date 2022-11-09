@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Migrations
+namespace Squidex.Infrastructure.Migrations;
+
+public interface IMigrated<out T>
 {
-    public interface IMigrated<out T>
-    {
-        T Migrate();
-    }
+    T Migrate();
 }

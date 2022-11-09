@@ -14,211 +14,210 @@ using Squidex.Infrastructure.States;
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
+namespace Squidex.Domain.Apps.Entities.MongoDb.Contents;
+
+public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject.State>, IDeleter
 {
-    public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject.State>, IDeleter
+    IAsyncEnumerable<SnapshotResult<ContentDomainObject.State>> ISnapshotStore<ContentDomainObject.State>.ReadAllAsync(
+        CancellationToken ct)
     {
-        IAsyncEnumerable<SnapshotResult<ContentDomainObject.State>> ISnapshotStore<ContentDomainObject.State>.ReadAllAsync(
-            CancellationToken ct)
-        {
-            return collectionComplete.StreamAll(ct)
-                .Select(x => new SnapshotResult<ContentDomainObject.State>(x.DocumentId, x.ToState(), x.Version, true));
-        }
+        return collectionComplete.StreamAll(ct)
+            .Select(x => new SnapshotResult<ContentDomainObject.State>(x.DocumentId, x.ToState(), x.Version, true));
+    }
 
-        async Task<SnapshotResult<ContentDomainObject.State>> ISnapshotStore<ContentDomainObject.State>.ReadAsync(DomainId key,
-            CancellationToken ct)
+    async Task<SnapshotResult<ContentDomainObject.State>> ISnapshotStore<ContentDomainObject.State>.ReadAsync(DomainId key,
+        CancellationToken ct)
+    {
+        using (Telemetry.Activities.StartActivity("MongoContentRepository/ReadAsync"))
         {
-            using (Telemetry.Activities.StartActivity("MongoContentRepository/ReadAsync"))
+            var existing =
+                await collectionComplete.FindAsync(key, ct);
+
+            // Support for all versions, where we do not have full snapshots in the collection.
+            if (existing?.IsSnapshot == true)
             {
-                var existing =
-                    await collectionComplete.FindAsync(key, ct);
-
-                // Support for all versions, where we do not have full snapshots in the collection.
-                if (existing?.IsSnapshot == true)
-                {
-                    return new SnapshotResult<ContentDomainObject.State>(existing.DocumentId, existing.ToState(), existing.Version);
-                }
-
-                return new SnapshotResult<ContentDomainObject.State>(default, null!, EtagVersion.Empty);
+                return new SnapshotResult<ContentDomainObject.State>(existing.DocumentId, existing.ToState(), existing.Version);
             }
-        }
 
-        async Task IDeleter.DeleteAppAsync(IAppEntity app,
-            CancellationToken ct)
+            return new SnapshotResult<ContentDomainObject.State>(default, null!, EtagVersion.Empty);
+        }
+    }
+
+    async Task IDeleter.DeleteAppAsync(IAppEntity app,
+        CancellationToken ct)
+    {
+        using (Telemetry.Activities.StartActivity("MongoContentRepository/DeleteAppAsync"))
         {
-            using (Telemetry.Activities.StartActivity("MongoContentRepository/DeleteAppAsync"))
+            await collectionComplete.DeleteAppAsync(app.Id, ct);
+            await collectionPublished.DeleteAppAsync(app.Id, ct);
+        }
+    }
+
+    async Task ISnapshotStore<ContentDomainObject.State>.ClearAsync(
+        CancellationToken ct)
+    {
+        using (Telemetry.Activities.StartActivity("MongoContentRepository/ClearAsync"))
+        {
+            await collectionComplete.ClearAsync(ct);
+            await collectionPublished.ClearAsync(ct);
+        }
+    }
+
+    async Task ISnapshotStore<ContentDomainObject.State>.RemoveAsync(DomainId key,
+        CancellationToken ct)
+    {
+        using (Telemetry.Activities.StartActivity("MongoContentRepository/RemoveAsync"))
+        {
+            // Some data is corrupt and might throw an exception if we do not ignore it.
+            if (key == DomainId.Empty)
             {
-                await collectionComplete.DeleteAppAsync(app.Id, ct);
-                await collectionPublished.DeleteAppAsync(app.Id, ct);
+                return;
             }
-        }
 
-        async Task ISnapshotStore<ContentDomainObject.State>.ClearAsync(
-            CancellationToken ct)
+            await Task.WhenAll(
+                collectionComplete.RemoveAsync(key, ct),
+                collectionPublished.RemoveAsync(key, ct));
+        }
+    }
+
+    async Task ISnapshotStore<ContentDomainObject.State>.WriteAsync(SnapshotWriteJob<ContentDomainObject.State> job,
+        CancellationToken ct)
+    {
+        using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteAsync"))
         {
-            using (Telemetry.Activities.StartActivity("MongoContentRepository/ClearAsync"))
+            // Some data is corrupt and might throw an exception if we do not ignore it.
+            if (!IsValid(job.Value))
             {
-                await collectionComplete.ClearAsync(ct);
-                await collectionPublished.ClearAsync(ct);
+                return;
             }
-        }
 
-        async Task ISnapshotStore<ContentDomainObject.State>.RemoveAsync(DomainId key,
-            CancellationToken ct)
-        {
-            using (Telemetry.Activities.StartActivity("MongoContentRepository/RemoveAsync"))
+            if (!CanUseTransactions)
             {
-                // Some data is corrupt and might throw an exception if we do not ignore it.
-                if (key == DomainId.Empty)
-                {
-                    return;
-                }
-
+                // If transactions are not supported we update the documents without version checks,
+                // otherwise we would not be able to recover from inconsistencies.
                 await Task.WhenAll(
-                    collectionComplete.RemoveAsync(key, ct),
-                    collectionPublished.RemoveAsync(key, ct));
+                    UpsertCompleteAsync(job, default),
+                    UpsertPublishedAsync(job, default));
+                return;
+            }
+
+            using (var session = await database.Client.StartSessionAsync(cancellationToken: ct))
+            {
+                // Make an update with full transaction support to be more consistent.
+                await session.WithTransactionAsync(async (session, ct) =>
+                {
+                    await UpsertVersionedCompleteAsync(session, job, ct);
+                    await UpsertVersionedPublishedAsync(session, job, ct);
+                    return true;
+                }, null, ct);
             }
         }
+    }
 
-        async Task ISnapshotStore<ContentDomainObject.State>.WriteAsync(SnapshotWriteJob<ContentDomainObject.State> job,
-            CancellationToken ct)
+    async Task ISnapshotStore<ContentDomainObject.State>.WriteManyAsync(IEnumerable<SnapshotWriteJob<ContentDomainObject.State>> jobs,
+        CancellationToken ct)
+    {
+        using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteManyAsync"))
         {
-            using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteAsync"))
+            var collectionUpdates = new Dictionary<IMongoCollection<MongoContentEntity>, List<MongoContentEntity>>();
+
+            var add = new Action<IMongoCollection<MongoContentEntity>, MongoContentEntity>((collection, entity) =>
             {
-                // Some data is corrupt and might throw an exception if we do not ignore it.
-                if (!IsValid(job.Value))
+                collectionUpdates.GetOrAddNew(collection).Add(entity);
+            });
+
+            foreach (var job in jobs)
+            {
+                var isValid = IsValid(job.Value);
+
+                if (isValid && ShouldWritePublished(job.Value))
                 {
-                    return;
+                    await collectionPublished.AddCollectionsAsync(
+                        await MongoContentEntity.CreatePublishedAsync(job, appProvider), add, ct);
                 }
 
-                if (!CanUseTransactions)
+                if (isValid)
                 {
-                    // If transactions are not supported we update the documents without version checks,
-                    // otherwise we would not be able to recover from inconsistencies.
-                    await Task.WhenAll(
-                        UpsertCompleteAsync(job, default),
-                        UpsertPublishedAsync(job, default));
-                    return;
-                }
-
-                using (var session = await database.Client.StartSessionAsync(cancellationToken: ct))
-                {
-                    // Make an update with full transaction support to be more consistent.
-                    await session.WithTransactionAsync(async (session, ct) =>
-                    {
-                        await UpsertVersionedCompleteAsync(session, job, ct);
-                        await UpsertVersionedPublishedAsync(session, job, ct);
-                        return true;
-                    }, null, ct);
+                    await collectionComplete.AddCollectionsAsync(
+                        await MongoContentEntity.CreateCompleteAsync(job, appProvider), add, ct);
                 }
             }
-        }
 
-        async Task ISnapshotStore<ContentDomainObject.State>.WriteManyAsync(IEnumerable<SnapshotWriteJob<ContentDomainObject.State>> jobs,
-            CancellationToken ct)
-        {
-            using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteManyAsync"))
+            var parallelOptions = new ParallelOptions
             {
-                var collectionUpdates = new Dictionary<IMongoCollection<MongoContentEntity>, List<MongoContentEntity>>();
+                CancellationToken = ct,
+                // This is just an estimate, but we do not want ot have unlimited parallelism.
+                MaxDegreeOfParallelism = 8
+            };
 
-                var add = new Action<IMongoCollection<MongoContentEntity>, MongoContentEntity>((collection, entity) =>
-                {
-                    collectionUpdates.GetOrAddNew(collection).Add(entity);
-                });
-
-                foreach (var job in jobs)
-                {
-                    var isValid = IsValid(job.Value);
-
-                    if (isValid && ShouldWritePublished(job.Value))
-                    {
-                        await collectionPublished.AddCollectionsAsync(
-                            await MongoContentEntity.CreatePublishedAsync(job, appProvider), add, ct);
-                    }
-
-                    if (isValid)
-                    {
-                        await collectionComplete.AddCollectionsAsync(
-                            await MongoContentEntity.CreateCompleteAsync(job, appProvider), add, ct);
-                    }
-                }
-
-                var parallelOptions = new ParallelOptions
-                {
-                    CancellationToken = ct,
-                    // This is just an estimate, but we do not want ot have unlimited parallelism.
-                    MaxDegreeOfParallelism = 8
-                };
-
-                // Make one update per collection.
-                await Parallel.ForEachAsync(collectionUpdates, parallelOptions, (update, ct) =>
-                {
-                    return new ValueTask(update.Key.InsertManyAsync(update.Value, InsertUnordered, ct));
-                });
-            }
-        }
-
-        private async Task UpsertPublishedAsync(SnapshotWriteJob<ContentDomainObject.State> job,
-            CancellationToken ct)
-        {
-            if (ShouldWritePublished(job.Value))
+            // Make one update per collection.
+            await Parallel.ForEachAsync(collectionUpdates, parallelOptions, (update, ct) =>
             {
-                var entityJob = job.As(await MongoContentEntity.CreatePublishedAsync(job, appProvider));
-
-                await collectionPublished.UpsertAsync(entityJob, ct);
-            }
-            else
-            {
-                await collectionPublished.RemoveAsync(job.Key, ct);
-            }
+                return new ValueTask(update.Key.InsertManyAsync(update.Value, InsertUnordered, ct));
+            });
         }
+    }
 
-        private async Task UpsertVersionedPublishedAsync(IClientSessionHandle session, SnapshotWriteJob<ContentDomainObject.State> job,
-            CancellationToken ct)
+    private async Task UpsertPublishedAsync(SnapshotWriteJob<ContentDomainObject.State> job,
+        CancellationToken ct)
+    {
+        if (ShouldWritePublished(job.Value))
         {
-            if (ShouldWritePublished(job.Value))
-            {
-                var entityJob = job.As(await MongoContentEntity.CreatePublishedAsync(job, appProvider));
+            var entityJob = job.As(await MongoContentEntity.CreatePublishedAsync(job, appProvider));
 
-                await collectionPublished.UpsertVersionedAsync(session, entityJob, ct);
-            }
-            else
-            {
-                await collectionPublished.RemoveAsync(session, job.Key, ct);
-            }
+            await collectionPublished.UpsertAsync(entityJob, ct);
         }
-
-        private async Task UpsertCompleteAsync(SnapshotWriteJob<ContentDomainObject.State> job,
-            CancellationToken ct)
+        else
         {
-            var entityJob = job.As(await MongoContentEntity.CreateCompleteAsync(job, appProvider));
-
-            await collectionComplete.UpsertAsync(entityJob, ct);
+            await collectionPublished.RemoveAsync(job.Key, ct);
         }
+    }
 
-        private async Task UpsertVersionedCompleteAsync(IClientSessionHandle session, SnapshotWriteJob<ContentDomainObject.State> job,
-            CancellationToken ct)
+    private async Task UpsertVersionedPublishedAsync(IClientSessionHandle session, SnapshotWriteJob<ContentDomainObject.State> job,
+        CancellationToken ct)
+    {
+        if (ShouldWritePublished(job.Value))
         {
-            var entityJob = job.As(await MongoContentEntity.CreateCompleteAsync(job, appProvider));
+            var entityJob = job.As(await MongoContentEntity.CreatePublishedAsync(job, appProvider));
 
-            await collectionComplete.UpsertVersionedAsync(session, entityJob, ct);
+            await collectionPublished.UpsertVersionedAsync(session, entityJob, ct);
         }
-
-        private static bool ShouldWritePublished(ContentDomainObject.State value)
+        else
         {
-            // Only published content is written to the published collection.
-            return value.Status == Status.Published && !value.IsDeleted;
+            await collectionPublished.RemoveAsync(session, job.Key, ct);
         }
+    }
 
-        private static bool IsValid(ContentDomainObject.State state)
-        {
-            // Some data is corrupt and might throw an exception during migration if we do not skip them.
-            return
-                state.AppId != null &&
-                state.AppId.Id != DomainId.Empty &&
-                state.CurrentVersion != null &&
-                state.SchemaId != null &&
-                state.SchemaId.Id != DomainId.Empty;
-        }
+    private async Task UpsertCompleteAsync(SnapshotWriteJob<ContentDomainObject.State> job,
+        CancellationToken ct)
+    {
+        var entityJob = job.As(await MongoContentEntity.CreateCompleteAsync(job, appProvider));
+
+        await collectionComplete.UpsertAsync(entityJob, ct);
+    }
+
+    private async Task UpsertVersionedCompleteAsync(IClientSessionHandle session, SnapshotWriteJob<ContentDomainObject.State> job,
+        CancellationToken ct)
+    {
+        var entityJob = job.As(await MongoContentEntity.CreateCompleteAsync(job, appProvider));
+
+        await collectionComplete.UpsertVersionedAsync(session, entityJob, ct);
+    }
+
+    private static bool ShouldWritePublished(ContentDomainObject.State value)
+    {
+        // Only published content is written to the published collection.
+        return value.Status == Status.Published && !value.IsDeleted;
+    }
+
+    private static bool IsValid(ContentDomainObject.State state)
+    {
+        // Some data is corrupt and might throw an exception during migration if we do not skip them.
+        return
+            state.AppId != null &&
+            state.AppId.Id != DomainId.Empty &&
+            state.CurrentVersion != null &&
+            state.SchemaId != null &&
+            state.SchemaId.Id != DomainId.Empty;
     }
 }

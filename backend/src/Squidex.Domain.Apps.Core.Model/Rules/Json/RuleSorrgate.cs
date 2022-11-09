@@ -9,45 +9,44 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Core.Rules.Json
+namespace Squidex.Domain.Apps.Core.Rules.Json;
+
+public sealed class RuleSorrgate : ISurrogate<Rule>
 {
-    public sealed class RuleSorrgate : ISurrogate<Rule>
+    public RuleTrigger Trigger { get; set; }
+
+    public RuleAction Action { get; set; }
+
+    public bool IsEnabled { get; set; }
+
+    public string Name { get; set; }
+
+    public void FromSource(Rule source)
     {
-        public RuleTrigger Trigger { get; set; }
+        SimpleMapper.Map(source, this);
+    }
 
-        public RuleAction Action { get; set; }
+    public Rule ToSource()
+    {
+        var trigger = Trigger;
 
-        public bool IsEnabled { get; set; }
-
-        public string Name { get; set; }
-
-        public void FromSource(Rule source)
+        if (trigger is IMigrated<RuleTrigger> migrated)
         {
-            SimpleMapper.Map(source, this);
+            trigger = migrated.Migrate();
         }
 
-        public Rule ToSource()
+        var rule = new Rule(trigger, Action);
+
+        if (!IsEnabled)
         {
-            var trigger = Trigger;
-
-            if (trigger is IMigrated<RuleTrigger> migrated)
-            {
-                trigger = migrated.Migrate();
-            }
-
-            var rule = new Rule(trigger, Action);
-
-            if (!IsEnabled)
-            {
-                rule = rule.Disable();
-            }
-
-            if (Name != null)
-            {
-                rule = rule.Rename(Name);
-            }
-
-            return rule;
+            rule = rule.Disable();
         }
+
+        if (Name != null)
+        {
+            rule = rule.Rename(Name);
+        }
+
+        return rule;
     }
 }

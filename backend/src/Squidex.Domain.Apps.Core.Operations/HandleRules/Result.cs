@@ -8,96 +8,95 @@
 using System.Globalization;
 using System.Text;
 
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Domain.Apps.Core.HandleRules;
+
+public sealed class Result
 {
-    public sealed class Result
+    public Exception? Exception { get; private init; }
+
+    public string? Dump { get; private set; }
+
+    public RuleResult Status { get; private set; }
+
+    public void Enrich(TimeSpan elapsed)
     {
-        public Exception? Exception { get; private init; }
+        var dumpBuilder = new StringBuilder();
 
-        public string? Dump { get; private set; }
-
-        public RuleResult Status { get; private set; }
-
-        public void Enrich(TimeSpan elapsed)
+        if (!string.IsNullOrWhiteSpace(Dump))
         {
-            var dumpBuilder = new StringBuilder();
+            dumpBuilder.AppendLine(Dump);
+        }
 
-            if (!string.IsNullOrWhiteSpace(Dump))
-            {
-                dumpBuilder.AppendLine(Dump);
-            }
-
-            if (Status == RuleResult.Timeout)
-            {
-                dumpBuilder.AppendLine();
-                dumpBuilder.AppendLine("Action timed out.");
-            }
-
-            if (Exception != null)
-            {
-                dumpBuilder.AppendLine();
-                dumpBuilder.Append("Error: ");
-                dumpBuilder.AppendLine(Exception.Message);
-            }
-
+        if (Status == RuleResult.Timeout)
+        {
             dumpBuilder.AppendLine();
-            dumpBuilder.AppendFormat(CultureInfo.InvariantCulture, "Elapsed {0}.", elapsed);
+            dumpBuilder.AppendLine("Action timed out.");
+        }
+
+        if (Exception != null)
+        {
             dumpBuilder.AppendLine();
-
-            Dump = dumpBuilder.ToString();
+            dumpBuilder.Append("Error: ");
+            dumpBuilder.AppendLine(Exception.Message);
         }
 
-        public static Result Ignored()
+        dumpBuilder.AppendLine();
+        dumpBuilder.AppendFormat(CultureInfo.InvariantCulture, "Elapsed {0}.", elapsed);
+        dumpBuilder.AppendLine();
+
+        Dump = dumpBuilder.ToString();
+    }
+
+    public static Result Ignored()
+    {
+        return Success("Ignored");
+    }
+
+    public static Result Complete()
+    {
+        return Success("Completed");
+    }
+
+    public static Result Create(string? dump, RuleResult result)
+    {
+        return new Result { Dump = dump, Status = result };
+    }
+
+    public static Result Success(string? dump)
+    {
+        return new Result { Dump = dump, Status = RuleResult.Success };
+    }
+
+    public static Result Failed(Exception? ex)
+    {
+        return Failed(ex, ex?.Message);
+    }
+
+    public static Result SuccessOrFailed(Exception? ex, string? dump)
+    {
+        if (ex != null)
         {
-            return Success("Ignored");
+            return Failed(ex, dump);
         }
-
-        public static Result Complete()
+        else
         {
-            return Success("Completed");
+            return Success(dump);
         }
+    }
 
-        public static Result Create(string? dump, RuleResult result)
+    public static Result Failed(Exception? ex, string? dump)
+    {
+        var result = new Result { Exception = ex, Dump = dump ?? ex?.Message };
+
+        if (ex is OperationCanceledException or TimeoutException)
         {
-            return new Result { Dump = dump, Status = result };
+            result.Status = RuleResult.Timeout;
         }
-
-        public static Result Success(string? dump)
+        else
         {
-            return new Result { Dump = dump, Status = RuleResult.Success };
+            result.Status = RuleResult.Failed;
         }
 
-        public static Result Failed(Exception? ex)
-        {
-            return Failed(ex, ex?.Message);
-        }
-
-        public static Result SuccessOrFailed(Exception? ex, string? dump)
-        {
-            if (ex != null)
-            {
-                return Failed(ex, dump);
-            }
-            else
-            {
-                return Success(dump);
-            }
-        }
-
-        public static Result Failed(Exception? ex, string? dump)
-        {
-            var result = new Result { Exception = ex, Dump = dump ?? ex?.Message };
-
-            if (ex is OperationCanceledException or TimeoutException)
-            {
-                result.Status = RuleResult.Timeout;
-            }
-            else
-            {
-                result.Status = RuleResult.Failed;
-            }
-
-            return result;
-        }
+        return result;
     }
 }

@@ -7,14 +7,13 @@
 
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands
+namespace Squidex.Domain.Apps.Entities.Apps.Commands;
+
+public sealed class UpdateRole : AppCommand
 {
-    public sealed class UpdateRole : AppCommand
-    {
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public string[] Permissions { get; set; }
+    public string[] Permissions { get; set; }
 
-        public JsonObject Properties { get; set; }
-    }
+    public JsonObject Properties { get; set; }
 }

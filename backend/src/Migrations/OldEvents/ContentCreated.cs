@@ -12,26 +12,25 @@ using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 using ContentCreatedV2 = Squidex.Domain.Apps.Events.Contents.ContentCreated;
 
-namespace Migrations.OldEvents
+namespace Migrations.OldEvents;
+
+[EventType(nameof(ContentCreated))]
+[Obsolete("New Event introduced")]
+public sealed class ContentCreated : ContentEvent, IMigrated<IEvent>
 {
-    [EventType(nameof(ContentCreated))]
-    [Obsolete("New Event introduced")]
-    public sealed class ContentCreated : ContentEvent, IMigrated<IEvent>
+    public Status Status { get; set; }
+
+    public ContentData Data { get; set; }
+
+    public IEvent Migrate()
     {
-        public Status Status { get; set; }
+        var migrated = SimpleMapper.Map(this, new ContentCreatedV2());
 
-        public ContentData Data { get; set; }
-
-        public IEvent Migrate()
+        if (migrated.Status == default)
         {
-            var migrated = SimpleMapper.Map(this, new ContentCreatedV2());
-
-            if (migrated.Status == default)
-            {
-                migrated.Status = Status.Draft;
-            }
-
-            return migrated;
+            migrated.Status = Status.Draft;
         }
+
+        return migrated;
     }
 }

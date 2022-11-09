@@ -7,40 +7,39 @@
 
 using Squidex.Infrastructure.Queries;
 
-namespace Squidex.Domain.Apps.Core.GenerateFilters
+namespace Squidex.Domain.Apps.Core.GenerateFilters;
+
+internal static class SharedSchemas
 {
-    internal static class SharedSchemas
+    public static readonly FilterSchema Date = new FilterSchema(FilterSchemaType.DateTime)
     {
-        public static readonly FilterSchema Date = new FilterSchema(FilterSchemaType.DateTime)
+        Extra = new
         {
-            Extra = new
-            {
-                editor = "Date"
-            }
-        };
+            editor = "Date"
+        }
+    };
 
-        public static readonly FilterSchema DateTime = new FilterSchema(FilterSchemaType.DateTime)
+    public static readonly FilterSchema DateTime = new FilterSchema(FilterSchemaType.DateTime)
+    {
+        Extra = new
         {
-            Extra = new
-            {
-                editor = "DateTime"
-            }
-        };
+            editor = "DateTime"
+        }
+    };
 
-        public static readonly FilterSchema Status = new FilterSchema(FilterSchemaType.String)
+    public static readonly FilterSchema Status = new FilterSchema(FilterSchemaType.String)
+    {
+        Extra = new
         {
-            Extra = new
-            {
-                editor = "Status"
-            }
-        };
+            editor = "Status"
+        }
+    };
 
-        public static readonly FilterSchema User = new FilterSchema(FilterSchemaType.String)
+    public static readonly FilterSchema User = new FilterSchema(FilterSchemaType.String)
+    {
+        Extra = new
         {
-            Extra = new
-            {
-                editor = "User"
-            }
-        };
-    }
+            editor = "User"
+        }
+    };
 }

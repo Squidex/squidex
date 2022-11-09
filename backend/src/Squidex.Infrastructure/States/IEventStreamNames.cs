@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Infrastructure.States;
+
+public interface IEventStreamNames
 {
-    public interface IEventStreamNames
-    {
-        string GetStreamName(Type aggregateType, string id);
-    }
+    string GetStreamName(Type aggregateType, string id);
 }

@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Reflection
+namespace Squidex.Infrastructure.Reflection;
+
+public interface ITypeProvider
 {
-    public interface ITypeProvider
-    {
-        void Map(TypeNameRegistry typeNameRegistry);
-    }
+    void Map(TypeNameRegistry typeNameRegistry);
 }

@@ -7,42 +7,41 @@
 
 using NodaTime;
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public sealed record DateTimeFieldProperties : FieldProperties
 {
-    public sealed record DateTimeFieldProperties : FieldProperties
+    public LocalizedValue<Instant?> DefaultValues { get; init; }
+
+    public Instant? DefaultValue { get; init; }
+
+    public Instant? MaxValue { get; init; }
+
+    public Instant? MinValue { get; init; }
+
+    public string? Format { get; set; }
+
+    public DateTimeCalculatedDefaultValue? CalculatedDefaultValue { get; init; }
+
+    public DateTimeFieldEditor Editor { get; init; }
+
+    public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
     {
-        public LocalizedValue<Instant?> DefaultValues { get; init; }
+        return visitor.Visit(this, args);
+    }
 
-        public Instant? DefaultValue { get; init; }
+    public override T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, IField field, TArgs args)
+    {
+        return visitor.Visit((IField<DateTimeFieldProperties>)field, args);
+    }
 
-        public Instant? MaxValue { get; init; }
+    public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
+    {
+        return Fields.DateTime(id, name, partitioning, this, settings);
+    }
 
-        public Instant? MinValue { get; init; }
-
-        public string? Format { get; set; }
-
-        public DateTimeCalculatedDefaultValue? CalculatedDefaultValue { get; init; }
-
-        public DateTimeFieldEditor Editor { get; init; }
-
-        public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
-        {
-            return visitor.Visit(this, args);
-        }
-
-        public override T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, IField field, TArgs args)
-        {
-            return visitor.Visit((IField<DateTimeFieldProperties>)field, args);
-        }
-
-        public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
-        {
-            return Fields.DateTime(id, name, partitioning, this, settings);
-        }
-
-        public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)
-        {
-            return Fields.DateTime(id, name, this, settings);
-        }
+    public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)
+    {
+        return Fields.DateTime(id, name, this, settings);
     }
 }

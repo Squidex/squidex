@@ -7,17 +7,16 @@
 
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.IdentityServer.Controllers.Setup
+namespace Squidex.Areas.IdentityServer.Controllers.Setup;
+
+public sealed class CreateUserModel
 {
-    public sealed class CreateUserModel
-    {
-        [LocalizedRequired]
-        public string Email { get; set; }
+    [LocalizedRequired]
+    public string Email { get; set; }
 
-        [LocalizedRequired]
-        public string Password { get; set; }
+    [LocalizedRequired]
+    public string Password { get; set; }
 
-        [LocalizedRequired]
-        public string PasswordConfirm { get; set; }
-    }
+    [LocalizedRequired]
+    public string PasswordConfirm { get; set; }
 }

@@ -12,70 +12,69 @@ using NSwag.Generation.Processors.Contexts;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 
-namespace Squidex.Areas.Api.Controllers.Rules.Models
+namespace Squidex.Areas.Api.Controllers.Rules.Models;
+
+public sealed class RuleActionProcessor : IDocumentProcessor
 {
-    public sealed class RuleActionProcessor : IDocumentProcessor
+    private readonly RuleTypeProvider ruleRegistry;
+
+    public RuleActionProcessor(RuleTypeProvider ruleRegistry)
     {
-        private readonly RuleTypeProvider ruleRegistry;
+        this.ruleRegistry = ruleRegistry;
+    }
 
-        public RuleActionProcessor(RuleTypeProvider ruleRegistry)
+    public void Process(DocumentProcessorContext context)
+    {
+        try
         {
-            this.ruleRegistry = ruleRegistry;
-        }
+            var schema = context.SchemaResolver.GetSchema(typeof(RuleAction), false);
 
-        public void Process(DocumentProcessorContext context)
-        {
-            try
+            if (schema != null)
             {
-                var schema = context.SchemaResolver.GetSchema(typeof(RuleAction), false);
+                var converter = new RuleActionConverter();
 
-                if (schema != null)
+                schema.DiscriminatorObject = new OpenApiDiscriminator
                 {
-                    var converter = new RuleActionConverter();
+                    PropertyName = converter.DiscriminatorName,
 
-                    schema.DiscriminatorObject = new OpenApiDiscriminator
+                    // The converter must be set so that NJsonSchema can get the allowed types for that.
+                    JsonInheritanceConverter = converter,
+                };
+
+                schema.Properties[converter.DiscriminatorName] = new JsonSchemaProperty
+                {
+                    Type = JsonObjectType.String,
+                    IsRequired = true,
+                    IsNullableRaw = true
+                };
+
+                // The types come from another assembly so we have to fix it here.
+                foreach (var (key, value) in ruleRegistry.Actions)
+                {
+                    var derivedSchema = context.SchemaGenerator.Generate<JsonSchema>(value.Type.ToContextualType(), context.SchemaResolver);
+
+                    var oldName = context.Document.Definitions.FirstOrDefault(x => x.Value == derivedSchema).Key;
+
+                    if (oldName != null)
                     {
-                        PropertyName = converter.DiscriminatorName,
-
-                        // The converter must be set so that NJsonSchema can get the allowed types for that.
-                        JsonInheritanceConverter = converter,
-                    };
-
-                    schema.Properties[converter.DiscriminatorName] = new JsonSchemaProperty
-                    {
-                        Type = JsonObjectType.String,
-                        IsRequired = true,
-                        IsNullableRaw = true
-                    };
-
-                    // The types come from another assembly so we have to fix it here.
-                    foreach (var (key, value) in ruleRegistry.Actions)
-                    {
-                        var derivedSchema = context.SchemaGenerator.Generate<JsonSchema>(value.Type.ToContextualType(), context.SchemaResolver);
-
-                        var oldName = context.Document.Definitions.FirstOrDefault(x => x.Value == derivedSchema).Key;
-
-                        if (oldName != null)
-                        {
-                            context.Document.Definitions.Remove(oldName);
-                            context.Document.Definitions.Add($"{key}RuleActionDto", derivedSchema);
-                        }
+                        context.Document.Definitions.Remove(oldName);
+                        context.Document.Definitions.Add($"{key}RuleActionDto", derivedSchema);
                     }
-
-                    RemoveFreezable(context, schema);
                 }
-            }
-            catch (KeyNotFoundException)
-            {
-                return;
+
+                RemoveFreezable(context, schema);
             }
         }
-
-        private static void RemoveFreezable(DocumentProcessorContext context, JsonSchema schema)
+        catch (KeyNotFoundException)
         {
-            context.Document.Definitions.Remove("Freezable");
-
-            schema.AllOf.Clear();
+            return;
         }
+    }
+
+    private static void RemoveFreezable(DocumentProcessorContext context, JsonSchema schema)
+    {
+        context.Document.Definitions.Remove("Freezable");
+
+        schema.AllOf.Clear();
     }
 }

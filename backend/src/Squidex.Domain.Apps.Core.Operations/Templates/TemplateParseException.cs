@@ -8,47 +8,46 @@
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace Squidex.Domain.Apps.Core.Templates
+namespace Squidex.Domain.Apps.Core.Templates;
+
+[Serializable]
+public class TemplateParseException : Exception
 {
-    [Serializable]
-    public class TemplateParseException : Exception
+    public IReadOnlyList<string> Errors { get; }
+
+    public TemplateParseException(string template, IEnumerable<string> errors, Exception? inner = null)
+        : base(BuildErrorMessage(errors, template), inner)
     {
-        public IReadOnlyList<string> Errors { get; }
+        Errors = errors.ToList();
+    }
 
-        public TemplateParseException(string template, IEnumerable<string> errors, Exception? inner = null)
-            : base(BuildErrorMessage(errors, template), inner)
+    protected TemplateParseException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
+    {
+        Errors = (info.GetValue(nameof(Errors), typeof(List<string>)) as List<string>) ?? new List<string>();
+    }
+
+    public override void GetObjectData(SerializationInfo info, StreamingContext context)
+    {
+        info.AddValue(nameof(Errors), Errors.ToList());
+    }
+
+    private static string BuildErrorMessage(IEnumerable<string> errors, string template)
+    {
+        var sb = new StringBuilder();
+
+        sb.AppendLine("Failed to parse template");
+
+        foreach (var error in errors)
         {
-            Errors = errors.ToList();
+            sb.Append(" * ");
+            sb.AppendLine(error);
         }
 
-        protected TemplateParseException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-            Errors = (info.GetValue(nameof(Errors), typeof(List<string>)) as List<string>) ?? new List<string>();
-        }
+        sb.AppendLine();
+        sb.AppendLine("Template:");
+        sb.AppendLine(template);
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue(nameof(Errors), Errors.ToList());
-        }
-
-        private static string BuildErrorMessage(IEnumerable<string> errors, string template)
-        {
-            var sb = new StringBuilder();
-
-            sb.AppendLine("Failed to parse template");
-
-            foreach (var error in errors)
-            {
-                sb.Append(" * ");
-                sb.AppendLine(error);
-            }
-
-            sb.AppendLine();
-            sb.AppendLine("Template:");
-            sb.AppendLine(template);
-
-            return sb.ToString();
-        }
+        return sb.ToString();
     }
 }

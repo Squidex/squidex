@@ -7,12 +7,11 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
-{
-    public sealed class ConfigureUIFields : SchemaCommand
-    {
-        public FieldNames? FieldsInLists { get; set; }
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands;
 
-        public FieldNames? FieldsInReferences { get; set; }
-    }
+public sealed class ConfigureUIFields : SchemaCommand
+{
+    public FieldNames? FieldsInLists { get; set; }
+
+    public FieldNames? FieldsInReferences { get; set; }
 }

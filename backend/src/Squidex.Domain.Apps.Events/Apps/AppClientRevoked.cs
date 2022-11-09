@@ -7,11 +7,10 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps;
+
+[EventType(nameof(AppClientRevoked))]
+public sealed class AppClientRevoked : AppEvent
 {
-    [EventType(nameof(AppClientRevoked))]
-    public sealed class AppClientRevoked : AppEvent
-    {
-        public string Id { get; set; }
-    }
+    public string Id { get; set; }
 }

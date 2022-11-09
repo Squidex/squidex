@@ -7,61 +7,60 @@
 
 using Squidex.Infrastructure.Translations;
 
-namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
-{
-    public sealed class ObjectValidator<TValue> : IValidator
-    {
-        private static readonly IReadOnlyDictionary<string, TValue> DefaultValue = new Dictionary<string, TValue>();
-        private readonly IDictionary<string, (bool IsOptional, IValidator Validator)> fields;
-        private readonly bool isPartial;
-        private readonly string fieldType;
+namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
 
-        public ObjectValidator(IDictionary<string, (bool IsOptional, IValidator Validator)> fields, bool isPartial, string fieldType)
+public sealed class ObjectValidator<TValue> : IValidator
+{
+    private static readonly IReadOnlyDictionary<string, TValue> DefaultValue = new Dictionary<string, TValue>();
+    private readonly IDictionary<string, (bool IsOptional, IValidator Validator)> fields;
+    private readonly bool isPartial;
+    private readonly string fieldType;
+
+    public ObjectValidator(IDictionary<string, (bool IsOptional, IValidator Validator)> fields, bool isPartial, string fieldType)
+    {
+        this.fields = fields;
+        this.fieldType = fieldType;
+        this.isPartial = isPartial;
+    }
+
+    public void Validate(object? value, ValidationContext context)
+    {
+        if (value.IsNullOrUndefined())
         {
-            this.fields = fields;
-            this.fieldType = fieldType;
-            this.isPartial = isPartial;
+            value = DefaultValue;
         }
 
-        public void Validate(object? value, ValidationContext context)
+        if (value is IReadOnlyDictionary<string, TValue> values)
         {
-            if (value.IsNullOrUndefined())
+            foreach (var fieldData in values)
             {
-                value = DefaultValue;
+                var name = fieldData.Key;
+
+                if (!fields.ContainsKey(name))
+                {
+                    context.AddError(context.Path.Enqueue(name), T.Get("contents.validation.unknownField", new { fieldType }));
+                }
             }
 
-            if (value is IReadOnlyDictionary<string, TValue> values)
+            foreach (var (name, field) in fields)
             {
-                foreach (var fieldData in values)
-                {
-                    var name = fieldData.Key;
+                var fieldValue = Undefined.Value;
 
-                    if (!fields.ContainsKey(name))
+                if (!values.TryGetValue(name, out var nestedValue))
+                {
+                    if (isPartial)
                     {
-                        context.AddError(context.Path.Enqueue(name), T.Get("contents.validation.unknownField", new { fieldType }));
+                        return;
                     }
                 }
-
-                foreach (var (name, field) in fields)
+                else
                 {
-                    var fieldValue = Undefined.Value;
-
-                    if (!values.TryGetValue(name, out var nestedValue))
-                    {
-                        if (isPartial)
-                        {
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        fieldValue = nestedValue!;
-                    }
-
-                    var fieldContext = context.Nested(name, field.IsOptional);
-
-                    field.Validator.Validate(fieldValue, fieldContext);
+                    fieldValue = nestedValue!;
                 }
+
+                var fieldContext = context.Nested(name, field.IsOptional);
+
+                field.Validator.Validate(fieldValue, fieldContext);
             }
         }
     }

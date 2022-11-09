@@ -9,73 +9,72 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Counter
+namespace Squidex.Domain.Apps.Entities.Contents.Counter;
+
+public sealed class CounterService : ICounterService, IDeleter
 {
-    public sealed class CounterService : ICounterService, IDeleter
+    private readonly IPersistenceFactory<State> persistenceFactory;
+
+    [CollectionName("Counters")]
+    public sealed class State
     {
-        private readonly IPersistenceFactory<State> persistenceFactory;
+        public Dictionary<string, long> Counters { get; set; } = new Dictionary<string, long>();
 
-        [CollectionName("Counters")]
-        public sealed class State
+        public bool Increment(string name)
         {
-            public Dictionary<string, long> Counters { get; set; } = new Dictionary<string, long>();
+            Counters[name] = Counters.GetValueOrDefault(name) + 1;
 
-            public bool Increment(string name)
-            {
-                Counters[name] = Counters.GetValueOrDefault(name) + 1;
-
-                return true;
-            }
-
-            public bool Reset(string name, long value)
-            {
-                Counters[name] = value;
-
-                return true;
-            }
+            return true;
         }
 
-        public CounterService(IPersistenceFactory<State> persistenceFactory)
+        public bool Reset(string name, long value)
         {
-            this.persistenceFactory = persistenceFactory;
+            Counters[name] = value;
+
+            return true;
         }
+    }
 
-        async Task IDeleter.DeleteAppAsync(IAppEntity app,
-            CancellationToken ct)
-        {
-            var state = await GetStateAsync(app.Id, ct);
+    public CounterService(IPersistenceFactory<State> persistenceFactory)
+    {
+        this.persistenceFactory = persistenceFactory;
+    }
 
-            await state.ClearAsync(ct);
-        }
+    async Task IDeleter.DeleteAppAsync(IAppEntity app,
+        CancellationToken ct)
+    {
+        var state = await GetStateAsync(app.Id, ct);
 
-        public async Task<long> IncrementAsync(DomainId appId, string name,
-            CancellationToken ct = default)
-        {
-            var state = await GetStateAsync(appId, ct);
+        await state.ClearAsync(ct);
+    }
 
-            await state.UpdateAsync(x => x.Increment(name), ct: ct);
+    public async Task<long> IncrementAsync(DomainId appId, string name,
+        CancellationToken ct = default)
+    {
+        var state = await GetStateAsync(appId, ct);
 
-            return state.Value.Counters[name];
-        }
+        await state.UpdateAsync(x => x.Increment(name), ct: ct);
 
-        public async Task<long> ResetAsync(DomainId appId, string name, long value,
-            CancellationToken ct = default)
-        {
-            var state = await GetStateAsync(appId, ct);
+        return state.Value.Counters[name];
+    }
 
-            await state.UpdateAsync(x => x.Reset(name, value), ct: ct);
+    public async Task<long> ResetAsync(DomainId appId, string name, long value,
+        CancellationToken ct = default)
+    {
+        var state = await GetStateAsync(appId, ct);
 
-            return state.Value.Counters[name];
-        }
+        await state.UpdateAsync(x => x.Reset(name, value), ct: ct);
 
-        private async Task<SimpleState<State>> GetStateAsync(DomainId appId,
-            CancellationToken ct)
-        {
-            var state = new SimpleState<State>(persistenceFactory, GetType(), appId);
+        return state.Value.Counters[name];
+    }
 
-            await state.LoadAsync(ct);
+    private async Task<SimpleState<State>> GetStateAsync(DomainId appId,
+        CancellationToken ct)
+    {
+        var state = new SimpleState<State>(persistenceFactory, GetType(), appId);
 
-            return state;
-        }
+        await state.LoadAsync(ct);
+
+        return state;
     }
 }

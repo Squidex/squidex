@@ -7,11 +7,10 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Rules.Repositories
+namespace Squidex.Domain.Apps.Entities.Rules.Repositories;
+
+public interface IRuleRepository
 {
-    public interface IRuleRepository
-    {
-        Task<List<IRuleEntity>> QueryAllAsync(DomainId appId,
-            CancellationToken ct = default);
-    }
+    Task<List<IRuleEntity>> QueryAllAsync(DomainId appId,
+        CancellationToken ct = default);
 }

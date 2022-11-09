@@ -9,32 +9,31 @@ using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Rules
+namespace Squidex.Domain.Apps.Entities.Rules;
+
+public sealed class RuleCommandMiddleware : AggregateCommandMiddleware<RuleCommandBase, RuleDomainObject>
 {
-    public sealed class RuleCommandMiddleware : AggregateCommandMiddleware<RuleCommandBase, RuleDomainObject>
+    private readonly IRuleEnricher ruleEnricher;
+    private readonly IContextProvider contextProvider;
+
+    public RuleCommandMiddleware(IDomainObjectFactory domainObjectFactory,
+        IRuleEnricher ruleEnricher, IContextProvider contextProvider)
+        : base(domainObjectFactory)
     {
-        private readonly IRuleEnricher ruleEnricher;
-        private readonly IContextProvider contextProvider;
+        this.ruleEnricher = ruleEnricher;
+        this.contextProvider = contextProvider;
+    }
 
-        public RuleCommandMiddleware(IDomainObjectFactory domainObjectFactory,
-            IRuleEnricher ruleEnricher, IContextProvider contextProvider)
-            : base(domainObjectFactory)
+    protected override async Task<object> EnrichResultAsync(CommandContext context, CommandResult result,
+        CancellationToken ct)
+    {
+        var payload = await base.EnrichResultAsync(context, result, ct);
+
+        if (payload is IRuleEntity rule and not IEnrichedRuleEntity)
         {
-            this.ruleEnricher = ruleEnricher;
-            this.contextProvider = contextProvider;
+            payload = await ruleEnricher.EnrichAsync(rule, contextProvider.Context, ct);
         }
 
-        protected override async Task<object> EnrichResultAsync(CommandContext context, CommandResult result,
-            CancellationToken ct)
-        {
-            var payload = await base.EnrichResultAsync(context, result, ct);
-
-            if (payload is IRuleEntity rule and not IEnrichedRuleEntity)
-            {
-                payload = await ruleEnricher.EnrichAsync(rule, contextProvider.Context, ct);
-            }
-
-            return payload;
-        }
+        return payload;
     }
 }

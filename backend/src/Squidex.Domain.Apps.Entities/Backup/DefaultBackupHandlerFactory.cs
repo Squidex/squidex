@@ -7,20 +7,19 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public sealed class DefaultBackupHandlerFactory : IBackupHandlerFactory
 {
-    public sealed class DefaultBackupHandlerFactory : IBackupHandlerFactory
+    private readonly IServiceProvider serviceProvider;
+
+    public DefaultBackupHandlerFactory(IServiceProvider serviceProvider)
     {
-        private readonly IServiceProvider serviceProvider;
+        this.serviceProvider = serviceProvider;
+    }
 
-        public DefaultBackupHandlerFactory(IServiceProvider serviceProvider)
-        {
-            this.serviceProvider = serviceProvider;
-        }
-
-        public IEnumerable<IBackupHandler> CreateMany()
-        {
-            return serviceProvider.GetRequiredService<IEnumerable<IBackupHandler>>();
-        }
+    public IEnumerable<IBackupHandler> CreateMany()
+    {
+        return serviceProvider.GetRequiredService<IEnumerable<IBackupHandler>>();
     }
 }

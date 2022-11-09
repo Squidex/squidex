@@ -8,28 +8,27 @@
 using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Scripting
+namespace Squidex.Domain.Apps.Core.Scripting;
+
+public class ScriptContext : Dictionary<string, object?>
 {
-    public class ScriptContext : Dictionary<string, object?>
+    public ScriptContext()
+        : base(StringComparer.OrdinalIgnoreCase)
     {
-        public ScriptContext()
-            : base(StringComparer.OrdinalIgnoreCase)
+    }
+
+    public bool TryGetValue<T>(string key, [MaybeNullWhen(false)] out T value)
+    {
+        Guard.NotNull(key);
+
+        value = default!;
+
+        if (TryGetValue(key, out var temp) && temp is T typed)
         {
+            value = typed;
+            return true;
         }
 
-        public bool TryGetValue<T>(string key, [MaybeNullWhen(false)] out T value)
-        {
-            Guard.NotNull(key);
-
-            value = default!;
-
-            if (TryGetValue(key, out var temp) && temp is T typed)
-            {
-                value = typed;
-                return true;
-            }
-
-            return false;
-        }
+        return false;
     }
 }

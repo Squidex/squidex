@@ -9,54 +9,53 @@ using System.Text.RegularExpressions;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 
-namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
+namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
+
+public class PatternValidator : IValidator
 {
-    public class PatternValidator : IValidator
+    private static readonly TimeSpan Timeout = TimeSpan.FromMilliseconds(20);
+    private readonly Regex regex;
+    private readonly string? errorMessage;
+
+    public PatternValidator(string pattern, string? errorMessage = null, bool capture = false)
     {
-        private static readonly TimeSpan Timeout = TimeSpan.FromMilliseconds(20);
-        private readonly Regex regex;
-        private readonly string? errorMessage;
+        Guard.NotNullOrEmpty(pattern);
 
-        public PatternValidator(string pattern, string? errorMessage = null, bool capture = false)
+        this.errorMessage = errorMessage;
+
+        var options = RegexOptions.None;
+
+        if (!capture)
         {
-            Guard.NotNullOrEmpty(pattern);
-
-            this.errorMessage = errorMessage;
-
-            var options = RegexOptions.None;
-
-            if (!capture)
-            {
-                options |= RegexOptions.ExplicitCapture;
-            }
-
-            regex = new Regex($"^{pattern}$", options, Timeout);
+            options |= RegexOptions.ExplicitCapture;
         }
 
-        public void Validate(object? value, ValidationContext context)
+        regex = new Regex($"^{pattern}$", options, Timeout);
+    }
+
+    public void Validate(object? value, ValidationContext context)
+    {
+        if (value is string stringValue)
         {
-            if (value is string stringValue)
+            if (!string.IsNullOrEmpty(stringValue))
             {
-                if (!string.IsNullOrEmpty(stringValue))
+                try
                 {
-                    try
+                    if (!regex.IsMatch(stringValue))
                     {
-                        if (!regex.IsMatch(stringValue))
+                        if (string.IsNullOrWhiteSpace(errorMessage))
                         {
-                            if (string.IsNullOrWhiteSpace(errorMessage))
-                            {
-                                context.AddError(context.Path, T.Get("contents.validation.pattern"));
-                            }
-                            else
-                            {
-                                context.AddError(context.Path, errorMessage);
-                            }
+                            context.AddError(context.Path, T.Get("contents.validation.pattern"));
+                        }
+                        else
+                        {
+                            context.AddError(context.Path, errorMessage);
                         }
                     }
-                    catch
-                    {
-                        context.AddError(context.Path, T.Get("contents.validation.regexTooSlow"));
-                    }
+                }
+                catch
+                {
+                    context.AddError(context.Path, T.Get("contents.validation.regexTooSlow"));
                 }
             }
         }

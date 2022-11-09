@@ -8,39 +8,38 @@
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 
-namespace Squidex.Extensions.Validation
+namespace Squidex.Extensions.Validation;
+
+public sealed class CompositeUniqueValidatorFactory : IValidatorsFactory
 {
-    public sealed class CompositeUniqueValidatorFactory : IValidatorsFactory
+    private const string Prefix = "unique:";
+    private readonly IContentRepository contentRepository;
+
+    public CompositeUniqueValidatorFactory(IContentRepository contentRepository)
     {
-        private const string Prefix = "unique:";
-        private readonly IContentRepository contentRepository;
+        this.contentRepository = contentRepository;
+    }
 
-        public CompositeUniqueValidatorFactory(IContentRepository contentRepository)
+    public IEnumerable<IValidator> CreateContentValidators(ValidationContext context, ValidatorFactory createFieldValidator)
+    {
+        foreach (var validatorTag in ValidatorTags(context.Root.Schema.Properties.Tags))
         {
-            this.contentRepository = contentRepository;
+            yield return new CompositeUniqueValidator(validatorTag, contentRepository);
+        }
+    }
+
+    private static IEnumerable<string> ValidatorTags(IEnumerable<string> tags)
+    {
+        if (tags == null)
+        {
+            yield break;
         }
 
-        public IEnumerable<IValidator> CreateContentValidators(ValidationContext context, ValidatorFactory createFieldValidator)
+        foreach (var tag in tags)
         {
-            foreach (var validatorTag in ValidatorTags(context.Root.Schema.Properties.Tags))
+            if (tag.StartsWith(Prefix, StringComparison.OrdinalIgnoreCase) && tag.Length > Prefix.Length)
             {
-                yield return new CompositeUniqueValidator(validatorTag, contentRepository);
-            }
-        }
-
-        private static IEnumerable<string> ValidatorTags(IEnumerable<string> tags)
-        {
-            if (tags == null)
-            {
-                yield break;
-            }
-
-            foreach (var tag in tags)
-            {
-                if (tag.StartsWith(Prefix, StringComparison.OrdinalIgnoreCase) && tag.Length > Prefix.Length)
-                {
-                    yield return tag;
-                }
+                yield return tag;
             }
         }
     }

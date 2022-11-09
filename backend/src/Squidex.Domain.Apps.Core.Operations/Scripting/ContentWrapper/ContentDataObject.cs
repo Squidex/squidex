@@ -13,145 +13,144 @@ using Jint.Runtime.Descriptors;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
+namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
+
+public sealed class ContentDataObject : ObjectInstance
 {
-    public sealed class ContentDataObject : ObjectInstance
+    private readonly ContentData contentData;
+    private HashSet<string> fieldsToDelete;
+    private Dictionary<string, PropertyDescriptor> fieldProperties;
+    private bool isChanged;
+
+    public override bool Extensible => true;
+
+    public ContentDataObject(Engine engine, ContentData contentData)
+        : base(engine)
     {
-        private readonly ContentData contentData;
-        private HashSet<string> fieldsToDelete;
-        private Dictionary<string, PropertyDescriptor> fieldProperties;
-        private bool isChanged;
+        this.contentData = contentData;
+    }
 
-        public override bool Extensible => true;
+    public void MarkChanged()
+    {
+        isChanged = true;
+    }
 
-        public ContentDataObject(Engine engine, ContentData contentData)
-            : base(engine)
+    public bool TryUpdate(out ContentData result)
+    {
+        result = contentData;
+
+        if (isChanged)
         {
-            this.contentData = contentData;
-        }
-
-        public void MarkChanged()
-        {
-            isChanged = true;
-        }
-
-        public bool TryUpdate(out ContentData result)
-        {
-            result = contentData;
-
-            if (isChanged)
+            if (fieldsToDelete != null)
             {
-                if (fieldsToDelete != null)
+                foreach (var field in fieldsToDelete)
                 {
-                    foreach (var field in fieldsToDelete)
-                    {
-                        contentData.Remove(field);
-                    }
+                    contentData.Remove(field);
                 }
+            }
 
-                if (fieldProperties != null)
+            if (fieldProperties != null)
+            {
+                foreach (var (key, propertyDescriptor) in fieldProperties)
                 {
-                    foreach (var (key, propertyDescriptor) in fieldProperties)
-                    {
-                        var value = (ContentDataProperty)propertyDescriptor;
+                    var value = (ContentDataProperty)propertyDescriptor;
 
-                        if (value.ContentField != null && value.ContentField.TryUpdate(out var fieldData))
-                        {
-                            contentData[key] = fieldData;
-                        }
+                    if (value.ContentField != null && value.ContentField.TryUpdate(out var fieldData))
+                    {
+                        contentData[key] = fieldData;
                     }
                 }
             }
-
-            return isChanged;
         }
 
-        public override void RemoveOwnProperty(JsValue property)
+        return isChanged;
+    }
+
+    public override void RemoveOwnProperty(JsValue property)
+    {
+        var propertyName = property.AsString();
+
+        fieldsToDelete ??= new HashSet<string>();
+        fieldsToDelete.Add(propertyName);
+
+        fieldProperties?.Remove(propertyName);
+
+        MarkChanged();
+    }
+
+    public override bool DefineOwnProperty(JsValue property, PropertyDescriptor desc)
+    {
+        EnsurePropertiesInitialized();
+
+        var propertyName = property.AsString();
+
+        if (!fieldProperties.ContainsKey(propertyName))
         {
-            var propertyName = property.AsString();
-
-            fieldsToDelete ??= new HashSet<string>();
-            fieldsToDelete.Add(propertyName);
-
-            fieldProperties?.Remove(propertyName);
-
-            MarkChanged();
+            fieldProperties[propertyName] = new ContentDataProperty(this) { Value = desc.Value };
         }
 
-        public override bool DefineOwnProperty(JsValue property, PropertyDescriptor desc)
+        return true;
+    }
+
+    public override bool Set(JsValue property, JsValue value, JsValue receiver)
+    {
+        EnsurePropertiesInitialized();
+
+        var propertyName = property.AsString();
+
+        fieldProperties.GetOrAdd(propertyName, (k, c) => new ContentDataProperty(c), this).Value = value;
+
+        return true;
+    }
+
+    public override PropertyDescriptor GetOwnProperty(JsValue property)
+    {
+        EnsurePropertiesInitialized();
+
+        var propertyName = property.AsString();
+
+        if (propertyName.Equals("toJSON", StringComparison.OrdinalIgnoreCase))
         {
-            EnsurePropertiesInitialized();
+            return PropertyDescriptor.Undefined;
+        }
 
-            var propertyName = property.AsString();
+        return fieldProperties.GetOrAdd(propertyName, (k, c) => new ContentDataProperty(c, new ContentFieldObject(c, new ContentFieldData(), false)), this);
+    }
 
-            if (!fieldProperties.ContainsKey(propertyName))
+    public override IEnumerable<KeyValuePair<JsValue, PropertyDescriptor>> GetOwnProperties()
+    {
+        EnsurePropertiesInitialized();
+
+        return fieldProperties.Select(x => new KeyValuePair<JsValue, PropertyDescriptor>(x.Key, x.Value));
+    }
+
+    public override List<JsValue> GetOwnPropertyKeys(Types types = Types.String | Types.Symbol)
+    {
+        EnsurePropertiesInitialized();
+
+        return fieldProperties.Keys.Select(x => (JsValue)x).ToList();
+    }
+
+    private void EnsurePropertiesInitialized()
+    {
+        if (fieldProperties == null)
+        {
+            fieldProperties = new Dictionary<string, PropertyDescriptor>(contentData.Count);
+
+            foreach (var (key, value) in contentData)
             {
-                fieldProperties[propertyName] = new ContentDataProperty(this) { Value = desc.Value };
-            }
-
-            return true;
-        }
-
-        public override bool Set(JsValue property, JsValue value, JsValue receiver)
-        {
-            EnsurePropertiesInitialized();
-
-            var propertyName = property.AsString();
-
-            fieldProperties.GetOrAdd(propertyName, (k, c) => new ContentDataProperty(c), this).Value = value;
-
-            return true;
-        }
-
-        public override PropertyDescriptor GetOwnProperty(JsValue property)
-        {
-            EnsurePropertiesInitialized();
-
-            var propertyName = property.AsString();
-
-            if (propertyName.Equals("toJSON", StringComparison.OrdinalIgnoreCase))
-            {
-                return PropertyDescriptor.Undefined;
-            }
-
-            return fieldProperties.GetOrAdd(propertyName, (k, c) => new ContentDataProperty(c, new ContentFieldObject(c, new ContentFieldData(), false)), this);
-        }
-
-        public override IEnumerable<KeyValuePair<JsValue, PropertyDescriptor>> GetOwnProperties()
-        {
-            EnsurePropertiesInitialized();
-
-            return fieldProperties.Select(x => new KeyValuePair<JsValue, PropertyDescriptor>(x.Key, x.Value));
-        }
-
-        public override List<JsValue> GetOwnPropertyKeys(Types types = Types.String | Types.Symbol)
-        {
-            EnsurePropertiesInitialized();
-
-            return fieldProperties.Keys.Select(x => (JsValue)x).ToList();
-        }
-
-        private void EnsurePropertiesInitialized()
-        {
-            if (fieldProperties == null)
-            {
-                fieldProperties = new Dictionary<string, PropertyDescriptor>(contentData.Count);
-
-                foreach (var (key, value) in contentData)
-                {
-                    fieldProperties.Add(key, new ContentDataProperty(this, new ContentFieldObject(this, value, false)));
-                }
+                fieldProperties.Add(key, new ContentDataProperty(this, new ContentFieldObject(this, value, false)));
             }
         }
+    }
 
-        public override object ToObject()
+    public override object ToObject()
+    {
+        if (TryUpdate(out var result))
         {
-            if (TryUpdate(out var result))
-            {
-                return result;
-            }
-
-            return contentData;
+            return result;
         }
+
+        return contentData;
     }
 }

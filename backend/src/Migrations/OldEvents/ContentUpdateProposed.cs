@@ -11,26 +11,25 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 
-namespace Migrations.OldEvents
+namespace Migrations.OldEvents;
+
+[EventType(nameof(ContentUpdateProposed))]
+[Obsolete("New Event introduced")]
+public sealed class ContentUpdateProposed : ContentEvent, IMigrated<IEvent>
 {
-    [EventType(nameof(ContentUpdateProposed))]
-    [Obsolete("New Event introduced")]
-    public sealed class ContentUpdateProposed : ContentEvent, IMigrated<IEvent>
+    public ContentData Data { get; set; }
+
+    public IEvent Migrate()
     {
-        public ContentData Data { get; set; }
+        var migrated = SimpleMapper.Map(this, new ContentDraftCreated());
 
-        public IEvent Migrate()
+        migrated.MigratedData = Data;
+
+        if (migrated.Status == default)
         {
-            var migrated = SimpleMapper.Map(this, new ContentDraftCreated());
-
-            migrated.MigratedData = Data;
-
-            if (migrated.Status == default)
-            {
-                migrated.Status = Status.Draft;
-            }
-
-            return migrated;
+            migrated.Status = Status.Draft;
         }
+
+        return migrated;
     }
 }

@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public interface ICommand
 {
-    public interface ICommand
-    {
-        long ExpectedVersion { get; set; }
-    }
+    long ExpectedVersion { get; set; }
 }

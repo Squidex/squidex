@@ -12,152 +12,151 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
+namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
+
+public partial class ContentDomainObject
 {
-    public partial class ContentDomainObject
+    public sealed class State : DomainObjectState<State>, IContentEntity
     {
-        public sealed class State : DomainObjectState<State>, IContentEntity
+        public NamedId<DomainId> AppId { get; set; }
+
+        public NamedId<DomainId> SchemaId { get; set; }
+
+        public ContentVersion? NewVersion { get; set; }
+
+        public ContentVersion CurrentVersion { get; set; }
+
+        public ScheduleJob? ScheduleJob { get; set; }
+
+        public bool IsDeleted { get; set; }
+
+        [JsonIgnore]
+        public DomainId UniqueId
         {
-            public NamedId<DomainId> AppId { get; set; }
+            get => DomainId.Combine(AppId, Id);
+        }
 
-            public NamedId<DomainId> SchemaId { get; set; }
+        [JsonIgnore]
+        public ContentData Data
+        {
+            get => NewVersion?.Data ?? CurrentData;
+        }
 
-            public ContentVersion? NewVersion { get; set; }
+        [JsonIgnore]
+        public ContentData CurrentData
+        {
+            get => CurrentVersion.Data;
+        }
 
-            public ContentVersion CurrentVersion { get; set; }
+        [JsonIgnore]
+        public Status? NewStatus
+        {
+            get => NewVersion?.Status;
+        }
 
-            public ScheduleJob? ScheduleJob { get; set; }
+        [JsonIgnore]
+        public Status Status
+        {
+            get => CurrentVersion?.Status ?? default;
+        }
 
-            public bool IsDeleted { get; set; }
-
-            [JsonIgnore]
-            public DomainId UniqueId
+        public override bool ApplyEvent(IEvent @event, EnvelopeHeaders headers)
+        {
+            switch (@event)
             {
-                get => DomainId.Combine(AppId, Id);
-            }
+                case ContentCreated e:
+                    {
+                        Id = e.ContentId;
 
-            [JsonIgnore]
-            public ContentData Data
-            {
-                get => NewVersion?.Data ?? CurrentData;
-            }
+                        SimpleMapper.Map(e, this);
 
-            [JsonIgnore]
-            public ContentData CurrentData
-            {
-                get => CurrentVersion.Data;
-            }
+                        CurrentVersion = new ContentVersion(e.Status, e.Data);
 
-            [JsonIgnore]
-            public Status? NewStatus
-            {
-                get => NewVersion?.Status;
-            }
+                        break;
+                    }
 
-            [JsonIgnore]
-            public Status Status
-            {
-                get => CurrentVersion?.Status ?? default;
-            }
+                case ContentDraftCreated e:
+                    {
+                        var newData = e.MigratedData?.UseSameFields(CurrentData) ?? CurrentData;
 
-            public override bool ApplyEvent(IEvent @event, EnvelopeHeaders headers)
-            {
-                switch (@event)
-                {
-                    case ContentCreated e:
+                        NewVersion = new ContentVersion(e.Status, newData);
+
+                        ScheduleJob = null;
+
+                        break;
+                    }
+
+                case ContentDraftDeleted:
+                    {
+                        NewVersion = null;
+
+                        ScheduleJob = null;
+
+                        break;
+                    }
+
+                case ContentStatusChanged e:
+                    {
+                        ScheduleJob = null;
+
+                        if (NewVersion != null)
                         {
-                            Id = e.ContentId;
-
-                            SimpleMapper.Map(e, this);
-
-                            CurrentVersion = new ContentVersion(e.Status, e.Data);
-
-                            break;
-                        }
-
-                    case ContentDraftCreated e:
-                        {
-                            var newData = e.MigratedData?.UseSameFields(CurrentData) ?? CurrentData;
-
-                            NewVersion = new ContentVersion(e.Status, newData);
-
-                            ScheduleJob = null;
-
-                            break;
-                        }
-
-                    case ContentDraftDeleted:
-                        {
-                            NewVersion = null;
-
-                            ScheduleJob = null;
-
-                            break;
-                        }
-
-                    case ContentStatusChanged e:
-                        {
-                            ScheduleJob = null;
-
-                            if (NewVersion != null)
+                            if (e.Status == Status.Published)
                             {
-                                if (e.Status == Status.Published)
-                                {
-                                    CurrentVersion = new ContentVersion(e.Status, NewVersion.Data.UseSameFields(CurrentData));
+                                CurrentVersion = new ContentVersion(e.Status, NewVersion.Data.UseSameFields(CurrentData));
 
-                                    NewVersion = null;
-                                }
-                                else
-                                {
-                                    NewVersion = NewVersion.WithStatus(e.Status);
-                                }
+                                NewVersion = null;
                             }
                             else
                             {
-                                CurrentVersion = CurrentVersion.WithStatus(e.Status);
+                                NewVersion = NewVersion.WithStatus(e.Status);
                             }
-
-                            break;
                         }
-
-                    case ContentSchedulingCancelled:
+                        else
                         {
-                            ScheduleJob = null;
-
-                            break;
+                            CurrentVersion = CurrentVersion.WithStatus(e.Status);
                         }
 
-                    case ContentStatusScheduled e:
+                        break;
+                    }
+
+                case ContentSchedulingCancelled:
+                    {
+                        ScheduleJob = null;
+
+                        break;
+                    }
+
+                case ContentStatusScheduled e:
+                    {
+                        ScheduleJob = ScheduleJob.Build(e.Status, e.Actor, e.DueTime);
+
+                        break;
+                    }
+
+                case ContentUpdated e:
+                    {
+                        if (NewVersion != null)
                         {
-                            ScheduleJob = ScheduleJob.Build(e.Status, e.Actor, e.DueTime);
-
-                            break;
+                            NewVersion = NewVersion.WithData(e.Data.UseSameFields(Data));
                         }
-
-                    case ContentUpdated e:
+                        else
                         {
-                            if (NewVersion != null)
-                            {
-                                NewVersion = NewVersion.WithData(e.Data.UseSameFields(Data));
-                            }
-                            else
-                            {
-                                CurrentVersion = CurrentVersion.WithData(e.Data.UseSameFields(CurrentData));
-                            }
-
-                            break;
+                            CurrentVersion = CurrentVersion.WithData(e.Data.UseSameFields(CurrentData));
                         }
 
-                    case ContentDeleted:
-                        {
-                            IsDeleted = true;
+                        break;
+                    }
 
-                            break;
-                        }
-                }
+                case ContentDeleted:
+                    {
+                        IsDeleted = true;
 
-                return true;
+                        break;
+                    }
             }
+
+            return true;
         }
     }
 }

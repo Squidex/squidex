@@ -7,9 +7,8 @@
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Domain.Apps.Entities.Billing
+namespace Squidex.Domain.Apps.Entities.Billing;
+
+public sealed record PlanChangedResult(string PlanId, bool Unsubscribed = false, Uri? RedirectUri = null)
 {
-    public sealed record PlanChangedResult(string PlanId, bool Unsubscribed = false, Uri? RedirectUri = null)
-    {
-    }
 }

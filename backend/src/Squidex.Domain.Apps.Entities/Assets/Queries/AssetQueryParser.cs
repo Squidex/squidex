@@ -18,143 +18,142 @@ using Squidex.Infrastructure.Queries.OData;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Domain.Apps.Entities.Assets.Queries
+namespace Squidex.Domain.Apps.Entities.Assets.Queries;
+
+public class AssetQueryParser
 {
-    public class AssetQueryParser
+    private readonly QueryModel queryModel = AssetQueryModel.Build();
+    private readonly IEdmModel edmModel;
+    private readonly IJsonSerializer serializer;
+    private readonly ITagService tagService;
+    private readonly AssetOptions options;
+
+    public AssetQueryParser(IJsonSerializer serializer, ITagService tagService, IOptions<AssetOptions> options)
     {
-        private readonly QueryModel queryModel = AssetQueryModel.Build();
-        private readonly IEdmModel edmModel;
-        private readonly IJsonSerializer serializer;
-        private readonly ITagService tagService;
-        private readonly AssetOptions options;
+        this.serializer = serializer;
+        this.tagService = tagService;
+        this.options = options.Value;
 
-        public AssetQueryParser(IJsonSerializer serializer, ITagService tagService, IOptions<AssetOptions> options)
+        edmModel = queryModel.ConvertToEdm("Squidex", "Asset");
+    }
+
+    public virtual async Task<Q> ParseAsync(Context context, Q q,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(context);
+        Guard.NotNull(q);
+
+        using (Telemetry.Activities.StartActivity("AssetQueryParser/ParseAsync"))
         {
-            this.serializer = serializer;
-            this.tagService = tagService;
-            this.options = options.Value;
+            var query = ParseClrQuery(q);
 
-            edmModel = queryModel.ConvertToEdm("Squidex", "Asset");
+            await TransformTagAsync(context, query, ct);
+
+            WithSorting(query);
+            WithPaging(query, q);
+
+            q = q.WithQuery(query);
+
+            if (context.ShouldSkipTotal())
+            {
+                q = q.WithoutTotal();
+            }
+            else if (context.ShouldSkipSlowTotal())
+            {
+                q = q.WithoutSlowTotal();
+            }
+
+            return q;
+        }
+    }
+
+    private ClrQuery ParseClrQuery(Q q)
+    {
+        var query = q.Query;
+
+        if (!string.IsNullOrWhiteSpace(q?.QueryAsJson))
+        {
+            query = ParseJson(q.QueryAsJson);
+        }
+        else if (!string.IsNullOrWhiteSpace(q?.QueryAsOdata))
+        {
+            query = ParseOData(q.QueryAsOdata);
         }
 
-        public virtual async Task<Q> ParseAsync(Context context, Q q,
-            CancellationToken ct = default)
+        return query;
+    }
+
+    private void WithPaging(ClrQuery query, Q q)
+    {
+        if (query.Take is <= 0 or long.MaxValue)
         {
-            Guard.NotNull(context);
-            Guard.NotNull(q);
-
-            using (Telemetry.Activities.StartActivity("AssetQueryParser/ParseAsync"))
+            if (q.Ids is { Count: > 0 })
             {
-                var query = ParseClrQuery(q);
-
-                await TransformTagAsync(context, query, ct);
-
-                WithSorting(query);
-                WithPaging(query, q);
-
-                q = q.WithQuery(query);
-
-                if (context.ShouldSkipTotal())
-                {
-                    q = q.WithoutTotal();
-                }
-                else if (context.ShouldSkipSlowTotal())
-                {
-                    q = q.WithoutSlowTotal();
-                }
-
-                return q;
+                query.Take = q.Ids.Count;
+            }
+            else
+            {
+                query.Take = options.DefaultPageSize;
             }
         }
-
-        private ClrQuery ParseClrQuery(Q q)
+        else if (query.Take > options.MaxResults)
         {
-            var query = q.Query;
+            query.Take = options.MaxResults;
+        }
+    }
 
-            if (!string.IsNullOrWhiteSpace(q?.QueryAsJson))
-            {
-                query = ParseJson(q.QueryAsJson);
-            }
-            else if (!string.IsNullOrWhiteSpace(q?.QueryAsOdata))
-            {
-                query = ParseOData(q.QueryAsOdata);
-            }
+    private static void WithSorting(ClrQuery query)
+    {
+        query.Sort ??= new List<SortNode>();
 
-            return query;
+        if (query.Sort.Count == 0)
+        {
+            query.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
         }
 
-        private void WithPaging(ClrQuery query, Q q)
+        if (!query.Sort.Any(x => string.Equals(x.Path.ToString(), "id", StringComparison.OrdinalIgnoreCase)))
         {
-            if (query.Take is <= 0 or long.MaxValue)
-            {
-                if (q.Ids is { Count: > 0 })
-                {
-                    query.Take = q.Ids.Count;
-                }
-                else
-                {
-                    query.Take = options.DefaultPageSize;
-                }
-            }
-            else if (query.Take > options.MaxResults)
-            {
-                query.Take = options.MaxResults;
-            }
+            query.Sort.Add(new SortNode(new List<string> { "id" }, SortOrder.Ascending));
         }
+    }
 
-        private static void WithSorting(ClrQuery query)
+    private async Task TransformTagAsync(Context context, ClrQuery query,
+        CancellationToken ct)
+    {
+        if (query.Filter != null)
         {
-            query.Sort ??= new List<SortNode>();
-
-            if (query.Sort.Count == 0)
-            {
-                query.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
-            }
-
-            if (!query.Sort.Any(x => string.Equals(x.Path.ToString(), "id", StringComparison.OrdinalIgnoreCase)))
-            {
-                query.Sort.Add(new SortNode(new List<string> { "id" }, SortOrder.Ascending));
-            }
+            query.Filter = await FilterTagTransformer.TransformAsync(query.Filter, context.App.Id, tagService, ct);
         }
+    }
 
-        private async Task TransformTagAsync(Context context, ClrQuery query,
-            CancellationToken ct)
+    private ClrQuery ParseJson(string json)
+    {
+        return queryModel.Parse(json, serializer);
+    }
+
+    private ClrQuery ParseOData(string odata)
+    {
+        try
         {
-            if (query.Filter != null)
-            {
-                query.Filter = await FilterTagTransformer.TransformAsync(query.Filter, context.App.Id, tagService, ct);
-            }
+            return edmModel.ParseQuery(odata).ToQuery();
         }
-
-        private ClrQuery ParseJson(string json)
+        catch (ValidationException)
         {
-            return queryModel.Parse(json, serializer);
+            throw;
         }
-
-        private ClrQuery ParseOData(string odata)
+        catch (NotSupportedException)
         {
-            try
-            {
-                return edmModel.ParseQuery(odata).ToQuery();
-            }
-            catch (ValidationException)
-            {
-                throw;
-            }
-            catch (NotSupportedException)
-            {
-                throw new ValidationException(T.Get("common.odataNotSupported", new { odata }));
-            }
-            catch (ODataException ex)
-            {
-                var message = ex.Message;
+            throw new ValidationException(T.Get("common.odataNotSupported", new { odata }));
+        }
+        catch (ODataException ex)
+        {
+            var message = ex.Message;
 
-                throw new ValidationException(T.Get("common.odataFailure", new { odata, message }), ex);
-            }
-            catch (Exception)
-            {
-                throw new ValidationException(T.Get("common.odataNotSupported", new { odata }));
-            }
+            throw new ValidationException(T.Get("common.odataFailure", new { odata, message }), ex);
+        }
+        catch (Exception)
+        {
+            throw new ValidationException(T.Get("common.odataNotSupported", new { odata }));
         }
     }
 }

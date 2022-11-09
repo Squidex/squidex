@@ -9,33 +9,32 @@ using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
+
+internal sealed class EntitySavedGraphType : SharedObjectGraphType<CommandResult>
 {
-    internal sealed class EntitySavedGraphType : SharedObjectGraphType<CommandResult>
+    public static readonly IGraphType Nullable = new EntitySavedGraphType();
+
+    public static readonly IGraphType NonNull = new NonNullGraphType(Nullable);
+
+    private EntitySavedGraphType()
     {
-        public static readonly IGraphType Nullable = new EntitySavedGraphType();
+        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
+        Name = "EntitySavedResultDto";
 
-        public static readonly IGraphType NonNull = new NonNullGraphType(Nullable);
-
-        private EntitySavedGraphType()
+        AddField(new FieldType
         {
-            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-            Name = "EntitySavedResultDto";
+            Name = "version",
+            Resolver = ResolveVersion(),
+            ResolvedType = Scalars.NonNullLong,
+            Description = "The new version of the item."
+        });
 
-            AddField(new FieldType
-            {
-                Name = "version",
-                Resolver = ResolveVersion(),
-                ResolvedType = Scalars.NonNullLong,
-                Description = "The new version of the item."
-            });
+        Description = "The result of a mutation";
+    }
 
-            Description = "The result of a mutation";
-        }
-
-        private static IFieldResolver ResolveVersion()
-        {
-            return Resolvers.Sync<CommandResult, long>(x => x.NewVersion);
-        }
+    private static IFieldResolver ResolveVersion()
+    {
+        return Resolvers.Sync<CommandResult, long>(x => x.NewVersion);
     }
 }

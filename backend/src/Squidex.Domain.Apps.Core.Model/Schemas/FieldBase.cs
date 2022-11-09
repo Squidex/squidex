@@ -7,22 +7,21 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public abstract class FieldBase
 {
-    public abstract class FieldBase
+    public long Id { get; }
+
+    public string Name { get; }
+
+    protected FieldBase(long id, string name)
     {
-        public long Id { get; }
+        Guard.NotNullOrEmpty(name);
+        Guard.GreaterThan(id, 0);
 
-        public string Name { get; }
+        Id = id;
 
-        protected FieldBase(long id, string name)
-        {
-            Guard.NotNullOrEmpty(name);
-            Guard.GreaterThan(id, 0);
-
-            Id = id;
-
-            Name = name;
-        }
+        Name = name;
     }
 }

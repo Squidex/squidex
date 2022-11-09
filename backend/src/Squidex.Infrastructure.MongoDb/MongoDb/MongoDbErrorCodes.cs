@@ -7,10 +7,9 @@
 
 #pragma warning disable SA1310 // Field names should not contain underscore
 
-namespace Squidex.Infrastructure.MongoDb
+namespace Squidex.Infrastructure.MongoDb;
+
+public static class MongoDbErrorCodes
 {
-    public static class MongoDbErrorCodes
-    {
-        public const int Errror16755_InvalidGeoData = 16755;
-    }
+    public const int Errror16755_InvalidGeoData = 16755;
 }

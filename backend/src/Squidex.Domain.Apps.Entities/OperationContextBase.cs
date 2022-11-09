@@ -12,78 +12,77 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities;
+
+public abstract class OperationContextBase<TCommand, TSnapShot> where TCommand : SquidexCommand, IAggregateCommand
 {
-    public abstract class OperationContextBase<TCommand, TSnapShot> where TCommand : SquidexCommand, IAggregateCommand
+    private readonly List<ValidationError> errors = new List<ValidationError>();
+    private readonly IServiceProvider serviceProvider;
+    private readonly Func<TSnapShot> snapshotProvider;
+    private readonly TSnapShot snapshotInitial;
+
+    public RefToken Actor => Command.Actor;
+
+    public IAppEntity App { get; init; }
+
+    public DomainId CommandId { get; init; }
+
+    public TCommand Command { get; init; }
+
+    public TSnapShot Snapshot => snapshotProvider();
+
+    public TSnapShot SnapshotInitial => snapshotInitial;
+
+    public ClaimsPrincipal? User => Command.User;
+
+    public Dictionary<string, object> Context { get; } = new Dictionary<string, object>();
+
+    protected OperationContextBase(IServiceProvider serviceProvider, Func<TSnapShot> snapshotProvider)
     {
-        private readonly List<ValidationError> errors = new List<ValidationError>();
-        private readonly IServiceProvider serviceProvider;
-        private readonly Func<TSnapShot> snapshotProvider;
-        private readonly TSnapShot snapshotInitial;
+        Guard.NotNull(serviceProvider);
+        Guard.NotNull(snapshotProvider);
 
-        public RefToken Actor => Command.Actor;
+        this.serviceProvider = serviceProvider;
+        this.snapshotProvider = snapshotProvider;
+        this.snapshotInitial = snapshotProvider();
+    }
 
-        public IAppEntity App { get; init; }
+    public T Resolve<T>() where T : notnull
+    {
+        return serviceProvider.GetRequiredService<T>();
+    }
 
-        public DomainId CommandId { get; init; }
+    public T? ResolveOptional<T>() where T : class
+    {
+        return serviceProvider.GetService(typeof(T)) as T;
+    }
 
-        public TCommand Command { get; init; }
+    public OperationContextBase<TCommand, TSnapShot> AddError(string message, params string[] propertyNames)
+    {
+        errors.Add(new ValidationError(message, propertyNames));
 
-        public TSnapShot Snapshot => snapshotProvider();
+        return this;
+    }
 
-        public TSnapShot SnapshotInitial => snapshotInitial;
+    public OperationContextBase<TCommand, TSnapShot> AddError(ValidationError newError)
+    {
+        errors.Add(newError);
 
-        public ClaimsPrincipal? User => Command.User;
+        return this;
+    }
 
-        public Dictionary<string, object> Context { get; } = new Dictionary<string, object>();
+    public OperationContextBase<TCommand, TSnapShot> AddErrors(IEnumerable<ValidationError> newErrors)
+    {
+        errors.AddRange(newErrors);
 
-        protected OperationContextBase(IServiceProvider serviceProvider, Func<TSnapShot> snapshotProvider)
+        return this;
+    }
+
+    public void ThrowOnErrors()
+    {
+        if (errors.Count > 0)
         {
-            Guard.NotNull(serviceProvider);
-            Guard.NotNull(snapshotProvider);
-
-            this.serviceProvider = serviceProvider;
-            this.snapshotProvider = snapshotProvider;
-            this.snapshotInitial = snapshotProvider();
-        }
-
-        public T Resolve<T>() where T : notnull
-        {
-            return serviceProvider.GetRequiredService<T>();
-        }
-
-        public T? ResolveOptional<T>() where T : class
-        {
-            return serviceProvider.GetService(typeof(T)) as T;
-        }
-
-        public OperationContextBase<TCommand, TSnapShot> AddError(string message, params string[] propertyNames)
-        {
-            errors.Add(new ValidationError(message, propertyNames));
-
-            return this;
-        }
-
-        public OperationContextBase<TCommand, TSnapShot> AddError(ValidationError newError)
-        {
-            errors.Add(newError);
-
-            return this;
-        }
-
-        public OperationContextBase<TCommand, TSnapShot> AddErrors(IEnumerable<ValidationError> newErrors)
-        {
-            errors.AddRange(newErrors);
-
-            return this;
-        }
-
-        public void ThrowOnErrors()
-        {
-            if (errors.Count > 0)
-            {
-                throw new ValidationException(errors);
-            }
+            throw new ValidationException(errors);
         }
     }
 }

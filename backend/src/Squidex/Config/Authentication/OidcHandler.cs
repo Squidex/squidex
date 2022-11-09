@@ -9,51 +9,50 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Squidex.Shared.Identity;
 
-namespace Squidex.Config.Authentication
+namespace Squidex.Config.Authentication;
+
+public sealed class OidcHandler : OpenIdConnectEvents
 {
-    public sealed class OidcHandler : OpenIdConnectEvents
+    private readonly MyIdentityOptions options;
+
+    public OidcHandler(MyIdentityOptions options)
     {
-        private readonly MyIdentityOptions options;
+        this.options = options;
+    }
 
-        public OidcHandler(MyIdentityOptions options)
+    public override Task TokenValidated(TokenValidatedContext context)
+    {
+        var identity = (ClaimsIdentity)context.Principal!.Identity!;
+
+        if (!string.IsNullOrWhiteSpace(options.OidcRoleClaimType) && options.OidcRoleMapping?.Count >= 0)
         {
-            this.options = options;
-        }
+            var permissions = options.OidcRoleMapping
+                .Where(r => identity.HasClaim(options.OidcRoleClaimType, r.Key))
+                .Select(r => r.Value)
+                .SelectMany(r => r)
+                .Distinct();
 
-        public override Task TokenValidated(TokenValidatedContext context)
-        {
-            var identity = (ClaimsIdentity)context.Principal!.Identity!;
-
-            if (!string.IsNullOrWhiteSpace(options.OidcRoleClaimType) && options.OidcRoleMapping?.Count >= 0)
+            foreach (var permission in permissions)
             {
-                var permissions = options.OidcRoleMapping
-                    .Where(r => identity.HasClaim(options.OidcRoleClaimType, r.Key))
-                    .Select(r => r.Value)
-                    .SelectMany(r => r)
-                    .Distinct();
-
-                foreach (var permission in permissions)
-                {
-                    identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
-                }
+                identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
             }
-
-            return base.TokenValidated(context);
         }
 
-        public override Task RedirectToIdentityProviderForSignOut(RedirectContext context)
+        return base.TokenValidated(context);
+    }
+
+    public override Task RedirectToIdentityProviderForSignOut(RedirectContext context)
+    {
+        if (!string.IsNullOrEmpty(options.OidcOnSignoutRedirectUrl))
         {
-            if (!string.IsNullOrEmpty(options.OidcOnSignoutRedirectUrl))
-            {
-                var logoutUri = options.OidcOnSignoutRedirectUrl;
+            var logoutUri = options.OidcOnSignoutRedirectUrl;
 
-                context.Response.Redirect(logoutUri);
-                context.HandleResponse();
+            context.Response.Redirect(logoutUri);
+            context.HandleResponse();
 
-                return Task.CompletedTask;
-            }
-
-            return base.RedirectToIdentityProviderForSignOut(context);
+            return Task.CompletedTask;
         }
+
+        return base.RedirectToIdentityProviderForSignOut(context);
     }
 }

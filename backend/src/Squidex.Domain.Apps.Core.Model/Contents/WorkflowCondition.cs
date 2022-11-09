@@ -7,12 +7,11 @@
 
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Core.Contents
-{
-    public abstract record WorkflowCondition
-    {
-        public string? Expression { get; init; }
+namespace Squidex.Domain.Apps.Core.Contents;
 
-        public ReadonlyList<string>? Roles { get; init; }
-    }
+public abstract record WorkflowCondition
+{
+    public string? Expression { get; init; }
+
+    public ReadonlyList<string>? Roles { get; init; }
 }

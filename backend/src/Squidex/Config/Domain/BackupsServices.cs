@@ -13,44 +13,43 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Schemas;
 
-namespace Squidex.Config.Domain
+namespace Squidex.Config.Domain;
+
+public static class BackupsServices
 {
-    public static class BackupsServices
+    public static void AddSquidexBackups(this IServiceCollection services)
     {
-        public static void AddSquidexBackups(this IServiceCollection services)
-        {
-            services.AddSingletonAs<TempFolderBackupArchiveLocation>()
-                .As<IBackupArchiveLocation>();
+        services.AddSingletonAs<TempFolderBackupArchiveLocation>()
+            .As<IBackupArchiveLocation>();
 
-            services.AddSingletonAs<DefaultBackupHandlerFactory>()
-                .As<IBackupHandlerFactory>();
+        services.AddSingletonAs<DefaultBackupHandlerFactory>()
+            .As<IBackupHandlerFactory>();
 
-            services.AddSingletonAs<DefaultBackupArchiveStore>()
-                .As<IBackupArchiveStore>();
+        services.AddSingletonAs<DefaultBackupArchiveStore>()
+            .As<IBackupArchiveStore>();
 
-            services.AddTransientAs<BackupService>()
-                .As<IBackupService>().As<IDeleter>();
+        services.AddTransientAs<BackupService>()
+            .As<IBackupService>().As<IDeleter>();
 
-            services.AddTransientAs<BackupApps>()
-                .As<IBackupHandler>();
+        services.AddTransientAs<BackupApps>()
+            .As<IBackupHandler>();
 
-            services.AddTransientAs<BackupAssets>()
-                .As<IBackupHandler>();
+        services.AddTransientAs<BackupAssets>()
+            .As<IBackupHandler>();
 
-            services.AddTransientAs<BackupContents>()
-                .As<IBackupHandler>();
+        services.AddTransientAs<BackupContents>()
+            .As<IBackupHandler>();
 
-            services.AddTransientAs<BackupRules>()
-                .As<IBackupHandler>();
+        services.AddTransientAs<BackupRules>()
+            .As<IBackupHandler>();
 
-            services.AddTransientAs<BackupSchemas>()
-                .As<IBackupHandler>();
+        services.AddTransientAs<BackupSchemas>()
+            .As<IBackupHandler>();
 
-            services.AddTransientAs<DefaultBackupHandlerFactory>()
-                .As<IBackupHandlerFactory>();
+        services.AddTransientAs<DefaultBackupHandlerFactory>()
+            .As<IBackupHandlerFactory>();
 
-            services.AddTransientAs<RestoreProcessor>()
-                .AsSelf();
-        }
+        services.AddTransientAs<RestoreProcessor>()
+            .AsSelf();
     }
 }

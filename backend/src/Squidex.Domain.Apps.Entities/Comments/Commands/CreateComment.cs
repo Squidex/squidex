@@ -7,17 +7,16 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Comments.Commands
+namespace Squidex.Domain.Apps.Entities.Comments.Commands;
+
+public sealed class CreateComment : CommentTextCommand
 {
-    public sealed class CreateComment : CommentTextCommand
+    public bool IsMention { get; set; }
+
+    public Uri? Url { get; set; }
+
+    public CreateComment()
     {
-        public bool IsMention { get; set; }
-
-        public Uri? Url { get; set; }
-
-        public CreateComment()
-        {
-            CommentId = DomainId.NewGuid();
-        }
+        CommentId = DomainId.NewGuid();
     }
 }

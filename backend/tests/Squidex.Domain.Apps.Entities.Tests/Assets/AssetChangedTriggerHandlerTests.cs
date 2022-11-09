@@ -20,173 +20,172 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Assets;
+
+public class AssetChangedTriggerHandlerTests
 {
-    public class AssetChangedTriggerHandlerTests
+    private readonly CancellationTokenSource cts = new CancellationTokenSource();
+    private readonly CancellationToken ct;
+    private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
+    private readonly IAssetLoader assetLoader = A.Fake<IAssetLoader>();
+    private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
+    private readonly IRuleTriggerHandler sut;
+
+    public AssetChangedTriggerHandlerTests()
     {
-        private readonly CancellationTokenSource cts = new CancellationTokenSource();
-        private readonly CancellationToken ct;
-        private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
-        private readonly IAssetLoader assetLoader = A.Fake<IAssetLoader>();
-        private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
-        private readonly IRuleTriggerHandler sut;
+        ct = cts.Token;
 
-        public AssetChangedTriggerHandlerTests()
-        {
-            ct = cts.Token;
+        A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
+            .Returns(true);
 
-            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
-                .Returns(true);
+        A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default))
+            .Returns(false);
 
-            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default))
-                .Returns(false);
+        sut = new AssetChangedTriggerHandler(scriptEngine, assetLoader, assetRepository);
+    }
 
-            sut = new AssetChangedTriggerHandler(scriptEngine, assetLoader, assetRepository);
-        }
+    public static IEnumerable<object[]> TestEvents()
+    {
+        yield return new object[] { TestUtils.CreateEvent<AssetCreated>(), EnrichedAssetEventType.Created };
+        yield return new object[] { TestUtils.CreateEvent<AssetUpdated>(), EnrichedAssetEventType.Updated };
+        yield return new object[] { TestUtils.CreateEvent<AssetAnnotated>(), EnrichedAssetEventType.Annotated };
+        yield return new object[] { TestUtils.CreateEvent<AssetDeleted>(), EnrichedAssetEventType.Deleted };
+    }
 
-        public static IEnumerable<object[]> TestEvents()
-        {
-            yield return new object[] { TestUtils.CreateEvent<AssetCreated>(), EnrichedAssetEventType.Created };
-            yield return new object[] { TestUtils.CreateEvent<AssetUpdated>(), EnrichedAssetEventType.Updated };
-            yield return new object[] { TestUtils.CreateEvent<AssetAnnotated>(), EnrichedAssetEventType.Annotated };
-            yield return new object[] { TestUtils.CreateEvent<AssetDeleted>(), EnrichedAssetEventType.Deleted };
-        }
+    [Fact]
+    public void Should_return_true_if_asking_for_snapshot_support()
+    {
+        Assert.True(sut.CanCreateSnapshotEvents);
+    }
 
-        [Fact]
-        public void Should_return_true_if_asking_for_snapshot_support()
-        {
-            Assert.True(sut.CanCreateSnapshotEvents);
-        }
+    [Fact]
+    public void Should_handle_asset_event()
+    {
+        Assert.True(sut.Handles(new AssetCreated()));
+    }
 
-        [Fact]
-        public void Should_handle_asset_event()
-        {
-            Assert.True(sut.Handles(new AssetCreated()));
-        }
+    [Fact]
+    public void Should_not_handle_asset_moved_event()
+    {
+        Assert.False(sut.Handles(new AssetMoved()));
+    }
 
-        [Fact]
-        public void Should_not_handle_asset_moved_event()
-        {
-            Assert.False(sut.Handles(new AssetMoved()));
-        }
+    [Fact]
+    public void Should_not_handle_other_event()
+    {
+        Assert.False(sut.Handles(new ContentCreated()));
+    }
 
-        [Fact]
-        public void Should_not_handle_other_event()
-        {
-            Assert.False(sut.Handles(new ContentCreated()));
-        }
+    [Fact]
+    public async Task Should_create_events_from_snapshots()
+    {
+        var ctx = Context();
 
-        [Fact]
-        public async Task Should_create_events_from_snapshots()
-        {
-            var ctx = Context();
-
-            A.CallTo(() => assetRepository.StreamAll(ctx.AppId.Id, ct))
-                .Returns(new List<AssetEntity>
-                {
-                    new AssetEntity(),
-                    new AssetEntity()
-                }.ToAsyncEnumerable());
-
-            var actual = await sut.CreateSnapshotEventsAsync(ctx, ct).ToListAsync(ct);
-
-            var typed = actual.OfType<EnrichedAssetEvent>().ToList();
-
-            Assert.Equal(2, typed.Count);
-            Assert.Equal(2, typed.Count(x => x.Type == EnrichedAssetEventType.Created && x.Name == "AssetQueried"));
-        }
-
-        [Theory]
-        [MemberData(nameof(TestEvents))]
-        public async Task Should_create_enriched_events(AssetEvent @event, EnrichedAssetEventType type)
-        {
-            var ctx = Context(appId: @event.AppId);
-
-            var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
-
-            A.CallTo(() => assetLoader.GetAsync(ctx.AppId.Id, @event.AssetId, 12, ct))
-                .Returns(new AssetEntity());
-
-            var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, ct).ToListAsync(ct);
-
-            var enrichedEvent = (EnrichedAssetEvent)actual.Single();
-
-            Assert.Equal(type, enrichedEvent.Type);
-            Assert.Equal(@event.Actor, enrichedEvent.Actor);
-            Assert.Equal(@event.AppId, enrichedEvent.AppId);
-            Assert.Equal(@event.AppId.Id, enrichedEvent.AppId.Id);
-        }
-
-        [Fact]
-        public void Should_trigger_check_if_condition_is_empty()
-        {
-            TestForCondition(string.Empty, ctx =>
+        A.CallTo(() => assetRepository.StreamAll(ctx.AppId.Id, ct))
+            .Returns(new List<AssetEntity>
             {
-                var @event = new EnrichedAssetEvent();
+                new AssetEntity(),
+                new AssetEntity()
+            }.ToAsyncEnumerable());
 
-                var actual = sut.Trigger(@event, ctx);
+        var actual = await sut.CreateSnapshotEventsAsync(ctx, ct).ToListAsync(ct);
 
-                Assert.True(actual);
-            });
-        }
+        var typed = actual.OfType<EnrichedAssetEvent>().ToList();
 
-        [Fact]
-        public void Should_trigger_check_if_condition_matchs()
+        Assert.Equal(2, typed.Count);
+        Assert.Equal(2, typed.Count(x => x.Type == EnrichedAssetEventType.Created && x.Name == "AssetQueried"));
+    }
+
+    [Theory]
+    [MemberData(nameof(TestEvents))]
+    public async Task Should_create_enriched_events(AssetEvent @event, EnrichedAssetEventType type)
+    {
+        var ctx = Context(appId: @event.AppId);
+
+        var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
+
+        A.CallTo(() => assetLoader.GetAsync(ctx.AppId.Id, @event.AssetId, 12, ct))
+            .Returns(new AssetEntity());
+
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, ct).ToListAsync(ct);
+
+        var enrichedEvent = (EnrichedAssetEvent)actual.Single();
+
+        Assert.Equal(type, enrichedEvent.Type);
+        Assert.Equal(@event.Actor, enrichedEvent.Actor);
+        Assert.Equal(@event.AppId, enrichedEvent.AppId);
+        Assert.Equal(@event.AppId.Id, enrichedEvent.AppId.Id);
+    }
+
+    [Fact]
+    public void Should_trigger_check_if_condition_is_empty()
+    {
+        TestForCondition(string.Empty, ctx =>
         {
-            TestForCondition("true", ctx =>
-            {
-                var @event = new EnrichedAssetEvent();
+            var @event = new EnrichedAssetEvent();
 
-                var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx);
 
-                Assert.True(actual);
-            });
-        }
+            Assert.True(actual);
+        });
+    }
 
-        [Fact]
-        public void Should_not_trigger_check_if_condition_does_not_matchs()
+    [Fact]
+    public void Should_trigger_check_if_condition_matchs()
+    {
+        TestForCondition("true", ctx =>
         {
-            TestForCondition("false", ctx =>
-            {
-                var @event = new EnrichedAssetEvent();
+            var @event = new EnrichedAssetEvent();
 
-                var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx);
 
-                Assert.False(actual);
-            });
-        }
+            Assert.True(actual);
+        });
+    }
 
-        private void TestForCondition(string condition, Action<RuleContext> action)
+    [Fact]
+    public void Should_not_trigger_check_if_condition_does_not_matchs()
+    {
+        TestForCondition("false", ctx =>
         {
-            var trigger = new AssetChangedTriggerV2
-            {
-                Condition = condition
-            };
+            var @event = new EnrichedAssetEvent();
 
-            action(Context(trigger));
+            var actual = sut.Trigger(@event, ctx);
 
-            if (string.IsNullOrWhiteSpace(condition))
-            {
-                A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
-                    .MustNotHaveHappened();
-            }
-            else
-            {
-                A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
-                    .MustHaveHappened();
-            }
-        }
+            Assert.False(actual);
+        });
+    }
 
-        private static RuleContext Context(RuleTrigger? trigger = null, NamedId<DomainId>? appId = null)
+    private void TestForCondition(string condition, Action<RuleContext> action)
+    {
+        var trigger = new AssetChangedTriggerV2
         {
-            trigger ??= new AssetChangedTriggerV2();
+            Condition = condition
+        };
 
-            return new RuleContext
-            {
-                AppId = appId ?? NamedId.Of(DomainId.NewGuid(), "my-app"),
-                Rule = new Rule(trigger, A.Fake<RuleAction>()),
-                RuleId = DomainId.NewGuid()
-            };
+        action(Context(trigger));
+
+        if (string.IsNullOrWhiteSpace(condition))
+        {
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
+                .MustNotHaveHappened();
         }
+        else
+        {
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
+                .MustHaveHappened();
+        }
+    }
+
+    private static RuleContext Context(RuleTrigger? trigger = null, NamedId<DomainId>? appId = null)
+    {
+        trigger ??= new AssetChangedTriggerV2();
+
+        return new RuleContext
+        {
+            AppId = appId ?? NamedId.Of(DomainId.NewGuid(), "my-app"),
+            Rule = new Rule(trigger, A.Fake<RuleAction>()),
+            RuleId = DomainId.NewGuid()
+        };
     }
 }

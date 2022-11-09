@@ -12,92 +12,91 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
+namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
+
+public partial class RuleDomainObject
 {
-    public partial class RuleDomainObject
+    [CollectionName("Rules")]
+    public sealed class State : DomainObjectState<State>, IRuleEntity
     {
-        [CollectionName("Rules")]
-        public sealed class State : DomainObjectState<State>, IRuleEntity
+        public NamedId<DomainId> AppId { get; set; }
+
+        public Rule RuleDef { get; set; }
+
+        public bool IsDeleted { get; set; }
+
+        [JsonIgnore]
+        public DomainId UniqueId
         {
-            public NamedId<DomainId> AppId { get; set; }
+            get => DomainId.Combine(AppId, Id);
+        }
 
-            public Rule RuleDef { get; set; }
+        public override bool ApplyEvent(IEvent @event)
+        {
+            var previousRule = RuleDef;
 
-            public bool IsDeleted { get; set; }
-
-            [JsonIgnore]
-            public DomainId UniqueId
+            switch (@event)
             {
-                get => DomainId.Combine(AppId, Id);
-            }
+                case RuleCreated e:
+                    {
+                        Id = e.RuleId;
 
-            public override bool ApplyEvent(IEvent @event)
-            {
-                var previousRule = RuleDef;
+                        RuleDef = new Rule(e.Trigger, e.Action);
+                        RuleDef = RuleDef.Rename(e.Name);
 
-                switch (@event)
-                {
-                    case RuleCreated e:
+                        AppId = e.AppId;
+                        return true;
+                    }
+
+                case RuleUpdated e:
+                    {
+                        if (e.Trigger != null)
                         {
-                            Id = e.RuleId;
+                            RuleDef = RuleDef.Update(e.Trigger);
+                        }
 
-                            RuleDef = new Rule(e.Trigger, e.Action);
+                        if (e.Action != null)
+                        {
+                            RuleDef = RuleDef.Update(e.Action);
+                        }
+
+                        if (e.Name != null)
+                        {
                             RuleDef = RuleDef.Rename(e.Name);
-
-                            AppId = e.AppId;
-                            return true;
                         }
 
-                    case RuleUpdated e:
-                        {
-                            if (e.Trigger != null)
-                            {
-                                RuleDef = RuleDef.Update(e.Trigger);
-                            }
-
-                            if (e.Action != null)
-                            {
-                                RuleDef = RuleDef.Update(e.Action);
-                            }
-
-                            if (e.Name != null)
-                            {
-                                RuleDef = RuleDef.Rename(e.Name);
-                            }
-
-                            if (e.IsEnabled == true)
-                            {
-                                RuleDef = RuleDef.Enable();
-                            }
-                            else if (e.IsEnabled == false)
-                            {
-                                RuleDef = RuleDef.Disable();
-                            }
-
-                            break;
-                        }
-
-                    case RuleEnabled:
+                        if (e.IsEnabled == true)
                         {
                             RuleDef = RuleDef.Enable();
-                            break;
                         }
-
-                    case RuleDisabled:
+                        else if (e.IsEnabled == false)
                         {
                             RuleDef = RuleDef.Disable();
-                            break;
                         }
 
-                    case RuleDeleted:
-                        {
-                            IsDeleted = true;
-                            return true;
-                        }
-                }
+                        break;
+                    }
 
-                return !ReferenceEquals(previousRule, RuleDef);
+                case RuleEnabled:
+                    {
+                        RuleDef = RuleDef.Enable();
+                        break;
+                    }
+
+                case RuleDisabled:
+                    {
+                        RuleDef = RuleDef.Disable();
+                        break;
+                    }
+
+                case RuleDeleted:
+                    {
+                        IsDeleted = true;
+                        return true;
+                    }
             }
+
+            return !ReferenceEquals(previousRule, RuleDef);
         }
     }
 }

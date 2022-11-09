@@ -9,23 +9,22 @@ using NJsonSchema;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 
-namespace Squidex.Areas.Api.Config.OpenApi
+namespace Squidex.Areas.Api.Config.OpenApi;
+
+public sealed class FixProcessor : IOperationProcessor
 {
-    public sealed class FixProcessor : IOperationProcessor
+    private static readonly JsonSchema StringSchema = new JsonSchema { Type = JsonObjectType.String };
+
+    public bool Process(OperationProcessorContext context)
     {
-        private static readonly JsonSchema StringSchema = new JsonSchema { Type = JsonObjectType.String };
-
-        public bool Process(OperationProcessorContext context)
+        foreach (var (_, parameter) in context.Parameters)
         {
-            foreach (var (_, parameter) in context.Parameters)
+            if (parameter.IsRequired && parameter.Schema is { Type: JsonObjectType.String })
             {
-                if (parameter.IsRequired && parameter.Schema is { Type: JsonObjectType.String })
-                {
-                    parameter.Schema = StringSchema;
-                }
+                parameter.Schema = StringSchema;
             }
-
-            return true;
         }
+
+        return true;
     }
 }

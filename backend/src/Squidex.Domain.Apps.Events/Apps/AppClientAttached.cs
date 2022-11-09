@@ -7,15 +7,14 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps;
+
+[EventType(nameof(AppClientAttached))]
+public sealed class AppClientAttached : AppEvent
 {
-    [EventType(nameof(AppClientAttached))]
-    public sealed class AppClientAttached : AppEvent
-    {
-        public string Id { get; set; }
+    public string Id { get; set; }
 
-        public string Secret { get; set; }
+    public string Secret { get; set; }
 
-        public string? Role { get; set; }
-    }
+    public string? Role { get; set; }
 }

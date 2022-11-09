@@ -5,36 +5,35 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Translations
+namespace Squidex.Infrastructure.Translations;
+
+public sealed class MissingKeys
 {
-    public sealed class MissingKeys
+    private const string MissingFileName = "__missing.txt";
+    private readonly object lockObject = new object();
+    private readonly HashSet<string> missingTranslations;
+
+    public MissingKeys()
     {
-        private const string MissingFileName = "__missing.txt";
-        private readonly object lockObject = new object();
-        private readonly HashSet<string> missingTranslations;
-
-        public MissingKeys()
+        if (File.Exists(MissingFileName))
         {
-            if (File.Exists(MissingFileName))
-            {
-                var missing = File.ReadAllLines(MissingFileName);
+            var missing = File.ReadAllLines(MissingFileName);
 
-                missingTranslations = new HashSet<string>(missing);
-            }
-            else
-            {
-                missingTranslations = new HashSet<string>();
-            }
+            missingTranslations = new HashSet<string>(missing);
         }
-
-        public void Log(string key)
+        else
         {
-            lock (lockObject)
+            missingTranslations = new HashSet<string>();
+        }
+    }
+
+    public void Log(string key)
+    {
+        lock (lockObject)
+        {
+            if (!missingTranslations.Add(key))
             {
-                if (!missingTranslations.Add(key))
-                {
-                    File.AppendAllLines(MissingFileName, new[] { key });
-                }
+                File.AppendAllLines(MissingFileName, new[] { key });
             }
         }
     }

@@ -8,11 +8,10 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps;
+
+[EventType(nameof(AppLanguageRemoved))]
+public sealed class AppLanguageRemoved : AppEvent
 {
-    [EventType(nameof(AppLanguageRemoved))]
-    public sealed class AppLanguageRemoved : AppEvent
-    {
-        public Language Language { get; set; }
-    }
+    public Language Language { get; set; }
 }

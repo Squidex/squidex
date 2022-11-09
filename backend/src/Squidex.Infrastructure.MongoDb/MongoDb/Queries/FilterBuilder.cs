@@ -10,33 +10,32 @@ using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Infrastructure.MongoDb.Queries
+namespace Squidex.Infrastructure.MongoDb.Queries;
+
+public static class FilterBuilder
 {
-    public static class FilterBuilder
+    public static (FilterDefinition<TDocument>? Filter, bool Last) BuildFilter<TDocument>(this ClrQuery query, bool supportsSearch = true)
     {
-        public static (FilterDefinition<TDocument>? Filter, bool Last) BuildFilter<TDocument>(this ClrQuery query, bool supportsSearch = true)
+        if (query.FullText != null)
         {
-            if (query.FullText != null)
+            if (!supportsSearch)
             {
-                if (!supportsSearch)
-                {
-                    throw new ValidationException(T.Get("common.fullTextNotSupported"));
-                }
-
-                return (Builders<TDocument>.Filter.Text(query.FullText), false);
+                throw new ValidationException(T.Get("common.fullTextNotSupported"));
             }
 
-            if (query.Filter != null)
-            {
-                return (query.Filter.BuildFilter<TDocument>(), true);
-            }
-
-            return (null, false);
+            return (Builders<TDocument>.Filter.Text(query.FullText), false);
         }
 
-        public static FilterDefinition<T> BuildFilter<T>(this FilterNode<ClrValue> filterNode)
+        if (query.Filter != null)
         {
-            return FilterVisitor<T>.Visit(filterNode);
+            return (query.Filter.BuildFilter<TDocument>(), true);
         }
+
+        return (null, false);
+    }
+
+    public static FilterDefinition<T> BuildFilter<T>(this FilterNode<ClrValue> filterNode)
+    {
+        return FilterVisitor<T>.Visit(filterNode);
     }
 }

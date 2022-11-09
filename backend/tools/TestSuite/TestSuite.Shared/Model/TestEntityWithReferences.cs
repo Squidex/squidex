@@ -11,36 +11,35 @@ using Squidex.ClientLibrary.Management;
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace TestSuite.Model
+namespace TestSuite.Model;
+
+public sealed class TestEntityWithReferences : Content<TestEntityWithReferencesData>
 {
-    public sealed class TestEntityWithReferences : Content<TestEntityWithReferencesData>
+    public static async Task<SchemaDto> CreateSchemaAsync(ISchemasClient schemas, string appName, string name)
     {
-        public static async Task<SchemaDto> CreateSchemaAsync(ISchemasClient schemas, string appName, string name)
+        var schema = await schemas.PostSchemaAsync(appName, new CreateSchemaDto
         {
-            var schema = await schemas.PostSchemaAsync(appName, new CreateSchemaDto
+            Name = name,
+            Fields = new List<UpsertSchemaFieldDto>
             {
-                Name = name,
-                Fields = new List<UpsertSchemaFieldDto>
+                new UpsertSchemaFieldDto
                 {
-                    new UpsertSchemaFieldDto
+                    Name = nameof(TestEntityWithReferencesData.References).ToLowerInvariant(),
+                    Properties = new ReferencesFieldPropertiesDto
                     {
-                        Name = nameof(TestEntityWithReferencesData.References).ToLowerInvariant(),
-                        Properties = new ReferencesFieldPropertiesDto
-                        {
-                            IsRequired = false
-                        }
+                        IsRequired = false
                     }
-                },
-                IsPublished = true
-            });
+                }
+            },
+            IsPublished = true
+        });
 
-            return schema;
-        }
+        return schema;
     }
+}
 
-    public sealed class TestEntityWithReferencesData
-    {
-        [JsonConverter(typeof(InvariantConverter))]
-        public string[] References { get; set; }
-    }
+public sealed class TestEntityWithReferencesData
+{
+    [JsonConverter(typeof(InvariantConverter))]
+    public string[] References { get; set; }
 }

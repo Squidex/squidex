@@ -12,24 +12,23 @@ using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 using AppPlanChangedV2 = Squidex.Domain.Apps.Events.Apps.AppPlanChanged;
 
-namespace Migrations.OldEvents
-{
-    [TypeName("AppPlanChanged")]
-    [Obsolete("New Event introduced")]
-    public sealed class AppPlanChanged : AppEvent, IMigrated<IEvent>
-    {
-        public string PlanId { get; set; }
+namespace Migrations.OldEvents;
 
-        public IEvent Migrate()
+[TypeName("AppPlanChanged")]
+[Obsolete("New Event introduced")]
+public sealed class AppPlanChanged : AppEvent, IMigrated<IEvent>
+{
+    public string PlanId { get; set; }
+
+    public IEvent Migrate()
+    {
+        if (!string.IsNullOrWhiteSpace(PlanId))
         {
-            if (!string.IsNullOrWhiteSpace(PlanId))
-            {
-                return SimpleMapper.Map(this, new AppPlanChangedV2());
-            }
-            else
-            {
-                return SimpleMapper.Map(this, new AppPlanReset());
-            }
+            return SimpleMapper.Map(this, new AppPlanChangedV2());
+        }
+        else
+        {
+            return SimpleMapper.Map(this, new AppPlanReset());
         }
     }
 }

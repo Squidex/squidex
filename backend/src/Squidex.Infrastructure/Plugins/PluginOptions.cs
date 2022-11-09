@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Plugins
+namespace Squidex.Infrastructure.Plugins;
+
+public sealed class PluginOptions
 {
-    public sealed class PluginOptions
-    {
-        public string[] Plugins { get; set; }
-    }
+    public string[] Plugins { get; set; }
 }

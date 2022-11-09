@@ -8,49 +8,48 @@
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Timers;
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+public sealed class PollingSubscription : IEventSubscription
 {
-    public sealed class PollingSubscription : IEventSubscription
+    private readonly CompletionTimer timer;
+
+    public PollingSubscription(
+        IEventStore eventStore,
+        IEventSubscriber<StoredEvent> eventSubscriber,
+        string? streamFilter,
+        string? position)
     {
-        private readonly CompletionTimer timer;
-
-        public PollingSubscription(
-            IEventStore eventStore,
-            IEventSubscriber<StoredEvent> eventSubscriber,
-            string? streamFilter,
-            string? position)
+        timer = new CompletionTimer(5000, async ct =>
         {
-            timer = new CompletionTimer(5000, async ct =>
+            try
             {
-                try
+                await foreach (var storedEvent in eventStore.QueryAllAsync(streamFilter, position, ct: ct))
                 {
-                    await foreach (var storedEvent in eventStore.QueryAllAsync(streamFilter, position, ct: ct))
-                    {
-                        await eventSubscriber.OnNextAsync(this, storedEvent);
+                    await eventSubscriber.OnNextAsync(this, storedEvent);
 
-                        position = storedEvent.EventPosition;
-                    }
+                    position = storedEvent.EventPosition;
                 }
-                catch (Exception ex)
-                {
-                    await eventSubscriber.OnErrorAsync(this, ex);
-                }
-            });
-        }
+            }
+            catch (Exception ex)
+            {
+                await eventSubscriber.OnErrorAsync(this, ex);
+            }
+        });
+    }
 
-        public ValueTask CompleteAsync()
-        {
-            return new ValueTask(timer.StopAsync());
-        }
+    public ValueTask CompleteAsync()
+    {
+        return new ValueTask(timer.StopAsync());
+    }
 
-        public void Dispose()
-        {
-            timer.StopAsync().Forget();
-        }
+    public void Dispose()
+    {
+        timer.StopAsync().Forget();
+    }
 
-        public void WakeUp()
-        {
-            timer.SkipCurrentDelay();
-        }
+    public void WakeUp()
+    {
+        timer.SkipCurrentDelay();
     }
 }

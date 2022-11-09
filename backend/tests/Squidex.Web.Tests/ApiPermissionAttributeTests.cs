@@ -21,130 +21,129 @@ using Xunit;
 
 #pragma warning disable IDE0017 // Simplify object initialization
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public class ApiPermissionAttributeTests
 {
-    public class ApiPermissionAttributeTests
+    private readonly HttpContext httpContext = new DefaultHttpContext();
+    private readonly ActionExecutingContext actionExecutingContext;
+    private readonly ActionExecutionDelegate next;
+    private readonly ClaimsIdentity user = new ClaimsIdentity();
+    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+    private bool isNextCalled;
+
+    public ApiPermissionAttributeTests()
     {
-        private readonly HttpContext httpContext = new DefaultHttpContext();
-        private readonly ActionExecutingContext actionExecutingContext;
-        private readonly ActionExecutionDelegate next;
-        private readonly ClaimsIdentity user = new ClaimsIdentity();
-        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-        private bool isNextCalled;
-
-        public ApiPermissionAttributeTests()
+        var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor
         {
-            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor
-            {
-                FilterDescriptors = new List<FilterDescriptor>()
-            });
+            FilterDescriptors = new List<FilterDescriptor>()
+        });
 
-            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>(), this);
-            actionExecutingContext.HttpContext = httpContext;
-            actionExecutingContext.HttpContext.User = new ClaimsPrincipal(user);
+        actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>(), this);
+        actionExecutingContext.HttpContext = httpContext;
+        actionExecutingContext.HttpContext.User = new ClaimsPrincipal(user);
 
-            next = () =>
-            {
-                isNextCalled = true;
-
-                return Task.FromResult<ActionExecutedContext>(null!);
-            };
-        }
-
-        [Fact]
-        public void Should_use_custom_authorization_scheme()
+        next = () =>
         {
-            var sut = new ApiPermissionAttribute();
+            isNextCalled = true;
 
-            Assert.Equal(Constants.ApiSecurityScheme, sut.AuthenticationSchemes);
-        }
+            return Task.FromResult<ActionExecutedContext>(null!);
+        };
+    }
 
-        [Fact]
-        public async Task Should_make_permission_check_with_app_feature()
-        {
-            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
+    [Fact]
+    public void Should_use_custom_authorization_scheme()
+    {
+        var sut = new ApiPermissionAttribute();
 
-            user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
+        Assert.Equal(Constants.ApiSecurityScheme, sut.AuthenticationSchemes);
+    }
 
-            SetContext();
+    [Fact]
+    public async Task Should_make_permission_check_with_app_feature()
+    {
+        actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
 
-            var sut = new ApiPermissionAttribute(PermissionIds.AppSchemasCreate);
+        user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
 
-            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+        SetContext();
 
-            Assert.Null(actionExecutingContext.Result);
-            Assert.True(isNextCalled);
-        }
+        var sut = new ApiPermissionAttribute(PermissionIds.AppSchemasCreate);
 
-        [Fact]
-        public async Task Should_make_permission_check_with_schema_feature()
-        {
-            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
-            actionExecutingContext.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Mocks.Schema(appId, schemaId)));
+        await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app.schemas.my-schema"));
+        Assert.Null(actionExecutingContext.Result);
+        Assert.True(isNextCalled);
+    }
 
-            SetContext();
+    [Fact]
+    public async Task Should_make_permission_check_with_schema_feature()
+    {
+        actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
+        actionExecutingContext.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Mocks.Schema(appId, schemaId)));
 
-            var sut = new ApiPermissionAttribute(PermissionIds.AppSchemasUpdate);
+        user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app.schemas.my-schema"));
 
-            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+        SetContext();
 
-            Assert.Null(actionExecutingContext.Result);
-            Assert.True(isNextCalled);
-        }
+        var sut = new ApiPermissionAttribute(PermissionIds.AppSchemasUpdate);
 
-        [Fact]
-        public async Task Should_return_forbidden_if_user_has_wrong_permission()
-        {
-            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
+        await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
+        Assert.Null(actionExecutingContext.Result);
+        Assert.True(isNextCalled);
+    }
 
-            SetContext();
+    [Fact]
+    public async Task Should_return_forbidden_if_user_has_wrong_permission()
+    {
+        actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
 
-            var sut = new ApiPermissionAttribute(PermissionIds.AppSchemasCreate);
+        user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 
-            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+        SetContext();
 
-            Assert.Equal(403, (actionExecutingContext.Result as StatusCodeResult)?.StatusCode);
-            Assert.False(isNextCalled);
-        }
+        var sut = new ApiPermissionAttribute(PermissionIds.AppSchemasCreate);
 
-        [Fact]
-        public async Task Should_return_forbidden_if_route_data_has_no_value()
-        {
-            user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
+        await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            SetContext();
+        Assert.Equal(403, (actionExecutingContext.Result as StatusCodeResult)?.StatusCode);
+        Assert.False(isNextCalled);
+    }
 
-            var sut = new ApiPermissionAttribute(PermissionIds.AppSchemasCreate);
+    [Fact]
+    public async Task Should_return_forbidden_if_route_data_has_no_value()
+    {
+        user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 
-            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+        SetContext();
 
-            Assert.Equal(403, (actionExecutingContext.Result as StatusCodeResult)?.StatusCode);
-            Assert.False(isNextCalled);
-        }
+        var sut = new ApiPermissionAttribute(PermissionIds.AppSchemasCreate);
 
-        [Fact]
-        public async Task Should_return_forbidden_if_user_has_no_permission()
-        {
-            SetContext();
+        await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            var sut = new ApiPermissionAttribute(PermissionIds.AppSchemasCreate);
+        Assert.Equal(403, (actionExecutingContext.Result as StatusCodeResult)?.StatusCode);
+        Assert.False(isNextCalled);
+    }
 
-            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+    [Fact]
+    public async Task Should_return_forbidden_if_user_has_no_permission()
+    {
+        SetContext();
 
-            Assert.Equal(403, (actionExecutingContext.Result as StatusCodeResult)?.StatusCode);
-            Assert.False(isNextCalled);
-        }
+        var sut = new ApiPermissionAttribute(PermissionIds.AppSchemasCreate);
 
-        private void SetContext()
-        {
-            var context = new Context(new ClaimsPrincipal(actionExecutingContext.HttpContext.User), null!);
+        await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            actionExecutingContext.HttpContext.Features.Set(context);
-        }
+        Assert.Equal(403, (actionExecutingContext.Result as StatusCodeResult)?.StatusCode);
+        Assert.False(isNextCalled);
+    }
+
+    private void SetContext()
+    {
+        var context = new Context(new ClaimsPrincipal(actionExecutingContext.HttpContext.User), null!);
+
+        actionExecutingContext.HttpContext.Features.Set(context);
     }
 }

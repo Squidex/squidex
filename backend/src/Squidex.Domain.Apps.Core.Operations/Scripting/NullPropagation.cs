@@ -10,34 +10,33 @@ using Jint.Native;
 using Jint.Runtime.Interop;
 using Jint.Runtime.References;
 
-namespace Squidex.Domain.Apps.Core.Scripting
+namespace Squidex.Domain.Apps.Core.Scripting;
+
+public sealed class NullPropagation : IReferenceResolver
 {
-    public sealed class NullPropagation : IReferenceResolver
+    public static readonly NullPropagation Instance = new NullPropagation();
+
+    public bool TryUnresolvableReference(Engine engine, Reference reference, out JsValue value)
     {
-        public static readonly NullPropagation Instance = new NullPropagation();
+        value = reference.GetBase();
 
-        public bool TryUnresolvableReference(Engine engine, Reference reference, out JsValue value)
-        {
-            value = reference.GetBase();
+        return true;
+    }
 
-            return true;
-        }
+    public bool TryPropertyReference(Engine engine, Reference reference, ref JsValue value)
+    {
+        return value.IsNull() || value.IsUndefined();
+    }
 
-        public bool TryPropertyReference(Engine engine, Reference reference, ref JsValue value)
-        {
-            return value.IsNull() || value.IsUndefined();
-        }
+    public bool TryGetCallable(Engine engine, object reference, out JsValue value)
+    {
+        value = new ClrFunctionInstance(engine, "anonymous", (thisObj, _) => thisObj);
 
-        public bool TryGetCallable(Engine engine, object reference, out JsValue value)
-        {
-            value = new ClrFunctionInstance(engine, "anonymous", (thisObj, _) => thisObj);
+        return true;
+    }
 
-            return true;
-        }
-
-        public bool CheckCoercible(JsValue value)
-        {
-            return true;
-        }
+    public bool CheckCoercible(JsValue value)
+    {
+        return true;
     }
 }

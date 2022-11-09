@@ -9,56 +9,55 @@ using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Assets;
+
+public class FileTypeAssetMetadataSourceTests
 {
-    public class FileTypeAssetMetadataSourceTests
+    private readonly FileTypeAssetMetadataSource sut = new FileTypeAssetMetadataSource();
+
+    [Fact]
+    public async Task Should_not_add_tag_if_no_file_info()
     {
-        private readonly FileTypeAssetMetadataSource sut = new FileTypeAssetMetadataSource();
+        var command = new CreateAsset();
 
-        [Fact]
-        public async Task Should_not_add_tag_if_no_file_info()
+        await sut.EnhanceAsync(command, default);
+
+        Assert.Empty(command.Tags);
+    }
+
+    [Fact]
+    public async Task Should_add_file_type()
+    {
+        var command = new CreateAsset
         {
-            var command = new CreateAsset();
+            File = new NoopAssetFile("File.DOCX")
+        };
 
-            await sut.EnhanceAsync(command, default);
+        await sut.EnhanceAsync(command, default);
 
-            Assert.Empty(command.Tags);
-        }
+        Assert.Contains("type/docx", command.Tags);
+    }
 
-        [Fact]
-        public async Task Should_add_file_type()
+    [Fact]
+    public async Task Should_add_blob_if_without_extension()
+    {
+        var command = new CreateAsset
         {
-            var command = new CreateAsset
-            {
-                File = new NoopAssetFile("File.DOCX")
-            };
+            File = new NoopAssetFile("File")
+        };
 
-            await sut.EnhanceAsync(command, default);
+        await sut.EnhanceAsync(command, default);
 
-            Assert.Contains("type/docx", command.Tags);
-        }
+        Assert.Contains("type/blob", command.Tags);
+    }
 
-        [Fact]
-        public async Task Should_add_blob_if_without_extension()
-        {
-            var command = new CreateAsset
-            {
-                File = new NoopAssetFile("File")
-            };
+    [Fact]
+    public void Should_always_format_to_empty()
+    {
+        var source = new AssetEntity();
 
-            await sut.EnhanceAsync(command, default);
+        var formatted = sut.Format(source);
 
-            Assert.Contains("type/blob", command.Tags);
-        }
-
-        [Fact]
-        public void Should_always_format_to_empty()
-        {
-            var source = new AssetEntity();
-
-            var formatted = sut.Format(source);
-
-            Assert.Empty(formatted);
-        }
+        Assert.Empty(formatted);
     }
 }

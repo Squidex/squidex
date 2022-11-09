@@ -12,171 +12,170 @@ using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Text;
 
-namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
+namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
+
+public static class GuardApp
 {
-    public static class GuardApp
+    public static void CanCreate(CreateApp command)
     {
-        public static void CanCreate(CreateApp command)
-        {
-            Guard.NotNull(command);
+        Guard.NotNull(command);
 
-            Validate.It(e =>
+        Validate.It(e =>
+        {
+            if (!command.Name.IsSlug())
             {
-                if (!command.Name.IsSlug())
-                {
-                    e(Not.ValidSlug(nameof(command.Name)), nameof(command.Name));
-                }
-            });
-        }
+                e(Not.ValidSlug(nameof(command.Name)), nameof(command.Name));
+            }
+        });
+    }
 
-        public static void CanUploadImage(UploadAppImage command)
+    public static void CanUploadImage(UploadAppImage command)
+    {
+        Guard.NotNull(command);
+
+        Validate.It(e =>
         {
-            Guard.NotNull(command);
-
-            Validate.It(e =>
+            if (command.File == null)
             {
-                if (command.File == null)
-                {
-                    e(Not.Defined(nameof(command.File)), nameof(command.File));
-                }
-            });
-        }
+                e(Not.Defined(nameof(command.File)), nameof(command.File));
+            }
+        });
+    }
 
-        public static void CanUpdate(UpdateApp command)
+    public static void CanUpdate(UpdateApp command)
+    {
+        Guard.NotNull(command);
+    }
+
+    public static void CanRemoveImage(RemoveAppImage command)
+    {
+        Guard.NotNull(command);
+    }
+
+    public static void CanUpdateAssetScripts(ConfigureAssetScripts command)
+    {
+        Guard.NotNull(command);
+    }
+
+    public static void CanUpdateSettings(UpdateAppSettings command)
+    {
+        Guard.NotNull(command);
+
+        Validate.It(e =>
         {
-            Guard.NotNull(command);
-        }
+            var prefix = nameof(command.Settings);
 
-        public static void CanRemoveImage(RemoveAppImage command)
-        {
-            Guard.NotNull(command);
-        }
+            var settings = command.Settings;
 
-        public static void CanUpdateAssetScripts(ConfigureAssetScripts command)
-        {
-            Guard.NotNull(command);
-        }
-
-        public static void CanUpdateSettings(UpdateAppSettings command)
-        {
-            Guard.NotNull(command);
-
-            Validate.It(e =>
+            if (settings == null)
             {
-                var prefix = nameof(command.Settings);
+                e(Not.Defined(nameof(settings)), prefix);
+                return;
+            }
 
-                var settings = command.Settings;
+            var patternsPrefix = $"{prefix}.{nameof(settings.Patterns)}";
 
-                if (settings == null)
+            if (settings.Patterns == null)
+            {
+                e(Not.Defined(nameof(settings.Patterns)), patternsPrefix);
+            }
+            else
+            {
+                settings.Patterns.Foreach((pattern, index) =>
                 {
-                    e(Not.Defined(nameof(settings)), prefix);
-                    return;
-                }
+                    var patternPrefix = $"{patternsPrefix}[{index}]";
 
-                var patternsPrefix = $"{prefix}.{nameof(settings.Patterns)}";
-
-                if (settings.Patterns == null)
-                {
-                    e(Not.Defined(nameof(settings.Patterns)), patternsPrefix);
-                }
-                else
-                {
-                    settings.Patterns.Foreach((pattern, index) =>
+                    if (string.IsNullOrWhiteSpace(pattern.Name))
                     {
-                        var patternPrefix = $"{patternsPrefix}[{index}]";
+                        e(Not.Defined(nameof(pattern.Name)), $"{patternPrefix}.{nameof(pattern.Name)}");
+                    }
 
-                        if (string.IsNullOrWhiteSpace(pattern.Name))
-                        {
-                            e(Not.Defined(nameof(pattern.Name)), $"{patternPrefix}.{nameof(pattern.Name)}");
-                        }
-
-                        if (string.IsNullOrWhiteSpace(pattern.Regex))
-                        {
-                            e(Not.Defined(nameof(pattern.Regex)), $"{patternPrefix}.{nameof(pattern.Regex)}");
-                        }
-                    });
-                }
-
-                var editorsPrefix = $"{prefix}.{nameof(settings.Editors)}";
-
-                if (settings.Editors == null)
-                {
-                    e(Not.Defined(nameof(settings.Editors)), editorsPrefix);
-                }
-                else
-                {
-                    settings.Editors.Foreach((editor, index) =>
+                    if (string.IsNullOrWhiteSpace(pattern.Regex))
                     {
-                        var editorPrefix = $"{editorsPrefix}[{index}]";
+                        e(Not.Defined(nameof(pattern.Regex)), $"{patternPrefix}.{nameof(pattern.Regex)}");
+                    }
+                });
+            }
 
-                        if (string.IsNullOrWhiteSpace(editor.Name))
-                        {
-                            e(Not.Defined(nameof(editor.Name)), $"{editorPrefix}.{nameof(editor.Name)}");
-                        }
+            var editorsPrefix = $"{prefix}.{nameof(settings.Editors)}";
 
-                        if (string.IsNullOrWhiteSpace(editor.Url))
-                        {
-                            e(Not.Defined(nameof(editor.Url)), $"{editorPrefix}.{nameof(editor.Url)}");
-                        }
-                    });
-                }
-            });
-        }
-
-        public static Task CanTransfer(TransferToTeam command, IAppEntity app, IAppProvider appProvider, CancellationToken ct)
-        {
-            Guard.NotNull(command);
-
-            return Validate.It(async e =>
+            if (settings.Editors == null)
             {
-                if (command.TeamId == null)
-                {
-                    return;
-                }
-
-                var team = await appProvider.GetTeamAsync(command.TeamId.Value, ct);
-
-                if (team == null || !team.Contributors.ContainsKey(command.Actor.Identifier))
-                {
-                    e(T.Get("apps.transfer.teamNotFound"));
-                }
-
-                if (app.Plan != null)
-                {
-                    e(T.Get("apps.transfer.planAssigned"));
-                }
-            });
-        }
-
-        public static void CanChangePlan(ChangePlan command, IAppEntity app, IBillingPlans billingPlans)
-        {
-            Guard.NotNull(command);
-
-            Validate.It(e =>
+                e(Not.Defined(nameof(settings.Editors)), editorsPrefix);
+            }
+            else
             {
-                if (string.IsNullOrWhiteSpace(command.PlanId))
+                settings.Editors.Foreach((editor, index) =>
                 {
-                    e(Not.Defined(nameof(command.PlanId)), nameof(command.PlanId));
-                    return;
-                }
+                    var editorPrefix = $"{editorsPrefix}[{index}]";
 
-                if (billingPlans.GetPlan(command.PlanId) == null)
-                {
-                    e(T.Get("apps.plans.notFound"), nameof(command.PlanId));
-                }
+                    if (string.IsNullOrWhiteSpace(editor.Name))
+                    {
+                        e(Not.Defined(nameof(editor.Name)), $"{editorPrefix}.{nameof(editor.Name)}");
+                    }
 
-                if (app.TeamId != null)
-                {
-                    e(T.Get("apps.plans.assignedToTeam"));
-                }
+                    if (string.IsNullOrWhiteSpace(editor.Url))
+                    {
+                        e(Not.Defined(nameof(editor.Url)), $"{editorPrefix}.{nameof(editor.Url)}");
+                    }
+                });
+            }
+        });
+    }
 
-                var plan = app.Plan;
+    public static Task CanTransfer(TransferToTeam command, IAppEntity app, IAppProvider appProvider, CancellationToken ct)
+    {
+        Guard.NotNull(command);
 
-                if (!string.IsNullOrWhiteSpace(command.PlanId) && plan != null && !plan.Owner.Equals(command.Actor))
-                {
-                    e(T.Get("apps.plans.notPlanOwner"));
-                }
-            });
-        }
+        return Validate.It(async e =>
+        {
+            if (command.TeamId == null)
+            {
+                return;
+            }
+
+            var team = await appProvider.GetTeamAsync(command.TeamId.Value, ct);
+
+            if (team == null || !team.Contributors.ContainsKey(command.Actor.Identifier))
+            {
+                e(T.Get("apps.transfer.teamNotFound"));
+            }
+
+            if (app.Plan != null)
+            {
+                e(T.Get("apps.transfer.planAssigned"));
+            }
+        });
+    }
+
+    public static void CanChangePlan(ChangePlan command, IAppEntity app, IBillingPlans billingPlans)
+    {
+        Guard.NotNull(command);
+
+        Validate.It(e =>
+        {
+            if (string.IsNullOrWhiteSpace(command.PlanId))
+            {
+                e(Not.Defined(nameof(command.PlanId)), nameof(command.PlanId));
+                return;
+            }
+
+            if (billingPlans.GetPlan(command.PlanId) == null)
+            {
+                e(T.Get("apps.plans.notFound"), nameof(command.PlanId));
+            }
+
+            if (app.TeamId != null)
+            {
+                e(T.Get("apps.plans.assignedToTeam"));
+            }
+
+            var plan = app.Plan;
+
+            if (!string.IsNullOrWhiteSpace(command.PlanId) && plan != null && !plan.Owner.Equals(command.Actor))
+            {
+                e(T.Get("apps.plans.notPlanOwner"));
+            }
+        });
     }
 }

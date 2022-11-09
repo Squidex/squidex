@@ -10,170 +10,169 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Log;
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Infrastructure.States;
+
+public class SimpleState<T> where T : class, new()
 {
-    public class SimpleState<T> where T : class, new()
+    private readonly AsyncLock? lockObject;
+    private readonly IPersistence<T> persistence;
+    private bool isLoaded;
+    private Instant lastWrite;
+
+    public T Value { get; set; } = new T();
+
+    public long Version
     {
-        private readonly AsyncLock? lockObject;
-        private readonly IPersistence<T> persistence;
-        private bool isLoaded;
-        private Instant lastWrite;
+        get => persistence.Version;
+    }
 
-        public T Value { get; set; } = new T();
+    public IClock Clock { get; set; } = SystemClock.Instance;
 
-        public long Version
+    public SimpleState(IPersistenceFactory<T> persistenceFactory, Type ownerType, string id, bool lockOperations = false)
+        : this(persistenceFactory, ownerType, DomainId.Create(id), lockOperations)
+    {
+    }
+
+    public SimpleState(IPersistenceFactory<T> persistenceFactory, Type ownerType, DomainId id, bool lockOperations = false)
+    {
+        Guard.NotNull(persistenceFactory);
+
+        persistence = persistenceFactory.WithSnapshots(ownerType, id, (state, version) =>
         {
-            get => persistence.Version;
+            Value = state;
+        });
+
+        if (lockOperations)
+        {
+            lockObject = new AsyncLock();
         }
+    }
 
-        public IClock Clock { get; set; } = SystemClock.Instance;
-
-        public SimpleState(IPersistenceFactory<T> persistenceFactory, Type ownerType, string id, bool lockOperations = false)
-            : this(persistenceFactory, ownerType, DomainId.Create(id), lockOperations)
+    public async Task LoadAsync(
+        CancellationToken ct = default)
+    {
+        using (await LockAsync())
         {
+            await LoadInternalAsync(ct);
         }
+    }
 
-        public SimpleState(IPersistenceFactory<T> persistenceFactory, Type ownerType, DomainId id, bool lockOperations = false)
+    public async Task ClearAsync(
+        CancellationToken ct = default)
+    {
+        using (await LockAsync())
         {
-            Guard.NotNull(persistenceFactory);
+            // Reset state first, in case the deletion fails.
+            Value = new T();
 
-            persistence = persistenceFactory.WithSnapshots(ownerType, id, (state, version) =>
-            {
-                Value = state;
-            });
+            await persistence.DeleteAsync(ct);
+        }
+    }
 
-            if (lockOperations)
+    public async Task WriteAsync(int ifNotWrittenWithinMs,
+        CancellationToken ct = default)
+    {
+        using (await LockAsync())
+        {
+            // Calculate the timestamp once.
+            var now = Clock.GetCurrentInstant();
+
+            if (ifNotWrittenWithinMs > 0 && now.Minus(lastWrite).TotalMilliseconds < ifNotWrittenWithinMs)
             {
-                lockObject = new AsyncLock();
+                return;
             }
-        }
 
-        public async Task LoadAsync(
-            CancellationToken ct = default)
+            await persistence.WriteSnapshotAsync(Value, ct);
+
+            // Only update the last write property if it is successful.
+            lastWrite = now;
+        }
+    }
+
+    public async Task WriteAsync(
+        CancellationToken ct = default)
+    {
+        using (await LockAsync())
         {
-            using (await LockAsync())
+            await persistence.WriteSnapshotAsync(Value, ct);
+
+            // Only update the last write property if it is successful.
+            lastWrite = Clock.GetCurrentInstant();
+        }
+    }
+
+    public async Task WriteEventAsync(Envelope<IEvent> envelope,
+        CancellationToken ct = default)
+    {
+        using (await LockAsync())
+        {
+            await persistence.WriteEventAsync(envelope, ct);
+
+            // Only update the last write property if it is successful.
+            lastWrite = Clock.GetCurrentInstant();
+        }
+    }
+
+    public Task UpdateAsync(Func<T, bool> updater, int retries = 20,
+        CancellationToken ct = default)
+    {
+        return UpdateAsync(state => (updater(state), None.Value), retries, ct);
+    }
+
+    public async Task<TResult> UpdateAsync<TResult>(Func<T, (bool, TResult)> updater, int retries = 20,
+        CancellationToken ct = default)
+    {
+        Guard.GreaterEquals(retries, 1);
+        Guard.LessThan(retries, 100);
+
+        using (await LockAsync())
+        {
+            // Ensure that the state is loaded before we make the update.
+            if (!isLoaded)
             {
                 await LoadInternalAsync(ct);
             }
-        }
 
-        public async Task ClearAsync(
-            CancellationToken ct = default)
-        {
-            using (await LockAsync())
+            for (var i = 0; i < retries; i++)
             {
-                // Reset state first, in case the deletion fails.
-                Value = new T();
-
-                await persistence.DeleteAsync(ct);
-            }
-        }
-
-        public async Task WriteAsync(int ifNotWrittenWithinMs,
-            CancellationToken ct = default)
-        {
-            using (await LockAsync())
-            {
-                // Calculate the timestamp once.
-                var now = Clock.GetCurrentInstant();
-
-                if (ifNotWrittenWithinMs > 0 && now.Minus(lastWrite).TotalMilliseconds < ifNotWrittenWithinMs)
+                try
                 {
-                    return;
+                    var (isChanged, result) = updater(Value);
+
+                    // If nothing has been changed, we can avoid the call to the database.
+                    if (!isChanged)
+                    {
+                        return result;
+                    }
+
+                    await WriteAsync(ct);
+                    return result;
                 }
-
-                await persistence.WriteSnapshotAsync(Value, ct);
-
-                // Only update the last write property if it is successful.
-                lastWrite = now;
-            }
-        }
-
-        public async Task WriteAsync(
-            CancellationToken ct = default)
-        {
-            using (await LockAsync())
-            {
-                await persistence.WriteSnapshotAsync(Value, ct);
-
-                // Only update the last write property if it is successful.
-                lastWrite = Clock.GetCurrentInstant();
-            }
-        }
-
-        public async Task WriteEventAsync(Envelope<IEvent> envelope,
-            CancellationToken ct = default)
-        {
-            using (await LockAsync())
-            {
-                await persistence.WriteEventAsync(envelope, ct);
-
-                // Only update the last write property if it is successful.
-                lastWrite = Clock.GetCurrentInstant();
-            }
-        }
-
-        public Task UpdateAsync(Func<T, bool> updater, int retries = 20,
-            CancellationToken ct = default)
-        {
-            return UpdateAsync(state => (updater(state), None.Value), retries, ct);
-        }
-
-        public async Task<TResult> UpdateAsync<TResult>(Func<T, (bool, TResult)> updater, int retries = 20,
-            CancellationToken ct = default)
-        {
-            Guard.GreaterEquals(retries, 1);
-            Guard.LessThan(retries, 100);
-
-            using (await LockAsync())
-            {
-                // Ensure that the state is loaded before we make the update.
-                if (!isLoaded)
+                catch (InconsistentStateException) when (i < retries - 1)
                 {
                     await LoadInternalAsync(ct);
                 }
-
-                for (var i = 0; i < retries; i++)
-                {
-                    try
-                    {
-                        var (isChanged, result) = updater(Value);
-
-                        // If nothing has been changed, we can avoid the call to the database.
-                        if (!isChanged)
-                        {
-                            return result;
-                        }
-
-                        await WriteAsync(ct);
-                        return result;
-                    }
-                    catch (InconsistentStateException) when (i < retries - 1)
-                    {
-                        await LoadInternalAsync(ct);
-                    }
-                }
-
-                return default!;
-            }
-        }
-
-        private async Task LoadInternalAsync(
-            CancellationToken ct = default)
-        {
-            await persistence.ReadAsync(ct: ct);
-
-            isLoaded = true;
-        }
-
-        private Task<IDisposable> LockAsync()
-        {
-            if (lockObject != null)
-            {
-                return lockObject.EnterAsync();
             }
 
-            return Task.FromResult<IDisposable>(NoopDisposable.Instance);
+            return default!;
         }
+    }
+
+    private async Task LoadInternalAsync(
+        CancellationToken ct = default)
+    {
+        await persistence.ReadAsync(ct: ct);
+
+        isLoaded = true;
+    }
+
+    private Task<IDisposable> LockAsync()
+    {
+        if (lockObject != null)
+        {
+            return lockObject.EnterAsync();
+        }
+
+        return Task.FromResult<IDisposable>(NoopDisposable.Instance);
     }
 }

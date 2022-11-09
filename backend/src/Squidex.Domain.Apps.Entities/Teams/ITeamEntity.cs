@@ -7,18 +7,17 @@
 
 using Squidex.Domain.Apps.Core;
 
-namespace Squidex.Domain.Apps.Entities.Teams
+namespace Squidex.Domain.Apps.Entities.Teams;
+
+public interface ITeamEntity :
+    IEntity,
+    IEntityWithCreatedBy,
+    IEntityWithLastModifiedBy,
+    IEntityWithVersion
 {
-    public interface ITeamEntity :
-        IEntity,
-        IEntityWithCreatedBy,
-        IEntityWithLastModifiedBy,
-        IEntityWithVersion
-    {
-        string Name { get; }
+    string Name { get; }
 
-        Contributors Contributors { get; }
+    Contributors Contributors { get; }
 
-        AssignedPlan? Plan { get; }
-    }
+    AssignedPlan? Plan { get; }
 }

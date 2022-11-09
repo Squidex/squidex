@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas;
+
+public abstract class FieldEvent : ParentFieldEvent
 {
-    public abstract class FieldEvent : ParentFieldEvent
-    {
-        public NamedId<long> FieldId { get; set; }
-    }
+    public NamedId<long> FieldId { get; set; }
 }

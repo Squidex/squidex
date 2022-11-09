@@ -7,152 +7,151 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Contents
+namespace Squidex.Domain.Apps.Core.Contents;
+
+public sealed class ContentData : Dictionary<string, ContentFieldData?>, IEquatable<ContentData>
 {
-    public sealed class ContentData : Dictionary<string, ContentFieldData?>, IEquatable<ContentData>
+    public ContentData()
+        : base(StringComparer.Ordinal)
     {
-        public ContentData()
-            : base(StringComparer.Ordinal)
+    }
+
+    public ContentData(ContentData source)
+        : base(source, StringComparer.Ordinal)
+    {
+    }
+
+    public ContentData(int capacity)
+        : base(capacity, StringComparer.Ordinal)
+    {
+    }
+
+    public ContentData AddField(string name, ContentFieldData? data)
+    {
+        Guard.NotNullOrEmpty(name);
+
+        this[name] = data;
+
+        return this;
+    }
+
+    public ContentData UseSameFields(ContentData? other)
+    {
+        if (other == null || other.Count == 0)
         {
-        }
-
-        public ContentData(ContentData source)
-            : base(source, StringComparer.Ordinal)
-        {
-        }
-
-        public ContentData(int capacity)
-            : base(capacity, StringComparer.Ordinal)
-        {
-        }
-
-        public ContentData AddField(string name, ContentFieldData? data)
-        {
-            Guard.NotNullOrEmpty(name);
-
-            this[name] = data;
-
             return this;
         }
 
-        public ContentData UseSameFields(ContentData? other)
+        foreach (var (fieldName, fieldData) in this.ToList())
         {
-            if (other == null || other.Count == 0)
+            if (fieldData == null)
             {
-                return this;
+                continue;
             }
 
-            foreach (var (fieldName, fieldData) in this.ToList())
+            if (!other.TryGetValue(fieldName, out var otherField) || otherField == null)
             {
-                if (fieldData == null)
-                {
-                    continue;
-                }
-
-                if (!other.TryGetValue(fieldName, out var otherField) || otherField == null)
-                {
-                    continue;
-                }
-
-                if (otherField.Equals(fieldData))
-                {
-                    this[fieldName] = otherField;
-                }
-                else
-                {
-                    foreach (var (language, value) in fieldData.ToList())
-                    {
-                        if (!otherField.TryGetValue(language, out var otherValue))
-                        {
-                            continue;
-                        }
-
-                        if (otherValue.Equals(value))
-                        {
-                            fieldData[language] = otherValue;
-                        }
-                    }
-                }
+                continue;
             }
 
-            return this;
-        }
-
-        private static ContentData MergeTo(ContentData target, params ContentData[] sources)
-        {
-            Guard.NotEmpty(sources);
-
-            if (sources.Length == 1 || sources.Skip(1).All(x => ReferenceEquals(x, sources[0])))
+            if (otherField.Equals(fieldData))
             {
-                return sources[0];
+                this[fieldName] = otherField;
             }
-
-            foreach (var source in sources)
+            else
             {
-                foreach (var (fieldName, sourceFieldData) in source)
+                foreach (var (language, value) in fieldData.ToList())
                 {
-                    if (sourceFieldData == null)
+                    if (!otherField.TryGetValue(language, out var otherValue))
                     {
                         continue;
                     }
 
-                    var targetFieldData = target.GetOrAdd(fieldName, _ => new ContentFieldData());
-
-                    if (targetFieldData == null)
+                    if (otherValue.Equals(value))
                     {
-                        continue;
-                    }
-
-                    foreach (var (partition, value) in sourceFieldData)
-                    {
-                        targetFieldData[partition] = value;
+                        fieldData[language] = otherValue;
                     }
                 }
             }
-
-            return target;
         }
 
-        public static ContentData Merge(params ContentData[] contents)
+        return this;
+    }
+
+    private static ContentData MergeTo(ContentData target, params ContentData[] sources)
+    {
+        Guard.NotEmpty(sources);
+
+        if (sources.Length == 1 || sources.Skip(1).All(x => ReferenceEquals(x, sources[0])))
         {
-            return MergeTo(new ContentData(), contents);
+            return sources[0];
         }
 
-        public ContentData MergeInto(ContentData target)
+        foreach (var source in sources)
         {
-            return Merge(target, this);
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return Equals(obj as ContentData);
-        }
-
-        public bool Equals(ContentData? other)
-        {
-            return other != null && (ReferenceEquals(this, other) || this.EqualsDictionary(other));
-        }
-
-        public override int GetHashCode()
-        {
-            return this.DictionaryHashCode();
-        }
-
-        public override string ToString()
-        {
-            return $"{{{string.Join(", ", this.Select(x => $"\"{x.Key}\":{x.Value}"))}}}";
-        }
-
-        public ContentData Clone()
-        {
-            var clone = new ContentData(Count);
-
-            foreach (var (key, value) in this)
+            foreach (var (fieldName, sourceFieldData) in source)
             {
-                clone[key] = value?.Clone()!;
-            }
+                if (sourceFieldData == null)
+                {
+                    continue;
+                }
 
-            return clone;
+                var targetFieldData = target.GetOrAdd(fieldName, _ => new ContentFieldData());
+
+                if (targetFieldData == null)
+                {
+                    continue;
+                }
+
+                foreach (var (partition, value) in sourceFieldData)
+                {
+                    targetFieldData[partition] = value;
+                }
+            }
         }
+
+        return target;
+    }
+
+    public static ContentData Merge(params ContentData[] contents)
+    {
+        return MergeTo(new ContentData(), contents);
+    }
+
+    public ContentData MergeInto(ContentData target)
+    {
+        return Merge(target, this);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as ContentData);
+    }
+
+    public bool Equals(ContentData? other)
+    {
+        return other != null && (ReferenceEquals(this, other) || this.EqualsDictionary(other));
+    }
+
+    public override int GetHashCode()
+    {
+        return this.DictionaryHashCode();
+    }
+
+    public override string ToString()
+    {
+        return $"{{{string.Join(", ", this.Select(x => $"\"{x.Key}\":{x.Value}"))}}}";
+    }
+
+    public ContentData Clone()
+    {
+        var clone = new ContentData(Count);
+
+        foreach (var (key, value) in this)
+        {
+            clone[key] = value?.Clone()!;
+        }
+
+        return clone;
     }
 }

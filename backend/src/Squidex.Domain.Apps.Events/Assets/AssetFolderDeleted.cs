@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Assets
+namespace Squidex.Domain.Apps.Events.Assets;
+
+[EventType(nameof(AssetFolderDeleted))]
+public sealed class AssetFolderDeleted : AssetFolderEvent
 {
-    [EventType(nameof(AssetFolderDeleted))]
-    public sealed class AssetFolderDeleted : AssetFolderEvent
-    {
-    }
 }

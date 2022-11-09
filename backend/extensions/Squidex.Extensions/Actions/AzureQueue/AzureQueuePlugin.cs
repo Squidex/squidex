@@ -9,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.AzureQueue
+namespace Squidex.Extensions.Actions.AzureQueue;
+
+public sealed class AzureQueuePlugin : IPlugin
 {
-    public sealed class AzureQueuePlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddRuleAction<AzureQueueAction, AzureQueueActionHandler>();
-        }
+        services.AddRuleAction<AzureQueueAction, AzureQueueActionHandler>();
     }
 }

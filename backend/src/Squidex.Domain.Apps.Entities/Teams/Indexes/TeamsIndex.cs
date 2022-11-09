@@ -8,42 +8,41 @@
 using Squidex.Domain.Apps.Entities.Teams.Repositories;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Teams.Indexes
+namespace Squidex.Domain.Apps.Entities.Teams.Indexes;
+
+public sealed class TeamsIndex : ITeamsIndex
 {
-    public sealed class TeamsIndex : ITeamsIndex
+    private readonly ITeamRepository teamRepository;
+
+    public TeamsIndex(ITeamRepository teamRepository)
     {
-        private readonly ITeamRepository teamRepository;
+        this.teamRepository = teamRepository;
+    }
 
-        public TeamsIndex(ITeamRepository teamRepository)
+    public async Task<ITeamEntity?> GetTeamAsync(DomainId id,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("TeamsIndex/GetTeamAsync"))
         {
-            this.teamRepository = teamRepository;
-        }
+            var team = await teamRepository.FindAsync(id, ct);
 
-        public async Task<ITeamEntity?> GetTeamAsync(DomainId id,
-            CancellationToken ct = default)
+            return IsValid(team) ? team : null;
+        }
+    }
+
+    public async Task<List<ITeamEntity>> GetTeamsAsync(string userId,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("TeamsIndex/GetTeamsAsync"))
         {
-            using (Telemetry.Activities.StartActivity("TeamsIndex/GetTeamAsync"))
-            {
-                var team = await teamRepository.FindAsync(id, ct);
+            var teams = await teamRepository.QueryAllAsync(userId, ct);
 
-                return IsValid(team) ? team : null;
-            }
+            return teams.Where(IsValid).ToList();
         }
+    }
 
-        public async Task<List<ITeamEntity>> GetTeamsAsync(string userId,
-            CancellationToken ct = default)
-        {
-            using (Telemetry.Activities.StartActivity("TeamsIndex/GetTeamsAsync"))
-            {
-                var teams = await teamRepository.QueryAllAsync(userId, ct);
-
-                return teams.Where(IsValid).ToList();
-            }
-        }
-
-        private static bool IsValid(ITeamEntity? rule)
-        {
-            return rule is { Version: > EtagVersion.Empty };
-        }
+    private static bool IsValid(ITeamEntity? rule)
+    {
+        return rule is { Version: > EtagVersion.Empty };
     }
 }

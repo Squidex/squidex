@@ -10,96 +10,95 @@ using Squidex.Infrastructure.Validation;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Infrastructure.Queries.Json
+namespace Squidex.Infrastructure.Queries.Json;
+
+public sealed class JsonFilterVisitor : FilterNodeVisitor<FilterNode<ClrValue>, JsonValue, JsonFilterVisitor.Args>
 {
-    public sealed class JsonFilterVisitor : FilterNodeVisitor<FilterNode<ClrValue>, JsonValue, JsonFilterVisitor.Args>
+    private static readonly JsonFilterVisitor Instance = new JsonFilterVisitor();
+
+    public record struct Args(QueryModel Model, List<string> Errors);
+
+    private JsonFilterVisitor()
     {
-        private static readonly JsonFilterVisitor Instance = new JsonFilterVisitor();
+    }
 
-        public record struct Args(QueryModel Model, List<string> Errors);
+    public static FilterNode<ClrValue>? Parse(FilterNode<JsonValue> filter, QueryModel model, List<string> errors)
+    {
+        var args = new Args(model, errors);
 
-        private JsonFilterVisitor()
+        var parsed = filter.Accept(Instance, args);
+
+        if (errors.Count > 0)
         {
+            return null;
         }
-
-        public static FilterNode<ClrValue>? Parse(FilterNode<JsonValue> filter, QueryModel model, List<string> errors)
+        else
         {
-            var args = new Args(model, errors);
+            return parsed;
+        }
+    }
 
-            var parsed = filter.Accept(Instance, args);
+    public override FilterNode<ClrValue> Visit(NegateFilter<JsonValue> nodeIn, Args args)
+    {
+        return new NegateFilter<ClrValue>(nodeIn.Accept(this, args));
+    }
 
-            if (errors.Count > 0)
+    public override FilterNode<ClrValue> Visit(LogicalFilter<JsonValue> nodeIn, Args args)
+    {
+        return new LogicalFilter<ClrValue>(nodeIn.Type, nodeIn.Filters.Select(x => x.Accept(this, args)).ToList());
+    }
+
+    public override FilterNode<ClrValue> Visit(CompareFilter<JsonValue> nodeIn, Args args)
+    {
+        var fieldMatches = nodeIn.Path.GetMatchingFields(args.Model.Schema, args.Errors);
+        var fieldErrors = new List<string>();
+
+        foreach (var field in fieldMatches)
+        {
+            fieldErrors.Clear();
+
+            var isValidOperator = args.Model.Operators.TryGetValue(field.Schema.Type, out var operators) && operators.Contains(nodeIn.Operator);
+
+            if (!isValidOperator)
             {
-                return null;
+                fieldErrors.Add(Errors.InvalidOperator(nodeIn.Operator, field.Schema.Type, nodeIn.Path));
             }
-            else
+
+            var value = ValueConverter.Convert(field, nodeIn.Value, nodeIn.Path, fieldErrors);
+
+            if (value != null && isValidOperator)
             {
-                return parsed;
-            }
-        }
-
-        public override FilterNode<ClrValue> Visit(NegateFilter<JsonValue> nodeIn, Args args)
-        {
-            return new NegateFilter<ClrValue>(nodeIn.Accept(this, args));
-        }
-
-        public override FilterNode<ClrValue> Visit(LogicalFilter<JsonValue> nodeIn, Args args)
-        {
-            return new LogicalFilter<ClrValue>(nodeIn.Type, nodeIn.Filters.Select(x => x.Accept(this, args)).ToList());
-        }
-
-        public override FilterNode<ClrValue> Visit(CompareFilter<JsonValue> nodeIn, Args args)
-        {
-            var fieldMatches = nodeIn.Path.GetMatchingFields(args.Model.Schema, args.Errors);
-            var fieldErrors = new List<string>();
-
-            foreach (var field in fieldMatches)
-            {
-                fieldErrors.Clear();
-
-                var isValidOperator = args.Model.Operators.TryGetValue(field.Schema.Type, out var operators) && operators.Contains(nodeIn.Operator);
-
-                if (!isValidOperator)
+                if (nodeIn.Operator == CompareOperator.In)
                 {
-                    fieldErrors.Add(Errors.InvalidOperator(nodeIn.Operator, field.Schema.Type, nodeIn.Path));
+                    if (!value.IsList)
+                    {
+                        value = value.ToList();
+                    }
                 }
-
-                var value = ValueConverter.Convert(field, nodeIn.Value, nodeIn.Path, fieldErrors);
-
-                if (value != null && isValidOperator)
+                else
                 {
-                    if (nodeIn.Operator == CompareOperator.In)
+                    if (value.IsList)
                     {
-                        if (!value.IsList)
-                        {
-                            value = value.ToList();
-                        }
-                    }
-                    else
-                    {
-                        if (value.IsList)
-                        {
-                            fieldErrors.Add(Errors.InvalidArray(nodeIn.Operator, nodeIn.Path));
-                        }
-                    }
-
-                    if (nodeIn.Operator == CompareOperator.Matchs && value.Value?.ToString()?.IsValidRegex() != true)
-                    {
-                        fieldErrors.Add(Errors.InvalidRegex(value.ToString(), nodeIn.Path));
+                        fieldErrors.Add(Errors.InvalidArray(nodeIn.Operator, nodeIn.Path));
                     }
                 }
 
-                if (args.Errors.Count == 0 && fieldErrors.Count == 0 && value != null)
+                if (nodeIn.Operator == CompareOperator.Matchs && value.Value?.ToString()?.IsValidRegex() != true)
                 {
-                    return new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, value);
-                }
-                else if (field == fieldMatches.Last())
-                {
-                    args.Errors.AddRange(fieldErrors);
+                    fieldErrors.Add(Errors.InvalidRegex(value.ToString(), nodeIn.Path));
                 }
             }
 
-            return new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, ClrValue.Null);
+            if (args.Errors.Count == 0 && fieldErrors.Count == 0 && value != null)
+            {
+                return new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, value);
+            }
+            else if (field == fieldMatches.Last())
+            {
+                args.Errors.AddRange(fieldErrors);
+            }
         }
+
+        return new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, ClrValue.Null);
     }
 }

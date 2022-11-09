@@ -10,55 +10,54 @@ using Squidex.Assets;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public class DefaultBackupArchiveStoreTests
 {
-    public class DefaultBackupArchiveStoreTests
+    private readonly CancellationTokenSource cts = new CancellationTokenSource();
+    private readonly CancellationToken ct;
+    private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
+    private readonly DomainId backupId = DomainId.NewGuid();
+    private readonly string fileName;
+    private readonly DefaultBackupArchiveStore sut;
+
+    public DefaultBackupArchiveStoreTests()
     {
-        private readonly CancellationTokenSource cts = new CancellationTokenSource();
-        private readonly CancellationToken ct;
-        private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
-        private readonly DomainId backupId = DomainId.NewGuid();
-        private readonly string fileName;
-        private readonly DefaultBackupArchiveStore sut;
+        ct = cts.Token;
 
-        public DefaultBackupArchiveStoreTests()
-        {
-            ct = cts.Token;
+        fileName = $"{backupId}_0";
 
-            fileName = $"{backupId}_0";
+        sut = new DefaultBackupArchiveStore(assetStore);
+    }
 
-            sut = new DefaultBackupArchiveStore(assetStore);
-        }
+    [Fact]
+    public async Task Should_invoke_asset_store_to_upload_archive_using_suffix_for_compatibility()
+    {
+        var stream = new MemoryStream();
 
-        [Fact]
-        public async Task Should_invoke_asset_store_to_upload_archive_using_suffix_for_compatibility()
-        {
-            var stream = new MemoryStream();
+        await sut.UploadAsync(backupId, stream, ct);
 
-            await sut.UploadAsync(backupId, stream, ct);
+        A.CallTo(() => assetStore.UploadAsync(fileName, stream, true, ct))
+            .MustHaveHappened();
+    }
 
-            A.CallTo(() => assetStore.UploadAsync(fileName, stream, true, ct))
-                .MustHaveHappened();
-        }
+    [Fact]
+    public async Task Should_invoke_asset_store_to_download_archive_using_suffix_for_compatibility()
+    {
+        var stream = new MemoryStream();
 
-        [Fact]
-        public async Task Should_invoke_asset_store_to_download_archive_using_suffix_for_compatibility()
-        {
-            var stream = new MemoryStream();
+        await sut.DownloadAsync(backupId, stream, ct);
 
-            await sut.DownloadAsync(backupId, stream, ct);
+        A.CallTo(() => assetStore.DownloadAsync(fileName, stream, default, ct))
+            .MustHaveHappened();
+    }
 
-            A.CallTo(() => assetStore.DownloadAsync(fileName, stream, default, ct))
-                .MustHaveHappened();
-        }
+    [Fact]
+    public async Task Should_invoke_asset_store_to_delete_archive_using_suffix_for_compatibility()
+    {
+        await sut.DeleteAsync(backupId, ct);
 
-        [Fact]
-        public async Task Should_invoke_asset_store_to_delete_archive_using_suffix_for_compatibility()
-        {
-            await sut.DeleteAsync(backupId, ct);
-
-            A.CallTo(() => assetStore.DeleteAsync(fileName, ct))
-                .MustHaveHappened();
-        }
+        A.CallTo(() => assetStore.DeleteAsync(fileName, ct))
+            .MustHaveHappened();
     }
 }

@@ -12,34 +12,33 @@ using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 using AppContributorAssignedV2 = Squidex.Domain.Apps.Events.Apps.AppContributorAssigned;
 
-namespace Migrations.OldEvents
+namespace Migrations.OldEvents;
+
+[EventType(nameof(AppContributorAssigned))]
+[Obsolete("New Event introduced")]
+public sealed class AppContributorAssigned : AppEvent, IMigrated<IEvent>
 {
-    [EventType(nameof(AppContributorAssigned))]
-    [Obsolete("New Event introduced")]
-    public sealed class AppContributorAssigned : AppEvent, IMigrated<IEvent>
+    public string ContributorId { get; set; }
+
+    public AppContributorPermission Permission { get; set; }
+
+    public IEvent Migrate()
     {
-        public string ContributorId { get; set; }
+        var result = SimpleMapper.Map(this, new AppContributorAssignedV2());
 
-        public AppContributorPermission Permission { get; set; }
-
-        public IEvent Migrate()
+        switch (Permission)
         {
-            var result = SimpleMapper.Map(this, new AppContributorAssignedV2());
-
-            switch (Permission)
-            {
-                case AppContributorPermission.Owner:
-                    result.Role = Role.Owner;
-                    break;
-                case AppContributorPermission.Developer:
-                    result.Role = Role.Developer;
-                    break;
-                case AppContributorPermission.Editor:
-                    result.Role = Role.Editor;
-                    break;
-            }
-
-            return result;
+            case AppContributorPermission.Owner:
+                result.Role = Role.Owner;
+                break;
+            case AppContributorPermission.Developer:
+                result.Role = Role.Developer;
+                break;
+            case AppContributorPermission.Editor:
+                result.Role = Role.Editor;
+                break;
         }
+
+        return result;
     }
 }

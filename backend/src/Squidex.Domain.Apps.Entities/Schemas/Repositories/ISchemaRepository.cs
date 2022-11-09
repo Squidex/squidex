@@ -7,17 +7,16 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Repositories
+namespace Squidex.Domain.Apps.Entities.Schemas.Repositories;
+
+public interface ISchemaRepository
 {
-    public interface ISchemaRepository
-    {
-        Task<List<ISchemaEntity>> QueryAllAsync(DomainId appId,
-            CancellationToken ct = default);
+    Task<List<ISchemaEntity>> QueryAllAsync(DomainId appId,
+        CancellationToken ct = default);
 
-        Task<ISchemaEntity?> FindAsync(DomainId appId, DomainId id,
-            CancellationToken ct = default);
+    Task<ISchemaEntity?> FindAsync(DomainId appId, DomainId id,
+        CancellationToken ct = default);
 
-        Task<ISchemaEntity?> FindAsync(DomainId appId, string name,
-            CancellationToken ct = default);
-    }
+    Task<ISchemaEntity?> FindAsync(DomainId appId, string name,
+        CancellationToken ct = default);
 }

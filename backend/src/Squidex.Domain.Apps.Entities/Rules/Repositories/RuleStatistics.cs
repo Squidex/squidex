@@ -8,18 +8,17 @@
 using NodaTime;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Rules.Repositories
+namespace Squidex.Domain.Apps.Entities.Rules.Repositories;
+
+public sealed class RuleStatistics
 {
-    public sealed class RuleStatistics
-    {
-        public DomainId AppId { get; set; }
+    public DomainId AppId { get; set; }
 
-        public DomainId RuleId { get; set; }
+    public DomainId RuleId { get; set; }
 
-        public int NumSucceeded { get; set; }
+    public int NumSucceeded { get; set; }
 
-        public int NumFailed { get; set; }
+    public int NumFailed { get; set; }
 
-        public Instant? LastExecuted { get; set; }
-    }
+    public Instant? LastExecuted { get; set; }
 }

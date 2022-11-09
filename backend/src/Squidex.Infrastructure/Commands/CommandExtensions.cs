@@ -7,28 +7,27 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public static class CommandExtensions
 {
-    public static class CommandExtensions
+    private static readonly NextDelegate End = (c, ct) => Task.CompletedTask;
+
+    public static Task HandleAsync(this ICommandMiddleware commandMiddleware, CommandContext context,
+        CancellationToken ct)
     {
-        private static readonly NextDelegate End = (c, ct) => Task.CompletedTask;
+        return commandMiddleware.HandleAsync(context, End, ct);
+    }
 
-        public static Task HandleAsync(this ICommandMiddleware commandMiddleware, CommandContext context,
-            CancellationToken ct)
+    public static Envelope<IEvent> Migrate<T>(this Envelope<IEvent> @event, T snapshot)
+    {
+        if (@event.Payload is IMigratedStateEvent<T> migratable)
         {
-            return commandMiddleware.HandleAsync(context, End, ct);
+            var payload = migratable.Migrate(snapshot);
+
+            @event = new Envelope<IEvent>(payload, @event.Headers);
         }
 
-        public static Envelope<IEvent> Migrate<T>(this Envelope<IEvent> @event, T snapshot)
-        {
-            if (@event.Payload is IMigratedStateEvent<T> migratable)
-            {
-                var payload = migratable.Migrate(snapshot);
-
-                @event = new Envelope<IEvent>(payload, @event.Headers);
-            }
-
-            return @event;
-        }
+        return @event;
     }
 }

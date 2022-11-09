@@ -9,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.Typesense
+namespace Squidex.Extensions.Actions.Typesense;
+
+public sealed class TypesensePlugin : IPlugin
 {
-    public sealed class TypesensePlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddRuleAction<TypesenseAction, TypesenseActionHandler>();
-        }
+        services.AddRuleAction<TypesenseAction, TypesenseActionHandler>();
     }
 }

@@ -9,18 +9,17 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
-{
-    public class CommentRuleTriggerDto : RuleTriggerDto
-    {
-        /// <summary>
-        /// Javascript condition when to trigger.
-        /// </summary>
-        public string? Condition { get; set; }
+namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers;
 
-        public override RuleTrigger ToTrigger()
-        {
-            return SimpleMapper.Map(this, new CommentTrigger());
-        }
+public class CommentRuleTriggerDto : RuleTriggerDto
+{
+    /// <summary>
+    /// Javascript condition when to trigger.
+    /// </summary>
+    public string? Condition { get; set; }
+
+    public override RuleTrigger ToTrigger()
+    {
+        return SimpleMapper.Map(this, new CommentTrigger());
     }
 }

@@ -7,37 +7,36 @@
 
 using Squidex.Translator.State;
 
-namespace Squidex.Translator.Processes
+namespace Squidex.Translator.Processes;
+
+public sealed class GenerateFrontendResources
 {
-    public sealed class GenerateFrontendResources
+    private readonly TranslationService service;
+    private readonly DirectoryInfo folder;
+
+    public GenerateFrontendResources(DirectoryInfo folder, TranslationService service)
     {
-        private readonly TranslationService service;
-        private readonly DirectoryInfo folder;
+        this.folder = new DirectoryInfo(Path.Combine(folder.FullName, "backend", "i18n"));
 
-        public GenerateFrontendResources(DirectoryInfo folder, TranslationService service)
+        this.service = service;
+    }
+
+    public void Run()
+    {
+        foreach (var locale in service.SupportedLocales)
         {
-            this.folder = new DirectoryInfo(Path.Combine(folder.FullName, "backend", "i18n"));
+            var fullName = Path.Combine(folder.FullName, $"frontend_{locale}.json");
 
-            this.service = service;
-        }
-
-        public void Run()
-        {
-            foreach (var locale in service.SupportedLocales)
+            if (!folder.Exists)
             {
-                var fullName = Path.Combine(folder.FullName, $"frontend_{locale}.json");
-
-                if (!folder.Exists)
-                {
-                    Directory.CreateDirectory(folder.FullName);
-                }
-
-                var texts = service.GetTextsWithFallback(locale);
-
-                service.WriteTo(texts, fullName);
+                Directory.CreateDirectory(folder.FullName);
             }
 
-            service.Save();
+            var texts = service.GetTextsWithFallback(locale);
+
+            service.WriteTo(texts, fullName);
         }
+
+        service.Save();
     }
 }

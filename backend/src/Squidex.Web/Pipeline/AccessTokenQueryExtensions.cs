@@ -7,13 +7,12 @@
 
 using Microsoft.AspNetCore.Builder;
 
-namespace Squidex.Web.Pipeline
+namespace Squidex.Web.Pipeline;
+
+public static class AccessTokenQueryExtensions
 {
-    public static class AccessTokenQueryExtensions
+    public static void UseAccessTokenQueryString(this IApplicationBuilder app)
     {
-        public static void UseAccessTokenQueryString(this IApplicationBuilder app)
-        {
-            app.UseMiddleware<AccessTokenQueryMiddleware>();
-        }
+        app.UseMiddleware<AccessTokenQueryMiddleware>();
     }
 }

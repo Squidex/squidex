@@ -9,20 +9,19 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Apps
+namespace Squidex.Domain.Apps.Core.Apps;
+
+public sealed record AppClient(string Name, string Secret)
 {
-    public sealed record AppClient(string Name, string Secret)
-    {
-        public string Name { get; init; } = Guard.NotNullOrEmpty(Name);
+    public string Name { get; init; } = Guard.NotNullOrEmpty(Name);
 
-        public string Secret { get; } = Guard.NotNullOrEmpty(Secret);
+    public string Secret { get; } = Guard.NotNullOrEmpty(Secret);
 
-        public string Role { get; init; } = "Editor";
+    public string Role { get; init; } = "Editor";
 
-        public long ApiCallsLimit { get; init; }
+    public long ApiCallsLimit { get; init; }
 
-        public long ApiTrafficLimit { get; init; }
+    public long ApiTrafficLimit { get; init; }
 
-        public bool AllowAnonymous { get; init; }
-    }
+    public bool AllowAnonymous { get; init; }
 }

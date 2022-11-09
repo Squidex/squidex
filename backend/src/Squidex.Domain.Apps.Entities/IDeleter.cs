@@ -8,19 +8,18 @@
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities;
+
+public interface IDeleter
 {
-    public interface IDeleter
+    int Order => 0;
+
+    Task DeleteAppAsync(IAppEntity app,
+        CancellationToken ct);
+
+    Task DeleteContributorAsync(DomainId appId, string contributorId,
+        CancellationToken ct)
     {
-        int Order => 0;
-
-        Task DeleteAppAsync(IAppEntity app,
-            CancellationToken ct);
-
-        Task DeleteContributorAsync(DomainId appId, string contributorId,
-            CancellationToken ct)
-        {
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
     }
 }

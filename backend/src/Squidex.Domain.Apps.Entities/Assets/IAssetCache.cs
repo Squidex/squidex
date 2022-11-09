@@ -8,9 +8,8 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Assets;
+
+public interface IAssetCache : IQueryCache<DomainId, IEnrichedAssetEntity>
 {
-    public interface IAssetCache : IQueryCache<DomainId, IEnrichedAssetEntity>
-    {
-    }
 }

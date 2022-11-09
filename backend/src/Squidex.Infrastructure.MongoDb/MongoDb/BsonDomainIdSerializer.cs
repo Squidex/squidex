@@ -9,69 +9,68 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 
-namespace Squidex.Infrastructure.MongoDb
+namespace Squidex.Infrastructure.MongoDb;
+
+public sealed class BsonDomainIdSerializer : SerializerBase<DomainId>, IBsonPolymorphicSerializer, IRepresentationConfigurable<BsonDomainIdSerializer>
 {
-    public sealed class BsonDomainIdSerializer : SerializerBase<DomainId>, IBsonPolymorphicSerializer, IRepresentationConfigurable<BsonDomainIdSerializer>
+    public static void Register()
     {
-        public static void Register()
+        try
         {
-            try
-            {
-                BsonSerializer.RegisterSerializer(new BsonDomainIdSerializer());
-            }
-            catch (BsonSerializationException)
-            {
-                return;
-            }
+            BsonSerializer.RegisterSerializer(new BsonDomainIdSerializer());
         }
-
-        public bool IsDiscriminatorCompatibleWithObjectSerializer
+        catch (BsonSerializationException)
         {
-            get => true;
+            return;
         }
+    }
 
-        public BsonType Representation { get; } = BsonType.String;
+    public bool IsDiscriminatorCompatibleWithObjectSerializer
+    {
+        get => true;
+    }
 
-        public override DomainId Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+    public BsonType Representation { get; } = BsonType.String;
+
+    public override DomainId Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+    {
+        switch (context.Reader.CurrentBsonType)
         {
-            switch (context.Reader.CurrentBsonType)
-            {
-                case BsonType.String:
-                    return DomainId.Create(context.Reader.ReadString());
-                case BsonType.Binary:
-                    var binary = context.Reader.ReadBinaryData();
+            case BsonType.String:
+                return DomainId.Create(context.Reader.ReadString());
+            case BsonType.Binary:
+                var binary = context.Reader.ReadBinaryData();
 
-                    if (binary.SubType is BsonBinarySubType.UuidLegacy or BsonBinarySubType.UuidStandard)
-                    {
-                        return DomainId.Create(binary.ToGuid());
-                    }
+                if (binary.SubType is BsonBinarySubType.UuidLegacy or BsonBinarySubType.UuidStandard)
+                {
+                    return DomainId.Create(binary.ToGuid());
+                }
 
-                    return DomainId.Create(binary.ToString());
-                default:
-                    ThrowHelper.NotSupportedException();
-                    return default!;
-            }
-        }
-
-        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, DomainId value)
-        {
-            context.Writer.WriteString(value.ToString());
-        }
-
-        public BsonDomainIdSerializer WithRepresentation(BsonType representation)
-        {
-            if (representation != BsonType.String)
-            {
+                return DomainId.Create(binary.ToString());
+            default:
                 ThrowHelper.NotSupportedException();
                 return default!;
-            }
-
-            return this;
         }
+    }
 
-        IBsonSerializer IRepresentationConfigurable.WithRepresentation(BsonType representation)
+    public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, DomainId value)
+    {
+        context.Writer.WriteString(value.ToString());
+    }
+
+    public BsonDomainIdSerializer WithRepresentation(BsonType representation)
+    {
+        if (representation != BsonType.String)
         {
-            return WithRepresentation(representation);
+            ThrowHelper.NotSupportedException();
+            return default!;
         }
+
+        return this;
+    }
+
+    IBsonSerializer IRepresentationConfigurable.WithRepresentation(BsonType representation)
+    {
+        return WithRepresentation(representation);
     }
 }

@@ -8,12 +8,11 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events
-{
-    public abstract class SquidexEvent : IEvent
-    {
-        public RefToken Actor { get; set; }
+namespace Squidex.Domain.Apps.Events;
 
-        public bool FromRule { get; set; }
-    }
+public abstract class SquidexEvent : IEvent
+{
+    public RefToken Actor { get; set; }
+
+    public bool FromRule { get; set; }
 }

@@ -10,47 +10,46 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Squidex.Infrastructure;
 
-namespace Squidex.Config.Domain
+namespace Squidex.Config.Domain;
+
+public static class TelemetryServices
 {
-    public static class TelemetryServices
+    public static void AddSquidexTelemetry(this IServiceCollection services, IConfiguration config)
     {
-        public static void AddSquidexTelemetry(this IServiceCollection services, IConfiguration config)
+        services.AddOpenTelemetryTracing();
+
+        services.AddSingleton(serviceProvider =>
         {
-            services.AddOpenTelemetryTracing();
+            var builder = Sdk.CreateTracerProviderBuilder();
 
-            services.AddSingleton(serviceProvider =>
+            var serviceName = config.GetValue<string>("logging:name") ?? "Squidex";
+
+            builder.SetResourceBuilder(
+                ResourceBuilder.CreateDefault()
+                    .AddService(serviceName, "Squidex",
+                        typeof(TelemetryServices).Assembly.GetName().Version!.ToString()));
+
+            builder.AddSource("Squidex");
+
+            builder.AddAspNetCoreInstrumentation();
+            builder.AddHttpClientInstrumentation();
+            builder.AddMongoDBInstrumentation();
+
+            var sampling = config.GetValue<double>("logging:otlp:sampling");
+
+            if (sampling > 0 && sampling < 1)
             {
-                var builder = Sdk.CreateTracerProviderBuilder();
+                builder.SetSampler(
+                    new ParentBasedSampler(
+                        new TraceIdRatioBasedSampler(sampling)));
+            }
 
-                var serviceName = config.GetValue<string>("logging:name") ?? "Squidex";
+            foreach (var configurator in serviceProvider.GetRequiredService<IEnumerable<ITelemetryConfigurator>>())
+            {
+                configurator.Configure(builder);
+            }
 
-                builder.SetResourceBuilder(
-                    ResourceBuilder.CreateDefault()
-                        .AddService(serviceName, "Squidex",
-                            typeof(TelemetryServices).Assembly.GetName().Version!.ToString()));
-
-                builder.AddSource("Squidex");
-
-                builder.AddAspNetCoreInstrumentation();
-                builder.AddHttpClientInstrumentation();
-                builder.AddMongoDBInstrumentation();
-
-                var sampling = config.GetValue<double>("logging:otlp:sampling");
-
-                if (sampling > 0 && sampling < 1)
-                {
-                    builder.SetSampler(
-                        new ParentBasedSampler(
-                            new TraceIdRatioBasedSampler(sampling)));
-                }
-
-                foreach (var configurator in serviceProvider.GetRequiredService<IEnumerable<ITelemetryConfigurator>>())
-                {
-                    configurator.Configure(builder);
-                }
-
-                return builder.Build();
-            });
-        }
+            return builder.Build();
+        });
     }
 }

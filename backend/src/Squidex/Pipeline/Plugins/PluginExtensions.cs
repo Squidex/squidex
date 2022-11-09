@@ -14,52 +14,51 @@ using Squidex.Infrastructure.Plugins;
 using Squidex.Log;
 using Squidex.Web;
 
-namespace Squidex.Pipeline.Plugins
+namespace Squidex.Pipeline.Plugins;
+
+public static class PluginExtensions
 {
-    public static class PluginExtensions
+    private static readonly AssemblyName[] SharedAssemblies = new[]
     {
-        private static readonly AssemblyName[] SharedAssemblies = new[]
+        typeof(IPlugin),
+        typeof(SquidexCoreModel),
+        typeof(SquidexCoreOperations),
+        typeof(SquidexEntities),
+        typeof(SquidexEvents),
+        typeof(SquidexInfrastructure),
+        typeof(SquidexWeb)
+    }.Select(x => x.Assembly.GetName()).ToArray();
+
+    public static IMvcBuilder AddSquidexPlugins(this IMvcBuilder mvcBuilder, IConfiguration config)
+    {
+        var pluginManager = new PluginManager();
+
+        var options = config.Get<PluginOptions>();
+
+        if (options.Plugins != null)
         {
-            typeof(IPlugin),
-            typeof(SquidexCoreModel),
-            typeof(SquidexCoreOperations),
-            typeof(SquidexEntities),
-            typeof(SquidexEvents),
-            typeof(SquidexInfrastructure),
-            typeof(SquidexWeb)
-        }.Select(x => x.Assembly.GetName()).ToArray();
-
-        public static IMvcBuilder AddSquidexPlugins(this IMvcBuilder mvcBuilder, IConfiguration config)
-        {
-            var pluginManager = new PluginManager();
-
-            var options = config.Get<PluginOptions>();
-
-            if (options.Plugins != null)
+            foreach (var path in options.Plugins)
             {
-                foreach (var path in options.Plugins)
-                {
-                    var pluginAssembly = pluginManager.Load(path, SharedAssemblies);
+                var pluginAssembly = pluginManager.Load(path, SharedAssemblies);
 
-                    if (pluginAssembly != null)
-                    {
-                        pluginAssembly.AddParts(mvcBuilder);
-                    }
+                if (pluginAssembly != null)
+                {
+                    pluginAssembly.AddParts(mvcBuilder);
                 }
             }
-
-            pluginManager.ConfigureServices(mvcBuilder.Services, config);
-
-            mvcBuilder.Services.AddSingleton(pluginManager);
-
-            return mvcBuilder;
         }
 
-        public static void UsePlugins(this IApplicationBuilder app)
-        {
-            var pluginManager = app.ApplicationServices.GetRequiredService<PluginManager>();
+        pluginManager.ConfigureServices(mvcBuilder.Services, config);
 
-            pluginManager.Log(app.ApplicationServices.GetRequiredService<ISemanticLog>());
-        }
+        mvcBuilder.Services.AddSingleton(pluginManager);
+
+        return mvcBuilder;
+    }
+
+    public static void UsePlugins(this IApplicationBuilder app)
+    {
+        var pluginManager = app.ApplicationServices.GetRequiredService<PluginManager>();
+
+        pluginManager.Log(app.ApplicationServices.GetRequiredService<ISemanticLog>());
     }
 }

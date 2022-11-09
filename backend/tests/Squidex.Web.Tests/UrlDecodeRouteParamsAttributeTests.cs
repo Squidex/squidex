@@ -12,28 +12,27 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Xunit;
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public class UrlDecodeRouteParamsAttributeTests
 {
-    public class UrlDecodeRouteParamsAttributeTests
+    [Fact]
+    public void Should_url_decode_params()
     {
-        [Fact]
-        public void Should_url_decode_params()
+        var sut = new UrlDecodeRouteParamsAttribute();
+
+        var actionContext = new ActionContext(new DefaultHttpContext(), new RouteData(), new ActionDescriptor
         {
-            var sut = new UrlDecodeRouteParamsAttribute();
+            FilterDescriptors = new List<FilterDescriptor>()
+        });
 
-            var actionContext = new ActionContext(new DefaultHttpContext(), new RouteData(), new ActionDescriptor
-            {
-                FilterDescriptors = new List<FilterDescriptor>()
-            });
+        var actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>
+        {
+            ["key"] = "path%2Fto%2Fsomething"
+        }, null!);
 
-            var actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>
-            {
-                ["key"] = "path%2Fto%2Fsomething"
-            }, null!);
+        sut.OnActionExecuting(actionExecutingContext);
 
-            sut.OnActionExecuting(actionExecutingContext);
-
-            Assert.Equal("path/to/something", actionExecutingContext.ActionArguments["key"]);
-        }
+        Assert.Equal("path/to/something", actionExecutingContext.ActionArguments["key"]);
     }
 }

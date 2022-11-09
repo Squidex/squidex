@@ -8,47 +8,46 @@
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
-namespace Squidex.Infrastructure.Json.System
+namespace Squidex.Infrastructure.Json.System;
+
+public class ReadOnlyCollectionTests
 {
-    public class ReadOnlyCollectionTests
+    public sealed class MyClass<T>
     {
-        public sealed class MyClass<T>
-        {
-            public T Values { get; set; }
-        }
+        public T Values { get; set; }
+    }
 
-        [Fact]
-        public void Should_serialize_and_deserialize_dictionary()
+    [Fact]
+    public void Should_serialize_and_deserialize_dictionary()
+    {
+        var source = new MyClass<IReadOnlyDictionary<int, int>>
         {
-            var source = new MyClass<IReadOnlyDictionary<int, int>>
+            Values = new Dictionary<int, int>
             {
-                Values = new Dictionary<int, int>
-                {
-                    [2] = 4,
-                    [3] = 9
-                }
-            };
+                [2] = 4,
+                [3] = 9
+            }
+        };
 
-            var serialized = source.SerializeAndDeserialize();
+        var serialized = source.SerializeAndDeserialize();
 
-            Assert.Equal(2, serialized.Values.Count);
-        }
+        Assert.Equal(2, serialized.Values.Count);
+    }
 
-        [Fact]
-        public void Should_serialize_and_deserialize_list_without_type_name()
+    [Fact]
+    public void Should_serialize_and_deserialize_list_without_type_name()
+    {
+        var source = new MyClass<IReadOnlyList<int>>
         {
-            var source = new MyClass<IReadOnlyList<int>>
+            Values = new List<int>
             {
-                Values = new List<int>
-                {
-                    2,
-                    3
-                }
-            };
+                2,
+                3
+            }
+        };
 
-            var serialized = source.SerializeAndDeserialize();
+        var serialized = source.SerializeAndDeserialize();
 
-            Assert.Equal(2, serialized.Values.Count);
-        }
+        Assert.Equal(2, serialized.Values.Count);
     }
 }

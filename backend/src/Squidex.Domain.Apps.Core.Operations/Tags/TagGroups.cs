@@ -7,15 +7,14 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Tags
-{
-    public static class TagGroups
-    {
-        public const string Assets = "Assets";
+namespace Squidex.Domain.Apps.Core.Tags;
 
-        public static string Schemas(DomainId schemaId)
-        {
-            return $"Schemas_{schemaId}";
-        }
+public static class TagGroups
+{
+    public const string Assets = "Assets";
+
+    public static string Schemas(DomainId schemaId)
+    {
+        return $"Schemas_{schemaId}";
     }
 }

@@ -11,55 +11,54 @@ using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Core.ConvertContent
+namespace Squidex.Domain.Apps.Core.ConvertContent;
+
+public sealed class ExcludeChangedTypes : IContentFieldConverter, IContentValueConverter
 {
-    public sealed class ExcludeChangedTypes : IContentFieldConverter, IContentValueConverter
+    private readonly IJsonSerializer serializer;
+
+    public ExcludeChangedTypes(IJsonSerializer serializer)
     {
-        private readonly IJsonSerializer serializer;
+        this.serializer = serializer;
+    }
 
-        public ExcludeChangedTypes(IJsonSerializer serializer)
+    public ContentFieldData? ConvertField(IRootField field, ContentFieldData source)
+    {
+        foreach (var (_, value) in source)
         {
-            this.serializer = serializer;
+            if (value.Value == default)
+            {
+                continue;
+            }
+
+            if (IsChangedType(field, value))
+            {
+                return null;
+            }
         }
 
-        public ContentFieldData? ConvertField(IRootField field, ContentFieldData source)
+        return source;
+    }
+
+    public (bool Remove, JsonValue) ConvertValue(IField field, JsonValue source, IField? parent)
+    {
+        if (parent == null || source == default)
         {
-            foreach (var (_, value) in source)
-            {
-                if (value.Value == default)
-                {
-                    continue;
-                }
-
-                if (IsChangedType(field, value))
-                {
-                    return null;
-                }
-            }
-
-            return source;
+            return (false, source);
         }
 
-        public (bool Remove, JsonValue) ConvertValue(IField field, JsonValue source, IField? parent)
-        {
-            if (parent == null || source == default)
-            {
-                return (false, source);
-            }
+        return (IsChangedType(field, source), source);
+    }
 
-            return (IsChangedType(field, source), source);
+    private bool IsChangedType(IField field, JsonValue source)
+    {
+        try
+        {
+            return !JsonValueValidator.IsValid(field, source, serializer);
         }
-
-        private bool IsChangedType(IField field, JsonValue source)
+        catch
         {
-            try
-            {
-                return !JsonValueValidator.IsValid(field, source, serializer);
-            }
-            catch
-            {
-                return true;
-            }
+            return true;
         }
     }
 }

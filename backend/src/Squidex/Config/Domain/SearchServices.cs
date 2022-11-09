@@ -7,14 +7,13 @@
 
 using Squidex.Domain.Apps.Entities.Search;
 
-namespace Squidex.Config.Domain
+namespace Squidex.Config.Domain;
+
+public static class SearchServices
 {
-    public static class SearchServices
+    public static void AddSquidexSearch(this IServiceCollection services)
     {
-        public static void AddSquidexSearch(this IServiceCollection services)
-        {
-            services.AddSingletonAs<SearchManager>()
-                .As<ISearchManager>();
-        }
+        services.AddSingletonAs<SearchManager>()
+            .As<ISearchManager>();
     }
 }

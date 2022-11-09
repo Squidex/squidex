@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands
-{
-    public sealed class ChangePlan : AppCommand
-    {
-        public bool FromCallback { get; set; }
+namespace Squidex.Domain.Apps.Entities.Apps.Commands;
 
-        public string PlanId { get; set; }
-    }
+public sealed class ChangePlan : AppCommand
+{
+    public bool FromCallback { get; set; }
+
+    public string PlanId { get; set; }
 }

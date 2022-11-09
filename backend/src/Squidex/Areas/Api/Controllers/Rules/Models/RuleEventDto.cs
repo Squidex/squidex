@@ -13,84 +13,83 @@ using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Rules.Models
+namespace Squidex.Areas.Api.Controllers.Rules.Models;
+
+public sealed class RuleEventDto : Resource
 {
-    public sealed class RuleEventDto : Resource
+    /// <summary>
+    /// The ID of the event.
+    /// </summary>
+    public DomainId Id { get; set; }
+
+    /// <summary>
+    /// The time when the event has been created.
+    /// </summary>
+    public Instant Created { get; set; }
+
+    /// <summary>
+    /// The description.
+    /// </summary>
+    [LocalizedRequired]
+    public string Description { get; set; }
+
+    /// <summary>
+    /// The name of the event.
+    /// </summary>
+    [LocalizedRequired]
+    public string EventName { get; set; }
+
+    /// <summary>
+    /// The last dump.
+    /// </summary>
+    public string? LastDump { get; set; }
+
+    /// <summary>
+    /// The number of calls.
+    /// </summary>
+    public int NumCalls { get; set; }
+
+    /// <summary>
+    /// The next attempt.
+    /// </summary>
+    public Instant? NextAttempt { get; set; }
+
+    /// <summary>
+    /// The result of the event.
+    /// </summary>
+    public RuleResult Result { get; set; }
+
+    /// <summary>
+    /// The result of the job.
+    /// </summary>
+    public RuleJobResult JobResult { get; set; }
+
+    public static RuleEventDto FromDomain(IRuleEventEntity ruleEvent, Resources resources)
     {
-        /// <summary>
-        /// The ID of the event.
-        /// </summary>
-        public DomainId Id { get; set; }
+        var result = new RuleEventDto();
 
-        /// <summary>
-        /// The time when the event has been created.
-        /// </summary>
-        public Instant Created { get; set; }
+        SimpleMapper.Map(ruleEvent, result);
+        SimpleMapper.Map(ruleEvent.Job, result);
 
-        /// <summary>
-        /// The description.
-        /// </summary>
-        [LocalizedRequired]
-        public string Description { get; set; }
+        return result.CreateLinks(resources);
+    }
 
-        /// <summary>
-        /// The name of the event.
-        /// </summary>
-        [LocalizedRequired]
-        public string EventName { get; set; }
+    private RuleEventDto CreateLinks(Resources resources)
+    {
+        var values = new { app = resources.App, id = Id };
 
-        /// <summary>
-        /// The last dump.
-        /// </summary>
-        public string? LastDump { get; set; }
-
-        /// <summary>
-        /// The number of calls.
-        /// </summary>
-        public int NumCalls { get; set; }
-
-        /// <summary>
-        /// The next attempt.
-        /// </summary>
-        public Instant? NextAttempt { get; set; }
-
-        /// <summary>
-        /// The result of the event.
-        /// </summary>
-        public RuleResult Result { get; set; }
-
-        /// <summary>
-        /// The result of the job.
-        /// </summary>
-        public RuleJobResult JobResult { get; set; }
-
-        public static RuleEventDto FromDomain(IRuleEventEntity ruleEvent, Resources resources)
+        if (resources.CanUpdateRuleEvents)
         {
-            var result = new RuleEventDto();
-
-            SimpleMapper.Map(ruleEvent, result);
-            SimpleMapper.Map(ruleEvent.Job, result);
-
-            return result.CreateLinks(resources);
+            AddPutLink("update",
+                resources.Url<RulesController>(x => nameof(x.PutEvent), values));
         }
 
-        private RuleEventDto CreateLinks(Resources resources)
+        if (resources.CanDeleteRuleEvents && NextAttempt != null)
         {
-            var values = new { app = resources.App, id = Id };
-
-            if (resources.CanUpdateRuleEvents)
-            {
-                AddPutLink("update",
-                    resources.Url<RulesController>(x => nameof(x.PutEvent), values));
-            }
-
-            if (resources.CanDeleteRuleEvents && NextAttempt != null)
-            {
-                AddDeleteLink("cancel",
-                    resources.Url<RulesController>(x => nameof(x.DeleteEvent), values));
-            }
-
-            return this;
+            AddDeleteLink("cancel",
+                resources.Url<RulesController>(x => nameof(x.DeleteEvent), values));
         }
+
+        return this;
     }
 }

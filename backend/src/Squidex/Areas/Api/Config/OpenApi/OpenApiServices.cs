@@ -19,139 +19,138 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
 
-namespace Squidex.Areas.Api.Config.OpenApi
+namespace Squidex.Areas.Api.Config.OpenApi;
+
+public static class OpenApiServices
 {
-    public static class OpenApiServices
+    public static void AddSquidexOpenApiSettings(this IServiceCollection services)
     {
-        public static void AddSquidexOpenApiSettings(this IServiceCollection services)
+        services.AddSingletonAs<ErrorDtoProcessor>()
+            .As<IDocumentProcessor>();
+
+        services.AddSingletonAs<RuleActionProcessor>()
+            .As<IDocumentProcessor>();
+
+        services.AddSingletonAs<CommonProcessor>()
+            .As<IDocumentProcessor>();
+
+        services.AddSingletonAs<XmlTagProcessor>()
+            .As<IDocumentProcessor>();
+
+        services.AddSingletonAs<SecurityProcessor>()
+            .As<IDocumentProcessor>();
+
+        services.AddSingletonAs<ScopesProcessor>()
+            .As<IOperationProcessor>();
+
+        services.AddSingletonAs<FixProcessor>()
+            .As<IOperationProcessor>();
+
+        services.AddSingletonAs<TagByGroupNameProcessor>()
+            .As<IOperationProcessor>();
+
+        services.AddSingletonAs<XmlResponseTypesProcessor>()
+            .As<IOperationProcessor>();
+
+        services.AddSingletonAs<JsonSchemaGenerator>()
+            .AsSelf();
+
+        services.AddSingletonAs<OpenApiSchemaGenerator>()
+            .AsSelf();
+
+        services.AddSingleton(c =>
         {
-            services.AddSingletonAs<ErrorDtoProcessor>()
-                .As<IDocumentProcessor>();
+            var settings = new JsonSchemaGeneratorSettings();
 
-            services.AddSingletonAs<RuleActionProcessor>()
-                .As<IDocumentProcessor>();
+            ConfigureSchemaSettings(settings, true);
 
-            services.AddSingletonAs<CommonProcessor>()
-                .As<IDocumentProcessor>();
+            return settings;
+        });
 
-            services.AddSingletonAs<XmlTagProcessor>()
-                .As<IDocumentProcessor>();
-
-            services.AddSingletonAs<SecurityProcessor>()
-                .As<IDocumentProcessor>();
-
-            services.AddSingletonAs<ScopesProcessor>()
-                .As<IOperationProcessor>();
-
-            services.AddSingletonAs<FixProcessor>()
-                .As<IOperationProcessor>();
-
-            services.AddSingletonAs<TagByGroupNameProcessor>()
-                .As<IOperationProcessor>();
-
-            services.AddSingletonAs<XmlResponseTypesProcessor>()
-                .As<IOperationProcessor>();
-
-            services.AddSingletonAs<JsonSchemaGenerator>()
-                .AsSelf();
-
-            services.AddSingletonAs<OpenApiSchemaGenerator>()
-                .AsSelf();
-
-            services.AddSingleton(c =>
-            {
-                var settings = new JsonSchemaGeneratorSettings();
-
-                ConfigureSchemaSettings(settings, true);
-
-                return settings;
-            });
-
-            services.AddSingleton(c =>
-            {
-                var settings = new OpenApiDocumentGeneratorSettings();
-
-                ConfigureSchemaSettings(settings, true);
-
-                foreach (var processor in c.GetRequiredService<IEnumerable<IDocumentProcessor>>())
-                {
-                    settings.DocumentProcessors.Add(processor);
-                }
-
-                return settings;
-            });
-
-            services.AddOpenApiDocument(settings =>
-            {
-                settings.Title = "Squidex API";
-
-                ConfigureSchemaSettings(settings);
-
-                settings.OperationProcessors.Add(new QueryParamsProcessor("/api/apps/{app}/assets"));
-            });
-        }
-
-        private static void ConfigureSchemaSettings(JsonSchemaGeneratorSettings settings, bool flatten = false)
+        services.AddSingleton(c =>
         {
-            settings.AllowReferencesWithProperties = true;
+            var settings = new OpenApiDocumentGeneratorSettings();
 
-            settings.ReflectionService = new ReflectionServices();
+            ConfigureSchemaSettings(settings, true);
 
-            settings.TypeMappers = new List<ITypeMapper>
+            foreach (var processor in c.GetRequiredService<IEnumerable<IDocumentProcessor>>())
             {
-                CreateStringMap<DomainId>(),
-                CreateStringMap<Instant>(JsonFormatStrings.DateTime),
-                CreateStringMap<LocalDate>(JsonFormatStrings.Date),
-                CreateStringMap<LocalDateTime>(JsonFormatStrings.DateTime),
-                CreateStringMap<Language>(),
-                CreateStringMap<NamedId<DomainId>>(),
-                CreateStringMap<NamedId<Guid>>(),
-                CreateStringMap<NamedId<string>>(),
-                CreateStringMap<RefToken>(),
-                CreateStringMap<Status>(),
+                settings.DocumentProcessors.Add(processor);
+            }
 
-                CreateObjectMap<JsonObject>(),
-                CreateObjectMap<AssetMetadata>(),
+            return settings;
+        });
 
-                CreateAnyMap<JsonDocument>(),
-                CreateAnyMap<JsonValue>(),
-                CreateAnyMap<FilterNode<JsonValue>>()
+        services.AddOpenApiDocument(settings =>
+        {
+            settings.Title = "Squidex API";
+
+            ConfigureSchemaSettings(settings);
+
+            settings.OperationProcessors.Add(new QueryParamsProcessor("/api/apps/{app}/assets"));
+        });
+    }
+
+    private static void ConfigureSchemaSettings(JsonSchemaGeneratorSettings settings, bool flatten = false)
+    {
+        settings.AllowReferencesWithProperties = true;
+
+        settings.ReflectionService = new ReflectionServices();
+
+        settings.TypeMappers = new List<ITypeMapper>
+        {
+            CreateStringMap<DomainId>(),
+            CreateStringMap<Instant>(JsonFormatStrings.DateTime),
+            CreateStringMap<LocalDate>(JsonFormatStrings.Date),
+            CreateStringMap<LocalDateTime>(JsonFormatStrings.DateTime),
+            CreateStringMap<Language>(),
+            CreateStringMap<NamedId<DomainId>>(),
+            CreateStringMap<NamedId<Guid>>(),
+            CreateStringMap<NamedId<string>>(),
+            CreateStringMap<RefToken>(),
+            CreateStringMap<Status>(),
+
+            CreateObjectMap<JsonObject>(),
+            CreateObjectMap<AssetMetadata>(),
+
+            CreateAnyMap<JsonDocument>(),
+            CreateAnyMap<JsonValue>(),
+            CreateAnyMap<FilterNode<JsonValue>>()
+        };
+
+        settings.SchemaType = SchemaType.OpenApi3;
+
+        settings.FlattenInheritanceHierarchy = flatten;
+    }
+
+    private static ITypeMapper CreateObjectMap<T>()
+    {
+        return new PrimitiveTypeMapper(typeof(T), schema =>
+        {
+            schema.Type = JsonObjectType.Object;
+
+            schema.AdditionalPropertiesSchema = new JsonSchema
+            {
+                Description = "Any"
             };
+        });
+    }
 
-            settings.SchemaType = SchemaType.OpenApi3;
-
-            settings.FlattenInheritanceHierarchy = flatten;
-        }
-
-        private static ITypeMapper CreateObjectMap<T>()
+    private static ITypeMapper CreateStringMap<T>(string? format = null)
+    {
+        return new PrimitiveTypeMapper(typeof(T), schema =>
         {
-            return new PrimitiveTypeMapper(typeof(T), schema =>
-            {
-                schema.Type = JsonObjectType.Object;
+            schema.Type = JsonObjectType.String;
 
-                schema.AdditionalPropertiesSchema = new JsonSchema
-                {
-                    Description = "Any"
-                };
-            });
-        }
+            schema.Format = format;
+        });
+    }
 
-        private static ITypeMapper CreateStringMap<T>(string? format = null)
+    private static ITypeMapper CreateAnyMap<T>()
+    {
+        return new PrimitiveTypeMapper(typeof(T), schema =>
         {
-            return new PrimitiveTypeMapper(typeof(T), schema =>
-            {
-                schema.Type = JsonObjectType.String;
-
-                schema.Format = format;
-            });
-        }
-
-        private static ITypeMapper CreateAnyMap<T>()
-        {
-            return new PrimitiveTypeMapper(typeof(T), schema =>
-            {
-                schema.Type = JsonObjectType.None;
-            });
-        }
+            schema.Type = JsonObjectType.None;
+        });
     }
 }

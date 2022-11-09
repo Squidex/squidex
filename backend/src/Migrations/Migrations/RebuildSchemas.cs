@@ -9,24 +9,23 @@ using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Migrations;
 
-namespace Migrations.Migrations
+namespace Migrations.Migrations;
+
+public sealed class RebuildSchemas : IMigration
 {
-    public sealed class RebuildSchemas : IMigration
+    private readonly Rebuilder rebuilder;
+    private readonly RebuildOptions rebuildOptions;
+
+    public RebuildSchemas(Rebuilder rebuilder,
+        IOptions<RebuildOptions> rebuildOptions)
     {
-        private readonly Rebuilder rebuilder;
-        private readonly RebuildOptions rebuildOptions;
+        this.rebuilder = rebuilder;
+        this.rebuildOptions = rebuildOptions.Value;
+    }
 
-        public RebuildSchemas(Rebuilder rebuilder,
-            IOptions<RebuildOptions> rebuildOptions)
-        {
-            this.rebuilder = rebuilder;
-            this.rebuildOptions = rebuildOptions.Value;
-        }
-
-        public Task UpdateAsync(
-            CancellationToken ct)
-        {
-            return rebuilder.RebuildSchemasAsync(rebuildOptions.BatchSize, ct);
-        }
+    public Task UpdateAsync(
+        CancellationToken ct)
+    {
+        return rebuilder.RebuildSchemasAsync(rebuildOptions.BatchSize, ct);
     }
 }

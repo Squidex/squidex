@@ -8,41 +8,40 @@
 using MongoDB.Driver;
 using Squidex.Infrastructure.Queries;
 
-namespace Squidex.Infrastructure.MongoDb.Queries
+namespace Squidex.Infrastructure.MongoDb.Queries;
+
+public static class SortBuilder
 {
-    public static class SortBuilder
+    public static SortDefinition<T>? BuildSort<T>(this ClrQuery query)
     {
-        public static SortDefinition<T>? BuildSort<T>(this ClrQuery query)
+        if (query is { Sort: not null, Sort: { Count: > 0 } })
         {
-            if (query is { Sort: not null, Sort: { Count: > 0 } })
+            var sorts = query.Sort.Select(OrderBy<T>).ToList();
+
+            if (sorts.Count > 1)
             {
-                var sorts = query.Sort.Select(OrderBy<T>).ToList();
-
-                if (sorts.Count > 1)
-                {
-                    return Builders<T>.Sort.Combine(sorts);
-                }
-                else
-                {
-                    return sorts[0];
-                }
-            }
-
-            return null;
-        }
-
-        public static SortDefinition<T> OrderBy<T>(SortNode sort)
-        {
-            var propertyName = string.Join(".", sort.Path);
-
-            if (sort.Order == SortOrder.Ascending)
-            {
-                return Builders<T>.Sort.Ascending(propertyName);
+                return Builders<T>.Sort.Combine(sorts);
             }
             else
             {
-                return Builders<T>.Sort.Descending(propertyName);
+                return sorts[0];
             }
+        }
+
+        return null;
+    }
+
+    public static SortDefinition<T> OrderBy<T>(SortNode sort)
+    {
+        var propertyName = string.Join(".", sort.Path);
+
+        if (sort.Order == SortOrder.Ascending)
+        {
+            return Builders<T>.Sort.Ascending(propertyName);
+        }
+        else
+        {
+            return Builders<T>.Sort.Descending(propertyName);
         }
     }
 }

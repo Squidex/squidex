@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public interface ICustomCommandMiddleware : ICommandMiddleware
 {
-    public interface ICustomCommandMiddleware : ICommandMiddleware
-    {
-    }
 }

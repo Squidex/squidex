@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Assets.Commands
+namespace Squidex.Domain.Apps.Entities.Assets.Commands;
+
+public enum BulkUpdateAssetType
 {
-    public enum BulkUpdateAssetType
-    {
-        Annotate,
-        Move,
-        Delete
-    }
+    Annotate,
+    Move,
+    Delete
 }

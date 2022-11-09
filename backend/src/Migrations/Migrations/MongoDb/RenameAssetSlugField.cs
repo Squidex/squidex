@@ -10,26 +10,25 @@ using MongoDB.Driver;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.MongoDb;
 
-namespace Migrations.Migrations.MongoDb
+namespace Migrations.Migrations.MongoDb;
+
+public sealed class RenameAssetSlugField : MongoBase<BsonDocument>, IMigration
 {
-    public sealed class RenameAssetSlugField : MongoBase<BsonDocument>, IMigration
+    private readonly IMongoDatabase database;
+
+    public RenameAssetSlugField(IMongoDatabase database)
     {
-        private readonly IMongoDatabase database;
+        this.database = database;
+    }
 
-        public RenameAssetSlugField(IMongoDatabase database)
-        {
-            this.database = database;
-        }
+    public Task UpdateAsync(
+        CancellationToken ct)
+    {
+        // Do not resolve in constructor, because most of the time it is not executed anyway.
+        var collection = database.GetCollection<BsonDocument>("States_Assets");
 
-        public Task UpdateAsync(
-            CancellationToken ct)
-        {
-            // Do not resolve in constructor, because most of the time it is not executed anyway.
-            var collection = database.GetCollection<BsonDocument>("States_Assets");
+        var update = Builders<BsonDocument>.Update.Rename("FileNameSlug", "Slug");
 
-            var update = Builders<BsonDocument>.Update.Rename("FileNameSlug", "Slug");
-
-            return collection.UpdateManyAsync(FindAll, update, cancellationToken: ct);
-        }
+        return collection.UpdateManyAsync(FindAll, update, cancellationToken: ct);
     }
 }

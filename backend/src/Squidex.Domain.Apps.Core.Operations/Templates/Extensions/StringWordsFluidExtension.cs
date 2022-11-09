@@ -9,24 +9,23 @@ using Fluid;
 using Fluid.Values;
 using Squidex.Text;
 
-namespace Squidex.Domain.Apps.Core.Templates.Extensions
+namespace Squidex.Domain.Apps.Core.Templates.Extensions;
+
+public class StringWordsFluidExtension : IFluidExtension
 {
-    public class StringWordsFluidExtension : IFluidExtension
+    private static readonly FilterDelegate WordCount = (input, arguments, context) =>
     {
-        private static readonly FilterDelegate WordCount = (input, arguments, context) =>
-        {
-            return FluidValue.Create(input.ToStringValue().WordCount());
-        };
+        return FluidValue.Create(input.ToStringValue().WordCount());
+    };
 
-        private static readonly FilterDelegate CharacterCount = (input, arguments, context) =>
-        {
-            return FluidValue.Create(input.ToStringValue().CharacterCount());
-        };
+    private static readonly FilterDelegate CharacterCount = (input, arguments, context) =>
+    {
+        return FluidValue.Create(input.ToStringValue().CharacterCount());
+    };
 
-        public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
-        {
-            TemplateContext.GlobalFilters.AddFilter("word_count", WordCount);
-            TemplateContext.GlobalFilters.AddFilter("character_count", CharacterCount);
-        }
+    public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
+    {
+        TemplateContext.GlobalFilters.AddFilter("word_count", WordCount);
+        TemplateContext.GlobalFilters.AddFilter("character_count", CharacterCount);
     }
 }

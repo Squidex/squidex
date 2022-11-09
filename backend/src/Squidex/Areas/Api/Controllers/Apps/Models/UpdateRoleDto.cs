@@ -10,24 +10,23 @@ using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.Api.Controllers.Apps.Models
+namespace Squidex.Areas.Api.Controllers.Apps.Models;
+
+public sealed class UpdateRoleDto
 {
-    public sealed class UpdateRoleDto
+    /// <summary>
+    /// Associated list of permissions.
+    /// </summary>
+    [LocalizedRequired]
+    public string[] Permissions { get; set; }
+
+    /// <summary>
+    /// Associated list of UI properties.
+    /// </summary>
+    public JsonObject Properties { get; set; }
+
+    public UpdateRole ToCommand(string name)
     {
-        /// <summary>
-        /// Associated list of permissions.
-        /// </summary>
-        [LocalizedRequired]
-        public string[] Permissions { get; set; }
-
-        /// <summary>
-        /// Associated list of UI properties.
-        /// </summary>
-        public JsonObject Properties { get; set; }
-
-        public UpdateRole ToCommand(string name)
-        {
-            return SimpleMapper.Map(this, new UpdateRole { Name = name });
-        }
+        return SimpleMapper.Map(this, new UpdateRole { Name = name });
     }
 }

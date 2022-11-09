@@ -10,39 +10,38 @@ using System.Text.RegularExpressions;
 #pragma warning disable RECS0026 // Possible unassigned object created by 'new'
 #pragma warning disable CA1806 // Do not ignore method results
 
-namespace Squidex.Infrastructure.Validation
+namespace Squidex.Infrastructure.Validation;
+
+public static class ValidationExtensions
 {
-    public static class ValidationExtensions
+    public static bool IsBetween<TValue>(this TValue value, TValue low, TValue high) where TValue : IComparable
     {
-        public static bool IsBetween<TValue>(this TValue value, TValue low, TValue high) where TValue : IComparable
+        return Comparer<TValue>.Default.Compare(low, value) <= 0 && Comparer<TValue>.Default.Compare(high, value) >= 0;
+    }
+
+    public static bool IsEnumValue<TEnum>(this TEnum value) where TEnum : struct
+    {
+        try
         {
-            return Comparer<TValue>.Default.Compare(low, value) <= 0 && Comparer<TValue>.Default.Compare(high, value) >= 0;
+            return Enum.IsDefined(typeof(TEnum), value);
         }
-
-        public static bool IsEnumValue<TEnum>(this TEnum value) where TEnum : struct
+        catch
         {
-            try
-            {
-                return Enum.IsDefined(typeof(TEnum), value);
-            }
-            catch
-            {
-                return false;
-            }
+            return false;
         }
+    }
 
-        public static bool IsValidRegex(this string value)
+    public static bool IsValidRegex(this string value)
+    {
+        try
         {
-            try
-            {
-                new Regex(value);
+            new Regex(value);
 
-                return true;
-            }
-            catch (ArgumentException)
-            {
-                return false;
-            }
+            return true;
+        }
+        catch (ArgumentException)
+        {
+            return false;
         }
     }
 }

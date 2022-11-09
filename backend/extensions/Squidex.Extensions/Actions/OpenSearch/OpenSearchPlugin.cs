@@ -9,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.OpenSearch
+namespace Squidex.Extensions.Actions.OpenSearch;
+
+public sealed class OpenSearchPlugin : IPlugin
 {
-    public sealed class OpenSearchPlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddRuleAction<OpenSearchAction, OpenSearchActionHandler>();
-        }
+        services.AddRuleAction<OpenSearchAction, OpenSearchActionHandler>();
     }
 }

@@ -9,41 +9,40 @@ using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Model;
 
-namespace TestSuite.Fixtures
+namespace TestSuite.Fixtures;
+
+public abstract class TestSchemaWithReferencesFixtureBase : CreatedAppFixture
 {
-    public abstract class TestSchemaWithReferencesFixtureBase : CreatedAppFixture
+    public IContentsClient<TestEntityWithReferences, TestEntityWithReferencesData> Contents { get; private set; }
+
+    public string SchemaName { get; }
+
+    protected TestSchemaWithReferencesFixtureBase(string schemaName)
     {
-        public IContentsClient<TestEntityWithReferences, TestEntityWithReferencesData> Contents { get; private set; }
+        SchemaName = schemaName;
+    }
 
-        public string SchemaName { get; }
+    public override async Task InitializeAsync()
+    {
+        await base.InitializeAsync();
 
-        protected TestSchemaWithReferencesFixtureBase(string schemaName)
+        await Factories.CreateAsync($"{nameof(TestEntityWithReferences)}_{SchemaName}", async () =>
         {
-            SchemaName = schemaName;
-        }
-
-        public override async Task InitializeAsync()
-        {
-            await base.InitializeAsync();
-
-            await Factories.CreateAsync($"{nameof(TestEntityWithReferences)}_{SchemaName}", async () =>
+            try
             {
-                try
+                await TestEntityWithReferences.CreateSchemaAsync(Schemas, AppName, SchemaName);
+            }
+            catch (SquidexManagementException ex)
+            {
+                if (ex.StatusCode != 400)
                 {
-                    await TestEntityWithReferences.CreateSchemaAsync(Schemas, AppName, SchemaName);
+                    throw;
                 }
-                catch (SquidexManagementException ex)
-                {
-                    if (ex.StatusCode != 400)
-                    {
-                        throw;
-                    }
-                }
+            }
 
-                return true;
-            });
+            return true;
+        });
 
-            Contents = ClientManager.CreateContentsClient<TestEntityWithReferences, TestEntityWithReferencesData>(SchemaName);
-        }
+        Contents = ClientManager.CreateContentsClient<TestEntityWithReferences, TestEntityWithReferencesData>(SchemaName);
     }
 }

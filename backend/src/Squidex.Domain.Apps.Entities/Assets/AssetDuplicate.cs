@@ -7,7 +7,6 @@
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Domain.Apps.Entities.Assets
-{
-    public sealed record AssetDuplicate(IEnrichedAssetEntity Asset);
-}
+namespace Squidex.Domain.Apps.Entities.Assets;
+
+public sealed record AssetDuplicate(IEnrichedAssetEntity Asset);

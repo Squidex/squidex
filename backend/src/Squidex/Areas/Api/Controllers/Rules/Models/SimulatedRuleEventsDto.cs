@@ -9,30 +9,29 @@ using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Rules.Models
+namespace Squidex.Areas.Api.Controllers.Rules.Models;
+
+public sealed class SimulatedRuleEventsDto : Resource
 {
-    public sealed class SimulatedRuleEventsDto : Resource
+    /// <summary>
+    /// The simulated rule events.
+    /// </summary>
+    [LocalizedRequired]
+    public SimulatedRuleEventDto[] Items { get; set; }
+
+    /// <summary>
+    /// The total number of simulated rule events.
+    /// </summary>
+    public long Total { get; set; }
+
+    public static SimulatedRuleEventsDto FromDomain(IList<SimulatedRuleEvent> events)
     {
-        /// <summary>
-        /// The simulated rule events.
-        /// </summary>
-        [LocalizedRequired]
-        public SimulatedRuleEventDto[] Items { get; set; }
-
-        /// <summary>
-        /// The total number of simulated rule events.
-        /// </summary>
-        public long Total { get; set; }
-
-        public static SimulatedRuleEventsDto FromDomain(IList<SimulatedRuleEvent> events)
+        var result = new SimulatedRuleEventsDto
         {
-            var result = new SimulatedRuleEventsDto
-            {
-                Total = events.Count,
-                Items = events.Select(SimulatedRuleEventDto.FromDomain).ToArray()
-            };
+            Total = events.Count,
+            Items = events.Select(SimulatedRuleEventDto.FromDomain).ToArray()
+        };
 
-            return result;
-        }
+        return result;
     }
 }

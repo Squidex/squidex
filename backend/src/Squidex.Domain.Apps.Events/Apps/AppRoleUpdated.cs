@@ -9,20 +9,19 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps;
+
+[EventType(nameof(AppRoleUpdated))]
+public sealed class AppRoleUpdated : AppEvent
 {
-    [EventType(nameof(AppRoleUpdated))]
-    public sealed class AppRoleUpdated : AppEvent
+    public string Name { get; set; }
+
+    public string[] Permissions { get; set; }
+
+    public JsonObject? Properties { get; set; }
+
+    public PermissionSet ToPermissions()
     {
-        public string Name { get; set; }
-
-        public string[] Permissions { get; set; }
-
-        public JsonObject? Properties { get; set; }
-
-        public PermissionSet ToPermissions()
-        {
-            return new PermissionSet(Permissions);
-        }
+        return new PermissionSet(Permissions);
     }
 }

@@ -7,13 +7,12 @@
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Infrastructure.Queries
+namespace Squidex.Infrastructure.Queries;
+
+public sealed record FilterSphere(double Longitude, double Latitude, double Radius)
 {
-    public sealed record FilterSphere(double Longitude, double Latitude, double Radius)
+    public override string ToString()
     {
-        public override string ToString()
-        {
-            return $"Radius({Longitude}, {Latitude}, {Radius})";
-        }
+        return $"Radius({Longitude}, {Latitude}, {Radius})";
     }
 }

@@ -7,10 +7,9 @@
 
 using Squidex.Domain.Apps.Entities.Teams;
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public interface ITeamFeature
 {
-    public interface ITeamFeature
-    {
-        ITeamEntity Team { get; }
-    }
+    ITeamEntity Team { get; }
 }

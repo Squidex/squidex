@@ -17,112 +17,111 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
+namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards;
+
+public static class ValidationExtensions
 {
-    public static class ValidationExtensions
+    public static void MustDeleteDraft(this ContentOperation operation)
     {
-        public static void MustDeleteDraft(this ContentOperation operation)
+        if (operation.Snapshot.NewStatus == null)
         {
-            if (operation.Snapshot.NewStatus == null)
-            {
-                throw new DomainException(T.Get("contents.draftToDeleteNotFound"));
-            }
+            throw new DomainException(T.Get("contents.draftToDeleteNotFound"));
+        }
+    }
+
+    public static void MustCreateDraft(this ContentOperation operation)
+    {
+        if (operation.Snapshot.EditingStatus() != Status.Published)
+        {
+            throw new DomainException(T.Get("contents.draftNotCreateForUnpublished"));
+        }
+    }
+
+    public static void MustHaveData(this ContentOperation operation, ContentData? data)
+    {
+        if (data == null)
+        {
+            operation.AddError(Not.Defined(nameof(data)), nameof(data));
         }
 
-        public static void MustCreateDraft(this ContentOperation operation)
+        operation.ThrowOnErrors();
+    }
+
+    public static async Task ValidateInputAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
+    {
+        var validator = GetValidator(operation, optimize, published);
+
+        await validator.ValidateInputAsync(data);
+
+        operation.AddErrors(validator.Errors).ThrowOnErrors();
+    }
+
+    public static async Task ValidateInputPartialAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
+    {
+        var validator = GetValidator(operation, optimize, published);
+
+        await validator.ValidateInputPartialAsync(data);
+
+        operation.AddErrors(validator.Errors).ThrowOnErrors();
+    }
+
+    public static async Task ValidateContentAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
+    {
+        var validator = GetValidator(operation, optimize, published);
+
+        await validator.ValidateContentAsync(data);
+
+        operation.AddErrors(validator.Errors).ThrowOnErrors();
+    }
+
+    public static async Task ValidateContentAndInputAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
+    {
+        var validator = GetValidator(operation, optimize, published);
+
+        await validator.ValidateInputAndContentAsync(data);
+
+        operation.AddErrors(validator.Errors).ThrowOnErrors();
+    }
+
+    public static void GenerateDefaultValues(this ContentOperation operation, ContentData data)
+    {
+        data.GenerateDefaultValues(operation.Schema.SchemaDef, operation.Partition());
+    }
+
+    public static async Task CheckReferrersAsync(this ContentOperation operation)
+    {
+        var contentRepository = operation.Resolve<IContentRepository>();
+
+        var hasReferrer = await contentRepository.HasReferrersAsync(operation.App.Id, operation.CommandId, SearchScope.All, default);
+
+        if (hasReferrer)
         {
-            if (operation.Snapshot.EditingStatus() != Status.Published)
-            {
-                throw new DomainException(T.Get("contents.draftNotCreateForUnpublished"));
-            }
+            throw new DomainException(T.Get("contents.referenced"), "OBJECT_REFERENCED");
         }
+    }
 
-        public static void MustHaveData(this ContentOperation operation, ContentData? data)
-        {
-            if (data == null)
-            {
-                operation.AddError(Not.Defined(nameof(data)), nameof(data));
-            }
+    private static ContentValidator GetValidator(this ContentOperation operation, bool optimize, bool published)
+    {
+        var rootContext =
+            new RootContext(operation.Resolve<IJsonSerializer>(),
+                operation.App.NamedId(),
+                operation.Schema.NamedId(),
+                operation.SchemaDef,
+                operation.CommandId,
+                operation.Components);
 
-            operation.ThrowOnErrors();
-        }
+        var validationContext = new ValidationContext(rootContext).Optimized(optimize).AsPublishing(published);
 
-        public static async Task ValidateInputAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
-        {
-            var validator = GetValidator(operation, optimize, published);
+        var validator =
+            new ContentValidator(operation.Partition(),
+                validationContext,
+                operation.Resolve<IEnumerable<IValidatorsFactory>>());
 
-            await validator.ValidateInputAsync(data);
+        return validator;
+    }
 
-            operation.AddErrors(validator.Errors).ThrowOnErrors();
-        }
-
-        public static async Task ValidateInputPartialAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
-        {
-            var validator = GetValidator(operation, optimize, published);
-
-            await validator.ValidateInputPartialAsync(data);
-
-            operation.AddErrors(validator.Errors).ThrowOnErrors();
-        }
-
-        public static async Task ValidateContentAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
-        {
-            var validator = GetValidator(operation, optimize, published);
-
-            await validator.ValidateContentAsync(data);
-
-            operation.AddErrors(validator.Errors).ThrowOnErrors();
-        }
-
-        public static async Task ValidateContentAndInputAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
-        {
-            var validator = GetValidator(operation, optimize, published);
-
-            await validator.ValidateInputAndContentAsync(data);
-
-            operation.AddErrors(validator.Errors).ThrowOnErrors();
-        }
-
-        public static void GenerateDefaultValues(this ContentOperation operation, ContentData data)
-        {
-            data.GenerateDefaultValues(operation.Schema.SchemaDef, operation.Partition());
-        }
-
-        public static async Task CheckReferrersAsync(this ContentOperation operation)
-        {
-            var contentRepository = operation.Resolve<IContentRepository>();
-
-            var hasReferrer = await contentRepository.HasReferrersAsync(operation.App.Id, operation.CommandId, SearchScope.All, default);
-
-            if (hasReferrer)
-            {
-                throw new DomainException(T.Get("contents.referenced"), "OBJECT_REFERENCED");
-            }
-        }
-
-        private static ContentValidator GetValidator(this ContentOperation operation, bool optimize, bool published)
-        {
-            var rootContext =
-                new RootContext(operation.Resolve<IJsonSerializer>(),
-                    operation.App.NamedId(),
-                    operation.Schema.NamedId(),
-                    operation.SchemaDef,
-                    operation.CommandId,
-                    operation.Components);
-
-            var validationContext = new ValidationContext(rootContext).Optimized(optimize).AsPublishing(published);
-
-            var validator =
-                new ContentValidator(operation.Partition(),
-                    validationContext,
-                    operation.Resolve<IEnumerable<IValidatorsFactory>>());
-
-            return validator;
-        }
-
-        private static PartitionResolver Partition(this ContentOperation operation)
-        {
-            return operation.App.PartitionResolver();
-        }
+    private static PartitionResolver Partition(this ContentOperation operation)
+    {
+        return operation.App.PartitionResolver();
     }
 }

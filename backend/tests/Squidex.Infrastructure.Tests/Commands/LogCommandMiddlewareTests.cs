@@ -9,77 +9,76 @@ using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public class LogCommandMiddlewareTests
 {
-    public class LogCommandMiddlewareTests
+    private readonly ILogger<LogCommandMiddleware> log = A.Fake<ILogger<LogCommandMiddleware>>();
+    private readonly LogCommandMiddleware sut;
+    private readonly ICommand command = A.Dummy<ICommand>();
+    private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
+
+    public LogCommandMiddlewareTests()
     {
-        private readonly ILogger<LogCommandMiddleware> log = A.Fake<ILogger<LogCommandMiddleware>>();
-        private readonly LogCommandMiddleware sut;
-        private readonly ICommand command = A.Dummy<ICommand>();
-        private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
+        A.CallTo(() => log.IsEnabled(A<LogLevel>._))
+            .Returns(true);
 
-        public LogCommandMiddlewareTests()
+        sut = new LogCommandMiddleware(log);
+    }
+
+    [Fact]
+    public async Task Should_log_before_and_after_request()
+    {
+        var context = new CommandContext(command, commandBus);
+
+        await sut.HandleAsync(context, (c, ct) =>
         {
-            A.CallTo(() => log.IsEnabled(A<LogLevel>._))
-                .Returns(true);
+            context.Complete(true);
 
-            sut = new LogCommandMiddleware(log);
-        }
+            return Task.CompletedTask;
+        }, default);
 
-        [Fact]
-        public async Task Should_log_before_and_after_request()
+        A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Debug)
+            .MustHaveHappened();
+
+        A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Information)
+            .MustHaveHappenedTwiceExactly();
+    }
+
+    [Fact]
+    public async Task Should_log_error_if_command_failed()
+    {
+        var context = new CommandContext(command, commandBus);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
-            var context = new CommandContext(command, commandBus);
+            await sut.HandleAsync(context, (c, ct) => throw new InvalidOperationException(), default);
+        });
 
-            await sut.HandleAsync(context, (c, ct) =>
-            {
-                context.Complete(true);
+        A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Debug)
+            .MustHaveHappened();
 
-                return Task.CompletedTask;
-            }, default);
+        A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Information)
+            .MustHaveHappened();
 
-            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Debug)
-                .MustHaveHappened();
+        A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Error)
+            .MustHaveHappened();
+    }
 
-            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Information)
-                .MustHaveHappenedTwiceExactly();
-        }
+    [Fact]
+    public async Task Should_log_if_command_is_not_handled()
+    {
+        var context = new CommandContext(command, commandBus);
 
-        [Fact]
-        public async Task Should_log_error_if_command_failed()
-        {
-            var context = new CommandContext(command, commandBus);
+        await sut.HandleAsync(context, (c, ct) => Task.CompletedTask, default);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            {
-                await sut.HandleAsync(context, (c, ct) => throw new InvalidOperationException(), default);
-            });
+        A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Debug)
+            .MustHaveHappened();
 
-            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Debug)
-                .MustHaveHappened();
+        A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Information)
+            .MustHaveHappenedTwiceExactly();
 
-            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Information)
-                .MustHaveHappened();
-
-            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Error)
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_log_if_command_is_not_handled()
-        {
-            var context = new CommandContext(command, commandBus);
-
-            await sut.HandleAsync(context, (c, ct) => Task.CompletedTask, default);
-
-            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Debug)
-                .MustHaveHappened();
-
-            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Information)
-                .MustHaveHappenedTwiceExactly();
-
-            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Critical)
-                .MustHaveHappened();
-        }
+        A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Critical)
+            .MustHaveHappened();
     }
 }

@@ -7,38 +7,37 @@
 
 using Microsoft.Extensions.Configuration;
 
-namespace TestSuite.Utils
+namespace TestSuite.Utils;
+
+public static class TestHelpers
 {
-    public static class TestHelpers
+    public static IConfiguration Configuration { get; }
+
+    static TestHelpers()
     {
-        public static IConfiguration Configuration { get; }
+        var basePath = Path.GetFullPath("../../../");
 
-        static TestHelpers()
+        Configuration = new ConfigurationBuilder()
+            .SetBasePath(basePath)
+            .AddJsonFile("appsettings.json", true)
+            .AddJsonFile("appsettings.Development.json", true)
+            .AddEnvironmentVariables()
+            .Build();
+    }
+
+    public static string GetAndPrintValue(string name, string fallback)
+    {
+        var value = Configuration[name];
+
+        if (string.IsNullOrWhiteSpace(value))
         {
-            var basePath = Path.GetFullPath("../../../");
-
-            Configuration = new ConfigurationBuilder()
-                .SetBasePath(basePath)
-                .AddJsonFile("appsettings.json", true)
-                .AddJsonFile("appsettings.Development.json", true)
-                .AddEnvironmentVariables()
-                .Build();
+            value = fallback;
+        }
+        else
+        {
+            Console.WriteLine("Using <{0}>=<{1}>", name, value);
         }
 
-        public static string GetAndPrintValue(string name, string fallback)
-        {
-            var value = Configuration[name];
-
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                value = fallback;
-            }
-            else
-            {
-                Console.WriteLine("Using <{0}>=<{1}>", name, value);
-            }
-
-            return value;
-        }
+        return value;
     }
 }

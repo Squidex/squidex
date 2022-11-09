@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Json
+namespace Squidex.Infrastructure.Json;
+
+public interface ISupportedTypes
 {
-    public interface ISupportedTypes
-    {
-        IEnumerable<Type> SupportedTypes { get; }
-    }
+    IEnumerable<Type> SupportedTypes { get; }
 }

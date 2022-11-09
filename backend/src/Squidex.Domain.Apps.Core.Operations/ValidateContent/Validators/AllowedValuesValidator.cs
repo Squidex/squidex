@@ -8,30 +8,29 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 
-namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
+namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
+
+public sealed class AllowedValuesValidator<TValue> : IValidator
 {
-    public sealed class AllowedValuesValidator<TValue> : IValidator
+    private readonly IEnumerable<TValue> allowedValues;
+
+    public AllowedValuesValidator(params TValue[] allowedValues)
+        : this((IEnumerable<TValue>)allowedValues)
     {
-        private readonly IEnumerable<TValue> allowedValues;
+    }
 
-        public AllowedValuesValidator(params TValue[] allowedValues)
-            : this((IEnumerable<TValue>)allowedValues)
+    public AllowedValuesValidator(IEnumerable<TValue> allowedValues)
+    {
+        Guard.NotNull(allowedValues);
+
+        this.allowedValues = allowedValues;
+    }
+
+    public void Validate(object? value, ValidationContext context)
+    {
+        if (value is TValue typedValue && !allowedValues.Contains(typedValue))
         {
-        }
-
-        public AllowedValuesValidator(IEnumerable<TValue> allowedValues)
-        {
-            Guard.NotNull(allowedValues);
-
-            this.allowedValues = allowedValues;
-        }
-
-        public void Validate(object? value, ValidationContext context)
-        {
-            if (value is TValue typedValue && !allowedValues.Contains(typedValue))
-            {
-                context.AddError(context.Path, T.Get("contents.validation.notAllowed"));
-            }
+            context.AddError(context.Path, T.Get("contents.validation.notAllowed"));
         }
     }
 }

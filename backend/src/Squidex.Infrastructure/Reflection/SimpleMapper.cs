@@ -11,224 +11,223 @@ using Squidex.Infrastructure.Reflection.Internal;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 
-namespace Squidex.Infrastructure.Reflection
+namespace Squidex.Infrastructure.Reflection;
+
+public static class SimpleMapper
 {
-    public static class SimpleMapper
+    private sealed class StringConversionPropertyMapper : PropertyMapper
     {
-        private sealed class StringConversionPropertyMapper : PropertyMapper
+        public StringConversionPropertyMapper(
+            PropertyAccessor sourceAccessor,
+            PropertyAccessor targetAccessor)
+            : base(sourceAccessor, targetAccessor)
         {
-            public StringConversionPropertyMapper(
-                PropertyAccessor sourceAccessor,
-                PropertyAccessor targetAccessor)
-                : base(sourceAccessor, targetAccessor)
-            {
-            }
-
-            public override void MapProperty(object source, object target, CultureInfo culture)
-            {
-                var value = GetValue(source);
-
-                SetValue(target, value?.ToString());
-            }
         }
 
-        private sealed class ConversionPropertyMapper : PropertyMapper
+        public override void MapProperty(object source, object target, CultureInfo culture)
         {
-            private readonly Type targetType;
+            var value = GetValue(source);
 
-            public ConversionPropertyMapper(
-                PropertyAccessor sourceAccessor,
-                PropertyAccessor targetAccessor,
-                Type targetType)
-                : base(sourceAccessor, targetAccessor)
-            {
-                this.targetType = targetType;
-            }
+            SetValue(target, value?.ToString());
+        }
+    }
 
-            public override void MapProperty(object source, object target, CultureInfo culture)
-            {
-                var value = GetValue(source);
+    private sealed class ConversionPropertyMapper : PropertyMapper
+    {
+        private readonly Type targetType;
 
-                if (value == null)
-                {
-                    return;
-                }
-
-                try
-                {
-                    var converted = Convert.ChangeType(value, targetType, culture);
-
-                    SetValue(target, converted);
-                }
-                catch
-                {
-                    return;
-                }
-            }
+        public ConversionPropertyMapper(
+            PropertyAccessor sourceAccessor,
+            PropertyAccessor targetAccessor,
+            Type targetType)
+            : base(sourceAccessor, targetAccessor)
+        {
+            this.targetType = targetType;
         }
 
-        private sealed class TypeConverterPropertyMapper : PropertyMapper
+        public override void MapProperty(object source, object target, CultureInfo culture)
         {
-            private readonly TypeConverter converter;
+            var value = GetValue(source);
 
-            public TypeConverterPropertyMapper(
-                PropertyAccessor sourceAccessor,
-                PropertyAccessor targetAccessor,
-                TypeConverter converter)
-                : base(sourceAccessor, targetAccessor)
+            if (value == null)
             {
-                this.converter = converter;
+                return;
             }
 
-            public override void MapProperty(object source, object target, CultureInfo culture)
+            try
             {
-                var value = GetValue(source);
+                var converted = Convert.ChangeType(value, targetType, culture);
 
-                if (value == null)
-                {
-                    return;
-                }
-
-                try
-                {
-                    var converted = converter.ConvertFrom(null, culture, value);
-
-                    SetValue(target, converted);
-                }
-                catch
-                {
-                    return;
-                }
+                SetValue(target, converted);
+            }
+            catch
+            {
+                return;
             }
         }
+    }
 
-        private class PropertyMapper
+    private sealed class TypeConverterPropertyMapper : PropertyMapper
+    {
+        private readonly TypeConverter converter;
+
+        public TypeConverterPropertyMapper(
+            PropertyAccessor sourceAccessor,
+            PropertyAccessor targetAccessor,
+            TypeConverter converter)
+            : base(sourceAccessor, targetAccessor)
         {
-            private readonly PropertyAccessor sourceAccessor;
-            private readonly PropertyAccessor targetAccessor;
-
-            public PropertyMapper(PropertyAccessor sourceAccessor, PropertyAccessor targetAccessor)
-            {
-                this.sourceAccessor = sourceAccessor;
-                this.targetAccessor = targetAccessor;
-            }
-
-            public virtual void MapProperty(object source, object target, CultureInfo culture)
-            {
-                var value = GetValue(source);
-
-                SetValue(target, value);
-            }
-
-            protected void SetValue(object destination, object? value)
-            {
-                targetAccessor.Set(destination, value);
-            }
-
-            protected object? GetValue(object source)
-            {
-                return sourceAccessor.Get(source);
-            }
+            this.converter = converter;
         }
 
-        private static class ClassMapper<TSource, TTarget> where TSource : class where TTarget : class
+        public override void MapProperty(object source, object target, CultureInfo culture)
         {
-            private static readonly List<PropertyMapper> Mappers = new List<PropertyMapper>();
+            var value = GetValue(source);
 
-            static ClassMapper()
+            if (value == null)
             {
-                var sourceClassType = typeof(TSource);
-                var sourceProperties =
-                    sourceClassType.GetPublicProperties()
-                        .Where(x => x.CanRead).ToList();
+                return;
+            }
 
-                var targetClassType = typeof(TTarget);
-                var targetProperties =
-                    targetClassType.GetPublicProperties()
-                        .Where(x => x.CanWrite).ToList();
+            try
+            {
+                var converted = converter.ConvertFrom(null, culture, value);
 
-                foreach (var sourceProperty in sourceProperties)
+                SetValue(target, converted);
+            }
+            catch
+            {
+                return;
+            }
+        }
+    }
+
+    private class PropertyMapper
+    {
+        private readonly PropertyAccessor sourceAccessor;
+        private readonly PropertyAccessor targetAccessor;
+
+        public PropertyMapper(PropertyAccessor sourceAccessor, PropertyAccessor targetAccessor)
+        {
+            this.sourceAccessor = sourceAccessor;
+            this.targetAccessor = targetAccessor;
+        }
+
+        public virtual void MapProperty(object source, object target, CultureInfo culture)
+        {
+            var value = GetValue(source);
+
+            SetValue(target, value);
+        }
+
+        protected void SetValue(object destination, object? value)
+        {
+            targetAccessor.Set(destination, value);
+        }
+
+        protected object? GetValue(object source)
+        {
+            return sourceAccessor.Get(source);
+        }
+    }
+
+    private static class ClassMapper<TSource, TTarget> where TSource : class where TTarget : class
+    {
+        private static readonly List<PropertyMapper> Mappers = new List<PropertyMapper>();
+
+        static ClassMapper()
+        {
+            var sourceClassType = typeof(TSource);
+            var sourceProperties =
+                sourceClassType.GetPublicProperties()
+                    .Where(x => x.CanRead).ToList();
+
+            var targetClassType = typeof(TTarget);
+            var targetProperties =
+                targetClassType.GetPublicProperties()
+                    .Where(x => x.CanWrite).ToList();
+
+            foreach (var sourceProperty in sourceProperties)
+            {
+                var targetProperty = targetProperties.Find(x => x.Name == sourceProperty.Name);
+
+                if (targetProperty == null)
                 {
-                    var targetProperty = targetProperties.Find(x => x.Name == sourceProperty.Name);
+                    continue;
+                }
 
-                    if (targetProperty == null)
+                var sourceType = sourceProperty.PropertyType;
+                var targetType = targetProperty.PropertyType;
+
+                if (sourceType == targetType)
+                {
+                    Mappers.Add(new PropertyMapper(
+                        new PropertyAccessor(sourceProperty),
+                        new PropertyAccessor(targetProperty)));
+                }
+                else if (targetType == typeof(string))
+                {
+                    Mappers.Add(new StringConversionPropertyMapper(
+                        new PropertyAccessor(sourceProperty),
+                        new PropertyAccessor(targetProperty)));
+                }
+                else
+                {
+                    var converter = TypeDescriptor.GetConverter(targetType);
+
+                    if (converter.CanConvertFrom(sourceType))
                     {
-                        continue;
-                    }
-
-                    var sourceType = sourceProperty.PropertyType;
-                    var targetType = targetProperty.PropertyType;
-
-                    if (sourceType == targetType)
-                    {
-                        Mappers.Add(new PropertyMapper(
+                        Mappers.Add(new TypeConverterPropertyMapper(
                             new PropertyAccessor(sourceProperty),
-                            new PropertyAccessor(targetProperty)));
+                            new PropertyAccessor(targetProperty),
+                            converter));
                     }
-                    else if (targetType == typeof(string))
+                    else if (sourceType.Implements<IConvertible>() || targetType.Implements<IConvertible>())
                     {
-                        Mappers.Add(new StringConversionPropertyMapper(
+                        Mappers.Add(new ConversionPropertyMapper(
                             new PropertyAccessor(sourceProperty),
-                            new PropertyAccessor(targetProperty)));
-                    }
-                    else
-                    {
-                        var converter = TypeDescriptor.GetConverter(targetType);
-
-                        if (converter.CanConvertFrom(sourceType))
-                        {
-                            Mappers.Add(new TypeConverterPropertyMapper(
-                                new PropertyAccessor(sourceProperty),
-                                new PropertyAccessor(targetProperty),
-                                converter));
-                        }
-                        else if (sourceType.Implements<IConvertible>() || targetType.Implements<IConvertible>())
-                        {
-                            Mappers.Add(new ConversionPropertyMapper(
-                                new PropertyAccessor(sourceProperty),
-                                new PropertyAccessor(targetProperty),
-                                targetType));
-                        }
+                            new PropertyAccessor(targetProperty),
+                            targetType));
                     }
                 }
             }
+        }
 
-            public static TTarget MapClass(TSource source, TTarget destination, CultureInfo culture)
+        public static TTarget MapClass(TSource source, TTarget destination, CultureInfo culture)
+        {
+            for (var i = 0; i < Mappers.Count; i++)
             {
-                for (var i = 0; i < Mappers.Count; i++)
-                {
-                    var mapper = Mappers[i];
+                var mapper = Mappers[i];
 
-                    mapper.MapProperty(source, destination, culture);
-                }
-
-                return destination;
+                mapper.MapProperty(source, destination, culture);
             }
-        }
 
-        public static TTarget Map<TSource, TTarget>(TSource source)
-            where TSource : class
-            where TTarget : class, new()
-        {
-            return Map(source, new TTarget(), CultureInfo.CurrentCulture);
+            return destination;
         }
+    }
 
-        public static TTarget Map<TSource, TTarget>(TSource source, TTarget target)
-            where TSource : class
-            where TTarget : class
-        {
-            return Map(source, target, CultureInfo.CurrentCulture);
-        }
+    public static TTarget Map<TSource, TTarget>(TSource source)
+        where TSource : class
+        where TTarget : class, new()
+    {
+        return Map(source, new TTarget(), CultureInfo.CurrentCulture);
+    }
 
-        public static TTarget Map<TSource, TTarget>(TSource source, TTarget target, CultureInfo culture)
-            where TSource : class
-            where TTarget : class
-        {
-            Guard.NotNull(source);
-            Guard.NotNull(culture);
-            Guard.NotNull(target);
+    public static TTarget Map<TSource, TTarget>(TSource source, TTarget target)
+        where TSource : class
+        where TTarget : class
+    {
+        return Map(source, target, CultureInfo.CurrentCulture);
+    }
 
-            return ClassMapper<TSource, TTarget>.MapClass(source, target, culture);
-        }
+    public static TTarget Map<TSource, TTarget>(TSource source, TTarget target, CultureInfo culture)
+        where TSource : class
+        where TTarget : class
+    {
+        Guard.NotNull(source);
+        Guard.NotNull(culture);
+        Guard.NotNull(target);
+
+        return ClassMapper<TSource, TTarget>.MapClass(source, target, culture);
     }
 }

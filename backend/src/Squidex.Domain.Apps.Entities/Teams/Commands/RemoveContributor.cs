@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Teams.Commands
+namespace Squidex.Domain.Apps.Entities.Teams.Commands;
+
+public sealed class RemoveContributor : TeamCommand
 {
-    public sealed class RemoveContributor : TeamCommand
-    {
-        public string ContributorId { get; set; }
-    }
+    public string ContributorId { get; set; }
 }

@@ -10,15 +10,14 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 
-namespace Migrations.OldEvents
+namespace Migrations.OldEvents;
+
+[EventType(nameof(ContentChangesDiscarded))]
+[Obsolete("New Event introduced")]
+public sealed class ContentChangesDiscarded : ContentEvent, IMigrated<IEvent>
 {
-    [EventType(nameof(ContentChangesDiscarded))]
-    [Obsolete("New Event introduced")]
-    public sealed class ContentChangesDiscarded : ContentEvent, IMigrated<IEvent>
+    public IEvent Migrate()
     {
-        public IEvent Migrate()
-        {
-            return SimpleMapper.Map(this, new ContentDraftDeleted());
-        }
+        return SimpleMapper.Map(this, new ContentDraftDeleted());
     }
 }

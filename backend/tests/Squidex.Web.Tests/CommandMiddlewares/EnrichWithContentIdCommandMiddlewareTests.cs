@@ -11,68 +11,67 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Xunit;
 
-namespace Squidex.Web.CommandMiddlewares
+namespace Squidex.Web.CommandMiddlewares;
+
+public class EnrichWithContentIdCommandMiddlewareTests
 {
-    public class EnrichWithContentIdCommandMiddlewareTests
+    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+    private readonly EnrichWithContentIdCommandMiddleware sut;
+
+    public EnrichWithContentIdCommandMiddlewareTests()
     {
-        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-        private readonly EnrichWithContentIdCommandMiddleware sut;
+        sut = new EnrichWithContentIdCommandMiddleware();
+    }
 
-        public EnrichWithContentIdCommandMiddlewareTests()
+    [Fact]
+    public async Task Should_replace_content_id_with_schema_id_if_placeholder_used()
+    {
+        var command = new UpdateContent
         {
-            sut = new EnrichWithContentIdCommandMiddleware();
-        }
+            ContentId = DomainId.Create("_schemaId_")
+        };
 
-        [Fact]
-        public async Task Should_replace_content_id_with_schema_id_if_placeholder_used()
+        await HandleAsync(command);
+
+        Assert.Equal(schemaId.Id, command.ContentId);
+    }
+
+    [Fact]
+    public async Task Should_not_replace_content_id_with_schema_for_create_command()
+    {
+        var command = new CreateContent
         {
-            var command = new UpdateContent
-            {
-                ContentId = DomainId.Create("_schemaId_")
-            };
+            ContentId = DomainId.Create("_schemaId_")
+        };
 
-            await HandleAsync(command);
+        await HandleAsync(command);
 
-            Assert.Equal(schemaId.Id, command.ContentId);
-        }
+        Assert.NotEqual(schemaId.Id, command.ContentId);
+    }
 
-        [Fact]
-        public async Task Should_not_replace_content_id_with_schema_for_create_command()
+    [Fact]
+    public async Task Should_not_replace_content_id_with_schema_id_if_placeholder_not_used()
+    {
+        var command = new UpdateContent
         {
-            var command = new CreateContent
-            {
-                ContentId = DomainId.Create("_schemaId_")
-            };
+            ContentId = DomainId.Create("{custom}")
+        };
 
-            await HandleAsync(command);
+        await HandleAsync(command);
 
-            Assert.NotEqual(schemaId.Id, command.ContentId);
-        }
+        Assert.NotEqual(schemaId.Id, command.ContentId);
+    }
 
-        [Fact]
-        public async Task Should_not_replace_content_id_with_schema_id_if_placeholder_not_used()
-        {
-            var command = new UpdateContent
-            {
-                ContentId = DomainId.Create("{custom}")
-            };
+    private async Task<CommandContext> HandleAsync(ContentCommand command)
+    {
+        command.AppId = appId;
+        command.SchemaId = schemaId;
 
-            await HandleAsync(command);
+        var commandContext = new CommandContext(command, A.Fake<ICommandBus>());
 
-            Assert.NotEqual(schemaId.Id, command.ContentId);
-        }
+        await sut.HandleAsync(commandContext, default);
 
-        private async Task<CommandContext> HandleAsync(ContentCommand command)
-        {
-            command.AppId = appId;
-            command.SchemaId = schemaId;
-
-            var commandContext = new CommandContext(command, A.Fake<ICommandBus>());
-
-            await sut.HandleAsync(commandContext, default);
-
-            return commandContext;
-        }
+        return commandContext;
     }
 }

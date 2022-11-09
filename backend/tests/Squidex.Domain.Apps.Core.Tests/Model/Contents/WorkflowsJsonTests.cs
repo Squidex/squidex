@@ -10,18 +10,17 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Core.Model.Contents
+namespace Squidex.Domain.Apps.Core.Model.Contents;
+
+public class WorkflowsJsonTests
 {
-    public class WorkflowsJsonTests
+    [Fact]
+    public void Should_serialize_and_deserialize()
     {
-        [Fact]
-        public void Should_serialize_and_deserialize()
-        {
-            var workflows = Workflows.Empty.Add(DomainId.NewGuid(), "my-workflow");
+        var workflows = Workflows.Empty.Add(DomainId.NewGuid(), "my-workflow");
 
-            var serialized = workflows.SerializeAndDeserialize();
+        var serialized = workflows.SerializeAndDeserialize();
 
-            Assert.Equal(workflows, serialized);
-        }
+        Assert.Equal(workflows, serialized);
     }
 }

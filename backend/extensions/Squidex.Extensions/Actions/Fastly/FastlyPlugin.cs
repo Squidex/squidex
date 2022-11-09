@@ -9,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.Fastly
+namespace Squidex.Extensions.Actions.Fastly;
+
+public sealed class FastlyPlugin : IPlugin
 {
-    public sealed class FastlyPlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddRuleAction<FastlyAction, FastlyActionHandler>();
-        }
+        services.AddRuleAction<FastlyAction, FastlyActionHandler>();
     }
 }

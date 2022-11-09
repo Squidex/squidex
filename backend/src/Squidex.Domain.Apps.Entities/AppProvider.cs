@@ -17,247 +17,246 @@ using Squidex.Domain.Apps.Entities.Teams.Indexes;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities;
+
+public sealed class AppProvider : IAppProvider
 {
-    public sealed class AppProvider : IAppProvider
+    private readonly ILocalCache localCache;
+    private readonly IAppsIndex indexForApps;
+    private readonly IRulesIndex indexForRules;
+    private readonly ISchemasIndex indexForSchemas;
+    private readonly ITeamsIndex indexForTeams;
+
+    public AppProvider(IAppsIndex indexForApps, IRulesIndex indexForRules, ISchemasIndex indexForSchemas, ITeamsIndex indexForTeams,
+        ILocalCache localCache)
     {
-        private readonly ILocalCache localCache;
-        private readonly IAppsIndex indexForApps;
-        private readonly IRulesIndex indexForRules;
-        private readonly ISchemasIndex indexForSchemas;
-        private readonly ITeamsIndex indexForTeams;
+        this.localCache = localCache;
+        this.indexForApps = indexForApps;
+        this.indexForRules = indexForRules;
+        this.indexForSchemas = indexForSchemas;
+        this.indexForTeams = indexForTeams;
+    }
 
-        public AppProvider(IAppsIndex indexForApps, IRulesIndex indexForRules, ISchemasIndex indexForSchemas, ITeamsIndex indexForTeams,
-            ILocalCache localCache)
+    public async Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
+        CancellationToken ct = default)
+    {
+        var app = await GetAppAsync(appId, canCache, ct);
+
+        if (app == null)
         {
-            this.localCache = localCache;
-            this.indexForApps = indexForApps;
-            this.indexForRules = indexForRules;
-            this.indexForSchemas = indexForSchemas;
-            this.indexForTeams = indexForTeams;
+            return (null, null);
         }
 
-        public async Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
-            CancellationToken ct = default)
+        var schema = await GetSchemaAsync(appId, id, canCache, ct);
+
+        if (schema == null)
         {
-            var app = await GetAppAsync(appId, canCache, ct);
-
-            if (app == null)
-            {
-                return (null, null);
-            }
-
-            var schema = await GetSchemaAsync(appId, id, canCache, ct);
-
-            if (schema == null)
-            {
-                return (null, null);
-            }
-
-            return (app, schema);
+            return (null, null);
         }
 
-        public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
-            CancellationToken ct = default)
+        return (app, schema);
+    }
+
+    public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
+        CancellationToken ct = default)
+    {
+        var cacheKey = AppCacheKey(appId);
+
+        var app = await GetOrCreate(cacheKey, () =>
         {
-            var cacheKey = AppCacheKey(appId);
+            return indexForApps.GetAppAsync(appId, canCache, ct);
+        });
 
-            var app = await GetOrCreate(cacheKey, () =>
-            {
-                return indexForApps.GetAppAsync(appId, canCache, ct);
-            });
-
-            if (app != null)
-            {
-                localCache.Add(AppCacheKey(app.Name), app);
-            }
-
-            return app;
+        if (app != null)
+        {
+            localCache.Add(AppCacheKey(app.Name), app);
         }
 
-        public async Task<IAppEntity?> GetAppAsync(string appName, bool canCache = false,
-            CancellationToken ct = default)
+        return app;
+    }
+
+    public async Task<IAppEntity?> GetAppAsync(string appName, bool canCache = false,
+        CancellationToken ct = default)
+    {
+        var cacheKey = AppCacheKey(appName);
+
+        var app = await GetOrCreate(cacheKey, () =>
         {
-            var cacheKey = AppCacheKey(appName);
+            return indexForApps.GetAppAsync(appName, canCache, ct);
+        });
 
-            var app = await GetOrCreate(cacheKey, () =>
-            {
-                return indexForApps.GetAppAsync(appName, canCache, ct);
-            });
-
-            if (app != null)
-            {
-                localCache.Add(AppCacheKey(app.Id), app);
-            }
-
-            return app;
+        if (app != null)
+        {
+            localCache.Add(AppCacheKey(app.Id), app);
         }
 
-        public async Task<ITeamEntity?> GetTeamAsync(DomainId teamId,
-            CancellationToken ct = default)
+        return app;
+    }
+
+    public async Task<ITeamEntity?> GetTeamAsync(DomainId teamId,
+        CancellationToken ct = default)
+    {
+        var cacheKey = TeamCacheKey(teamId);
+
+        var team = await GetOrCreate(cacheKey, () =>
         {
-            var cacheKey = TeamCacheKey(teamId);
+            return indexForTeams.GetTeamAsync(teamId, ct);
+        });
 
-            var team = await GetOrCreate(cacheKey, () =>
-            {
-                return indexForTeams.GetTeamAsync(teamId, ct);
-            });
+        return team;
+    }
 
-            return team;
+    public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache = false,
+        CancellationToken ct = default)
+    {
+        var cacheKey = SchemaCacheKey(appId, name);
+
+        var schema = await GetOrCreate(cacheKey, () =>
+        {
+            return indexForSchemas.GetSchemaAsync(appId, name, canCache, ct);
+        });
+
+        if (schema != null)
+        {
+            localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
         }
 
-        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache = false,
-            CancellationToken ct = default)
+        return schema;
+    }
+
+    public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
+        CancellationToken ct = default)
+    {
+        var cacheKey = SchemaCacheKey(appId, id);
+
+        var schema = await GetOrCreate(cacheKey, () =>
         {
-            var cacheKey = SchemaCacheKey(appId, name);
+            return indexForSchemas.GetSchemaAsync(appId, id, canCache, ct);
+        });
 
-            var schema = await GetOrCreate(cacheKey, () =>
-            {
-                return indexForSchemas.GetSchemaAsync(appId, name, canCache, ct);
-            });
+        if (schema != null)
+        {
+            localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
+        }
 
-            if (schema != null)
+        return schema;
+    }
+
+    public async Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions,
+        CancellationToken ct = default)
+    {
+        var apps = await GetOrCreate($"GetUserApps({userId})", () =>
+        {
+            return indexForApps.GetAppsForUserAsync(userId, permissions, ct)!;
+        });
+
+        return apps?.ToList() ?? new List<IAppEntity>();
+    }
+
+    public async Task<List<IAppEntity>> GetTeamAppsAsync(DomainId teamId,
+        CancellationToken ct = default)
+    {
+        var apps = await GetOrCreate($"GetTeamApps({teamId})", () =>
+        {
+            return indexForApps.GetAppsForTeamAsync(teamId, ct)!;
+        });
+
+        return apps?.ToList() ?? new List<IAppEntity>();
+    }
+
+    public async Task<List<ITeamEntity>> GetUserTeamsAsync(string userId, CancellationToken ct = default)
+    {
+        var teams = await GetOrCreate($"GetUserTeams({userId})", () =>
+        {
+            return indexForTeams.GetTeamsAsync(userId, ct)!;
+        });
+
+        return teams?.ToList() ?? new List<ITeamEntity>();
+    }
+
+    public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId,
+        CancellationToken ct = default)
+    {
+        var schemas = await GetOrCreate($"GetSchemasAsync({appId})", () =>
+        {
+            return indexForSchemas.GetSchemasAsync(appId, ct)!;
+        });
+
+        if (schemas != null)
+        {
+            foreach (var schema in schemas)
             {
                 localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
-            }
-
-            return schema;
-        }
-
-        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
-            CancellationToken ct = default)
-        {
-            var cacheKey = SchemaCacheKey(appId, id);
-
-            var schema = await GetOrCreate(cacheKey, () =>
-            {
-                return indexForSchemas.GetSchemaAsync(appId, id, canCache, ct);
-            });
-
-            if (schema != null)
-            {
                 localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
             }
-
-            return schema;
         }
 
-        public async Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions,
-            CancellationToken ct = default)
+        return schemas?.ToList() ?? new List<ISchemaEntity>();
+    }
+
+    public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId,
+        CancellationToken ct = default)
+    {
+        var rules = await GetOrCreate($"GetRulesAsync({appId})", () =>
         {
-            var apps = await GetOrCreate($"GetUserApps({userId})", () =>
-            {
-                return indexForApps.GetAppsForUserAsync(userId, permissions, ct)!;
-            });
+            return indexForRules.GetRulesAsync(appId, ct)!;
+        });
 
-            return apps?.ToList() ?? new List<IAppEntity>();
-        }
+        return rules?.ToList() ?? new List<IRuleEntity>();
+    }
 
-        public async Task<List<IAppEntity>> GetTeamAppsAsync(DomainId teamId,
-            CancellationToken ct = default)
+    public async Task<IRuleEntity?> GetRuleAsync(DomainId appId, DomainId id,
+        CancellationToken ct = default)
+    {
+        var rules = await GetRulesAsync(appId, ct);
+
+        return rules.Find(x => x.Id == id);
+    }
+
+    public async Task<T?> GetOrCreate<T>(object key, Func<Task<T?>> creator) where T : class
+    {
+        if (localCache.TryGetValue(key, out var value))
         {
-            var apps = await GetOrCreate($"GetTeamApps({teamId})", () =>
+            switch (value)
             {
-                return indexForApps.GetAppsForTeamAsync(teamId, ct)!;
-            });
-
-            return apps?.ToList() ?? new List<IAppEntity>();
-        }
-
-        public async Task<List<ITeamEntity>> GetUserTeamsAsync(string userId, CancellationToken ct = default)
-        {
-            var teams = await GetOrCreate($"GetUserTeams({userId})", () =>
-            {
-                return indexForTeams.GetTeamsAsync(userId, ct)!;
-            });
-
-            return teams?.ToList() ?? new List<ITeamEntity>();
-        }
-
-        public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId,
-            CancellationToken ct = default)
-        {
-            var schemas = await GetOrCreate($"GetSchemasAsync({appId})", () =>
-            {
-                return indexForSchemas.GetSchemasAsync(appId, ct)!;
-            });
-
-            if (schemas != null)
-            {
-                foreach (var schema in schemas)
-                {
-                    localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
-                    localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
-                }
+                case T typed:
+                    return typed;
+                case Task<T?> typedTask:
+                    return await typedTask;
+                default:
+                    return null;
             }
-
-            return schemas?.ToList() ?? new List<ISchemaEntity>();
         }
 
-        public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId,
-            CancellationToken ct = default)
-        {
-            var rules = await GetOrCreate($"GetRulesAsync({appId})", () =>
-            {
-                return indexForRules.GetRulesAsync(appId, ct)!;
-            });
+        var result = creator();
 
-            return rules?.ToList() ?? new List<IRuleEntity>();
-        }
+        localCache.Add(key, result);
 
-        public async Task<IRuleEntity?> GetRuleAsync(DomainId appId, DomainId id,
-            CancellationToken ct = default)
-        {
-            var rules = await GetRulesAsync(appId, ct);
+        return await result;
+    }
 
-            return rules.Find(x => x.Id == id);
-        }
+    private static string AppCacheKey(DomainId appId)
+    {
+        return $"APPS_ID_{appId}";
+    }
 
-        public async Task<T?> GetOrCreate<T>(object key, Func<Task<T?>> creator) where T : class
-        {
-            if (localCache.TryGetValue(key, out var value))
-            {
-                switch (value)
-                {
-                    case T typed:
-                        return typed;
-                    case Task<T?> typedTask:
-                        return await typedTask;
-                    default:
-                        return null;
-                }
-            }
+    private static string AppCacheKey(string appName)
+    {
+        return $"APPS_NAME_{appName}";
+    }
 
-            var result = creator();
+    private static string TeamCacheKey(DomainId teamId)
+    {
+        return $"TEAMS_ID{teamId}";
+    }
 
-            localCache.Add(key, result);
+    private static string SchemaCacheKey(DomainId appId, DomainId id)
+    {
+        return $"SCHEMAS_ID_{appId}_{id}";
+    }
 
-            return await result;
-        }
-
-        private static string AppCacheKey(DomainId appId)
-        {
-            return $"APPS_ID_{appId}";
-        }
-
-        private static string AppCacheKey(string appName)
-        {
-            return $"APPS_NAME_{appName}";
-        }
-
-        private static string TeamCacheKey(DomainId teamId)
-        {
-            return $"TEAMS_ID{teamId}";
-        }
-
-        private static string SchemaCacheKey(DomainId appId, DomainId id)
-        {
-            return $"SCHEMAS_ID_{appId}_{id}";
-        }
-
-        private static string SchemaCacheKey(DomainId appId, string name)
-        {
-            return $"SCHEMAS_NAME_{appId}_{name}";
-        }
+    private static string SchemaCacheKey(DomainId appId, string name)
+    {
+        return $"SCHEMAS_NAME_{appId}_{name}";
     }
 }

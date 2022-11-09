@@ -7,42 +7,41 @@
 
 using Squidex.Infrastructure.Caching;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
+namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
+
+public sealed class EnrichForCaching : IContentEnricherStep
 {
-    public sealed class EnrichForCaching : IContentEnricherStep
+    private readonly IRequestCache requestCache;
+
+    public EnrichForCaching(IRequestCache requestCache)
     {
-        private readonly IRequestCache requestCache;
+        this.requestCache = requestCache;
+    }
 
-        public EnrichForCaching(IRequestCache requestCache)
+    public Task EnrichAsync(Context context,
+        CancellationToken ct)
+    {
+        context.AddCacheHeaders(requestCache);
+
+        return Task.CompletedTask;
+    }
+
+    public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+        CancellationToken ct)
+    {
+        var app = context.App;
+
+        foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
         {
-            this.requestCache = requestCache;
-        }
+            ct.ThrowIfCancellationRequested();
 
-        public Task EnrichAsync(Context context,
-            CancellationToken ct)
-        {
-            context.AddCacheHeaders(requestCache);
+            var (schema, _) = await schemas(group.Key);
 
-            return Task.CompletedTask;
-        }
-
-        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
-            CancellationToken ct)
-        {
-            var app = context.App;
-
-            foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+            foreach (var content in group)
             {
-                ct.ThrowIfCancellationRequested();
-
-                var (schema, _) = await schemas(group.Key);
-
-                foreach (var content in group)
-                {
-                    requestCache.AddDependency(content.UniqueId, content.Version);
-                    requestCache.AddDependency(schema.UniqueId, schema.Version);
-                    requestCache.AddDependency(app.UniqueId, app.Version);
-                }
+                requestCache.AddDependency(content.UniqueId, content.Version);
+                requestCache.AddDependency(schema.UniqueId, schema.Version);
+                requestCache.AddDependency(app.UniqueId, app.Version);
             }
         }
     }

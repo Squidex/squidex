@@ -7,36 +7,35 @@
 
 using Squidex.Log;
 
-namespace Squidex.Extensions.APM.Stackdriver
+namespace Squidex.Extensions.APM.Stackdriver;
+
+public sealed class StackdriverSeverityLogAppender : ILogAppender
 {
-    public sealed class StackdriverSeverityLogAppender : ILogAppender
+    public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception exception)
     {
-        public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception exception)
-        {
-            var severity = GetSeverity(logLevel);
+        var severity = GetSeverity(logLevel);
 
-            writer.WriteProperty(nameof(severity), severity);
-        }
+        writer.WriteProperty(nameof(severity), severity);
+    }
 
-        private static string GetSeverity(SemanticLogLevel logLevel)
+    private static string GetSeverity(SemanticLogLevel logLevel)
+    {
+        switch (logLevel)
         {
-            switch (logLevel)
-            {
-                case SemanticLogLevel.Trace:
-                    return "DEBUG";
-                case SemanticLogLevel.Debug:
-                    return "DEBUG";
-                case SemanticLogLevel.Information:
-                    return "INFO";
-                case SemanticLogLevel.Warning:
-                    return "WARNING";
-                case SemanticLogLevel.Error:
-                    return "ERROR";
-                case SemanticLogLevel.Fatal:
-                    return "CRITICAL";
-                default:
-                    return "DEFAULT";
-            }
+            case SemanticLogLevel.Trace:
+                return "DEBUG";
+            case SemanticLogLevel.Debug:
+                return "DEBUG";
+            case SemanticLogLevel.Information:
+                return "INFO";
+            case SemanticLogLevel.Warning:
+                return "WARNING";
+            case SemanticLogLevel.Error:
+                return "ERROR";
+            case SemanticLogLevel.Fatal:
+                return "CRITICAL";
+            default:
+                return "DEFAULT";
         }
     }
 }

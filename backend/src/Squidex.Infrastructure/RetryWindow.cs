@@ -7,40 +7,39 @@
 
 using NodaTime;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+public sealed class RetryWindow
 {
-    public sealed class RetryWindow
+    private readonly Duration windowDuration;
+    private readonly int windowSize;
+    private readonly Queue<Instant> retries = new Queue<Instant>();
+    private readonly IClock clock;
+
+    public RetryWindow(TimeSpan windowDuration, int windowSize, IClock? clock = null)
     {
-        private readonly Duration windowDuration;
-        private readonly int windowSize;
-        private readonly Queue<Instant> retries = new Queue<Instant>();
-        private readonly IClock clock;
+        this.windowDuration = Duration.FromTimeSpan(windowDuration);
+        this.windowSize = windowSize + 1;
 
-        public RetryWindow(TimeSpan windowDuration, int windowSize, IClock? clock = null)
+        this.clock = clock ?? SystemClock.Instance;
+    }
+
+    public void Reset()
+    {
+        retries.Clear();
+    }
+
+    public bool CanRetryAfterFailure()
+    {
+        var now = clock.GetCurrentInstant();
+
+        retries.Enqueue(now);
+
+        while (retries.Count > windowSize)
         {
-            this.windowDuration = Duration.FromTimeSpan(windowDuration);
-            this.windowSize = windowSize + 1;
-
-            this.clock = clock ?? SystemClock.Instance;
+            retries.Dequeue();
         }
 
-        public void Reset()
-        {
-            retries.Clear();
-        }
-
-        public bool CanRetryAfterFailure()
-        {
-            var now = clock.GetCurrentInstant();
-
-            retries.Enqueue(now);
-
-            while (retries.Count > windowSize)
-            {
-                retries.Dequeue();
-            }
-
-            return retries.Count < windowSize || (retries.Count > 0 && (now - retries.Peek()) > windowDuration);
-        }
+        return retries.Count < windowSize || (retries.Count > 0 && (now - retries.Peek()) > windowDuration);
     }
 }

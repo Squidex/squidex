@@ -8,11 +8,10 @@
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas;
+
+[EventType(nameof(SchemaPreviewUrlsConfigured))]
+public sealed class SchemaPreviewUrlsConfigured : SchemaEvent
 {
-    [EventType(nameof(SchemaPreviewUrlsConfigured))]
-    public sealed class SchemaPreviewUrlsConfigured : SchemaEvent
-    {
-        public ReadonlyDictionary<string, string>? PreviewUrls { get; set; }
-    }
+    public ReadonlyDictionary<string, string>? PreviewUrls { get; set; }
 }

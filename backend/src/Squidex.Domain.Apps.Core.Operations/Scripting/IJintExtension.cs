@@ -7,20 +7,19 @@
 
 using Jint;
 
-namespace Squidex.Domain.Apps.Core.Scripting
+namespace Squidex.Domain.Apps.Core.Scripting;
+
+public interface IJintExtension
 {
-    public interface IJintExtension
+    void Extend(Engine engine)
     {
-        void Extend(Engine engine)
-        {
-        }
+    }
 
-        void Extend(ScriptExecutionContext context)
-        {
-        }
+    void Extend(ScriptExecutionContext context)
+    {
+    }
 
-        void ExtendAsync(ScriptExecutionContext context)
-        {
-        }
+    void ExtendAsync(ScriptExecutionContext context)
+    {
     }
 }

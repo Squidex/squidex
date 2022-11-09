@@ -5,15 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Search
+namespace Squidex.Domain.Apps.Entities.Search;
+
+public enum SearchResultType
 {
-    public enum SearchResultType
-    {
-        Asset,
-        Content,
-        Dashboard,
-        Setting,
-        Rule,
-        Schema
-    }
+    Asset,
+    Content,
+    Dashboard,
+    Setting,
+    Rule,
+    Schema
 }

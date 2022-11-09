@@ -8,48 +8,47 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public sealed record ComponentsFieldProperties : FieldProperties
 {
-    public sealed record ComponentsFieldProperties : FieldProperties
+    public int? MinItems { get; init; }
+
+    public int? MaxItems { get; init; }
+
+    public ReadonlyList<string>? UniqueFields { get; init; }
+
+    public DomainId SchemaId
     {
-        public int? MinItems { get; init; }
-
-        public int? MaxItems { get; init; }
-
-        public ReadonlyList<string>? UniqueFields { get; init; }
-
-        public DomainId SchemaId
+        init
         {
-            init
-            {
-                SchemaIds = value != default ? ReadonlyList.Create(value) : null;
-            }
-            get
-            {
-                return SchemaIds?.FirstOrDefault() ?? default;
-            }
+            SchemaIds = value != default ? ReadonlyList.Create(value) : null;
         }
-
-        public ReadonlyList<DomainId>? SchemaIds { get; init; }
-
-        public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
+        get
         {
-            return visitor.Visit(this, args);
+            return SchemaIds?.FirstOrDefault() ?? default;
         }
+    }
 
-        public override T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, IField field, TArgs args)
-        {
-            return visitor.Visit((IField<ComponentsFieldProperties>)field, args);
-        }
+    public ReadonlyList<DomainId>? SchemaIds { get; init; }
 
-        public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
-        {
-            return Fields.Components(id, name, partitioning, this, settings);
-        }
+    public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
+    {
+        return visitor.Visit(this, args);
+    }
 
-        public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)
-        {
-            return Fields.Components(id, name, this, settings);
-        }
+    public override T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, IField field, TArgs args)
+    {
+        return visitor.Visit((IField<ComponentsFieldProperties>)field, args);
+    }
+
+    public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
+    {
+        return Fields.Components(id, name, partitioning, this, settings);
+    }
+
+    public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)
+    {
+        return Fields.Components(id, name, this, settings);
     }
 }

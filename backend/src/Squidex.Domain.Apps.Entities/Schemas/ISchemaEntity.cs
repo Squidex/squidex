@@ -8,18 +8,17 @@
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Schemas
+namespace Squidex.Domain.Apps.Entities.Schemas;
+
+public interface ISchemaEntity :
+    IEntity,
+    IEntityWithCreatedBy,
+    IEntityWithLastModifiedBy,
+    IEntityWithVersion
 {
-    public interface ISchemaEntity :
-        IEntity,
-        IEntityWithCreatedBy,
-        IEntityWithLastModifiedBy,
-        IEntityWithVersion
-    {
-        NamedId<DomainId> AppId { get; }
+    NamedId<DomainId> AppId { get; }
 
-        bool IsDeleted { get; }
+    bool IsDeleted { get; }
 
-        Schema SchemaDef { get; }
-    }
+    Schema SchemaDef { get; }
 }

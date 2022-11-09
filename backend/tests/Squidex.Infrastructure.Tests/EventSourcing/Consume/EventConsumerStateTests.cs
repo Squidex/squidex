@@ -9,24 +9,23 @@ using FluentAssertions;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
-namespace Squidex.Infrastructure.EventSourcing.Consume
+namespace Squidex.Infrastructure.EventSourcing.Consume;
+
+public class EventConsumerStateTests
 {
-    public class EventConsumerStateTests
+    [Fact]
+    public void Should_serialize_and_deserialize()
     {
-        [Fact]
-        public void Should_serialize_and_deserialize()
+        var state = new EventConsumerState
         {
-            var state = new EventConsumerState
-            {
-                Count = 1,
-                IsStopped = true,
-                Error = "Error",
-                Position = "Position"
-            };
+            Count = 1,
+            IsStopped = true,
+            Error = "Error",
+            Position = "Position"
+        };
 
-            var serialized = state.SerializeAndDeserialize();
+        var serialized = state.SerializeAndDeserialize();
 
-            serialized.Should().BeEquivalentTo(state);
-        }
+        serialized.Should().BeEquivalentTo(state);
     }
 }

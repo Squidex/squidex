@@ -15,189 +15,188 @@ using Squidex.Infrastructure.Email;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Notifications
+namespace Squidex.Domain.Apps.Entities.Notifications;
+
+public sealed class EmailUserNotifications : IUserNotifications
 {
-    public sealed class EmailUserNotifications : IUserNotifications
+    private readonly IEmailSender emailSender;
+    private readonly IUrlGenerator urlGenerator;
+    private readonly ILogger<EmailUserNotifications> log;
+    private readonly EmailUserNotificationOptions texts;
+
+    private sealed class TemplatesVars
     {
-        private readonly IEmailSender emailSender;
-        private readonly IUrlGenerator urlGenerator;
-        private readonly ILogger<EmailUserNotifications> log;
-        private readonly EmailUserNotificationOptions texts;
+        public IUser? User { get; set; }
 
-        private sealed class TemplatesVars
+        public IUser? Assigner { get; init; }
+
+        public string? AppName { get; init; }
+
+        public string? TeamName { get; init; }
+
+        public long? ApiCalls { get; init; }
+
+        public long? ApiCallsLimit { get; init; }
+
+        public string URL { get; set; }
+    }
+
+    public bool IsActive
+    {
+        get => true;
+    }
+
+    public EmailUserNotifications(
+        IOptions<EmailUserNotificationOptions> texts,
+        IEmailSender emailSender,
+        IUrlGenerator urlGenerator,
+        ILogger<EmailUserNotifications> log)
+    {
+        this.texts = texts.Value;
+        this.emailSender = emailSender;
+        this.urlGenerator = urlGenerator;
+
+        this.log = log;
+    }
+
+    public Task SendUsageAsync(IUser user, IAppEntity app, long usage, long usageLimit,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(user);
+        Guard.NotNull(app);
+
+        var vars = new TemplatesVars
         {
-            public IUser? User { get; set; }
+            ApiCalls = usage,
+            ApiCallsLimit = usageLimit,
+            AppName = app.DisplayName()
+        };
 
-            public IUser? Assigner { get; init; }
+        return SendEmailAsync("Usage",
+            texts.UsageSubject,
+            texts.UsageBody,
+            user, vars, ct);
+    }
 
-            public string? AppName { get; init; }
+    public Task SendInviteAsync(IUser assigner, IUser user, IAppEntity app,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(assigner);
+        Guard.NotNull(user);
+        Guard.NotNull(app);
 
-            public string? TeamName { get; init; }
+        var vars = new TemplatesVars { Assigner = assigner, AppName = app.DisplayName() };
 
-            public long? ApiCalls { get; init; }
-
-            public long? ApiCallsLimit { get; init; }
-
-            public string URL { get; set; }
-        }
-
-        public bool IsActive
+        if (user.Claims.HasConsent())
         {
-            get => true;
-        }
-
-        public EmailUserNotifications(
-            IOptions<EmailUserNotificationOptions> texts,
-            IEmailSender emailSender,
-            IUrlGenerator urlGenerator,
-            ILogger<EmailUserNotifications> log)
-        {
-            this.texts = texts.Value;
-            this.emailSender = emailSender;
-            this.urlGenerator = urlGenerator;
-
-            this.log = log;
-        }
-
-        public Task SendUsageAsync(IUser user, IAppEntity app, long usage, long usageLimit,
-            CancellationToken ct = default)
-        {
-            Guard.NotNull(user);
-            Guard.NotNull(app);
-
-            var vars = new TemplatesVars
-            {
-                ApiCalls = usage,
-                ApiCallsLimit = usageLimit,
-                AppName = app.DisplayName()
-            };
-
-            return SendEmailAsync("Usage",
-                texts.UsageSubject,
-                texts.UsageBody,
+            return SendEmailAsync("ExistingUser",
+                texts.ExistingUserSubject,
+                texts.ExistingUserBody,
                 user, vars, ct);
         }
-
-        public Task SendInviteAsync(IUser assigner, IUser user, IAppEntity app,
-            CancellationToken ct = default)
+        else
         {
-            Guard.NotNull(assigner);
-            Guard.NotNull(user);
-            Guard.NotNull(app);
+            return SendEmailAsync("NewUser",
+                texts.NewUserSubject,
+                texts.NewUserBody,
+                user, vars, ct);
+        }
+    }
 
-            var vars = new TemplatesVars { Assigner = assigner, AppName = app.DisplayName() };
+    public Task SendInviteAsync(IUser assigner, IUser user, ITeamEntity team,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(assigner);
+        Guard.NotNull(user);
+        Guard.NotNull(team);
 
-            if (user.Claims.HasConsent())
-            {
-                return SendEmailAsync("ExistingUser",
-                    texts.ExistingUserSubject,
-                    texts.ExistingUserBody,
-                    user, vars, ct);
-            }
-            else
-            {
-                return SendEmailAsync("NewUser",
-                    texts.NewUserSubject,
-                    texts.NewUserBody,
-                    user, vars, ct);
-            }
+        var vars = new TemplatesVars { Assigner = assigner, TeamName = team.Name };
+
+        if (user.Claims.HasConsent())
+        {
+            return SendEmailAsync("ExistingUser",
+                texts.ExistingTeamUserSubject,
+                texts.ExistingTeamUserBody,
+                user, vars, ct);
+        }
+        else
+        {
+            return SendEmailAsync("NewUser",
+                texts.NewTeamUserSubject,
+                texts.NewTeamUserBody,
+                user, vars, ct);
+        }
+    }
+
+    private async Task SendEmailAsync(string template, string emailSubj, string emailBody, IUser user, TemplatesVars vars,
+        CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(emailBody))
+        {
+            log.LogWarning("Cannot send email to {email}: No email subject configured for template {template}.", template, user.Email);
+            return;
         }
 
-        public Task SendInviteAsync(IUser assigner, IUser user, ITeamEntity team,
-            CancellationToken ct = default)
+        if (string.IsNullOrWhiteSpace(emailSubj))
         {
-            Guard.NotNull(assigner);
-            Guard.NotNull(user);
-            Guard.NotNull(team);
-
-            var vars = new TemplatesVars { Assigner = assigner, TeamName = team.Name };
-
-            if (user.Claims.HasConsent())
-            {
-                return SendEmailAsync("ExistingUser",
-                    texts.ExistingTeamUserSubject,
-                    texts.ExistingTeamUserBody,
-                    user, vars, ct);
-            }
-            else
-            {
-                return SendEmailAsync("NewUser",
-                    texts.NewTeamUserSubject,
-                    texts.NewTeamUserBody,
-                    user, vars, ct);
-            }
+            log.LogWarning("Cannot send email to {email}: No email body configured for template {template}.", template, user.Email);
+            return;
         }
 
-        private async Task SendEmailAsync(string template, string emailSubj, string emailBody, IUser user, TemplatesVars vars,
-            CancellationToken ct)
+        vars.URL = urlGenerator.UI();
+
+        vars.User = user;
+
+        emailSubj = Format(emailSubj, vars);
+        emailBody = Format(emailBody, vars);
+
+        try
         {
-            if (string.IsNullOrWhiteSpace(emailBody))
-            {
-                log.LogWarning("Cannot send email to {email}: No email subject configured for template {template}.", template, user.Email);
-                return;
-            }
+            await emailSender.SendAsync(user.Email, emailSubj, emailBody, ct);
+        }
+        catch (Exception ex)
+        {
+            log.LogError(ex, "Failed to send notification to {email}.", user.Email);
+            throw;
+        }
+    }
 
-            if (string.IsNullOrWhiteSpace(emailSubj))
-            {
-                log.LogWarning("Cannot send email to {email}: No email body configured for template {template}.", template, user.Email);
-                return;
-            }
-
-            vars.URL = urlGenerator.UI();
-
-            vars.User = user;
-
-            emailSubj = Format(emailSubj, vars);
-            emailBody = Format(emailBody, vars);
-
-            try
-            {
-                await emailSender.SendAsync(user.Email, emailSubj, emailBody, ct);
-            }
-            catch (Exception ex)
-            {
-                log.LogError(ex, "Failed to send notification to {email}.", user.Email);
-                throw;
-            }
+    private static string Format(string text, TemplatesVars vars)
+    {
+        if (!string.IsNullOrWhiteSpace(vars.AppName))
+        {
+            text = text.Replace("$APP_NAME", vars.AppName, StringComparison.Ordinal);
         }
 
-        private static string Format(string text, TemplatesVars vars)
+        if (!string.IsNullOrWhiteSpace(vars.TeamName))
         {
-            if (!string.IsNullOrWhiteSpace(vars.AppName))
-            {
-                text = text.Replace("$APP_NAME", vars.AppName, StringComparison.Ordinal);
-            }
-
-            if (!string.IsNullOrWhiteSpace(vars.TeamName))
-            {
-                text = text.Replace("$TEAM_NAME", vars.AppName, StringComparison.Ordinal);
-            }
-
-            if (vars.Assigner != null)
-            {
-                text = text.Replace("$ASSIGNER_EMAIL", vars.Assigner.Email, StringComparison.Ordinal);
-                text = text.Replace("$ASSIGNER_NAME", vars.Assigner.Claims.DisplayName(), StringComparison.Ordinal);
-            }
-
-            if (vars.User != null)
-            {
-                text = text.Replace("$USER_EMAIL", vars.User.Email, StringComparison.Ordinal);
-                text = text.Replace("$USER_NAME", vars.User.Claims.DisplayName(), StringComparison.Ordinal);
-            }
-
-            if (vars.ApiCallsLimit != null)
-            {
-                text = text.Replace("$API_CALLS_LIMIT", vars.ApiCallsLimit.ToString(), StringComparison.Ordinal);
-            }
-
-            if (vars.ApiCalls != null)
-            {
-                text = text.Replace("$API_CALLS", vars.ApiCalls.ToString(), StringComparison.Ordinal);
-            }
-
-            text = text.Replace("$UI_URL", vars.URL, StringComparison.Ordinal);
-
-            return text;
+            text = text.Replace("$TEAM_NAME", vars.AppName, StringComparison.Ordinal);
         }
+
+        if (vars.Assigner != null)
+        {
+            text = text.Replace("$ASSIGNER_EMAIL", vars.Assigner.Email, StringComparison.Ordinal);
+            text = text.Replace("$ASSIGNER_NAME", vars.Assigner.Claims.DisplayName(), StringComparison.Ordinal);
+        }
+
+        if (vars.User != null)
+        {
+            text = text.Replace("$USER_EMAIL", vars.User.Email, StringComparison.Ordinal);
+            text = text.Replace("$USER_NAME", vars.User.Claims.DisplayName(), StringComparison.Ordinal);
+        }
+
+        if (vars.ApiCallsLimit != null)
+        {
+            text = text.Replace("$API_CALLS_LIMIT", vars.ApiCallsLimit.ToString(), StringComparison.Ordinal);
+        }
+
+        if (vars.ApiCalls != null)
+        {
+            text = text.Replace("$API_CALLS", vars.ApiCalls.ToString(), StringComparison.Ordinal);
+        }
+
+        text = text.Replace("$UI_URL", vars.URL, StringComparison.Ordinal);
+
+        return text;
     }
 }

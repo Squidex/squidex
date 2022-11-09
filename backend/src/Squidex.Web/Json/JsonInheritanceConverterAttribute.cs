@@ -7,16 +7,15 @@
 
 using System.Text.Json.Serialization;
 
-namespace Squidex.Web.Json
-{
-    public sealed class JsonInheritanceConverterAttribute : JsonConverterAttribute
-    {
-        public string DiscriminatorName { get; }
+namespace Squidex.Web.Json;
 
-        public JsonInheritanceConverterAttribute(Type baseType, string discriminatorName = "$type")
-            : base(typeof(JsonInheritanceConverter<>).MakeGenericType(baseType))
-        {
-            DiscriminatorName = discriminatorName;
-        }
+public sealed class JsonInheritanceConverterAttribute : JsonConverterAttribute
+{
+    public string DiscriminatorName { get; }
+
+    public JsonInheritanceConverterAttribute(Type baseType, string discriminatorName = "$type")
+        : base(typeof(JsonInheritanceConverter<>).MakeGenericType(baseType))
+    {
+        DiscriminatorName = discriminatorName;
     }
 }

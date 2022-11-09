@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands;
+
+public abstract class ParentFieldCommand : SchemaCommand
 {
-    public abstract class ParentFieldCommand : SchemaCommand
-    {
-        public long? ParentFieldId { get; set; }
-    }
+    public long? ParentFieldId { get; set; }
 }

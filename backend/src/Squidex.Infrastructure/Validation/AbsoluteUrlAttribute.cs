@@ -9,21 +9,20 @@ using System.ComponentModel.DataAnnotations;
 using Squidex.Infrastructure.Translations;
 using Squidex.Text;
 
-namespace Squidex.Infrastructure.Validation
+namespace Squidex.Infrastructure.Validation;
+
+[AttributeUsage(AttributeTargets.Property)]
+public sealed class AbsoluteUrlAttribute : ValidationAttribute
 {
-    [AttributeUsage(AttributeTargets.Property)]
-    public sealed class AbsoluteUrlAttribute : ValidationAttribute
+    public override string FormatErrorMessage(string name)
     {
-        public override string FormatErrorMessage(string name)
-        {
-            var property = T.Get($"common.{name.ToCamelCase()}", name);
+        var property = T.Get($"common.{name.ToCamelCase()}", name);
 
-            return T.Get("annotations_AbsoluteUrl", new { property });
-        }
+        return T.Get("annotations_AbsoluteUrl", new { property });
+    }
 
-        public override bool IsValid(object? value)
-        {
-            return value is not Uri uri || uri.IsAbsoluteUri;
-        }
+    public override bool IsValid(object? value)
+    {
+        return value is not Uri uri || uri.IsAbsoluteUri;
     }
 }

@@ -10,64 +10,63 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure.Http;
 
-namespace Squidex.Extensions.Actions
+namespace Squidex.Extensions.Actions;
+
+public static class RuleHelper
 {
-    public static class RuleHelper
+    public static bool ShouldDelete(this EnrichedEvent @event, IScriptEngine scriptEngine, string expression)
     {
-        public static bool ShouldDelete(this EnrichedEvent @event, IScriptEngine scriptEngine, string expression)
+        if (!string.IsNullOrWhiteSpace(expression))
         {
-            if (!string.IsNullOrWhiteSpace(expression))
+            // Script vars are just wrappers over dictionaries for better performance.
+            var vars = new EventScriptVars
             {
-                // Script vars are just wrappers over dictionaries for better performance.
-                var vars = new EventScriptVars
-                {
-                    Event = @event
-                };
+                Event = @event
+            };
 
-                return scriptEngine.Evaluate(vars, expression);
-            }
-
-            return IsContentDeletion(@event) || IsAssetDeletion(@event);
+            return scriptEngine.Evaluate(vars, expression);
         }
 
-        public static bool IsContentDeletion(this EnrichedEvent @event)
-        {
-            return @event is EnrichedContentEvent { Type: EnrichedContentEventType.Deleted or EnrichedContentEventType.Unpublished };
-        }
+        return IsContentDeletion(@event) || IsAssetDeletion(@event);
+    }
 
-        public static bool IsAssetDeletion(this EnrichedEvent @event)
-        {
-            return @event is EnrichedAssetEvent { Type: EnrichedAssetEventType.Deleted };
-        }
+    public static bool IsContentDeletion(this EnrichedEvent @event)
+    {
+        return @event is EnrichedContentEvent { Type: EnrichedContentEventType.Deleted or EnrichedContentEventType.Unpublished };
+    }
 
-        public static async Task<Result> OneWayRequestAsync(this HttpClient client, HttpRequestMessage request, string requestBody = null,
-            CancellationToken ct = default)
+    public static bool IsAssetDeletion(this EnrichedEvent @event)
+    {
+        return @event is EnrichedAssetEvent { Type: EnrichedAssetEventType.Deleted };
+    }
+
+    public static async Task<Result> OneWayRequestAsync(this HttpClient client, HttpRequestMessage request, string requestBody = null,
+        CancellationToken ct = default)
+    {
+        HttpResponseMessage response = null;
+        try
         {
-            HttpResponseMessage response = null;
-            try
+            response = await client.SendAsync(request, ct);
+
+            var responseString = await response.Content.ReadAsStringAsync(ct);
+            var requestDump = DumpFormatter.BuildDump(request, response, requestBody, responseString);
+
+            if (!response.IsSuccessStatusCode)
             {
-                response = await client.SendAsync(request, ct);
-
-                var responseString = await response.Content.ReadAsStringAsync(ct);
-                var requestDump = DumpFormatter.BuildDump(request, response, requestBody, responseString);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var ex = new HttpRequestException($"Response code does not indicate success: {(int)response.StatusCode} ({response.StatusCode}).");
-
-                    return Result.Failed(ex, requestDump);
-                }
-                else
-                {
-                    return Result.Success(requestDump);
-                }
-            }
-            catch (Exception ex)
-            {
-                var requestDump = DumpFormatter.BuildDump(request, response, requestBody, ex.ToString());
+                var ex = new HttpRequestException($"Response code does not indicate success: {(int)response.StatusCode} ({response.StatusCode}).");
 
                 return Result.Failed(ex, requestDump);
             }
+            else
+            {
+                return Result.Success(requestDump);
+            }
+        }
+        catch (Exception ex)
+        {
+            var requestDump = DumpFormatter.BuildDump(request, response, requestBody, ex.ToString());
+
+            return Result.Failed(ex, requestDump);
         }
     }
 }

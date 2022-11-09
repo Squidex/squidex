@@ -11,30 +11,29 @@ using Squidex.Domain.Apps.Entities.MongoDb.Text;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text;
+
+public sealed class MongoTextIndexFixture : IAsyncLifetime
 {
-    public sealed class MongoTextIndexFixture : IAsyncLifetime
+    public MongoTextIndex Index { get; }
+
+    public MongoTextIndexFixture()
     {
-        public MongoTextIndex Index { get; }
+        TestUtils.SetupBson();
 
-        public MongoTextIndexFixture()
-        {
-            TestUtils.SetupBson();
+        var mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
+        var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
-            var mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
-            var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
+        Index = new MongoTextIndex(mongoDatabase);
+    }
 
-            Index = new MongoTextIndex(mongoDatabase);
-        }
+    public Task InitializeAsync()
+    {
+        return Index.InitializeAsync(default);
+    }
 
-        public Task InitializeAsync()
-        {
-            return Index.InitializeAsync(default);
-        }
-
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
-        }
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 }

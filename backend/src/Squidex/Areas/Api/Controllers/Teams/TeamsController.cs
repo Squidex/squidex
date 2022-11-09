@@ -14,139 +14,138 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Teams
+namespace Squidex.Areas.Api.Controllers.Teams;
+
+/// <summary>
+/// Update and query teams.
+/// </summary>
+[ApiExplorerSettings(GroupName = nameof(Teams))]
+public sealed class TeamsController : ApiController
 {
-    /// <summary>
-    /// Update and query teams.
-    /// </summary>
-    [ApiExplorerSettings(GroupName = nameof(Teams))]
-    public sealed class TeamsController : ApiController
+    private readonly IAppProvider appProvider;
+
+    public TeamsController(ICommandBus commandBus, IAppProvider appProvider)
+        : base(commandBus)
     {
-        private readonly IAppProvider appProvider;
+        this.appProvider = appProvider;
+    }
 
-        public TeamsController(ICommandBus commandBus, IAppProvider appProvider)
-            : base(commandBus)
+    /// <summary>
+    /// Get your teams.
+    /// </summary>
+    /// <returns>
+    /// 200 => Teams returned.
+    /// </returns>
+    /// <remarks>
+    /// You can only retrieve the list of teams when you are authenticated as a user (OpenID implicit flow).
+    /// You will retrieve all teams, where you are assigned as a contributor.
+    /// </remarks>
+    [HttpGet]
+    [Route("teams/")]
+    [ProducesResponseType(typeof(TeamDto[]), StatusCodes.Status200OK)]
+    [ApiPermission]
+    [ApiCosts(0)]
+    public async Task<IActionResult> GetTeams()
+    {
+        var teams = await appProvider.GetUserTeamsAsync(UserOrClientId, HttpContext.RequestAborted);
+
+        var response = Deferred.Response(() =>
         {
-            this.appProvider = appProvider;
-        }
+            return teams.OrderBy(x => x.Name).Select(a => TeamDto.FromDomain(a, UserOrClientId, Resources)).ToArray();
+        });
 
-        /// <summary>
-        /// Get your teams.
-        /// </summary>
-        /// <returns>
-        /// 200 => Teams returned.
-        /// </returns>
-        /// <remarks>
-        /// You can only retrieve the list of teams when you are authenticated as a user (OpenID implicit flow).
-        /// You will retrieve all teams, where you are assigned as a contributor.
-        /// </remarks>
-        [HttpGet]
-        [Route("teams/")]
-        [ProducesResponseType(typeof(TeamDto[]), StatusCodes.Status200OK)]
-        [ApiPermission]
-        [ApiCosts(0)]
-        public async Task<IActionResult> GetTeams()
+        Response.Headers[HeaderNames.ETag] = teams.ToEtag();
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Get an team by name.
+    /// </summary>
+    /// <param name="team">The name of the team.</param>
+    /// <returns>
+    /// 200 => Teams returned.
+    /// 404 => Team not found.
+    /// </returns>
+    [HttpGet]
+    [Route("teams/{team}")]
+    [ProducesResponseType(typeof(TeamDto), StatusCodes.Status200OK)]
+    [ApiPermission]
+    [ApiCosts(0)]
+    public IActionResult GetTeam(string team)
+    {
+        var response = Deferred.Response(() =>
         {
-            var teams = await appProvider.GetUserTeamsAsync(UserOrClientId, HttpContext.RequestAborted);
+            return TeamDto.FromDomain(Team, UserOrClientId, Resources);
+        });
 
-            var response = Deferred.Response(() =>
-            {
-                return teams.OrderBy(x => x.Name).Select(a => TeamDto.FromDomain(a, UserOrClientId, Resources)).ToArray();
-            });
+        Response.Headers[HeaderNames.ETag] = Team.ToEtag();
 
-            Response.Headers[HeaderNames.ETag] = teams.ToEtag();
+        return Ok(response);
+    }
 
-            return Ok(response);
-        }
+    /// <summary>
+    /// Create a new team.
+    /// </summary>
+    /// <param name="request">The team object that needs to be added to Squidex.</param>
+    /// <returns>
+    /// 201 => Team created.
+    /// 400 => Team request not valid.
+    /// 409 => Team name is already in use.
+    /// </returns>
+    /// <remarks>
+    /// You can only create an team when you are authenticated as a user (OpenID implicit flow).
+    /// You will be assigned as owner of the new team automatically.
+    /// </remarks>
+    [HttpPost]
+    [Route("teams/")]
+    [ProducesResponseType(typeof(TeamDto), 201)]
+    [ApiPermission]
+    [ApiCosts(0)]
+    public async Task<IActionResult> PostTeam([FromBody] CreateTeamDto request)
+    {
+        var response = await InvokeCommandAsync(request.ToCommand());
 
-        /// <summary>
-        /// Get an team by name.
-        /// </summary>
-        /// <param name="team">The name of the team.</param>
-        /// <returns>
-        /// 200 => Teams returned.
-        /// 404 => Team not found.
-        /// </returns>
-        [HttpGet]
-        [Route("teams/{team}")]
-        [ProducesResponseType(typeof(TeamDto), StatusCodes.Status200OK)]
-        [ApiPermission]
-        [ApiCosts(0)]
-        public IActionResult GetTeam(string team)
+        return CreatedAtAction(nameof(GetTeams), response);
+    }
+
+    /// <summary>
+    /// Update the team.
+    /// </summary>
+    /// <param name="team">The name of the team to update.</param>
+    /// <param name="request">The values to update.</param>
+    /// <returns>
+    /// 200 => Team updated.
+    /// 400 => Team request not valid.
+    /// 404 => Team not found.
+    /// </returns>
+    [HttpPut]
+    [Route("teams/{team}/")]
+    [ProducesResponseType(typeof(TeamDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.TeamUpdate)]
+    [ApiCosts(0)]
+    public async Task<IActionResult> PutTeam(string team, [FromBody] UpdateTeamDto request)
+    {
+        var response = await InvokeCommandAsync(request.ToCommand());
+
+        return Ok(response);
+    }
+
+    private Task<TeamDto> InvokeCommandAsync(ICommand command)
+    {
+        return InvokeCommandAsync(command, x =>
         {
-            var response = Deferred.Response(() =>
-            {
-                return TeamDto.FromDomain(Team, UserOrClientId, Resources);
-            });
+            return TeamDto.FromDomain(x, UserOrClientId, Resources);
+        });
+    }
 
-            Response.Headers[HeaderNames.ETag] = Team.ToEtag();
+    private async Task<T> InvokeCommandAsync<T>(ICommand command, Func<ITeamEntity, T> converter)
+    {
+        var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-            return Ok(response);
-        }
+        var result = context.Result<ITeamEntity>();
+        var response = converter(result);
 
-        /// <summary>
-        /// Create a new team.
-        /// </summary>
-        /// <param name="request">The team object that needs to be added to Squidex.</param>
-        /// <returns>
-        /// 201 => Team created.
-        /// 400 => Team request not valid.
-        /// 409 => Team name is already in use.
-        /// </returns>
-        /// <remarks>
-        /// You can only create an team when you are authenticated as a user (OpenID implicit flow).
-        /// You will be assigned as owner of the new team automatically.
-        /// </remarks>
-        [HttpPost]
-        [Route("teams/")]
-        [ProducesResponseType(typeof(TeamDto), 201)]
-        [ApiPermission]
-        [ApiCosts(0)]
-        public async Task<IActionResult> PostTeam([FromBody] CreateTeamDto request)
-        {
-            var response = await InvokeCommandAsync(request.ToCommand());
-
-            return CreatedAtAction(nameof(GetTeams), response);
-        }
-
-        /// <summary>
-        /// Update the team.
-        /// </summary>
-        /// <param name="team">The name of the team to update.</param>
-        /// <param name="request">The values to update.</param>
-        /// <returns>
-        /// 200 => Team updated.
-        /// 400 => Team request not valid.
-        /// 404 => Team not found.
-        /// </returns>
-        [HttpPut]
-        [Route("teams/{team}/")]
-        [ProducesResponseType(typeof(TeamDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(PermissionIds.TeamUpdate)]
-        [ApiCosts(0)]
-        public async Task<IActionResult> PutTeam(string team, [FromBody] UpdateTeamDto request)
-        {
-            var response = await InvokeCommandAsync(request.ToCommand());
-
-            return Ok(response);
-        }
-
-        private Task<TeamDto> InvokeCommandAsync(ICommand command)
-        {
-            return InvokeCommandAsync(command, x =>
-            {
-                return TeamDto.FromDomain(x, UserOrClientId, Resources);
-            });
-        }
-
-        private async Task<T> InvokeCommandAsync<T>(ICommand command, Func<ITeamEntity, T> converter)
-        {
-            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
-
-            var result = context.Result<ITeamEntity>();
-            var response = converter(result);
-
-            return response;
-        }
+        return response;
     }
 }

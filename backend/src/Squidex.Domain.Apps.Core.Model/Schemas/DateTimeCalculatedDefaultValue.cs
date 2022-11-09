@@ -5,11 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public enum DateTimeCalculatedDefaultValue
 {
-    public enum DateTimeCalculatedDefaultValue
-    {
-        Now,
-        Today
-    }
+    Now,
+    Today
 }

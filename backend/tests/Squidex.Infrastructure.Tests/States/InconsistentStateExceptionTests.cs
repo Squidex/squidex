@@ -8,24 +8,23 @@
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Infrastructure.States;
+
+public class InconsistentStateExceptionTests
 {
-    public class InconsistentStateExceptionTests
+    [Fact]
+    public void Should_serialize_and_deserialize()
     {
-        [Fact]
-        public void Should_serialize_and_deserialize()
-        {
-            var source = new InconsistentStateException(100, 200, new InvalidOperationException("Inner"));
-            var actual = source.SerializeAndDeserializeBinary();
+        var source = new InconsistentStateException(100, 200, new InvalidOperationException("Inner"));
+        var actual = source.SerializeAndDeserializeBinary();
 
-            Assert.IsType<InvalidOperationException>(actual.InnerException);
+        Assert.IsType<InvalidOperationException>(actual.InnerException);
 
-            Assert.Equal("Inner", actual.InnerException?.Message);
+        Assert.Equal("Inner", actual.InnerException?.Message);
 
-            Assert.Equal(actual.VersionExpected, source.VersionExpected);
-            Assert.Equal(actual.VersionCurrent, source.VersionCurrent);
+        Assert.Equal(actual.VersionExpected, source.VersionExpected);
+        Assert.Equal(actual.VersionCurrent, source.VersionCurrent);
 
-            Assert.Equal(actual.Message, source.Message);
-        }
+        Assert.Equal(actual.Message, source.Message);
     }
 }

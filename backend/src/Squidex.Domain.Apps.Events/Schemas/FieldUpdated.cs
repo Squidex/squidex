@@ -8,11 +8,10 @@
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas;
+
+[EventType(nameof(FieldUpdated))]
+public sealed class FieldUpdated : FieldEvent
 {
-    [EventType(nameof(FieldUpdated))]
-    public sealed class FieldUpdated : FieldEvent
-    {
-        public FieldProperties Properties { get; set; }
-    }
+    public FieldProperties Properties { get; set; }
 }

@@ -9,30 +9,29 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
+namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields;
+
+public sealed class ArrayFieldPropertiesDto : FieldPropertiesDto
 {
-    public sealed class ArrayFieldPropertiesDto : FieldPropertiesDto
+    /// <summary>
+    /// The minimum allowed items for the field value.
+    /// </summary>
+    public int? MinItems { get; set; }
+
+    /// <summary>
+    /// The maximum allowed items for the field value.
+    /// </summary>
+    public int? MaxItems { get; set; }
+
+    /// <summary>
+    /// The fields that must be unique.
+    /// </summary>
+    public ReadonlyList<string>? UniqueFields { get; set; }
+
+    public override FieldProperties ToProperties()
     {
-        /// <summary>
-        /// The minimum allowed items for the field value.
-        /// </summary>
-        public int? MinItems { get; set; }
+        var result = SimpleMapper.Map(this, new ArrayFieldProperties());
 
-        /// <summary>
-        /// The maximum allowed items for the field value.
-        /// </summary>
-        public int? MaxItems { get; set; }
-
-        /// <summary>
-        /// The fields that must be unique.
-        /// </summary>
-        public ReadonlyList<string>? UniqueFields { get; set; }
-
-        public override FieldProperties ToProperties()
-        {
-            var result = SimpleMapper.Map(this, new ArrayFieldProperties());
-
-            return result;
-        }
+        return result;
     }
 }

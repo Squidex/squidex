@@ -9,7 +9,6 @@ using Squidex.Infrastructure;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Domain.Apps.Entities
-{
-    public sealed record BulkUpdateResultItem(DomainId? Id, int JobIndex, Exception? Exception = null);
-}
+namespace Squidex.Domain.Apps.Entities;
+
+public sealed record BulkUpdateResultItem(DomainId? Id, int JobIndex, Exception? Exception = null);

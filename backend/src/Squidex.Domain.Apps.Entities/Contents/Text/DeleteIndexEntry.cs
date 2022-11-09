@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text;
+
+public sealed class DeleteIndexEntry : IndexCommand
 {
-    public sealed class DeleteIndexEntry : IndexCommand
-    {
-    }
 }

@@ -8,47 +8,46 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
-namespace Squidex.Config.Authentication
+namespace Squidex.Config.Authentication;
+
+public static class OidcServices
 {
-    public static class OidcServices
+    public static AuthenticationBuilder AddSquidexExternalOdic(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions)
     {
-        public static AuthenticationBuilder AddSquidexExternalOdic(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions)
+        if (identityOptions.IsOidcConfigured())
         {
-            if (identityOptions.IsOidcConfigured())
+            var displayName = !string.IsNullOrWhiteSpace(identityOptions.OidcName) ? identityOptions.OidcName : OpenIdConnectDefaults.DisplayName;
+
+            authBuilder.AddOpenIdConnect("ExternalOidc", displayName, options =>
             {
-                var displayName = !string.IsNullOrWhiteSpace(identityOptions.OidcName) ? identityOptions.OidcName : OpenIdConnectDefaults.DisplayName;
+                options.Authority = identityOptions.OidcAuthority;
+                options.ClientId = identityOptions.OidcClient;
+                options.ClientSecret = identityOptions.OidcSecret;
+                options.RequireHttpsMetadata = identityOptions.RequiresHttps;
+                options.Events = new OidcHandler(identityOptions);
 
-                authBuilder.AddOpenIdConnect("ExternalOidc", displayName, options =>
+                if (!string.IsNullOrEmpty(identityOptions.OidcMetadataAddress))
                 {
-                    options.Authority = identityOptions.OidcAuthority;
-                    options.ClientId = identityOptions.OidcClient;
-                    options.ClientSecret = identityOptions.OidcSecret;
-                    options.RequireHttpsMetadata = identityOptions.RequiresHttps;
-                    options.Events = new OidcHandler(identityOptions);
+                    options.MetadataAddress = identityOptions.OidcMetadataAddress;
+                }
 
-                    if (!string.IsNullOrEmpty(identityOptions.OidcMetadataAddress))
+                if (!string.IsNullOrEmpty(identityOptions.OidcResponseType))
+                {
+                    options.ResponseType = identityOptions.OidcResponseType;
+                }
+
+                options.GetClaimsFromUserInfoEndpoint = identityOptions.OidcGetClaimsFromUserInfoEndpoint;
+
+                if (identityOptions.OidcScopes != null)
+                {
+                    foreach (var scope in identityOptions.OidcScopes)
                     {
-                        options.MetadataAddress = identityOptions.OidcMetadataAddress;
+                        options.Scope.Add(scope);
                     }
-
-                    if (!string.IsNullOrEmpty(identityOptions.OidcResponseType))
-                    {
-                        options.ResponseType = identityOptions.OidcResponseType;
-                    }
-
-                    options.GetClaimsFromUserInfoEndpoint = identityOptions.OidcGetClaimsFromUserInfoEndpoint;
-
-                    if (identityOptions.OidcScopes != null)
-                    {
-                        foreach (var scope in identityOptions.OidcScopes)
-                        {
-                            options.Scope.Add(scope);
-                        }
-                    }
-                });
-            }
-
-            return authBuilder;
+                }
+            });
         }
+
+        return authBuilder;
     }
 }

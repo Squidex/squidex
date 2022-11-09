@@ -10,34 +10,33 @@ using MongoDB.Driver;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.MongoDb;
 
-namespace Migrations.Migrations.MongoDb
+namespace Migrations.Migrations.MongoDb;
+
+public sealed class ConvertRuleEventsJson : MongoBase<BsonDocument>, IMigration
 {
-    public sealed class ConvertRuleEventsJson : MongoBase<BsonDocument>, IMigration
+    private readonly IMongoCollection<BsonDocument> collection;
+
+    public ConvertRuleEventsJson(IMongoDatabase database)
     {
-        private readonly IMongoCollection<BsonDocument> collection;
+        collection = database.GetCollection<BsonDocument>("RuleEvents");
+    }
 
-        public ConvertRuleEventsJson(IMongoDatabase database)
+    public async Task UpdateAsync(
+        CancellationToken ct)
+    {
+        foreach (var document in collection.Find(FindAll).ToEnumerable(ct))
         {
-            collection = database.GetCollection<BsonDocument>("RuleEvents");
-        }
-
-        public async Task UpdateAsync(
-            CancellationToken ct)
-        {
-            foreach (var document in collection.Find(FindAll).ToEnumerable(ct))
+            try
             {
-                try
-                {
-                    document["Job"]["actionData"] = document["Job"]["actionData"].ToBsonDocument().ToJson();
+                document["Job"]["actionData"] = document["Job"]["actionData"].ToBsonDocument().ToJson();
 
-                    var filter = Filter.Eq("_id", document["_id"].ToString());
+                var filter = Filter.Eq("_id", document["_id"].ToString());
 
-                    await collection.ReplaceOneAsync(filter, document, cancellationToken: ct);
-                }
-                catch
-                {
-                    continue;
-                }
+                await collection.ReplaceOneAsync(filter, document, cancellationToken: ct);
+            }
+            catch
+            {
+                continue;
             }
         }
     }

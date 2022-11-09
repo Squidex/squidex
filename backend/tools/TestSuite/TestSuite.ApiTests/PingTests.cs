@@ -9,35 +9,34 @@ using TestSuite.Fixtures;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 
-namespace TestSuite.ApiTests
+namespace TestSuite.ApiTests;
+
+public class PingTests : IClassFixture<CreatedAppFixture>
 {
-    public class PingTests : IClassFixture<CreatedAppFixture>
+    public CreatedAppFixture _ { get; }
+
+    public PingTests(CreatedAppFixture fixture)
     {
-        public CreatedAppFixture _ { get; }
+        _ = fixture;
+    }
 
-        public PingTests(CreatedAppFixture fixture)
-        {
-            _ = fixture;
-        }
+    [Fact]
+    public async Task Should_ping_service()
+    {
+        await _.Ping.GetPingAsync();
+    }
 
-        [Fact]
-        public async Task Should_ping_service()
-        {
-            await _.Ping.GetPingAsync();
-        }
+    [Fact]
+    public async Task Should_ping_app()
+    {
+        await _.Ping.GetAppPingAsync(_.AppName);
+    }
 
-        [Fact]
-        public async Task Should_ping_app()
-        {
-            await _.Ping.GetAppPingAsync(_.AppName);
-        }
+    [Fact]
+    public async Task Should_get_info()
+    {
+        var infos = await _.Ping.GetInfoAsync();
 
-        [Fact]
-        public async Task Should_get_info()
-        {
-            var infos = await _.Ping.GetInfoAsync();
-
-            Assert.NotNull(infos);
-        }
+        Assert.NotNull(infos);
     }
 }

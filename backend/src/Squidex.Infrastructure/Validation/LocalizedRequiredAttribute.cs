@@ -9,16 +9,15 @@ using System.ComponentModel.DataAnnotations;
 using Squidex.Infrastructure.Translations;
 using Squidex.Text;
 
-namespace Squidex.Infrastructure.Validation
-{
-    [AttributeUsage(AttributeTargets.Property)]
-    public class LocalizedRequiredAttribute : RequiredAttribute
-    {
-        public override string FormatErrorMessage(string name)
-        {
-            var property = T.Get($"common.{name.ToCamelCase()}", name);
+namespace Squidex.Infrastructure.Validation;
 
-            return T.Get("annotations_Required", base.FormatErrorMessage(name), new { name = property });
-        }
+[AttributeUsage(AttributeTargets.Property)]
+public class LocalizedRequiredAttribute : RequiredAttribute
+{
+    public override string FormatErrorMessage(string name)
+    {
+        var property = T.Get($"common.{name.ToCamelCase()}", name);
+
+        return T.Get("annotations_Required", base.FormatErrorMessage(name), new { name = property });
     }
 }

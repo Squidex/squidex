@@ -10,13 +10,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Validation
+namespace Squidex.Extensions.Validation;
+
+public sealed class CompositeUniqueValidatorPlugin : IPlugin
 {
-    public sealed class CompositeUniqueValidatorPlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddSingleton<IValidatorsFactory, CompositeUniqueValidatorFactory>();
-        }
+        services.AddSingleton<IValidatorsFactory, CompositeUniqueValidatorFactory>();
     }
 }

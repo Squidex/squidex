@@ -11,127 +11,126 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Log;
 
-namespace Squidex.Infrastructure.Plugins
+namespace Squidex.Infrastructure.Plugins;
+
+public sealed class PluginManager : DisposableObjectBase
 {
-    public sealed class PluginManager : DisposableObjectBase
+    private readonly HashSet<PluginLoader> pluginLoaders = new HashSet<PluginLoader>();
+    private readonly HashSet<IPlugin> loadedPlugins = new HashSet<IPlugin>();
+    private readonly List<(string Plugin, string Action, Exception Exception)> exceptions = new List<(string, string, Exception)>();
+
+    protected override void DisposeObject(bool disposing)
     {
-        private readonly HashSet<PluginLoader> pluginLoaders = new HashSet<PluginLoader>();
-        private readonly HashSet<IPlugin> loadedPlugins = new HashSet<IPlugin>();
-        private readonly List<(string Plugin, string Action, Exception Exception)> exceptions = new List<(string, string, Exception)>();
-
-        protected override void DisposeObject(bool disposing)
+        if (disposing)
         {
-            if (disposing)
+            foreach (var loader in pluginLoaders)
             {
-                foreach (var loader in pluginLoaders)
-                {
-                    loader.Dispose();
-                }
+                loader.Dispose();
             }
         }
+    }
 
-        public Assembly? Load(string path, AssemblyName[] sharedAssemblies)
+    public Assembly? Load(string path, AssemblyName[] sharedAssemblies)
+    {
+        Guard.NotNullOrEmpty(path);
+        Guard.NotNull(sharedAssemblies);
+
+        Assembly? assembly = null;
+
+        var loader = PluginLoaders.LoadPlugin(path, sharedAssemblies);
+
+        if (loader != null)
         {
-            Guard.NotNullOrEmpty(path);
-            Guard.NotNull(sharedAssemblies);
-
-            Assembly? assembly = null;
-
-            var loader = PluginLoaders.LoadPlugin(path, sharedAssemblies);
-
-            if (loader != null)
+            try
             {
-                try
-                {
-                    assembly = loader.LoadDefaultAssembly();
+                assembly = loader.LoadDefaultAssembly();
 
-                    Add(path, assembly);
+                Add(path, assembly);
 
-                    pluginLoaders.Add(loader);
-                }
-                catch (Exception ex)
-                {
-                    LogException(path, "LoadingAssembly", ex);
-
-                    loader.Dispose();
-                }
+                pluginLoaders.Add(loader);
             }
-            else
+            catch (Exception ex)
             {
-                LogException(path, "LoadingPlugin", new FileNotFoundException($"Cannot find plugin at {path}"));
-            }
+                LogException(path, "LoadingAssembly", ex);
 
-            return assembly;
-        }
-
-        private void Add(string name, Assembly assembly)
-        {
-            var pluginTypes =
-                assembly.GetTypes()
-                    .Where(t => typeof(IPlugin).IsAssignableFrom(t))
-                    .Where(t => !t.IsAbstract);
-
-            foreach (var pluginType in pluginTypes)
-            {
-                try
-                {
-                    var plugin = (IPlugin)Activator.CreateInstance(pluginType)!;
-
-                    loadedPlugins.Add(plugin);
-                }
-                catch (Exception ex)
-                {
-                    LogException(name, "Instantiating", ex);
-                }
+                loader.Dispose();
             }
         }
-
-        private void LogException(string plugin, string action, Exception exception)
+        else
         {
-            exceptions.Add((plugin, action, exception));
+            LogException(path, "LoadingPlugin", new FileNotFoundException($"Cannot find plugin at {path}"));
         }
 
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            Guard.NotNull(services);
-            Guard.NotNull(config);
+        return assembly;
+    }
 
-            foreach (var plugin in loadedPlugins)
+    private void Add(string name, Assembly assembly)
+    {
+        var pluginTypes =
+            assembly.GetTypes()
+                .Where(t => typeof(IPlugin).IsAssignableFrom(t))
+                .Where(t => !t.IsAbstract);
+
+        foreach (var pluginType in pluginTypes)
+        {
+            try
             {
-                plugin.ConfigureServices(services, config);
+                var plugin = (IPlugin)Activator.CreateInstance(pluginType)!;
+
+                loadedPlugins.Add(plugin);
+            }
+            catch (Exception ex)
+            {
+                LogException(name, "Instantiating", ex);
             }
         }
+    }
 
-        public void Log(ISemanticLog log)
+    private void LogException(string plugin, string action, Exception exception)
+    {
+        exceptions.Add((plugin, action, exception));
+    }
+
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
+    {
+        Guard.NotNull(services);
+        Guard.NotNull(config);
+
+        foreach (var plugin in loadedPlugins)
         {
-            Guard.NotNull(log);
+            plugin.ConfigureServices(services, config);
+        }
+    }
 
-            if (loadedPlugins.Count > 0 || exceptions.Count > 0)
-            {
-                var status = exceptions.Count > 0 ? "CompletedWithErrors" : "Completed";
+    public void Log(ISemanticLog log)
+    {
+        Guard.NotNull(log);
 
-                log.LogInformation(w => w
-                    .WriteProperty("message", "Plugins loaded.")
-                    .WriteProperty("action", "pluginsLoaded")
-                    .WriteProperty("status", status)
-                    .WriteArray("errors", e =>
+        if (loadedPlugins.Count > 0 || exceptions.Count > 0)
+        {
+            var status = exceptions.Count > 0 ? "CompletedWithErrors" : "Completed";
+
+            log.LogInformation(w => w
+                .WriteProperty("message", "Plugins loaded.")
+                .WriteProperty("action", "pluginsLoaded")
+                .WriteProperty("status", status)
+                .WriteArray("errors", e =>
+                {
+                    foreach (var (plugin, action, exception) in exceptions)
                     {
-                        foreach (var (plugin, action, exception) in exceptions)
-                        {
-                            e.WriteObject(x => x
-                                .WriteProperty("plugin", plugin)
-                                .WriteProperty("action", action)
-                                .WriteException(exception));
-                        }
-                    })
-                    .WriteArray("plugins", a =>
+                        e.WriteObject(x => x
+                            .WriteProperty("plugin", plugin)
+                            .WriteProperty("action", action)
+                            .WriteException(exception));
+                    }
+                })
+                .WriteArray("plugins", a =>
+                {
+                    foreach (var plugin in loadedPlugins)
                     {
-                        foreach (var plugin in loadedPlugins)
-                        {
-                            a.WriteValue(plugin.GetType().ToString());
-                        }
-                    }));
-            }
+                        a.WriteValue(plugin.GetType().ToString());
+                    }
+                }));
         }
     }
 }

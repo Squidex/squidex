@@ -10,27 +10,26 @@ using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
-namespace Squidex.Infrastructure.Email
+namespace Squidex.Infrastructure.Email;
+
+[Trait("Category", "Dependencies")]
+public class SmtpEmailSenderTests
 {
-    [Trait("Category", "Dependencies")]
-    public class SmtpEmailSenderTests
+    [Fact]
+    public async Task Should_handle_timeout_properly()
     {
-        [Fact]
-        public async Task Should_handle_timeout_properly()
+        var options = TestConfig.Configuration.GetSection("email:smtp").Get<SmtpOptions>();
+
+        var recipient = TestConfig.Configuration["email:smtp:recipient"];
+
+        var testSubject = TestConfig.Configuration["email:smtp:testSubject"];
+        var testBody = TestConfig.Configuration["email:smtp:testBody"];
+
+        var sut = new SmtpEmailSender(Options.Create(options));
+
+        using (var cts = new CancellationTokenSource(5000))
         {
-            var options = TestConfig.Configuration.GetSection("email:smtp").Get<SmtpOptions>();
-
-            var recipient = TestConfig.Configuration["email:smtp:recipient"];
-
-            var testSubject = TestConfig.Configuration["email:smtp:testSubject"];
-            var testBody = TestConfig.Configuration["email:smtp:testBody"];
-
-            var sut = new SmtpEmailSender(Options.Create(options));
-
-            using (var cts = new CancellationTokenSource(5000))
-            {
-                await sut.SendAsync(recipient, testSubject, testBody, cts.Token);
-            }
+            await sut.SendAsync(recipient, testSubject, testBody, cts.Token);
         }
     }
 }

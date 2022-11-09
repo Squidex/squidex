@@ -12,31 +12,30 @@ using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 
-namespace Squidex.Domain.Users
+namespace Squidex.Domain.Users;
+
+public sealed class UserClaimsPrincipalFactoryWithEmail : UserClaimsPrincipalFactory<IdentityUser, IdentityRole>
 {
-    public sealed class UserClaimsPrincipalFactoryWithEmail : UserClaimsPrincipalFactory<IdentityUser, IdentityRole>
+    private const string AdministratorRole = "ADMINISTRATOR";
+
+    public UserClaimsPrincipalFactoryWithEmail(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<IdentityOptions> optionsAccessor)
+        : base(userManager, roleManager, optionsAccessor)
     {
-        private const string AdministratorRole = "ADMINISTRATOR";
+    }
 
-        public UserClaimsPrincipalFactoryWithEmail(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<IdentityOptions> optionsAccessor)
-            : base(userManager, roleManager, optionsAccessor)
+    public override async Task<ClaimsPrincipal> CreateAsync(IdentityUser user)
+    {
+        var principal = await base.CreateAsync(user);
+
+        var identity = principal.Identities.First();
+
+        identity.AddClaim(new Claim(OpenIdClaims.Email, await UserManager.GetEmailAsync(user)));
+
+        if (await UserManager.IsInRoleAsync(user, AdministratorRole))
         {
+            identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, PermissionIds.Admin));
         }
 
-        public override async Task<ClaimsPrincipal> CreateAsync(IdentityUser user)
-        {
-            var principal = await base.CreateAsync(user);
-
-            var identity = principal.Identities.First();
-
-            identity.AddClaim(new Claim(OpenIdClaims.Email, await UserManager.GetEmailAsync(user)));
-
-            if (await UserManager.IsInRoleAsync(user, AdministratorRole))
-            {
-                identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, PermissionIds.Admin));
-            }
-
-            return principal;
-        }
+        return principal;
     }
 }

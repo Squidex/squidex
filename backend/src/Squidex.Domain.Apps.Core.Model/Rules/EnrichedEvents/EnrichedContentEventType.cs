@@ -5,15 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
+namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+
+public enum EnrichedContentEventType
 {
-    public enum EnrichedContentEventType
-    {
-        Created,
-        Deleted,
-        Published,
-        StatusChanged,
-        Updated,
-        Unpublished
-    }
+    Created,
+    Deleted,
+    Published,
+    StatusChanged,
+    Updated,
+    Unpublished
 }

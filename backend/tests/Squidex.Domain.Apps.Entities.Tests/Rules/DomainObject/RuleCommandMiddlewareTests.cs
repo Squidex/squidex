@@ -12,92 +12,91 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
+namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
+
+public sealed class RuleCommandMiddlewareTests : HandlerTestBase<RuleDomainObject.State>
 {
-    public sealed class RuleCommandMiddlewareTests : HandlerTestBase<RuleDomainObject.State>
+    private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
+    private readonly IRuleEnricher ruleEnricher = A.Fake<IRuleEnricher>();
+    private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
+    private readonly DomainId ruleId = DomainId.NewGuid();
+    private readonly Context requestContext;
+    private readonly RuleCommandMiddleware sut;
+
+    public sealed class MyCommand : SquidexCommand
     {
-        private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
-        private readonly IRuleEnricher ruleEnricher = A.Fake<IRuleEnricher>();
-        private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
-        private readonly DomainId ruleId = DomainId.NewGuid();
-        private readonly Context requestContext;
-        private readonly RuleCommandMiddleware sut;
+    }
 
-        public sealed class MyCommand : SquidexCommand
-        {
-        }
+    protected override DomainId Id
+    {
+        get => ruleId;
+    }
 
-        protected override DomainId Id
-        {
-            get => ruleId;
-        }
+    public RuleCommandMiddlewareTests()
+    {
+        requestContext = Context.Anonymous(Mocks.App(AppNamedId));
 
-        public RuleCommandMiddlewareTests()
-        {
-            requestContext = Context.Anonymous(Mocks.App(AppNamedId));
+        A.CallTo(() => contextProvider.Context)
+            .Returns(requestContext);
 
-            A.CallTo(() => contextProvider.Context)
-                .Returns(requestContext);
+        sut = new RuleCommandMiddleware(domainObjectFactory, ruleEnricher, contextProvider);
+    }
 
-            sut = new RuleCommandMiddleware(domainObjectFactory, ruleEnricher, contextProvider);
-        }
+    [Fact]
+    public async Task Should_not_invoke_enricher_for_other_actual()
+    {
+        await HandleAsync(new EnableRule(), 12);
 
-        [Fact]
-        public async Task Should_not_invoke_enricher_for_other_actual()
-        {
-            await HandleAsync(new EnableRule(), 12);
+        A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnrichedRuleEntity>._, requestContext, default))
+            .MustNotHaveHappened();
+    }
 
-            A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnrichedRuleEntity>._, requestContext, default))
-                .MustNotHaveHappened();
-        }
+    [Fact]
+    public async Task Should_not_invoke_enricher_if_already_enriched()
+    {
+        var actual = new RuleEntity();
 
-        [Fact]
-        public async Task Should_not_invoke_enricher_if_already_enriched()
-        {
-            var actual = new RuleEntity();
+        var context =
+            await HandleAsync(new EnableRule(),
+                actual);
 
-            var context =
-                await HandleAsync(new EnableRule(),
-                    actual);
+        Assert.Same(actual, context.Result<IEnrichedRuleEntity>());
 
-            Assert.Same(actual, context.Result<IEnrichedRuleEntity>());
+        A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnrichedRuleEntity>._, requestContext, default))
+            .MustNotHaveHappened();
+    }
 
-            A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnrichedRuleEntity>._, requestContext, default))
-                .MustNotHaveHappened();
-        }
+    [Fact]
+    public async Task Should_enrich_rule_actual()
+    {
+        var actual = A.Fake<IRuleEntity>();
 
-        [Fact]
-        public async Task Should_enrich_rule_actual()
-        {
-            var actual = A.Fake<IRuleEntity>();
+        var enriched = new RuleEntity();
 
-            var enriched = new RuleEntity();
+        A.CallTo(() => ruleEnricher.EnrichAsync(actual, requestContext, default))
+            .Returns(enriched);
 
-            A.CallTo(() => ruleEnricher.EnrichAsync(actual, requestContext, default))
-                .Returns(enriched);
+        var context =
+            await HandleAsync(new EnableRule(),
+                actual);
 
-            var context =
-                await HandleAsync(new EnableRule(),
-                    actual);
+        Assert.Same(enriched, context.Result<IEnrichedRuleEntity>());
+    }
 
-            Assert.Same(enriched, context.Result<IEnrichedRuleEntity>());
-        }
+    private Task<CommandContext> HandleAsync(RuleCommand command, object actual)
+    {
+        command.RuleId = ruleId;
 
-        private Task<CommandContext> HandleAsync(RuleCommand command, object actual)
-        {
-            command.RuleId = ruleId;
+        CreateCommand(command);
 
-            CreateCommand(command);
+        var domainObject = A.Fake<RuleDomainObject>();
 
-            var domainObject = A.Fake<RuleDomainObject>();
+        A.CallTo(() => domainObject.ExecuteAsync(A<IAggregateCommand>._, A<CancellationToken>._))
+            .Returns(new CommandResult(command.AggregateId, 1, 0, actual));
 
-            A.CallTo(() => domainObject.ExecuteAsync(A<IAggregateCommand>._, A<CancellationToken>._))
-                .Returns(new CommandResult(command.AggregateId, 1, 0, actual));
+        A.CallTo(() => domainObjectFactory.Create<RuleDomainObject>(command.AggregateId))
+            .Returns(domainObject);
 
-            A.CallTo(() => domainObjectFactory.Create<RuleDomainObject>(command.AggregateId))
-                .Returns(domainObject);
-
-            return HandleAsync(sut, command);
-        }
+        return HandleAsync(sut, command);
     }
 }

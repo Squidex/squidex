@@ -5,11 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public enum BooleanFieldEditor
 {
-    public enum BooleanFieldEditor
-    {
-        Checkbox,
-        Toggle
-    }
+    Checkbox,
+    Toggle
 }

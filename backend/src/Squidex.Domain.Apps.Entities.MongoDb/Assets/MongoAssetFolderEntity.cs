@@ -14,76 +14,75 @@ using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
+namespace Squidex.Domain.Apps.Entities.MongoDb.Assets;
+
+public sealed class MongoAssetFolderEntity : IAssetFolderEntity, IVersionedEntity<DomainId>
 {
-    public sealed class MongoAssetFolderEntity : IAssetFolderEntity, IVersionedEntity<DomainId>
+    [BsonId]
+    [BsonElement("_id")]
+    public DomainId DocumentId { get; set; }
+
+    [BsonRequired]
+    [BsonElement("_ai")]
+    public DomainId IndexedAppId { get; set; }
+
+    [BsonRequired]
+    [BsonElement("id")]
+    public DomainId Id { get; set; }
+
+    [BsonRequired]
+    [BsonElement("pi")]
+    public DomainId ParentId { get; set; }
+
+    [BsonRequired]
+    [BsonElement("ai")]
+    public NamedId<DomainId> AppId { get; set; }
+
+    [BsonRequired]
+    [BsonElement("ct")]
+    public Instant Created { get; set; }
+
+    [BsonRequired]
+    [BsonElement("mt")]
+    public Instant LastModified { get; set; }
+
+    [BsonRequired]
+    [BsonElement("fn")]
+    public string FolderName { get; set; }
+
+    [BsonRequired]
+    [BsonElement("vs")]
+    public long Version { get; set; }
+
+    [BsonRequired]
+    [BsonElement("cb")]
+    public RefToken CreatedBy { get; set; }
+
+    [BsonRequired]
+    [BsonElement("mb")]
+    public RefToken LastModifiedBy { get; set; }
+
+    [BsonRequired]
+    [BsonElement("dl")]
+    public bool IsDeleted { get; set; }
+
+    public DomainId UniqueId
     {
-        [BsonId]
-        [BsonElement("_id")]
-        public DomainId DocumentId { get; set; }
+        get => DocumentId;
+    }
 
-        [BsonRequired]
-        [BsonElement("_ai")]
-        public DomainId IndexedAppId { get; set; }
+    public AssetFolderDomainObject.State ToState()
+    {
+        return SimpleMapper.Map(this, new AssetFolderDomainObject.State());
+    }
 
-        [BsonRequired]
-        [BsonElement("id")]
-        public DomainId Id { get; set; }
+    public static MongoAssetFolderEntity Create(SnapshotWriteJob<AssetFolderDomainObject.State> job)
+    {
+        var entity = SimpleMapper.Map(job.Value, new MongoAssetFolderEntity());
 
-        [BsonRequired]
-        [BsonElement("pi")]
-        public DomainId ParentId { get; set; }
+        entity.DocumentId = job.Key;
+        entity.IndexedAppId = job.Value.AppId.Id;
 
-        [BsonRequired]
-        [BsonElement("ai")]
-        public NamedId<DomainId> AppId { get; set; }
-
-        [BsonRequired]
-        [BsonElement("ct")]
-        public Instant Created { get; set; }
-
-        [BsonRequired]
-        [BsonElement("mt")]
-        public Instant LastModified { get; set; }
-
-        [BsonRequired]
-        [BsonElement("fn")]
-        public string FolderName { get; set; }
-
-        [BsonRequired]
-        [BsonElement("vs")]
-        public long Version { get; set; }
-
-        [BsonRequired]
-        [BsonElement("cb")]
-        public RefToken CreatedBy { get; set; }
-
-        [BsonRequired]
-        [BsonElement("mb")]
-        public RefToken LastModifiedBy { get; set; }
-
-        [BsonRequired]
-        [BsonElement("dl")]
-        public bool IsDeleted { get; set; }
-
-        public DomainId UniqueId
-        {
-            get => DocumentId;
-        }
-
-        public AssetFolderDomainObject.State ToState()
-        {
-            return SimpleMapper.Map(this, new AssetFolderDomainObject.State());
-        }
-
-        public static MongoAssetFolderEntity Create(SnapshotWriteJob<AssetFolderDomainObject.State> job)
-        {
-            var entity = SimpleMapper.Map(job.Value, new MongoAssetFolderEntity());
-
-            entity.DocumentId = job.Key;
-            entity.IndexedAppId = job.Value.AppId.Id;
-
-            return entity;
-        }
+        return entity;
     }
 }

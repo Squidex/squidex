@@ -11,15 +11,14 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 
-namespace Migrations.OldEvents
+namespace Migrations.OldEvents;
+
+[EventType(nameof(ContentPublished))]
+[Obsolete("New Event introduced")]
+public sealed class ContentPublished : ContentEvent, IMigrated<IEvent>
 {
-    [EventType(nameof(ContentPublished))]
-    [Obsolete("New Event introduced")]
-    public sealed class ContentPublished : ContentEvent, IMigrated<IEvent>
+    public IEvent Migrate()
     {
-        public IEvent Migrate()
-        {
-            return SimpleMapper.Map(this, new ContentStatusChanged { Status = Status.Published });
-        }
+        return SimpleMapper.Map(this, new ContentStatusChanged { Status = Status.Published });
     }
 }

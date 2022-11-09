@@ -9,269 +9,268 @@ using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
-namespace Squidex.Infrastructure.Migrations
+namespace Squidex.Infrastructure.Migrations;
+
+public class MigratorTests
 {
-    public class MigratorTests
+    private readonly CancellationTokenSource cts = new CancellationTokenSource();
+    private readonly CancellationToken ct;
+    private readonly IMigrationStatus status = A.Fake<IMigrationStatus>();
+    private readonly IMigrationPath path = A.Fake<IMigrationPath>();
+    private readonly ILogger<Migrator> log = A.Fake<ILogger<Migrator>>();
+    private readonly List<(int From, int To, IMigration Migration)> migrations = new List<(int From, int To, IMigration Migration)>();
+
+    public sealed class InMemoryStatus : IMigrationStatus
     {
-        private readonly CancellationTokenSource cts = new CancellationTokenSource();
-        private readonly CancellationToken ct;
-        private readonly IMigrationStatus status = A.Fake<IMigrationStatus>();
-        private readonly IMigrationPath path = A.Fake<IMigrationPath>();
-        private readonly ILogger<Migrator> log = A.Fake<ILogger<Migrator>>();
-        private readonly List<(int From, int To, IMigration Migration)> migrations = new List<(int From, int To, IMigration Migration)>();
+        private readonly object lockObject = new object();
+        private int version;
+        private bool isLocked;
 
-        public sealed class InMemoryStatus : IMigrationStatus
+        public Task<int> GetVersionAsync(
+            CancellationToken ct = default)
         {
-            private readonly object lockObject = new object();
-            private int version;
-            private bool isLocked;
+            return Task.FromResult(version);
+        }
 
-            public Task<int> GetVersionAsync(
-                CancellationToken ct = default)
+        public Task<bool> TryLockAsync(
+            CancellationToken ct = default)
+        {
+            var lockAcquired = false;
+
+            lock (lockObject)
             {
-                return Task.FromResult(version);
+                if (!isLocked)
+                {
+                    isLocked = true;
+
+                    lockAcquired = true;
+                }
             }
 
-            public Task<bool> TryLockAsync(
-                CancellationToken ct = default)
+            return Task.FromResult(lockAcquired);
+        }
+
+        public Task CompleteAsync(int newVersion,
+            CancellationToken ct = default)
+        {
+            lock (lockObject)
             {
-                var lockAcquired = false;
+                version = newVersion;
+            }
 
-                lock (lockObject)
+            return Task.CompletedTask;
+        }
+
+        public Task UnlockAsync(
+            CancellationToken ct = default)
+        {
+            lock (lockObject)
+            {
+                isLocked = false;
+            }
+
+            return Task.CompletedTask;
+        }
+    }
+
+    public MigratorTests()
+    {
+        ct = cts.Token;
+
+        A.CallTo(() => path.GetNext(A<int>._))
+            .ReturnsLazily((int version) =>
+            {
+                var selected = migrations.Where(x => x.From == version).ToList();
+
+                if (selected.Count == 0)
                 {
-                    if (!isLocked)
-                    {
-                        isLocked = true;
-
-                        lockAcquired = true;
-                    }
+                    return (0, null);
                 }
 
-                return Task.FromResult(lockAcquired);
-            }
+                var newVersion = selected.Max(x => x.To);
 
-            public Task CompleteAsync(int newVersion,
-                CancellationToken ct = default)
-            {
-                lock (lockObject)
-                {
-                    version = newVersion;
-                }
+                return (newVersion, migrations.Select(x => x.Migration));
+            });
 
-                return Task.CompletedTask;
-            }
+        A.CallTo(() => status.GetVersionAsync(ct))
+            .Returns(0);
 
-            public Task UnlockAsync(
-                CancellationToken ct = default)
-            {
-                lock (lockObject)
-                {
-                    isLocked = false;
-                }
+        A.CallTo(() => status.TryLockAsync(ct))
+            .Returns(true);
+    }
 
-                return Task.CompletedTask;
-            }
-        }
+    [Fact]
+    public async Task Should_migrate_in_one_step()
+    {
+        var migrator_0_1 = BuildMigration(0, 1);
+        var migrator_1_2 = BuildMigration(0, 2);
+        var migrator_2_3 = BuildMigration(0, 3);
 
-        public MigratorTests()
+        var sut = new Migrator(status, path, log);
+
+        await sut.MigrateAsync(ct);
+
+        A.CallTo(() => migrator_0_1.UpdateAsync(ct))
+            .MustHaveHappened();
+
+        A.CallTo(() => migrator_1_2.UpdateAsync(ct))
+            .MustHaveHappened();
+
+        A.CallTo(() => migrator_2_3.UpdateAsync(ct))
+            .MustHaveHappened();
+
+        A.CallTo(() => status.CompleteAsync(1, A<CancellationToken>._))
+            .MustNotHaveHappened();
+
+        A.CallTo(() => status.CompleteAsync(2, A<CancellationToken>._))
+            .MustNotHaveHappened();
+
+        A.CallTo(() => status.CompleteAsync(3, ct))
+            .MustHaveHappened();
+
+        A.CallTo(() => status.UnlockAsync(default))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_migrate_step_by_step()
+    {
+        var migrator_0_1 = BuildMigration(0, 1);
+        var migrator_1_2 = BuildMigration(1, 2);
+        var migrator_2_3 = BuildMigration(2, 3);
+
+        var sut = new Migrator(status, path, log);
+
+        await sut.MigrateAsync(ct);
+
+        A.CallTo(() => migrator_0_1.UpdateAsync(ct))
+            .MustHaveHappened();
+
+        A.CallTo(() => migrator_1_2.UpdateAsync(ct))
+            .MustHaveHappened();
+
+        A.CallTo(() => migrator_2_3.UpdateAsync(ct))
+            .MustHaveHappened();
+
+        A.CallTo(() => status.CompleteAsync(1, ct))
+            .MustHaveHappened();
+
+        A.CallTo(() => status.CompleteAsync(2, ct))
+            .MustHaveHappened();
+
+        A.CallTo(() => status.CompleteAsync(3, ct))
+            .MustHaveHappened();
+
+        A.CallTo(() => status.UnlockAsync(A<CancellationToken>._))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_unlock_if_migration_failed()
+    {
+        var migrator_0_1 = BuildMigration(0, 1);
+        var migrator_1_2 = BuildMigration(1, 2);
+        var migrator_2_3 = BuildMigration(2, 3);
+
+        var sut = new Migrator(status, path, log);
+
+        A.CallTo(() => migrator_1_2.UpdateAsync(ct))
+            .Throws(new InvalidOperationException());
+
+        await Assert.ThrowsAsync<MigrationFailedException>(() => sut.MigrateAsync(ct));
+
+        A.CallTo(() => migrator_0_1.UpdateAsync(A<CancellationToken>._))
+            .MustHaveHappened();
+
+        A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._))
+            .MustHaveHappened();
+
+        A.CallTo(() => migrator_2_3.UpdateAsync(A<CancellationToken>._))
+            .MustNotHaveHappened();
+
+        A.CallTo(() => status.CompleteAsync(1, A<CancellationToken>._))
+            .MustNotHaveHappened();
+
+        A.CallTo(() => status.CompleteAsync(2, A<CancellationToken>._))
+            .MustNotHaveHappened();
+
+        A.CallTo(() => status.CompleteAsync(3, A<CancellationToken>._))
+            .MustNotHaveHappened();
+
+        A.CallTo(() => status.UnlockAsync(default))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_log_exception_if_migration_failed()
+    {
+        var migrator_0_1 = BuildMigration(0, 1);
+        var migrator_1_2 = BuildMigration(1, 2);
+
+        var ex = new InvalidOperationException();
+
+        A.CallTo(() => migrator_0_1.UpdateAsync(ct))
+            .Throws(ex);
+
+        var sut = new Migrator(status, path, log);
+
+        await Assert.ThrowsAsync<MigrationFailedException>(() => sut.MigrateAsync(ct));
+
+        A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Critical && x.GetArgument<Exception>(3) == ex)
+            .MustHaveHappened();
+
+        A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_prevent_multiple_updates()
+    {
+        var migrator_0_1 = BuildMigration(0, 1);
+        var migrator_1_2 = BuildMigration(0, 2);
+
+        var sut = new Migrator(new InMemoryStatus(), path, log) { LockWaitMs = 2 };
+
+        await Task.WhenAll(Enumerable.Repeat(0, 10).Select(x => Task.Run(() => sut.MigrateAsync(ct), ct)));
+
+        A.CallTo(() => migrator_0_1.UpdateAsync(ct))
+            .MustHaveHappenedOnceExactly();
+
+        A.CallTo(() => migrator_1_2.UpdateAsync(ct))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_not_release_lock_if_not_acquired()
+    {
+        using (var tcs = new CancellationTokenSource())
         {
-            ct = cts.Token;
+            var sut = new Migrator(status, path, log) { LockWaitMs = 2 };
 
-            A.CallTo(() => path.GetNext(A<int>._))
-                .ReturnsLazily((int version) =>
-                {
-                    var selected = migrations.Where(x => x.From == version).ToList();
+            A.CallTo(() => status.TryLockAsync(tcs.Token))
+                .Returns(false);
 
-                    if (selected.Count == 0)
-                    {
-                        return (0, null);
-                    }
-
-                    var newVersion = selected.Max(x => x.To);
-
-                    return (newVersion, migrations.Select(x => x.Migration));
-                });
-
-            A.CallTo(() => status.GetVersionAsync(ct))
-                .Returns(0);
-
-            A.CallTo(() => status.TryLockAsync(ct))
-                .Returns(true);
-        }
-
-        [Fact]
-        public async Task Should_migrate_in_one_step()
-        {
-            var migrator_0_1 = BuildMigration(0, 1);
-            var migrator_1_2 = BuildMigration(0, 2);
-            var migrator_2_3 = BuildMigration(0, 3);
-
-            var sut = new Migrator(status, path, log);
-
-            await sut.MigrateAsync(ct);
-
-            A.CallTo(() => migrator_0_1.UpdateAsync(ct))
-                .MustHaveHappened();
-
-            A.CallTo(() => migrator_1_2.UpdateAsync(ct))
-                .MustHaveHappened();
-
-            A.CallTo(() => migrator_2_3.UpdateAsync(ct))
-                .MustHaveHappened();
-
-            A.CallTo(() => status.CompleteAsync(1, A<CancellationToken>._))
-                .MustNotHaveHappened();
-
-            A.CallTo(() => status.CompleteAsync(2, A<CancellationToken>._))
-                .MustNotHaveHappened();
-
-            A.CallTo(() => status.CompleteAsync(3, ct))
-                .MustHaveHappened();
-
-            A.CallTo(() => status.UnlockAsync(default))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_migrate_step_by_step()
-        {
-            var migrator_0_1 = BuildMigration(0, 1);
-            var migrator_1_2 = BuildMigration(1, 2);
-            var migrator_2_3 = BuildMigration(2, 3);
-
-            var sut = new Migrator(status, path, log);
-
-            await sut.MigrateAsync(ct);
-
-            A.CallTo(() => migrator_0_1.UpdateAsync(ct))
-                .MustHaveHappened();
-
-            A.CallTo(() => migrator_1_2.UpdateAsync(ct))
-                .MustHaveHappened();
-
-            A.CallTo(() => migrator_2_3.UpdateAsync(ct))
-                .MustHaveHappened();
-
-            A.CallTo(() => status.CompleteAsync(1, ct))
-                .MustHaveHappened();
-
-            A.CallTo(() => status.CompleteAsync(2, ct))
-                .MustHaveHappened();
-
-            A.CallTo(() => status.CompleteAsync(3, ct))
-                .MustHaveHappened();
-
-            A.CallTo(() => status.UnlockAsync(A<CancellationToken>._))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_unlock_if_migration_failed()
-        {
-            var migrator_0_1 = BuildMigration(0, 1);
-            var migrator_1_2 = BuildMigration(1, 2);
-            var migrator_2_3 = BuildMigration(2, 3);
-
-            var sut = new Migrator(status, path, log);
-
-            A.CallTo(() => migrator_1_2.UpdateAsync(ct))
-                .Throws(new InvalidOperationException());
-
-            await Assert.ThrowsAsync<MigrationFailedException>(() => sut.MigrateAsync(ct));
-
-            A.CallTo(() => migrator_0_1.UpdateAsync(A<CancellationToken>._))
-                .MustHaveHappened();
-
-            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._))
-                .MustHaveHappened();
-
-            A.CallTo(() => migrator_2_3.UpdateAsync(A<CancellationToken>._))
-                .MustNotHaveHappened();
-
-            A.CallTo(() => status.CompleteAsync(1, A<CancellationToken>._))
-                .MustNotHaveHappened();
-
-            A.CallTo(() => status.CompleteAsync(2, A<CancellationToken>._))
-                .MustNotHaveHappened();
-
-            A.CallTo(() => status.CompleteAsync(3, A<CancellationToken>._))
-                .MustNotHaveHappened();
-
-            A.CallTo(() => status.UnlockAsync(default))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_log_exception_if_migration_failed()
-        {
-            var migrator_0_1 = BuildMigration(0, 1);
-            var migrator_1_2 = BuildMigration(1, 2);
-
-            var ex = new InvalidOperationException();
-
-            A.CallTo(() => migrator_0_1.UpdateAsync(ct))
-                .Throws(ex);
-
-            var sut = new Migrator(status, path, log);
-
-            await Assert.ThrowsAsync<MigrationFailedException>(() => sut.MigrateAsync(ct));
-
-            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Critical && x.GetArgument<Exception>(3) == ex)
-                .MustHaveHappened();
-
-            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._))
-                .MustNotHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_prevent_multiple_updates()
-        {
-            var migrator_0_1 = BuildMigration(0, 1);
-            var migrator_1_2 = BuildMigration(0, 2);
-
-            var sut = new Migrator(new InMemoryStatus(), path, log) { LockWaitMs = 2 };
-
-            await Task.WhenAll(Enumerable.Repeat(0, 10).Select(x => Task.Run(() => sut.MigrateAsync(ct), ct)));
-
-            A.CallTo(() => migrator_0_1.UpdateAsync(ct))
-                .MustHaveHappenedOnceExactly();
-
-            A.CallTo(() => migrator_1_2.UpdateAsync(ct))
-                .MustHaveHappenedOnceExactly();
-        }
-
-        [Fact]
-        public async Task Should_not_release_lock_if_not_acquired()
-        {
-            using (var tcs = new CancellationTokenSource())
-            {
-                var sut = new Migrator(status, path, log) { LockWaitMs = 2 };
-
-                A.CallTo(() => status.TryLockAsync(tcs.Token))
-                    .Returns(false);
-
-                var task = sut.MigrateAsync(tcs.Token);
+            var task = sut.MigrateAsync(tcs.Token);
 
 #pragma warning disable MA0040 // Flow the cancellation token
-                await Task.Delay(100);
+            await Task.Delay(100);
 #pragma warning restore MA0040 // Flow the cancellation token
 
-                tcs.Cancel();
+            tcs.Cancel();
 
-                await task;
+            await task;
 
-                A.CallTo(() => status.UnlockAsync(A<CancellationToken>._))
-                    .MustNotHaveHappened();
-            }
+            A.CallTo(() => status.UnlockAsync(A<CancellationToken>._))
+                .MustNotHaveHappened();
         }
+    }
 
-        private IMigration BuildMigration(int fromVersion, int toVersion)
-        {
-            var migration = A.Fake<IMigration>();
+    private IMigration BuildMigration(int fromVersion, int toVersion)
+    {
+        var migration = A.Fake<IMigration>();
 
-            migrations.Add((fromVersion, toVersion, migration));
+        migrations.Add((fromVersion, toVersion, migration));
 
-            return migration;
-        }
+        return migration;
     }
 }

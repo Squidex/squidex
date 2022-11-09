@@ -5,11 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public interface IAggregate
 {
-    public interface IAggregate
-    {
-        Task<CommandResult> ExecuteAsync(IAggregateCommand command,
-            CancellationToken ct);
-    }
+    Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+        CancellationToken ct);
 }

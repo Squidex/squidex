@@ -5,48 +5,47 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+public abstract class DisposableObjectBase : IDisposable
 {
-    public abstract class DisposableObjectBase : IDisposable
+    private readonly object disposeLock = new object();
+    private bool isDisposed;
+
+    public bool IsDisposed => isDisposed;
+
+    public void Dispose()
     {
-        private readonly object disposeLock = new object();
-        private bool isDisposed;
+        Dispose(true);
 
-        public bool IsDisposed => isDisposed;
+        GC.SuppressFinalize(this);
+    }
 
-        public void Dispose()
+    protected void Dispose(bool disposing)
+    {
+        if (isDisposed)
         {
-            Dispose(true);
-
-            GC.SuppressFinalize(this);
+            return;
         }
 
-        protected void Dispose(bool disposing)
+        lock (disposeLock)
         {
-            if (isDisposed)
+            if (!isDisposed)
             {
-                return;
+                DisposeObject(disposing);
             }
-
-            lock (disposeLock)
-            {
-                if (!isDisposed)
-                {
-                    DisposeObject(disposing);
-                }
-            }
-
-            isDisposed = true;
         }
 
-        protected abstract void DisposeObject(bool disposing);
+        isDisposed = true;
+    }
 
-        protected void ThrowIfDisposed()
+    protected abstract void DisposeObject(bool disposing);
+
+    protected void ThrowIfDisposed()
+    {
+        if (isDisposed)
         {
-            if (isDisposed)
-            {
-                throw new ObjectDisposedException(GetType().Name);
-            }
+            throw new ObjectDisposedException(GetType().Name);
         }
     }
 }

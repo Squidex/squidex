@@ -7,19 +7,18 @@
 
 using System.Runtime.Serialization;
 
-namespace Squidex.Domain.Apps.Entities.Backup
-{
-    [Serializable]
-    public class BackupRestoreException : Exception
-    {
-        public BackupRestoreException(string message, Exception? inner = null)
-            : base(message, inner)
-        {
-        }
+namespace Squidex.Domain.Apps.Entities.Backup;
 
-        protected BackupRestoreException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
+[Serializable]
+public class BackupRestoreException : Exception
+{
+    public BackupRestoreException(string message, Exception? inner = null)
+        : base(message, inner)
+    {
+    }
+
+    protected BackupRestoreException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
+    {
     }
 }

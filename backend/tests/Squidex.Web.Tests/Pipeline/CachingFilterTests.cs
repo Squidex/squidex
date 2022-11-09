@@ -15,99 +15,98 @@ using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Xunit;
 
-namespace Squidex.Web.Pipeline
+namespace Squidex.Web.Pipeline;
+
+public class CachingFilterTests
 {
-    public class CachingFilterTests
+    private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
+    private readonly HttpContext httpContext = new DefaultHttpContext();
+    private readonly ActionExecutingContext executingContext;
+    private readonly ActionExecutedContext executedContext;
+    private readonly CachingOptions cachingOptions = new CachingOptions();
+    private readonly CachingManager cachingManager;
+    private readonly CachingFilter sut;
+
+    public CachingFilterTests()
     {
-        private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
-        private readonly HttpContext httpContext = new DefaultHttpContext();
-        private readonly ActionExecutingContext executingContext;
-        private readonly ActionExecutedContext executedContext;
-        private readonly CachingOptions cachingOptions = new CachingOptions();
-        private readonly CachingManager cachingManager;
-        private readonly CachingFilter sut;
+        A.CallTo(() => httpContextAccessor.HttpContext)
+            .Returns(httpContext);
 
-        public CachingFilterTests()
+        cachingManager = new CachingManager(httpContextAccessor, Options.Create(cachingOptions));
+
+        var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+        var actionFilters = new List<IFilterMetadata>();
+
+        executingContext = new ActionExecutingContext(actionContext, actionFilters, new Dictionary<string, object?>(), this);
+        executedContext = new ActionExecutedContext(actionContext, actionFilters, this)
         {
-            A.CallTo(() => httpContextAccessor.HttpContext)
-                .Returns(httpContext);
+            Result = new OkResult()
+        };
 
-            cachingManager = new CachingManager(httpContextAccessor, Options.Create(cachingOptions));
+        sut = new CachingFilter(cachingManager);
+    }
 
-            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
-            var actionFilters = new List<IFilterMetadata>();
+    [Theory]
+    [InlineData("13", "13")]
+    [InlineData("13", "W/13")]
+    [InlineData("W/13", "13")]
+    [InlineData("W/13", "W/13")]
+    public async Task Should_return_304_for_same_etags(string ifNoneMatch, string etag)
+    {
+        httpContext.Request.Method = HttpMethods.Get;
+        httpContext.Request.Headers[HeaderNames.IfNoneMatch] = ifNoneMatch;
 
-            executingContext = new ActionExecutingContext(actionContext, actionFilters, new Dictionary<string, object?>(), this);
-            executedContext = new ActionExecutedContext(actionContext, actionFilters, this)
-            {
-                Result = new OkResult()
-            };
+        httpContext.Response.Headers[HeaderNames.ETag] = etag;
 
-            sut = new CachingFilter(cachingManager);
-        }
+        await sut.OnActionExecutionAsync(executingContext, Next());
 
-        [Theory]
-        [InlineData("13", "13")]
-        [InlineData("13", "W/13")]
-        [InlineData("W/13", "13")]
-        [InlineData("W/13", "W/13")]
-        public async Task Should_return_304_for_same_etags(string ifNoneMatch, string etag)
+        Assert.Equal(304, ((StatusCodeResult)executedContext.Result!).StatusCode);
+    }
+
+    [Fact]
+    public async Task Should_return_304_for_same_etags_from_cache_manager()
+    {
+        httpContext.Request.Method = HttpMethods.Get;
+        httpContext.Request.Headers[HeaderNames.IfNoneMatch] = "2C70E12B7A0646F92279F427C7B38E7334D8E5389CFF167A1DC30E73F826B683";
+
+        await sut.OnActionExecutionAsync(executingContext, () =>
         {
-            httpContext.Request.Method = HttpMethods.Get;
-            httpContext.Request.Headers[HeaderNames.IfNoneMatch] = ifNoneMatch;
+            cachingManager.AddDependency("key");
 
-            httpContext.Response.Headers[HeaderNames.ETag] = etag;
+            return Task.FromResult(executedContext);
+        });
 
-            await sut.OnActionExecutionAsync(executingContext, Next());
+        Assert.Equal(304, ((StatusCodeResult)executedContext.Result!).StatusCode);
+    }
 
-            Assert.Equal(304, ((StatusCodeResult)executedContext.Result!).StatusCode);
-        }
+    [Fact]
+    public async Task Should_not_return_304_for_different_etags()
+    {
+        httpContext.Request.Method = HttpMethods.Get;
+        httpContext.Request.Headers[HeaderNames.IfNoneMatch] = "W/13";
 
-        [Fact]
-        public async Task Should_return_304_for_same_etags_from_cache_manager()
-        {
-            httpContext.Request.Method = HttpMethods.Get;
-            httpContext.Request.Headers[HeaderNames.IfNoneMatch] = "2C70E12B7A0646F92279F427C7B38E7334D8E5389CFF167A1DC30E73F826B683";
+        httpContext.Response.Headers[HeaderNames.ETag] = "W/11";
 
-            await sut.OnActionExecutionAsync(executingContext, () =>
-            {
-                cachingManager.AddDependency("key");
+        await sut.OnActionExecutionAsync(executingContext, Next());
 
-                return Task.FromResult(executedContext);
-            });
+        Assert.Equal(200, ((StatusCodeResult)executedContext.Result!).StatusCode);
+    }
 
-            Assert.Equal(304, ((StatusCodeResult)executedContext.Result!).StatusCode);
-        }
+    [Fact]
+    public async Task Should_not_return_304_for_post()
+    {
+        httpContext.Request.Method = HttpMethods.Post;
+        httpContext.Request.Headers[HeaderNames.IfNoneMatch] = "W/13";
 
-        [Fact]
-        public async Task Should_not_return_304_for_different_etags()
-        {
-            httpContext.Request.Method = HttpMethods.Get;
-            httpContext.Request.Headers[HeaderNames.IfNoneMatch] = "W/13";
+        httpContext.Response.Headers[HeaderNames.ETag] = "W/13";
 
-            httpContext.Response.Headers[HeaderNames.ETag] = "W/11";
+        await sut.OnActionExecutionAsync(executingContext, Next());
 
-            await sut.OnActionExecutionAsync(executingContext, Next());
+        Assert.Equal(200, ((StatusCodeResult)executedContext.Result!).StatusCode);
+    }
 
-            Assert.Equal(200, ((StatusCodeResult)executedContext.Result!).StatusCode);
-        }
-
-        [Fact]
-        public async Task Should_not_return_304_for_post()
-        {
-            httpContext.Request.Method = HttpMethods.Post;
-            httpContext.Request.Headers[HeaderNames.IfNoneMatch] = "W/13";
-
-            httpContext.Response.Headers[HeaderNames.ETag] = "W/13";
-
-            await sut.OnActionExecutionAsync(executingContext, Next());
-
-            Assert.Equal(200, ((StatusCodeResult)executedContext.Result!).StatusCode);
-        }
-
-        private ActionExecutionDelegate Next()
-        {
-            return () => Task.FromResult(executedContext);
-        }
+    private ActionExecutionDelegate Next()
+    {
+        return () => Task.FromResult(executedContext);
     }
 }

@@ -16,181 +16,180 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 
-namespace Squidex.Areas.Api.Controllers.Contents.Generator
+namespace Squidex.Areas.Api.Controllers.Contents.Generator;
+
+internal sealed class Builder
 {
-    internal sealed class Builder
+    public string AppName { get; }
+
+    public JsonSchema ChangeStatusSchema { get; }
+
+    public JsonSchema BulkResponseSchema { get; }
+
+    public JsonSchema BulkRequestSchema { get; }
+
+    public JsonSchema QuerySchema { get; }
+
+    public OpenApiDocument OpenApiDocument { get; }
+
+    public OpenApiSchemaResolver OpenApiSchemaResolver { get; }
+
+    internal Builder(IAppEntity app,
+        OpenApiDocument document,
+        OpenApiSchemaResolver schemaResolver,
+        OpenApiSchemaGenerator schemaGenerator)
     {
-        public string AppName { get; }
+        AppName = app.Name;
 
-        public JsonSchema ChangeStatusSchema { get; }
+        OpenApiDocument = document;
+        OpenApiSchemaResolver = schemaResolver;
 
-        public JsonSchema BulkResponseSchema { get; }
+        ChangeStatusSchema = CreateSchema<ChangeStatusDto>(schemaResolver, schemaGenerator);
+        BulkRequestSchema = CreateSchema<BulkUpdateContentsDto>(schemaResolver, schemaGenerator);
+        BulkResponseSchema = CreateSchema<BulkResultDto>(schemaResolver, schemaGenerator);
+        QuerySchema = CreateSchema<QueryDto>(schemaResolver, schemaGenerator);
+    }
 
-        public JsonSchema BulkRequestSchema { get; }
+    private static JsonSchema CreateSchema<T>(OpenApiSchemaResolver schemaResolver, OpenApiSchemaGenerator schemaGenerator)
+    {
+        var contextualType = typeof(T).ToContextualType();
 
-        public JsonSchema QuerySchema { get; }
+        return schemaGenerator.GenerateWithReference<JsonSchema>(contextualType, schemaResolver);
+    }
 
-        public OpenApiDocument OpenApiDocument { get; }
-
-        public OpenApiSchemaResolver OpenApiSchemaResolver { get; }
-
-        internal Builder(IAppEntity app,
-            OpenApiDocument document,
-            OpenApiSchemaResolver schemaResolver,
-            OpenApiSchemaGenerator schemaGenerator)
+    public OperationsBuilder Shared()
+    {
+        var dataSchema = RegisterReference("DataDto", _ =>
         {
-            AppName = app.Name;
+            return JsonSchema.CreateAnySchema();
+        });
 
-            OpenApiDocument = document;
-            OpenApiSchemaResolver = schemaResolver;
+        var contentSchema = RegisterReference("ContentDto", _ =>
+        {
+            return ContentJsonSchema.Build(dataSchema, true);
+        });
 
-            ChangeStatusSchema = CreateSchema<ChangeStatusDto>(schemaResolver, schemaGenerator);
-            BulkRequestSchema = CreateSchema<BulkUpdateContentsDto>(schemaResolver, schemaGenerator);
-            BulkResponseSchema = CreateSchema<BulkResultDto>(schemaResolver, schemaGenerator);
-            QuerySchema = CreateSchema<QueryDto>(schemaResolver, schemaGenerator);
+        var contentsSchema = RegisterReference("ContentResultDto", _ =>
+        {
+            return BuildResult(contentSchema);
+        });
+
+        var path = $"/api/content/{AppName}";
+
+        var builder = new OperationsBuilder
+        {
+            ContentSchema = contentSchema,
+            ContentsSchema = contentsSchema,
+            DataSchema = dataSchema,
+            Path = path,
+            Parent = this,
+            SchemaDisplayName = "__Shared",
+            SchemaName = "__Shared",
+            SchemaTypeName = "__Shared"
+        };
+
+        builder.AddTag("API endpoints for operations across all schemas.");
+
+        return builder;
+    }
+
+    public OperationsBuilder Schema(Schema schema, PartitionResolver partitionResolver, ResolvedComponents components, bool flat)
+    {
+        var typeName = schema.TypeName();
+
+        var dataSchema = RegisterReference($"{typeName}DataDto", _ =>
+        {
+            return schema.BuildJsonSchemaDynamic(partitionResolver, components, CreateReference, false, true);
+        });
+
+        var contentDataSchema = dataSchema;
+
+        if (flat)
+        {
+            contentDataSchema = RegisterReference($"{typeName}FlatDataDto", _ =>
+            {
+                return schema.BuildJsonSchemaFlat(partitionResolver, components, CreateReference, false, true);
+            });
         }
 
-        private static JsonSchema CreateSchema<T>(OpenApiSchemaResolver schemaResolver, OpenApiSchemaGenerator schemaGenerator)
+        var contentSchema = RegisterReference($"{typeName}ContentDto", _ =>
         {
-            var contextualType = typeof(T).ToContextualType();
+            return ContentJsonSchema.Build(contentDataSchema, true);
+        });
 
-            return schemaGenerator.GenerateWithReference<JsonSchema>(contextualType, schemaResolver);
-        }
-
-        public OperationsBuilder Shared()
+        var contentsSchema = RegisterReference($"{typeName}ContentResultDto", _ =>
         {
-            var dataSchema = RegisterReference("DataDto", _ =>
-            {
-                return JsonSchema.CreateAnySchema();
-            });
+            return BuildResult(contentSchema);
+        });
 
-            var contentSchema = RegisterReference("ContentDto", _ =>
-            {
-                return ContentJsonSchema.Build(dataSchema, true);
-            });
+        var path = $"/api/content/{AppName}/{schema.Name}";
 
-            var contentsSchema = RegisterReference("ContentResultDto", _ =>
-            {
-                return BuildResult(contentSchema);
-            });
-
-            var path = $"/api/content/{AppName}";
-
-            var builder = new OperationsBuilder
-            {
-                ContentSchema = contentSchema,
-                ContentsSchema = contentsSchema,
-                DataSchema = dataSchema,
-                Path = path,
-                Parent = this,
-                SchemaDisplayName = "__Shared",
-                SchemaName = "__Shared",
-                SchemaTypeName = "__Shared"
-            };
-
-            builder.AddTag("API endpoints for operations across all schemas.");
-
-            return builder;
-        }
-
-        public OperationsBuilder Schema(Schema schema, PartitionResolver partitionResolver, ResolvedComponents components, bool flat)
+        var builder = new OperationsBuilder
         {
-            var typeName = schema.TypeName();
+            ContentSchema = contentSchema,
+            ContentsSchema = contentsSchema,
+            DataSchema = dataSchema,
+            Path = path,
+            Parent = this,
+            SchemaDisplayName = schema.DisplayName(),
+            SchemaName = schema.Name,
+            SchemaTypeName = typeName
+        };
 
-            var dataSchema = RegisterReference($"{typeName}DataDto", _ =>
-            {
-                return schema.BuildJsonSchemaDynamic(partitionResolver, components, CreateReference, false, true);
-            });
+        builder.AddTag("API endpoints for [schema] content items.");
 
-            var contentDataSchema = dataSchema;
+        return builder;
+    }
 
-            if (flat)
-            {
-                contentDataSchema = RegisterReference($"{typeName}FlatDataDto", _ =>
-                {
-                    return schema.BuildJsonSchemaFlat(partitionResolver, components, CreateReference, false, true);
-                });
-            }
+    private JsonSchema RegisterReference(string name, Func<string, JsonSchema> creator)
+    {
+        name = char.ToUpperInvariant(name[0]) + name[1..];
 
-            var contentSchema = RegisterReference($"{typeName}ContentDto", _ =>
-            {
-                return ContentJsonSchema.Build(contentDataSchema, true);
-            });
+        var reference = OpenApiDocument.Definitions.GetOrAdd(name, creator);
 
-            var contentsSchema = RegisterReference($"{typeName}ContentResultDto", _ =>
-            {
-                return BuildResult(contentSchema);
-            });
-
-            var path = $"/api/content/{AppName}/{schema.Name}";
-
-            var builder = new OperationsBuilder
-            {
-                ContentSchema = contentSchema,
-                ContentsSchema = contentsSchema,
-                DataSchema = dataSchema,
-                Path = path,
-                Parent = this,
-                SchemaDisplayName = schema.DisplayName(),
-                SchemaName = schema.Name,
-                SchemaTypeName = typeName
-            };
-
-            builder.AddTag("API endpoints for [schema] content items.");
-
-            return builder;
-        }
-
-        private JsonSchema RegisterReference(string name, Func<string, JsonSchema> creator)
+        return new JsonSchema
         {
-            name = char.ToUpperInvariant(name[0]) + name[1..];
+            Reference = reference
+        };
+    }
 
-            var reference = OpenApiDocument.Definitions.GetOrAdd(name, creator);
+    private (JsonSchema, JsonSchema?) CreateReference(string name)
+    {
+        name = char.ToUpperInvariant(name[0]) + name[1..];
 
-            return new JsonSchema
-            {
-                Reference = reference
-            };
-        }
-
-        private (JsonSchema, JsonSchema?) CreateReference(string name)
+        if (OpenApiDocument.Definitions.TryGetValue(name, out var definition))
         {
-            name = char.ToUpperInvariant(name[0]) + name[1..];
-
-            if (OpenApiDocument.Definitions.TryGetValue(name, out var definition))
-            {
-                var reference = new JsonSchema
-                {
-                    Reference = definition
-                };
-
-                return (reference, null);
-            }
-
-            definition = JsonTypeBuilder.Object();
-
-            OpenApiDocument.Definitions.Add(name, definition);
-
-            return (new JsonSchema
+            var reference = new JsonSchema
             {
                 Reference = definition
-            }, definition);
+            };
+
+            return (reference, null);
         }
 
-        private static JsonSchema BuildResult(JsonSchema contentSchema)
+        definition = JsonTypeBuilder.Object();
+
+        OpenApiDocument.Definitions.Add(name, definition);
+
+        return (new JsonSchema
         {
-            return new JsonSchema
+            Reference = definition
+        }, definition);
+    }
+
+    private static JsonSchema BuildResult(JsonSchema contentSchema)
+    {
+        return new JsonSchema
+        {
+            AllowAdditionalProperties = false,
+            Properties =
             {
-                AllowAdditionalProperties = false,
-                Properties =
-                {
-                    ["total"] = JsonTypeBuilder.NumberProperty(
-                        FieldDescriptions.ContentsTotal, true),
-                    ["items"] = JsonTypeBuilder.ArrayProperty(contentSchema,
-                        FieldDescriptions.ContentsItems, true)
-                },
-                Type = JsonObjectType.Object
-            };
-        }
+                ["total"] = JsonTypeBuilder.NumberProperty(
+                    FieldDescriptions.ContentsTotal, true),
+                ["items"] = JsonTypeBuilder.ArrayProperty(contentSchema,
+                    FieldDescriptions.ContentsItems, true)
+            },
+            Type = JsonObjectType.Object
+        };
     }
 }

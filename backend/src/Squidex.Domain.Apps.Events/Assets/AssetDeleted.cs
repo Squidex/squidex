@@ -7,13 +7,12 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Assets
-{
-    [EventType(nameof(AssetDeleted))]
-    public sealed class AssetDeleted : AssetEvent
-    {
-        public long DeletedSize { get; set; }
+namespace Squidex.Domain.Apps.Events.Assets;
 
-        public HashSet<string>? OldTags { get; set; }
-    }
+[EventType(nameof(AssetDeleted))]
+public sealed class AssetDeleted : AssetEvent
+{
+    public long DeletedSize { get; set; }
+
+    public HashSet<string>? OldTags { get; set; }
 }

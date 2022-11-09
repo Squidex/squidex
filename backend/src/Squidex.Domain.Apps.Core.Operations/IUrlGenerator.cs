@@ -8,58 +8,57 @@
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core
+namespace Squidex.Domain.Apps.Core;
+
+public interface IUrlGenerator
 {
-    public interface IUrlGenerator
-    {
-        string? AssetSource(NamedId<DomainId> appId, DomainId assetId, long fileVersion);
+    string? AssetSource(NamedId<DomainId> appId, DomainId assetId, long fileVersion);
 
-        string? AssetThumbnail(NamedId<DomainId> appId, string idOrSlug, AssetType assetType);
+    string? AssetThumbnail(NamedId<DomainId> appId, string idOrSlug, AssetType assetType);
 
-        string AssetsUI(NamedId<DomainId> appId, string? @ref = null);
+    string AssetsUI(NamedId<DomainId> appId, string? @ref = null);
 
-        string AssetContentCDNBase();
+    string AssetContentCDNBase();
 
-        string AssetContent(NamedId<DomainId> appId, string idOrSlug);
+    string AssetContent(NamedId<DomainId> appId, string idOrSlug);
 
-        string AssetContentBase();
+    string AssetContentBase();
 
-        string AssetContentBase(string appName);
+    string AssetContentBase(string appName);
 
-        string BackupsUI(NamedId<DomainId> appId);
+    string BackupsUI(NamedId<DomainId> appId);
 
-        string ClientsUI(NamedId<DomainId> appId);
+    string ClientsUI(NamedId<DomainId> appId);
 
-        string ContentCDNBase();
+    string ContentCDNBase();
 
-        string ContentBase();
+    string ContentBase();
 
-        string ContentsUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId);
+    string ContentsUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId);
 
-        string ContentUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId, DomainId contentId);
+    string ContentUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId, DomainId contentId);
 
-        string ContributorsUI(NamedId<DomainId> appId);
+    string ContributorsUI(NamedId<DomainId> appId);
 
-        string DashboardUI(NamedId<DomainId> appId);
+    string DashboardUI(NamedId<DomainId> appId);
 
-        string LanguagesUI(NamedId<DomainId> appId);
+    string LanguagesUI(NamedId<DomainId> appId);
 
-        string PatternsUI(NamedId<DomainId> appId);
+    string PatternsUI(NamedId<DomainId> appId);
 
-        string PlansUI(NamedId<DomainId> appId);
+    string PlansUI(NamedId<DomainId> appId);
 
-        string RolesUI(NamedId<DomainId> appId);
+    string RolesUI(NamedId<DomainId> appId);
 
-        string RulesUI(NamedId<DomainId> appId);
+    string RulesUI(NamedId<DomainId> appId);
 
-        string SchemasUI(NamedId<DomainId> appId);
+    string SchemasUI(NamedId<DomainId> appId);
 
-        string SchemaUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId);
+    string SchemaUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId);
 
-        string WorkflowsUI(NamedId<DomainId> appId);
+    string WorkflowsUI(NamedId<DomainId> appId);
 
-        string Root();
+    string Root();
 
-        string UI();
-    }
+    string UI();
 }

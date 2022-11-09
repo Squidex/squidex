@@ -12,79 +12,78 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
 
-namespace Squidex.Extensions.Actions.Notification
+namespace Squidex.Extensions.Actions.Notification;
+
+public sealed class NotificationActionHandler : RuleActionHandler<NotificationAction, CreateComment>
 {
-    public sealed class NotificationActionHandler : RuleActionHandler<NotificationAction, CreateComment>
+    private const string Description = "Send a Notification";
+    private readonly ICommandBus commandBus;
+    private readonly IUserResolver userResolver;
+
+    public NotificationActionHandler(RuleEventFormatter formatter, ICommandBus commandBus, IUserResolver userResolver)
+        : base(formatter)
     {
-        private const string Description = "Send a Notification";
-        private readonly ICommandBus commandBus;
-        private readonly IUserResolver userResolver;
+        this.commandBus = commandBus;
 
-        public NotificationActionHandler(RuleEventFormatter formatter, ICommandBus commandBus, IUserResolver userResolver)
-            : base(formatter)
+        this.userResolver = userResolver;
+    }
+
+    protected override async Task<(string Description, CreateComment Data)> CreateJobAsync(EnrichedEvent @event, NotificationAction action)
+    {
+        if (@event is EnrichedUserEventBase userEvent)
         {
-            this.commandBus = commandBus;
+            var user = await userResolver.FindByIdOrEmailAsync(action.User);
 
-            this.userResolver = userResolver;
-        }
-
-        protected override async Task<(string Description, CreateComment Data)> CreateJobAsync(EnrichedEvent @event, NotificationAction action)
-        {
-            if (@event is EnrichedUserEventBase userEvent)
+            if (user == null)
             {
-                var user = await userResolver.FindByIdOrEmailAsync(action.User);
-
-                if (user == null)
-                {
-                    throw new InvalidOperationException($"Cannot find user by '{action.User}'");
-                }
-
-                var actor = userEvent.Actor;
-
-                if (!string.IsNullOrEmpty(action.Client))
-                {
-                    actor = RefToken.Client(action.Client);
-                }
-
-                var ruleJob = new CreateComment
-                {
-                    AppId = CommentsCommand.NoApp,
-                    Actor = actor,
-                    CommentId = DomainId.NewGuid(),
-                    CommentsId = DomainId.Create(user.Id),
-                    FromRule = true,
-                    Text = await FormatAsync(action.Text, @event)
-                };
-
-                if (!string.IsNullOrWhiteSpace(action.Url))
-                {
-                    var url = await FormatAsync(action.Url, @event);
-
-                    if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uri))
-                    {
-                        ruleJob.Url = uri;
-                    }
-                }
-
-                return (Description, ruleJob);
+                throw new InvalidOperationException($"Cannot find user by '{action.User}'");
             }
 
-            return ("Ignore", new CreateComment());
-        }
+            var actor = userEvent.Actor;
 
-        protected override async Task<Result> ExecuteJobAsync(CreateComment job,
-            CancellationToken ct = default)
-        {
-            var command = job;
-
-            if (command.CommentsId == default)
+            if (!string.IsNullOrEmpty(action.Client))
             {
-                return Result.Ignored();
+                actor = RefToken.Client(action.Client);
             }
 
-            await commandBus.PublishAsync(command, ct);
+            var ruleJob = new CreateComment
+            {
+                AppId = CommentsCommand.NoApp,
+                Actor = actor,
+                CommentId = DomainId.NewGuid(),
+                CommentsId = DomainId.Create(user.Id),
+                FromRule = true,
+                Text = await FormatAsync(action.Text, @event)
+            };
 
-            return Result.Success($"Notified: {command.Text}");
+            if (!string.IsNullOrWhiteSpace(action.Url))
+            {
+                var url = await FormatAsync(action.Url, @event);
+
+                if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uri))
+                {
+                    ruleJob.Url = uri;
+                }
+            }
+
+            return (Description, ruleJob);
         }
+
+        return ("Ignore", new CreateComment());
+    }
+
+    protected override async Task<Result> ExecuteJobAsync(CreateComment job,
+        CancellationToken ct = default)
+    {
+        var command = job;
+
+        if (command.CommentsId == default)
+        {
+            return Result.Ignored();
+        }
+
+        await commandBus.PublishAsync(command, ct);
+
+        return Result.Success($"Notified: {command.Text}");
     }
 }

@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Backup.State
+namespace Squidex.Domain.Apps.Entities.Backup.State;
+
+public class BackupRestoreState
 {
-    public class BackupRestoreState
-    {
-        public RestoreJob? Job { get; set; }
-    }
+    public RestoreJob? Job { get; set; }
 }

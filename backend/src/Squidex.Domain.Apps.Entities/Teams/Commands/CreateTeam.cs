@@ -7,15 +7,14 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Teams.Commands
-{
-    public sealed class CreateTeam : TeamCommand
-    {
-        public string Name { get; set; }
+namespace Squidex.Domain.Apps.Entities.Teams.Commands;
 
-        public CreateTeam()
-        {
-            TeamId = DomainId.NewGuid();
-        }
+public sealed class CreateTeam : TeamCommand
+{
+    public string Name { get; set; }
+
+    public CreateTeam()
+    {
+        TeamId = DomainId.NewGuid();
     }
 }

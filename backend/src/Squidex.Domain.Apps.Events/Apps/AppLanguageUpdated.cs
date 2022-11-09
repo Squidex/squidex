@@ -8,17 +8,16 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps;
+
+[TypeName("AppLanguageUpdated")]
+public sealed class AppLanguageUpdated : AppEvent
 {
-    [TypeName("AppLanguageUpdated")]
-    public sealed class AppLanguageUpdated : AppEvent
-    {
-        public Language Language { get; set; }
+    public Language Language { get; set; }
 
-        public bool IsOptional { get; set; }
+    public bool IsOptional { get; set; }
 
-        public bool IsMaster { get; set; }
+    public bool IsMaster { get; set; }
 
-        public Language[]? Fallback { get; set; }
-    }
+    public Language[]? Fallback { get; set; }
 }

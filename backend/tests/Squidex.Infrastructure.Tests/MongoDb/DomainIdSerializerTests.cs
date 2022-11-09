@@ -12,81 +12,80 @@ using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
-namespace Squidex.Infrastructure.MongoDb
+namespace Squidex.Infrastructure.MongoDb;
+
+public class DomainIdSerializerTests
 {
-    public class DomainIdSerializerTests
+    private sealed class StringEntity<T>
     {
-        private sealed class StringEntity<T>
+        [BsonRepresentation(BsonType.String)]
+        public T Id { get; set; }
+    }
+
+    private sealed class IdEntity<T>
+    {
+        public T Id { get; set; }
+    }
+
+    public DomainIdSerializerTests()
+    {
+        TestUtils.SetupBson();
+    }
+
+    [Fact]
+    public void Should_deserialize_from_string()
+    {
+        var id = Guid.NewGuid();
+
+        var source = new IdEntity<string> { Id = id.ToString() };
+
+        var actual = SerializeAndDeserializeBson<IdEntity<string>, IdEntity<DomainId>>(source);
+
+        Assert.Equal(actual.Id.ToString(), id.ToString());
+    }
+
+    [Fact]
+    public void Should_deserialize_from_guid_string()
+    {
+        var id = Guid.NewGuid();
+
+        var source = new StringEntity<Guid> { Id = id };
+
+        var actual = SerializeAndDeserializeBson<StringEntity<Guid>, IdEntity<DomainId>>(source);
+
+        Assert.Equal(actual.Id.ToString(), id.ToString());
+    }
+
+    [Fact]
+    public void Should_deserialize_from_guid_bytes()
+    {
+        var id = Guid.NewGuid();
+
+        var source = new IdEntity<Guid> { Id = id };
+
+        var actual = SerializeAndDeserializeBson<IdEntity<Guid>, IdEntity<DomainId>>(source);
+
+        Assert.Equal(actual.Id.ToString(), id.ToString());
+    }
+
+    private static TOut SerializeAndDeserializeBson<TIn, TOut>(TIn source)
+    {
+        var stream = new MemoryStream();
+
+        using (var writer = new BsonBinaryWriter(stream))
         {
-            [BsonRepresentation(BsonType.String)]
-            public T Id { get; set; }
+            BsonSerializer.Serialize(writer, source);
+
+            writer.Flush();
         }
 
-        private sealed class IdEntity<T>
+        stream.Position = 0;
+
+        using (var reader = new BsonBinaryReader(stream))
         {
-            public T Id { get; set; }
-        }
+            var target = BsonSerializer.Deserialize<TOut>(reader);
 
-        public DomainIdSerializerTests()
-        {
-            TestUtils.SetupBson();
-        }
-
-        [Fact]
-        public void Should_deserialize_from_string()
-        {
-            var id = Guid.NewGuid();
-
-            var source = new IdEntity<string> { Id = id.ToString() };
-
-            var actual = SerializeAndDeserializeBson<IdEntity<string>, IdEntity<DomainId>>(source);
-
-            Assert.Equal(actual.Id.ToString(), id.ToString());
-        }
-
-        [Fact]
-        public void Should_deserialize_from_guid_string()
-        {
-            var id = Guid.NewGuid();
-
-            var source = new StringEntity<Guid> { Id = id };
-
-            var actual = SerializeAndDeserializeBson<StringEntity<Guid>, IdEntity<DomainId>>(source);
-
-            Assert.Equal(actual.Id.ToString(), id.ToString());
-        }
-
-        [Fact]
-        public void Should_deserialize_from_guid_bytes()
-        {
-            var id = Guid.NewGuid();
-
-            var source = new IdEntity<Guid> { Id = id };
-
-            var actual = SerializeAndDeserializeBson<IdEntity<Guid>, IdEntity<DomainId>>(source);
-
-            Assert.Equal(actual.Id.ToString(), id.ToString());
-        }
-
-        private static TOut SerializeAndDeserializeBson<TIn, TOut>(TIn source)
-        {
-            var stream = new MemoryStream();
-
-            using (var writer = new BsonBinaryWriter(stream))
-            {
-                BsonSerializer.Serialize(writer, source);
-
-                writer.Flush();
-            }
-
-            stream.Position = 0;
-
-            using (var reader = new BsonBinaryReader(stream))
-            {
-                var target = BsonSerializer.Deserialize<TOut>(reader);
-
-                return target;
-            }
+            return target;
         }
     }
 }

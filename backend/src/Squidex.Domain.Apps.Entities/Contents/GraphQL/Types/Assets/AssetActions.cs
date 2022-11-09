@@ -15,128 +15,127 @@ using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Shared;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets;
+
+internal static class AssetActions
 {
-    internal static class AssetActions
+    public static class Metadata
     {
-        public static class Metadata
+        public static readonly QueryArguments Arguments = new QueryArguments
         {
-            public static readonly QueryArguments Arguments = new QueryArguments
+            new QueryArgument(Scalars.String)
             {
-                new QueryArgument(Scalars.String)
-                {
-                    Name = "path",
-                    Description = FieldDescriptions.JsonPath,
-                    DefaultValue = null
-                }
-            };
+                Name = "path",
+                Description = FieldDescriptions.JsonPath,
+                DefaultValue = null
+            }
+        };
 
-            public static readonly IFieldResolver Resolver = Resolvers.Sync<IEnrichedAssetEntity, object?>((source, fieldContext, _) =>
-            {
-                if (fieldContext.Arguments != null &&
-                    fieldContext.Arguments.TryGetValue("path", out var path))
-                {
-                    source.Metadata.TryGetByPath(path.Value as string, out var result);
-
-                    return result;
-                }
-
-                return source.Metadata;
-            });
-        }
-
-        public static class Find
+        public static readonly IFieldResolver Resolver = Resolvers.Sync<IEnrichedAssetEntity, object?>((source, fieldContext, _) =>
         {
-            public static readonly QueryArguments Arguments = new QueryArguments
+            if (fieldContext.Arguments != null &&
+                fieldContext.Arguments.TryGetValue("path", out var path))
             {
-                new QueryArgument(Scalars.NonNullString)
-                {
-                    Name = "id",
-                    Description = "The ID of the asset (usually GUID).",
-                    DefaultValue = null
-                }
-            };
+                source.Metadata.TryGetByPath(path.Value as string, out var result);
 
-            public static readonly IFieldResolver Resolver = Resolvers.Async<object, object?>(async (_, fieldContext, context) =>
-            {
-                var assetId = fieldContext.GetArgument<DomainId>("id");
+                return result;
+            }
 
-                return await context.FindAssetAsync(assetId,
-                    fieldContext.CancellationToken);
-            });
-        }
+            return source.Metadata;
+        });
+    }
 
-        public static class Query
+    public static class Find
+    {
+        public static readonly QueryArguments Arguments = new QueryArguments
         {
-            public static readonly QueryArguments Arguments = new QueryArguments
+            new QueryArgument(Scalars.NonNullString)
             {
-                new QueryArgument(Scalars.Int)
-                {
-                    Name = "top",
-                    Description = FieldDescriptions.QueryTop,
-                    DefaultValue = null
-                },
-                new QueryArgument(Scalars.Int)
-                {
-                    Name = "skip",
-                    Description = FieldDescriptions.QuerySkip,
-                    DefaultValue = 0
-                },
-                new QueryArgument(Scalars.String)
-                {
-                    Name = "filter",
-                    Description = FieldDescriptions.QueryFilter,
-                    DefaultValue = null
-                },
-                new QueryArgument(Scalars.String)
-                {
-                    Name = "orderby",
-                    Description = FieldDescriptions.QueryOrderBy,
-                    DefaultValue = null
-                }
-            };
+                Name = "id",
+                Description = "The ID of the asset (usually GUID).",
+                DefaultValue = null
+            }
+        };
 
-            public static readonly IFieldResolver Resolver = Resolvers.Async<object, object>(async (_, fieldContext, context) =>
-            {
-                var query = fieldContext.BuildODataQuery();
-
-                var q = Q.Empty.WithODataQuery(query).WithoutTotal();
-
-                return await context.QueryAssetsAsync(q,
-                    fieldContext.CancellationToken);
-            });
-
-            public static readonly IFieldResolver ResolverWithTotal = Resolvers.Async<object, object>(async (_, fieldContext, context) =>
-            {
-                var query = fieldContext.BuildODataQuery();
-
-                var q = Q.Empty.WithODataQuery(query);
-
-                return await context.QueryAssetsAsync(q,
-                    fieldContext.CancellationToken);
-            });
-        }
-
-        public static class Subscription
+        public static readonly IFieldResolver Resolver = Resolvers.Async<object, object?>(async (_, fieldContext, context) =>
         {
-            public static readonly QueryArguments Arguments = new QueryArguments
-            {
-                new QueryArgument(Scalars.EnrichedAssetEventType)
-                {
-                    Name = "type",
-                    Description = FieldDescriptions.EventType,
-                    DefaultValue = null
-                }
-            };
+            var assetId = fieldContext.GetArgument<DomainId>("id");
 
-            public static readonly ISourceStreamResolver Resolver = Resolvers.Stream(PermissionIds.AppAssetsRead, c =>
+            return await context.FindAssetAsync(assetId,
+                fieldContext.CancellationToken);
+        });
+    }
+
+    public static class Query
+    {
+        public static readonly QueryArguments Arguments = new QueryArguments
+        {
+            new QueryArgument(Scalars.Int)
             {
-                return new AssetSubscription
-                {
-                    // Primary filter for the event types.
-                    Type = c.GetArgument<EnrichedAssetEventType?>("type")
-                };
-            });
-        }
+                Name = "top",
+                Description = FieldDescriptions.QueryTop,
+                DefaultValue = null
+            },
+            new QueryArgument(Scalars.Int)
+            {
+                Name = "skip",
+                Description = FieldDescriptions.QuerySkip,
+                DefaultValue = 0
+            },
+            new QueryArgument(Scalars.String)
+            {
+                Name = "filter",
+                Description = FieldDescriptions.QueryFilter,
+                DefaultValue = null
+            },
+            new QueryArgument(Scalars.String)
+            {
+                Name = "orderby",
+                Description = FieldDescriptions.QueryOrderBy,
+                DefaultValue = null
+            }
+        };
+
+        public static readonly IFieldResolver Resolver = Resolvers.Async<object, object>(async (_, fieldContext, context) =>
+        {
+            var query = fieldContext.BuildODataQuery();
+
+            var q = Q.Empty.WithODataQuery(query).WithoutTotal();
+
+            return await context.QueryAssetsAsync(q,
+                fieldContext.CancellationToken);
+        });
+
+        public static readonly IFieldResolver ResolverWithTotal = Resolvers.Async<object, object>(async (_, fieldContext, context) =>
+        {
+            var query = fieldContext.BuildODataQuery();
+
+            var q = Q.Empty.WithODataQuery(query);
+
+            return await context.QueryAssetsAsync(q,
+                fieldContext.CancellationToken);
+        });
+    }
+
+    public static class Subscription
+    {
+        public static readonly QueryArguments Arguments = new QueryArguments
+        {
+            new QueryArgument(Scalars.EnrichedAssetEventType)
+            {
+                Name = "type",
+                Description = FieldDescriptions.EventType,
+                DefaultValue = null
+            }
+        };
+
+        public static readonly ISourceStreamResolver Resolver = Resolvers.Stream(PermissionIds.AppAssetsRead, c =>
+        {
+            return new AssetSubscription
+            {
+                // Primary filter for the event types.
+                Type = c.GetArgument<EnrichedAssetEventType?>("type")
+            };
+        });
     }
 }

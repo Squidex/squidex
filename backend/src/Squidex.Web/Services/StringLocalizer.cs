@@ -10,99 +10,98 @@ using Microsoft.Extensions.Localization;
 using Squidex.Infrastructure.Translations;
 using Squidex.Text;
 
-namespace Squidex.Web.Services
+namespace Squidex.Web.Services;
+
+public sealed class StringLocalizer : IStringLocalizer, IStringLocalizerFactory
 {
-    public sealed class StringLocalizer : IStringLocalizer, IStringLocalizerFactory
+    private readonly ILocalizer translationService;
+    private readonly CultureInfo? culture;
+
+    public LocalizedString this[string name]
     {
-        private readonly ILocalizer translationService;
-        private readonly CultureInfo? culture;
+        get => this[name, null!];
+    }
 
-        public LocalizedString this[string name]
+    public LocalizedString this[string name, params object[] arguments]
+    {
+        get
         {
-            get => this[name, null!];
-        }
-
-        public LocalizedString this[string name, params object[] arguments]
-        {
-            get
+            if (string.IsNullOrWhiteSpace(name))
             {
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    return new LocalizedString(name, name, false);
-                }
-
-                var currentCulture = culture ?? CultureInfo.CurrentUICulture;
-
-                TranslateProperty(name, arguments, currentCulture);
-
-                var (result, found) = translationService.Get(currentCulture, $"dotnet_{name}", name);
-
-                if (arguments != null && found)
-                {
-                    try
-                    {
-                        result = string.Format(currentCulture, result, arguments);
-                    }
-                    catch (FormatException)
-                    {
-                        return new LocalizedString(name, name, true);
-                    }
-                }
-
-                return new LocalizedString(name, result, !found);
+                return new LocalizedString(name, name, false);
             }
-        }
 
-        private void TranslateProperty(string name, object[] arguments, CultureInfo currentCulture)
-        {
-            if (arguments?.Length == 1 && IsValidationError(name))
+            var currentCulture = culture ?? CultureInfo.CurrentUICulture;
+
+            TranslateProperty(name, arguments, currentCulture);
+
+            var (result, found) = translationService.Get(currentCulture, $"dotnet_{name}", name);
+
+            if (arguments != null && found)
             {
-                var key = $"common.{arguments[0].ToString()?.ToCamelCase()}";
-
-                var (result, found) = translationService.Get(currentCulture, key, name);
-
-                if (found)
+                try
                 {
-                    arguments[0] = result;
+                    result = string.Format(currentCulture, result, arguments);
+                }
+                catch (FormatException)
+                {
+                    return new LocalizedString(name, name, true);
                 }
             }
-        }
 
-        public StringLocalizer(ILocalizer translationService)
-            : this(translationService, null)
+            return new LocalizedString(name, result, !found);
+        }
+    }
+
+    private void TranslateProperty(string name, object[] arguments, CultureInfo currentCulture)
+    {
+        if (arguments?.Length == 1 && IsValidationError(name))
         {
-        }
+            var key = $"common.{arguments[0].ToString()?.ToCamelCase()}";
 
-        private StringLocalizer(ILocalizer translationService, CultureInfo? culture)
-        {
-            this.translationService = translationService;
+            var (result, found) = translationService.Get(currentCulture, key, name);
 
-            this.culture = culture;
+            if (found)
+            {
+                arguments[0] = result;
+            }
         }
+    }
 
-        public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures)
-        {
-            return Enumerable.Empty<LocalizedString>();
-        }
+    public StringLocalizer(ILocalizer translationService)
+        : this(translationService, null)
+    {
+    }
 
-        public IStringLocalizer WithCulture(CultureInfo culture)
-        {
-            return new StringLocalizer(translationService, culture);
-        }
+    private StringLocalizer(ILocalizer translationService, CultureInfo? culture)
+    {
+        this.translationService = translationService;
 
-        public IStringLocalizer Create(string baseName, string location)
-        {
-            return this;
-        }
+        this.culture = culture;
+    }
 
-        public IStringLocalizer Create(Type resourceSource)
-        {
-            return this;
-        }
+    public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures)
+    {
+        return Enumerable.Empty<LocalizedString>();
+    }
 
-        private static bool IsValidationError(string name)
-        {
-            return name.Contains("annotations_", StringComparison.OrdinalIgnoreCase);
-        }
+    public IStringLocalizer WithCulture(CultureInfo culture)
+    {
+        return new StringLocalizer(translationService, culture);
+    }
+
+    public IStringLocalizer Create(string baseName, string location)
+    {
+        return this;
+    }
+
+    public IStringLocalizer Create(Type resourceSource)
+    {
+        return this;
+    }
+
+    private static bool IsValidationError(string name)
+    {
+        return name.Contains("annotations_", StringComparison.OrdinalIgnoreCase);
     }
 }

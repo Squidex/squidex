@@ -7,16 +7,15 @@
 
 using Xunit;
 
-namespace Squidex.Web
-{
-    public class ApiCostsAttributeTests
-    {
-        [Fact]
-        public void Should_assign_costs()
-        {
-            var sut = new ApiCostsAttribute(10.5);
+namespace Squidex.Web;
 
-            Assert.Equal(10.5, sut.Costs);
-        }
+public class ApiCostsAttributeTests
+{
+    [Fact]
+    public void Should_assign_costs()
+    {
+        var sut = new ApiCostsAttribute(10.5);
+
+        Assert.Equal(10.5, sut.Costs);
     }
 }

@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+public sealed class SchemaMustBePublishedAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public sealed class SchemaMustBePublishedAttribute : Attribute
-    {
-    }
 }

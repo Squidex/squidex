@@ -11,39 +11,38 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Assets;
+
+public class AssetTagsDeleterTests
 {
-    public class AssetTagsDeleterTests
+    private readonly CancellationTokenSource cts = new CancellationTokenSource();
+    private readonly CancellationToken ct;
+    private readonly ITagService tagService = A.Fake<ITagService>();
+    private readonly AssetTagsDeleter sut;
+
+    public AssetTagsDeleterTests()
     {
-        private readonly CancellationTokenSource cts = new CancellationTokenSource();
-        private readonly CancellationToken ct;
-        private readonly ITagService tagService = A.Fake<ITagService>();
-        private readonly AssetTagsDeleter sut;
+        ct = cts.Token;
 
-        public AssetTagsDeleterTests()
-        {
-            ct = cts.Token;
+        sut = new AssetTagsDeleter(tagService);
+    }
 
-            sut = new AssetTagsDeleter(tagService);
-        }
+    [Fact]
+    public void Should_run_with_default_order()
+    {
+        var order = ((IDeleter)sut).Order;
 
-        [Fact]
-        public void Should_run_with_default_order()
-        {
-            var order = ((IDeleter)sut).Order;
+        Assert.Equal(0, order);
+    }
 
-            Assert.Equal(0, order);
-        }
+    [Fact]
+    public async Task Should_remove_events_from_streams()
+    {
+        var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
 
-        [Fact]
-        public async Task Should_remove_events_from_streams()
-        {
-            var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
+        await sut.DeleteAppAsync(app, ct);
 
-            await sut.DeleteAppAsync(app, ct);
-
-            A.CallTo(() => tagService.ClearAsync(app.Id, TagGroups.Assets, ct))
-                .MustHaveHappened();
-        }
+        A.CallTo(() => tagService.ClearAsync(app.Id, TagGroups.Assets, ct))
+            .MustHaveHappened();
     }
 }

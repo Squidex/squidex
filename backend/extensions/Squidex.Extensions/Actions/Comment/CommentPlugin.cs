@@ -9,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.Comment
+namespace Squidex.Extensions.Actions.Comment;
+
+public sealed class CommentPlugin : IPlugin
 {
-    public sealed class CommentPlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddRuleAction<CommentAction, CommentActionHandler>();
-        }
+        services.AddRuleAction<CommentAction, CommentActionHandler>();
     }
 }

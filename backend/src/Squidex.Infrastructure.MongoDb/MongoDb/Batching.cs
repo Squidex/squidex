@@ -7,13 +7,12 @@
 
 using MongoDB.Driver;
 
-namespace Squidex.Infrastructure.MongoDb
+namespace Squidex.Infrastructure.MongoDb;
+
+public static class Batching
 {
-    public static class Batching
+    public static readonly FindOptions Options = new FindOptions
     {
-        public static readonly FindOptions Options = new FindOptions
-        {
-            BatchSize = 200
-        };
-    }
+        BatchSize = 200
+    };
 }

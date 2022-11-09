@@ -9,22 +9,21 @@ using Confluent.Kafka;
 using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
 
-namespace Squidex.Extensions.Actions.Kafka
+namespace Squidex.Extensions.Actions.Kafka;
+
+public class KafkaProducerOptions : ProducerConfig
 {
-    public class KafkaProducerOptions : ProducerConfig
+    public SchemaRegistryConfig SchemaRegistry { get; set; }
+
+    public AvroSerializerConfig AvroSerializer { get; set; }
+
+    public bool IsProducerConfigured()
     {
-        public SchemaRegistryConfig SchemaRegistry { get; set; }
+        return !string.IsNullOrWhiteSpace(BootstrapServers);
+    }
 
-        public AvroSerializerConfig AvroSerializer { get; set; }
-
-        public bool IsProducerConfigured()
-        {
-            return !string.IsNullOrWhiteSpace(BootstrapServers);
-        }
-
-        public bool IsSchemaRegistryConfigured()
-        {
-            return !string.IsNullOrWhiteSpace(SchemaRegistry?.Url);
-        }
+    public bool IsSchemaRegistryConfigured()
+    {
+        return !string.IsNullOrWhiteSpace(SchemaRegistry?.Url);
     }
 }

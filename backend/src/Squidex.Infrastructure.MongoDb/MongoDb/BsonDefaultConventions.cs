@@ -8,32 +8,31 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Conventions;
 
-namespace Squidex.Infrastructure.MongoDb
+namespace Squidex.Infrastructure.MongoDb;
+
+public static class BsonDefaultConventions
 {
-    public static class BsonDefaultConventions
+    private static bool isRegistered;
+
+    public static void Register()
     {
-        private static bool isRegistered;
-
-        public static void Register()
+        try
         {
-            try
-            {
-                if (isRegistered)
-                {
-                    return;
-                }
-
-                ConventionRegistry.Register("IgnoreExtraElements", new ConventionPack
-                {
-                    new IgnoreExtraElementsConvention(true)
-                }, t => true);
-
-                isRegistered = true;
-            }
-            catch (BsonSerializationException)
+            if (isRegistered)
             {
                 return;
             }
+
+            ConventionRegistry.Register("IgnoreExtraElements", new ConventionPack
+            {
+                new IgnoreExtraElementsConvention(true)
+            }, t => true);
+
+            isRegistered = true;
+        }
+        catch (BsonSerializationException)
+        {
+            return;
         }
     }
 }

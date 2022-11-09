@@ -7,57 +7,56 @@
 
 using Xunit;
 
-namespace Squidex.Infrastructure.Queries
+namespace Squidex.Infrastructure.Queries;
+
+public class QueryTests
 {
-    public class QueryTests
+    [Fact]
+    public void Should_add_fields_from_sorting()
     {
-        [Fact]
-        public void Should_add_fields_from_sorting()
+        var query = new ClrQuery
         {
-            var query = new ClrQuery
+            Sort = new List<SortNode>
             {
-                Sort = new List<SortNode>
-                {
-                    new SortNode("field1", SortOrder.Ascending),
-                    new SortNode("field1", SortOrder.Ascending),
-                    new SortNode("field2", SortOrder.Ascending)
-                }
-            };
+                new SortNode("field1", SortOrder.Ascending),
+                new SortNode("field1", SortOrder.Ascending),
+                new SortNode("field2", SortOrder.Ascending)
+            }
+        };
 
-            var fields = query.GetAllFields();
+        var fields = query.GetAllFields();
 
-            var expected = new HashSet<string>
-            {
-                "field1",
-                "field2"
-            };
-
-            Assert.Equal(expected, fields);
-        }
-
-        [Fact]
-        public void Should_add_fields_from_filters()
+        var expected = new HashSet<string>
         {
-            var query = new ClrQuery
-            {
-                Filter =
-                    ClrFilter.And(
-                        ClrFilter.Not(
-                            ClrFilter.Eq("field1", 1)),
-                        ClrFilter.Or(
-                            ClrFilter.Eq("field2", 2),
-                            ClrFilter.Eq("field2", 4)))
-            };
+            "field1",
+            "field2"
+        };
 
-            var fields = query.GetAllFields();
+        Assert.Equal(expected, fields);
+    }
 
-            var expected = new HashSet<string>
-            {
-                "field1",
-                "field2"
-            };
+    [Fact]
+    public void Should_add_fields_from_filters()
+    {
+        var query = new ClrQuery
+        {
+            Filter =
+                ClrFilter.And(
+                    ClrFilter.Not(
+                        ClrFilter.Eq("field1", 1)),
+                    ClrFilter.Or(
+                        ClrFilter.Eq("field2", 2),
+                        ClrFilter.Eq("field2", 4)))
+        };
 
-            Assert.Equal(expected, fields);
-        }
+        var fields = query.GetAllFields();
+
+        var expected = new HashSet<string>
+        {
+            "field1",
+            "field2"
+        };
+
+        Assert.Equal(expected, fields);
     }
 }
