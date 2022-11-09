@@ -230,7 +230,7 @@ public class ContentQueryParser
             entry.AbsoluteExpirationRelativeToNow = CacheTime;
 
             return ContentQueryModel.Build(schema?.SchemaDef, context.App.PartitionResolver(), components);
-        });
+        })!;
 
         return result;
     }
@@ -245,7 +245,7 @@ public class ContentQueryParser
             entry.AbsoluteExpirationRelativeToNow = CacheTime;
 
             return BuildQueryModel(context, schema, components).ConvertToEdm("Contents", schema?.SchemaDef.Name ?? "Generic");
-        });
+        })!;
 
         return result;
     }

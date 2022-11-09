@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
 using System.Text;
+using Squidex.Infrastructure;
 
 namespace Squidex.Pipeline.Squid;
 
@@ -25,34 +25,51 @@ public sealed class SquidMiddleware
     {
         var request = context.Request;
 
-        var face = "sad";
+        string? requestedFace = null;
+        string? requestedTitle = null;
+        string? requestedText = null;
+        string? requestedBackground = null;
 
-        if (request.Query.TryGetValue("face", out var faceValue) && (faceValue == "sad" || faceValue == "happy"))
+        if (request.Query.TryGetValue("face", out var faceValue))
         {
-            face = faceValue;
+            requestedFace = faceValue;
         }
 
-        var isSad = face == "sad";
-
-        var title = isSad ? "OH DAMN!" : "OH YEAH!";
-
-        if (request.Query.TryGetValue("title", out var titleValue) && !string.IsNullOrWhiteSpace(titleValue))
+        if (request.Query.TryGetValue("title", out var titleValue))
         {
-            title = titleValue;
+            requestedTitle = titleValue!;
         }
 
-        var text = "text";
-
-        if (request.Query.TryGetValue("text", out var textValue) && !string.IsNullOrWhiteSpace(textValue))
+        if (request.Query.TryGetValue("text", out var textValue))
         {
-            text = textValue;
+            requestedText = textValue!;
         }
 
-        var background = isSad ? "#F5F5F9" : "#4CC159";
-
-        if (request.Query.TryGetValue("background", out var backgroundValue) && !string.IsNullOrWhiteSpace(backgroundValue))
+        if (request.Query.TryGetValue("background", out var backgroundValue))
         {
-            background = backgroundValue;
+            requestedBackground = backgroundValue;
+        }
+
+        if (string.IsNullOrWhiteSpace(requestedFace) || requestedFace is not "sad" or "happy")
+        {
+            requestedFace = "sad";
+        }
+
+        var isSad = requestedFace == "sad";
+
+        if (string.IsNullOrWhiteSpace(requestedTitle))
+        {
+            requestedTitle = isSad ? "OH DAMN!" : "OH YEAH!";
+        }
+
+        if (string.IsNullOrWhiteSpace(requestedText))
+        {
+            requestedText = "text";
+        }
+
+        if (string.IsNullOrWhiteSpace(requestedBackground))
+        {
+            requestedBackground = isSad ? "#F5F5F9" : "#4CC159";
         }
 
         var isSmall = request.Query.TryGetValue("small", out _);
@@ -68,13 +85,13 @@ public sealed class SquidMiddleware
             svg = isSad ? squidSadLG : squidHappyLG;
         }
 
-        var (l1, l2, l3) = SplitText(text);
+        var (line1, line2, line3) = SplitText(requestedText);
 
-        svg = svg.Replace("{{TITLE}}", title.ToUpperInvariant(), StringComparison.Ordinal);
-        svg = svg.Replace("{{TEXT1}}", l1, StringComparison.Ordinal);
-        svg = svg.Replace("{{TEXT2}}", l2, StringComparison.Ordinal);
-        svg = svg.Replace("{{TEXT3}}", l3, StringComparison.Ordinal);
-        svg = svg.Replace("[COLOR]", background, StringComparison.Ordinal);
+        svg = svg.Replace("{{TITLE}}", requestedTitle.ToUpperInvariant(), StringComparison.Ordinal);
+        svg = svg.Replace("{{TEXT1}}", line1, StringComparison.Ordinal);
+        svg = svg.Replace("{{TEXT2}}", line2, StringComparison.Ordinal);
+        svg = svg.Replace("{{TEXT3}}", line3, StringComparison.Ordinal);
+        svg = svg.Replace("[COLOR]", requestedBackground, StringComparison.Ordinal);
 
         context.Response.StatusCode = 200;
         context.Response.ContentType = "image/svg+xml";

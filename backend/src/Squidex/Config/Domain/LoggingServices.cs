@@ -63,6 +63,11 @@ public static class LoggingServices
                 return false;
             }
 
+            if (category == null)
+            {
+                return true;
+            }
+
             if (category.StartsWith("OpenIddict", StringComparison.OrdinalIgnoreCase))
             {
                 return level >= LogLevel.Warning;

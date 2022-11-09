@@ -132,7 +132,7 @@ public sealed class AssetContentQueryDto
 
             request.Headers.TryGetValue("Accept", out var accept);
 
-            return accept.Any(x => x.Contains(mimeType, StringComparison.OrdinalIgnoreCase)) && assetThumbnailGenerator.CanReadAndWrite(mimeType);
+            return accept.Any(x => x?.Contains(mimeType, StringComparison.OrdinalIgnoreCase) == true) && assetThumbnailGenerator.CanReadAndWrite(mimeType);
         }
 #if ENABLE_AVIF
         if (Accepts("image/avif"))

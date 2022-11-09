@@ -18,12 +18,12 @@ public class SmtpEmailSenderTests
     [Fact]
     public async Task Should_handle_timeout_properly()
     {
-        var options = TestConfig.Configuration.GetSection("email:smtp").Get<SmtpOptions>();
+        var options = TestConfig.Configuration.GetSection("email:smtp").Get<SmtpOptions>()!;
 
-        var recipient = TestConfig.Configuration["email:smtp:recipient"];
+        var recipient = TestConfig.Configuration["email:smtp:recipient"]!;
 
-        var testSubject = TestConfig.Configuration["email:smtp:testSubject"];
-        var testBody = TestConfig.Configuration["email:smtp:testBody"];
+        var testSubject = TestConfig.Configuration["email:smtp:testSubject"]!;
+        var testBody = TestConfig.Configuration["email:smtp:testBody"]!;
 
         var sut = new SmtpEmailSender(Options.Create(options));
 

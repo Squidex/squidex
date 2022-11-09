@@ -47,7 +47,7 @@ public abstract class MongoEventStoreFixture : IAsyncLifetime
 public sealed class MongoEventStoreDirectFixture : MongoEventStoreFixture
 {
     public MongoEventStoreDirectFixture()
-        : base(TestConfig.Configuration["mongodb:configuration"])
+        : base(TestConfig.Configuration["mongodb:configuration"]!)
     {
     }
 }
@@ -55,7 +55,7 @@ public sealed class MongoEventStoreDirectFixture : MongoEventStoreFixture
 public sealed class MongoEventStoreReplicaSetFixture : MongoEventStoreFixture
 {
     public MongoEventStoreReplicaSetFixture()
-        : base(TestConfig.Configuration["mongodb:configurationReplica"])
+        : base(TestConfig.Configuration["mongodb:configurationReplica"]!)
     {
     }
 }

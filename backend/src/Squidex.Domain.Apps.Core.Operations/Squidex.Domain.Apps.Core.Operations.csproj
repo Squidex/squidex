@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Squidex.Domain.Apps.Core</RootNamespace>
     <LangVersion>10.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -21,16 +21,16 @@
     <PackageReference Include="Fluid.Core.Squidex" Version="1.0.0-beta" />
 	<PackageReference Include="GeoJSON.Net" Version="1.2.19" />
 	<PackageReference Include="Jint" Version="3.0.0-beta-2036" />
-	<PackageReference Include="Meziantou.Analyzer" Version="1.0.702">
+	<PackageReference Include="Meziantou.Analyzer" Version="1.0.746">
 	  <PrivateAssets>all</PrivateAssets>
 	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-    <PackageReference Include="NJsonSchema" Version="10.7.2" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+    <PackageReference Include="NJsonSchema" Version="10.8.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="4.13.0" />
+    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="5.0.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
-    <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="7.0.0" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="ValueTaskSupplement" Version="1.1.0" />
   </ItemGroup>

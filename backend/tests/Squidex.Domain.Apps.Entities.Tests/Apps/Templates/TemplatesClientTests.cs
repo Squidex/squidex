@@ -19,7 +19,7 @@ public class TemplatesClientTests
     {
         var httpClientFactory = A.Fake<IHttpClientFactory>();
 
-        A.CallTo(() => httpClientFactory.CreateClient(null))
+        A.CallTo(() => httpClientFactory.CreateClient(A<string>._))
             .Returns(new HttpClient());
 
         sut = new TemplatesClient(httpClientFactory, Options.Create(new TemplatesOptions

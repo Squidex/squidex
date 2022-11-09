@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <LangVersion>10.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -16,7 +16,7 @@
     <PackageReference Include="GraphQL" Version="7.1.1" />
     <PackageReference Include="GraphQL.SystemTextJson" Version="7.1.1" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="7.1.1" />
-    <PackageReference Include="Meziantou.Analyzer" Version="1.0.702">
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.746">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
