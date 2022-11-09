@@ -21,7 +21,7 @@
     ]
   },
   "dependencies": {
-    "preact": "^10.3.1",
+    "preact": "^10.11.2",
     "preact-render-to-string": "^5.1.4"
   },
   "devDependencies": {
