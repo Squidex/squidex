@@ -73,16 +73,11 @@ public sealed class DefaultEventFormatter : IEventFormatter
             payload = migratedEvent.Migrate();
         }
 
-        if (!typeRegistry[typeof(IEvent)].TryGetName(payload.GetType(), out var typeName))
-        {
-            ThrowHelper.InvalidOperationException($"Cannot find event with type '{payload.GetType()}'.");
-            return default!;
-        }
-
-        var json = serializer.Serialize(envelope.Payload, envelope.Payload.GetType());
+        var payloadType = typeRegistry.GetName<IEvent>(payload.GetType());
+        var payloadJson = serializer.Serialize(envelope.Payload, envelope.Payload.GetType());
 
         envelope.SetCommitId(commitId);
 
-        return new EventData(typeName, envelope.Headers, json);
+        return new EventData(payloadType, envelope.Headers, payloadJson);
     }
 }

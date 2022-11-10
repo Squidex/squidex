@@ -28,7 +28,7 @@ public sealed class SecurityProcessor : SecurityDefinitionAppender
 
         var security = new OpenApiSecurityScheme
         {
-            Type = OpenApiSecuritySchemeType.OAuth2,
+            Type = OpenApiSecuritySchemeType.OpenIdConnect,
 
             // The link to the endpoint where the user can request the token.
             TokenUrl = tokenUrl,

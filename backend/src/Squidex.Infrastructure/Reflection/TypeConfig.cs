@@ -27,16 +27,19 @@ public sealed class TypeConfig
         Guard.NotNull(derivedType);
         Guard.NotNullOrEmpty(typeName);
 
-        if (!derivedTypes.Contains((derivedType, typeName)))
+        lock (derivedTypes)
         {
-            derivedTypes.Add((derivedType, typeName));
-        }
+            if (!derivedTypes.Contains((derivedType, typeName)))
+            {
+                derivedTypes.Add((derivedType, typeName));
+            }
 
-        var conflict = derivedTypes.Find(x => x.TypeName == typeName && x.DerivedType != derivedType);
+            var conflict = derivedTypes.Find(x => x.TypeName == typeName && x.DerivedType != derivedType);
 
-        if (conflict.DerivedType != null)
-        {
-            ThrowHelper.ArgumentException($"Type name '{typeName}' is already used by type '{conflict.DerivedType}", nameof(typeName));
+            if (conflict.DerivedType != null)
+            {
+                ThrowHelper.ArgumentException($"Type name '{typeName}' is already used by type '{conflict.DerivedType}", nameof(typeName));
+            }
         }
 
         mapByName = null;

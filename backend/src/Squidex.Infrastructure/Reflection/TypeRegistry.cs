@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Google.Protobuf.Reflection;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.Reflection;
@@ -16,7 +15,13 @@ public sealed class TypeRegistry
 
     public TypeConfig this[Type type]
     {
-        get => configs.GetOrAddNew(type);
+        get
+        {
+            lock (configs)
+            {
+                return configs.GetOrAddNew(type);
+            }
+        }
     }
 
     public TypeRegistry(IEnumerable<ITypeProvider>? providers = null)
@@ -65,9 +70,20 @@ public sealed class TypeRegistry
 
     public string GetName<T>(Type derivedType) where T : class
     {
-        if (!this[typeof(IEvent)].TryGetName(derivedType, out var name))
+        if (!this[typeof(T)].TryGetName(derivedType, out var name))
         {
-            ThrowHelper.InvalidOperationException($"Unknown derived type {derivedType}.");
+            ThrowHelper.ArgumentException($"Unknown derived type {derivedType}.", nameof(derivedType));
+            return default!;
+        }
+
+        return name;
+    }
+
+    public Type GetType<T>(string typeName) where T : class
+    {
+        if (!this[typeof(T)].TryGetType(typeName, out var name))
+        {
+            ThrowHelper.ArgumentException($"Unknown derived type {typeName}.", nameof(typeName));
             return default!;
         }
 

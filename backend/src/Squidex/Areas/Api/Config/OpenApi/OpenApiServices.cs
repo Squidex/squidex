@@ -44,9 +44,6 @@ public static class OpenApiServices
         services.AddSingletonAs<ScopesProcessor>()
             .As<IOperationProcessor>();
 
-        services.AddSingletonAs<FixQueryTypesProcessor>()
-            .As<IOperationProcessor>();
-
         services.AddSingletonAs<TagByGroupNameProcessor>()
             .As<IOperationProcessor>();
 

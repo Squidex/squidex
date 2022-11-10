@@ -296,12 +296,7 @@ public sealed class RuleService : IRuleService
     private async Task<JobResult> CreateJobAsync(IRuleActionHandler actionHandler, EnrichedEvent enrichedEvent, RuleContext context, Instant now)
     {
         var actionType = context.Rule.Action.GetType();
-
-        if (!typeRegistry[typeof(RuleAction)].TryGetName(actionType, out var actionName))
-        {
-            ThrowHelper.InvalidOperationException($"Invalid action type '{actionType}'.");
-            return default!;
-        }
+        var actionName = typeRegistry.GetName<RuleAction>(actionType);
 
         var expires = now.Plus(Constants.ExpirationTime);
 
@@ -365,12 +360,7 @@ public sealed class RuleService : IRuleService
 
         try
         {
-            if (!typeRegistry[typeof(RuleAction)].TryGetType(actionName, out var actionType))
-            {
-                ThrowHelper.InvalidOperationException($"Invalid action type '{actionName}'.");
-                return default!;
-            }
-
+            var actionType = typeRegistry.GetType<RuleAction>(actionName);
             var actionHandler = ruleActionHandlers[actionType];
             var actionObject = serializer.Deserialize<object>(job, actionHandler.DataType);
 
