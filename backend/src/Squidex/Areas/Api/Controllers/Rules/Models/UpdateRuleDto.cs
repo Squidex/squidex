@@ -28,7 +28,6 @@ public sealed class UpdateRuleDto
     /// <summary>
     /// The action properties.
     /// </summary>
-    [JsonConverter(typeof(RuleActionConverter))]
     public RuleAction? Action { get; set; }
 
     /// <summary>

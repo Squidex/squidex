@@ -24,7 +24,7 @@ public sealed class RuleService : IRuleService
 {
     private readonly Dictionary<Type, IRuleActionHandler> ruleActionHandlers;
     private readonly Dictionary<Type, IRuleTriggerHandler> ruleTriggerHandlers;
-    private readonly TypeNameRegistry typeNameRegistry;
+    private readonly TypeRegistry typeRegistry;
     private readonly RuleOptions ruleOptions;
     private readonly IEventEnricher eventEnricher;
     private readonly IJsonSerializer serializer;
@@ -39,9 +39,9 @@ public sealed class RuleService : IRuleService
         IEventEnricher eventEnricher,
         IJsonSerializer serializer,
         ILogger<RuleService> log,
-        TypeNameRegistry typeNameRegistry)
+        TypeRegistry typeRegistry)
     {
-        this.typeNameRegistry = typeNameRegistry;
+        this.typeRegistry = typeRegistry;
         this.eventEnricher = eventEnricher;
         this.ruleOptions = ruleOptions.Value;
         this.ruleTriggerHandlers = ruleTriggerHandlers.ToDictionary(x => x.TriggerType);
@@ -295,7 +295,13 @@ public sealed class RuleService : IRuleService
 
     private async Task<JobResult> CreateJobAsync(IRuleActionHandler actionHandler, EnrichedEvent enrichedEvent, RuleContext context, Instant now)
     {
-        var actionName = typeNameRegistry.GetName(context.Rule.Action.GetType());
+        var actionType = context.Rule.Action.GetType();
+
+        if (!typeRegistry[typeof(RuleAction)].TryGetName(actionType, out var actionName))
+        {
+            ThrowHelper.InvalidOperationException($"Invalid action type '{actionType}'.");
+            return default!;
+        }
 
         var expires = now.Plus(Constants.ExpirationTime);
 
@@ -359,17 +365,21 @@ public sealed class RuleService : IRuleService
 
         try
         {
-            var actionType = typeNameRegistry.GetType(actionName);
-            var actionHandler = ruleActionHandlers[actionType];
+            if (!typeRegistry[typeof(RuleAction)].TryGetType(actionName, out var actionType))
+            {
+                ThrowHelper.InvalidOperationException($"Invalid action type '{actionName}'.");
+                return default!;
+            }
 
-            var deserialized = serializer.Deserialize<object>(job, actionHandler.DataType);
+            var actionHandler = ruleActionHandlers[actionType];
+            var actionObject = serializer.Deserialize<object>(job, actionHandler.DataType);
 
             using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
                 // Enforce a timeout after a configured time span.
                 combined.CancelAfter(GetTimeoutInMs());
 
-                result = await actionHandler.ExecuteJobAsync(deserialized, combined.Token).WithCancellation(combined.Token);
+                result = await actionHandler.ExecuteJobAsync(actionObject, combined.Token).WithCancellation(combined.Token);
             }
         }
         catch (Exception ex)

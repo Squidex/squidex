@@ -15,12 +15,19 @@ public class TemplatesClientTests
 {
     private readonly TemplatesClient sut;
 
+    private sealed class CustomHttpClient : HttpClient
+    {
+        protected override void Dispose(bool disposing)
+        {
+        }
+    }
+
     public TemplatesClientTests()
     {
         var httpClientFactory = A.Fake<IHttpClientFactory>();
 
         A.CallTo(() => httpClientFactory.CreateClient(A<string>._))
-            .Returns(new HttpClient());
+            .Returns(new CustomHttpClient());
 
         sut = new TemplatesClient(httpClientFactory, Options.Create(new TemplatesOptions
         {

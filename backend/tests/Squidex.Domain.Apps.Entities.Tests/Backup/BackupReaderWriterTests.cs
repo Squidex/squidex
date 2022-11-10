@@ -23,7 +23,7 @@ public class BackupReaderWriterTests
     private readonly IEventFormatter eventFormatter;
     private readonly IEventStreamNames eventStreamNames = A.Fake<IEventStreamNames>();
     private readonly IJsonSerializer serializer = TestUtils.DefaultSerializer;
-    private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
+    private readonly TypeRegistry typeNameRegistry = new TypeRegistry();
 
     [TypeName(nameof(MyEvent))]
     public sealed class MyEvent : IEvent
@@ -33,7 +33,7 @@ public class BackupReaderWriterTests
 
     public BackupReaderWriterTests()
     {
-        typeNameRegistry.Map(typeof(MyEvent));
+        typeNameRegistry.Add<IEvent, MyEvent>("MyEvent");
 
         eventFormatter = new DefaultEventFormatter(typeNameRegistry, serializer);
     }

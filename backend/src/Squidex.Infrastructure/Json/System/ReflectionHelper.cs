@@ -42,4 +42,9 @@ internal static class ReflectionHelper
 
         return dynamicMethod;
     }
+
+    public static string GetShortTypeName(this Type type)
+    {
+        return $"{type.FullName}, {type.Assembly.GetName().Name}";
+    }
 }

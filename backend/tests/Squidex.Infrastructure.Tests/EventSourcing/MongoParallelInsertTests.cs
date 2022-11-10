@@ -71,9 +71,9 @@ public sealed class MongoParallelInsertTests : IClassFixture<MongoEventStoreRepl
     {
         _ = fixture;
 
-        var typeNameRegistry = new TypeNameRegistry().Map(typeof(MyEvent), "My");
+        var typeRegistry = new TypeRegistry().Add<IEvent, MyEvent>("MyEvent");
 
-        eventFormatter = new DefaultEventFormatter(typeNameRegistry, TestUtils.DefaultSerializer);
+        eventFormatter = new DefaultEventFormatter(typeRegistry, TestUtils.DefaultSerializer);
     }
 
     [Fact]

@@ -5,20 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
+using Xunit;
 
 namespace Squidex.Infrastructure.Reflection;
 
-[Serializable]
-public class TypeNameNotFoundException : Exception
+public class TypeNameAttributeTests
 {
-    public TypeNameNotFoundException(string? message = null, Exception? inner = null)
-        : base(message, inner)
+    [Fact]
+    public void Should_instantiate()
     {
-    }
+        var attribute = new TypeNameAttribute("MyTypeName");
 
-    protected TypeNameNotFoundException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
+        Assert.Equal("MyTypeName", attribute.TypeName);
     }
 }

@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Config.OpenApi;
 
@@ -43,7 +44,7 @@ public static class OpenApiServices
         services.AddSingletonAs<ScopesProcessor>()
             .As<IOperationProcessor>();
 
-        services.AddSingletonAs<FixProcessor>()
+        services.AddSingletonAs<FixQueryTypesProcessor>()
             .As<IOperationProcessor>();
 
         services.AddSingletonAs<TagByGroupNameProcessor>()
@@ -51,9 +52,6 @@ public static class OpenApiServices
 
         services.AddSingletonAs<XmlResponseTypesProcessor>()
             .As<IOperationProcessor>();
-
-        services.AddSingletonAs<InheritanceProcessor>()
-            .As<ISchemaProcessor>();
 
         services.AddSingletonAs<JsonSchemaGenerator>()
             .AsSelf();
@@ -65,7 +63,7 @@ public static class OpenApiServices
         {
             var settings = new JsonSchemaGeneratorSettings();
 
-            ConfigureSchemaSettings(settings, true);
+            ConfigureSchemaSettings(settings, c.GetRequiredService<TypeRegistry>(), true);
 
             return settings;
         });
@@ -74,7 +72,7 @@ public static class OpenApiServices
         {
             var settings = new OpenApiDocumentGeneratorSettings();
 
-            ConfigureSchemaSettings(settings, true);
+            ConfigureSchemaSettings(settings, c.GetRequiredService<TypeRegistry>(), true);
 
             foreach (var processor in c.GetRequiredService<IEnumerable<IDocumentProcessor>>())
             {
@@ -84,22 +82,16 @@ public static class OpenApiServices
             return settings;
         });
 
-        services.AddOpenApiDocument(settings =>
+        services.AddOpenApiDocument((settings, services) =>
         {
-            settings.Title = "Squidex API";
-
-            ConfigureSchemaSettings(settings);
+            ConfigureSchemaSettings(settings, services.GetRequiredService<TypeRegistry>(), false);
 
             settings.OperationProcessors.Add(new QueryParamsProcessor("/api/apps/{app}/assets"));
         });
     }
 
-    private static void ConfigureSchemaSettings(JsonSchemaGeneratorSettings settings, bool flatten = false)
+    private static void ConfigureSchemaSettings(JsonSchemaGeneratorSettings settings, TypeRegistry typeRegistry, bool flatten)
     {
-        settings.AllowReferencesWithProperties = true;
-
-        settings.ReflectionService = new ReflectionServices();
-
         settings.TypeMappers = new List<ITypeMapper>
         {
             CreateStringMap<DomainId>(),
@@ -121,9 +113,11 @@ public static class OpenApiServices
             CreateAnyMap<FilterNode<JsonValue>>()
         };
 
-        settings.SchemaType = SchemaType.OpenApi3;
-
+        settings.AllowReferencesWithProperties = true;
         settings.FlattenInheritanceHierarchy = flatten;
+        settings.SchemaProcessors.Add(new DiscriminatorProcessor(typeRegistry));
+        settings.SchemaType = SchemaType.OpenApi3;
+        settings.ReflectionService = new ReflectionServices();
     }
 
     private static ITypeMapper CreateObjectMap<T>()

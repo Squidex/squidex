@@ -9,5 +9,5 @@ namespace Squidex.Infrastructure.Reflection;
 
 public interface ITypeProvider
 {
-    void Map(TypeNameRegistry typeNameRegistry);
+    void Map(TypeRegistry typeRegistry);
 }

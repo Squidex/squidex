@@ -24,7 +24,6 @@ public sealed class CreateRuleDto
     /// The action properties.
     /// </summary>
     [LocalizedRequired]
-    [JsonConverter(typeof(RuleActionConverter))]
     public RuleAction Action { get; set; }
 
     public Rule ToRule()

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Claims;
 using System.Text.Json;
@@ -41,6 +42,8 @@ namespace Squidex.Domain.Apps.Core.TestHelpers;
 
 public static class TestUtils
 {
+    public static readonly TypeRegistry TypeRegistry = CreateTypeRegistry(typeof(TestUtils).Assembly);
+
     public static readonly IJsonSerializer DefaultSerializer = CreateSerializer();
 
     public sealed class ObjectHolder<T>
@@ -71,6 +74,20 @@ public static class TestUtils
         BsonStringSerializer<Status>.Register();
     }
 
+    public static TypeRegistry CreateTypeRegistry(Assembly assembly)
+    {
+        var typeRegistry =
+            new TypeRegistry()
+                .Map(new FieldTypeProvider())
+                .Map(new AssemblyTypeProvider<IEvent>(assembly))
+                .Map(new AssemblyTypeProvider<IEvent>(SquidexEvents.Assembly))
+                .Map(new AssemblyTypeProvider<RuleAction>(assembly))
+                .Map(new AssemblyTypeProvider<RuleTrigger>(assembly))
+                .Map(new RuleTypeProvider());
+
+        return typeRegistry;
+    }
+
     public static IJsonSerializer CreateSerializer(Action<JsonSerializerOptions>? configure = null)
     {
         var serializerSettings = DefaultOptions(configure);
@@ -80,22 +97,17 @@ public static class TestUtils
 
     public static JsonSerializerOptions DefaultOptions(Action<JsonSerializerOptions>? configure = null)
     {
-        var typeNameRegistry =
-            new TypeNameRegistry()
-                .Map(new FieldTypeProvider())
-                .Map(new RuleTypeProvider())
-                .MapUnmapped(typeof(TestUtils).Assembly);
-
         var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
-        options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         // It is also a readonly list, so we have to register it first, so that other converters do not pick this up.
         options.Converters.Add(new StringConverter<PropertyPath>(x => x));
+
+        options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         options.Converters.Add(new GeoJsonConverterFactory());
-        options.Converters.Add(new InheritanceConverter<IEvent>(typeNameRegistry));
-        options.Converters.Add(new InheritanceConverter<FieldProperties>(typeNameRegistry));
-        options.Converters.Add(new InheritanceConverter<RuleAction>(typeNameRegistry));
-        options.Converters.Add(new InheritanceConverter<RuleTrigger>(typeNameRegistry));
+        options.Converters.Add(new PolymorphicConverter<IEvent>(TypeRegistry));
+        options.Converters.Add(new PolymorphicConverter<FieldProperties>(TypeRegistry));
+        options.Converters.Add(new PolymorphicConverter<RuleAction>(TypeRegistry));
+        options.Converters.Add(new PolymorphicConverter<RuleTrigger>(TypeRegistry));
         options.Converters.Add(new JsonValueConverter());
         options.Converters.Add(new ReadonlyDictionaryConverterFactory());
         options.Converters.Add(new ReadonlyListConverterFactory());
@@ -118,6 +130,7 @@ public static class TestUtils
         options.Converters.Add(new StringConverter<RefToken>());
         options.Converters.Add(new StringConverter<Status>());
         options.Converters.Add(new JsonStringEnumConverter());
+        options.TypeInfoResolver = new PolymorphicTypeResolver(TypeRegistry);
         configure?.Invoke(options);
 
         return options;

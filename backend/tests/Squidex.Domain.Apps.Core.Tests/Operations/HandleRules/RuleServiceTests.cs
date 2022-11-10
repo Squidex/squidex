@@ -35,7 +35,7 @@ public class RuleServiceTests
     private readonly string actionDescription = "MyDescription";
     private readonly DomainId ruleId = DomainId.NewGuid();
     private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
+    private readonly TypeRegistry typeRegistry = new TypeRegistry();
     private readonly RuleService sut;
 
     public sealed class InvalidEvent : IEvent
@@ -65,8 +65,7 @@ public class RuleServiceTests
 
     public RuleServiceTests()
     {
-        typeNameRegistry.Map(typeof(ContentCreated));
-        typeNameRegistry.Map(typeof(ValidAction), actionName);
+        typeRegistry.Add<RuleAction, ValidAction>(actionName);
 
         A.CallTo(() => clock.GetCurrentInstant())
             .Returns(SystemClock.Instance.GetCurrentInstant().WithoutMs());
@@ -85,7 +84,7 @@ public class RuleServiceTests
         sut = new RuleService(Options.Create(new RuleOptions()),
             new[] { ruleTriggerHandler },
             new[] { ruleActionHandler },
-            eventEnricher, TestUtils.DefaultSerializer, log, typeNameRegistry)
+            eventEnricher, TestUtils.DefaultSerializer, log, typeRegistry)
         {
             Clock = clock
         };

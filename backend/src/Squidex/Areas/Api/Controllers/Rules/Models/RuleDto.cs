@@ -72,7 +72,6 @@ public sealed class RuleDto : Resource
     /// The action properties.
     /// </summary>
     [LocalizedRequired]
-    [JsonConverter(typeof(RuleActionConverter))]
     public RuleAction Action { get; set; }
 
     /// <summary>

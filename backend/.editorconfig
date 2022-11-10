@@ -13,6 +13,9 @@ insert_final_newline = true
 indent_style = space
 indent_size = 4
 
+csharp_style_namespace_declarations = file_scoped
+
+
 # FAILING ANALYZERS
 dotnet_diagnostic.RECS0002.severity = none
 dotnet_diagnostic.RECS0117.severity = none

@@ -65,9 +65,10 @@ public static class TestUtils
     {
         var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
-        options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         // It is also a readonly list, so we have to register it first, so that other converters do not pick this up.
         options.Converters.Add(new StringConverter<PropertyPath>(x => x));
+
+        options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         options.Converters.Add(new JsonValueConverter());
         options.Converters.Add(new ReadonlyDictionaryConverterFactory());
         options.Converters.Add(new ReadonlyListConverterFactory());
@@ -82,7 +83,6 @@ public static class TestUtils
         options.Converters.Add(new StringConverter<Language>());
         options.Converters.Add(new StringConverter<RefToken>());
         options.Converters.Add(new JsonStringEnumConverter());
-        options.TypeInfoResolver = new PolymorphicTypeResolver(new TypeNameRegistry());
         configure?.Invoke(options);
 
         return options;

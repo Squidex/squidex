@@ -96,10 +96,5 @@ public static class RuleServices
 
         services.AddSingletonAs<RuleEventFormatter>()
             .AsSelf();
-
-        services.AddInitializer<RuleTypeProvider>("Serializer (Rules)", registry =>
-        {
-            RuleActionConverter.Mapping = registry.Actions.ToDictionary(x => x.Key, x => x.Value.Type);
-        }, -1);
     }
 }

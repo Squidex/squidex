@@ -16,6 +16,8 @@ namespace Squidex.Areas.Api.Config.OpenApi;
 
 public sealed class ErrorDtoProcessor : IDocumentProcessor
 {
+    private const string InternalErrorDescription = "Operation failed.";
+
     public void Process(DocumentProcessorContext context)
     {
         var errorSchema = GetErrorSchema(context);
@@ -32,9 +34,7 @@ public sealed class ErrorDtoProcessor : IDocumentProcessor
     {
         if (!operation.Responses.ContainsKey("500"))
         {
-            const string description = "Operation failed.";
-
-            var response = new OpenApiResponse { Description = description, Schema = errorSchema };
+            var response = new OpenApiResponse { Description = InternalErrorDescription, Schema = errorSchema };
 
             operation.Responses["500"] = response;
         }

@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.EventSourcing;
 
 public class DefaultEventFormatterTests
 {
-    public sealed class MyOldEvent : IEvent, IMigrated<IEvent>
+    public sealed class MyEventOld : IEvent, IMigrated<IEvent>
     {
         public string MyProperty { get; set; }
 
@@ -29,12 +29,12 @@ public class DefaultEventFormatterTests
 
     public DefaultEventFormatterTests()
     {
-        var typeNameRegistry =
-            new TypeNameRegistry()
-                .Map(typeof(MyEvent), "Event")
-                .Map(typeof(MyOldEvent), "OldEvent");
+        var typeRegistry =
+            new TypeRegistry()
+                .Add<IEvent, MyEvent>("Event")
+                .Add<IEvent, MyEventOld>("OldEvent");
 
-        sut = new DefaultEventFormatter(typeNameRegistry, TestUtils.DefaultSerializer);
+        sut = new DefaultEventFormatter(typeRegistry, TestUtils.DefaultSerializer);
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class DefaultEventFormatterTests
     [Fact]
     public void Should_migrate_event_serializing()
     {
-        var inputEvent = new Envelope<MyOldEvent>(new MyOldEvent { MyProperty = "My-Property" });
+        var inputEvent = new Envelope<MyEventOld>(new MyEventOld { MyProperty = "My-Property" });
 
         var eventData = sut.ToEventData(inputEvent, Guid.NewGuid());
         var eventStored = new StoredEvent("stream", "0", -1, eventData);
@@ -76,7 +76,7 @@ public class DefaultEventFormatterTests
     [Fact]
     public void Should_migrate_event_deserializing()
     {
-        var inputEvent = new Envelope<MyOldEvent>(new MyOldEvent { MyProperty = "My-Property" });
+        var inputEvent = new Envelope<MyEventOld>(new MyEventOld { MyProperty = "My-Property" });
 
         var eventData = sut.ToEventData(inputEvent, Guid.NewGuid(), false);
         var eventStored = new StoredEvent("stream", "0", -1, eventData);

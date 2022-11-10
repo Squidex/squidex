@@ -14,11 +14,11 @@ namespace Squidex.Infrastructure.EventSourcing;
 public sealed class DefaultEventFormatter : IEventFormatter
 {
     private readonly IJsonSerializer serializer;
-    private readonly TypeNameRegistry typeNameRegistry;
+    private readonly TypeRegistry typeRegistry;
 
-    public DefaultEventFormatter(TypeNameRegistry typeNameRegistry, IJsonSerializer serializer)
+    public DefaultEventFormatter(TypeRegistry typeNameRegistry, IJsonSerializer serializer)
     {
-        this.typeNameRegistry = typeNameRegistry;
+        this.typeRegistry = typeNameRegistry;
         this.serializer = serializer;
     }
 
@@ -33,7 +33,8 @@ public sealed class DefaultEventFormatter : IEventFormatter
 
         if (envelope == null)
         {
-            throw new TypeNameNotFoundException($"Cannot find event with type name '{storedEvent.Data.Type}'.");
+            ThrowHelper.InvalidOperationException($"Cannot find event with type name '{storedEvent.Data.Type}'.");
+            return default!;
         }
 
         return envelope;
@@ -43,21 +44,19 @@ public sealed class DefaultEventFormatter : IEventFormatter
     {
         Guard.NotNull(storedEvent);
 
-        var payloadType = typeNameRegistry.GetTypeOrNull(storedEvent.Data.Type);
-
-        if (payloadType == null)
+        if (!typeRegistry[typeof(IEvent)].TryGetType(storedEvent.Data.Type, out var type))
         {
             return null;
         }
 
-        var payloadValue = serializer.Deserialize<IEvent>(storedEvent.Data.Payload, payloadType);
+        var payload = serializer.Deserialize<IEvent>(storedEvent.Data.Payload, type);
 
-        if (payloadValue is IMigrated<IEvent> migratedEvent)
+        if (payload is IMigrated<IEvent> migratedEvent)
         {
-            payloadValue = migratedEvent.Migrate();
+            payload = migratedEvent.Migrate();
         }
 
-        var envelope = new Envelope<IEvent>(payloadValue, storedEvent.Data.Headers);
+        var envelope = new Envelope<IEvent>(payload, storedEvent.Data.Headers);
 
         envelope.SetEventPosition(storedEvent.EventPosition);
         envelope.SetEventStreamNumber(storedEvent.EventStreamNumber);
@@ -67,18 +66,23 @@ public sealed class DefaultEventFormatter : IEventFormatter
 
     public EventData ToEventData(Envelope<IEvent> envelope, Guid commitId, bool migrate = true)
     {
-        var payloadValue = envelope.Payload;
+        var payload = envelope.Payload;
 
-        if (migrate && payloadValue is IMigrated<IEvent> migratedEvent)
+        if (migrate && payload is IMigrated<IEvent> migratedEvent)
         {
-            payloadValue = migratedEvent.Migrate();
+            payload = migratedEvent.Migrate();
         }
 
-        var payloadType = typeNameRegistry.GetName(payloadValue.GetType());
-        var payloadJson = serializer.Serialize(envelope.Payload, envelope.Payload.GetType());
+        if (!typeRegistry[typeof(IEvent)].TryGetName(payload.GetType(), out var typeName))
+        {
+            ThrowHelper.InvalidOperationException($"Cannot find event with type '{payload.GetType()}'.");
+            return default!;
+        }
+
+        var json = serializer.Serialize(envelope.Payload, envelope.Payload.GetType());
 
         envelope.SetCommitId(commitId);
 
-        return new EventData(payloadType, envelope.Headers, payloadJson);
+        return new EventData(typeName, envelope.Headers, json);
     }
 }

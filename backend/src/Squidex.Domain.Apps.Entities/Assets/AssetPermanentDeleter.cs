@@ -27,14 +27,14 @@ public sealed class AssetPermanentDeleter : IEventConsumer
         get => "^asset-";
     }
 
-    public AssetPermanentDeleter(IAssetFileStore assetFileStore, TypeNameRegistry typeNameRegistry)
+    public AssetPermanentDeleter(IAssetFileStore assetFileStore, TypeRegistry typeRegistry)
     {
         this.assetFileStore = assetFileStore;
 
         // Compute the event types names once for performance reasons and use hashset for extensibility.
         consumingTypes = new HashSet<string>
         {
-            typeNameRegistry.GetName<AssetDeleted>()
+            typeRegistry.GetName<IEvent, AssetDeleted>()
         };
     }
 

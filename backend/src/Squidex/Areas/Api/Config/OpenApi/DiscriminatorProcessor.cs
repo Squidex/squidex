@@ -5,28 +5,28 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text.Json;
 using NJsonSchema;
 using NJsonSchema.Generation;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Config.OpenApi;
 
-public sealed class InheritanceProcessor : ISchemaProcessor
+public sealed class DiscriminatorProcessor : ISchemaProcessor
 {
-    private readonly JsonSerializerOptions options;
+    private readonly TypeRegistry typeRegistry;
 
-    public InheritanceProcessor(JsonSerializerOptions options)
+    public DiscriminatorProcessor(TypeRegistry typeRegistry)
     {
-        this.options = options;
+        this.typeRegistry = typeRegistry;
     }
 
     public void Process(SchemaProcessorContext context)
     {
-        var typeInfo = options.GetTypeInfo(context.ContextualType.Type);
+        var config = typeRegistry[context.ContextualType.Type];
 
-        if (typeInfo.PolymorphismOptions != null)
+        if (config.DerivedTypes.Count > 0 && config.DiscriminatorProperty != null)
         {
-            var discriminatorName = typeInfo.PolymorphismOptions.TypeDiscriminatorPropertyName;
+            var discriminatorName = config.DiscriminatorProperty;
 
             var discriminator = new OpenApiDiscriminator
             {
@@ -35,16 +35,11 @@ public sealed class InheritanceProcessor : ISchemaProcessor
 
             var schema = context.Schema;
 
-            foreach (var derivedType in typeInfo.PolymorphismOptions.DerivedTypes)
+            foreach (var (derivedType, typeName) in config.DerivedTypes)
             {
-                if (derivedType.TypeDiscriminator == null)
-                {
-                    continue;
-                }
+                var derivedSchema = context.Generator.Generate(derivedType, context.Resolver);
 
-                var derivedSchema = context.Generator.Generate(derivedType.DerivedType, context.Resolver);
-
-                discriminator.Mapping[derivedType.TypeDiscriminator.ToString()!] = new JsonSchema
+                discriminator.Mapping[typeName] = new JsonSchema
                 {
                     Reference = derivedSchema
                 };

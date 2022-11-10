@@ -14,8 +14,8 @@ namespace Squidex.Domain.Apps.Entities.Assets;
 
 public sealed class AssetHistoryEventsCreator : HistoryEventsCreatorBase
 {
-    public AssetHistoryEventsCreator(TypeNameRegistry typeNameRegistry)
-        : base(typeNameRegistry)
+    public AssetHistoryEventsCreator(TypeRegistry typeRegistry)
+        : base(typeRegistry)
     {
         AddEventMessage<AssetCreated>(
             "history.assets.uploaded");

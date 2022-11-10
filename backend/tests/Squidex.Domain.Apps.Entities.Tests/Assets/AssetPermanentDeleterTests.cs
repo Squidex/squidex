@@ -7,10 +7,11 @@
 
 using FakeItEasy;
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Reflection;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
@@ -19,17 +20,11 @@ public class AssetPermanentDeleterTests
 {
     private readonly IAssetFileStore assetFiletore = A.Fake<IAssetFileStore>();
     private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly TypeNameRegistry typeNameRegistry;
     private readonly AssetPermanentDeleter sut;
 
     public AssetPermanentDeleterTests()
     {
-        typeNameRegistry =
-            new TypeNameRegistry()
-                .Map(typeof(AssetCreated))
-                .Map(typeof(AssetDeleted));
-
-        sut = new AssetPermanentDeleter(assetFiletore, typeNameRegistry);
+        sut = new AssetPermanentDeleter(assetFiletore, TestUtils.TypeRegistry);
     }
 
     [Fact]
@@ -59,9 +54,11 @@ public class AssetPermanentDeleterTests
     [Fact]
     public void Should_handle_deletion_event()
     {
+        var eventType = TestUtils.TypeRegistry.GetName<IEvent, AssetDeleted>();
+
         var storedEvent =
             new StoredEvent("stream", "1", 1,
-                new EventData(typeNameRegistry.GetName<AssetDeleted>(), new EnvelopeHeaders(), "payload"));
+                new EventData(eventType, new EnvelopeHeaders(), "payload"));
 
         Assert.True(sut.Handles(storedEvent));
     }
@@ -69,9 +66,11 @@ public class AssetPermanentDeleterTests
     [Fact]
     public void Should_not_handle_creation_event()
     {
+        var eventType = TestUtils.TypeRegistry.GetName<IEvent, AssetCreated>();
+
         var storedEvent =
             new StoredEvent("stream", "1", 1,
-                new EventData(typeNameRegistry.GetName<AssetCreated>(), new EnvelopeHeaders(), "payload"));
+                new EventData(eventType, new EnvelopeHeaders(), "payload"));
 
         Assert.False(sut.Handles(storedEvent));
     }

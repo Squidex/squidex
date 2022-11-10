@@ -7,24 +7,23 @@
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.Json.System;
 
-public abstract class InheritanceConverterBase<T> : JsonConverter<T>, IInheritanceConverter where T : notnull
+public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : notnull
 {
     private readonly JsonEncodedText discriminatorProperty;
+    private readonly string discriminatorName;
+    private readonly TypeRegistry typeRegistry;
 
-    public string DiscriminatorName { get; }
-
-    protected InheritanceConverterBase(string discriminatorName)
+    public PolymorphicConverter(TypeRegistry typeRegistry)
     {
+        this.typeRegistry = typeRegistry;
+
+        discriminatorName = typeRegistry[typeof(T)].DiscriminatorProperty ?? Constants.DefaultDiscriminatorProperty;
         discriminatorProperty = JsonEncodedText.Encode(discriminatorName);
-        DiscriminatorName = discriminatorName;
     }
-
-    public abstract Type GetDiscriminatorType(string name, Type typeToConvert);
-
-    public abstract string GetDiscriminatorValue(Type type);
 
     public override T? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -38,8 +37,7 @@ public abstract class InheritanceConverterBase<T> : JsonConverter<T>, IInheritan
 
         while (typeReader.Read())
         {
-            if (typeReader.TokenType == JsonTokenType.PropertyName &&
-                typeReader.ValueTextEquals(discriminatorProperty.EncodedUtf8Bytes))
+            if (typeReader.TokenType == JsonTokenType.PropertyName && IsDiscriminiator(typeReader))
             {
                 // Advance the reader to the property value
                 typeReader.Read();
@@ -51,7 +49,7 @@ public abstract class InheritanceConverterBase<T> : JsonConverter<T>, IInheritan
                 }
 
                 // Resolve the type from the discriminator value.
-                var type = GetDiscriminatorType(typeReader.GetString()!, typeToConvert);
+                var type = GetDiscriminatorType(typeReader.GetString()!);
 
                 // Perform the actual deserialization with the original reader
                 return (T)JsonSerializer.Deserialize(ref reader, type, options)!;
@@ -65,8 +63,15 @@ public abstract class InheritanceConverterBase<T> : JsonConverter<T>, IInheritan
             }
         }
 
-        ThrowHelper.JsonException($"Object has no discriminator '{DiscriminatorName}.");
+        ThrowHelper.JsonException($"Object has no discriminator '{discriminatorName}.");
         return default!;
+    }
+
+    private bool IsDiscriminiator(Utf8JsonReader typeReader)
+    {
+        return
+            typeReader.ValueTextEquals(discriminatorProperty.EncodedUtf8Bytes) ||
+            typeReader.ValueTextEquals(Constants.DefaultDiscriminatorProperty);
     }
 
     public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
@@ -82,5 +87,16 @@ public abstract class InheritanceConverterBase<T> : JsonConverter<T>, IInheritan
         {
             ThrowHelper.JsonException($"TypeInfoResolver must be of type PolymorphicTypeResolver.");
         }
+    }
+
+    private Type GetDiscriminatorType(string name)
+    {
+        if (!typeRegistry[typeof(T)].TryGetType(name, out var type))
+        {
+            ThrowHelper.JsonException($"Object has invalid discriminator '{name}'.");
+            return default!;
+        }
+
+        return type;
     }
 }

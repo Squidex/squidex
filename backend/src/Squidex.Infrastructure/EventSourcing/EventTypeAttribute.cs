@@ -12,6 +12,8 @@ namespace Squidex.Infrastructure.EventSourcing;
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public sealed class EventTypeAttribute : TypeNameAttribute
 {
+    private const string Suffix = "Event";
+
     public EventTypeAttribute(string typeName, int version = 1)
         : base(CreateTypeName(typeName, version))
     {
@@ -19,6 +21,16 @@ public sealed class EventTypeAttribute : TypeNameAttribute
 
     private static string CreateTypeName(string typeName, int version)
     {
-        return $"{typeName}Event" + (version > 1 ? $"V{version}" : string.Empty);
+        if (!typeName.EndsWith(Suffix, StringComparison.OrdinalIgnoreCase))
+        {
+            typeName += Suffix;
+        }
+
+        if (version > 1)
+        {
+            typeName = $"{typeName}V{version}";
+        }
+
+        return typeName;
     }
 }

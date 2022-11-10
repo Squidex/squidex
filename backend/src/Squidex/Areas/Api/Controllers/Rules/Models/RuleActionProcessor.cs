@@ -31,17 +31,14 @@ public sealed class RuleActionProcessor : IDocumentProcessor
 
             if (schema != null)
             {
-                var converter = new RuleActionConverter();
-
-                schema.DiscriminatorObject = new OpenApiDiscriminator
+                var discriminator = new OpenApiDiscriminator
                 {
-                    PropertyName = converter.DiscriminatorName,
-
-                    // The converter must be set so that NJsonSchema can get the allowed types for that.
-                    JsonInheritanceConverter = converter,
+                    PropertyName = "actionType"
                 };
 
-                schema.Properties[converter.DiscriminatorName] = new JsonSchemaProperty
+                schema.DiscriminatorObject = discriminator;
+
+                schema.Properties[discriminator.PropertyName] = new JsonSchemaProperty
                 {
                     Type = JsonObjectType.String,
                     IsRequired = true,
@@ -51,6 +48,7 @@ public sealed class RuleActionProcessor : IDocumentProcessor
                 // The types come from another assembly so we have to fix it here.
                 foreach (var (key, value) in ruleRegistry.Actions)
                 {
+                    var derivedType = $"{key}RuleActionDto";
                     var derivedSchema = context.SchemaGenerator.Generate<JsonSchema>(value.Type.ToContextualType(), context.SchemaResolver);
 
                     var oldName = context.Document.Definitions.FirstOrDefault(x => x.Value == derivedSchema).Key;
@@ -58,7 +56,7 @@ public sealed class RuleActionProcessor : IDocumentProcessor
                     if (oldName != null)
                     {
                         context.Document.Definitions.Remove(oldName);
-                        context.Document.Definitions.Add($"{key}RuleActionDto", derivedSchema);
+                        context.Document.Definitions.Add(derivedType, derivedSchema);
                     }
                 }
 

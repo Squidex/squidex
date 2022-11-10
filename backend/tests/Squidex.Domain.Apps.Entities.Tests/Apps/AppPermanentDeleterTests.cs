@@ -6,13 +6,13 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Reflection;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
@@ -22,18 +22,11 @@ public class AppPermanentDeleterTests
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
     private readonly IDeleter deleter1 = A.Fake<IDeleter>();
     private readonly IDeleter deleter2 = A.Fake<IDeleter>();
-    private readonly TypeNameRegistry typeNameRegistry;
     private readonly AppPermanentDeleter sut;
 
     public AppPermanentDeleterTests()
     {
-        typeNameRegistry =
-            new TypeNameRegistry()
-                .Map(typeof(AppCreated))
-                .Map(typeof(AppContributorRemoved))
-                .Map(typeof(AppDeleted));
-
-        sut = new AppPermanentDeleter(new[] { deleter1, deleter2 }, domainObjectFactory, typeNameRegistry);
+        sut = new AppPermanentDeleter(new[] { deleter1, deleter2 }, domainObjectFactory, TestUtils.TypeRegistry);
     }
 
     [Fact]
@@ -63,9 +56,11 @@ public class AppPermanentDeleterTests
     [Fact]
     public void Should_handle_delete_event()
     {
+        var eventType = TestUtils.TypeRegistry.GetName<IEvent, AppDeleted>();
+
         var storedEvent =
             new StoredEvent("stream", "1", 1,
-                new EventData(typeNameRegistry.GetName<AppDeleted>(), new EnvelopeHeaders(), "payload"));
+                new EventData(eventType, new EnvelopeHeaders(), "payload"));
 
         Assert.True(sut.Handles(storedEvent));
     }
@@ -73,9 +68,11 @@ public class AppPermanentDeleterTests
     [Fact]
     public void Should_handle_contributor_event()
     {
+        var eventType = TestUtils.TypeRegistry.GetName<IEvent, AppContributorRemoved>();
+
         var storedEvent =
             new StoredEvent("stream", "1", 1,
-                new EventData(typeNameRegistry.GetName<AppContributorRemoved>(), new EnvelopeHeaders(), "payload"));
+                new EventData(eventType, new EnvelopeHeaders(), "payload"));
 
         Assert.True(sut.Handles(storedEvent));
     }
@@ -83,9 +80,11 @@ public class AppPermanentDeleterTests
     [Fact]
     public void Should_not_handle_creation_event()
     {
+        var eventType = TestUtils.TypeRegistry.GetName<IEvent, AppCreated>();
+
         var storedEvent =
             new StoredEvent("stream", "1", 1,
-                new EventData(typeNameRegistry.GetName<AppCreated>(), new EnvelopeHeaders(), "payload"));
+                new EventData(eventType, new EnvelopeHeaders(), "payload"));
 
         Assert.False(sut.Handles(storedEvent));
     }
@@ -97,8 +96,7 @@ public class AppPermanentDeleterTests
 
         await sut.On(Envelope.Create(new AppContributorRemoved
         {
-            AppId = app.NamedId(),
-            ContributorId = "user1"
+            AppId = app.NamedId(), ContributorId = "user1"
         }));
 
         A.CallTo(() => deleter1.DeleteContributorAsync(app.Id, "user1", default))

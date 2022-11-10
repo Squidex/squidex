@@ -206,34 +206,16 @@ public sealed class RuleTypeProvider : ITypeProvider
         return type.TypeName(false, ActionSuffix, ActionSuffixV2);
     }
 
-    public void Map(TypeNameRegistry typeNameRegistry)
+    public void Map(TypeRegistry typeRegistry)
     {
+        typeRegistry.Discriminator<RuleAction>("actionType");
+
         foreach (var (_, actionType) in actionTypes)
         {
-            typeNameRegistry.Map(actionType.Type, actionType.Type.Name);
+            typeRegistry.Add<RuleAction>(actionType.Type, actionType.Type.Name);
         }
 
-        var addedTypes = new HashSet<Type>();
-
-        static IEnumerable<Type> FindTypes(Type baseType)
-        {
-            return baseType.Assembly.GetTypes().Where(x => baseType.IsAssignableFrom(x) && !x.IsAbstract);
-        }
-
-        foreach (var type in FindTypes(typeof(EnrichedEvent)))
-        {
-            if (addedTypes.Add(type))
-            {
-                typeNameRegistry.Map(type, type.Name);
-            }
-        }
-
-        foreach (var type in FindTypes(typeof(RuleTrigger)))
-        {
-            if (addedTypes.Add(type))
-            {
-                typeNameRegistry.Map(type, type.Name);
-            }
-        }
+        typeRegistry.Map(new AssemblyTypeProvider<EnrichedEvent>());
+        typeRegistry.Map(new AssemblyTypeProvider<RuleTrigger>("triggerType"));
     }
 }

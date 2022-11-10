@@ -65,7 +65,7 @@ public abstract class EventConsumerProcessorIntegrationTests
         var mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
         var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
-        var typeFactory = new TypeNameRegistry().Map(typeof(MyEvent), "MyEvent");
+        var typeRegistry = new TypeRegistry().Add<IEvent, MyEvent>("MyEvent");
 
         var services = new ServiceCollection()
             .AddLogging()
@@ -74,7 +74,7 @@ public abstract class EventConsumerProcessorIntegrationTests
             .AddSingleton(eventConsumer)
             .AddSingleton(mongoClient)
             .AddSingleton(mongoDatabase)
-            .AddSingleton(typeFactory)
+            .AddSingleton(typeRegistry)
             .AddSingleton(typeof(IPersistenceFactory<>), typeof(Store<>))
             .AddSingleton<EventConsumerProcessor>()
             .AddSingleton<IEventConsumer>(eventConsumer)
