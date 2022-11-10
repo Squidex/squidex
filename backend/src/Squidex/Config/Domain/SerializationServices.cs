@@ -15,7 +15,6 @@ using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Apps.Json;
 using Squidex.Domain.Apps.Core.Contents;

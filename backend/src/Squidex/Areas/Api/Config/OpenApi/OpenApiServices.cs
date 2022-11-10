@@ -27,7 +27,7 @@ public static class OpenApiServices
     public static void AddSquidexOpenApiSettings(this IServiceCollection services)
     {
         services.AddSingletonAs<ErrorDtoProcessor>()
-            .As<IDocumentProcessor>();
+            .As<IOperationProcessor>();
 
         services.AddSingletonAs<RuleActionProcessor>()
             .As<IDocumentProcessor>();
@@ -35,7 +35,7 @@ public static class OpenApiServices
         services.AddSingletonAs<CommonProcessor>()
             .As<IDocumentProcessor>();
 
-        services.AddSingletonAs<XmlTagProcessor>()
+        services.AddSingletonAs<TagXmlProcessor>()
             .As<IDocumentProcessor>();
 
         services.AddSingletonAs<SecurityProcessor>()
@@ -45,9 +45,6 @@ public static class OpenApiServices
             .As<IOperationProcessor>();
 
         services.AddSingletonAs<TagByGroupNameProcessor>()
-            .As<IOperationProcessor>();
-
-        services.AddSingletonAs<XmlResponseTypesProcessor>()
             .As<IOperationProcessor>();
 
         services.AddSingletonAs<JsonSchemaGenerator>()

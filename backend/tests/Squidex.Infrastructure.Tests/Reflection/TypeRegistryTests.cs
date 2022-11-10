@@ -7,7 +7,6 @@
 
 using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.Reflection;

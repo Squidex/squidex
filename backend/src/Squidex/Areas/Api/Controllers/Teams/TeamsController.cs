@@ -33,9 +33,7 @@ public sealed class TeamsController : ApiController
     /// <summary>
     /// Get your teams.
     /// </summary>
-    /// <returns>
-    /// 200 => Teams returned.
-    /// </returns>
+    /// <response code="200">Teams returned.</response>.
     /// <remarks>
     /// You can only retrieve the list of teams when you are authenticated as a user (OpenID implicit flow).
     /// You will retrieve all teams, where you are assigned as a contributor.
@@ -63,10 +61,8 @@ public sealed class TeamsController : ApiController
     /// Get an team by name.
     /// </summary>
     /// <param name="team">The name of the team.</param>
-    /// <returns>
-    /// 200 => Teams returned.
-    /// 404 => Team not found.
-    /// </returns>
+    /// <response code="200">Teams returned.</response>.
+    /// <response code="404">Team not found.</response>.
     [HttpGet]
     [Route("teams/{team}")]
     [ProducesResponseType(typeof(TeamDto), StatusCodes.Status200OK)]
@@ -88,11 +84,9 @@ public sealed class TeamsController : ApiController
     /// Create a new team.
     /// </summary>
     /// <param name="request">The team object that needs to be added to Squidex.</param>
-    /// <returns>
-    /// 201 => Team created.
-    /// 400 => Team request not valid.
-    /// 409 => Team name is already in use.
-    /// </returns>
+    /// <response code="201">Team created.</response>.
+    /// <response code="400">Team request not valid.</response>.
+    /// <response code="409">Team name is already in use.</response>.
     /// <remarks>
     /// You can only create an team when you are authenticated as a user (OpenID implicit flow).
     /// You will be assigned as owner of the new team automatically.
@@ -114,11 +108,9 @@ public sealed class TeamsController : ApiController
     /// </summary>
     /// <param name="team">The name of the team to update.</param>
     /// <param name="request">The values to update.</param>
-    /// <returns>
-    /// 200 => Team updated.
-    /// 400 => Team request not valid.
-    /// 404 => Team not found.
-    /// </returns>
+    /// <response code="200">Team updated.</response>.
+    /// <response code="400">Team request not valid.</response>.
+    /// <response code="404">Team not found.</response>.
     [HttpPut]
     [Route("teams/{team}/")]
     [ProducesResponseType(typeof(TeamDto), StatusCodes.Status200OK)]

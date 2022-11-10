@@ -33,9 +33,7 @@ public class RestoreController : ApiController
     /// <summary>
     /// Get current restore status.
     /// </summary>
-    /// <returns>
-    /// 200 => Status returned.
-    /// </returns>
+    /// <response code="200">Status returned.</response>.
     [HttpGet]
     [Route("apps/restore/")]
     [ProducesResponseType(typeof(RestoreJobDto), StatusCodes.Status200OK)]
@@ -58,11 +56,10 @@ public class RestoreController : ApiController
     /// Restore a backup.
     /// </summary>
     /// <param name="request">The backup to restore.</param>
-    /// <returns>
-    /// 204 => Restore operation started.
-    /// </returns>
+    /// <response code="204">Restore operation started.</response>.
     [HttpPost]
     [Route("apps/restore/")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermission(PermissionIds.AdminRestore)]
     public async Task<IActionResult> PostRestoreJob([FromBody] RestoreRequestDto request)
     {

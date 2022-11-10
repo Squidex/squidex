@@ -33,9 +33,7 @@ public sealed class TranslationsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">The translation request.</param>
-    /// <returns>
-    /// 200 => Text translated.
-    /// </returns>
+    /// <response code="200">Text translated.</response>.
     [HttpPost]
     [Route("apps/{app}/translations/")]
     [ProducesResponseType(typeof(TranslationDto), StatusCodes.Status200OK)]

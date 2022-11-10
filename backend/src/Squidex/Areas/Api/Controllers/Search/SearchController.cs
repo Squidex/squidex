@@ -33,10 +33,8 @@ public class SearchController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="query">The search query.</param>
-    /// <returns>
-    /// 200 => Search results returned.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="200">Search results returned.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpGet]
     [Route("apps/{app}/search/")]
     [ProducesResponseType(typeof(SearchResultDto[]), StatusCodes.Status200OK)]

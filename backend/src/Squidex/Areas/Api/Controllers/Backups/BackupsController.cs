@@ -34,10 +34,8 @@ public class BackupsController : ApiController
     /// Get all backup jobs.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <returns>
-    /// 200 => Backups returned.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="200">Backups returned.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpGet]
     [Route("apps/{app}/backups/")]
     [ProducesResponseType(typeof(BackupJobsDto), StatusCodes.Status200OK)]
@@ -56,14 +54,12 @@ public class BackupsController : ApiController
     /// Start a new backup.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <returns>
-    /// 204 => Backup started.
-    /// 400 => Backup contingent reached.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="204">Backup started.</response>.
+    /// <response code="400">Backup contingent reached.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpPost]
     [Route("apps/{app}/backups/")]
-    [ProducesResponseType(typeof(BackupJobDto[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppBackupsCreate)]
     [ApiCosts(0)]
     public async Task<IActionResult> PostBackup(string app)
@@ -78,13 +74,11 @@ public class BackupsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the backup to delete.</param>
-    /// <returns>
-    /// 204 => Backup deleted.
-    /// 404 => Backup or app not found.
-    /// </returns>
+    /// <response code="204">Backup deleted.</response>.
+    /// <response code="404">Backup or app not found.</response>.
     [HttpDelete]
     [Route("apps/{app}/backups/{id}")]
-    [ProducesResponseType(typeof(BackupJobDto[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppBackupsDelete)]
     [ApiCosts(0)]
     public async Task<IActionResult> DeleteBackup(string app, DomainId id)

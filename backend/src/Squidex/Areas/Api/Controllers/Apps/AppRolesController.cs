@@ -35,10 +35,8 @@ public sealed class AppRolesController : ApiController
     /// Get app roles.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <returns>
-    /// 200 => Roles returned.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="200">Roles returned.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpGet]
     [Route("apps/{app}/roles/")]
     [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
@@ -60,10 +58,8 @@ public sealed class AppRolesController : ApiController
     /// Get app permissions.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <returns>
-    /// 200 => App permissions returned.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="200">App permissions returned.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpGet]
     [Route("apps/{app}/roles/permissions")]
     [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
@@ -86,11 +82,9 @@ public sealed class AppRolesController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">Role object that needs to be added to the app.</param>
-    /// <returns>
-    /// 201 => Role created.
-    /// 400 => Role request not valid.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="201">Role created.</response>.
+    /// <response code="400">Role request not valid.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpPost]
     [Route("apps/{app}/roles/")]
     [ProducesResponseType(typeof(RolesDto), 201)]
@@ -111,11 +105,9 @@ public sealed class AppRolesController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="roleName">The name of the role to be updated.</param>
     /// <param name="request">Role to be updated for the app.</param>
-    /// <returns>
-    /// 200 => Role updated.
-    /// 400 => Role request not valid.
-    /// 404 => Role or app not found.
-    /// </returns>
+    /// <response code="200">Role updated.</response>.
+    /// <response code="400">Role request not valid.</response>.
+    /// <response code="404">Role or app not found.</response>.
     [HttpPut]
     [Route("apps/{app}/roles/{roleName}/")]
     [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
@@ -136,11 +128,9 @@ public sealed class AppRolesController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="roleName">The name of the role.</param>
-    /// <returns>
-    /// 200 => Role deleted.
-    /// 400 => Role is in use by contributor or client or a default role.
-    /// 404 => Role or app not found.
-    /// </returns>
+    /// <response code="200">Role deleted.</response>.
+    /// <response code="400">Role is in use by contributor or client or a default role.</response>.
+    /// <response code="404">Role or app not found.</response>.
     [HttpDelete]
     [Route("apps/{app}/roles/{roleName}/")]
     [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]

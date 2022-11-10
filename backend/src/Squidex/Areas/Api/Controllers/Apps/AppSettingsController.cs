@@ -29,10 +29,8 @@ public sealed class AppSettingsController : ApiController
     /// Get the app settings.
     /// </summary>
     /// <param name="app">The name of the app to get the settings for.</param>
-    /// <returns>
-    /// 200 => App settings returned.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="200">App settings returned.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpGet]
     [Route("apps/{app}/settings")]
     [ProducesResponseType(typeof(AppSettingsDto), StatusCodes.Status200OK)]
@@ -53,11 +51,9 @@ public sealed class AppSettingsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app to update.</param>
     /// <param name="request">The values to update.</param>
-    /// <returns>
-    /// 200 => App updated.
-    /// 400 => App request not valid.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="200">App updated.</response>.
+    /// <response code="400">App request not valid.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpPut]
     [Route("apps/{app}/settings")]
     [ProducesResponseType(typeof(AppSettingsDto), StatusCodes.Status200OK)]

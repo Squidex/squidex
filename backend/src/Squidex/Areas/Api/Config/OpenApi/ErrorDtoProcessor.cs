@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Xml.Linq;
 using Namotion.Reflection;
 using NJsonSchema;
 using NSwag;
@@ -14,54 +15,64 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Config.OpenApi;
 
-public sealed class ErrorDtoProcessor : IDocumentProcessor
+public sealed class ErrorDtoProcessor : IOperationProcessor
 {
-    private const string InternalErrorDescription = "Operation failed.";
-
-    public void Process(DocumentProcessorContext context)
+    public bool Process(OperationProcessorContext context)
     {
-        var errorSchema = GetErrorSchema(context);
+        var operation = context.OperationDescription.Operation;
 
-        foreach (var operation in context.Document.Paths.Values.SelectMany(x => x.Values))
+        void AddResponse(string code, string description)
         {
-            AddErrorResponses(operation, errorSchema);
+            if (!IsErrorCode(code))
+            {
+                return;
+            }
 
-            CleanupResponses(operation);
+            if (!operation.Responses.ContainsKey(code))
+            {
+                operation.Responses.Add(code, new OpenApiResponse
+                {
+                    Description = description
+                });
+            }
         }
-    }
 
-    private static void AddErrorResponses(OpenApiOperation operation, JsonSchema errorSchema)
-    {
-        if (!operation.Responses.ContainsKey("500"))
+        AddResponse("500", "Operation failed.");
+        AddResponse("400", "Validation error.");
+
+        var responses =
+            context.MethodInfo.GetXmlDocsElement(null)?
+                .Nodes()
+                .OfType<XElement>()
+                .Where(x => x.Name == "response")
+                .Where(x => x.Attribute("code") != null)
+                ?? Enumerable.Empty<XElement>();
+
+        foreach (var response in responses)
         {
-            var response = new OpenApiResponse { Description = InternalErrorDescription, Schema = errorSchema };
-
-            operation.Responses["500"] = response;
+            AddResponse(response.Attribute("code")!.Value, response.Value);
         }
 
         foreach (var (code, response) in operation.Responses)
         {
-            if (code != "404" && code.StartsWith("4", StringComparison.OrdinalIgnoreCase) && response.Schema == null)
+            if (response.Schema == null)
             {
-                response.Schema = errorSchema;
+                if (IsErrorCode(code) && code != "404")
+                {
+                    response.Schema = GetErrorSchema(context);
+                }
             }
         }
+
+        return true;
     }
 
-    private static void CleanupResponses(OpenApiOperation operation)
+    private static bool IsErrorCode(string code)
     {
-        foreach (var (code, response) in operation.Responses.ToList())
-        {
-            if (string.IsNullOrWhiteSpace(response.Description) ||
-                response.Description?.Contains("=&gt;", StringComparison.Ordinal) == true ||
-                response.Description?.Contains("=>", StringComparison.Ordinal) == true)
-            {
-                operation.Responses.Remove(code);
-            }
-        }
+        return !code.StartsWith("2", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static JsonSchema GetErrorSchema(DocumentProcessorContext context)
+    private static JsonSchema GetErrorSchema(OperationProcessorContext context)
     {
         var errorType = typeof(ErrorDto).ToContextualType();
 

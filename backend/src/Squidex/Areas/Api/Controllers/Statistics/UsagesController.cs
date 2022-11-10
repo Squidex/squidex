@@ -56,10 +56,8 @@ public sealed class UsagesController : ApiController
     /// Get api calls as log file.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <returns>
-    /// 200 => Usage tracking results returned.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="200">Usage tracking results returned.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpGet]
     [Route("apps/{app}/usages/log/")]
     [ProducesResponseType(typeof(LogDownloadDto), StatusCodes.Status200OK)]
@@ -105,11 +103,9 @@ public sealed class UsagesController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="fromDate">The from date.</param>
     /// <param name="toDate">The to date.</param>
-    /// <returns>
-    /// 200 => API call returned.
-    /// 404 => App not found.
-    /// 400 => Range between from date and to date is not valid or has more than 100 days.
-    /// </returns>
+    /// <response code="200">API call returned.</response>.
+    /// <response code="404">App not found.</response>.
+    /// <response code="400">Range between from date and to date is not valid or has more than 100 days.</response>.
     [HttpGet]
     [Route("apps/{app}/usages/calls/{fromDate}/{toDate}/")]
     [ProducesResponseType(typeof(CallsUsageDtoDto), StatusCodes.Status200OK)]
@@ -139,11 +135,9 @@ public sealed class UsagesController : ApiController
     /// <param name="team">The name of the team.</param>
     /// <param name="fromDate">The from date.</param>
     /// <param name="toDate">The to date.</param>
-    /// <returns>
-    /// 200 => API call returned.
-    /// 400 => Range between from date and to date is not valid or has more than 100 days.
-    /// 404 => Team not found.
-    /// </returns>
+    /// <response code="200">API call returned.</response>.
+    /// <response code="400">Range between from date and to date is not valid or has more than 100 days.</response>.
+    /// <response code="404">Team not found.</response>.
     [HttpGet]
     [Route("teams/{team}/usages/calls/{fromDate}/{toDate}/")]
     [ProducesResponseType(typeof(CallsUsageDtoDto), StatusCodes.Status200OK)]
@@ -171,10 +165,8 @@ public sealed class UsagesController : ApiController
     /// Get total asset size.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <returns>
-    /// 200 => Storage usage returned.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="200">Storage usage returned.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpGet]
     [Route("apps/{app}/usages/storage/today/")]
     [ProducesResponseType(typeof(CurrentStorageDto), StatusCodes.Status200OK)]
@@ -196,10 +188,8 @@ public sealed class UsagesController : ApiController
     /// Get total asset size by team.
     /// </summary>
     /// <param name="team">The ID of the team.</param>
-    /// <returns>
-    /// 200 => Storage usage returned.
-    /// 404 => Team not found.
-    /// </returns>
+    /// <response code="200">Storage usage returned.</response>.
+    /// <response code="404">Team not found.</response>.
     [HttpGet]
     [Route("teams/{team}/usages/storage/today/")]
     [ProducesResponseType(typeof(CurrentStorageDto), StatusCodes.Status200OK)]
@@ -223,11 +213,9 @@ public sealed class UsagesController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="fromDate">The from date.</param>
     /// <param name="toDate">The to date.</param>
-    /// <returns>
-    /// 200 => Storage usage returned.
-    /// 400 => Range between from date and to date is not valid or has more than 100 days.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="200">Storage usage returned.</response>.
+    /// <response code="400">Range between from date and to date is not valid or has more than 100 days.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpGet]
     [Route("apps/{app}/usages/storage/{fromDate}/{toDate}/")]
     [ProducesResponseType(typeof(StorageUsagePerDateDto[]), StatusCodes.Status200OK)]
@@ -253,11 +241,9 @@ public sealed class UsagesController : ApiController
     /// <param name="team">The ID of the team.</param>
     /// <param name="fromDate">The from date.</param>
     /// <param name="toDate">The to date.</param>
-    /// <returns>
-    /// 200 => Storage usage returned.
-    /// 400 => Range between from date and to date is not valid or has more than 100 days.
-    /// 404 => Team not found.
-    /// </returns>
+    /// <response code="200">Storage usage returned.</response>.
+    /// <response code="400">Range between from date and to date is not valid or has more than 100 days.</response>.
+    /// <response code="404">Team not found.</response>.
     [HttpGet]
     [Route("teams/{team}/usages/storage/{fromDate}/{toDate}/")]
     [ProducesResponseType(typeof(StorageUsagePerDateDto[]), StatusCodes.Status200OK)]

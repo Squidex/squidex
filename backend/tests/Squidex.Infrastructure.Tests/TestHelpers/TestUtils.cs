@@ -20,7 +20,6 @@ using Squidex.Infrastructure.Json.System;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
-using Squidex.Infrastructure.Reflection;
 
 #pragma warning disable SYSLIB0011 // Type or member is obsolete
 

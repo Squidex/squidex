@@ -41,10 +41,8 @@ public sealed class CommentsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="resource">The path to the resource.</param>
-    /// <returns>
-    /// 200 => Watching users returned.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="200">Watching users returned.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpGet]
     [Route("apps/{app}/watching/{*resource}")]
     [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
@@ -66,10 +64,8 @@ public sealed class CommentsController : ApiController
     /// <remarks>
     /// When passing in a version you can retrieve all updates since then.
     /// </remarks>
-    /// <returns>
-    /// 200 => Comments returned.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="200">Comments returned.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpGet]
     [Route("apps/{app}/comments/{commentsId}")]
     [ProducesResponseType(typeof(CommentsDto), StatusCodes.Status200OK)]
@@ -95,11 +91,9 @@ public sealed class CommentsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="commentsId">The ID of the comments.</param>
     /// <param name="request">The comment object that needs to created.</param>
-    /// <returns>
-    /// 201 => Comment created.
-    /// 400 => Comment request not valid.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="201">Comment created.</response>.
+    /// <response code="400">Comment request not valid.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpPost]
     [Route("apps/{app}/comments/{commentsId}")]
     [ProducesResponseType(typeof(CommentDto), 201)]
@@ -123,13 +117,12 @@ public sealed class CommentsController : ApiController
     /// <param name="commentsId">The ID of the comments.</param>
     /// <param name="commentId">The ID of the comment.</param>
     /// <param name="request">The comment object that needs to updated.</param>
-    /// <returns>
-    /// 204 => Comment updated.
-    /// 400 => Comment request not valid.
-    /// 404 => Comment or app not found.
-    /// </returns>
+    /// <response code="204">Comment updated.</response>.
+    /// <response code="400">Comment request not valid.</response>.
+    /// <response code="404">Comment or app not found.</response>.
     [HttpPut]
     [Route("apps/{app}/comments/{commentsId}/{commentId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppCommentsUpdate)]
     [ApiCosts(0)]
     public async Task<IActionResult> PutComment(string app, DomainId commentsId, DomainId commentId, [FromBody] UpsertCommentDto request)
@@ -147,12 +140,11 @@ public sealed class CommentsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="commentsId">The ID of the comments.</param>
     /// <param name="commentId">The ID of the comment.</param>
-    /// <returns>
-    /// 204 => Comment deleted.
-    /// 404 => Comment or app not found.
-    /// </returns>
+    /// <response code="204">Comment deleted.</response>.
+    /// <response code="404">Comment or app not found.</response>.
     [HttpDelete]
     [Route("apps/{app}/comments/{commentsId}/{commentId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppCommentsDelete)]
     [ApiCosts(0)]
     public async Task<IActionResult> DeleteComment(string app, DomainId commentsId, DomainId commentId)

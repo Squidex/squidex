@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
-
 namespace Squidex.Infrastructure.Reflection;
 
 public sealed class TypeRegistry
