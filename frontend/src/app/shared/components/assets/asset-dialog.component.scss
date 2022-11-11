@@ -33,6 +33,14 @@
     visibility: hidden;
 }
 
+.metadata-row {
+    margin-bottom: .5rem;
+
+    &:last-child {
+        margin: 0;
+    }
+}
+
 .path {
     min-height: 2.5rem;
 }
