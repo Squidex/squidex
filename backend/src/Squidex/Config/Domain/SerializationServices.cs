@@ -75,6 +75,7 @@ public static class SerializationServices
         options.Converters.Add(new StringConverter<RefToken>());
         options.Converters.Add(new StringConverter<Status>());
         options.Converters.Add(new JsonStringEnumConverter());
+        options.TypeInfoResolver = new PolymorphicTypeResolver(typeRegistry);
         options.IncludeFields = true;
 
         return options;

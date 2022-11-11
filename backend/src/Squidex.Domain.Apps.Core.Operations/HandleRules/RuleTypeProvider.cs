@@ -210,9 +210,9 @@ public sealed class RuleTypeProvider : ITypeProvider
     {
         typeRegistry.Discriminator<RuleAction>("actionType");
 
-        foreach (var (_, actionType) in actionTypes)
+        foreach (var (name, actionType) in actionTypes)
         {
-            typeRegistry.Add<RuleAction>(actionType.Type, actionType.Type.Name);
+            typeRegistry.Add<RuleAction>(actionType.Type, name);
         }
 
         typeRegistry.Map(new AssemblyTypeProvider<EnrichedEvent>());

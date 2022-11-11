@@ -17,11 +17,10 @@ public delegate bool Parser<T>(ReadOnlySpan<char> input, out T result);
 
 [TypeConverter(typeof(NamedIdTypeConverter))]
 public sealed record NamedId<T>(T Id, string Name) where T : notnull
-#pragma warning restore SA1313 // Parameter names should begin with lower-case letter
 {
     private static readonly int GuidLength = Guid.Empty.ToString().Length;
 
-    public string Name { get; } = Guard.NotNull(Name);
+    public string Name { get; init; } = Guard.NotNullOrEmpty(Name);
 
     public override string ToString()
     {

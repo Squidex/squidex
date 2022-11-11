@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 using Squidex.Infrastructure.Json.System;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
+using static Squidex.Infrastructure.Json.Objects.JsonValuesSerializationTests;
 
 namespace Squidex.Infrastructure;
 
@@ -18,6 +19,24 @@ public class NamedIdTests
     {
         [JsonConverter(typeof(StringConverter<NamedId<long>>))]
         public NamedId<long> Value { get; set; }
+    }
+
+    public static IEnumerable<object[]> Serializers()
+    {
+        yield return new object[] { SerializerMode.Json };
+        yield return new object[] { SerializerMode.Bson };
+    }
+
+    private static T Serialize<T>(T input, SerializerMode mode)
+    {
+        if (mode == SerializerMode.Bson)
+        {
+            return input.SerializeAndDeserializeBson();
+        }
+        else
+        {
+            return input.SerializeAndDeserialize();
+        }
     }
 
     [Fact]
@@ -41,28 +60,31 @@ public class NamedIdTests
         Assert.Equal($"{id},my-name", namedId.ToString());
     }
 
-    [Fact]
-    public void Should_serialize_and_deserialize_null_guid_token()
+    [Theory]
+    [MemberData(nameof(Serializers))]
+    public void Should_serialize_and_deserialize_null_guid_token(SerializerMode mode)
     {
         NamedId<Guid>? value = null;
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = Serialize(value, mode);
 
         Assert.Equal(value, serialized);
     }
 
-    [Fact]
-    public void Should_serialize_and_deserialize_valid_guid_token()
+    [Theory]
+    [MemberData(nameof(Serializers))]
+    public void Should_serialize_and_deserialize_valid_guid_token(SerializerMode mode)
     {
         var value = NamedId.Of(Guid.NewGuid(), "my-name");
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = Serialize(value, mode);
 
         Assert.Equal(value, serialized);
     }
 
-    [Fact]
-    public void Should_serialize_and_deserialize_null_long_token()
+    [Theory]
+    [MemberData(nameof(Serializers))]
+    public void Should_serialize_and_deserialize_null_long_token(SerializerMode mode)
     {
         NamedId<long>? value = null;
 
@@ -71,52 +93,57 @@ public class NamedIdTests
         Assert.Equal(value, serialized);
     }
 
-    [Fact]
-    public void Should_serialize_and_deserialize_valid_long_token()
+    [Theory]
+    [MemberData(nameof(Serializers))]
+    public void Should_serialize_and_deserialize_valid_long_token(SerializerMode mode)
     {
         var value = NamedId.Of(123L, "my-name");
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = Serialize(value, mode);
 
         Assert.Equal(value, serialized);
     }
 
-    [Fact]
-    public void Should_serialize_and_deserialize_null_string_token()
+    [Theory]
+    [MemberData(nameof(Serializers))]
+    public void Should_serialize_and_deserialize_null_string_token(SerializerMode mode)
     {
         NamedId<string>? value = null;
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = Serialize(value, mode);
 
         Assert.Equal(value, serialized);
     }
 
-    [Fact]
-    public void Should_serialize_and_deserialize_valid_string_token()
+    [Theory]
+    [MemberData(nameof(Serializers))]
+    public void Should_serialize_and_deserialize_valid_string_token(SerializerMode mode)
     {
         var value = NamedId.Of(Guid.NewGuid().ToString(), "my-name");
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = Serialize(value, mode);
 
         Assert.Equal(value, serialized);
     }
 
-    [Fact]
-    public void Should_serialize_and_deserialize_null_id_token()
+    [Theory]
+    [MemberData(nameof(Serializers))]
+    public void Should_serialize_and_deserialize_null_id_token(SerializerMode mode)
     {
         NamedId<DomainId>? value = null;
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = Serialize(value, mode);
 
         Assert.Equal(value, serialized);
     }
 
-    [Fact]
-    public void Should_serialize_and_deserialize_valid_id_token()
+    [Theory]
+    [MemberData(nameof(Serializers))]
+    public void Should_serialize_and_deserialize_valid_id_token(SerializerMode mode)
     {
         var value = NamedId.Of(DomainId.NewGuid().ToString(), "my-name");
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = Serialize(value, mode);
 
         Assert.Equal(value, serialized);
     }

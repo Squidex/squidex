@@ -16,9 +16,9 @@ public sealed class DefaultEventFormatter : IEventFormatter
     private readonly IJsonSerializer serializer;
     private readonly TypeRegistry typeRegistry;
 
-    public DefaultEventFormatter(TypeRegistry typeNameRegistry, IJsonSerializer serializer)
+    public DefaultEventFormatter(TypeRegistry typeRegistry, IJsonSerializer serializer)
     {
-        this.typeRegistry = typeNameRegistry;
+        this.typeRegistry = typeRegistry;
         this.serializer = serializer;
     }
 
