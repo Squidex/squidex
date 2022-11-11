@@ -33,8 +33,7 @@ public sealed class DefaultAppLogStore : IAppLogStore, IDeleter
     private static readonly CsvConfiguration CsvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
     {
         DetectDelimiter = false,
-        Delimiter = "|",
-        LeaveOpen = true
+        Delimiter = "|"
     };
 
     private readonly IRequestLogStore requestLogStore;
@@ -88,7 +87,7 @@ public sealed class DefaultAppLogStore : IAppLogStore, IDeleter
         var writer = new StreamWriter(stream, Encoding.UTF8, 4096, true);
         try
         {
-            await using (var csv = new CsvWriter(writer, CsvConfiguration))
+            await using (var csv = new CsvWriter(writer, CsvConfiguration, true))
             {
                 csv.WriteField(FieldTimestamp);
                 csv.WriteField(FieldRequestPath);

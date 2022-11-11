@@ -15,6 +15,7 @@ using NSwag.Generation.Processors;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
@@ -115,10 +116,20 @@ public static class OpenApiServices
 
             CreateAnyMap<JsonDocument>(),
             CreateAnyMap<JsonValue>(),
-            CreateAnyMap<FilterNode<JsonValue>>()
+            CreateAnyMap<FilterNode<JsonValue>>(),
+
+            new PrimitiveTypeMapper(typeof(FieldNames), schema =>
+            {
+                schema.Type = JsonObjectType.Array;
+
+                schema.Item = new JsonSchema
+                {
+                    Type = JsonObjectType.String
+                };
+            }),
         };
 
-        settings.SchemaType = SchemaType.OpenApi3;
+        settings.SchemaType = NJsonSchema.SchemaType.OpenApi3;
 
         settings.FlattenInheritanceHierarchy = flatten;
     }
