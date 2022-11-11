@@ -100,6 +100,7 @@
   "assets.metadataAdd": "添加元数据",
   "assets.moveFailed": "资源移动失败。请重新加载。",
   "assets.protected": "受保护",
+  "assets.protectedHint": "Assets are public by default. Everybody with the link can download the file. If you make an asset protected, only authenticated users (usually a client) can download the asset.",
   "assets.refreshTooltip": "刷新资源",
   "assets.reloaded": "资源重新加载。",
   "assets.removeConfirmText": "你真的要移除资源吗？",

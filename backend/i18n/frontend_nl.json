@@ -100,6 +100,7 @@
   "assets.metadataAdd": "Metadata toevoegen",
   "assets.moveFailed": "Verplaatsen van item is mislukt. Laad opnieuw.",
   "assets.protected": "Beschermd",
+  "assets.protectedHint": "Assets are public by default. Everybody with the link can download the file. If you make an asset protected, only authenticated users (usually a client) can download the asset.",
   "assets.refreshTooltip": "Bestanden vernieuwen",
   "assets.reloaded": "Bestanden herladen.",
   "assets.removeConfirmText": "Wil je het bestand echt verwijderen?",

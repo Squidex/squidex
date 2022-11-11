@@ -105,7 +105,7 @@ public sealed class TemplateCommandMiddleware : ICommandMiddleware
 
     private static async Task<ISyncService> CreateSyncServiceAsync(string repository, ISession session)
     {
-        var fs = await FileSystems.CreateAsync(repository, session.WorkingDirectory);
+        var fs = await FileSystems.CreateAsync(repository);
 
         return new SyncService(fs, session);
     }

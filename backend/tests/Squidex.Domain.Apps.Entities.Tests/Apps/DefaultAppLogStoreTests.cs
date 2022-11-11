@@ -130,7 +130,7 @@ public class DefaultAppLogStoreTests
 
         using (var reader = new StreamReader(stream))
         {
-            while (await reader.ReadLineAsync() != null)
+            while (await reader.ReadLineAsync(default) != null)
             {
                 lines++;
             }

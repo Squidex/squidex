@@ -12,9 +12,9 @@ using NJsonSchema.Generation.TypeMappers;
 using NodaTime;
 using NSwag.Generation;
 using NSwag.Generation.Processors;
-using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
@@ -88,30 +88,29 @@ public static class OpenApiServices
     {
         settings.TypeMappers = new List<ITypeMapper>
         {
+            CreateAnyMap<FilterNode<JsonValue>>(),
+            CreateAnyMap<JsonDocument>(),
+            CreateAnyMap<JsonValue>(),
+            CreateArrayMap<FieldNames>(JsonObjectType.String),
+            CreateObjectMap<AssetMetadata>(),
+            CreateObjectMap<JsonObject>(),
             CreateStringMap<DomainId>(),
             CreateStringMap<Instant>(JsonFormatStrings.DateTime),
+            CreateStringMap<Language>(),
             CreateStringMap<LocalDate>(JsonFormatStrings.Date),
             CreateStringMap<LocalDateTime>(JsonFormatStrings.DateTime),
-            CreateStringMap<Language>(),
             CreateStringMap<NamedId<DomainId>>(),
             CreateStringMap<NamedId<Guid>>(),
             CreateStringMap<NamedId<string>>(),
             CreateStringMap<RefToken>(),
             CreateStringMap<Status>(),
-
-            CreateObjectMap<JsonObject>(),
-            CreateObjectMap<AssetMetadata>(),
-
-            CreateAnyMap<JsonDocument>(),
-            CreateAnyMap<JsonValue>(),
-            CreateAnyMap<FilterNode<JsonValue>>()
         };
 
         settings.AllowReferencesWithProperties = true;
         settings.FlattenInheritanceHierarchy = flatten;
         settings.SchemaNameGenerator = new SchemaNameGenerator();
         settings.SchemaProcessors.Add(new DiscriminatorProcessor(typeRegistry));
-        settings.SchemaType = SchemaType.OpenApi3;
+        settings.SchemaType = NJsonSchema.SchemaType.OpenApi3;
         settings.ReflectionService = new ReflectionServices();
     }
 
@@ -124,6 +123,19 @@ public static class OpenApiServices
             schema.AdditionalPropertiesSchema = new JsonSchema
             {
                 Description = "Any"
+            };
+        });
+    }
+
+    private static ITypeMapper CreateArrayMap<T>(JsonObjectType itemType)
+    {
+        return new PrimitiveTypeMapper(typeof(T), schema =>
+        {
+            schema.Type = JsonObjectType.Array;
+
+            schema.Item = new JsonSchema
+            {
+                Type = itemType
             };
         });
     }

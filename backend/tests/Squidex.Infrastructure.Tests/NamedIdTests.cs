@@ -88,7 +88,7 @@ public class NamedIdTests
     {
         NamedId<long>? value = null;
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = Serialize(value, mode);
 
         Assert.Equal(value, serialized);
     }

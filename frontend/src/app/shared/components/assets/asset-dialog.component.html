@@ -136,7 +136,7 @@
                         <div class="form-group">
                             <label>{{ 'assets.metadata' | sqxTranslate }}</label>
             
-                            <div class="form-group row g-0" *ngFor="let form of annotateForm.metadataControls; let i = index" [formGroup]="form">
+                            <div class="metadata-row row g-0" *ngFor="let form of annotateForm.metadataControls; let i = index" [formGroup]="form">
                                 <div class="col col-name pe-1">
                                     <sqx-control-errors for="name" fieldName="Name"></sqx-control-errors>
                 
@@ -171,6 +171,10 @@
                             <input type="checkbox" class="form-check-input" id="isProtected" formControlName="isProtected">
             
                             <label class="form-check-label" for="isProtected">{{ 'assets.protected' | sqxTranslate }}</label>
+
+                            <sqx-form-hint>
+                                {{ 'assets.protectedHint' | sqxTranslate }}
+                            </sqx-form-hint>
                         </div>
                     </div>
                 </ng-container>

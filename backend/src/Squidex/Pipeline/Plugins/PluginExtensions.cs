@@ -41,10 +41,7 @@ public static class PluginExtensions
             {
                 var pluginAssembly = pluginManager.Load(path, SharedAssemblies);
 
-                if (pluginAssembly != null)
-                {
-                    pluginAssembly.AddParts(mvcBuilder);
-                }
+                pluginAssembly?.AddParts(mvcBuilder);
             }
         }
 
