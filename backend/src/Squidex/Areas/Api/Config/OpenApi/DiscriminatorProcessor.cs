@@ -22,40 +22,46 @@ public sealed class DiscriminatorProcessor : ISchemaProcessor
 
     public void Process(SchemaProcessorContext context)
     {
+        if (context.Schema.DiscriminatorObject != null)
+        {
+            return;
+        }
+
         var config = typeRegistry[context.ContextualType.Type];
 
-        if (config.DerivedTypes.Count > 0 && config.DiscriminatorProperty != null)
+        if (config.DerivedTypes.Count <= 0 || config.DiscriminatorProperty == null)
         {
-            var discriminatorName = config.DiscriminatorProperty;
-
-            var discriminator = new OpenApiDiscriminator
-            {
-                PropertyName = discriminatorName
-            };
-
-            var schema = context.Schema;
-
-            foreach (var (derivedType, typeName) in config.DerivedTypes)
-            {
-                var derivedSchema = context.Generator.Generate(derivedType, context.Resolver);
-
-                discriminator.Mapping[typeName] = new JsonSchema
-                {
-                    Reference = derivedSchema
-                };
-            }
-
-            schema.DiscriminatorObject = discriminator;
-
-            if (!schema.Properties.TryGetValue(discriminatorName, out var existingProperty))
-            {
-                schema.Properties[discriminatorName] = existingProperty = new JsonSchemaProperty
-                {
-                    Type = JsonObjectType.String
-                };
-            }
-
-            existingProperty.IsRequired = true;
+            return;
         }
+
+        var discriminatorName = config.DiscriminatorProperty;
+        var discriminatorObject = new OpenApiDiscriminator
+        {
+            PropertyName = discriminatorName
+        };
+
+        var schema = context.Schema;
+
+        foreach (var (derivedType, typeName) in config.DerivedTypes)
+        {
+            var derivedSchema = context.Generator.Generate(derivedType, context.Resolver);
+
+            discriminatorObject.Mapping[typeName] = new JsonSchema
+            {
+                Reference = derivedSchema
+            };
+        }
+
+        schema.DiscriminatorObject = discriminatorObject;
+
+        if (!schema.Properties.TryGetValue(discriminatorName, out var existingProperty))
+        {
+            schema.Properties[discriminatorName] = existingProperty = new JsonSchemaProperty
+            {
+                Type = JsonObjectType.String
+            };
+        }
+
+        existingProperty.IsRequired = true;
     }
 }

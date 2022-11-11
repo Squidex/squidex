@@ -25,7 +25,7 @@ jobs:
         env:
           BUILD_NUMBER: ${{ github.run_number }}
         run: |
-          echo "BUILD_NUMBER=$(($BUILD_NUMBER + 5967))" >> $GITHUB_ENV
+          echo "BUILD_NUMBER=$(($BUILD_NUMBER + 6000))" >> $GITHUB_ENV
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2.1.0
@@ -73,7 +73,7 @@ jobs:
         env:
           BUILD_NUMBER: ${{ github.run_number }}
         run: |
-          echo "BUILD_NUMBER=$(($BUILD_NUMBER + 5967))" >> $GITHUB_ENV
+          echo "BUILD_NUMBER=$(($BUILD_NUMBER + 6000))" >> $GITHUB_ENV
 
       - name: Checkout
         uses: actions/checkout@v2.5.0
@@ -112,7 +112,7 @@ jobs:
       - name: RUN TEST
         uses: kohlerdominik/docker-run-action@v1.1.0
         with:
-          image: squidex/build
+          image: squidex/build:7
           environment: |
             CONFIG__BACKUPURL=http://localhost:5000
             CONFIG__WAIT=60
@@ -126,7 +126,7 @@ jobs:
       - name: RUN TEST on path
         uses: kohlerdominik/docker-run-action@v1.1.0
         with:
-          image: squidex/build
+          image: squidex/build:7
           environment: |
             CONFIG__BACKUPURL=http://localhost:5000
             CONFIG__WAIT=60
@@ -140,7 +140,7 @@ jobs:
       - name: RUN TEST with dedicated collections
         uses: kohlerdominik/docker-run-action@v1.1.0
         with:
-          image: squidex/build
+          image: squidex/build:7
           environment: |
             CONFIG__BACKUPURL=http://localhost:5000
             CONFIG__WAIT=60
@@ -171,7 +171,7 @@ jobs:
         env:
           BUILD_NUMBER: ${{ github.run_number }}
         run: |
-          echo "BUILD_NUMBER=$(($BUILD_NUMBER + 5967))" >> $GITHUB_ENV
+          echo "BUILD_NUMBER=$(($BUILD_NUMBER + 6000))" >> $GITHUB_ENV
 
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.3.2

@@ -29,9 +29,6 @@ public static class OpenApiServices
         services.AddSingletonAs<ErrorDtoProcessor>()
             .As<IOperationProcessor>();
 
-        services.AddSingletonAs<RuleActionProcessor>()
-            .As<IDocumentProcessor>();
-
         services.AddSingletonAs<CommonProcessor>()
             .As<IDocumentProcessor>();
 
@@ -46,6 +43,9 @@ public static class OpenApiServices
 
         services.AddSingletonAs<TagByGroupNameProcessor>()
             .As<IOperationProcessor>();
+
+        services.AddSingletonAs<SchemaNameGenerator>()
+            .As<ISchemaNameGenerator>();
 
         services.AddSingletonAs<JsonSchemaGenerator>()
             .AsSelf();
@@ -109,6 +109,7 @@ public static class OpenApiServices
 
         settings.AllowReferencesWithProperties = true;
         settings.FlattenInheritanceHierarchy = flatten;
+        settings.SchemaNameGenerator = new SchemaNameGenerator();
         settings.SchemaProcessors.Add(new DiscriminatorProcessor(typeRegistry));
         settings.SchemaType = SchemaType.OpenApi3;
         settings.ReflectionService = new ReflectionServices();
