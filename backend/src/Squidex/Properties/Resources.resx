@@ -176,9 +176,13 @@ Query your items by passing in one or many IDs with the following query paramete
 * **ids**: A comma-separated list of ids. If you define this option all other settings are ignored.</value>
   </data>
   <data name="OpenApiSecurity" xml:space="preserve">
-    <value>Squidex uses oauth2 client authentication. Read more about it at: https://oauth.net/2/ and https://tools.ietf.org/html/rfc6750.
+    <value>Squidex uses OpenId Connect (OIDC) with the Client Credentials Flow (defined in OAuth 2.0 RFC 6749, section 4.4).
 
-To retrieve an access token, the client id must make a request to the token url. For example:
+The OpenId Connect Client Credentials flow can be used for machine to machine authentication. In this grant a specific user is not authorized but rather the credentials are verified and a generic `access_token` is returned.
+
+The `access_token` is a signed JSON Web Token (JWT) which contains expiry information. 
+
+To retrieve an access token you must pass the Client ID and Client Secret to the token endpoint to authenticate yourself and get a token:
 
     $ curl
         -X POST '&lt;TOKEN_URL&gt;' 
@@ -188,7 +192,7 @@ To retrieve an access token, the client id must make a request to the token url.
             client_secret=[CLIENT_SECRET]&amp;
 			scope=squidex-api'
 
-You must send this token in the `Authorization` header when making requests to the API:
+Pass this token to all consecutiv requests to the API via the `Authorization` header:
 
      Authorization: Bearer &lt;token&gt;</value>
   </data>

@@ -15,32 +15,26 @@ namespace Squidex.Areas.Api.Config.OpenApi;
 public sealed class SecurityProcessor : SecurityDefinitionAppender
 {
     public SecurityProcessor(IUrlGenerator urlGenerator)
-        : base(Constants.SecurityDefinition, Enumerable.Empty<string>(), CreateOAuthSchema(urlGenerator))
+        : base(Constants.SecurityDefinition, new[] { Constants.ScopeApi }, CreateOAuthSchema(urlGenerator))
     {
     }
 
     private static OpenApiSecurityScheme CreateOAuthSchema(IUrlGenerator urlGenerator)
     {
-        var tokenUrl = urlGenerator.BuildUrl($"/{Constants.PrefixIdentityServer}/connect/token", false);
-
-        // Just described the token URL again.
-        var securityText = Properties.Resources.OpenApiSecurity.Replace("<TOKEN_URL>", tokenUrl, StringComparison.Ordinal);
+        string BuildUrl(string endpoint)
+        {
+            return urlGenerator.BuildUrl($"/{Constants.PrefixIdentityServer}/{endpoint}", false);
+        }
 
         var security = new OpenApiSecurityScheme
         {
             Type = OpenApiSecuritySchemeType.OpenIdConnect,
 
-            // The link to the endpoint where the user can request the token.
-            TokenUrl = tokenUrl,
+            // The discovery endpoint
+            OpenIdConnectUrl = BuildUrl(".well-known/openid-configuration"),
 
-            // Basically the same like client credentials flow.
-            Flow = OpenApiOAuth2Flow.Application,
-
-            Scopes = new Dictionary<string, string>
-            {
-                [Constants.ScopeApi] = "Read and write access to the API"
-            },
-            Description = securityText,
+            // Just described the token URL again.
+            Description = Properties.Resources.OpenApiSecurity.Replace("<TOKEN_URL>", BuildUrl($"connect/token"), StringComparison.Ordinal)
         };
 
         return security;
