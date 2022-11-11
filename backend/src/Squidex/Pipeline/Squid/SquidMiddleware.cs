@@ -50,12 +50,12 @@ public sealed class SquidMiddleware
             requestedBackground = backgroundValue;
         }
 
-        if (string.IsNullOrWhiteSpace(requestedFace) || requestedFace is not "sad" or "happy")
+        if (string.IsNullOrWhiteSpace(requestedFace) || requestedFace is not "sad" and not "happy")
         {
             requestedFace = "sad";
         }
 
-        var isSad = requestedFace == "sad";
+        var isSad = string.Equals(requestedFace, "sad", StringComparison.OrdinalIgnoreCase);
 
         if (string.IsNullOrWhiteSpace(requestedTitle))
         {
