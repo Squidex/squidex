@@ -126,7 +126,7 @@ public sealed class UsagesController : ApiController
         var (summary, details) = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date, HttpContext.RequestAborted);
 
         // Use the current app plan to show the limits to the user.
-        var (plan, _, _) = await usageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
+        var (plan, _, _) = await usageGate.GetPlanForAppAsync(App, false, HttpContext.RequestAborted);
 
         var response = CallsUsageDtoDto.FromDomain(plan, summary, details);
 
@@ -185,7 +185,7 @@ public sealed class UsagesController : ApiController
         var size = await assetStatsRepository.GetTotalSizeByAppAsync(AppId, HttpContext.RequestAborted);
 
         // Use the current app plan to show the limits to the user.
-        var (plan, _, _) = await usageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
+        var (plan, _, _) = await usageGate.GetPlanForAppAsync(App, false, HttpContext.RequestAborted);
 
         var response = new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize };
 

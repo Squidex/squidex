@@ -60,7 +60,7 @@ public sealed class AppPlansController : ApiController
 
             var (plan, link, referral) =
                 await AsyncHelper.WhenAll(
-                    usageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted),
+                    usageGate.GetPlanForAppAsync(App, false, HttpContext.RequestAborted),
                     billingManager.GetPortalLinkAsync(UserId, App, HttpContext.RequestAborted),
                     billingManager.GetReferralInfoAsync(UserId, App, HttpContext.RequestAborted));
 

@@ -469,7 +469,7 @@ public sealed class AssetsController : ApiController
             throw new ValidationException(error);
         }
 
-        var (plan, _, _) = await usageGate.GetPlanForAppAsync(App, HttpContext.RequestAborted);
+        var (plan, _, _) = await usageGate.GetPlanForAppAsync(App, true, HttpContext.RequestAborted);
 
         var currentSize = await assetUsageTracker.GetTotalSizeByAppAsync(AppId, HttpContext.RequestAborted);
 

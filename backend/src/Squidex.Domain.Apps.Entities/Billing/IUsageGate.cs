@@ -28,10 +28,10 @@ public interface IUsageGate
     Task DeleteAssetsUsageAsync(
         CancellationToken ct = default);
 
-    Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanForAppAsync(IAppEntity app,
+    Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanForAppAsync(IAppEntity app, bool canCache,
         CancellationToken ct = default);
 
-    Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanForAppAsync(DomainId appId,
+    Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanForAppAsync(DomainId appId, bool canCache,
         CancellationToken ct = default);
 
     Task<(Plan Plan, string PlanId)> GetPlanForTeamAsync(ITeamEntity team,

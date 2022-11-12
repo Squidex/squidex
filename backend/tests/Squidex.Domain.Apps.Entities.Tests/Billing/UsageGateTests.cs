@@ -82,7 +82,7 @@ public class UsageGateTests
     [Fact]
     public async Task Should_get_free_plan_for_app()
     {
-        var plan = await sut.GetPlanForAppAsync(appWithoutTeam, ct);
+        var plan = await sut.GetPlanForAppAsync(appWithoutTeam, false, ct);
 
         Assert.Equal((planFree, planFree.Id, null), plan);
     }
@@ -98,7 +98,7 @@ public class UsageGateTests
         A.CallTo(() => team.Id)
             .Returns(teamId);
 
-        var plan = await sut.GetPlanForAppAsync(appWithTeam, ct);
+        var plan = await sut.GetPlanForAppAsync(appWithTeam, false, ct);
 
         Assert.Equal((planFree, planFree.Id, teamId), plan);
     }
@@ -109,7 +109,7 @@ public class UsageGateTests
         A.CallTo(() => appWithoutTeam.Plan)
             .Returns(new AssignedPlan(RefToken.User("1"), planPaid.Id));
 
-        var plan = await sut.GetPlanForAppAsync(appWithoutTeam, ct);
+        var plan = await sut.GetPlanForAppAsync(appWithoutTeam, false, ct);
 
         Assert.Equal((planPaid, planPaid.Id, null), plan);
     }
@@ -123,7 +123,7 @@ public class UsageGateTests
         A.CallTo(() => appWithoutTeam.Plan)
             .Returns(new AssignedPlan(RefToken.User("1"), planPaid.Id));
 
-        var plan = await sut.GetPlanForAppAsync(appWithoutTeam.Id, ct);
+        var plan = await sut.GetPlanForAppAsync(appWithoutTeam.Id, false, ct);
 
         Assert.Equal((planPaid, planPaid.Id, null), plan);
     }
@@ -142,7 +142,7 @@ public class UsageGateTests
         A.CallTo(() => team.Plan)
             .Returns(new AssignedPlan(RefToken.User("1"), planPaid.Id));
 
-        var plan = await sut.GetPlanForAppAsync(appWithTeam, ct);
+        var plan = await sut.GetPlanForAppAsync(appWithTeam, false, ct);
 
         Assert.Equal((planPaid, planPaid.Id, teamId), plan);
     }

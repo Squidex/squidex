@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Billing;
@@ -48,14 +47,9 @@ public sealed class AppContributorsController : ApiController
     [ProducesResponseType(typeof(ContributorsDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppContributorsRead)]
     [ApiCosts(0)]
-    public IActionResult GetContributors(string app)
+    public async Task<IActionResult> GetContributors(string app)
     {
-        var response = Deferred.AsyncResponse(() =>
-        {
-            return GetResponseAsync(App, false);
-        });
-
-        Response.Headers[HeaderNames.ETag] = App.ToEtag();
+        var response = await GetResponseAsync(App, false);
 
         return Ok(response);
     }
@@ -145,7 +139,7 @@ public sealed class AppContributorsController : ApiController
 
     private async Task<ContributorsDto> GetResponseAsync(IAppEntity app, bool invited)
     {
-        var (plan, _, _) = await usageGate.GetPlanForAppAsync(app, HttpContext.RequestAborted);
+        var (plan, _, _) = await usageGate.GetPlanForAppAsync(app, false, HttpContext.RequestAborted);
 
         return await ContributorsDto.FromDomainAsync(app, Resources, userResolver, plan, invited);
     }

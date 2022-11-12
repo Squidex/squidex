@@ -134,7 +134,7 @@ public sealed class UsageGate : IUsageGate, IAssetUsageTracker
         Guard.NotNull(app);
 
         // Resolve the plan from either the app or the assigned team.
-        var (plan, _, teamId) = await GetPlanForAppAsync(app, ct);
+        var (plan, _, teamId) = await GetPlanForAppAsync(app, true, ct);
 
         var appId = app.Id;
         var blocking = false;
@@ -222,7 +222,7 @@ public sealed class UsageGate : IUsageGate, IAssetUsageTracker
             usageTracker.TrackAsync(SummaryDate, appKey, null, counters, ct)
         };
 
-        var (_, _, teamId) = await GetPlanForAppAsync(appId, ct);
+        var (_, _, teamId) = await GetPlanForAppAsync(appId, true, ct);
 
         if (teamId != null)
         {
@@ -235,12 +235,17 @@ public sealed class UsageGate : IUsageGate, IAssetUsageTracker
         await Task.WhenAll(tasks);
     }
 
-    public Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanForAppAsync(IAppEntity app,
+    public Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanForAppAsync(IAppEntity app, bool canCache,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
 
-        return memoryCache.GetOrCreateAsync(app, async x =>
+        if (!canCache)
+        {
+            return GetPlanCoreAsync(app, ct);
+        }
+
+        return memoryCache.GetOrCreateAsync(CacheKey(app.Id), async x =>
         {
             x.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
 
@@ -248,10 +253,15 @@ public sealed class UsageGate : IUsageGate, IAssetUsageTracker
         });
     }
 
-    public Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanForAppAsync(DomainId appId,
+    public Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanForAppAsync(DomainId appId, bool canCache,
         CancellationToken ct = default)
     {
-        return memoryCache.GetOrCreateAsync(appId, async x =>
+        if (!canCache)
+        {
+            return GetPlanCoreAsync(appId, ct);
+        }
+
+        return memoryCache.GetOrCreateAsync(CacheKey(appId), async x =>
         {
             x.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
 
@@ -309,5 +319,10 @@ public sealed class UsageGate : IUsageGate, IAssetUsageTracker
     private static string TeamAssetsKey(DomainId appId)
     {
         return $"{appId}_TeamAssets";
+    }
+
+    private static string CacheKey(DomainId appId)
+    {
+        return $"{appId}_Plan";
     }
 }
