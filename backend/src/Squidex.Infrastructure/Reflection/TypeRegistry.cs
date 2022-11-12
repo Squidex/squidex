@@ -40,14 +40,20 @@ public sealed class TypeRegistry
 
     public TypeRegistry Add<T>(Type derivedType, string typeName) where T : class
     {
-        configs.GetOrAddNew(typeof(T)).Add(derivedType, typeName);
+        lock (configs)
+        {
+            configs.GetOrAddNew(typeof(T)).Add(derivedType, typeName);
+        }
 
         return this;
     }
 
     public TypeRegistry Discriminator<T>(string? discriminiatorProperty)
     {
-        configs.GetOrAddNew(typeof(T)).DiscriminatorProperty ??= discriminiatorProperty;
+        lock (configs)
+        {
+            configs.GetOrAddNew(typeof(T)).DiscriminatorProperty ??= discriminiatorProperty;
+        }
 
         return this;
     }

@@ -22,24 +22,21 @@ public sealed class TypeConfig
         get => derivedTypes;
     }
 
-    public void Add(Type derivedType, string typeName)
+    internal void Add(Type derivedType, string typeName)
     {
         Guard.NotNull(derivedType);
         Guard.NotNullOrEmpty(typeName);
 
-        lock (derivedTypes)
+        if (!derivedTypes.Contains((derivedType, typeName)))
         {
-            if (!derivedTypes.Contains((derivedType, typeName)))
-            {
-                derivedTypes.Add((derivedType, typeName));
-            }
+            derivedTypes.Add((derivedType, typeName));
+        }
 
-            var conflict = derivedTypes.Find(x => x.TypeName == typeName && x.DerivedType != derivedType);
+        var (conflict, _) = derivedTypes.Find(x => x.TypeName == typeName && x.DerivedType != derivedType);
 
-            if (conflict.DerivedType != null)
-            {
-                ThrowHelper.ArgumentException($"Type name '{typeName}' is already used by type '{conflict.DerivedType}", nameof(typeName));
-            }
+        if (conflict != null)
+        {
+            ThrowHelper.ArgumentException($"Type name '{typeName}' is already used by type '{conflict}", nameof(typeName));
         }
 
         mapByName = null;
