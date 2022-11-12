@@ -30,9 +30,7 @@ public sealed class PolymorphicTypeResolver : DefaultJsonTypeInfoResolver
 
         while (baseType != null)
         {
-            var config = typeRegistry[baseType];
-
-            if (config.TryGetName(type, out var typeName))
+            if (typeRegistry.TryGetConfig(type, out var config) && config.TryGetName(baseType, out var typeName))
             {
                 var discriminiatorName = config.DiscriminatorProperty ?? Constants.DefaultDiscriminatorProperty;
                 var discriminatorField = typeInfo.CreateJsonPropertyInfo(typeof(string), discriminiatorName);

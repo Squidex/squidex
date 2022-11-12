@@ -21,12 +21,10 @@ public class FieldTypeProvider : ITypeProvider
             return baseType.Assembly.GetTypes().Where(x => baseType.IsAssignableFrom(x) && !x.IsAbstract);
         }
 
-        var config = typeRegistry[typeof(FieldProperties)];
-
         foreach (var type in FindTypes(typeof(FieldProperties)))
         {
-            config.Add(type, type.TypeName(false, SuffixOld));
-            config.Add(type, type.TypeName(false, Suffix));
+            typeRegistry.Add<FieldProperties>(type, type.TypeName(false, SuffixOld));
+            typeRegistry.Add<FieldProperties>(type, type.TypeName(false, Suffix));
         }
     }
 }

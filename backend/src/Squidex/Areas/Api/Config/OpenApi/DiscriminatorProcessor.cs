@@ -27,9 +27,9 @@ public sealed class DiscriminatorProcessor : ISchemaProcessor
             return;
         }
 
-        var config = typeRegistry[context.ContextualType.Type];
-
-        if (config.DerivedTypes.Count <= 0 || config.DiscriminatorProperty == null)
+        if (!typeRegistry.TryGetConfig(context.ContextualType.Type, out var config) ||
+            config.DerivedTypes.Count <= 0 ||
+            config.DiscriminatorProperty == null)
         {
             return;
         }

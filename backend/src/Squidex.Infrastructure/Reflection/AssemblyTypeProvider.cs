@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace Squidex.Infrastructure.Reflection;
 
-public sealed class AssemblyTypeProvider<T> : ITypeProvider
+public sealed class AssemblyTypeProvider<T> : ITypeProvider where T : class
 {
     private readonly Assembly assembly;
 
@@ -32,7 +32,6 @@ public sealed class AssemblyTypeProvider<T> : ITypeProvider
     public void Map(TypeRegistry typeRegistry)
     {
         var baseType = typeof(T);
-        var baseConfig = typeRegistry[baseType];
 
         foreach (var derivedType in assembly.GetTypes())
         {
@@ -45,10 +44,10 @@ public sealed class AssemblyTypeProvider<T> : ITypeProvider
                     typeName = derivedType.TypeName(false, baseType.Name);
                 }
 
-                baseConfig.Add(derivedType, typeName);
+                typeRegistry.Add<T>(derivedType, typeName);
             }
         }
 
-        baseConfig.DiscriminatorProperty ??= DiscriminatorProperty;
+        typeRegistry.Discriminator<T>(DiscriminatorProperty);
     }
 }

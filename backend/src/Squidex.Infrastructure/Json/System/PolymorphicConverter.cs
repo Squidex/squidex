@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.Json.System;
 
-public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : notnull
+public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
 {
     private readonly JsonEncodedText discriminatorProperty;
     private readonly string discriminatorName;
@@ -21,7 +21,9 @@ public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : notnull
     {
         this.typeRegistry = typeRegistry;
 
-        discriminatorName = typeRegistry[typeof(T)].DiscriminatorProperty ?? Constants.DefaultDiscriminatorProperty;
+        typeRegistry.TryGetConfig<T>(out var config);
+
+        discriminatorName = config?.DiscriminatorProperty ?? Constants.DefaultDiscriminatorProperty;
         discriminatorProperty = JsonEncodedText.Encode(discriminatorName);
     }
 
@@ -91,7 +93,7 @@ public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : notnull
 
     private Type GetDiscriminatorType(string name)
     {
-        if (!typeRegistry[typeof(T)].TryGetType(name, out var type))
+        if (!typeRegistry.TryGetType<T>(name, out var type))
         {
             ThrowHelper.JsonException($"Object has invalid discriminator '{name}'.");
             return default!;

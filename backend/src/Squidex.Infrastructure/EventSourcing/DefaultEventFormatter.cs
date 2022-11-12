@@ -44,7 +44,7 @@ public sealed class DefaultEventFormatter : IEventFormatter
     {
         Guard.NotNull(storedEvent);
 
-        if (!typeRegistry[typeof(IEvent)].TryGetType(storedEvent.Data.Type, out var type))
+        if (!typeRegistry.TryGetType<IEvent>(storedEvent.Data.Type, out var type))
         {
             return null;
         }

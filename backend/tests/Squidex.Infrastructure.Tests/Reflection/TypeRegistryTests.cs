@@ -64,7 +64,7 @@ public class TypeRegistryTests
     {
         sut.Add<Base, DerivedAttribute>("My");
 
-        sut[typeof(Base)].TryGetName(typeof(DerivedAttribute), out var name);
+        sut.TryGetName<Base>(typeof(DerivedAttribute), out var name);
 
         Assert.Equal("My", name);
         Assert.Equal("My", sut.GetName<Base, DerivedAttribute>());
@@ -75,7 +75,7 @@ public class TypeRegistryTests
     {
         sut.Add<Base>(typeof(DerivedAttribute), "My");
 
-        sut[typeof(Base)].TryGetType("My", out var type);
+        sut.TryGetType<Base>("My", out var type);
 
         Assert.Equal(typeof(DerivedAttribute), type);
         Assert.Equal(typeof(DerivedAttribute), sut.GetType<Base>("My"));
@@ -86,7 +86,7 @@ public class TypeRegistryTests
     {
         sut.Map(new AssemblyTypeProvider<Base>());
 
-        sut[typeof(Base)].TryGetType("Derived", out var type);
+        sut.TryGetType<Base>("Derived", out var type);
 
         Assert.Equal(typeof(DerivedBase), type);
         Assert.Equal(typeof(DerivedBase), sut.GetType<Base>("Derived"));
@@ -97,7 +97,7 @@ public class TypeRegistryTests
     {
         sut.Map(new AssemblyTypeProvider<Base>());
 
-        sut[typeof(Base)].TryGetType("DerivedCustom", out var type);
+        sut.TryGetType<Base>("DerivedCustom", out var type);
 
         Assert.Equal(typeof(DerivedCustom), type);
         Assert.Equal(typeof(DerivedCustom), sut.GetType<Base>("DerivedCustom"));
@@ -108,7 +108,7 @@ public class TypeRegistryTests
     {
         sut.Map(new AssemblyTypeProvider<Base>());
 
-        sut[typeof(Base)].TryGetType("DerivedEventV2", out var type);
+        sut.TryGetType<Base>("DerivedEventV2", out var type);
 
         Assert.Equal(typeof(DerivedEvent), type);
         Assert.Equal(typeof(DerivedEvent), sut.GetType<Base>("DerivedEventV2"));

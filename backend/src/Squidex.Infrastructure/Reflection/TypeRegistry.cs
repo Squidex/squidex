@@ -5,22 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Squidex.Infrastructure.Reflection;
 
 public sealed class TypeRegistry
 {
     private readonly Dictionary<Type, TypeConfig> configs = new Dictionary<Type, TypeConfig>();
-
-    public TypeConfig this[Type type]
-    {
-        get
-        {
-            lock (configs)
-            {
-                return configs.GetOrAddNew(type);
-            }
-        }
-    }
 
     public TypeRegistry(IEnumerable<ITypeProvider>? providers = null)
     {
@@ -49,14 +40,14 @@ public sealed class TypeRegistry
 
     public TypeRegistry Add<T>(Type derivedType, string typeName) where T : class
     {
-        this[typeof(T)].Add(derivedType, typeName);
+        configs.GetOrAddNew(typeof(T)).Add(derivedType, typeName);
 
         return this;
     }
 
-    public TypeRegistry Discriminator<T>(string discriminiatorProperty)
+    public TypeRegistry Discriminator<T>(string? discriminiatorProperty)
     {
-        this[typeof(T)].DiscriminatorProperty = discriminiatorProperty;
+        configs.GetOrAddNew(typeof(T)).DiscriminatorProperty ??= discriminiatorProperty;
 
         return this;
     }
@@ -68,7 +59,7 @@ public sealed class TypeRegistry
 
     public string GetName<T>(Type derivedType) where T : class
     {
-        if (!this[typeof(T)].TryGetName(derivedType, out var name))
+        if (!TryGetName<T>(derivedType, out var name))
         {
             ThrowHelper.ArgumentException($"Unknown derived type {derivedType}.", nameof(derivedType));
             return default!;
@@ -79,12 +70,36 @@ public sealed class TypeRegistry
 
     public Type GetType<T>(string typeName) where T : class
     {
-        if (!this[typeof(T)].TryGetType(typeName, out var name))
+        if (!TryGetType<T>(typeName, out var name))
         {
             ThrowHelper.ArgumentException($"Unknown derived type {typeName}.", nameof(typeName));
             return default!;
         }
 
         return name;
+    }
+
+    public bool TryGetName<T>(Type derivedType, [MaybeNullWhen(false)] out string typeName) where T : class
+    {
+        typeName = null!;
+
+        return TryGetConfig<T>(out var config) && config.TryGetName(derivedType, out typeName);
+    }
+
+    public bool TryGetType<T>(string typeName, [MaybeNullWhen(false)] out Type derivedType) where T : class
+    {
+        derivedType = null!;
+
+        return TryGetConfig<T>(out var config) && config.TryGetType(typeName, out derivedType);
+    }
+
+    public bool TryGetConfig<T>([MaybeNullWhen(false)] out TypeConfig config) where T : class
+    {
+        return TryGetConfig(typeof(T), out config);
+    }
+
+    public bool TryGetConfig(Type baseType, [MaybeNullWhen(false)] out TypeConfig config)
+    {
+        return configs.TryGetValue(baseType, out config);
     }
 }
