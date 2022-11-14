@@ -128,7 +128,9 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
             case AssignContributor assignContributor:
                 return UpdateReturnAsync(assignContributor, async (c, ct) =>
                 {
-                    await GuardAppContributors.CanAssign(c, Snapshot, Users, Plan);
+                    var (plan, _, _) = await UsageGate.GetPlanForAppAsync(Snapshot, false, ct);
+
+                    await GuardAppContributors.CanAssign(c, Snapshot, Users, plan);
 
                     AssignContributor(c, !Snapshot.Contributors.ContainsKey(assignContributor.ContributorId));
 
@@ -480,6 +482,11 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
         get => serviceProvider.GetRequiredService<IBillingManager>();
     }
 
+    private IUsageGate UsageGate
+    {
+        get => serviceProvider.GetRequiredService<IUsageGate>();
+    }
+
     private IUserResolver Users
     {
         get => serviceProvider.GetRequiredService<IUserResolver>();
@@ -488,10 +495,5 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
     private Plan FreePlan
     {
         get => BillingPlans.GetFreePlan();
-    }
-
-    private Plan Plan
-    {
-        get => BillingPlans.GetActualPlan(Snapshot.Plan?.PlanId).Plan;
     }
 }

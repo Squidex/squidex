@@ -30,6 +30,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     private readonly IBillingManager billingManager = A.Fake<IBillingManager>();
     private readonly IUser user;
     private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
+    private readonly IUsageGate usageGate = A.Fake<IUsageGate>();
     private readonly string contributorId = DomainId.NewGuid().ToString();
     private readonly string clientId = "client";
     private readonly string clientNewName = "My Client";
@@ -53,14 +54,14 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
         A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId, default))
             .Returns(user);
 
+        A.CallTo(() => usageGate.GetPlanForAppAsync(A<IAppEntity>.That.Matches(x => x.Plan != null && x.Plan.PlanId == planIdFree), false, default))
+            .Returns((new Plan { Id = planIdFree, MaxContributors = 10 }, planIdFree, null));
+
+        A.CallTo(() => usageGate.GetPlanForAppAsync(A<IAppEntity>.That.Matches(x => x.Plan != null && x.Plan.PlanId == planIdPaid), false, default))
+            .Returns((new Plan { Id = planIdPaid, MaxContributors = 30 }, planIdPaid, null));
+
         A.CallTo(() => billingPlans.GetFreePlan())
             .Returns(new Plan { Id = planIdFree, MaxContributors = 10 });
-
-        A.CallTo(() => billingPlans.GetPlan(planIdFree))
-            .Returns(new Plan { Id = planIdFree, MaxContributors = 10 });
-
-        A.CallTo(() => billingPlans.GetPlan(planIdPaid))
-            .Returns(new Plan { Id = planIdPaid, MaxContributors = 30 });
 
         A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<IAppEntity>._, A<string>._, default))
             .Returns(Task.FromResult<Uri?>(null));
@@ -80,9 +81,10 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
         var serviceProvider =
             new ServiceCollection()
                 .AddSingleton(appProvider)
-                .AddSingleton(initialSettings)
-                .AddSingleton(billingPlans)
                 .AddSingleton(billingManager)
+                .AddSingleton(billingPlans)
+                .AddSingleton(initialSettings)
+                .AddSingleton(usageGate)
                 .AddSingleton(userResolver)
                 .BuildServiceProvider();
 

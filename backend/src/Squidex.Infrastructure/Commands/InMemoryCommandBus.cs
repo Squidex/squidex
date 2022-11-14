@@ -17,7 +17,7 @@ public sealed class InMemoryCommandBus : ICommandBus
 
         NextDelegate next = (c, ct) => Task.CompletedTask;
 
-        foreach (var middleware in middlewares.Reverse())
+        foreach (var middleware in reverseMiddlewares)
         {
             next = Create(next, middleware);
         }
