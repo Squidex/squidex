@@ -1,6 +1,6 @@
 <sqx-title message="i18n:common.subscription"></sqx-title>
 
-<sqx-layout layout="main" titleText="i18n:common.subscription" titleIcon="subscription" [innerWidth]="60">
+<sqx-layout layout="main" titleText="i18n:common.subscription" titleIcon="subscription" [innerWidth]="63">
     <ng-container menu>
         <sqx-notifo topic="apps/{{plansState.appId}}/settings/plan"></sqx-notifo>
 
@@ -10,7 +10,7 @@
     </ng-container>
 
     <ng-container>
-        <sqx-list-view innerWidth="60rem" [isLoading]="plansState.isLoading | async">
+        <sqx-list-view innerWidth="63rem" [isLoading]="plansState.isLoading | async">
             <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
                 <div class="alert alert-danger" *ngIf="(plansState.locked | async) === 'NotOwner'">
                     {{ 'plans.notPlanOwner' | sqxTranslate }} {{ 'plans.planOwner' | sqxTranslate }}: <strong className="no-wrap">{{plansState.planOwner | async | sqxUserName}}</strong>
@@ -35,8 +35,8 @@
                         {{ 'plans.noPlanConfigured' | sqxTranslate }}
                     </div>
 
-                    <div class="row gx-2">
-                        <div class="col-3" *ngFor="let planInfo of plans; trackBy: trackByPlan">
+                    <div class="plans">
+                        <div class="plan" *ngFor="let planInfo of plans; trackBy: trackByPlan">
                             <sqx-plan [planInfo]="planInfo"></sqx-plan>
                         </div>
                     </div>
