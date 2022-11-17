@@ -87,9 +87,21 @@ WORKDIR /app
 COPY --from=backend /build/ .
 COPY --from=frontend /build/ wwwroot/build/
 
-EXPOSE 80
-EXPOSE 443
+# expose only non-privileged ports (1-1024) so we do not require root
+EXPOSE 10080
+EXPOSE 10443
 EXPOSE 11111
+
+# add a group and a user > 10000 to avoid conflicts with system accounts
+RUN groupadd --gid 10000 --system runner
+RUN useradd --uid 10000 --gid 10000 --shell /bin/false --no-create-home --system runner
+
+# change the ownership of the files we added to the system so the new user can modify them if required
+RUN chgrp -R runner /tools && chown -R runner /tools
+RUN chgrp -R runner /app && chown -R runner /app
+
+# make sure the new user is set and runs the entrypoint
+USER 10000:10000
 
 ENV DIAGNOSTICS__COUNTERSTOOL=/tools/dotnet-counters
 ENV DIAGNOSTICS__DUMPTOOL=/tools/dotnet-dump
