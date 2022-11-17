@@ -61,7 +61,7 @@ The command removes all the Kubernetes components associated with the chart and 
 ### Squidex parameters
 
 | Name                                                 | Description                                                                                                      | Value                        |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |------------------------------|
 | `env.EVENTSTORE__MONGODB__DATABASE`                  | The name of the database for events                                                                              | `Squidex`                    |
 | `env.IDENTITY__ADMINEMAIL`                           | The initial admin email address.                                                                                 | `""`                         |
 | `env.IDENTITY__ADMINPASSWORD`                        | The initial admin email address.                                                                                 | `""`                         |
@@ -86,7 +86,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `env.IDENTITY__OIDCRESPONSETYPE`                     | The type of the response. id_token or code.                                                                      | `nil`                        |
 | `env.IDENTITY__OIDCSCOPES`                           | The scopes.                                                                                                      | `[]`                         |
 | `env.IDENTITY__OIDCSINGOUTREDIRECTURL`               | The redirect URL for the sign out.                                                                               | `nil`                        |
-| `env.LOGGING__APPLICATIONINSIGHTS__ENABLED`          | Enable monitoring via application insights.                                                                      | `falsen`                     |
+| `env.LOGGING__APPLICATIONINSIGHTS__ENABLED`          | Enable monitoring via application insights.                                                                      | `false`                      |
 | `env.LOGGING__APPLICATIONINSIGHTS__CONNECTIONSTRING` | The connection string to application insights.                                                                   | `nil`                        |
 | `env.LOGGING__COLORS`                                | Use colors in the console output.                                                                                | `false`                      |
 | `env.LOGGING__HUMAN`                                 | Setting the flag to true, enables well formatteds json logs.                                                     | `false`                      |

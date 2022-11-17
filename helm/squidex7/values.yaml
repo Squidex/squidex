@@ -46,6 +46,12 @@ affinity: { }
 ## @skip clusterSuffix
 clusterSuffix: cluster.local
 
+## @skip podSecurityContext
+podSecurityContext: { }
+
+## @skip containerSecurityContext
+containerSecurityContext: { }
+
 ## @skip auth
 auth:
   ## 
@@ -165,7 +171,7 @@ env:
 
   ## @param env.LOGGING__APPLICATIONINSIGHTS__ENABLED Enable monitoring via application insights.
   ##
-  LOGGING__APPLICATIONINSIGHTS__ENABLED: falsen
+  LOGGING__APPLICATIONINSIGHTS__ENABLED: false
   ## @param env.LOGGING__APPLICATIONINSIGHTS__CONNECTIONSTRING The connection string to application insights.
   ##
   LOGGING__APPLICATIONINSIGHTS__CONNECTIONSTRING: null # "instrumentationkey=keyvalue"
@@ -223,6 +229,12 @@ mongodb-replicaset:
   ## @param mongodb-replicaset.replicas The number of replicas.
   ##
   replicas: 3
+  
+  ## @skip podSecurityContext
+  podSecurityContext: { }
+
+  ## @skip containerSecurityContext
+  containerSecurityContext: { }
   
   ## @skip mongodb-replicaset.auth
   auth:
