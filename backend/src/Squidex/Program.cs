@@ -56,10 +56,6 @@ public static class Program
 
                         serverOptions.ListenAnyIP(5000);
                     }
-                    else
-                    {
-                        serverOptions.ListenAnyIP(10080);
-                    }
                 });
 
                 builder.UseStartup<Startup>();

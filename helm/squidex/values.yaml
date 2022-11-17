@@ -225,7 +225,10 @@ env:
   URLS__BASEURL: https://squidex.local/ # 
 
   ## @param env.URLS__ENFORCEHTTPS Set it to true to redirect the user from http to https permanently
-  URLS__ENFORCEHTTPS: false 
+  URLS__ENFORCEHTTPS: false
+  
+  ## @param env.ASPNETCORE_URLS: an override to ensure that kestrel starts on a non-privileged port
+  ASPNETCORE_URLS: http://+:10080
 
 ## @section MongoDB parameters
 mongodb-replicaset:
