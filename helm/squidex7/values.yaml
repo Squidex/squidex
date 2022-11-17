@@ -46,11 +46,31 @@ affinity: { }
 ## @skip clusterSuffix
 clusterSuffix: cluster.local
 
-## @skip podSecurityContext
+## @param podSecurityContext - object - optional
+## You can modify the security context used to run PODS in the cluster
+## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+## An example that follows the Restricted profile is described below:
+#
 podSecurityContext: { }
+# seccompProfile:
+#   type: RuntimeDefault
+# runAsNonRoot: true
+# runAsUser: 10000
+# runAsGroup: 10000
+# fsGroup: 10000
 
-## @skip containerSecurityContext
+## @param containerSecurityContext - object - optional
+## You can modify the security context used to run CONTAINERS in the cluster
+## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+## An example that follows the Restricted profile is described below:
+#
 containerSecurityContext: { }
+# allowPrivilegeEscalation: false
+# capabilities:
+#   drop:
+#     - ALL
+#   add:
+#     - NET_BIND_SERVICE
 
 ## @skip auth
 auth:
@@ -233,11 +253,31 @@ mongodb-replicaset:
   ##
   replicas: 3
   
-  ## @skip podSecurityContext
+  ## @param podSecurityContext - object - optional
+  ## You can modify the security context used to run PODS in the cluster
+  ## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+  ## An example that follows the Restricted profile is described below:
+  #
   podSecurityContext: { }
+  # seccompProfile:
+  #   type: RuntimeDefault
+  # runAsNonRoot: true
+  # runAsUser: 10000
+  # runAsGroup: 10000
+  # fsGroup: 10000
 
-  ## @skip containerSecurityContext
+  ## @param containerSecurityContext - object - optional
+  ## You can modify the security context used to run CONTAINERS in the cluster
+  ## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+  ## An example that follows the Restricted profile is described below:
+  #
   containerSecurityContext: { }
+  # allowPrivilegeEscalation: false
+  # capabilities:
+  #   drop:
+  #     - ALL
+  #   add:
+  #     - NET_BIND_SERVICE
   
   ## @skip mongodb-replicaset.auth
   auth:
