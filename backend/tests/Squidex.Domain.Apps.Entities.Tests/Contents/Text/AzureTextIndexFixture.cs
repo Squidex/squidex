@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Extensions.Text.Azure;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 

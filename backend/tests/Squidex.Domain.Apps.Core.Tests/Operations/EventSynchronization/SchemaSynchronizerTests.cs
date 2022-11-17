@@ -10,7 +10,6 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization;
 

@@ -5,11 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
-using Xunit;
 
 namespace Squidex.Domain.Users;
 

@@ -6,10 +6,8 @@
 // ==========================================================================
 
 using System.Globalization;
-using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Xunit;
 
 namespace Squidex.Infrastructure.Log;
 

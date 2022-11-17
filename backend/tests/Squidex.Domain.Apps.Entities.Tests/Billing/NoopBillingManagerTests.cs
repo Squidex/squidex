@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Teams;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Billing;
 

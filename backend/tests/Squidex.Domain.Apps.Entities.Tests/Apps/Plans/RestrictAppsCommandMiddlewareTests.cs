@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using FakeItEasy;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
@@ -14,7 +13,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Plans;
 

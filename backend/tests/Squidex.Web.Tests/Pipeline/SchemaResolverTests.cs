@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -19,7 +18,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
-using Xunit;
 
 #pragma warning disable IDE0017 // Simplify object initialization
 

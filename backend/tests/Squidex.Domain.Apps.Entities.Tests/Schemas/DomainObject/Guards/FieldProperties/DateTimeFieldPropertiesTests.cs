@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FluentAssertions;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards.FieldProperties;
 

@@ -5,15 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
-using FluentAssertions;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.TestHelpers;
 using Squidex.Messaging;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Backup;
 

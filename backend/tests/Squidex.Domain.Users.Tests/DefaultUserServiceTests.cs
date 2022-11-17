@@ -7,14 +7,12 @@
 
 using System.Globalization;
 using System.Security.Claims;
-using FakeItEasy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
-using Xunit;
 
 namespace Squidex.Domain.Users;
 

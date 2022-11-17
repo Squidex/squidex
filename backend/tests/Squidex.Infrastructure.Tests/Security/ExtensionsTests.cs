@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using Xunit;
 
 namespace Squidex.Infrastructure.Security;
 

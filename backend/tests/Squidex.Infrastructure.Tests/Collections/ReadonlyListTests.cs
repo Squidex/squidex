@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 namespace Squidex.Infrastructure.Collections;
 

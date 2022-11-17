@@ -5,15 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
-using FluentAssertions;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.MongoDb;
 

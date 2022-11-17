@@ -9,7 +9,6 @@ using NodaTime;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing;
 

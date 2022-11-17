@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FluentAssertions;
 using Squidex.Infrastructure.Validation;
-using Xunit;
 using Xunit.Sdk;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers;

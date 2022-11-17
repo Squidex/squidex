@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using FakeItEasy;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 

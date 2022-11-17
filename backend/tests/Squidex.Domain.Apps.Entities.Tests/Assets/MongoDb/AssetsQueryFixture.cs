@@ -18,7 +18,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.MongoDb;
 

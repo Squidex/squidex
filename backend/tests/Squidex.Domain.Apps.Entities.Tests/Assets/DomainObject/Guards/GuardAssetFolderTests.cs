@@ -6,14 +6,12 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
 

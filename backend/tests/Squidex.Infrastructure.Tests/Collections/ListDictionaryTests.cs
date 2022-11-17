@@ -7,7 +7,6 @@
 
 using System.Collections;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 #pragma warning disable xUnit2017 // Do not use Contains() to check if a value exists in a collection
 #pragma warning disable IDE0028 // Simplify collection initialization

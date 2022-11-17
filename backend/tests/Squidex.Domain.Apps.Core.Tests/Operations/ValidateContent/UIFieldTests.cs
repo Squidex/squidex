@@ -5,14 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent;
 

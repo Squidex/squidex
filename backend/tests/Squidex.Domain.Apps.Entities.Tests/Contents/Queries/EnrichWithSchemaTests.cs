@@ -10,7 +10,6 @@ using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 

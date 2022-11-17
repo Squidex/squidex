@@ -8,7 +8,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 namespace Squidex.Infrastructure.Email;
 

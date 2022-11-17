@@ -10,7 +10,6 @@ using Squidex.Domain.Apps.Core.Contents.Json;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Contents;
 

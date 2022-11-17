@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
-using Xunit;
-
 namespace Squidex.Infrastructure.Commands;
 
 public class InMemoryCommandBusTests

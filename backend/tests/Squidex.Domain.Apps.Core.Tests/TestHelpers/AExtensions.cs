@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
-
 namespace Squidex.Domain.Apps.Core.TestHelpers;
 
 public static class AExtensions

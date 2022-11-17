@@ -5,11 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
-using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
 

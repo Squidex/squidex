@@ -7,7 +7,6 @@
 
 using System.Net;
 using System.Security.Claims;
-using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
@@ -18,7 +17,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Validation;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting;
 

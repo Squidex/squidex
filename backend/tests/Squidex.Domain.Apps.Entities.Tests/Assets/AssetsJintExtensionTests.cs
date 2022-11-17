@@ -7,7 +7,6 @@
 
 using System.Security.Claims;
 using System.Text;
-using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -20,7 +19,6 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.Tasks;
-using Xunit;
 
 namespace Squidex.Infrastructure;
 

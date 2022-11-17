@@ -5,11 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 #pragma warning disable MA0048 // File name must match type name
 

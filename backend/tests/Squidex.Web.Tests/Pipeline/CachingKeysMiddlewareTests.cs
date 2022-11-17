@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Options;
@@ -14,7 +13,6 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
-using Xunit;
 
 namespace Squidex.Web.Pipeline;
 

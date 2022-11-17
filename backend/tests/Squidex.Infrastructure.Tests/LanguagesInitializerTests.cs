@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Options;
-using Xunit;
 
 namespace Squidex.Infrastructure;
 

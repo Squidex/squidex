@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.Reflection.Internal;
-using Xunit;
 
 namespace Squidex.Infrastructure.Reflection;
 

@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.Subscriptions;
 

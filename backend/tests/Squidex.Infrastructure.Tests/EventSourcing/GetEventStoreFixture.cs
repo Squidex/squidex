@@ -7,7 +7,6 @@
 
 using EventStore.Client;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing;
 

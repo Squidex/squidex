@@ -6,10 +6,8 @@
 // ==========================================================================
 
 using System.Xml.Linq;
-using FakeItEasy;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
-using Xunit;
 
 namespace Squidex.Domain.Users;
 

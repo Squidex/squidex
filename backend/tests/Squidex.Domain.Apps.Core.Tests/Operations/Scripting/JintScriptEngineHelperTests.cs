@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Net;
-using FakeItEasy;
 using Jint.Runtime;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -16,7 +15,6 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting;
 

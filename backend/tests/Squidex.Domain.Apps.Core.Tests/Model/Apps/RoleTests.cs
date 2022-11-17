@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Apps;
 

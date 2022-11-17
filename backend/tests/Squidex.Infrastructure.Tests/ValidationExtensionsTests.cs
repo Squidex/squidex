@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.Validation;
-using Xunit;
 
 namespace Squidex.Infrastructure;
 

@@ -11,7 +11,6 @@ using Squidex.Caching;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing.Consume;
 

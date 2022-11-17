@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FluentAssertions;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization;

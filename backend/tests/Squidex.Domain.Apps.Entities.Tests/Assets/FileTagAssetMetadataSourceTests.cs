@@ -9,7 +9,6 @@ using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure.Json.Objects;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 

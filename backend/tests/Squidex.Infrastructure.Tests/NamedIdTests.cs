@@ -8,7 +8,6 @@
 using System.Text.Json.Serialization;
 using Squidex.Infrastructure.Json.System;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 using static Squidex.Infrastructure.Json.Objects.JsonValuesSerializationTests;
 
 namespace Squidex.Infrastructure;

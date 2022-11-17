@@ -7,7 +7,6 @@
 
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing;
 

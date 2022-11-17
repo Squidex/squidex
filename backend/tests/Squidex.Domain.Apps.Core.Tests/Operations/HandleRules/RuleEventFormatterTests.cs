@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
@@ -22,7 +21,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
-using Xunit;
 
 #pragma warning disable CA2012 // Use ValueTasks correctly
 

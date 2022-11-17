@@ -10,7 +10,6 @@ using Jint;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared.Identity;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting;
 

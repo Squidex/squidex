@@ -7,7 +7,6 @@
 
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 namespace Squidex.Infrastructure.Json.System;
 

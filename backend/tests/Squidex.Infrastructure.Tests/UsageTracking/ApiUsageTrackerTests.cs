@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
-using FluentAssertions;
-using Xunit;
-
 namespace Squidex.Infrastructure.UsageTracking;
 
 public class ApiUsageTrackerTests

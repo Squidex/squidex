@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
-using Xunit;
 
 namespace Squidex.Infrastructure.States;
 

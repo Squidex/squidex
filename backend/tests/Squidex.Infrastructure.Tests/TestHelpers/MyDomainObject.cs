@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;

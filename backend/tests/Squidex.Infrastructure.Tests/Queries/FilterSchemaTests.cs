@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.Collections;
-using Xunit;
 
 namespace Squidex.Infrastructure.Queries;
 

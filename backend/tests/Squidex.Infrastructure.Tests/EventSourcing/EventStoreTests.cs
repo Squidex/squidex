@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using System.Globalization;
-using FluentAssertions;
-using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing;
 

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Globalization;
-using FakeItEasy;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -14,7 +13,6 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Backup;
 

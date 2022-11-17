@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FluentAssertions;
-using Xunit;
-
 namespace Squidex.Domain.Apps.Entities.Billing;
 
 public class ConfigPlansProviderTests

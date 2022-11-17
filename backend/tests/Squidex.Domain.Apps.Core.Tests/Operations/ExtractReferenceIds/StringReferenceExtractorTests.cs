@@ -5,10 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Infrastructure;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds;
 

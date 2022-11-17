@@ -5,12 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
-using FluentAssertions;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.TestHelpers;
 using Squidex.Messaging;
-using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing.Consume;
 

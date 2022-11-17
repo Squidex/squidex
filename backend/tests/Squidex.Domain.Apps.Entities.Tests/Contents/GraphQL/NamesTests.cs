@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 

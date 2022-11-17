@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Xunit;
-
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 public class QueryParserTests

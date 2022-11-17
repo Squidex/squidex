@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Text;
-using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
@@ -17,7 +16,6 @@ using Squidex.Domain.Apps.Core.Templates.Extensions;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 

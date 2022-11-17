@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.Collections;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Contents;
 

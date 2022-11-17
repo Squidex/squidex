@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Diagnostics;
-using Xunit;
 
 namespace Squidex.Infrastructure.Reflection;
 

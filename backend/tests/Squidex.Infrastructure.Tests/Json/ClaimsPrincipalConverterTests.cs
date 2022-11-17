@@ -7,7 +7,6 @@
 
 using System.Security.Claims;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 namespace Squidex.Infrastructure.Json;
 

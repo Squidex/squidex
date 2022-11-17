@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
@@ -21,7 +20,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 

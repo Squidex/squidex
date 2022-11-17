@@ -11,7 +11,6 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.MongoDb.Text;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 

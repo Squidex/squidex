@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Xunit;
 using GraphQLSchema = GraphQL.Types.Schema;
 using Schema = Squidex.Domain.Apps.Core.Schemas.Schema;
 

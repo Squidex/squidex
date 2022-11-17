@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -18,7 +17,6 @@ using Squidex.Domain.Apps.Events.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Shared.Users;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Invitation;
 

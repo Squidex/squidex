@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -18,7 +17,6 @@ using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 

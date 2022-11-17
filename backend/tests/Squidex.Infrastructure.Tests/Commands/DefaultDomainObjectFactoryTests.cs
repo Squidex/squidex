@@ -5,10 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.States;
-using Xunit;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 

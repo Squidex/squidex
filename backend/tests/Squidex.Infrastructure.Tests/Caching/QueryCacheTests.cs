@@ -7,7 +7,6 @@
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Xunit;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 

@@ -8,7 +8,6 @@
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Extensions.Text.ElasticSearch;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 

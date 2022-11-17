@@ -6,11 +6,9 @@
 // ==========================================================================
 
 using System.Globalization;
-using FakeItEasy;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
