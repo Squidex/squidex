@@ -7,7 +7,7 @@ entries:
     dependencies:
     - condition: mongodb-replicaset.enabled
       name: mongodb-replicaset
-      repository: https://kubernetes-charts.storage.googleapis.com/
+      repository: https://charts.helm.sh/stable
       version: 3.9.6
     description: Squidex CMS
     digest: 566b4d063d2717e00fc04b35bf594869dc9e5398bb08da13b542a5497dd4dc19
@@ -33,7 +33,7 @@ entries:
     dependencies:
     - condition: mongodb-replicaset.enabled
       name: mongodb-replicaset
-      repository: https://kubernetes-charts.storage.googleapis.com/
+      repository: https://charts.helm.sh/stable
       version: 3.9.6
     description: Squidex CMS v7.0 and newer
     digest: 9cc4c40f4a5825a33835fa8f0fc4c40389f2da96b247a9425dd999b90ee1457f
