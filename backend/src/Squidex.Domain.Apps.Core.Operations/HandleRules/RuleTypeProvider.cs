@@ -212,6 +212,7 @@ public sealed class RuleTypeProvider : ITypeProvider
 
         foreach (var (name, actionType) in actionTypes)
         {
+            typeRegistry.Add<RuleAction>(actionType.Type, actionType.Type.Name);
             typeRegistry.Add<RuleAction>(actionType.Type, name);
         }
 
