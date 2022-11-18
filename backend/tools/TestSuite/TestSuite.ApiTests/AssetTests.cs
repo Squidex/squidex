@@ -391,9 +391,6 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
 
-        var numErrors = 0;
-        var numSuccess = 0;
-
         // STEP 3: Make parallel upserts.
         await Parallel.ForEachAsync(Enumerable.Range(0, 20), async (i, ct) =>
         {
@@ -405,14 +402,9 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             }
             catch (SquidexManagementException ex) when (ex.StatusCode is 409 or 412)
             {
-                Interlocked.Increment(ref numErrors);
                 return;
             }
         });
-
-        // At least some errors and success should have happened.
-        Assert.True(numErrors >= 0);
-        Assert.True(numSuccess >= 0);
 
 
         // STEP 3: Make an normal update to ensure nothing is corrupt.
