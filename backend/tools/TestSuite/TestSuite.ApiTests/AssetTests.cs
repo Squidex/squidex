@@ -374,6 +374,37 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_annotate_asset_in_parallel()
     {
+        // STEP 1: Create asset
+        var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
+
+
+        // STEP 3: Make parallel upserts.
+        await Parallel.ForEachAsync(Enumerable.Range(0, 20), async (i, ct) =>
+        {
+            try
+            {
+                var randomTag1 = $"tag_{Guid.NewGuid()}";
+                var randomTag2 = $"tag_{Guid.NewGuid()}";
+
+                var randomMetadataRequest = new AnnotateAssetDto
+                {
+                    Tags = new List<string>
+                    {
+                        randomTag1,
+                        randomTag2
+                    }
+                };
+
+                await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, randomMetadataRequest);
+            }
+            catch (SquidexManagementException ex) when (ex.StatusCode is 409 or 412)
+            {
+                return;
+            }
+        });
+
+
+        // STEP 3: Make an normal update to ensure nothing is corrupt.
         var tag1 = $"tag_{Guid.NewGuid()}";
         var tag2 = $"tag_{Guid.NewGuid()}";
 
@@ -386,28 +417,6 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             }
         };
 
-
-        // STEP 1: Create asset
-        var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
-
-
-        // STEP 3: Make parallel upserts.
-        await Parallel.ForEachAsync(Enumerable.Range(0, 20), async (i, ct) =>
-        {
-            try
-            {
-                await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, metadataRequest);
-
-                Interlocked.Increment(ref numSuccess);
-            }
-            catch (SquidexManagementException ex) when (ex.StatusCode is 409 or 412)
-            {
-                return;
-            }
-        });
-
-
-        // STEP 3: Make an normal update to ensure nothing is corrupt.
         var asset_2 = await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, metadataRequest);
 
 
