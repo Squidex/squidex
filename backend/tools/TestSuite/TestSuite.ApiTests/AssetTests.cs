@@ -429,6 +429,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         Assert.Equal(1, tags[tag2]);
 
         await Verify(asset_2)
+            .IgnoreMember<AssetDto>(x => x.Version)
             .IgnoreMember<AssetDto>(x => x.Tags);
     }
 
