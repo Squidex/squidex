@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Net;
-using Xunit;
 
 namespace Squidex.Infrastructure.Net;
 

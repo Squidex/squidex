@@ -17,7 +17,6 @@ using Squidex.Infrastructure;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Web.Pipeline;
-using Xunit;
 
 #pragma warning disable IDE0017 // Simplify object initialization
 

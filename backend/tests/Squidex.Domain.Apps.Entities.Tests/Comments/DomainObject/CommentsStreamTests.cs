@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
-using FluentAssertions;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Comments;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
@@ -15,7 +13,6 @@ using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Comments.DomainObject;
 

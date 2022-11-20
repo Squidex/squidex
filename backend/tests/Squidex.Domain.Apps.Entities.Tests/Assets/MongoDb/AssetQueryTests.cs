@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using NodaTime.Text;
@@ -16,7 +15,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Validation;
-using Xunit;
 using ClrFilter = Squidex.Infrastructure.Queries.ClrFilter;
 using SortBuilder = Squidex.Infrastructure.Queries.SortBuilder;
 

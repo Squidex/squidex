@@ -11,7 +11,6 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.MongoDb.Text;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
@@ -26,7 +25,7 @@ public sealed class AtlasTextIndexFixture : IAsyncLifetime
         var mongoClient = new MongoClient(TestConfig.Configuration["atlas:configuration"]);
         var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["atlas:database"]);
 
-        var options = TestConfig.Configuration.GetSection("atlas").Get<AtlasOptions>();
+        var options = TestConfig.Configuration.GetSection("atlas").Get<AtlasOptions>()!;
 
         Index = new AtlasTextIndex(mongoDatabase, Options.Create(options));
     }

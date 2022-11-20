@@ -10,7 +10,6 @@ using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.TestHelpers;
 using Squidex.Infrastructure.Validation;
-using Xunit;
 
 namespace Squidex.Infrastructure.Queries;
 

@@ -25,17 +25,21 @@ public sealed class UserClaimsPrincipalFactoryWithEmail : UserClaimsPrincipalFac
 
     public override async Task<ClaimsPrincipal> CreateAsync(IdentityUser user)
     {
-        var principal = await base.CreateAsync(user);
+        var userPrincipal = await base.CreateAsync(user);
+        var userIdentity = userPrincipal.Identities.First();
 
-        var identity = principal.Identities.First();
+        var email = await UserManager.GetEmailAsync(user);
 
-        identity.AddClaim(new Claim(OpenIdClaims.Email, await UserManager.GetEmailAsync(user)));
+        if (email != null)
+        {
+            userIdentity.AddClaim(new Claim(OpenIdClaims.Email, email));
+        }
 
         if (await UserManager.IsInRoleAsync(user, AdministratorRole))
         {
-            identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, PermissionIds.Admin));
+            userIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, PermissionIds.Admin));
         }
 
-        return principal;
+        return userPrincipal;
     }
 }

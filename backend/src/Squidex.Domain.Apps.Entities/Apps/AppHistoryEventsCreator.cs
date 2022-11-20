@@ -15,8 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Apps;
 
 public sealed class AppHistoryEventsCreator : HistoryEventsCreatorBase
 {
-    public AppHistoryEventsCreator(TypeNameRegistry typeNameRegistry)
-        : base(typeNameRegistry)
+    public AppHistoryEventsCreator(TypeRegistry typeRegistry)
+        : base(typeRegistry)
     {
         AddEventMessage<AppCreated>(
             "history.apps.created");

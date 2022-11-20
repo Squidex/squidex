@@ -5,16 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Validation;
-using Squidex.Web.Json;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models;
 
-[JsonInheritanceConverter(typeof(FieldPropertiesDto), "fieldType")]
-[KnownType(nameof(Subtypes))]
 public abstract class FieldPropertiesDto
 {
     /// <summary>
@@ -61,11 +57,4 @@ public abstract class FieldPropertiesDto
     public ReadonlyList<string>? Tags { get; set; }
 
     public abstract FieldProperties ToProperties();
-
-    public static Type[] Subtypes()
-    {
-        var type = typeof(FieldPropertiesDto);
-
-        return type.Assembly.GetTypes().Where(type.IsAssignableFrom).ToArray();
-    }
 }

@@ -6,13 +6,11 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using FakeItEasy;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers;
 

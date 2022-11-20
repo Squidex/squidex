@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using FakeItEasy;
-using FluentAssertions;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -18,7 +16,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 

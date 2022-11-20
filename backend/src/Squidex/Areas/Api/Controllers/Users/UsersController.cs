@@ -58,9 +58,7 @@ public sealed class UsersController : ApiController
     /// <summary>
     /// Get the user resources.
     /// </summary>
-    /// <returns>
-    /// 200 => User resources returned.
-    /// </returns>
+    /// <response code="200">User resources returned.</response>.
     [HttpGet]
     [Route("")]
     [ProducesResponseType(typeof(ResourcesDto), StatusCodes.Status200OK)]
@@ -79,9 +77,7 @@ public sealed class UsersController : ApiController
     /// <remarks>
     /// Search the user by query that contains the email address or the part of the email address.
     /// </remarks>
-    /// <returns>
-    /// 200 => Users returned.
-    /// </returns>
+    /// <response code="200">Users returned.</response>.
     [HttpGet]
     [Route("users/")]
     [ProducesResponseType(typeof(UserDto[]), StatusCodes.Status200OK)]
@@ -108,10 +104,8 @@ public sealed class UsersController : ApiController
     /// Get user by id.
     /// </summary>
     /// <param name="id">The ID of the user (GUID).</param>
-    /// <returns>
-    /// 200 => User found.
-    /// 404 => User not found.
-    /// </returns>
+    /// <response code="200">User found.</response>.
+    /// <response code="404">User not found.</response>.
     [HttpGet]
     [Route("users/{id}/")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
@@ -141,10 +135,8 @@ public sealed class UsersController : ApiController
     /// Get user picture by id.
     /// </summary>
     /// <param name="id">The ID of the user (GUID).</param>
-    /// <returns>
-    /// 200 => User found and image or fallback returned.
-    /// 404 => User not found.
-    /// </returns>
+    /// <response code="200">User found and image or fallback returned.</response>.
+    /// <response code="404">User not found.</response>.
     [HttpGet]
     [Route("users/{id}/picture/")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]

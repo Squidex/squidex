@@ -7,7 +7,6 @@
 
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 namespace Squidex.Infrastructure.Json.Objects;
 
@@ -19,7 +18,7 @@ public class JsonValuesSerializationTests
         Bson
     }
 
-    private static IEnumerable<object[]> Serializers()
+    public static IEnumerable<object[]> Serializers()
     {
         yield return new object[] { SerializerMode.Json };
         yield return new object[] { SerializerMode.Bson };

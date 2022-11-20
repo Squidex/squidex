@@ -30,9 +30,7 @@ public sealed class TemplatesController : ApiController
     /// <summary>
     /// Get all templates.
     /// </summary>
-    /// <returns>
-    /// 200 => Templates returned.
-    /// </returns>
+    /// <response code="200">Templates returned.</response>.
     [HttpGet]
     [Route("templates/")]
     [ProducesResponseType(typeof(TemplatesDto), StatusCodes.Status200OK)]
@@ -50,10 +48,8 @@ public sealed class TemplatesController : ApiController
     /// Get template details.
     /// </summary>
     /// <param name="name">The name of the template.</param>
-    /// <returns>
-    /// 200 => Template returned.
-    /// 404 => Template not found.
-    /// </returns>
+    /// <response code="200">Template returned.</response>.
+    /// <response code="404">Template not found.</response>.
     [HttpGet]
     [Route("templates/{name}")]
     [ProducesResponseType(typeof(TemplateDetailsDto), StatusCodes.Status200OK)]

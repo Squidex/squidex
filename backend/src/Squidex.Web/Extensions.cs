@@ -8,7 +8,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Web;
@@ -62,11 +61,13 @@ public static class Extensions
     {
         result = null!;
 
-        if (headers.TryGetValue(header, out var value) && value != StringValues.Empty)
+        if (headers.TryGetValue(header, out var value))
         {
-            if (!string.IsNullOrWhiteSpace(value))
+            string? valueString = value;
+
+            if (!string.IsNullOrWhiteSpace(valueString))
             {
-                result = value;
+                result = valueString;
                 return true;
             }
         }

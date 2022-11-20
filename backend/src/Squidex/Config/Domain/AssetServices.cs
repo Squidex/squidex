@@ -164,12 +164,12 @@ public static class AssetServices
 
                 var options = new FTPAssetOptions
                 {
-                    Path = config.GetOptionalValue("assetStore:ftp:path", "/")
+                    Path = config.GetOptionalValue("assetStore:ftp:path", "/")!
                 };
 
                 services.AddSingletonAs(c =>
                     {
-                        var factory = new Func<FtpClient>(() => new FtpClient(serverHost, serverPort, username, password));
+                        var factory = new Func<AsyncFtpClient>(() => new AsyncFtpClient(serverHost, username, password, serverPort));
 
                         return new FTPAssetStore(factory, options, c.GetRequiredService<ILogger<FTPAssetStore>>());
                     })

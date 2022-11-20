@@ -5,12 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Xunit;
 
 #pragma warning disable CA2012 // Use ValueTasks correctly
 
@@ -70,7 +68,7 @@ public class EnrichWithWorkflowsTests
 
         await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
 
-        Assert.Empty(content.NextStatuses);
+        Assert.Empty(content.NextStatuses!);
 
         A.CallTo(() => workflow.GetNextAsync(content, A<Status>._, requestContext.UserPrincipal))
             .MustNotHaveHappened();

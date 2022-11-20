@@ -7,7 +7,6 @@
 
 using NodaTime;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 namespace Squidex.Infrastructure.MongoDb;
 

@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ConvertContent;
 
@@ -20,7 +19,7 @@ public class FieldConvertersTests
 {
     private readonly LanguagesConfig languages = LanguagesConfig.English.Set(Language.DE);
 
-    private static IEnumerable<object?[]> InvalidValues()
+    public static IEnumerable<object?[]> InvalidValues()
     {
         yield return new object?[] { JsonValue.Null };
         yield return new object?[] { JsonValue.Create(false) }; // Undefined

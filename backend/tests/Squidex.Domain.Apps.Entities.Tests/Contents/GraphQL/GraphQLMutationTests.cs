@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Text.Json;
-using FakeItEasy;
 using GraphQL;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Contents;
@@ -15,7 +14,6 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 

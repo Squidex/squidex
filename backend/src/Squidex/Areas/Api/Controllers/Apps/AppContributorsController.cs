@@ -38,10 +38,8 @@ public sealed class AppContributorsController : ApiController
     /// Get app contributors.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <returns>
-    /// 200 => Contributors returned.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="200">Contributors returned.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpGet]
     [Route("apps/{app}/contributors/")]
     [ProducesResponseType(typeof(ContributorsDto), StatusCodes.Status200OK)]
@@ -59,11 +57,9 @@ public sealed class AppContributorsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">Contributor object that needs to be added to the app.</param>
-    /// <returns>
-    /// 201 => Contributor assigned to app.
-    /// 400 => Contributor request not valid.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="201">Contributor assigned to app.</response>.
+    /// <response code="400">Contributor request not valid.</response>.
+    /// <response code="404">App not found.</response>.
     [HttpPost]
     [Route("apps/{app}/contributors/")]
     [ProducesResponseType(typeof(ContributorsDto), StatusCodes.Status201Created)]
@@ -82,10 +78,8 @@ public sealed class AppContributorsController : ApiController
     /// Remove yourself.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <returns>
-    /// 200 => Contributor removed.
-    /// 404 => Contributor or app not found.
-    /// </returns>
+    /// <response code="200">Contributor removed.</response>.
+    /// <response code="404">Contributor or app not found.</response>.
     [HttpDelete]
     [Route("apps/{app}/contributors/me/")]
     [ProducesResponseType(typeof(ContributorsDto), StatusCodes.Status200OK)]
@@ -105,10 +99,8 @@ public sealed class AppContributorsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the contributor.</param>
-    /// <returns>
-    /// 200 => Contributor removed.
-    /// 404 => Contributor or app not found.
-    /// </returns>
+    /// <response code="200">Contributor removed.</response>.
+    /// <response code="404">Contributor or app not found.</response>.
     [HttpDelete]
     [Route("apps/{app}/contributors/{id}/")]
     [ProducesResponseType(typeof(ContributorsDto), StatusCodes.Status200OK)]

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text.Json.Serialization;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Infrastructure;
@@ -28,7 +27,6 @@ public sealed class UpdateRuleDto
     /// <summary>
     /// The action properties.
     /// </summary>
-    [JsonConverter(typeof(RuleActionConverter))]
     public RuleAction? Action { get; set; }
 
     /// <summary>

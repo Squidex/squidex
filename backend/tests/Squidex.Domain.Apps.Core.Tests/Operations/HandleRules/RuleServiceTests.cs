@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NodaTime;
@@ -19,7 +18,6 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules;
 
@@ -35,7 +33,7 @@ public class RuleServiceTests
     private readonly string actionDescription = "MyDescription";
     private readonly DomainId ruleId = DomainId.NewGuid();
     private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
+    private readonly TypeRegistry typeRegistry = new TypeRegistry();
     private readonly RuleService sut;
 
     public sealed class InvalidEvent : IEvent
@@ -65,8 +63,7 @@ public class RuleServiceTests
 
     public RuleServiceTests()
     {
-        typeNameRegistry.Map(typeof(ContentCreated));
-        typeNameRegistry.Map(typeof(ValidAction), actionName);
+        typeRegistry.Add<RuleAction, ValidAction>(actionName);
 
         A.CallTo(() => clock.GetCurrentInstant())
             .Returns(SystemClock.Instance.GetCurrentInstant().WithoutMs());
@@ -85,7 +82,7 @@ public class RuleServiceTests
         sut = new RuleService(Options.Create(new RuleOptions()),
             new[] { ruleTriggerHandler },
             new[] { ruleActionHandler },
-            eventEnricher, TestUtils.DefaultSerializer, log, typeNameRegistry)
+            eventEnricher, TestUtils.DefaultSerializer, log, typeRegistry)
         {
             Clock = clock
         };

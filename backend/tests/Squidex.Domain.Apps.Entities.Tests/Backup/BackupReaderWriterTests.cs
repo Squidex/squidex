@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Globalization;
-using FakeItEasy;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -14,7 +13,6 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Backup;
 
@@ -23,7 +21,7 @@ public class BackupReaderWriterTests
     private readonly IEventFormatter eventFormatter;
     private readonly IEventStreamNames eventStreamNames = A.Fake<IEventStreamNames>();
     private readonly IJsonSerializer serializer = TestUtils.DefaultSerializer;
-    private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
+    private readonly TypeRegistry typeRegistry = new TypeRegistry();
 
     [TypeName(nameof(MyEvent))]
     public sealed class MyEvent : IEvent
@@ -33,9 +31,9 @@ public class BackupReaderWriterTests
 
     public BackupReaderWriterTests()
     {
-        typeNameRegistry.Map(typeof(MyEvent));
+        typeRegistry.Add<IEvent, MyEvent>("MyEvent");
 
-        eventFormatter = new DefaultEventFormatter(typeNameRegistry, serializer);
+        eventFormatter = new DefaultEventFormatter(typeRegistry, serializer);
     }
 
     [Fact]

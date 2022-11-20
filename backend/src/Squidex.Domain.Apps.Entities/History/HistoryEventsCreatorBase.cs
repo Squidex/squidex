@@ -14,37 +14,37 @@ namespace Squidex.Domain.Apps.Entities.History;
 public abstract class HistoryEventsCreatorBase : IHistoryEventsCreator
 {
     private readonly Dictionary<string, string> texts = new Dictionary<string, string>();
-    private readonly TypeNameRegistry typeNameRegistry;
+    private readonly TypeRegistry typeRegistry;
 
     public IReadOnlyDictionary<string, string> Texts
     {
         get => texts;
     }
 
-    protected HistoryEventsCreatorBase(TypeNameRegistry typeNameRegistry)
+    protected HistoryEventsCreatorBase(TypeRegistry typeRegistry)
     {
-        Guard.NotNull(typeNameRegistry);
+        Guard.NotNull(typeRegistry);
 
-        this.typeNameRegistry = typeNameRegistry;
+        this.typeRegistry = typeRegistry;
     }
 
     protected void AddEventMessage<TEvent>(string message) where TEvent : IEvent
     {
         Guard.NotNullOrEmpty(message);
 
-        texts[typeNameRegistry.GetName<TEvent>()] = message;
+        texts[typeRegistry.GetName<IEvent, TEvent>()] = message;
     }
 
     protected bool HasEventText(IEvent @event)
     {
-        var message = typeNameRegistry.GetName(@event.GetType());
+        var message = typeRegistry.GetName<IEvent>(@event.GetType());
 
         return texts.ContainsKey(message);
     }
 
     protected HistoryEvent ForEvent(IEvent @event, string channel)
     {
-        var message = typeNameRegistry.GetName(@event.GetType());
+        var message = typeRegistry.GetName<IEvent>(@event.GetType());
 
         return new HistoryEvent(channel, message);
     }

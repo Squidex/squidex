@@ -31,10 +31,8 @@ public sealed class AppClientsController : ApiController
     /// Get app clients.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <returns>
-    /// 200 => Clients returned.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="200">Clients returned.</response>.
+    /// <response code="404">App not found.</response>.
     /// <remarks>
     /// Gets all configured clients for the app with the specified name.
     /// </remarks>
@@ -60,11 +58,9 @@ public sealed class AppClientsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">Client object that needs to be added to the app.</param>
-    /// <returns>
-    /// 201 => Client created.
-    /// 400 => Client request not valid.
-    /// 404 => App not found.
-    /// </returns>
+    /// <response code="201">Client created.</response>.
+    /// <response code="400">Client request not valid.</response>.
+    /// <response code="404">App not found.</response>.
     /// <remarks>
     /// Create a new client for the app with the specified name.
     /// The client secret is auto generated on the server and returned. The client does not expire, the access token is valid for 30 days.
@@ -89,11 +85,9 @@ public sealed class AppClientsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the client that must be updated.</param>
     /// <param name="request">Client object that needs to be updated.</param>
-    /// <returns>
-    /// 200 => Client updated.
-    /// 400 => Client request not valid.
-    /// 404 => Client or app not found.
-    /// </returns>
+    /// <response code="200">Client updated.</response>.
+    /// <response code="400">Client request not valid.</response>.
+    /// <response code="404">Client or app not found.</response>.
     /// <remarks>
     /// Only the display name can be changed, create a new client if necessary.
     /// </remarks>
@@ -116,10 +110,8 @@ public sealed class AppClientsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the client that must be deleted.</param>
-    /// <returns>
-    /// 200 => Client deleted.
-    /// 404 => Client or app not found.
-    /// </returns>
+    /// <response code="200">Client deleted.</response>.
+    /// <response code="404">Client or app not found.</response>.
     /// <remarks>
     /// The application that uses this client credentials cannot access the API after it has been revoked.
     /// </remarks>

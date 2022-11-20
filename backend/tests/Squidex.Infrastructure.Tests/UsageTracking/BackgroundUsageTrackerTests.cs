@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
-using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Xunit;
 
 namespace Squidex.Infrastructure.UsageTracking;
 

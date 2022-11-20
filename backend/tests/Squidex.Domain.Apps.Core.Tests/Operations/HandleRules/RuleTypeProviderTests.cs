@@ -6,11 +6,9 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using FluentAssertions;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure.Validation;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules;
 

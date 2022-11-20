@@ -7,7 +7,6 @@
 
 using System.Collections;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 namespace Squidex.Infrastructure.Security;
 

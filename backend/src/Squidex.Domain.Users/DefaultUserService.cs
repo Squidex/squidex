@@ -46,7 +46,7 @@ public sealed class DefaultUserService : IUserService
     {
         Guard.NotNull(user);
 
-        return userManager.GetUserId(user);
+        return userManager.GetUserId(user)!;
     }
 
     public async Task<IResultList<IUser>> QueryAsync(IEnumerable<string> ids,
@@ -82,7 +82,7 @@ public sealed class DefaultUserService : IUserService
             {
                 var normalizedEmail = userManager.NormalizeEmail(email);
 
-                result = result.Where(x => x.NormalizedEmail.Contains(normalizedEmail));
+                result = result.Where(x => x.NormalizedEmail!.Contains(normalizedEmail));
             }
 
             return result;
@@ -387,7 +387,7 @@ public sealed class DefaultUserService : IUserService
 
         if (!claims.Any(x => string.Equals(x.Type, SquidexClaimTypes.DisplayName, StringComparison.OrdinalIgnoreCase)))
         {
-            claims.Add(new Claim(SquidexClaimTypes.DisplayName, user.Email));
+            claims.Add(new Claim(SquidexClaimTypes.DisplayName, user.Email!));
         }
 
         return new UserWithClaims(user, claims.ToList());

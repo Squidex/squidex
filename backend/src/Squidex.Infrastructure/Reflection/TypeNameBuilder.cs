@@ -22,7 +22,6 @@ public static class TypeNameBuilder
                 if (typeName.EndsWith(suffix, StringComparison.Ordinal))
                 {
                     typeName = typeName[..^suffix.Length];
-
                     break;
                 }
             }

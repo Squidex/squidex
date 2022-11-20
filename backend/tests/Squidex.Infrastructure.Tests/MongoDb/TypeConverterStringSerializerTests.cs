@@ -7,7 +7,6 @@
 
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
-using Xunit;
 
 namespace Squidex.Infrastructure.MongoDb;
 

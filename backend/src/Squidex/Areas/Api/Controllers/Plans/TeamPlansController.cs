@@ -43,10 +43,8 @@ public sealed class TeamPlansController : ApiController
     /// Get team plan information.
     /// </summary>
     /// <param name="team">The name of the team.</param>
-    /// <returns>
-    /// 200 => Team plan information returned.
-    /// 404 => Team not found.
-    /// </returns>
+    /// <response code="200">Team plan information returned.</response>.
+    /// <response code="404">Team not found.</response>.
     [HttpGet]
     [Route("teams/{team}/plans/")]
     [ProducesResponseType(typeof(PlansDto), StatusCodes.Status200OK)]
@@ -92,10 +90,8 @@ public sealed class TeamPlansController : ApiController
     /// </summary>
     /// <param name="team">The name of the team.</param>
     /// <param name="request">Plan object that needs to be changed.</param>
-    /// <returns>
-    /// 200 => Plan changed or redirect url returned.
-    /// 404 => Team not found.
-    /// </returns>
+    /// <response code="200">Plan changed or redirect url returned.</response>.
+    /// <response code="404">Team not found.</response>.
     [HttpPut]
     [Route("teams/{team}/plan/")]
     [ProducesResponseType(typeof(PlanChangedDto), StatusCodes.Status200OK)]

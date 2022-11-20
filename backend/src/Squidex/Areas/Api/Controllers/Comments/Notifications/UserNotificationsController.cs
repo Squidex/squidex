@@ -41,9 +41,7 @@ public sealed class UserNotificationsController : ApiController
     /// <remarks>
     /// When passing in a version you can retrieve all updates since then.
     /// </remarks>
-    /// <returns>
-    /// 200 => All comments returned.
-    /// </returns>
+    /// <response code="200">All comments returned.</response>.
     [HttpGet]
     [Route("users/{userId}/notifications")]
     [ProducesResponseType(typeof(CommentsDto), StatusCodes.Status200OK)]
@@ -69,12 +67,11 @@ public sealed class UserNotificationsController : ApiController
     /// </summary>
     /// <param name="userId">The user id.</param>
     /// <param name="commentId">The ID of the comment.</param>
-    /// <returns>
-    /// 204 => Comment deleted.
-    /// 404 => Comment not found.
-    /// </returns>
+    /// <response code="204">Comment deleted.</response>.
+    /// <response code="404">Comment not found.</response>.
     [HttpDelete]
     [Route("users/{userId}/notifications/{commentId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermission]
     public async Task<IActionResult> DeleteComment(DomainId userId, DomainId commentId)
     {

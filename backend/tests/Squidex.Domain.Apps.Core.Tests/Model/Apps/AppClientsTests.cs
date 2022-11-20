@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
-using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
 

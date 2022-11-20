@@ -22,7 +22,7 @@ internal sealed class UserWithClaims : IUser
 
     public string Email
     {
-        get => Identity.Email;
+        get => Identity.Email!;
     }
 
     public bool IsLocked

@@ -7,9 +7,7 @@
 
 using System.ComponentModel;
 using System.Text.Json.Serialization;
-using FluentAssertions;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 namespace Squidex.Infrastructure;
 

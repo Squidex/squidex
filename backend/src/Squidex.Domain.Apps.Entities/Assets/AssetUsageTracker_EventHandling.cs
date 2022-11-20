@@ -157,7 +157,7 @@ public partial class AssetUsageTracker : IEventConsumer
         // Store the latest tags in memory for fast access.
         if (memoryCache.TryGetValue<State>(key, out var state))
         {
-            return state.Tags;
+            return state?.Tags;
         }
 
         var stored = await store.ReadAsync(key, ct);

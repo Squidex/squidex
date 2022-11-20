@@ -12,7 +12,6 @@ using Lucene.Net.Analysis.Util;
 using Lucene.Net.Util;
 using MongoDB.Bson;
 using Squidex.Domain.Apps.Entities.MongoDb.Text;
-using Xunit;
 using LuceneQueryAnalyzer = Lucene.Net.QueryParsers.Classic.QueryParser;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;

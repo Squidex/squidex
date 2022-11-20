@@ -6,14 +6,12 @@
 // ==========================================================================
 
 using System.Text;
-using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Xunit;
 
 namespace Squidex.Web.Pipeline;
 

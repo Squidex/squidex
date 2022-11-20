@@ -52,10 +52,8 @@ public sealed class AssetContentController : ApiController
     /// <param name="idOrSlug">The id or slug of the asset.</param>
     /// <param name="request">The request parameters.</param>
     /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
-    /// <returns>
-    /// 200 => Asset found and content or (resized) image returned.
-    /// 404 => Asset or app not found.
-    /// </returns>
+    /// <response code="200">Asset found and content or (resized) image returned.</response>.
+    /// <response code="404">Asset or app not found.</response>.
     [HttpGet]
     [Route("assets/{app}/{idOrSlug}/{*more}")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
@@ -81,10 +79,8 @@ public sealed class AssetContentController : ApiController
     /// </summary>
     /// <param name="id">The ID of the asset.</param>
     /// <param name="request">The request parameters.</param>
-    /// <returns>
-    /// 200 => Asset found and content or (resized) image returned.
-    /// 404 => Asset or app not found.
-    /// </returns>
+    /// <response code="200">Asset found and content or (resized) image returned.</response>.
+    /// <response code="404">Asset or app not found.</response>.
     [HttpGet]
     [Route("assets/{id}/")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]

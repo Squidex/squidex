@@ -7,14 +7,12 @@
 
 using System.Globalization;
 using System.Security.Claims;
-using FakeItEasy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
-using Xunit;
 
 namespace Squidex.Domain.Users;
 
@@ -79,7 +77,7 @@ public class DefaultUserServiceTests
     {
         var identity = CreateIdentity(found: true);
 
-        var actual = await sut.FindByEmailAsync(identity.Email);
+        var actual = await sut.FindByEmailAsync(identity.Email!);
 
         Assert.Same(identity, actual?.Identity);
     }
@@ -89,7 +87,7 @@ public class DefaultUserServiceTests
     {
         var identity = CreateIdentity(found: false);
 
-        var actual = await sut.FindByEmailAsync(identity.Email);
+        var actual = await sut.FindByEmailAsync(identity.Email!);
 
         Assert.Null(actual);
     }
@@ -119,7 +117,7 @@ public class DefaultUserServiceTests
         CreateIdentity(found: false);
 
         A.CallTo(() => userManager.FindByLoginAsync(provider, providerKey))
-            .Returns(Task.FromResult<IdentityUser>(null!));
+            .Returns(Task.FromResult<IdentityUser?>(null));
 
         var actual = await sut.FindByLoginAsync(provider, providerKey);
 
@@ -171,12 +169,12 @@ public class DefaultUserServiceTests
 
         var values = new UserValues
         {
-            Email = identity.Email
+            Email = identity.Email!
         };
 
         SetupCreation(identity, 1);
 
-        await sut.CreateAsync(values.Email, values);
+        await sut.CreateAsync(values.Email!, values);
 
         A.CallTo(() => userEvents.OnUserRegisteredAsync(A<IUser>.That.Matches(x => x.Identity == identity)))
             .MustHaveHappened();
@@ -206,7 +204,7 @@ public class DefaultUserServiceTests
 
         SetupCreation(identity, 1);
 
-        await sut.CreateAsync(identity.Email, values);
+        await sut.CreateAsync(identity.Email!, values);
 
         A.CallTo(() => userEvents.OnConsentGivenAsync(A<IUser>.That.Matches(x => x.Identity == identity)))
             .MustHaveHappened();
@@ -224,7 +222,7 @@ public class DefaultUserServiceTests
 
         SetupCreation(identity, 0);
 
-        await sut.CreateAsync(identity.Email, values);
+        await sut.CreateAsync(identity.Email!, values);
 
         A.CallTo(() => userManager.AddClaimsAsync(identity, HasClaim(SquidexClaimTypes.Permissions, PermissionIds.Admin)))
             .MustHaveHappened();
@@ -242,7 +240,7 @@ public class DefaultUserServiceTests
 
         SetupCreation(identity, 0);
 
-        await sut.CreateAsync(identity.Email, values, true);
+        await sut.CreateAsync(identity.Email!, values, true);
 
         A.CallTo(() => userManager.SetLockoutEndDateAsync(identity, A<DateTimeOffset>._))
             .MustNotHaveHappened();
@@ -260,7 +258,7 @@ public class DefaultUserServiceTests
 
         SetupCreation(identity, 1);
 
-        await sut.CreateAsync(identity.Email, values, true);
+        await sut.CreateAsync(identity.Email!, values, true);
 
         A.CallTo(() => userManager.SetLockoutEndDateAsync(identity, InFuture()))
             .MustHaveHappened();
@@ -278,7 +276,7 @@ public class DefaultUserServiceTests
 
         SetupCreation(identity, 1);
 
-        await sut.CreateAsync(identity.Email, values, false);
+        await sut.CreateAsync(identity.Email!, values, false);
 
         A.CallTo(() => userManager.AddPasswordAsync(identity, values.Password))
             .MustHaveHappened();
@@ -561,16 +559,16 @@ public class DefaultUserServiceTests
             A.CallTo(() => userManager.FindByIdAsync(identity.Id))
                 .Returns(identity);
 
-            A.CallTo(() => userManager.FindByEmailAsync(identity.Email))
+            A.CallTo(() => userManager.FindByEmailAsync(identity.Email!))
                 .Returns(identity);
         }
         else
         {
             A.CallTo(() => userManager.FindByIdAsync(identity.Id))
-                .Returns(Task.FromResult<IdentityUser>(null!));
+                .Returns(Task.FromResult<IdentityUser?>(null));
 
-            A.CallTo(() => userManager.FindByEmailAsync(identity.Email))
-                .Returns(Task.FromResult<IdentityUser>(null!));
+            A.CallTo(() => userManager.FindByEmailAsync(identity.Email!))
+                .Returns(Task.FromResult<IdentityUser?>(null));
         }
 
         return identity;
@@ -588,7 +586,7 @@ public class DefaultUserServiceTests
         A.CallTo(() => userManager.Users)
             .Returns(users.AsQueryable());
 
-        A.CallTo(() => userFactory.Create(identity.Email))
+        A.CallTo(() => userFactory.Create(identity.Email!))
             .Returns(identity);
     }
 

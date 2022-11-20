@@ -6,14 +6,12 @@
 // ==========================================================================
 
 using System.Reactive.Linq;
-using FakeItEasy;
 using GraphQL;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Infrastructure;
 using Squidex.Shared;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 

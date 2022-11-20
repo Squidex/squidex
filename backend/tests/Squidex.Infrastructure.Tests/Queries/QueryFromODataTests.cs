@@ -8,7 +8,6 @@
 using Microsoft.OData.Edm;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Queries.OData;
-using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable IDE1006 // Naming Styles

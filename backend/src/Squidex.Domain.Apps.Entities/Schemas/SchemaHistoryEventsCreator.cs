@@ -15,8 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas;
 
 public sealed class SchemaHistoryEventsCreator : HistoryEventsCreatorBase
 {
-    public SchemaHistoryEventsCreator(TypeNameRegistry typeNameRegistry)
-        : base(typeNameRegistry)
+    public SchemaHistoryEventsCreator(TypeRegistry typeRegistry)
+        : base(typeRegistry)
     {
         AddEventMessage<SchemaFieldsReordered>(
             "history.schemas.fieldsReordered");

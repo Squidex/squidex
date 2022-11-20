@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.Extensions;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -96,10 +95,5 @@ public static class RuleServices
 
         services.AddSingletonAs<RuleEventFormatter>()
             .AsSelf();
-
-        services.AddInitializer<RuleTypeProvider>("Serializer (Rules)", registry =>
-        {
-            RuleActionConverter.Mapping = registry.Actions.ToDictionary(x => x.Key, x => x.Value.Type);
-        }, -1);
     }
 }

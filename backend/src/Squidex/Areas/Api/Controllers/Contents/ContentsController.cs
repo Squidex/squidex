@@ -40,10 +40,8 @@ public sealed class ContentsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="ids">The optional ids of the content to fetch.</param>
     /// <param name="q">The optional json query.</param>
-    /// <returns>
-    /// 200 => Contents retunred.
-    /// 404 => Schema or app not found.
-    /// </returns>
+    /// <response code="200">Contents retunred.</response>.
+    /// <response code="404">Schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -70,10 +68,8 @@ public sealed class ContentsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="query">The required query object.</param>
-    /// <returns>
-    /// 200 => Contents returned.
-    /// 404 => Schema or app not found.
-    /// </returns>
+    /// <response code="200">Contents returned.</response>.
+    /// <response code="404">Schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -101,10 +97,8 @@ public sealed class ContentsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the content to fetch.</param>
     /// <param name="version">The optional version.</param>
-    /// <returns>
-    /// 200 => Content returned.
-    /// 404 => Content, schema or app not found.
-    /// </returns>
+    /// <response code="200">Content returned.</response>.
+    /// <response code="404">Content, schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -136,16 +130,15 @@ public sealed class ContentsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the content to fetch.</param>
-    /// <returns>
-    /// 204 => Content is valid.
-    /// 400 => Content not valid.
-    /// 404 => Content, schema or app not found.
-    /// </returns>
+    /// <response code="204">Content is valid.</response>.
+    /// <response code="400">Content not valid.</response>.
+    /// <response code="404">Content, schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
     [HttpGet]
     [Route("content/{app}/{schema}/{id}/validity")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     public async Task<IActionResult> GetContentValidity(string app, string schema, DomainId id)
@@ -164,10 +157,8 @@ public sealed class ContentsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the content to fetch.</param>
     /// <param name="q">The optional json query.</param>
-    /// <returns>
-    /// 200 => Contents returned.
-    /// 404 => Content, schema or app not found.
-    /// </returns>
+    /// <response code="200">Contents returned.</response>.
+    /// <response code="404">Content, schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -195,10 +186,8 @@ public sealed class ContentsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the content to fetch.</param>
     /// <param name="q">The optional json query.</param>
-    /// <returns>
-    /// 200 => Content returned.
-    /// 404 => Content, schema or app not found.
-    /// </returns>
+    /// <response code="200">Content returned.</response>.
+    /// <response code="404">Content, schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -226,10 +215,8 @@ public sealed class ContentsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the content to fetch.</param>
     /// <param name="version">The version fo the content to fetch.</param>
-    /// <returns>
-    /// 200 => Content version returned.
-    /// 404 => Content, schema or app not found.
-    /// </returns>
+    /// <response code="200">Content version returned.</response>.
+    /// <response code="404">Content, schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -261,11 +248,9 @@ public sealed class ContentsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="request">The request parameters.</param>
-    /// <returns>
-    /// 201 => Content created.
-    /// 400 => Content request not valid.
-    /// 404 => Content, schema or app not found.
-    /// </returns>
+    /// <response code="201">Content created.</response>.
+    /// <response code="400">Content request not valid.</response>.
+    /// <response code="404">Content, schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -289,11 +274,9 @@ public sealed class ContentsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="request">The import request.</param>
-    /// <returns>
-    /// 200 => Contents created.
-    /// 400 => Content request not valid.
-    /// 404 => Content references, schema or app not found.
-    /// </returns>
+    /// <response code="200">Contents created.</response>.
+    /// <response code="400">Content request not valid.</response>.
+    /// <response code="404">Content references, schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -321,11 +304,9 @@ public sealed class ContentsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="request">The bulk update request.</param>
-    /// <returns>
-    /// 201 => Contents created, update or delete.
-    /// 400 => Contents request not valid.
-    /// 404 => Contents references, schema or app not found.
-    /// </returns>
+    /// <response code="201">Contents created, update or delete.</response>.
+    /// <response code="400">Contents request not valid.</response>.
+    /// <response code="404">Contents references, schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -353,11 +334,9 @@ public sealed class ContentsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the content item to update.</param>
     /// <param name="request">The request parameters.</param>
-    /// <returns>
-    /// 200 => Content created or updated.
-    /// 400 => Content request not valid.
-    /// 404 => Content references, schema or app not found.
-    /// </returns>
+    /// <response code="200">Content created or updated.</response>.
+    /// <response code="400">Content request not valid.</response>.
+    /// <response code="404">Content references, schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -382,11 +361,9 @@ public sealed class ContentsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the content item to update.</param>
     /// <param name="request">The full data for the content item.</param>
-    /// <returns>
-    /// 200 => Content updated.
-    /// 400 => Content request not valid.
-    /// 404 => Content references, schema or app not found.
-    /// </returns>
+    /// <response code="200">Content updated.</response>.
+    /// <response code="400">Content request not valid.</response>.
+    /// <response code="404">Content references, schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -411,11 +388,9 @@ public sealed class ContentsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the content item to patch.</param>
     /// <param name="request">The patch for the content item.</param>
-    /// <returns>
-    /// 200 => Content patched.
-    /// 400 => Content request not valid.
-    /// 404 => Content, schema or app not found.
-    /// </returns>
+    /// <response code="200">Content patched.</response>.
+    /// <response code="400">Content request not valid.</response>.
+    /// <response code="404">Content, schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -440,11 +415,9 @@ public sealed class ContentsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the content item to change.</param>
     /// <param name="request">The status request.</param>
-    /// <returns>
-    /// 200 => Content status changed.
-    /// 400 => Content request not valid.
-    /// 404 => Content, schema or app not found.
-    /// </returns>
+    /// <response code="200">Content status changed.</response>.
+    /// <response code="400">Content request not valid.</response>.
+    /// <response code="404">Content, schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -468,11 +441,9 @@ public sealed class ContentsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the content item to cancel.</param>
-    /// <returns>
-    /// 200 => Content status change cancelled.
-    /// 400 => Content request not valid.
-    /// 404 => Content, schema or app not found.
-    /// </returns>
+    /// <response code="200">Content status change cancelled.</response>.
+    /// <response code="400">Content request not valid.</response>.
+    /// <response code="404">Content, schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -496,10 +467,8 @@ public sealed class ContentsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the content item to create the draft for.</param>
-    /// <returns>
-    /// 200 => Content draft created.
-    /// 404 => Content, schema or app not found.
-    /// </returns>
+    /// <response code="200">Content draft created.</response>.
+    /// <response code="404">Content, schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -523,10 +492,8 @@ public sealed class ContentsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the content item to delete the draft from.</param>
-    /// <returns>
-    /// 200 => Content draft deleted.
-    /// 404 => Content, schema or app not found.
-    /// </returns>
+    /// <response code="200">Content draft deleted.</response>.
+    /// <response code="404">Content, schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -551,16 +518,15 @@ public sealed class ContentsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the content item to delete.</param>
     /// <param name="request">The request parameters.</param>
-    /// <returns>
-    /// 204 => Content deleted.
-    /// 400 => Content cannot be deleted.
-    /// 404 => Content, schema or app not found.
-    /// </returns>
+    /// <response code="204">Content deleted.</response>.
+    /// <response code="400">Content cannot be deleted.</response>.
+    /// <response code="404">Content, schema or app not found.</response>.
     /// <remarks>
     /// You can create an generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
     [HttpDelete]
     [Route("content/{app}/{schema}/{id}/")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppContentsDeleteOwn)]
     [ApiCosts(1)]
     public async Task<IActionResult> DeleteContent(string app, string schema, DomainId id, DeleteContentDto request)

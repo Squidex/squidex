@@ -8,7 +8,6 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
-using Xunit;
 
 #pragma warning disable SA1122 // Use string.Empty for empty strings
 

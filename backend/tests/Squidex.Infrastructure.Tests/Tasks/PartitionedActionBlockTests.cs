@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Threading.Tasks.Dataflow;
-using Xunit;
 
 namespace Squidex.Infrastructure.Tasks;
 

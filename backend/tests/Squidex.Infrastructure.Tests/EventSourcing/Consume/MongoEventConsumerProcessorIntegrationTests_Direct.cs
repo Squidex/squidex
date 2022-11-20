@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Xunit;
-
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 
 namespace Squidex.Infrastructure.EventSourcing.Consume;

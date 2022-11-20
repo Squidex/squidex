@@ -62,9 +62,9 @@ public static class StoreServices
         {
             ["MongoDB"] = () =>
             {
-                var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
-                var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
-                var mongoContentDatabaseName = config.GetOptionalValue("store:mongoDb:contentDatabase", mongoDatabaseName);
+                var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration")!;
+                var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database")!;
+                var mongoContentDatabaseName = config.GetOptionalValue("store:mongoDb:contentDatabase", mongoDatabaseName)!;
 
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(MongoSnapshotStore<>));
 

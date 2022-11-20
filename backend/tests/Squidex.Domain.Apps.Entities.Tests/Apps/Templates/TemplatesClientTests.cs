@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Microsoft.Extensions.Options;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates;
 
@@ -15,12 +13,19 @@ public class TemplatesClientTests
 {
     private readonly TemplatesClient sut;
 
+    private sealed class CustomHttpClient : HttpClient
+    {
+        protected override void Dispose(bool disposing)
+        {
+        }
+    }
+
     public TemplatesClientTests()
     {
         var httpClientFactory = A.Fake<IHttpClientFactory>();
 
-        A.CallTo(() => httpClientFactory.CreateClient(null))
-            .Returns(new HttpClient());
+        A.CallTo(() => httpClientFactory.CreateClient(A<string>._))
+            .Returns(new CustomHttpClient());
 
         sut = new TemplatesClient(httpClientFactory, Options.Create(new TemplatesOptions
         {

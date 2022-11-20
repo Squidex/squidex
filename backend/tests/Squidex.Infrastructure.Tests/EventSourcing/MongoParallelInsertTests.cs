@@ -5,12 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 
@@ -71,9 +69,9 @@ public sealed class MongoParallelInsertTests : IClassFixture<MongoEventStoreRepl
     {
         _ = fixture;
 
-        var typeNameRegistry = new TypeNameRegistry().Map(typeof(MyEvent), "My");
+        var typeRegistry = new TypeRegistry().Add<IEvent, MyEvent>("MyEvent");
 
-        eventFormatter = new DefaultEventFormatter(typeNameRegistry, TestUtils.DefaultSerializer);
+        eventFormatter = new DefaultEventFormatter(typeRegistry, TestUtils.DefaultSerializer);
     }
 
     [Fact]

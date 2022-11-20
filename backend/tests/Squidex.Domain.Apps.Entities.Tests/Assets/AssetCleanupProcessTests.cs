@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using tusdotnet.Interfaces;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 

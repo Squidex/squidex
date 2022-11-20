@@ -5,13 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FluentAssertions;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.Reflection;
-using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
 
@@ -49,13 +46,11 @@ public class RuleTests
         }
     }
 
-    [TypeName(nameof(TestAction1))]
     public sealed record TestAction1 : RuleAction
     {
         public string Property { get; set; }
     }
 
-    [TypeName(nameof(TestAction2))]
     public sealed record TestAction2 : RuleAction
     {
         public string Property { get; set; }

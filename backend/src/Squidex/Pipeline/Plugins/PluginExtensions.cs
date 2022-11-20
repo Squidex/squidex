@@ -35,16 +35,13 @@ public static class PluginExtensions
 
         var options = config.Get<PluginOptions>();
 
-        if (options.Plugins != null)
+        if (options?.Plugins != null)
         {
             foreach (var path in options.Plugins)
             {
                 var pluginAssembly = pluginManager.Load(path, SharedAssemblies);
 
-                if (pluginAssembly != null)
-                {
-                    pluginAssembly.AddParts(mvcBuilder);
-                }
+                pluginAssembly?.AddParts(mvcBuilder);
             }
         }
 

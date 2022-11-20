@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Globalization;
-using Xunit;
 
 namespace Squidex.Infrastructure.Translations;
 

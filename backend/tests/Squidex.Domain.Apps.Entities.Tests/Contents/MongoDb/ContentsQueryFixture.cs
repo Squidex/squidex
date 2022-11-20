@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Globalization;
-using FakeItEasy;
 using LoremNET;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -25,7 +24,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
-using Xunit;
 
 #pragma warning disable MA0048 // File name must match type name
 

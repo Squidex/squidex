@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using System.Globalization;
-using FluentAssertions;
-using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing;
 
@@ -417,7 +415,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
             await Task.Delay(1000);
         }
 
-        Assert.Empty(readEvents);
+        Assert.Empty(readEvents!);
     }
 
     [Fact]
@@ -450,7 +448,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
             await Task.Delay(1000);
         }
 
-        Assert.Empty(readEvents);
+        Assert.Empty(readEvents!);
     }
 
     private Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long position = EtagVersion.Any)

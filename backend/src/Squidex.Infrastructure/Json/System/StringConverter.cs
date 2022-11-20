@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -47,10 +48,7 @@ public sealed class StringConverter<T> : JsonConverter<T> where T : notnull
                 }
 
             case JsonTokenType.StartObject:
-                var optionsWithoutSelf = new JsonSerializerOptions(options);
-
-                // Remove the current converter, otherwise we would create a stackoverflow exception.
-                optionsWithoutSelf.Converters.Remove(this);
+                var optionsWithoutSelf = OptionClones.GetOptionsWithoutConverter(options, this);
 
                 return JsonSerializer.Deserialize<T>(ref reader, optionsWithoutSelf);
 
@@ -73,5 +71,32 @@ public sealed class StringConverter<T> : JsonConverter<T> where T : notnull
     public override void WriteAsPropertyName(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
     {
         writer.WritePropertyName(convertToString(value)!);
+    }
+}
+
+#pragma warning disable MA0048 // File name must match type name
+internal static class OptionClones
+#pragma warning restore MA0048 // File name must match type name
+{
+    private static readonly ConditionalWeakTable<JsonSerializerOptions, JsonSerializerOptions> Clones = new ConditionalWeakTable<JsonSerializerOptions, JsonSerializerOptions>();
+
+    public static JsonSerializerOptions GetOptionsWithoutConverter(JsonSerializerOptions source, JsonConverter converter)
+    {
+        if (!source.Converters.Contains(converter))
+        {
+            return source;
+        }
+
+        if (!Clones.TryGetValue(source, out var clone))
+        {
+            clone = new JsonSerializerOptions(source);
+
+            // Remove the current converter, otherwise we would create a stackoverflow exception.
+            clone.Converters.Remove(converter);
+
+            Clones.TryAdd(source, clone);
+        }
+
+        return clone;
     }
 }

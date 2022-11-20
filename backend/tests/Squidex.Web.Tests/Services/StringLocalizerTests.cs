@@ -7,7 +7,6 @@
 
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
-using Xunit;
 
 namespace Squidex.Web.Services;
 

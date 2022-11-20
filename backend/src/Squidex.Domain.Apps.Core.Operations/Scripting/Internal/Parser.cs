@@ -37,6 +37,6 @@ internal sealed class Parser
             var parser = new JavaScriptParser(script, DefaultParserOptions);
 
             return parser.ParseScript();
-        });
+        })!;
     }
 }

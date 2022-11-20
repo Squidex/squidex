@@ -13,7 +13,8 @@ using Migrations;
 using NetTopologySuite.IO.Converters;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
-using Squidex.Domain.Apps.Core;
+using Squidex.Areas.Api.Controllers.Rules.Models;
+using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Apps.Json;
 using Squidex.Domain.Apps.Core.Contents;
@@ -36,18 +37,21 @@ namespace Squidex.Config.Domain;
 
 public static class SerializationServices
 {
-    private static JsonSerializerOptions ConfigureJson(TypeNameRegistry typeNameRegistry, JsonSerializerOptions? options = null)
+    private static JsonSerializerOptions ConfigureJson(TypeRegistry typeRegistry, JsonSerializerOptions? options = null)
     {
         options ??= new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
-        options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         // It is also a readonly list, so we have to register it first, so that other converters do not pick this up.
         options.Converters.Add(new StringConverter<PropertyPath>(x => x));
+
+        options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         options.Converters.Add(new GeoJsonConverterFactory());
-        options.Converters.Add(new InheritanceConverter<IEvent>(typeNameRegistry));
-        options.Converters.Add(new InheritanceConverter<FieldProperties>(typeNameRegistry));
-        options.Converters.Add(new InheritanceConverter<RuleAction>(typeNameRegistry));
-        options.Converters.Add(new InheritanceConverter<RuleTrigger>(typeNameRegistry));
+        options.Converters.Add(new PolymorphicConverter<IEvent>(typeRegistry));
+        options.Converters.Add(new PolymorphicConverter<FieldProperties>(typeRegistry));
+        options.Converters.Add(new PolymorphicConverter<FieldPropertiesDto>(typeRegistry));
+        options.Converters.Add(new PolymorphicConverter<RuleAction>(typeRegistry));
+        options.Converters.Add(new PolymorphicConverter<RuleTrigger>(typeRegistry));
+        options.Converters.Add(new PolymorphicConverter<RuleTriggerDto>(typeRegistry));
         options.Converters.Add(new JsonValueConverter());
         options.Converters.Add(new ReadonlyDictionaryConverterFactory());
         options.Converters.Add(new ReadonlyListConverterFactory());
@@ -71,6 +75,7 @@ public static class SerializationServices
         options.Converters.Add(new StringConverter<RefToken>());
         options.Converters.Add(new StringConverter<Status>());
         options.Converters.Add(new JsonStringEnumConverter());
+        options.TypeInfoResolver = new PolymorphicTypeResolver(typeRegistry);
         options.IncludeFields = true;
 
         return options;
@@ -78,17 +83,17 @@ public static class SerializationServices
 
     public static IServiceCollection AddSquidexSerializers(this IServiceCollection services)
     {
-        services.AddSingletonAs<AutoAssembyTypeProvider<SquidexCoreModel>>()
-            .As<ITypeProvider>();
+        services.AddSingleton<ITypeProvider>(
+            new AssemblyTypeProvider<IEvent>(SquidexEvents.Assembly));
 
-        services.AddSingletonAs<AutoAssembyTypeProvider<SquidexEvents>>()
-            .As<ITypeProvider>();
+        services.AddSingleton<ITypeProvider>(
+            new AssemblyTypeProvider<IEvent>(SquidexMigrations.Assembly));
 
-        services.AddSingletonAs<AutoAssembyTypeProvider<SquidexInfrastructure>>()
-            .As<ITypeProvider>();
+        services.AddSingleton<ITypeProvider>(
+            new AssemblyTypeProvider<FieldPropertiesDto>("fieldType"));
 
-        services.AddSingletonAs<AutoAssembyTypeProvider<SquidexMigrations>>()
-            .As<ITypeProvider>();
+        services.AddSingleton<ITypeProvider>(
+            new AssemblyTypeProvider<RuleTriggerDto>("triggerType"));
 
         services.AddSingletonAs<FieldTypeProvider>()
             .As<ITypeProvider>();
@@ -96,15 +101,15 @@ public static class SerializationServices
         services.AddSingletonAs<SystemJsonSerializer>()
             .As<IJsonSerializer>();
 
-        services.AddSingletonAs<TypeNameRegistry>()
+        services.AddSingletonAs<TypeRegistry>()
             .AsSelf();
 
-        services.AddSingletonAs(c => ConfigureJson(c.GetRequiredService<TypeNameRegistry>()))
+        services.AddSingletonAs(c => ConfigureJson(c.GetRequiredService<TypeRegistry>()))
             .As<JsonSerializerOptions>();
 
         services.Configure<JsonSerializerOptions>((c, options) =>
         {
-            ConfigureJson(c.GetRequiredService<TypeNameRegistry>(), options);
+            ConfigureJson(c.GetRequiredService<TypeRegistry>(), options);
         });
 
         return services;
@@ -114,7 +119,7 @@ public static class SerializationServices
     {
         builder.Services.Configure<JsonOptions>((c, options) =>
         {
-            ConfigureJson(c.GetRequiredService<TypeNameRegistry>(), options.JsonSerializerOptions);
+            ConfigureJson(c.GetRequiredService<TypeRegistry>(), options.JsonSerializerOptions);
 
             // Do not write null values.
             options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;

@@ -5,12 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Json;
-using Xunit;
 
 namespace Squidex.Infrastructure.Commands;
 
@@ -60,7 +58,7 @@ public class DefaultDomainObjectCacheTests
     [Fact]
     public async Task Should_provide_from_cache_if_found()
     {
-        object returned;
+        object? returned;
 
         A.CallTo(() => cache.TryGetValue($"{id}_10", out returned))
             .Returns(true)

@@ -37,7 +37,7 @@ public sealed class RecursiveDeleter : IEventConsumer
         ICommandBus commandBus,
         IAssetRepository assetRepository,
         IAssetFolderRepository assetFolderRepository,
-        TypeNameRegistry typeNameRegistry,
+        TypeRegistry typeRegistry,
         ILogger<RecursiveDeleter> log)
     {
         this.commandBus = commandBus;
@@ -49,7 +49,7 @@ public sealed class RecursiveDeleter : IEventConsumer
         // Compute the event types names once for performance reasons and use hashset for extensibility.
         consumingTypes = new HashSet<string>
         {
-            typeNameRegistry.GetName<AssetFolderDeleted>()
+            typeRegistry.GetName<IEvent, AssetFolderDeleted>()
         };
     }
 

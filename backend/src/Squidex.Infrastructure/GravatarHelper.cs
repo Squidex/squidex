@@ -29,19 +29,16 @@ public static class GravatarHelper
 
     private static string Hash(string email)
     {
-        using (var md5 = MD5.Create())
+        var normalizedEmail = email.ToLowerInvariant().Trim();
+
+        var hashBytes = MD5.HashData(Encoding.UTF8.GetBytes(normalizedEmail));
+        var hashBuilder = new StringBuilder();
+
+        for (var i = 0; i < hashBytes.Length; i++)
         {
-            var normalizedEmail = email.ToLowerInvariant().Trim();
-
-            var hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(normalizedEmail));
-            var hashBuilder = new StringBuilder();
-
-            for (var i = 0; i < hashBytes.Length; i++)
-            {
-                hashBuilder.Append(hashBytes[i].ToString("x2", CultureInfo.InvariantCulture));
-            }
-
-            return hashBuilder.ToString();
+            hashBuilder.Append(hashBytes[i].ToString("x2", CultureInfo.InvariantCulture));
         }
+
+        return hashBuilder.ToString();
     }
 }

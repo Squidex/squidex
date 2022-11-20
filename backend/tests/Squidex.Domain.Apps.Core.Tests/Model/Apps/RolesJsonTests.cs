@@ -5,12 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Apps;
 

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using NodaTime;
-using Xunit;
 
 namespace Squidex.Infrastructure;
 

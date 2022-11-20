@@ -87,18 +87,24 @@ public sealed class MongoUser : IdentityUser
         claims.Foreach(RemoveClaim);
     }
 
-    internal void ReplaceClaim(Claim existingClaim, Claim newClaim)
+    internal void ReplaceClaim(Claim existingClaim, Claim? newClaim)
     {
         RemoveClaim(existingClaim);
 
-        AddClaim(newClaim);
+        if (newClaim != null)
+        {
+            AddClaim(newClaim);
+        }
     }
 
-    internal void ReplaceToken(string provider, string name, string value)
+    internal void ReplaceToken(string provider, string name, string? value)
     {
         RemoveToken(provider, name);
 
-        AddToken(provider, name, value);
+        if (value != null)
+        {
+            AddToken(provider, name, value);
+        }
     }
 }
 

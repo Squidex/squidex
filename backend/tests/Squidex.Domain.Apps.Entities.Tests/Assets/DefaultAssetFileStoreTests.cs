@@ -6,13 +6,11 @@
 // ==========================================================================
 
 using System.Globalization;
-using FakeItEasy;
 using Microsoft.Extensions.Options;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 

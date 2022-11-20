@@ -111,6 +111,6 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
             entry.AbsoluteExpirationRelativeToNow = cacheDuration;
 
             return appProvider.GetRulesAsync(appId);
-        });
+        })!;
     }
 }

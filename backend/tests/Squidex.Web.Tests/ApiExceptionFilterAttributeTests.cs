@@ -7,7 +7,6 @@
 
 using System.Security;
 using System.Text;
-using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -16,7 +15,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
-using Xunit;
 
 #pragma warning disable MA0015 // Specify the parameter name in ArgumentException
 

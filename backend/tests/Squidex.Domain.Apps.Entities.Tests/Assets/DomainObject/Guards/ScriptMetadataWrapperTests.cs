@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure.Json.Objects;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
 

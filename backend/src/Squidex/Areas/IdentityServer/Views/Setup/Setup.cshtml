@@ -6,11 +6,11 @@
 void RenderValidation(string field)
 {
     @if (ViewContext.ViewData.ModelState[field]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
-    {
-        <div class="errors-container">
+{
+    <div class="errors-container">
                 <span class="errors">@Html.ValidationMessage(field)</span>
             </div>
-    }
+}
 }
 
 void RenderRuleAsSuccess(string message)
@@ -78,48 +78,48 @@ void RenderRuleAsWarning(string message)
 
     @if (Model!.IsValidHttps)
 {
-    RenderRuleAsSuccess(T.Get("setup.ruleHttps.success"));
+RenderRuleAsSuccess(T.Get("setup.ruleHttps.success"));
 }
 else
 {
-    RenderRuleAsCritical(T.Get("setup.ruleHttps.failure"));
+RenderRuleAsCritical(T.Get("setup.ruleHttps.failure"));
 }
 
     @if (Model!.BaseUrlConfigured == Model!.BaseUrlCurrent)
 {
-    RenderRuleAsSuccess(T.Get("setup.ruleUrl.success"));
+RenderRuleAsSuccess(T.Get("setup.ruleUrl.success"));
 }
 else
 {
-    RenderRuleAsCritical(T.Get("setup.ruleUrl.failure", new { actual = Model!.BaseUrlCurrent, configured = Model!.BaseUrlConfigured }));
+RenderRuleAsCritical(T.Get("setup.ruleUrl.failure", new { actual = Model!.BaseUrlCurrent, configured = Model!.BaseUrlConfigured }));
 }
 
     @if (Model!.EverybodyCanCreateApps)
 {
-    RenderRuleAsWarning(T.Get("setup.ruleAppCreation.warningAdmins"));
+RenderRuleAsWarning(T.Get("setup.ruleAppCreation.warningAdmins"));
 }
 else
 {
-    RenderRuleAsWarning(T.Get("setup.ruleAppCreation.warningAll"));
+RenderRuleAsWarning(T.Get("setup.ruleAppCreation.warningAll"));
 }
 
     @if (Model!.EverybodyCanCreateTeams)
 {
-    RenderRuleAsWarning(T.Get("setup.ruleTeamCreation.warningAdmins"));
+RenderRuleAsWarning(T.Get("setup.ruleTeamCreation.warningAdmins"));
 }
 else
 {
-    RenderRuleAsWarning(T.Get("setup.ruleTeamCreation.warningAll"));
+RenderRuleAsWarning(T.Get("setup.ruleTeamCreation.warningAll"));
 }
 
     @if (Model!.IsAssetStoreFtp)
 {
-    RenderRuleAsWarning(T.Get("setup.ruleFtp.warning"));
+RenderRuleAsWarning(T.Get("setup.ruleFtp.warning"));
 }
 
     @if (Model!.IsAssetStoreFile)
 {
-    RenderRuleAsWarning(T.Get("setup.ruleFolder.warning"));
+RenderRuleAsWarning(T.Get("setup.ruleFolder.warning"));
 }
 </div>
 
@@ -153,11 +153,11 @@ else
     <h3>@T.Get("setup.createUser.headlineCreate")</h3>
 
     @if (!string.IsNullOrWhiteSpace(Model!.ErrorMessage))
-    {
-        <div class="form-alert form-alert-error">
+{
+    <div class="form-alert form-alert-error">
                 @Model!.ErrorMessage
             </div>
-    }
+}
 
     <form class="profile-form" asp-controller="Setup" asp-action="Setup" method="post">
             <div class="form-group">

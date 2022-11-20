@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 namespace Squidex.Infrastructure.Json.System;
 
-public class JsonInheritanceConverterBaseTests
+public class PolymorphicConverterTests
 {
     private record Base;
 
@@ -22,24 +22,6 @@ public class JsonInheritanceConverterBaseTests
     private record B : Base
     {
         public int PropertyB { get; init; }
-    }
-
-    private sealed class Converter : InheritanceConverterBase<Base>
-    {
-        public Converter()
-            : base("$type")
-        {
-        }
-
-        public override Type GetDiscriminatorType(string name, Type typeToConvert)
-        {
-            return name == "A" ? typeof(A) : typeof(B);
-        }
-
-        public override string GetDiscriminatorValue(Type type)
-        {
-            return type == typeof(A) ? "A" : "B";
-        }
     }
 
     [Fact]
@@ -64,6 +46,23 @@ public class JsonInheritanceConverterBaseTests
 
         var source = new Dictionary<string, object>
         {
+            ["$baseType"] = "A",
+            ["propertyA"] = 42,
+            ["propertyOther"] = 44
+        };
+
+        var serialized = serializer.Deserialize<Base>(serializer.Serialize(source));
+
+        Assert.Equal(new A { PropertyA = 42 }, serialized);
+    }
+
+    [Fact]
+    public void Should_deserialize_when_discriminiator_is_default()
+    {
+        var serializer = CreateSerializer();
+
+        var source = new Dictionary<string, object>
+        {
             ["$type"] = "A",
             ["propertyA"] = 42,
             ["propertyOther"] = 44
@@ -83,7 +82,7 @@ public class JsonInheritanceConverterBaseTests
         {
             ["propertyB"] = 42,
             ["propertyOther"] = 44,
-            ["$type"] = "B"
+            ["$baseType"] = "B"
         };
 
         var serialized = serializer.Deserialize<Base>(serializer.Serialize(source));
@@ -95,7 +94,14 @@ public class JsonInheritanceConverterBaseTests
     {
         return TestUtils.CreateSerializer(options =>
         {
-            options.Converters.Add(new Converter());
+            var typeRegistry =
+                new TypeRegistry()
+                    .Discriminator<Base>("$baseType")
+                    .Add<Base, A>("A")
+                    .Add<Base, B>("B");
+
+            options.TypeInfoResolver = new PolymorphicTypeResolver(typeRegistry);
+            options.Converters.Add(new PolymorphicConverter<Base>(typeRegistry));
         });
     }
 }

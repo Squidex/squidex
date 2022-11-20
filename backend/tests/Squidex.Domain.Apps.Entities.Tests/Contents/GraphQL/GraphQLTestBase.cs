@@ -8,7 +8,6 @@
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Text.RegularExpressions;
-using FakeItEasy;
 using GraphQL;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
@@ -28,7 +27,6 @@ using Squidex.Infrastructure.Tasks;
 using Squidex.Messaging.Subscriptions;
 using Squidex.Shared;
 using Squidex.Shared.Users;
-using Xunit;
 
 #pragma warning disable SA1401 // Fields must be private
 

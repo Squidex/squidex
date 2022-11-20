@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Concurrent;
-using Xunit;
 
 namespace Squidex.Infrastructure.Tasks;
 

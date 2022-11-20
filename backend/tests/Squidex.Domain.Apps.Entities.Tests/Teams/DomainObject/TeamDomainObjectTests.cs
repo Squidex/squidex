@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
@@ -16,7 +15,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Teams;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Teams.DomainObject;
 

@@ -62,13 +62,13 @@ public sealed class MongoRoleStore : MongoRepositoryBase<IdentityRole>, IRoleSto
     {
     }
 
-    public async Task<IdentityRole> FindByIdAsync(string roleId,
+    public async Task<IdentityRole?> FindByIdAsync(string roleId,
         CancellationToken cancellationToken)
     {
         return await Collection.Find(x => x.Id == roleId).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<IdentityRole> FindByNameAsync(string normalizedRoleName,
+    public async Task<IdentityRole?> FindByNameAsync(string normalizedRoleName,
         CancellationToken cancellationToken)
     {
         return await Collection.Find(x => x.NormalizedName == normalizedRoleName).FirstOrDefaultAsync(cancellationToken);
@@ -104,19 +104,19 @@ public sealed class MongoRoleStore : MongoRepositoryBase<IdentityRole>, IRoleSto
         return Task.FromResult(role.Id);
     }
 
-    public Task<string> GetRoleNameAsync(IdentityRole role,
+    public Task<string?> GetRoleNameAsync(IdentityRole role,
         CancellationToken cancellationToken)
     {
         return Task.FromResult(role.Name);
     }
 
-    public Task<string> GetNormalizedRoleNameAsync(IdentityRole role,
+    public Task<string?> GetNormalizedRoleNameAsync(IdentityRole role,
         CancellationToken cancellationToken)
     {
         return Task.FromResult(role.NormalizedName);
     }
 
-    public Task SetRoleNameAsync(IdentityRole role, string roleName,
+    public Task SetRoleNameAsync(IdentityRole role, string? roleName,
         CancellationToken cancellationToken)
     {
         role.Name = roleName;
@@ -124,7 +124,7 @@ public sealed class MongoRoleStore : MongoRepositoryBase<IdentityRole>, IRoleSto
         return Task.CompletedTask;
     }
 
-    public Task SetNormalizedRoleNameAsync(IdentityRole role, string normalizedName,
+    public Task SetNormalizedRoleNameAsync(IdentityRole role, string? normalizedName,
         CancellationToken cancellationToken)
     {
         role.NormalizedName = normalizedName;

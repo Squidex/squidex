@@ -6,11 +6,9 @@
 // ==========================================================================
 
 using System.Globalization;
-using FakeItEasy;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
@@ -130,7 +128,7 @@ public class DefaultAppLogStoreTests
 
         using (var reader = new StreamReader(stream))
         {
-            while (await reader.ReadLineAsync() != null)
+            while (await reader.ReadLineAsync(default) != null)
             {
                 lines++;
             }

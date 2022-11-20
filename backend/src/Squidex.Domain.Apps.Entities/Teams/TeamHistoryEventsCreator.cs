@@ -14,8 +14,8 @@ namespace Squidex.Domain.Teams.Entities.Teams;
 
 public sealed class TeamHistoryEventsCreator : HistoryEventsCreatorBase
 {
-    public TeamHistoryEventsCreator(TypeNameRegistry typeNameRegistry)
-        : base(typeNameRegistry)
+    public TeamHistoryEventsCreator(TypeRegistry typeRegistry)
+        : base(typeRegistry)
     {
         AddEventMessage<TeamCreated>(
             "history.teams.created");

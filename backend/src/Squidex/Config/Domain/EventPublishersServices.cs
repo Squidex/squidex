@@ -29,7 +29,7 @@ public static class EventPublishersServices
                 throw new ConfigurationException(error);
             }
 
-            var eventsFilter = child.GetValue<string>("eventsFilter");
+            var eventsFilter = child.GetValue<string>("eventsFilter") ?? string.Empty;
 
             var enabled = child.GetValue<bool>("enabled");
 

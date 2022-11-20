@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Caching;
@@ -19,7 +18,6 @@ using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.TestHelpers;
 using Squidex.Infrastructure.Validation;
 using Squidex.Messaging;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes;
 

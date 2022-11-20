@@ -6,13 +6,11 @@
 // ==========================================================================
 
 using System.Security.Cryptography;
-using FakeItEasy;
 using IdentityModel;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Server;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
-using Xunit;
 
 namespace Squidex.Domain.Users;
 

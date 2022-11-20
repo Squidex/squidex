@@ -67,7 +67,7 @@ public sealed class CachingUsageTracker : IUsageTracker
             entry.AbsoluteExpirationRelativeToNow = CacheDuration;
 
             return inner.GetForMonthAsync(key, date, category, ct);
-        });
+        })!;
     }
 
     public Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate, string? category,
@@ -82,6 +82,6 @@ public sealed class CachingUsageTracker : IUsageTracker
             entry.AbsoluteExpirationRelativeToNow = CacheDuration;
 
             return inner.GetAsync(key, fromDate, toDate, category, ct);
-        });
+        })!;
     }
 }

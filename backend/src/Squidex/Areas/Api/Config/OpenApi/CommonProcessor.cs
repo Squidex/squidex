@@ -16,13 +16,8 @@ namespace Squidex.Areas.Api.Config.OpenApi;
 public sealed class CommonProcessor : IDocumentProcessor
 {
     private readonly string version;
-    private readonly string logoBackground = "#3f83df";
+    private readonly string logoColor = "#3f83df";
     private readonly string logoUrl;
-
-    private readonly OpenApiExternalDocumentation documentation = new OpenApiExternalDocumentation
-    {
-        Url = "https://docs.squidex.io"
-    };
 
     public CommonProcessor(ExposedValues exposedValues, IUrlGenerator urlGenerator)
     {
@@ -36,6 +31,7 @@ public sealed class CommonProcessor : IDocumentProcessor
 
     public void Process(DocumentProcessorContext context)
     {
+        context.Document.Info.Title = "Squidex API";
         context.Document.Info.Version = version;
         context.Document.Info.ExtensionData = new Dictionary<string, object>
         {
@@ -43,10 +39,13 @@ public sealed class CommonProcessor : IDocumentProcessor
             {
                 url = logoUrl,
                 backgroundStyle = string.Empty,
-                backgroundColor = logoBackground
+                backgroundColor = logoColor
             }
         };
 
-        context.Document.ExternalDocumentation = documentation;
+        context.Document.ExternalDocumentation = new OpenApiExternalDocumentation
+        {
+            Url = "https://docs.squidex.io"
+        };
     }
 }

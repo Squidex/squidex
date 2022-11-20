@@ -8,7 +8,6 @@
 using System.Security.Claims;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
-using Xunit;
 
 namespace Squidex.Web.Pipeline;
 

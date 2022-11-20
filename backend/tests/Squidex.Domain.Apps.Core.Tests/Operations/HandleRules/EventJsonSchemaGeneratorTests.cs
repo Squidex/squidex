@@ -8,7 +8,6 @@
 using NJsonSchema.Generation;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules;
 

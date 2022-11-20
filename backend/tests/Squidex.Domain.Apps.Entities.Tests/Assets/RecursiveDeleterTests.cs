@@ -5,16 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Microsoft.Extensions.Logging;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Reflection;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
@@ -29,9 +27,7 @@ public class RecursiveDeleterTests
 
     public RecursiveDeleterTests()
     {
-        var typeNameRegistry = new TypeNameRegistry().Map(typeof(AssetFolderDeleted));
-
-        sut = new RecursiveDeleter(commandBus, assetRepository, assetFolderRepository, typeNameRegistry, log);
+        sut = new RecursiveDeleter(commandBus, assetRepository, assetFolderRepository, TestUtils.TypeRegistry, log);
     }
 
     [Fact]

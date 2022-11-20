@@ -34,14 +34,11 @@ public static class RandomHash
 
     public static string ToSha256Base64(this byte[] bytes)
     {
-        using (var sha = SHA256.Create())
-        {
-            var bytesHash = sha.ComputeHash(bytes);
+        var hashBytes = SHA256.HashData(bytes);
 
-            var result = Convert.ToBase64String(bytesHash);
+        var result = Convert.ToBase64String(hashBytes);
 
-            return result;
-        }
+        return result;
     }
 
     public static string ToSha256(this string value)

@@ -5,12 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Reflection;
+using System.Text.Json;
 
-public sealed class AutoAssembyTypeProvider<T> : ITypeProvider
+namespace Squidex.Infrastructure.Json.System;
+
+internal sealed class Constants
 {
-    public void Map(TypeNameRegistry typeNameRegistry)
-    {
-        typeNameRegistry.MapUnmapped(typeof(T).Assembly);
-    }
+    public const string DefaultDiscriminatorProperty = "$type";
+
+    public static readonly JsonEncodedText DefaultDiscriminiatorPropertyJson = JsonEncodedText.Encode("$type");
 }

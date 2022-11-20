@@ -30,7 +30,7 @@ public sealed class AppPermanentDeleter : IEventConsumer
         get => "^app-";
     }
 
-    public AppPermanentDeleter(IEnumerable<IDeleter> deleters, IDomainObjectFactory factory, TypeNameRegistry typeNameRegistry)
+    public AppPermanentDeleter(IEnumerable<IDeleter> deleters, IDomainObjectFactory factory, TypeRegistry typeRegistry)
     {
         this.deleters = deleters.OrderBy(x => x.Order).ToList();
         this.factory = factory;
@@ -38,8 +38,8 @@ public sealed class AppPermanentDeleter : IEventConsumer
         // Compute the event types names once for performance reasons and use hashset for extensibility.
         consumingTypes = new HashSet<string>
         {
-            typeNameRegistry.GetName<AppDeleted>(),
-            typeNameRegistry.GetName<AppContributorRemoved>()
+            typeRegistry.GetName<IEvent, AppDeleted>(),
+            typeRegistry.GetName<IEvent, AppContributorRemoved>()
         };
     }
 

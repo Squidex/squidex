@@ -29,12 +29,10 @@ public sealed class PingController : ApiController
     /// <summary>
     /// Get API information.
     /// </summary>
-    /// <returns>
-    /// 200 => Infos returned.
-    /// </returns>
+    /// <response code="200">Infos returned.</response>.
     [HttpGet]
-    [ProducesResponseType(typeof(ExposedValues), StatusCodes.Status200OK)]
     [Route("info/")]
+    [ProducesResponseType(typeof(ExposedValues), StatusCodes.Status200OK)]
     public IActionResult GetInfo()
     {
         return Ok(exposedValues);
@@ -43,14 +41,13 @@ public sealed class PingController : ApiController
     /// <summary>
     /// Get ping status of the API.
     /// </summary>
-    /// <returns>
-    /// 204 => Service ping successful.
-    /// </returns>
+    /// <response code="204">Service ping successful.</response>.
     /// <remarks>
     /// Can be used to test, if the Squidex API is alive and responding.
     /// </remarks>
     [HttpGet]
     [Route("ping/")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public IActionResult GetPing()
     {
         return NoContent();
@@ -60,14 +57,13 @@ public sealed class PingController : ApiController
     /// Get ping status.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <returns>
-    /// 204 => Service ping successful.
-    /// </returns>
+    /// <response code="204">Service ping successful.</response>.
     /// <remarks>
     /// Can be used to test, if the Squidex API is alive and responding.
     /// </remarks>
     [HttpGet]
     [Route("ping/{app}/")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppPing)]
     [ApiCosts(0)]
     public IActionResult GetAppPing(string app)

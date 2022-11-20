@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Teams;
@@ -13,7 +12,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
-using Xunit;
 using AssignAppContributor = Squidex.Domain.Apps.Entities.Apps.Commands.AssignContributor;
 using AssignTeamContributor = Squidex.Domain.Apps.Entities.Teams.Commands.AssignContributor;
 

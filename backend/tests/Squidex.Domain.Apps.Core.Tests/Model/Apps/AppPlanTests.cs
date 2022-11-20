@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Apps;
 

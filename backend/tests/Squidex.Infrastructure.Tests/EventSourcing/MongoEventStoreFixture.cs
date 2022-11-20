@@ -5,11 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
 #pragma warning disable MA0048 // File name must match type name
 
@@ -47,7 +45,7 @@ public abstract class MongoEventStoreFixture : IAsyncLifetime
 public sealed class MongoEventStoreDirectFixture : MongoEventStoreFixture
 {
     public MongoEventStoreDirectFixture()
-        : base(TestConfig.Configuration["mongodb:configuration"])
+        : base(TestConfig.Configuration["mongodb:configuration"]!)
     {
     }
 }
@@ -55,7 +53,7 @@ public sealed class MongoEventStoreDirectFixture : MongoEventStoreFixture
 public sealed class MongoEventStoreReplicaSetFixture : MongoEventStoreFixture
 {
     public MongoEventStoreReplicaSetFixture()
-        : base(TestConfig.Configuration["mongodb:configurationReplica"])
+        : base(TestConfig.Configuration["mongodb:configurationReplica"]!)
     {
     }
 }

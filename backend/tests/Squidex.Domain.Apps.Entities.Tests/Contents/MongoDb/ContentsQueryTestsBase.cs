@@ -10,7 +10,6 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
-using Xunit;
 using F = Squidex.Infrastructure.Queries.ClrFilter;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
