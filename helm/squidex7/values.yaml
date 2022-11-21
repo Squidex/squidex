@@ -256,25 +256,38 @@ mongodb:
   ##
   replicaCount: 3
   
-  ## @param podSecurityContext - object - optional
-  ## You can modify the security context used to run PODS in the cluster
-  ## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
-  ## An example that follows the Restricted profile is described below:
-  #
-  # podSecurityContext: { }
+  ## MongoDB(&reg;) pods' Security Context.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param podSecurityContext.enabled Enable MongoDB(&reg;) pod(s)' Security Context
+  ## @param podSecurityContext.fsGroup Group ID for the volumes of the MongoDB(&reg;) pod(s)
+  ## @param podSecurityContext.sysctls sysctl settings of the MongoDB(&reg;) pod(s)'
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroup: 1001
+    ## sysctl settings
+    ## Example:
+    ## sysctls:
+    ## - name: net.core.somaxconn
+    ##   value: "10000"
+    ##
+    sysctls: [ ]
   # seccompProfile:
   #   type: RuntimeDefault
   # runAsNonRoot: true
   # runAsUser: 10000
   # runAsGroup: 10000
-  # fsGroup: 10000
 
-  ## @param containerSecurityContext - object - optional
-  ## You can modify the security context used to run CONTAINERS in the cluster
-  ## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
-  ## An example that follows the Restricted profile is described below:
-  #
-  # containerSecurityContext: { }
+  ## MongoDB(&reg;) containers' Security Context (main and metrics container).
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param containerSecurityContext.enabled Enable MongoDB(&reg;) container(s)' Security Context
+  ## @param containerSecurityContext.runAsUser User ID for the MongoDB(&reg;) container
+  ## @param containerSecurityContext.runAsNonRoot Set MongoDB(&reg;) container's Security Context runAsNonRoot
+  ##
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 1001
+    runAsNonRoot: true
   # allowPrivilegeEscalation: false
   # capabilities:
   #   drop:
