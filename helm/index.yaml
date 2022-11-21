@@ -5,10 +5,10 @@ entries:
     appVersion: 5.9.0
     created: "2022-08-10T10:38:40.2985659+02:00"
     dependencies:
-    - condition: mongodb-replicaset.enabled
-      name: mongodb-replicaset
-      repository: https://charts.helm.sh/stable
-      version: 3.9.6
+    - condition: mongodb.enabled
+      name: mongodb
+      repository: https://charts.bitnami.com/bitnami
+      version: 13.4.4
     description: Squidex CMS
     digest: 566b4d063d2717e00fc04b35bf594869dc9e5398bb08da13b542a5497dd4dc19
     home: https://squidex.io/
@@ -31,10 +31,10 @@ entries:
     appVersion: 7.0.2
     created: "2022-08-10T10:38:40.2995659+02:00"
     dependencies:
-    - condition: mongodb-replicaset.enabled
-      name: mongodb-replicaset
-      repository: https://charts.helm.sh/stable
-      version: 3.9.6
+    - condition: mongodb.enabled
+      name: mongodb
+      repository: https://charts.bitnami.com/bitnami
+      version: 13.4.4
     description: Squidex CMS v7.0 and newer
     digest: 9cc4c40f4a5825a33835fa8f0fc4c40389f2da96b247a9425dd999b90ee1457f
     home: https://squidex.io/

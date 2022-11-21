@@ -251,20 +251,23 @@ env:
   ASPNETCORE_URLS: http://+:10080
 
 ## @section MongoDB parameters
-mongodb-replicaset:
-  ## @param mongodb-replicaset.enabled Uses the custom mongoDB instance.
+mongodb:
+  ## @param mongodb.enabled Uses the custom mongoDB instance.
   ##
   enabled: true
-  ## @param mongodb-replicaset.replicas The number of replicas.
+
+  architecture: replicaset
+
+  ## @param mongodb.replicas The number of replicas.
   ##
-  replicas: 3
+  replicaCount: 3
   
   ## @param podSecurityContext - object - optional
   ## You can modify the security context used to run PODS in the cluster
   ## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
   ## An example that follows the Restricted profile is described below:
   #
-  podSecurityContext: { }
+  # podSecurityContext: { }
   # seccompProfile:
   #   type: RuntimeDefault
   # runAsNonRoot: true
@@ -277,7 +280,7 @@ mongodb-replicaset:
   ## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
   ## An example that follows the Restricted profile is described below:
   #
-  containerSecurityContext: { }
+  # containerSecurityContext: { }
   # allowPrivilegeEscalation: false
   # capabilities:
   #   drop:
@@ -285,7 +288,7 @@ mongodb-replicaset:
   #   add:
   #     - NET_BIND_SERVICE
 
-  ## @skip mongodb-replicaset.auth
+  ## @skip mongodb.auth
   auth:
     enabled: false
     existingKeySecret: ""
@@ -298,11 +301,11 @@ mongodb-replicaset:
     # key: keycontent
   
   persistentVolume:
-    ## @param mongodb-replicaset.persistentVolume.enabled If true, persistent volume claims are created.
+    ## @param mongodb.persistentVolume.enabled If true, persistent volume claims are created.
     ##
     enabled: true
-    ## @param mongodb-replicaset.persistentVolume.storageClass Persistent volume storage class.
-    ## mongodb-replicaset data Persistent Volume Storage Class
+    ## @param mongodb.persistentVolume.storageClass Persistent volume storage class.
+    ## mongodb data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
     ## If undefined (the default) or set to null, no storageClassName spec is
@@ -311,13 +314,13 @@ mongodb-replicaset:
     ##
     ##
     storageClass: ""
-    ## @param mongodb-replicaset.persistentVolume.accessModes Persistent volume access modes.
+    ## @param mongodb.persistentVolume.accessModes Persistent volume access modes.
     ##
     accessModes:
       - ReadWriteOnce
-    ## @param mongodb-replicaset.persistentVolume.size Persistent volume size.
+    ## @param mongodb.persistentVolume.size Persistent volume size.
     ##
     size: 10Gi
   
-  ## @skip mongodb-replicaset.nodeSelector
+  ## @skip mongodb.nodeSelector
   nodeSelector: {}
