@@ -266,7 +266,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public orderFields(schema: SchemaDto, fields: ReadonlyArray<any>, parent?: RootFieldDto): Observable<SchemaDto> {
+    public orderFields(schema: SchemaDto, fields: ReadonlyArray<FieldDto>, parent?: RootFieldDto): Observable<SchemaDto> {
         return this.schemasService.putFieldOrdering(this.appName, parent || schema, fields.map(t => t.fieldId), schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');

@@ -14,14 +14,23 @@ $padding: 1rem;
 }
 
 .table-items-row-summary {
-    padding-left: 3rem;
-    padding-right: 1.25rem;
-    position: relative;
+    padding-left: .75rem;
 }
 
-.drag-container {
-    @include absolute(1.6rem, auto, auto, .75rem);
-    line-height: 1px;
+.plain {
+    background: none;
+    border: 0;
+    border-radius: 0;
+
+    .table-items-row-details {
+        background: $color-white;
+        border: 1px solid $color-border;
+        border-radius: $border-radius;
+    }
+
+    .btn-expand.expanded::before {
+        border-bottom-color: $color-border !important;
+    }
 }
 
 .col {
@@ -39,27 +48,29 @@ $padding: 1rem;
     position: relative;
 }
 
-.nested-field {
-    position: relative;
-
-    &-add {
-        border: 2px dashed $field-line;
-        padding: 1rem;
+:host ::ng-deep {
+    .nested-field {
         position: relative;
-    }
 
-    &-line-v {
-        @include absolute($padding, auto, 3 * $padding + .25rem, $padding);
-        border: 0;
-        border-left: 2px dashed $field-line;
-        width: 2px;
-    }
+        &-add {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            position: relative;
+        }
 
-    &-line-h {
-        @include absolute(-2px, auto, 50%, -$padding);
-        border: 0;
-        border-bottom: 2px dashed $field-line;
-        width: $padding - .25rem;
+        &-line-v {
+            @include absolute($padding, auto, 3 * $padding + .25rem, $padding);
+            border: 0;
+            border-left: 2px dashed $field-line;
+            width: 2px;
+        }
+
+        &-line-h {
+            @include absolute(-2px, auto, 50%, -$padding);
+            border: 0;
+            border-bottom: 2px dashed $field-line;
+            width: $padding - .25rem;
+        }
     }
 }
 

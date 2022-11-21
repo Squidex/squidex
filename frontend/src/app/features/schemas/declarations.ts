@@ -7,6 +7,7 @@
 
 export * from './pages/schema/common/schema-edit-form.component';
 export * from './pages/schema/export/schema-export-form.component';
+export * from './pages/schema/fields/field-group.component';
 export * from './pages/schema/fields/field-wizard.component';
 export * from './pages/schema/fields/field.component';
 export * from './pages/schema/fields/forms/field-form-common.component';
@@ -14,6 +15,7 @@ export * from './pages/schema/fields/forms/field-form-ui.component';
 export * from './pages/schema/fields/forms/field-form-validation.component';
 export * from './pages/schema/fields/forms/field-form.component';
 export * from './pages/schema/fields/schema-fields.component';
+export * from './pages/schema/fields/sortable-field-list.component';
 export * from './pages/schema/fields/types/array-validation.component';
 export * from './pages/schema/fields/types/assets-ui.component';
 export * from './pages/schema/fields/types/assets-validation.component';

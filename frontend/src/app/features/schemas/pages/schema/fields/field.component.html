@@ -1,13 +1,12 @@
-<div class="table-items-row table-items-row-expandable field"> 
+<div class="table-items-row table-items-row-expandable field" [class.plain]="plain"> 
     <div class="table-items-row-summary">
-        <span class="drag-container">
-            <ng-content></ng-content>
-        </span>  
-
         <div class="row align-items-center">
-            <div class="col-6">
+            <div class="col col-auto">
+                <ng-content></ng-content>
+            </div>
+            <div class="col">
                 <span class="field-name">
-                    <i class="field-icon icon-type-{{field.properties.fieldType}}"></i> 
+                    <i *ngIf="!plain" class="field-icon icon-type-{{field.properties.fieldType}}"></i> 
 
                     <ng-container *ngIf="field.isHidden else visible">
                         <span class="field-hidden" title="i18n:schemas.field.hiddenMarker">{{field.displayName}}</span>
@@ -20,7 +19,7 @@
                     <span class="field-partitioning ms-2" *ngIf="field['isLocalizable']">{{ 'schemas.field.localizableMarker' | sqxTranslate }}</span>
                 </span>
             </div>
-            <div class="col col-tags flex-nowrap">
+            <div class="col-4 flex-nowrap" *ngIf="!plain">
                 <div class="float-end">
                     <span class="ms-1 badge rounded-pill badge-danger"  *ngIf="field.isLocked">
                         {{ 'schemas.field.lockedMarker' | sqxTranslate }}
@@ -110,35 +109,31 @@
         <ng-container *ngIf="field['nested']; let nested">
             <span class="nested-field-line-v"></span>
 
-            <div
-                cdkDropList
-                [cdkDropListDisabled]="!isEditable"
-                [cdkDropListData]="nested"
-                (cdkDropListDropped)="sortFields($event)">
-                <div *ngFor="let nested of nested; trackBy: trackByFieldFn" class="nested-field table-drag" cdkDrag cdkDragLockAxis="y">
-
-                    <span class="nested-field-line-h"></span>
-    
-                    <sqx-field [field]="nested" [schema]="schema" [parent]="$any(field)" [settings]="settings" [languages]="languages">
-                        <i cdkDragHandle class="icon-drag2 drag-handle"></i>
-                    </sqx-field>
-                </div>
-            </div>
+            <sqx-sortable-field-list
+                [fields]="nested"
+                [fieldsEmpty]="nested.length === 0"
+                [languages]="languages"
+                [schema]="schema"
+                [settings]="settings"
+                [sortable]="isEditable === true"
+                (sorted)="sortFields($event)"
+                [parent]="$any(field)">
+            </sqx-sortable-field-list>
             
             <div class="nested-field nested-field-add" *ngIf="isEditable">
                 <span class="nested-field-line-h"></span>
 
-                <button type="button" class="btn btn-success btn-sm" (click)="addFieldDialog.show()">
+                <button type="button" class="btn btn-success btn-sm" (click)="fieldWizard.show()">
                     <i class="icon icon-plus"></i> {{ 'schemas.addNestedField' | sqxTranslate }}
                 </button>
             </div>
                 
-            <ng-container *sqxModal="addFieldDialog">
+            <ng-container *sqxModal="fieldWizard">
                 <sqx-field-wizard 
                     [parent]="$any(field)"
                     [schema]="schema"
                     [settings]="settings"
-                    (complete)="addFieldDialog.hide()">
+                    (complete)="fieldWizard.hide()">
                 </sqx-field-wizard>
             </ng-container>
         </ng-container>

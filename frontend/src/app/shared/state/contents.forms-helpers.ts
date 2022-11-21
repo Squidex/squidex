@@ -99,8 +99,10 @@ export abstract class Hidden {
     }
 }
 
-export function groupFields<T extends FieldDto>(fields: ReadonlyArray<T>): { separator?: T; fields: ReadonlyArray<T> }[] {
-    const result: { separator?: T; fields: ReadonlyArray<T> }[] = [];
+export type FieldGroup<T = FieldDto> = { separator?: T; fields: T[] };
+
+export function groupFields<T extends FieldDto>(fields: ReadonlyArray<T>, keepEmpty = false): FieldGroup<T>[] {
+    const result: FieldGroup<T>[] = [];
 
     let currentSeparator: T | undefined;
     let currentFields: T[] = [];
@@ -109,7 +111,7 @@ export function groupFields<T extends FieldDto>(fields: ReadonlyArray<T>): { sep
         if (field.properties.isContentField) {
             currentFields.push(field);
         } else {
-            if (currentFields.length > 0) {
+            if (currentFields.length > 0 || keepEmpty) {
                 result.push({ separator: currentSeparator, fields: currentFields });
             }
 
@@ -118,7 +120,7 @@ export function groupFields<T extends FieldDto>(fields: ReadonlyArray<T>): { sep
         }
     }
 
-    if (currentFields.length > 0) {
+    if (currentFields.length > 0 || keepEmpty) {
         result.push({ separator: currentSeparator, fields: currentFields });
     }
 
