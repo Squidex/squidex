@@ -79,20 +79,23 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
             var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
 
-            var pausingStream = new PauseStream(fileParameter.Data, 0.5);
+            var pausingStream = new PauseStream(fileParameter.Data, 0.05);
             var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
 
             var numUploads = 0;
+            var numConflicts = 0;
 
             await using (pausingFile.Data)
             {
-                using var cts = new CancellationTokenSource(5000);
+                using var cts = new CancellationTokenSource(5000000);
 
                 while (progress.Asset == null)
                 {
                     // When the previous request is still in progress we just give it another try.
-                    if (progress.Exception is SquidexManagementException { StatusCode: 409 })
+                    if (progress.Exception is SquidexManagementException { StatusCode: 409 } && numConflicts < 3)
                     {
+                        numConflicts++;
+
                         progress.ResetException();
 
                         // Wait a little bit to finish the request on the server.
@@ -238,7 +241,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_replace_asset_using_tus_in_chunks()
     {
-        for (var i = 0; i < 5; i++)
+        for (var i = 0; i < 500; i++)
         {
             // STEP 1: Create asset
             var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
@@ -249,10 +252,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
             var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
 
-            var pausingStream = new PauseStream(fileParameter.Data, 0.5);
+            var pausingStream = new PauseStream(fileParameter.Data, 0.01);
             var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
 
             var numUploads = 0;
+            var numConflicts = 0;
 
             await using (pausingFile.Data)
             {
@@ -262,8 +266,10 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
                 while (progress.Asset == null)
                 {
                     // When the previous request is still in progress we just give it another try.
-                    if (progress.Exception is SquidexManagementException { StatusCode: 409 })
+                    if (progress.Exception is SquidexManagementException { StatusCode: 409 } && numConflicts < 3)
                     {
+                        numConflicts++;
+
                         progress.ResetException();
 
                         // Wait a little bit to finish the request on the server.
