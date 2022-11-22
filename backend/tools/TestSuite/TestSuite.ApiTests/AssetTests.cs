@@ -9,6 +9,7 @@ using System.Net;
 using Squidex.Assets;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
+using Xunit.Sdk;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
@@ -71,7 +72,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_upload_asset_using_tus_in_chunks()
     {
-        for (var i = 0; i < 100; i++)
+        for (var i = 0; i < 5; i++)
         {
             // STEP 1: Create asset
             progress = new ProgressHandler();
@@ -92,6 +93,8 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
                     // When the previous request is still in progress we just give it another try.
                     if (progress.Exception is SquidexManagementException { StatusCode: 409 })
                     {
+                        progress.ResetException();
+
                         // Wait a little bit to finish the request on the server.
                         await Task.Delay(100, cts.Token);
                     }
@@ -261,6 +264,8 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
                     // When the previous request is still in progress we just give it another try.
                     if (progress.Exception is SquidexManagementException { StatusCode: 409 })
                     {
+                        progress.ResetException();
+
                         // Wait a little bit to finish the request on the server.
                         await Task.Delay(100, cts.Token);
                     }
@@ -707,11 +712,16 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             return options;
         }
 
+        public void ResetException()
+        {
+            Exception = null;
+        }
+
         public Task OnCompletedAsync(AssetUploadCompletedEvent @event,
             CancellationToken ct)
         {
             // This is a previous exception, so we can unset it.
-            Exception = null;
+            ResetException();
 
             Asset = @event.Asset;
             return Task.CompletedTask;
@@ -734,7 +744,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         public Task OnFailedAsync(AssetUploadExceptionEvent @event,
             CancellationToken ct)
         {
-            if (!@event.Exception.ToString().Contains("PAUSED", StringComparison.OrdinalIgnoreCase))
+            if (@event.Exception.InnerException is not PauseException)
             {
                 Exception = @event.Exception;
             }
@@ -743,7 +753,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         }
     }
 
-    public class PauseStream : DelegateStream
+    private sealed class PauseException : Exception
+    {
+    }
+
+    private sealed class PauseStream : DelegateStream
     {
         private readonly double pauseAfter = 1;
         private int totalRead;
@@ -764,7 +778,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         {
             if (totalRead > Length * pauseAfter)
             {
-                throw new InvalidOperationException("PAUSED");
+                throw new PauseException();
             }
 
             var bytesRead = await base.ReadAsync(buffer, cancellationToken);
