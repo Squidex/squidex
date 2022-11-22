@@ -1,0 +1,16 @@
+@import 'mixins';
+@import 'vars';
+
+$field-line: #c7cfd7;
+
+.field-placeholder {
+    border: 2px dashed $field-line;
+    border-radius: 0;
+    margin-bottom: .25rem;
+    margin-top: 0;
+    min-height: 4rem;
+}
+
+.cdk-drop-list-dragging {
+    border: 0;
+}
