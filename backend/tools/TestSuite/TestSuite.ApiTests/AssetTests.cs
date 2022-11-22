@@ -56,9 +56,9 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
                 progress.AsOptions());
         }
 
+        Assert.Null(progress.Exception);
         Assert.NotEmpty(progress.Progress);
         Assert.NotNull(progress.Asset);
-        Assert.Null(progress.Exception);
 
         await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
         {
@@ -101,9 +101,9 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
                 }
             }
 
+            Assert.Null(progress.Exception);
             Assert.NotEmpty(progress.Progress);
             Assert.NotNull(progress.Asset);
-            Assert.Null(progress.Exception);
             Assert.True(numUploads > 1);
 
             await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
@@ -215,9 +215,9 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
                 progress.AsOptions(asset_1.Id));
         }
 
+        Assert.Null(progress.Exception);
         Assert.NotNull(progress.Asset);
         Assert.NotEmpty(progress.Progress);
-        Assert.Null(progress.Exception);
 
         await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
         {
@@ -231,51 +231,48 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_replace_asset_using_tus_in_chunks()
     {
-        for (var i = 0; i < 5; i++)
+        // STEP 1: Create asset
+        var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
+
+
+        // STEP 2: Reupload asset
+        progress = new ProgressHandler();
+
+        var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
+
+        var pausingStream = new PauseStream(fileParameter.Data, 0.5);
+        var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
+
+        var numUploads = 0;
+
+        await using (pausingFile.Data)
         {
-            // STEP 1: Create asset
-            var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
+            using var cts = new CancellationTokenSource(5000);
 
-
-            // STEP 2: Reupload asset
-            progress = new ProgressHandler();
-
-            var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
-
-            var pausingStream = new PauseStream(fileParameter.Data, 0.5);
-            var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
-
-            var numUploads = 0;
-
-            await using (pausingFile.Data)
+            while (progress.Asset == null && progress.Exception == null)
             {
-                using var cts = new CancellationTokenSource(5000);
+                pausingStream.Reset();
 
-                while (progress.Asset == null && progress.Exception == null)
-                {
-                    pausingStream.Reset();
+                await _.Assets.UploadAssetAsync(_.AppName, pausingFile,
+                    progress.AsOptions(asset_1.Id), cts.Token);
 
-                    await _.Assets.UploadAssetAsync(_.AppName, pausingFile,
-                        progress.AsOptions(asset_1.Id), cts.Token);
+                await Task.Delay(50, cts.Token);
 
-                    await Task.Delay(50, cts.Token);
-
-                    numUploads++;
-                }
+                numUploads++;
             }
+        }
 
-            Assert.NotEmpty(progress.Progress);
-            Assert.NotNull(progress.Asset);
-            Assert.Null(progress.Exception);
-            Assert.True(numUploads > 1);
+        Assert.Null(progress.Exception);
+        Assert.NotEmpty(progress.Progress);
+        Assert.NotNull(progress.Asset);
+        Assert.True(numUploads > 1);
 
-            await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
-            {
-                var downloaded = await _.DownloadAsync(progress.Asset);
+        await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
+        {
+            var downloaded = await _.DownloadAsync(progress.Asset);
 
-                // Should dowload with correct size.
-                Assert.Equal(stream.Length, downloaded.Length);
-            }
+            // Should dowload with correct size.
+            Assert.Equal(stream.Length, downloaded.Length);
         }
     }
 
