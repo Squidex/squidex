@@ -89,6 +89,9 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
         {
             try
             {
+                // We need to translate the query names to the document field names in MongoDB.
+                var query = q.Query.AdjustToModel(appId);
+
                 if (q.Ids is { Count: > 0 })
                 {
                     var filter = BuildFilter(appId, q.Ids.ToHashSet());
@@ -98,10 +101,10 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
                             .SortByDescending(x => x.LastModified).ThenBy(x => x.Id)
                             .QueryLimit(q.Query)
                             .QuerySkip(q.Query)
-                            .ToListRandomAsync(Collection, q.Query.Random, ct);
+                            .ToListRandomAsync(Collection, query.Random, ct);
                     long assetTotal = assetEntities.Count;
 
-                    if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
+                    if (assetEntities.Count >= query.Take || query.Skip > 0)
                     {
                         if (q.NoTotal)
                         {
@@ -117,8 +120,6 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
                 }
                 else
                 {
-                    var query = q.Query.AdjustToModel(appId);
-
                     // Default means that no other filters are applied and we only query by app.
                     var (filter, isDefault) = query.BuildFilter(appId, parentId);
 
@@ -130,9 +131,9 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
                             .ToListRandomAsync(Collection, query.Random, ct);
                     long assetTotal = assetEntities.Count;
 
-                    if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
+                    if (assetEntities.Count >= query.Take || query.Skip > 0)
                     {
-                        var isDefaultQuery = q.Query.Filter == null;
+                        var isDefaultQuery = query.Filter == null;
 
                         if (q.NoTotal || (q.NoSlowTotal && !isDefaultQuery))
                         {
