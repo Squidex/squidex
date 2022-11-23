@@ -250,6 +250,8 @@ mongodb:
   ##
   enabled: true
 
+  ## @param architecture MongoDB(&reg;) architecture (`standalone` or `replicaset`)
+  ##
   architecture: replicaset
 
   ## @param mongodb.replicas The number of replicas.
@@ -331,6 +333,8 @@ mongodb:
   ## @skip mongodb.nodeSelector
   nodeSelector: {}
 
+  ## @section Arbiter parameters
+  ##
   arbiter:
     ## MongoDB(&reg;) pods' Security Context.
     ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
