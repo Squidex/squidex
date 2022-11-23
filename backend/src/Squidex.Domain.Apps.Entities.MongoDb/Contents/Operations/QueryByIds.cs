@@ -28,7 +28,8 @@ internal sealed class QueryByIds : OperationBase
             return ReadonlyList.Empty<ContentIdStatus>();
         }
 
-        var filter = CreateFilter(appId, null, ids);
+        // Create a filter from the Ids and ensure that the content ids match to the app ID.
+        var filter = CreateFilter(appId, null, ids, null);
 
         var contentEntities = await Collection.FindStatusAsync(filter, ct);
 
@@ -43,12 +44,16 @@ internal sealed class QueryByIds : OperationBase
             return ResultList.Empty<IContentEntity>();
         }
 
-        var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), q.Ids.ToHashSet());
+        // We need to translate the query names to the document field names in MongoDB.
+        var query = q.Query.AdjustToModel(app.Id);
 
-        var contentEntities = await FindContentsAsync(q.Query, filter, ct);
+        // Create a filter from the Ids and ensure that the content ids match to the schema IDs.
+        var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), q.Ids.ToHashSet(), query.Filter);
+
+        var contentEntities = await FindContentsAsync(query, filter, ct);
         var contentTotal = (long)contentEntities.Count;
 
-        if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
+        if (contentTotal >= query.Take || query.Skip > 0)
         {
             if (q.NoTotal)
             {
@@ -68,14 +73,16 @@ internal sealed class QueryByIds : OperationBase
     {
         var result =
             Collection.Find(filter)
-                .QueryLimit(query)
+                .QuerySort(query)
                 .QuerySkip(query)
+                .QueryLimit(query)
                 .ToListRandomAsync(Collection, query.Random, ct);
 
         return await result;
     }
 
-    private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, IEnumerable<DomainId>? schemaIds, HashSet<DomainId> ids)
+    private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, IEnumerable<DomainId>? schemaIds, HashSet<DomainId> ids,
+        FilterNode<ClrValue>? filter)
     {
         var filters = new List<FilterDefinition<MongoContentEntity>>();
 
@@ -100,6 +107,11 @@ internal sealed class QueryByIds : OperationBase
         }
 
         filters.Add(Filter.Ne(x => x.IsDeleted, true));
+
+        if (filter != null)
+        {
+            filters.Add(filter.BuildFilter<MongoContentEntity>());
+        }
 
         return Filter.And(filters);
     }

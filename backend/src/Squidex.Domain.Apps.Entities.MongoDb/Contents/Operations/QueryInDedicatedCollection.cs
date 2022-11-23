@@ -91,9 +91,9 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
         var contentEntities = await contentCollection.QueryContentsAsync(filter, query, ct);
         var contentTotal = (long)contentEntities.Count;
 
-        if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
+        if (contentTotal >= query.Take || query.Skip > 0)
         {
-            if (q.NoTotal || (q.NoSlowTotal && q.Query.Filter != null))
+            if (q.NoTotal || (q.NoSlowTotal && query.Filter != null))
             {
                 contentTotal = -1;
             }
