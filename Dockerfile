@@ -87,9 +87,15 @@ WORKDIR /app
 COPY --from=backend /build/ .
 COPY --from=frontend /build/ wwwroot/build/
 
-# expose only non-privileged ports (1-1024) so we do not require root
-EXPOSE 10080
-EXPOSE 10443
+# set capability of NET_BIND_SERVICE to allow containers to bind and expose privileged ports
+# set net_bind both [e]ffective & [p]ermitted
+RUN apt install libcap2 libcap2-bin -y
+# it is the dotnet binary that requires the capability to launch a kestrel server on privileged ports
+RUN setcap CAP_NET_BIND_SERVICE=+ep /usr/share/dotnet/dotnet
+
+# expose privileged ports
+EXPOSE 80
+EXPOSE 443
 EXPOSE 11111
 
 # add a group and a user > 10000 to avoid conflicts with system accounts
