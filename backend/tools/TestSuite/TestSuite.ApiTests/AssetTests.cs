@@ -80,44 +80,12 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
             var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
 
-            var pausingStream = new PauseStream(fileParameter.Data, 0.25);
-            var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
-
-            var numUploads = 0;
-            var numConflicts = 0;
-
-            await using (pausingFile.Data)
-            {
-                using var cts = new CancellationTokenSource(5000);
-
-                while (progress.Asset == null)
-                {
-                    // When the previous request is still in progress we just give it another try.
-                    if (progress.Exception is SquidexManagementException { StatusCode: 409 } && numConflicts < 3)
-                    {
-                        numConflicts++;
-
-                        progress.ResetException();
-
-                        // Wait a little bit to finish the request on the server.
-                        await Task.Delay(100, cts.Token);
-                    }
-                    else if (progress.Exception != null)
-                    {
-                        break;
-                    }
-
-                    pausingStream.Reset();
-
-                    await _.Assets.UploadAssetAsync(_.AppName, pausingFile, progress.AsOptions(), cts.Token);
-                    numUploads++;
-                }
-            }
+            await UploadInChunksAsync(fileParameter);
 
             Assert.Null(progress.Exception);
             Assert.NotEmpty(progress.Progress);
             Assert.NotNull(progress.Asset);
-            Assert.True(numUploads > 1);
+            Assert.True(progress.Uploads.Count > 1);
 
             await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
             {
@@ -253,45 +221,12 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
             var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
 
-            var pausingStream = new PauseStream(fileParameter.Data, 0.25);
-            var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
-
-            var numUploads = 0;
-            var numConflicts = 0;
-
-            await using (pausingFile.Data)
-            {
-                using var cts = new CancellationTokenSource(5000);
-
-                // When the previous request is still in progress we just give it another try.
-                while (progress.Asset == null)
-                {
-                    // When the previous request is still in progress we just give it another try.
-                    if (progress.Exception is SquidexManagementException { StatusCode: 409 } && numConflicts < 3)
-                    {
-                        numConflicts++;
-
-                        progress.ResetException();
-
-                        // Wait a little bit to finish the request on the server.
-                        await Task.Delay(100, cts.Token);
-                    }
-                    else if (progress.Exception != null)
-                    {
-                        break;
-                    }
-
-                    pausingStream.Reset();
-
-                    await _.Assets.UploadAssetAsync(_.AppName, pausingFile, progress.AsOptions(asset_1.Id), cts.Token);
-                    numUploads++;
-                }
-            }
+            await UploadInChunksAsync(fileParameter, asset_1.Id);
 
             Assert.Null(progress.Exception);
             Assert.NotEmpty(progress.Progress);
             Assert.NotNull(progress.Asset);
-            Assert.True(numUploads > 1);
+            Assert.True(progress.Uploads.Count > 1);
 
             await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
             {
@@ -705,6 +640,8 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
         public List<int> Progress { get; } = new List<int>();
 
+        public List<int> Uploads { get; } = new List<int>();
+
         public Exception Exception { get; private set; }
 
         public AssetDto Asset { get; private set; }
@@ -719,8 +656,10 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             return options;
         }
 
-        public void ResetException()
+        public void Reset()
         {
+            Uploads.Add(Progress.LastOrDefault());
+
             Exception = null;
         }
 
@@ -728,7 +667,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             CancellationToken ct)
         {
             // This is a previous exception, so we can unset it.
-            ResetException();
+            Reset();
 
             Asset = @event.Asset;
             return Task.CompletedTask;
@@ -760,6 +699,43 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         }
     }
 
+    private async Task UploadInChunksAsync(FileParameter fileParameter, string id = null)
+    {
+        var pausingStream = new PauseStream(fileParameter.Data, 0.25);
+        var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
+
+        var numConflicts = 0;
+
+        await using (pausingFile.Data)
+        {
+            using var cts = new CancellationTokenSource(5000);
+
+            // When the previous request is still in progress we just give it another try.
+            while (progress.Asset == null)
+            {
+                // When the previous request is still in progress we just give it another try.
+                if (progress.Exception is SquidexManagementException { StatusCode: 409 } && numConflicts < 3)
+                {
+                    numConflicts++;
+
+                    // Wait a little bit to finish the request on the server.
+                    await Task.Delay(100, cts.Token);
+                }
+                else if (progress.Exception != null)
+                {
+                    break;
+                }
+
+                // Reset exceptions from previous attempts.
+                progress.Reset();
+
+                pausingStream.Reset();
+
+                await _.Assets.UploadAssetAsync(_.AppName, pausingFile, progress.AsOptions(id), cts.Token);
+            }
+        }
+    }
+
     private sealed class PauseException : Exception
     {
     }
@@ -783,7 +759,12 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         public override async ValueTask<int> ReadAsync(Memory<byte> buffer,
             CancellationToken cancellationToken = default)
         {
-            if (totalRead > Length * pauseAfter)
+            if (Position >= Length)
+            {
+                return 0;
+            }
+
+            if (totalRead >= Length * pauseAfter)
             {
                 throw new PauseException();
             }
