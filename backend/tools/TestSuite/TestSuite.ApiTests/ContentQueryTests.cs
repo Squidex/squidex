@@ -361,7 +361,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
     [Fact]
     public async Task Should_query_by_near_location_with_odata()
     {
-        var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(3 3)') lt 1000" };
+        var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(103 3)') lt 1000" };
 
         var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
 
@@ -381,7 +381,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
                     op = "lt",
                     value = new
                     {
-                        longitude = 3,
+                        longitude = 103,
                         latitude = 3,
                         distance = 1000
                     }
@@ -397,7 +397,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
     [Fact]
     public async Task Should_query_by_near_geoson_location_with_odata()
     {
-        var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(4 4)') lt 1000" };
+        var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(104 4)') lt 1000" };
 
         var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
 
@@ -466,7 +466,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
                     op = "lt",
                     value = new
                     {
-                        longitude = 4,
+                        longitude = 104,
                         latitude = 4,
                         distance = 1000
                     }

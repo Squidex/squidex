@@ -7,8 +7,6 @@
 
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
-using System.Runtime.InteropServices;
-using TestSuite.Fixtures;
 
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
