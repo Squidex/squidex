@@ -107,12 +107,12 @@ The command removes all the Kubernetes components associated with the chart and 
 
 | Name                                               | Description                                    | Value               |
 | -------------------------------------------------- | ---------------------------------------------- | ------------------- |
-| `mongodb.enabled`                       | Uses the custom mongoDB instance.              | `true`              |
-| `mongodb.replicaCount`                  | The number of replicas.                        | `3`                 |
-| `mongodb.persistentVolume.enabled`      | If true, persistent volume claims are created. | `true`              |
-| `mongodb.persistentVolume.storageClass` | Persistent volume storage class.               | `""`                |
-| `mongodb.persistentVolume.accessModes`  | Persistent volume access modes.                | `["ReadWriteOnce"]` |
-| `mongodb.persistentVolume.size`         | Persistent volume size.                        | `10Gi`              |
+| `mongodb-replicaset.enabled`                       | Uses the custom mongoDB instance.              | `true`              |
+| `mongodb-replicaset.replicaCount`                  | The number of replicas.                        | `3`                 |
+| `mongodb-replicaset.persistentVolume.enabled`      | If true, persistent volume claims are created. | `true`              |
+| `mongodb-replicaset.persistentVolume.storageClass` | Persistent volume storage class.               | `""`                |
+| `mongodb-replicaset.persistentVolume.accessModes`  | Persistent volume access modes.                | `["ReadWriteOnce"]` |
+| `mongodb-replicaset.persistentVolume.size`         | Persistent volume size.                        | `10Gi`              |
 
 
 Parameters are generated with: https://github.com/bitnami-labs/readme-generator-for-helm#configuration-file

@@ -251,7 +251,7 @@ env:
   ASPNETCORE_URLS: http://+:80
 
 ## @section MongoDB parameters
-mongodb:
+mongodb-replicaset:
   ## @param mongodb.enabled Uses the custom mongoDB instance.
   ##
   enabled: true
@@ -260,7 +260,7 @@ mongodb:
   ##
   architecture: replicaset
 
-  ## @param mongodb.replicas The number of replicas.
+  ## @param mongodb-replicaset.replicas The number of replicas.
   ##
   replicaCount: 3
   
@@ -302,7 +302,7 @@ mongodb:
   #   add:
   #     - NET_BIND_SERVICE
 
-  ## @skip mongodb.auth
+  ## @skip mongodb-replicaset.auth
   auth:
     enabled: false
     existingKeySecret: ""
@@ -315,10 +315,10 @@ mongodb:
     # key: keycontent
   
   persistentVolume:
-    ## @param mongodb.persistentVolume.enabled If true, persistent volume claims are created.
+    ## @param mongodb-replicaset.persistentVolume.enabled If true, persistent volume claims are created.
     ##
     enabled: true
-    ## @param mongodb.persistentVolume.storageClass Persistent volume storage class.
+    ## @param mongodb-replicaset.persistentVolume.storageClass Persistent volume storage class.
     ## mongodb data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -328,15 +328,15 @@ mongodb:
     ##
     ##
     storageClass: ""
-    ## @param mongodb.persistentVolume.accessModes Persistent volume access modes.
+    ## @param mongodb-replicaset.persistentVolume.accessModes Persistent volume access modes.
     ##
     accessModes:
       - ReadWriteOnce
-    ## @param mongodb.persistentVolume.size Persistent volume size.
+    ## @param mongodb-replicaset.persistentVolume.size Persistent volume size.
     ##
     size: 10Gi
   
-  ## @skip mongodb.nodeSelector
+  ## @skip mongodb-replicaset.nodeSelector
   nodeSelector: {}
 
   ## @section Arbiter parameters

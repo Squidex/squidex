@@ -5,8 +5,9 @@ entries:
     appVersion: 5.9.0
     created: "2022-08-10T10:38:40.2985659+02:00"
     dependencies:
-    - condition: mongodb.enabled
+    - condition: mongodb-replicaset.enabled
       name: mongodb
+      alias: mongodb-replicaset
       repository: https://charts.bitnami.com/bitnami
       version: 13.4.4
     description: Squidex CMS
@@ -31,8 +32,9 @@ entries:
     appVersion: 7.0.2
     created: "2022-08-10T10:38:40.2995659+02:00"
     dependencies:
-    - condition: mongodb.enabled
+    - condition: mongodb-replicaset.enabled
       name: mongodb
+      alias: mongodb-replicaset
       repository: https://charts.bitnami.com/bitnami
       version: 13.4.4
     description: Squidex CMS v7.0 and newer

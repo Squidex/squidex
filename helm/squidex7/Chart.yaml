@@ -23,6 +23,7 @@ sources:
 
 dependencies:
   - name: mongodb
+    alias: mongodb-replicaset
     version: 13.4.4
     repository: https://charts.bitnami.com/bitnami
-    condition: mongodb.enabled
+    condition: mongodb-replicaset.enabled

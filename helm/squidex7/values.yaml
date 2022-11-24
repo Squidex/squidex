@@ -245,8 +245,8 @@ env:
   ASPNETCORE_URLS: http://+:80
 
 ## @section MongoDB parameters
-mongodb:
-  ## @param mongodb.enabled Uses the custom mongoDB instance.
+mongodb-replicaset:
+  ## @param mongodb-replicaset.enabled Uses the custom mongoDB instance.
   ##
   enabled: true
 
@@ -254,7 +254,7 @@ mongodb:
   ##
   architecture: replicaset
 
-  ## @param mongodb.replicas The number of replicas.
+  ## @param mongodb-replicaset.replicas The number of replicas.
   ##
   replicaCount: 3
   
@@ -296,7 +296,7 @@ mongodb:
   #   add:
   #     - NET_BIND_SERVICE
   
-  ## @skip mongodb.auth
+  ## @skip mongodb-replicaset.auth
   auth:
     enabled: false
     existingKeySecret: ""
@@ -309,10 +309,10 @@ mongodb:
     # key: keycontent
   
   persistentVolume:
-    ## @param mongodb.persistentVolume.enabled If true, persistent volume claims are created.
+    ## @param mongodb-replicaset.persistentVolume.enabled If true, persistent volume claims are created.
     ##
     enabled: true
-    ## @param mongodb.persistentVolume.storageClass Persistent volume storage class.
+    ## @param mongodb-replicaset.persistentVolume.storageClass Persistent volume storage class.
     ## mongodb data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -322,54 +322,13 @@ mongodb:
     ##
     ##
     storageClass: ""
-    ## @param mongodb.persistentVolume.accessModes Persistent volume access modes.
+    ## @param mongodb-replicaset.persistentVolume.accessModes Persistent volume access modes.
     ##
     accessModes:
       - ReadWriteOnce
-    ## @param mongodb.persistentVolume.size Persistent volume size.
+    ## @param mongodb-replicaset.persistentVolume.size Persistent volume size.
     ##
     size: 10Gi
   
-  ## @skip mongodb.nodeSelector
+  ## @skip mongodb-replicaset.nodeSelector
   nodeSelector: {}
-
-  ## @section Arbiter parameters
-  ##
-  arbiter:
-    ## MongoDB(&reg;) pods' Security Context.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
-    ## @param podSecurityContext.enabled Enable MongoDB(&reg;) pod(s)' Security Context
-    ## @param podSecurityContext.fsGroup Group ID for the volumes of the MongoDB(&reg;) pod(s)
-    ## @param podSecurityContext.sysctls sysctl settings of the MongoDB(&reg;) pod(s)'
-    ##
-    podSecurityContext:
-      enabled: true
-      fsGroup: 1001
-      ## sysctl settings
-      ## Example:
-      ## sysctls:
-      ## - name: net.core.somaxconn
-      ##   value: "10000"
-      ##
-      sysctls: [ ]
-    # seccompProfile:
-    #   type: RuntimeDefault
-    # runAsNonRoot: true
-    # runAsUser: 1001
-
-    ## MongoDB(&reg;) containers' Security Context (main and metrics container).
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
-    ## @param containerSecurityContext.enabled Enable MongoDB(&reg;) container(s)' Security Context
-    ## @param containerSecurityContext.runAsUser User ID for the MongoDB(&reg;) container
-    ## @param containerSecurityContext.runAsNonRoot Set MongoDB(&reg;) container's Security Context runAsNonRoot
-    ##
-    containerSecurityContext:
-      enabled: true
-      runAsUser: 1001
-      runAsNonRoot: true
-    # allowPrivilegeEscalation: false
-    # capabilities:
-    #   drop:
-    #     - ALL
-    #   add:
-    #     - NET_BIND_SERVICE
