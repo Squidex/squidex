@@ -165,7 +165,7 @@
   "clients.add.title": "Adicionar um novo Cliente",
   "clients.addFailed": "Falhou em adicionar cliente. Por favor, recarregue.",
   "clients.allowAnonymous": "Permitir acesso anónimo.",
-  "clients.allowAnonymousHint": "Permitir o acesso à API sem acesso a todos os recursos configurados através do grupo deste cliente. Não dê mais do que um cliente acesso anónimo.",
+  "clients.allowAnonymousHint": "Permitir o acesso à API sem acesso a todos os ficheiros configurados através do grupo deste cliente. Não dê mais do que um cliente acesso anónimo.",
   "clients.apiCallsLimit": "Chamadas Max API",
   "clients.apiCallsLimitHint": "Limite o número de chamadas API que este cliente pode fazer por mês para proteger o seu contingente API para outros clientes que são mais importantes.",
   "clients.clientIdValidationMessage": "O nome só pode conter letras, números e traços.",

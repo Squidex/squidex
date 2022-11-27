@@ -173,16 +173,16 @@
     <value>A equipa não existe.</value>
   </data>
   <data name="assets.folderNotFound" xml:space="preserve">
-    <value>A pasta de recursos não existe.</value>
+    <value>A pasta de ficheiros não existe.</value>
   </data>
   <data name="assets.folderRecursion" xml:space="preserve">
     <value>Não é possível adicionar pasta à sua própria criança.</value>
   </data>
   <data name="assets.maxSizeReached" xml:space="preserve">
-    <value>Você alcançou o tamanho máximo de recursos.</value>
+    <value>Você alcançou o tamanho máximo de ficheiros.</value>
   </data>
   <data name="assets.referenced" xml:space="preserve">
-    <value>Os recursos são referenciados por um conteúdo e não podem ser excluídos.</value>
+    <value>Os ficheiros são referenciados por um conteúdo e não podem ser excluídos.</value>
   </data>
   <data name="backups.alreadyRunning" xml:space="preserve">
     <value>Já se encontra um processo de backup em processamento.</value>
@@ -719,7 +719,7 @@
     <value>Entidade ({id}) versão {expectedVersion} não encontrada, mas sim {currentVersion}.</value>
   </data>
   <data name="history.apps.assetScriptsConfigured" xml:space="preserve">
-    <value>Scripts de recursos actualizados</value>
+    <value>Scripts de ficheiros actualizados</value>
   </data>
   <data name="history.apps.clientAdded" xml:space="preserve">
     <value>cliente {[Id]} adicionado na app</value>
@@ -791,13 +791,13 @@
     <value>fluxo de trabalho actualizado.</value>
   </data>
   <data name="history.assets.replaced" xml:space="preserve">
-    <value>recurso substituido.</value>
+    <value>ficheiro substituido.</value>
   </data>
   <data name="history.assets.updated" xml:space="preserve">
-    <value>recurso actualizado.</value>
+    <value>ficheiro actualizado.</value>
   </data>
   <data name="history.assets.uploaded" xml:space="preserve">
-    <value>recurso carregado.</value>
+    <value>ficheiro carregado.</value>
   </data>
   <data name="history.contents.created" xml:space="preserve">
     <value>conteúdo criado {[Schema]}.</value>
@@ -1004,10 +1004,10 @@
     <value>Com a sua configuração, qualquer utilizador pode criar apps. Se pretende alterar, altere esta variavel de sistema  &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=true&lt;/code&gt;.</value>
   </data>
   <data name="setup.ruleFolder.warning" xml:space="preserve">
-    <value>Está a usar &lt;strong&gt;armazenamento de recursos&lt;/strong&gt; onde todos recursos são gravados no sistema de ficheiros local. Por favor lembrar incluir a pasta de recursos dentro da sua estratégia de backup e mapear para um volume, se estiver a usar docker.</value>
+    <value>Está a usar &lt;strong&gt;armazenamento de ficheiros&lt;/strong&gt; onde todos ficheiros são gravados no sistema de ficheiros local. Por favor lembrar incluir a pasta de ficheiros dentro da sua estratégia de backup e mapear para um volume, se estiver a usar docker.</value>
   </data>
   <data name="setup.ruleFtp.warning" xml:space="preserve">
-    <value>Está a usar &lt;strong&gt;armazenamento de recursos com FTP&lt;/strong&gt;. Não é recomendado usar este tipo devido a problemas de performance.</value>
+    <value>Está a usar &lt;strong&gt;armazenamento de ficheiros com FTP&lt;/strong&gt;. Não é recomendado usar este tipo devido a problemas de performance.</value>
   </data>
   <data name="setup.ruleHttps.failure" xml:space="preserve">
     <value>Não está a aceder a este site via https. Se este aviso não está correcto então Squidex não pode detectar o modo https, provavelmente a sua instância está por tras de uma reverse proxy como nginx. Confirme que http headers are forwarded properly, via the &lt;code&gt;X-Forwarded-*&lt;/code&gt; headers.</value>
@@ -1052,7 +1052,7 @@
     <value>E-Mailsa automáticos (opcional)</value>
   </data>
   <data name="users.consent.emailText" xml:space="preserve">
-    <value>Entendo e concordo que o Squidex envia e-mails para me informar sobre novos recursos, alterações de última hora e tempos de inatividade.</value>
+    <value>Entendo e concordo que o Squidex envia e-mails para me informar sobre novos ficheiros, alterações de última hora e tempos de inatividade.</value>
   </data>
   <data name="users.consent.headline" xml:space="preserve">
     <value>Nós precisamos do seu consentimento</value>
