@@ -60,6 +60,6 @@
     </sqx-field-form-ui>
 </div>
 
-<div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 3">
+<div class="table-items-row-details-tab" *ngIf="selectedTab === 3">
     <sqx-json-more [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-json-more>
 </div>

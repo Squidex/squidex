@@ -3,7 +3,7 @@
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPlaceholder">{{ 'schemas.field.placeholder' | sqxTranslate }}</label>
 
         <div class="col-9">
-            <input type="text" class="form-control" id="{{field.fieldId}}_fieldPlaceholder" maxlength="100" formControlName="placeholder">
+            <input class="form-control" id="{{field.fieldId}}_fieldPlaceholder" maxlength="100" formControlName="placeholder">
 
             <sqx-form-hint>
                 {{ 'schemas.field.placeholderHint' | sqxTranslate }}
