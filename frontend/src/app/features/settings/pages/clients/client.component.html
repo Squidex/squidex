@@ -29,7 +29,7 @@
                 </label>
                 <div class="col">
                     <div class="input-group">
-                        <input readonly disabled class="form-control" value="{{appsState.appName}}:{{client.id}}" #inputName>
+                        <input readonly class="form-control" value="{{appsState.appName}}:{{client.id}}" #inputName>
 
                         <button type="button" class="btn btn-outline-secondary" [sqxCopy]="inputName">
                             <i class="icon-copy"></i>
@@ -44,7 +44,7 @@
                 </label>
                 <div class="col">
                     <div class="input-group">
-                        <input readonly disabled class="form-control" [value]="client.secret" #inputSecret>
+                        <input readonly class="form-control" [value]="client.secret" #inputSecret>
 
                         <button type="button" class="btn btn-outline-secondary" [sqxCopy]="inputSecret">
                             <i class="icon-copy"></i>

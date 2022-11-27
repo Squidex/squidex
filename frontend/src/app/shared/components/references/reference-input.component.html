@@ -1,5 +1,5 @@
 <div class="input-group">
-    <input readonly disabled class="form-control" [ngModel]="snapshot.selectedName" (click)="openDialog()" />
+    <input readonly class="form-control" [ngModel]="snapshot.selectedName" (click)="openDialog()" />
 
     <button type="button" class="btn btn-outline-secondary" [disabled]="snapshot.isDisabled" (click)="selectContent()" sqxStopClick>
         <i class="icon-close"></i>

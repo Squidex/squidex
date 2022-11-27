@@ -85,7 +85,7 @@
                             <label for="id">{{ 'common.id' | sqxTranslate }}</label>
 
                             <div class="input-group">
-                                <input readonly disabled class="form-control" name="id" id="id" value="{{asset.id}}" #inputId>
+                                <input readonly class="form-control" name="id" id="id" value="{{asset.id}}" #inputId>
 
                                 <button type="button" class="btn btn-outline-secondary" [sqxCopy]="inputId">
                                     <i class="icon-copy"></i>
@@ -97,7 +97,7 @@
                             <label for="url">{{ 'common.url' | sqxTranslate }}</label>
 
                             <div class="input-group">
-                                <input readonly disabled class="form-control" name="url" id="url" value="{{asset | sqxAssetUrl:asset.version:false}}" #inputUrl>
+                                <input readonly class="form-control" name="url" id="url" value="{{asset | sqxAssetUrl:asset.version:false}}" #inputUrl>
 
                                 <button type="button" class="btn btn-outline-secondary" [sqxCopy]="inputUrl">
                                     <i class="icon-copy"></i>

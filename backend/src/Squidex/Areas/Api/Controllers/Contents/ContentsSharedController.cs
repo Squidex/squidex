@@ -43,8 +43,6 @@ public sealed class ContentsSharedController : ApiController
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
-    [HttpGet]
-    [HttpPost]
     [Route("content/{app}/graphql/")]
     [Route("content/{app}/graphql/batch")]
     [ApiPermissionOrAnonymous]
