@@ -762,7 +762,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
             if (remaining < buffer.Length)
             {
-                buffer = buffer[..(int)remaining];
+                buffer = buffer[.. (int)remaining];
             }
 
             var bytesRead = await base.ReadAsync(buffer, cancellationToken);

@@ -39,6 +39,20 @@ function isFunction(value) {
     return typeof value === 'function';
 }
 
+function isArrayOfStrings(value) {
+    if (!Array.isArray(value)) {
+        return false;
+    }
+
+    for (var i = 0; i < value.length; i++) {
+        if (!isString(value[i])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 function SquidexPlugin() {
     var initHandler;
     var initCalled = false;
@@ -82,7 +96,7 @@ function SquidexPlugin() {
 
     var editor = {
         /**
-         * Get the current value.
+         * Get the current context.
          */
         getContext: function () {
             return context;
@@ -140,13 +154,13 @@ function SquidexPlugin() {
     };
 
     return editor;
-
 }
 
 function SquidexFormField() {
     var context;
     var currentConfirm;
     var currentPickAssets;
+    var currentPickContents;
     var disabled = false;
     var disabledHandler;
     var formValue;
@@ -218,6 +232,8 @@ function SquidexFormField() {
         if (event.source !== window) {
             var type = event.data.type;
 
+            console.log('Received Message: ' + type);
+
             if (type === 'disabled') {
                 var newDisabled = event.data.isDisabled;
 
@@ -276,6 +292,14 @@ function SquidexFormField() {
                 if (currentPickAssets && currentPickAssets.correlationId === correlationId) {
                     if (typeof currentPickAssets.callback === 'function') {
                         currentPickAssets.callback(event.data.result);
+                    }
+                }
+            } else if (type === 'pickContentsResult') {
+                var correlationId = event.data.correlationId;
+
+                if (currentPickContents && currentPickContents.correlationId === correlationId) {
+                    if (typeof currentPickContents.callback === 'function') {
+                        currentPickContents.callback(event.data.result);
                     }
                 }
             }
@@ -459,6 +483,29 @@ function SquidexFormField() {
 
             if (window.parent) {
                 window.parent.postMessage({ type: 'pickAssets', correlationId: correlationId }, '*');
+            }
+        },
+
+        /**
+         * Shows the dialog to pick assets.
+         * 
+         * @param {string} schemas: The list of schema names.
+         * @param {function} callback The callback to invoke when the dialog is completed or closed.
+         */
+        pickContents: function (schemas, callback) {
+            if (!isFunction(callback) || !isArrayOfStrings(schemas)) {
+                return;
+            }
+
+            var correlationId = new Date().getTime().toString();
+
+            currentPickContents = {
+                correlationId: correlationId,
+                callback: callback
+            };
+
+            if (window.parent) {
+                window.parent.postMessage({ type: 'pickContents', correlationId: correlationId, schemas: schemas }, '*');
             }
         },
 

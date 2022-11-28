@@ -5,7 +5,7 @@
     <form [class.hidden]="snapshot.isMapHidden">
         <div class="editor" #editor></div>
 
-        <input [class.hidden]="!isGoogleMaps" class="form-control search-control" type="text" [disabled]="snapshot.isDisabled" placeholder="{{ 'common.searchGoogleMaps' | sqxTranslate }}" #searchBox>
+        <input [class.hidden]="!isGoogleMaps" class="form-control search-control" [disabled]="snapshot.isDisabled" placeholder="{{ 'common.searchGoogleMaps' | sqxTranslate }}" #searchBox>
     </form>
 
     <div class="row mt-2">

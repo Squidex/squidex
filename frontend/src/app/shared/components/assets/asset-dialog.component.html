@@ -110,7 +110,7 @@
                             
                             <sqx-control-errors for="fileName"></sqx-control-errors>
                     
-                            <input type="text" class="form-control" id="fileName" formControlName="fileName" spellcheck="false">
+                            <input class="form-control" id="fileName" formControlName="fileName" spellcheck="false">
                         </div>
                     
                         <div class="form-group">
@@ -118,7 +118,7 @@
                             
                             <sqx-control-errors for="slug"></sqx-control-errors>
                     
-                            <input type="text" class="form-control slug" id="slug" formControlName="slug" sqxTransformInput="Slugify" spellcheck="false">
+                            <input class="form-control slug" id="slug" formControlName="slug" sqxTransformInput="Slugify" spellcheck="false">
             
                             <button type="button" class="btn btn-text-secondary btn-sm slug-generate" (click)="generateSlug()">
                                 {{ 'common.generate' | sqxTranslate }}
@@ -140,13 +140,13 @@
                                 <div class="col col-name pe-1">
                                     <sqx-control-errors for="name" fieldName="Name"></sqx-control-errors>
                 
-                                    <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="{{ 'common.name' | sqxTranslate }}" spellcheck="false">
+                                    <input class="form-control" maxlength="1000" formControlName="name" placeholder="{{ 'common.name' | sqxTranslate }}" spellcheck="false">
                                 </div>
                 
                                 <div class="col pe-1">
                                     <sqx-control-errors for="value" fieldName="Value"></sqx-control-errors>
                 
-                                    <input type="text" class="form-control" formControlName="value" placeholder="{{ 'common.value' | sqxTranslate }}">
+                                    <input class="form-control" formControlName="value" placeholder="{{ 'common.value' | sqxTranslate }}">
                                 </div>
             
                                 <div class="col-auto col-options">

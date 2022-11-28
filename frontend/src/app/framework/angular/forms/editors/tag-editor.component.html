@@ -14,7 +14,7 @@
             {{item}} <i class="icon-close" (click)="remove(i)"></i>
         </span>
 
-        <input type="text" class="blank text-input" #input
+        <input class="blank text-input" #input
             (blur)="markTouched()" (copy)="onCopy($event)" (cut)="onCut($event)" (focus)="focus()" (keydown)="onKeyDown($event)" (paste)="onPaste($event)"
             [name]="inputName"
             [placeholder]="placeholder | sqxTranslate"
