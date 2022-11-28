@@ -20,5 +20,8 @@ export module UILanguages {
     }, {
         iso2Code: 'zh',
         localName: '简体中文',
+    }, {
+        iso2Code: 'pt',
+        localName: 'Portuguese',
     }];
 }
