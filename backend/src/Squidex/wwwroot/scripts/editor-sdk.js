@@ -77,8 +77,6 @@ function SquidexPlugin() {
     function eventListener(event) {
         if (event.source !== window) {
             var type = event.data.type;
-
-            console.log('Received Message: ' + type);
             
             if (type === 'contentChanged') {
                 content = event.data.content;
