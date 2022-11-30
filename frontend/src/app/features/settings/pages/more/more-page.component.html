@@ -12,7 +12,7 @@
                             <div class="form-group">
                                 <label for="email">{{ 'common.name' | sqxTranslate }}</label>
                 
-                                <input type="text" class="form-control" disabled readonly [value]="app.name">
+                                <input readonly class="form-control" [value]="app.name">
                             </div>
         
                             <div class="form-group">
@@ -20,7 +20,7 @@
                 
                                 <sqx-control-errors for="label"></sqx-control-errors>
                 
-                                <input type="text" class="form-control" id="label" maxlength="100" formControlName="label">
+                                <input class="form-control" id="label" maxlength="100" formControlName="label">
                             </div>
         
                             <div class="form-group">
@@ -28,7 +28,7 @@
                 
                                 <sqx-control-errors for="description"></sqx-control-errors>
                 
-                                <input type="text" class="form-control" id="description" maxlength="100" formControlName="description">
+                                <input class="form-control" id="description" maxlength="100" formControlName="description">
                             </div>
                         </div>
         

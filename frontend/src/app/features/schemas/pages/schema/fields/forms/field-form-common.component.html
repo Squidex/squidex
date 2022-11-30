@@ -3,7 +3,7 @@
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldName">{{ 'common.name' | sqxTranslate }}</label>
 
         <div class="col-9">
-            <input type="text" class="form-control" id="{{field.fieldId}}_fieldName" readonly [ngModel]="field.name" [ngModelOptions]="{ standalone: true }">
+            <input readonly class="form-control" id="{{field.fieldId}}_fieldName" [ngModel]="field.name" [ngModelOptions]="{ standalone: true }">
 
             <sqx-form-hint>
                 {{ 'schemas.field.nameHint' | sqxTranslate }}
@@ -17,7 +17,7 @@
         <div class="col-9">
             <sqx-control-errors for="label"></sqx-control-errors>
 
-            <input type="text" class="form-control" id="{{field.fieldId}}_fieldLabel" maxlength="100" formControlName="label">
+            <input class="form-control" id="{{field.fieldId}}_fieldLabel" maxlength="100" formControlName="label">
 
             <sqx-form-hint>
                 {{ 'schemas.field.labelHint' | sqxTranslate }}
@@ -31,7 +31,7 @@
         <div class="col-9">
             <sqx-control-errors for="hints"></sqx-control-errors>
 
-            <input type="text" class="form-control" id="{{field.fieldId}}_fieldHints" maxlength="1000" formControlName="hints">
+            <input class="form-control" id="{{field.fieldId}}_fieldHints" maxlength="1000" formControlName="hints">
 
             <sqx-form-hint>
                 {{ 'schemas.field.hintsHint' | sqxTranslate }}

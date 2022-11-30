@@ -32,7 +32,7 @@ public static class WebExtensions
 
     public static IApplicationBuilder UseSquidexLocalization(this IApplicationBuilder app)
     {
-        var supportedCultures = new[] { "en", "nl", "it", "zh" };
+        var supportedCultures = new[] { "en", "nl", "it", "zh", "pt" };
 
         var localizationOptions = new RequestLocalizationOptions()
             .SetDefaultCulture(supportedCultures[0])

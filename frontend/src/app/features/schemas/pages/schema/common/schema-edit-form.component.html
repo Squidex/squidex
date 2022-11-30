@@ -7,7 +7,7 @@
             <div class="form-group">
                 <label for="name">{{ 'common.name' | sqxTranslate }}</label>
         
-                <input type="text" class="form-control" id="name" readonly [ngModel]="schema.name" [ngModelOptions]="{ standalone: true }">
+                <input readonly class="form-control" id="name" [ngModel]="schema.name" [ngModelOptions]="{ standalone: true }">
             </div>
 
             <div class="form-group">
@@ -15,7 +15,7 @@
                 
                 <sqx-control-errors for="label"></sqx-control-errors>
         
-                <input type="text" class="form-control" id="label" formControlName="label">
+                <input class="form-control" id="label" formControlName="label">
 
                 <sqx-form-hint>{{ 'schemas.schemaLabelHint' | sqxTranslate }}</sqx-form-hint>
             </div>
@@ -25,7 +25,7 @@
                 
                 <sqx-control-errors for="hints"></sqx-control-errors>
         
-                <textarea type="text" class="form-control" id="hints" formControlName="hints" rows="4"></textarea>
+                <textarea class="form-control" id="hints" formControlName="hints" rows="4"></textarea>
 
                 <sqx-form-hint>{{ 'schemas.schemaHintsHint' | sqxTranslate }}</sqx-form-hint>
             </div>

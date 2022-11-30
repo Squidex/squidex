@@ -9,11 +9,11 @@
             </button>
         </div>
         <div class="input-group flex-grow">
-            <input type="text" class="form-control form-date" [formControl]="dateControl" placeholder="{{ 'common.date' | sqxTranslate }}"
+            <input class="form-control form-date" [formControl]="dateControl" placeholder="{{ 'common.date' | sqxTranslate }}"
                 [class.with-buttons]="isDateTimeMode && shouldShowDateTimeModeButton" 
                 (blur)="callTouched()" maxlength="10" #dateInput>
 
-            <input type="text" class="form-control form-time" [formControl]="timeControl" placeholder="{{ 'common.time' | sqxTranslate }}" (blur)="callTouched()" *ngIf="isDateTimeMode">
+            <input class="form-control form-time" [formControl]="timeControl" placeholder="{{ 'common.time' | sqxTranslate }}" (blur)="callTouched()" *ngIf="isDateTimeMode">
         </div>
 
         <button type="button" class="btn btn-text-secondary btn-sm btn-clear" [class.hidden]="!hasValue"

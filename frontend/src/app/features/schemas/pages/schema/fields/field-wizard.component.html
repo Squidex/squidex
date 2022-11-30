@@ -53,7 +53,7 @@
                 <div class="form-group">
                     <sqx-control-errors for="name"></sqx-control-errors>
 
-                    <input type="text" class="form-control" formControlName="name" maxlength="40" #nameInput placeholder="{{ 'schemas.field.namePlaceholder' | sqxTranslate }}" sqxFocusOnInit>
+                    <input class="form-control" formControlName="name" maxlength="40" #nameInput placeholder="{{ 'schemas.field.namePlaceholder' | sqxTranslate }}" sqxFocusOnInit>
                 </div>
 
                 <div class="form-group" *ngIf="schema.type !== 'Component' && !parent && (addFieldForm.isContentField | async)">

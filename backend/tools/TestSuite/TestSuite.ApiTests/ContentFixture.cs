@@ -9,7 +9,7 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public sealed class ContentFixture : TestSchemaFixtureBase
+public class ContentFixture : TestSchemaFixtureBase
 {
     public ContentFixture()
         : base("my-writes")

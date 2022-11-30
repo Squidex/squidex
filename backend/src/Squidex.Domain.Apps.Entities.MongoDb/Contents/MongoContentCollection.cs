@@ -180,17 +180,17 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
                     return await queryScheduled.QueryAsync(app, new List<ISchemaEntity> { schema }, q, ct);
                 }
 
-                if (q.Referencing == default)
+                if (q.Referencing != default)
                 {
-                    if (queryInDedicatedCollection != null)
-                    {
-                        return await queryInDedicatedCollection.QueryAsync(schema, q, ct);
-                    }
-
-                    return await queryByQuery.QueryAsync(schema, q, ct);
+                    return await queryReferences.QueryAsync(app, new List<ISchemaEntity> { schema }, q, ct);
                 }
 
-                return ResultList.Empty<IContentEntity>();
+                if (queryInDedicatedCollection != null)
+                {
+                    return await queryInDedicatedCollection.QueryAsync(schema, q, ct);
+                }
+
+                return await queryByQuery.QueryAsync(schema, q, ct);
             }
             catch (MongoCommandException ex) when (ex.Code == 96)
             {

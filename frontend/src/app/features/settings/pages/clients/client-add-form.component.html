@@ -6,7 +6,7 @@
             <div class="col">
                 <sqx-control-errors for="id"></sqx-control-errors>
 
-                <input type="text" class="form-control" formControlName="id" maxlength="40" placeholder="{{ 'clients.clientNamePlaceholder' | sqxTranslate }}" autocomplete="off" sqxTransformInput="LowerCase">
+                <input class="form-control" formControlName="id" maxlength="40" placeholder="{{ 'clients.clientNamePlaceholder' | sqxTranslate }}" autocomplete="off" sqxTransformInput="LowerCase">
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-success" [disabled]="addClientForm.hasNoId | async">

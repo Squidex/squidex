@@ -21,15 +21,15 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-assets-selector',
-    styleUrls: ['./assets-selector.component.scss'],
-    templateUrl: './assets-selector.component.html',
+    selector: 'sqx-asset-selector',
+    styleUrls: ['./asset-selector.component.scss'],
+    templateUrl: './asset-selector.component.html',
     providers: [
         ComponentAssetsState,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AssetsSelectorComponent extends StatefulComponent<State> implements OnInit {
+export class AssetSelectorComponent extends StatefulComponent<State> implements OnInit {
     @Output()
     public select = new EventEmitter<ReadonlyArray<AssetDto>>();
 
