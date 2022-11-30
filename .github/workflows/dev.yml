@@ -54,9 +54,6 @@ jobs:
       - name: Pull from Cache
         run: docker pull squidex/squidex-build
 
-      - name: Load Image
-        run: docker load < squidex-tmp.tar.gz
-
       - name: Replace Image Name1
         uses: mikefarah/yq@v4.28.2
         with:
