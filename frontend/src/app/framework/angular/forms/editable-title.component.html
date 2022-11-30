@@ -5,7 +5,7 @@
                 <div class="form-group me-2">
                     <sqx-control-errors for="name"></sqx-control-errors>
                     
-                    <input type="text" class="form-control" [formControl]="renameForm" [maxLength]="maxLength" sqxFocusOnInit (keydown)="onKeyDown($event)" spellcheck="false">
+                    <input class="form-control" [formControl]="renameForm" [maxLength]="maxLength" sqxFocusOnInit (keydown)="onKeyDown($event)" spellcheck="false">
                 </div>
             </div>
             <div class="col-auto">

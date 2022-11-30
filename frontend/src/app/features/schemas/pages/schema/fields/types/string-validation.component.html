@@ -32,7 +32,7 @@
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPattern">{{ 'common.pattern' | sqxTranslate }}</label>
 
         <div class="col-9">
-            <input type="text" class="form-control" id="{{field.fieldId}}_fieldPattern" formControlName="pattern" placeholder="{{ 'schemas.fieldTypes.string.pattern' | sqxTranslate }}" #inputPattern autocomplete="off" autocorrect="off" autocapitalize="off" (focus)="patternsModal.show()">
+            <input class="form-control" id="{{field.fieldId}}_fieldPattern" formControlName="pattern" placeholder="{{ 'schemas.fieldTypes.string.pattern' | sqxTranslate }}" #inputPattern autocomplete="off" autocorrect="off" autocapitalize="off" (focus)="patternsModal.show()">
 
             <ng-container *ngIf="settings.patterns.length > 0 && (showPatternSuggestions | async)">
                 <ng-container *sqxModal="patternsModal">
@@ -57,7 +57,7 @@
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPatternMessage">{{ 'schemas.fieldTypes.string.patternMessage' | sqxTranslate }}</label>
 
         <div class="col-9">
-            <input type="text" class="form-control" id="{{field.fieldId}}_fieldPatternMessage" formControlName="patternMessage">
+            <input class="form-control" id="{{field.fieldId}}_fieldPatternMessage" formControlName="patternMessage">
         </div>
     </div>
 
@@ -119,7 +119,7 @@
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValue">{{ 'schemas.field.defaultValue' | sqxTranslate }}</label>
 
         <div class="col-9">
-            <input type="text" class="form-control" id="{{field.fieldId}}_fieldDefaultValue" formControlName="defaultValue">
+            <input class="form-control" id="{{field.fieldId}}_fieldDefaultValue" formControlName="defaultValue">
         </div>
     </div>
 
@@ -127,7 +127,7 @@
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValues">{{ 'schemas.field.defaultValues' | sqxTranslate }}</label>
 
         <div class="col-9">
-            <sqx-localized-input type="text" [languages]="languages" formControlName="defaultValues" id="{{field.fieldId}}_fieldDefaultValues"></sqx-localized-input>
+            <sqx-localized-input [languages]="languages" formControlName="defaultValues" id="{{field.fieldId}}_fieldDefaultValues"></sqx-localized-input>
 
             <sqx-form-hint>
                 {{ 'schemas.field.defaultValuesHint' | sqxTranslate }}

@@ -106,8 +106,8 @@ public static class Extensions
         var result =
             collection.Find(filter)
                 .QuerySort(query)
-                .QueryLimit(query)
                 .QuerySkip(query)
+                .QueryLimit(query)
                 .ToListRandomAsync(collection, query.Random, ct);
 
         return await result;

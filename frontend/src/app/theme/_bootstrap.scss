@@ -675,3 +675,13 @@ $icon-size: 4.5rem;
         border-bottom-width: 1px;
     }
 }
+
+.form-control {
+    &[readonly] {
+        color: $input-disabled-color;
+        background-color: $input-disabled-bg;
+        border-color: $input-disabled-border-color;
+        border-radius: inherit;
+        opacity: 1;
+    }
+}

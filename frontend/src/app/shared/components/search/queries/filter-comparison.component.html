@@ -69,7 +69,7 @@
             </sqx-dropdown>
         </ng-container>
         <ng-container *ngSwitchCase="'String'">
-            <input type="text" class="form-control" *ngIf="!field.schema.extra"
+            <input class="form-control" *ngIf="!field.schema.extra"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)" />
         </ng-container>
@@ -94,7 +94,7 @@
                 </sqx-dropdown>
             </ng-container>
             <ng-template #noPermission>
-                <input type="text" class="form-control"
+                <input class="form-control"
                     [ngModel]="filter.value"
                     (ngModelChange)="changeValue($event)" />
             </ng-template>

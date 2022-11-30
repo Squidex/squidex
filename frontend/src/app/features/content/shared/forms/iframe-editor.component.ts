@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Even
 import { AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DialogModel, DialogService, disabled$, StatefulComponent, Types, value$ } from '@app/framework';
-import { AppsState, AssetDto, computeEditorUrl } from '@app/shared';
+import { AppLanguageDto, AppsState, AssetDto, computeEditorUrl, ContentDto } from '@app/shared';
 
 interface State {
     // True, when the editor is shown as fullscreen.
@@ -17,7 +17,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-iframe-editor[context][formField][formIndex][formValue][formControlBinding]',
+    selector: 'sqx-iframe-editor[context][formField][formIndex][formValue][formControlBinding][language][languages]',
     styleUrls: ['./iframe-editor.component.scss'],
     templateUrl: './iframe-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,7 +26,6 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
     private value: any;
     private isInitialized = false;
     private isDisabled = false;
-    private assetsCorrelationId: any;
 
     @ViewChild('iframe', { static: false })
     public iframe!: ElementRef<HTMLIFrameElement>;
@@ -38,10 +37,10 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
     public inner!: ElementRef<HTMLElement>;
 
     @Output()
-    public expandedChange = new EventEmitter();
+    public isExpandedChange = new EventEmitter();
 
     @Input()
-    public expanded = false;
+    public isExpanded = false;
 
     @Input()
     public context: any = {};
@@ -56,7 +55,10 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
     public formIndex?: number | null;
 
     @Input()
-    public language?: string | null;
+    public language!: AppLanguageDto;
+
+    @Input()
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()
     public formControlBinding!: AbstractControl;
@@ -73,7 +75,12 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
 
     public computedUrl = '';
 
+    public assetsCorrelationId: any;
     public assetsDialog = new DialogModel();
+
+    public contentsCorrelationId: any;
+    public contentsSchemas?: string[];
+    public contentsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly appsState: AppsState,
@@ -161,8 +168,8 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
             } else if (type === 'expanded') {
                 const { mode } = event.data;
 
-                if (mode !== this.expanded) {
-                    this.expandedChange.emit();
+                if (mode !== this.isExpanded) {
+                    this.isExpandedChange.emit();
                 }
             } else if (type === 'valueChanged') {
                 const { value } = event.data;
@@ -201,6 +208,14 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
                     this.assetsCorrelationId = correlationId;
                     this.assetsDialog.show();
                 }
+            } else if (type === 'pickContents') {
+                const { correlationId, schemas } = event.data;
+
+                if (correlationId) {
+                    this.contentsCorrelationId = correlationId;
+                    this.contentsSchemas = schemas;
+                    this.contentsDialog.show();
+                }
             }
 
             this.detectChanges();
@@ -215,6 +230,16 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
         }
 
         this.assetsDialog.hide();
+    }
+
+    public pickContents(contents: ReadonlyArray<ContentDto>) {
+        if (this.contentsCorrelationId) {
+            this.sendMessage('pickContentsResult', { correlationId: this.contentsCorrelationId, result: contents });
+
+            this.contentsCorrelationId = null;
+        }
+
+        this.contentsDialog.hide();
     }
 
     public updateValue(obj: any) {
@@ -250,7 +275,7 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
     }
 
     private sendExpanded() {
-        this.sendMessage('expandedChanged', { expanded: this.expanded });
+        this.sendMessage('expandedChanged', { expanded: this.isExpanded });
     }
 
     private sendDisabled() {

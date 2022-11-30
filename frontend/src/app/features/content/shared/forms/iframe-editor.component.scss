@@ -18,3 +18,14 @@ iframe {
         height: 100% !important;
     }
 }
+
+.expanded {
+    @include absolute(50px, 0, 0, 0);
+    overflow: hidden;
+
+    iframe {
+        height: 100% !important;
+        overflow-x: auto !important;
+        overflow-y: auto !important;
+    }
+}

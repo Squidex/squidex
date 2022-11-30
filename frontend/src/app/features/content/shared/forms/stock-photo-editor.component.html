@@ -8,7 +8,7 @@
         <i class="icon-search"></i>
     </button>
 
-    <input class="form-control" [formControl]="valueControl" readonly>
+    <input readonly [disabled]="true" class="form-control" [formControl]="valueControl">
 </div>
 
 <div *ngIf="stockPhotoThumbnail | async; let url;" class="preview mt-1" [class.hidden-important]="snapshot.thumbnailStatus === 'Failed'">

@@ -38,7 +38,10 @@ public sealed class ContentQueryFixture : TestSchemaFixtureBase
                         nested2 = index
                     }
                 }),
-                Geo = GeoJson.Point(index, index, oldFormat: index % 2 == 1),
+                Geo = GeoJson.Point(
+                    index + 100,
+                    index,
+                    oldFormat: index % 2 == 1),
                 Localized = new Dictionary<string, string>
                 {
                     ["en"] = index.ToString(CultureInfo.InvariantCulture)

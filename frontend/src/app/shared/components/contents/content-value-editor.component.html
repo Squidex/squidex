@@ -19,10 +19,10 @@
         <ng-container *ngSwitchCase="'String'">
             <ng-container [ngSwitch]="field.rawProperties.editor">
                 <ng-container *ngSwitchCase="'Input'">
-                    <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder">
+                    <input class="form-control" [formControlName]="field.name" [placeholder]="field.displayPlaceholder">
                 </ng-container>
                 <ng-container *ngSwitchCase="'Slug'">
-                    <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" sqxTransformInput="Slugify">
+                    <input class="form-control" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" sqxTransformInput="Slugify">
                 </ng-container>
                 <ng-container *ngSwitchCase="'Dropdown'">
                     <select class="form-select" [formControlName]="field.name">
