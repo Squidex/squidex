@@ -1,5 +1,6 @@
 #!/bin/bash
-set -x
+set -x # Prints commands
+set -e # Fails script if any command fails
 #setting up some vars for the version especially as a '.' is not allowed in an Atlas DB name
 # staging or production
 export environment=$1
