@@ -49,10 +49,6 @@
                     <i class="icon-copy"></i>
                 </button>
 
-                <a class="btn btn-text-secondary" target="_blank" [routerLink]="['../..', content.schemaName, content.id]">
-                    <i class="icon-pencil"></i>
-                </a>
-
                 <button type="button" class="btn btn-text-secondary" *ngIf="canRemove"
                     (sqxConfirmClick)="delete.emit()"
                     confirmTitle="i18n:contents.removeConfirmTitle"
@@ -60,6 +56,10 @@
                     confirmRememberKey="removeReference">
                     <i class="icon-close"></i>
                 </button>
+
+                <a class="btn btn-text-secondary" target="_blank" [routerLink]="['../..', content.schemaName, content.id]">
+                    <i class="icon-pencil"></i>
+                </a>
             </div>
         </div>
     </td>
