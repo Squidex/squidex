@@ -1,5 +1,5 @@
 name: Dev
-concurrency: dev
+concurrency: build
 
 on:
   push:
