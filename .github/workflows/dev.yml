@@ -45,7 +45,6 @@ jobs:
         uses: docker/build-push-action@v3.2.0
         with:
           push: false
-          load: true
           build-args: "SQUIDEX__VERSION=5.0.0-dev-${{ env.BUILD_NUMBER }}"
           platforms: linux/amd64,linux/arm64
           cache-from: type=local,src=/tmp/.buildx-cache
