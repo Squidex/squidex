@@ -89,7 +89,6 @@ COPY --from=frontend /build/ wwwroot/build/
 
 EXPOSE 80
 EXPOSE 443
-EXPOSE 11111
 
 ENV DIAGNOSTICS__COUNTERSTOOL=/tools/dotnet-counters
 ENV DIAGNOSTICS__DUMPTOOL=/tools/dotnet-dump
