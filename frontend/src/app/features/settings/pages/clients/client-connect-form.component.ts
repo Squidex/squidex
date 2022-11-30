@@ -21,10 +21,7 @@ export class ClientConnectFormComponent implements OnInit {
     public client!: ClientDto;
 
     public appName!: string;
-
-    public connectToken?: AccessTokenDto;
-    public connectHttpText = '';
-    public connectLibraryText = '';
+    public appToken?: AccessTokenDto;
 
     public step = 'Start';
 
@@ -44,13 +41,10 @@ export class ClientConnectFormComponent implements OnInit {
     public ngOnInit() {
         this.appName = this.appsState.appName;
 
-        this.connectHttpText = connectHttpText(this.apiUrl, this.appName, this.client);
-        this.connectLibraryText = connectLibrary(this.apiUrl, this.appName, this.client);
-
         this.clientsService.createToken(this.appsState.appName, this.client)
             .subscribe({
                 next: dto => {
-                    this.connectToken = dto;
+                    this.appToken = dto;
 
                     this.changeDetector.detectChanges();
                 },
@@ -63,26 +57,4 @@ export class ClientConnectFormComponent implements OnInit {
     public go(step: string) {
         this.step = step;
     }
-}
-
-function connectHttpText(apiUrl: ApiUrlConfig, app: string, client: { id: string; secret: string }) {
-    const url = apiUrl.buildUrl('identity-server/connect/token');
-
-    return `$ curl
-    -X POST '${url}'
-    -H 'Content-Type: application/x-www-form-urlencoded'
-    -d 'grant_type=client_credentials&
-        client_id=${app}:${client.id}&
-        client_secret=${client.secret}&
-        scope=squidex-api'`;
-}
-
-function connectLibrary(apiUrl: ApiUrlConfig, app: string, client: { id: string; secret: string }) {
-    const url = apiUrl.value;
-
-    return `var clientManager = new SquidexClientManager(
-    "${url}",
-    "${app}",
-    "${app}:${client.id}",
-    "${client.secret}")`;
 }
