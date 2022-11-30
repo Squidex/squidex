@@ -35,10 +35,11 @@ jobs:
         with:
           push: false
           load: true
-          tags: squidex-tmp
           build-args: "SQUIDEX__VERSION=${{ env.GITHUB_REF_SLUG }}"
+          platforms: linux/amd64,linux/arm64
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
+          tags: squidex-tmp
 
       - name: Export Image
         run: docker save squidex-tmp | gzip > squidex-tmp.tar.gz
