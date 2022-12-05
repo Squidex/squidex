@@ -13,7 +13,7 @@ export default {
     component: StatusIconComponent,
     argTypes: {
         status: {
-            control: 'enum',
+            control: 'select',
             options: [
                 'Failed',
                 'Success',
@@ -25,7 +25,7 @@ export default {
             control: 'text',
         },
         size: {
-            control: 'enum',
+            control: 'select',
             options: [
                 'sm',
                 'md',

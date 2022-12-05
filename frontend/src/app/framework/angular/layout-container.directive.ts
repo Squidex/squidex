@@ -63,13 +63,14 @@ export class LayoutContainerDirective implements AfterViewInit {
         }
 
         let currentSize = 0;
+        let layoutWidth = this.containerWidth;
         let layoutsWidthSpread = 0;
 
         for (const layout of layouts) {
-            if (layout.desiredWidth > 0) {
-                const layoutWidth = layout.desiredWidth;
+            const desiredWidth = layout.computeDesiredWidth(layouts.length, layoutWidth);
 
-                layout.measure(`${layoutWidth}rem`);
+            if (desiredWidth >= 0) {
+                layout.measure(`${desiredWidth}rem`);
 
                 currentSize += layout.renderWidth;
             } else {
@@ -77,10 +78,12 @@ export class LayoutContainerDirective implements AfterViewInit {
             }
         }
 
-        const spreadWidth = (this.containerWidth - currentSize) / layoutsWidthSpread;
+        const spreadWidth = (layoutWidth - currentSize) / layoutsWidthSpread;
 
         for (const layout of layouts) {
-            if (layout.desiredWidth <= 0) {
+            const desiredWidth = layout.computeDesiredWidth(layouts.length, layoutWidth);
+
+            if (desiredWidth < 0) {
                 layout.measure(`${spreadWidth}px`);
 
                 currentSize += layout.renderWidth;
@@ -97,8 +100,10 @@ export class LayoutContainerDirective implements AfterViewInit {
             currentLayer -= 10;
         }
 
-        const diff = Math.max(0, currentPosition - this.containerWidth);
+        const diff = Math.max(0, currentPosition - layoutWidth);
 
+        this.renderer.setStyle(this.element.nativeElement, 'overflow-x', diff > 1 ? 'auto' : 'hidden');
+        this.renderer.setStyle(this.element.nativeElement, 'overflow-y', 'hidden');
         this.renderer.setProperty(this.element.nativeElement, 'scrollLeft', diff);
     }
 }

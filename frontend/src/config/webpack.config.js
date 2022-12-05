@@ -74,11 +74,11 @@ module.exports = (config, _, options) => {
     if (index >= 0) {
         config.plugins.splice(index, 1);
     }
-    
+
     config.plugins.push(new plugins.MiniCssExtractPlugin({
         filename: '[name].css',
     }));
-    
+
     /*
      * Specifies the name of each output file on disk.
      *
@@ -93,7 +93,7 @@ module.exports = (config, _, options) => {
      */
     config.output.chunkFilename = '[id].[fullhash].chunk.js';
 
-    /* 
+    /*
      * The filename for assets.
      */
     config.output.assetModuleFilename = 'assets/[hash][ext][query]';

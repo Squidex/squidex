@@ -43,9 +43,35 @@
     align-items: stretch;
     display: flex;
     flex-direction: row;
+    flex-grow: inherit;
+
+    &.minimized {
+        z-index: 30 !important;
+
+        & > .panel2-slice {
+            &.right {
+                @include absolute(0, 0, 0);
+                @include box-shadow-outer(0, -2px, 3px, .13);
+            }
+
+            &.left {
+                @include box-shadow-outer(0, 2px, 3px, .13);
+                max-width: none;
+            }
+
+            &.collapsed {
+                box-shadow: none;
+            }
+        }
+
+        .panel2-collapse {
+            display: inline !important;
+        }
+    }
 
     &-slice {
         align-items: stretch;
+        background-color: $color-background;
         display: flex;
         flex-direction: column;
         flex-grow: 0;
@@ -58,8 +84,12 @@
             flex-shrink: 1;
             max-width: 100%;
 
+            .panel2-sidebar-title {
+                white-space: nowrap;
+            }
+
             &.collapsed {
-                width: 3.25rem !important;
+                @include force-width-important(3.25rem);
 
                 .panel2-sidebar-title {
                     opacity: 1;
@@ -73,14 +103,12 @@
                     display: none;
                 }
 
-                .panel2-header {
-                    padding-left: 0;
-                    padding-right: 0;
-                    width: 3rem !important;
-                }
-
                 .panel2-collapse {
                     transform: rotate(180deg);
+                }
+
+                & {
+                    cursor: pointer;
                 }
             }
         }
@@ -106,7 +134,7 @@
             overflow: hidden;
         }
 
-        &.simple {
+        &.right {
             border: 0;
             border-left: 1px solid $color-border;
             width: 100%;
@@ -177,6 +205,15 @@
                 @include absolute(50%, null, null, .5rem);
             }
         }
+
+        &.right {
+            .panel2-collapse {
+                @include absolute(55%, .5rem, null, null);
+                display: none;
+                font-size: .9rem;
+                font-weight: lighter;
+            }
+        }
     }
 
     &-collapse {
@@ -211,7 +248,7 @@
                 width: 100%;
             }
 
-            &.simple {
+            &.right {
                 width: 100%;
             }
 
@@ -234,8 +271,7 @@
     }
 
     &-sidebar-title {
-        @include absolute(7rem, 1.5rem);
-        font-size: $font-small;
+        @include absolute(7rem, 1.75rem);
         opacity: 0;
         transform: rotate(270deg);
         transform-origin: right;
@@ -278,8 +314,8 @@
     }
 
     .nav-link {
-        border: 0;
         border-radius: $border-radius;
+        border: 0;
         color: lighten($color-text, 20%);
         cursor: pointer;
         font-size: inherit;
@@ -294,16 +330,18 @@
             margin-right: 1rem;
         }
 
+        &:hover,
+        &:active,
         &.active {
             background-color: $color-theme-brand-light;
-            color: $color-theme-brand;
-            cursor: default;
-            font-weight: 500;
         }
 
         &:hover {
-            background-color: $color-theme-brand-light;
             color: $color-text;
+        }
+
+        &.active {
+            color: $color-theme-brand;
         }
     }
 
