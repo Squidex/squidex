@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { EMPTY, Observable, of } from 'rxjs';
+import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
 import { AddFieldDto, CreateSchemaDto, FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from './../services/schemas.service';
@@ -184,6 +184,31 @@ export class SchemasState extends State<Snapshot> {
 
             return { ...s, addedCategories: categories };
         }, 'Category Removed');
+    }
+
+    public renameCategory(oldName: string, name: string) {
+        const schemas = this.snapshot.schemas.filter(x => x.category === oldName);
+
+        return forkJoin(schemas.map(s => this.schemasService.putCategory(this.appName, s, { name }, s.version))).pipe(
+            tap(updated => {
+                this.next(s => {
+                    let { schemas, selectedSchema } = s;
+
+                    for (const schema of updated) {
+                        schemas = schemas.replacedBy('id', schema).sortedByString(x => x.displayName);
+
+                        selectedSchema =
+                            schema &&
+                            selectedSchema &&
+                            selectedSchema.id === schema.id ?
+                            schema :
+                            selectedSchema;
+                    }
+
+                    return { ...s, schemas, selectedSchema };
+                }, 'Updated');
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public publish(schema: SchemaDto): Observable<SchemaDto> {

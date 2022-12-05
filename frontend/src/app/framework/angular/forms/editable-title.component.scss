@@ -1,34 +1,36 @@
 @import 'mixins';
 @import 'vars';
 
-.title {
-    @include hover-visible('.title-edit', inline);
-    position: relative;
+:host {
+    display: block;
+}
 
-    &-edit {
-        @include absolute(0, 0, null, null);
-        color: darken($color-border-dark, 20%);
-        cursor: pointer;
-        padding: .6rem .25rem;
-    }
+.title-view {
+    @include hover-visible('.title-edit', block);
 
-    &-name {
-        display: inline;
-        font-size: 1.2rem;
-        font-weight: normal;
-        padding-right: 1.75rem;
-    }
-
-    &-view {
-        @include truncate;
-        border-bottom: 1px solid transparent;
-        border-top: 0;
-        padding: .375rem 0;
-        position: absolute;
+    .col {
+        overflow: hidden;
     }
 }
 
+.btn-placeholder {
+    padding-left: 0;
+    padding-right: 0;
+    width: 0;
+}
+
+.row {
+    flex-wrap: nowrap;
+}
+
 h3 {
+    margin: 0;
+
+    &.sm {
+        font-size: 1rem;
+        font-weight: normal;
+    }
+
     &.fallback {
         color: $color-text-decent;
     }
