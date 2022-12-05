@@ -78,14 +78,16 @@ $panel-sidebar:             3.75rem;
 $font-small:                85%;
 $font-smallest:             80%;
 
+$headings-line-height:      1.3;
+
 $btn-disabled-color:        inherit;
 $btn-disabled-bg:           inherit;
 $btn-disabled-border-color: inherit;
 
-$history-dot-size: 10px;
-$history-dot-offset-x: -($history-dot-size * .5 + 1px);
-$history-dot-sm-size: 6px;
-$history-dot-sm-offset-x: -($history-dot-sm-size * .5 + 1px);
+$history-dot-size:          10px;
+$history-dot-offset-x:      -($history-dot-size * .5 + 1px);
+$history-dot-sm-size:       6px;
+$history-dot-sm-offset-x:   -($history-dot-sm-size * .5 + 1px);
 
 $asset-width:               14.5rem;
 $asset-folder-height:       4rem;

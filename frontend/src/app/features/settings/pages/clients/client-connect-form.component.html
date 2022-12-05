@@ -69,7 +69,15 @@
                     <h5><span class="badge rounded-pill bg-dark">1</span> {{ 'clients.connectWizard.manuallyStep1' | sqxTranslate }}</h5>
 
                     <p>                 
-                        <sqx-code>{{connectHttpText}}</sqx-code>
+                        <sqx-code>
+                            <div ngPreserveWhitespaces>$ curl</div>
+                            <div ngPreserveWhitespaces>-X POST '{{apiUrl.buildUrl('/identity-server/connect/token')}}'</div>
+                            <div ngPreserveWhitespaces>-H 'Content-Type: application/x-www-form-urlencoded'</div>
+                            <div ngPreserveWhitespaces>-d 'grant_type=client_credentials&</div>
+                            <div ngPreserveWhitespaces>    client_id={{appName}}:{{client.id}}</div>
+                            <div ngPreserveWhitespaces>    client_secret={{client.secret}}</div>
+                            <div ngPreserveWhitespaces>    scope=squidex-api'</div>
+                        </sqx-code>
                     </p>
                 </div>
                 
@@ -77,7 +85,7 @@
                     <h5><span class="badge rounded-pill bg-dark">2</span> {{ 'clients.connectWizard.manuallyStep2' | sqxTranslate }}</h5>
 
                     <p>              
-                        <sqx-code>{{connectToken?.accessToken}}</sqx-code>
+                        <sqx-code>{{appToken?.accessToken}}</sqx-code>
                     </p>
                 </div>
                 
@@ -130,6 +138,12 @@
             </ng-container>
             <ng-container *ngSwitchCase="'SDK'">
                 <div class="section step">
+                    <sqx-form-hint>
+                        {{ 'clients.connectWizard.sdkDocumentation' | sqxTranslate }} <a href="https://docs.squidex.io/02-documentation/software-development-kits/.net-standard" sqxExternalLink>{{ 'common.documentation' | sqxTranslate }}</a>
+                    </sqx-form-hint>
+                </div>
+
+                <div class="section step">
                     <h5><span class="badge rounded-pill bg-dark">1</span> {{ 'clients.connectWizard.sdkStep1' | sqxTranslate }}</h5>
 
                     <div [innerHTML]="'clients.connectWizard.sdkStep1Download' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
@@ -143,7 +157,42 @@
                     <h5><span class="badge rounded-pill bg-dark">2</span> {{ 'clients.connectWizard.sdkStep2' | sqxTranslate }}</h5>
 
                     <p>              
-                        <sqx-code>{{connectLibraryText}}</sqx-code>
+                        <sqx-code>
+                            <div ngPreserveWhitespaces>var clientManager = new SquidexClientManager(new SquidexOptions</div>
+                            <div ngPreserveWhitespaces>{{'{'}}</div>
+                            <div ngPreserveWhitespaces>    AppName = {{appName}},</div>
+                            <div ngPreserveWhitespaces>    ClientId = {{appName}}:{{client.id}},</div>
+                            <div ngPreserveWhitespaces>    ClientSecret = {{client.secret}},</div>
+                            <div ngPreserveWhitespaces>    Url = {{apiUrl.value}}</div>
+                            <div ngPreserveWhitespaces>});</div>
+                        </sqx-code>
+                    </p>
+                </div>
+
+
+                <div class="section step">
+                    <h5><span class="badge rounded-pill bg-dark">3</span> {{ 'clients.connectWizard.sdkStep3' | sqxTranslate }}</h5>
+
+                    <div [innerHTML]="'clients.connectWizard.sdkStep3Download' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+
+                    <p>              
+                        <sqx-code>dotnet add package Squidex.ClientLibrary.ServiceExtensions</sqx-code>
+                    </p>
+                </div>
+
+                <div class="section step">
+                    <h5><span class="badge rounded-pill bg-dark">4</span> {{ 'clients.connectWizard.sdkStep4' | sqxTranslate }}</h5>
+
+                    <p>              
+                        <sqx-code>
+                            <div ngPreserveWhitespaces>services.AddSquidex(options =></div>
+                            <div ngPreserveWhitespaces>{{'{'}}</div>
+                            <div ngPreserveWhitespaces>    options.AppName = {{appName}};</div>
+                            <div ngPreserveWhitespaces>    options.ClientId = {{appName}}:{{client.id}};</div>
+                            <div ngPreserveWhitespaces>    options.ClientSecret = {{client.secret}};</div>
+                            <div ngPreserveWhitespaces>    options.Url = {{apiUrl.value}};</div>
+                            <div ngPreserveWhitespaces>});</div>
+                        </sqx-code>
                     </p>
                 </div>
 

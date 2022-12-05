@@ -730,6 +730,9 @@
   <data name="history.apps.clientUpdated" xml:space="preserve">
     <value>Aggiornato client {[Id]}</value>
   </data>
+  <data name="history.apps.common.updated" xml:space="preserve">
+    <value>updated general settings</value>
+  </data>
   <data name="history.apps.contributoreAssigned" xml:space="preserve">
     <value>Associato {user:[Contributor]} al ruolo {[Role]}</value>
   </data>
@@ -777,9 +780,6 @@
   </data>
   <data name="history.apps.transfered" xml:space="preserve">
     <value>updated app to client</value>
-  </data>
-  <data name="history.apps.updated" xml:space="preserve">
-    <value>updated general settings</value>
   </data>
   <data name="history.apps.workflowAdded" xml:space="preserve">
     <value>added workflow {[Name]}.</value>

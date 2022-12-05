@@ -17,7 +17,7 @@ export default {
             control: 'number',
         },
         color: {
-            control: 'enum',
+            control: 'select',
             options: [
                 'white',
                 'theme',

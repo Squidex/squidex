@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { ContentDto, interpolate, LocalStoreService, ModalModel, SchemaDto, Settings, StatefulComponent } from '@app/shared';
+import { AuthService, ContentDto, interpolate, LocalStoreService, ModalModel, SchemaDto, Settings, StatefulComponent } from '@app/shared';
 
 interface State {
     // The name of the selected preview config.
@@ -37,6 +37,7 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
     public dropdown = new ModalModel();
 
     constructor(changeDetector: ChangeDetectorRef,
+        private readonly authService: AuthService,
         private readonly localStore: LocalStoreService,
     ) {
         super(changeDetector, {
@@ -74,7 +75,11 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
     }
 
     private navigateTo(name: string) {
-        const url = interpolate(this.schema.previewUrls[name], this.content, 'iv');
+        const vars = { ...this.content };
+
+        vars['accessToken'] = this.authService.user?.accessToken;
+
+        const url = interpolate(this.schema.previewUrls[name], vars, 'iv');
 
         window.open(url, '_blank');
     }
