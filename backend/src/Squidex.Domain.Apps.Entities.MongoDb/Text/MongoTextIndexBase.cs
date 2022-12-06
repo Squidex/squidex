@@ -164,6 +164,8 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
     private Task SearchBySchemaAsync(List<(DomainId, double)> result, string text, IAppEntity app, IEnumerable<DomainId> schemaIds, SearchScope scope, int take, double factor,
         CancellationToken ct = default)
     {
+        text = QueryParser.ParseQuery(text);
+
         var filter =
             Filter.And(
                 Filter.Eq(x => x.AppId, app.Id),
@@ -177,6 +179,8 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
     private Task SearchByAppAsync(List<(DomainId, double)> result, string text, IAppEntity app, SearchScope scope, int take, double factor,
         CancellationToken ct = default)
     {
+        text = QueryParser.ParseQuery(text);
+
         var filter =
             Filter.And(
                 Filter.Eq(x => x.AppId, app.Id),

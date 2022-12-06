@@ -54,7 +54,7 @@ public class ContentQueryServiceTests
         A.CallTo(() => appProvider.GetSchemasAsync(appId.Id, ct))
             .Returns(new List<ISchemaEntity> { schema });
 
-        A.CallTo(() => queryParser.ParseAsync(A<Context>._, A<Q>._, A<ISchemaEntity?>._))
+        A.CallTo(() => queryParser.ParseAsync(A<Context>._, A<Q>._, A<ISchemaEntity?>._, default))
             .ReturnsLazily(c => Task.FromResult(c.GetArgument<Q>(1)!));
 
         var options = Options.Create(new ContentOptions());
