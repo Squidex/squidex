@@ -478,7 +478,7 @@ describe('SchemasState', () => {
             it('should update schema with matching category', () => {
                 const updated = createSchema(1, '_new');
 
-                schemasService.setup(x => x.putCategory(app, schema2, { name: 'new-name' }, version))
+                schemasService.setup(x => x.putCategory(app, schema1, { name: 'new-name' }, version))
                     .returns(() => of(updated)).verifiable();
 
                 schemasState.renameCategory('schema-category1', 'new-name').subscribe();

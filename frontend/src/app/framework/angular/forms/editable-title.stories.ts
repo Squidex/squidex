@@ -15,16 +15,16 @@ export default {
     title: 'Framework/EditableTitle',
     component: EditableTitleComponent,
     argTypes: {
-        text: {
-            control: 'text',
+        inputTitle: {
+            control: 'inputTitle',
         },
         closeButton: {
             control: 'boolean',
         },
-        textRequired: {
+        inputTitleRequired: {
             control: 'boolean',
         },
-        textLength: {
+        inputTitleLength: {
             control: 'number',
         },
         size: {
@@ -38,8 +38,8 @@ export default {
     },
     args: {
         closeButton: true,
-        textLength: 30,
-        textRequired: true,
+        inputTitleLength: 30,
+        inputTitleRequired: true,
     },
     decorators: [
         moduleMetadata({
@@ -66,9 +66,9 @@ const Template: Story<EditableTitleComponent> = (args: EditableTitleComponent) =
                     <sqx-editable-title 
                         [closeButton]="closeButton"
                         [size]="size"
-                        [text]="text"
-                        [textLength]="textLength"
-                        [textRequired]="textRequired">
+                        [inputTitle]="inputTitle"
+                        [inputTitleLength]="inputTitleLength"
+                        [inputTitleRequired]="inputTitleRequired">
                     </sqx-editable-title>
                 </div>
                 <div class="col-3">
