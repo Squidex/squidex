@@ -82,7 +82,7 @@ public class ContentQueryParser
             query.Filter = await GeoQueryTransformer.TransformAsync(query.Filter, context, schema, textIndex, ct);
         }
 
-        if (!string.IsNullOrWhiteSpace(query.FullText))
+        if (string.IsNullOrWhiteSpace(query.FullText))
         {
             return;
         }
