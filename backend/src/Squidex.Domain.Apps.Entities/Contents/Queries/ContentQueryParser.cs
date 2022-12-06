@@ -30,7 +30,7 @@ public class ContentQueryParser
     private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
     private readonly IMemoryCache cache;
     private readonly IJsonSerializer serializer;
-    private readonly IAppProvider appprovider;
+    private readonly IAppProvider appProvider;
     private readonly ITextIndex textIndex;
     private readonly ContentOptions options;
 
@@ -38,22 +38,23 @@ public class ContentQueryParser
         IMemoryCache cache, IJsonSerializer serializer)
     {
         this.serializer = serializer;
-        this.appprovider = appprovider;
+        this.appProvider = appprovider;
         this.textIndex = textIndex;
         this.cache = cache;
         this.options = options.Value;
     }
 
-    public virtual async Task<Q> ParseAsync(Context context, Q q, ISchemaEntity? schema = null)
+    public virtual async Task<Q> ParseAsync(Context context, Q q, ISchemaEntity? schema = null,
+        CancellationToken ct = default)
     {
         Guard.NotNull(context);
         Guard.NotNull(q);
 
         using (Telemetry.Activities.StartActivity("ContentQueryParser/ParseAsync"))
         {
-            var query = await ParseClrQueryAsync(context, q, schema);
+            var query = await ParseClrQueryAsync(context, q, schema, ct);
 
-            await TransformFilterAsync(query, context, schema);
+            await TransformFilterAsync(query, context, schema, ct);
 
             WithSorting(query);
             WithPaging(query, q);
@@ -73,11 +74,12 @@ public class ContentQueryParser
         }
     }
 
-    private async Task TransformFilterAsync(ClrQuery query, Context context, ISchemaEntity? schema)
+    private async Task TransformFilterAsync(ClrQuery query, Context context, ISchemaEntity? schema,
+        CancellationToken ct)
     {
         if (query.Filter != null && schema != null)
         {
-            query.Filter = await GeoQueryTransformer.TransformAsync(query.Filter, context, schema, textIndex);
+            query.Filter = await GeoQueryTransformer.TransformAsync(query.Filter, context, schema, textIndex, ct);
         }
 
         if (!string.IsNullOrWhiteSpace(query.FullText))
@@ -93,7 +95,7 @@ public class ContentQueryParser
                 PreferredSchemaId = schema.Id
             };
 
-            var fullTextIds = await textIndex.SearchAsync(context.App, textQuery, context.Scope());
+            var fullTextIds = await textIndex.SearchAsync(context.App, textQuery, context.Scope(), ct);
             var fullTextFilter = ClrFilter.Eq("id", "__notfound__");
 
             if (fullTextIds?.Any() == true)
@@ -114,13 +116,14 @@ public class ContentQueryParser
         }
     }
 
-    private async Task<ClrQuery> ParseClrQueryAsync(Context context, Q q, ISchemaEntity? schema)
+    private async Task<ClrQuery> ParseClrQueryAsync(Context context, Q q, ISchemaEntity? schema,
+        CancellationToken ct)
     {
         var components = ResolvedComponents.Empty;
 
         if (schema != null)
         {
-            components = await appprovider.GetComponentsAsync(schema);
+            components = await appProvider.GetComponentsAsync(schema, ct);
         }
 
         var query = q.Query;

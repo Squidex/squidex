@@ -94,7 +94,7 @@ public sealed class ContentQueryService : IContentQueryService
                 q = q with { CreatedBy = context.UserPrincipal.Token() };
             }
 
-            q = await queryParser.ParseAsync(context, q, schema);
+            q = await ParseCoreAsync(context, q, schema, ct);
 
             var contents = await QueryCoreAsync(context, q, schema, ct);
 
@@ -126,7 +126,7 @@ public sealed class ContentQueryService : IContentQueryService
                 return ResultList.Empty<IEnrichedContentEntity>();
             }
 
-            q = await queryParser.ParseAsync(context, q);
+            q = await ParseCoreAsync(context, q, null, ct);
 
             var contents = await QueryCoreAsync(context, q, schemas, ct);
 
@@ -213,6 +213,18 @@ public sealed class ContentQueryService : IContentQueryService
         var schemas = await appProvider.GetSchemasAsync(context.App.Id, ct);
 
         return schemas.Where(x => IsAccessible(x) && HasPermission(context, x, PermissionIds.AppContentsReadOwn)).ToList();
+    }
+
+    private async Task<Q> ParseCoreAsync(Context context, Q q, ISchemaEntity? schema,
+        CancellationToken ct)
+    {
+        using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
+        {
+            // Enforce a hard timeout
+            combined.CancelAfter(options.TimeoutQuery);
+
+            return await queryParser.ParseAsync(context, q, schema, ct);
+        }
     }
 
     private async Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, Q q, ISchemaEntity schema,

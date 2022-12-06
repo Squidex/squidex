@@ -177,7 +177,7 @@ public sealed class AssetQueryService : IAssetQueryService
 
         using (Telemetry.Activities.StartActivity("AssetQueryService/QueryAsync"))
         {
-            q = await queryParser.ParseAsync(context, q, ct);
+            q = await ParseCoreAsync(context, q, ct);
 
             var assets = await QueryCoreAsync(context, parentId, q, ct);
 
@@ -212,6 +212,18 @@ public sealed class AssetQueryService : IAssetQueryService
         using (Telemetry.Activities.StartActivity("AssetQueryService/TransformCoreAsync"))
         {
             return await assetEnricher.EnrichAsync(assets, context, ct);
+        }
+    }
+
+    private async Task<Q> ParseCoreAsync(Context context, Q q,
+        CancellationToken ct)
+    {
+        using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
+        {
+            // Enforce a hard timeout
+            combined.CancelAfter(options.TimeoutQuery);
+
+            return await queryParser.ParseAsync(context, q, ct);
         }
     }
 

@@ -17,15 +17,16 @@ internal sealed class GeoQueryTransformer : AsyncTransformVisitor<ClrValue, GeoQ
 {
     public static readonly GeoQueryTransformer Instance = new GeoQueryTransformer();
 
-    public record struct Args(Context Context, ISchemaEntity Schema, ITextIndex TextIndex);
+    public record struct Args(Context Context, ISchemaEntity Schema, ITextIndex TextIndex, CancellationToken CancellationToken);
 
     private GeoQueryTransformer()
     {
     }
 
-    public static async Task<FilterNode<ClrValue>?> TransformAsync(FilterNode<ClrValue> filter, Context context, ISchemaEntity schema, ITextIndex textIndex)
+    public static async Task<FilterNode<ClrValue>?> TransformAsync(FilterNode<ClrValue> filter, Context context, ISchemaEntity schema, ITextIndex textIndex,
+        CancellationToken ct)
     {
-        var args = new Args(context, schema, textIndex);
+        var args = new Args(context, schema, textIndex, ct);
 
         return await filter.Accept(Instance, args);
     }
@@ -39,7 +40,7 @@ internal sealed class GeoQueryTransformer : AsyncTransformVisitor<ClrValue, GeoQ
             var searchQuery = new GeoQuery(args.Schema.Id, field, sphere.Latitude, sphere.Longitude, sphere.Radius, 1000);
             var searchScope = args.Context.Scope();
 
-            var ids = await args.TextIndex.SearchAsync(args.Context.App, searchQuery, searchScope);
+            var ids = await args.TextIndex.SearchAsync(args.Context.App, searchQuery, searchScope, args.CancellationToken);
 
             if (ids == null || ids.Count == 0)
             {
