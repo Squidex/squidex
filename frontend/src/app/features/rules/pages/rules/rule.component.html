@@ -2,12 +2,13 @@
     <div class="card-header">
         <div class="row">
             <div class="col col-name">
-                <sqx-editable-title [disabled]="!rule.canUpdate"
-                    [fallback]="'rules.unnamed' | sqxTranslate" 
-                    [name]="rule.name"
-                    (nameChange)="rename($event)"
-                    [maxLength]="60"
-                    [isRequired]="false">
+                <sqx-editable-title
+                    [disabled]="!rule.canUpdate"
+                    [displayFallback]="'rules.unnamed' | sqxTranslate" 
+                    (inputTitleChange)="rename($event)"
+                    [inputTitle]="rule.name"
+                    [inputTitleLength]="60"
+                    [inputTitleRequired]="false" >
                 </sqx-editable-title>
             </div>
             <div class="col-auto" [class.invisible]="!rule.canDelete && !rule.canRun">

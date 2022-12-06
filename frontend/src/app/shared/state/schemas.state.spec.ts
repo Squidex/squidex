@@ -474,6 +474,18 @@ describe('SchemasState', () => {
                 expect(schemasState.snapshot.schemas).toEqual([updated, schema2]);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
+
+            it('should update schema with matching category', () => {
+                const updated = createSchema(1, '_new');
+
+                schemasService.setup(x => x.putCategory(app, schema1, { name: 'new-name' }, version))
+                    .returns(() => of(updated)).verifiable();
+
+                schemasState.renameCategory('schema-category1', 'new-name').subscribe();
+
+                expect(schemasState.snapshot.schemas).toEqual([updated, schema2]);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
+            });
         });
     });
 

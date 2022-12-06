@@ -82,38 +82,40 @@ public class ContentQueryParser
             query.Filter = await GeoQueryTransformer.TransformAsync(query.Filter, context, schema, textIndex, ct);
         }
 
-        if (!string.IsNullOrWhiteSpace(query.FullText))
+        if (string.IsNullOrWhiteSpace(query.FullText))
         {
-            if (schema == null)
-            {
-                ThrowHelper.InvalidOperationException();
-                return;
-            }
-
-            var textQuery = new TextQuery(query.FullText, 1000)
-            {
-                PreferredSchemaId = schema.Id
-            };
-
-            var fullTextIds = await textIndex.SearchAsync(context.App, textQuery, context.Scope(), ct);
-            var fullTextFilter = ClrFilter.Eq("id", "__notfound__");
-
-            if (fullTextIds?.Any() == true)
-            {
-                fullTextFilter = ClrFilter.In("id", fullTextIds.Select(x => x.ToString()).ToList());
-            }
-
-            if (query.Filter != null)
-            {
-                query.Filter = ClrFilter.And(query.Filter, fullTextFilter);
-            }
-            else
-            {
-                query.Filter = fullTextFilter;
-            }
-
-            query.FullText = null;
+            return;
         }
+
+        if (schema == null)
+        {
+            ThrowHelper.InvalidOperationException();
+            return;
+        }
+
+        var textQuery = new TextQuery(query.FullText, 1000)
+        {
+            PreferredSchemaId = schema.Id
+        };
+
+        var fullTextIds = await textIndex.SearchAsync(context.App, textQuery, context.Scope(), ct);
+        var fullTextFilter = ClrFilter.Eq("id", "__notfound__");
+
+        if (fullTextIds?.Any() == true)
+        {
+            fullTextFilter = ClrFilter.In("id", fullTextIds.Select(x => x.ToString()).ToList());
+        }
+
+        if (query.Filter != null)
+        {
+            query.Filter = ClrFilter.And(query.Filter, fullTextFilter);
+        }
+        else
+        {
+            query.Filter = fullTextFilter;
+        }
+
+        query.FullText = null;
     }
 
     private async Task<ClrQuery> ParseClrQueryAsync(Context context, Q q, ISchemaEntity? schema,

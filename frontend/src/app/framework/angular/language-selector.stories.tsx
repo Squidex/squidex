@@ -15,7 +15,7 @@ export default {
     component: LanguageSelectorComponent,
     argTypes: {
         size: {
-            control: 'enum',
+            control: 'select',
             options: [
                 'sm',
                 'md',

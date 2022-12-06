@@ -89,12 +89,28 @@
     width: $width;
 }
 
+@mixin force-width-important($width) {
+    // Ensure that we use the minimum width in flex scenarios.
+    max-width: $width !important;
+    min-width: $width !important;
+    // Normal width definition.
+    width: $width !important;
+}
+
 @mixin force-height($height) {
-    // Normal height definition.
-    height: $height;
     // Ensure that we use the minimum height in flex scenarios.
     max-height: $height;
     min-height: $height;
+    // Normal height definition.
+    height: $height;
+}
+
+@mixin force-height-important($height) {
+    // Ensure that we use the minimum height in flex scenarios.
+    max-height: $height !important;
+    min-height: $height !important;
+    // Normal height definition.
+    height: $height !important;
 }
 
 @mixin caret-top($color, $size: .6rem) {
