@@ -5,8 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { moduleMetadata } from '@storybook/angular';
 import { Meta, Story } from '@storybook/angular/types-6-0';
-import { AvatarComponent } from '@app/framework';
+import { AvatarComponent, SqxFrameworkModule } from '@app/framework';
 
 export default {
     title: 'Framework/Avatar',
@@ -22,6 +23,14 @@ export default {
             control: 'number',
         },
     },
+    decorators: [
+        moduleMetadata({
+            imports: [
+                SqxFrameworkModule,
+                SqxFrameworkModule.forRoot(),
+            ],
+        }),
+    ],
 } as Meta;
 
 const Template: Story<AvatarComponent> = (args: AvatarComponent) => ({
