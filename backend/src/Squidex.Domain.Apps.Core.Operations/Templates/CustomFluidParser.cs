@@ -6,16 +6,14 @@
 // ==========================================================================
 
 using Fluid;
+using Fluid.Ast;
+using Parlot.Fluent;
 
 namespace Squidex.Domain.Apps.Core.Templates;
 
-public interface IFluidExtension
+public sealed class CustomFluidParser : FluidParser
 {
-    void RegisterLanguageExtensions(CustomFluidParser parser, TemplateOptions options)
-    {
-    }
+    public Deferred<Expression> PrimaryParser => Primary;
 
-    void BeforeRun(TemplateContext templateContext)
-    {
-    }
+    public Parser<char> CommaParser => Comma;
 }

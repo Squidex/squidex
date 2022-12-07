@@ -8,79 +8,60 @@
 using System.Text.Encodings.Web;
 using Fluid;
 using Fluid.Ast;
-using Fluid.Tags;
 using Fluid.Values;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
-using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
+using static Parlot.Fluent.Parsers;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
 public sealed class AssetsFluidExtension : IFluidExtension
 {
-    private static readonly FluidValue ErrorNullAsset = FluidValue.Create(null);
     private static readonly FluidValue ErrorNoAsset = new StringValue("NoAsset");
     private static readonly FluidValue ErrorNoImage = new StringValue("NoImage");
     private static readonly FluidValue ErrorTooBig = new StringValue("ErrorTooBig");
     private readonly IServiceProvider serviceProvider;
-
-    private sealed class AssetTag : ArgumentsTag
-    {
-        private readonly IServiceProvider serviceProvider;
-
-        public AssetTag(IServiceProvider serviceProvider)
-        {
-            this.serviceProvider = serviceProvider;
-        }
-
-        public override async ValueTask<Completion> WriteToAsync(TextWriter writer,
-            TextEncoder encoder, TemplateContext context, FilterArgument[] arguments)
-        {
-            if (arguments.Length == 2 && context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
-            {
-                var id = await arguments[1].Expression.EvaluateAsync(context);
-
-                var asset = await ResolveAssetAsync(serviceProvider, enrichedEvent.AppId.Id, id);
-
-                if (asset != null)
-                {
-                    var name = (await arguments[0].Expression.EvaluateAsync(context)).ToStringValue();
-
-                    context.SetValue(name, asset);
-                }
-            }
-
-            return Completion.Normal;
-        }
-    }
 
     public AssetsFluidExtension(IServiceProvider serviceProvider)
     {
         this.serviceProvider = serviceProvider;
     }
 
-    public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
+    public void RegisterLanguageExtensions(CustomFluidParser parser, TemplateOptions options)
     {
-        memberAccessStrategy.Register<IAssetEntity>();
-        memberAccessStrategy.Register<IAssetInfo>();
-        memberAccessStrategy.Register<IWithId<DomainId>>();
-        memberAccessStrategy.Register<IEntity>();
-        memberAccessStrategy.Register<IEntityWithCreatedBy>();
-        memberAccessStrategy.Register<IEntityWithLastModifiedBy>();
-        memberAccessStrategy.Register<IEntityWithVersion>();
-        memberAccessStrategy.Register<IEnrichedAssetEntity>();
+        AddAssetFilter(options);
+        AddAssetTextFilter(options);
 
-        AddAssetFilter();
-        AddAssetTextFilter();
+        var args = parser.PrimaryParser.And(ZeroOrOne(parser.CommaParser)).And(parser.PrimaryParser);
+
+        parser.RegisterParserTag("asset", args, ResolveAsset);
     }
 
-    private void AddAssetFilter()
+    private async ValueTask<Completion> ResolveAsset(ValueTuple<Expression, char, Expression> arguments, TextWriter writer, TextEncoder encoder, TemplateContext context)
     {
-        TemplateContext.GlobalFilters.AddAsyncFilter("asset", async (input, arguments, context) =>
+        if (context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
+        {
+            var assetId = await arguments.Item3.EvaluateAsync(context);
+            var asset = await ResolveAssetAsync(serviceProvider, enrichedEvent.AppId.Id, assetId);
+
+            if (asset != null)
+            {
+                var name = (await arguments.Item1.EvaluateAsync(context)).ToStringValue();
+
+                context.SetValue(name, asset);
+            }
+        }
+
+        return Completion.Normal;
+    }
+
+    private void AddAssetFilter(TemplateOptions options)
+    {
+        options.Filters.AddFilter("asset", async (input, arguments, context) =>
         {
             if (context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
             {
@@ -88,19 +69,19 @@ public sealed class AssetsFluidExtension : IFluidExtension
 
                 if (asset == null)
                 {
-                    return ErrorNullAsset;
+                    return NilValue.Instance;
                 }
 
-                return FluidValue.Create(asset);
+                return FluidValue.Create(asset, options);
             }
 
-            return ErrorNullAsset;
+            return NilValue.Instance;
         });
     }
 
-    private void AddAssetTextFilter()
+    private void AddAssetTextFilter(TemplateOptions options)
     {
-        TemplateContext.GlobalFilters.AddAsyncFilter("assetText", async (input, arguments, context) =>
+        options.Filters.AddFilter("assetText", async (input, arguments, context) =>
         {
             if (input is not ObjectValue objectValue)
             {
@@ -134,7 +115,7 @@ public sealed class AssetsFluidExtension : IFluidExtension
             return ErrorNoAsset;
         });
 
-        TemplateContext.GlobalFilters.AddAsyncFilter("assetBlurHash", async (input, arguments, context) =>
+        options.Filters.AddFilter("assetBlurHash", async (input, arguments, context) =>
         {
             if (input is not ObjectValue objectValue)
             {
@@ -187,11 +168,6 @@ public sealed class AssetsFluidExtension : IFluidExtension
 
             return ErrorNoAsset;
         });
-    }
-
-    public void RegisterLanguageExtensions(FluidParserFactory factory)
-    {
-        factory.RegisterTag("asset", new AssetTag(serviceProvider));
     }
 
     private static async Task<IAssetEntity?> ResolveAssetAsync(IServiceProvider serviceProvider, DomainId appId, FluidValue id)

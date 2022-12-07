@@ -6,48 +6,33 @@
 // ==========================================================================
 
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace Squidex.Domain.Apps.Core.Templates;
 
 [Serializable]
 public class TemplateParseException : Exception
 {
-    public IReadOnlyList<string> Errors { get; }
+    public string Error { get; set; }
 
-    public TemplateParseException(string template, IEnumerable<string> errors, Exception? inner = null)
-        : base(BuildErrorMessage(errors, template), inner)
+    public TemplateParseException(string template, string error, Exception? inner = null)
+        : base(BuildErrorMessage(error, template), inner)
     {
-        Errors = errors.ToList();
+        Error = error;
     }
 
     protected TemplateParseException(SerializationInfo info, StreamingContext context)
         : base(info, context)
     {
-        Errors = (info.GetValue(nameof(Errors), typeof(List<string>)) as List<string>) ?? new List<string>();
+        Error = info.GetString(nameof(Error)) ?? string.Empty;
     }
 
     public override void GetObjectData(SerializationInfo info, StreamingContext context)
     {
-        info.AddValue(nameof(Errors), Errors.ToList());
+        info.AddValue(nameof(Error), Error);
     }
 
-    private static string BuildErrorMessage(IEnumerable<string> errors, string template)
+    private static string BuildErrorMessage(string error, string template)
     {
-        var sb = new StringBuilder();
-
-        sb.AppendLine("Failed to parse template");
-
-        foreach (var error in errors)
-        {
-            sb.Append(" * ");
-            sb.AppendLine(error);
-        }
-
-        sb.AppendLine();
-        sb.AppendLine("Template:");
-        sb.AppendLine(template);
-
-        return sb.ToString();
+        return $"Failed to parse template with <{error}>, template: {template}.";
     }
 }

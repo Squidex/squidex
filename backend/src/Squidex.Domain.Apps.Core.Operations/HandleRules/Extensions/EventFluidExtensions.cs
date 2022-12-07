@@ -23,15 +23,15 @@ public sealed class EventFluidExtensions : IFluidExtension
         this.urlGenerator = urlGenerator;
     }
 
-    public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
+    public void RegisterLanguageExtensions(CustomFluidParser parser, TemplateOptions options)
     {
-        TemplateContext.GlobalFilters.AddFilter("contentUrl", ContentUrl);
-        TemplateContext.GlobalFilters.AddFilter("assetContentUrl", AssetContentUrl);
-        TemplateContext.GlobalFilters.AddFilter("assetContentAppUrl", AssetContentAppUrl);
-        TemplateContext.GlobalFilters.AddFilter("assetContentSlugUrl", AssetContentSlugUrl);
+        options.Filters.AddFilter("contentUrl", ContentUrl);
+        options.Filters.AddFilter("assetContentUrl", AssetContentUrl);
+        options.Filters.AddFilter("assetContentAppUrl", AssetContentAppUrl);
+        options.Filters.AddFilter("assetContentSlugUrl", AssetContentSlugUrl);
     }
 
-    private FluidValue ContentUrl(FluidValue input, FilterArguments arguments, TemplateContext context)
+    private ValueTask<FluidValue> ContentUrl(FluidValue input, FilterArguments arguments, TemplateContext context)
     {
         var value = input.ToObjectValue();
 
@@ -60,7 +60,7 @@ public sealed class EventFluidExtensions : IFluidExtension
         return NilValue.Empty;
     }
 
-    private FluidValue AssetContentUrl(FluidValue input, FilterArguments arguments, TemplateContext context)
+    private ValueTask<FluidValue> AssetContentUrl(FluidValue input, FilterArguments arguments, TemplateContext context)
     {
         var value = input.ToObjectValue();
 
@@ -89,7 +89,7 @@ public sealed class EventFluidExtensions : IFluidExtension
         return NilValue.Empty;
     }
 
-    private FluidValue AssetContentAppUrl(FluidValue input, FilterArguments arguments, TemplateContext context)
+    private ValueTask<FluidValue> AssetContentAppUrl(FluidValue input, FilterArguments arguments, TemplateContext context)
     {
         var value = input.ToObjectValue();
 
@@ -118,7 +118,7 @@ public sealed class EventFluidExtensions : IFluidExtension
         return NilValue.Empty;
     }
 
-    private FluidValue AssetContentSlugUrl(FluidValue input, FilterArguments arguments, TemplateContext context)
+    private ValueTask<FluidValue> AssetContentSlugUrl(FluidValue input, FilterArguments arguments, TemplateContext context)
     {
         var value = input.ToObjectValue();
 
