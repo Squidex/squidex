@@ -36,10 +36,10 @@
   
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.0" />
-    <PackageReference Include="GraphQL" Version="7.1.1" />
-    <PackageReference Include="GraphQL.MicrosoftDI" Version="7.1.1" />
-    <PackageReference Include="GraphQL.SystemTextJson" Version="7.1.1" />
-    <PackageReference Include="Meziantou.Analyzer" Version="1.0.746">
+    <PackageReference Include="GraphQL" Version="7.2.0" />
+    <PackageReference Include="GraphQL.MicrosoftDI" Version="7.2.0" />
+    <PackageReference Include="GraphQL.SystemTextJson" Version="7.2.0" />
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.756">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -62,20 +62,20 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc7" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc7" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="ReportGenerator" Version="5.1.11" PrivateAssets="all" />
-    <PackageReference Include="Squidex.Assets.Azure" Version="5.0.0" />
-    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="5.0.0" />
-    <PackageReference Include="Squidex.Assets.FTP" Version="5.0.0" />
-    <PackageReference Include="Squidex.Assets.ImageMagick" Version="5.0.0" />
-    <PackageReference Include="Squidex.Assets.ImageSharp" Version="5.0.0" />
-    <PackageReference Include="Squidex.Assets.Mongo" Version="5.0.0" />
-    <PackageReference Include="Squidex.Assets.S3" Version="5.0.0" />
-    <PackageReference Include="Squidex.Assets.TusAdapter" Version="5.0.0" />
+    <PackageReference Include="ReportGenerator" Version="5.1.12" PrivateAssets="all" />
+    <PackageReference Include="Squidex.Assets.Azure" Version="5.3.0" />
+    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="5.3.0" />
+    <PackageReference Include="Squidex.Assets.FTP" Version="5.3.0" />
+    <PackageReference Include="Squidex.Assets.ImageMagick" Version="5.3.0" />
+    <PackageReference Include="Squidex.Assets.ImageSharp" Version="5.3.0" />
+    <PackageReference Include="Squidex.Assets.Mongo" Version="5.3.0" />
+    <PackageReference Include="Squidex.Assets.S3" Version="5.3.0" />
+    <PackageReference Include="Squidex.Assets.TusAdapter" Version="5.3.0" />
     <PackageReference Include="Squidex.Caching.Orleans" Version="1.9.0" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="12.2.0" />
-    <PackageReference Include="Squidex.Hosting" Version="5.0.0" />
-    <PackageReference Include="Squidex.Messaging.All" Version="5.0.0" />
-    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="5.0.0" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="12.6.0" />
+    <PackageReference Include="Squidex.Hosting" Version="5.3.0" />
+    <PackageReference Include="Squidex.Messaging.All" Version="5.3.0" />
+    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="5.3.0" />
     <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="4.0.1-dev" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
   </ItemGroup>

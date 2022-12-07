@@ -14,7 +14,7 @@
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Meziantou.Analyzer" Version="1.0.746">
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.756">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
