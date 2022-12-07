@@ -34,19 +34,22 @@ public sealed class ReferencesFluidExtension : IFluidExtension
         AddReferenceFilter(options);
 
         parser.RegisterParserTag("reference",
-            parser.PrimaryParser.And(ZeroOrOne(parser.CommaParser)).And(parser.PrimaryParser), ResolveReference);
+            parser.PrimaryParser.AndSkip(ZeroOrOne(parser.CommaParser)).And(parser.PrimaryParser), 
+            ResolveReference);
     }
 
-    private async ValueTask<Completion> ResolveReference(ValueTuple<Expression, char, Expression> arguments, TextWriter writer, TextEncoder encoder, TemplateContext context)
+    private async ValueTask<Completion> ResolveReference(ValueTuple<Expression, Expression> arguments, TextWriter writer, TextEncoder encoder, TemplateContext context)
     {
         if (context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
         {
-            var contentId = await arguments.Item3.EvaluateAsync(context);
+            var (nameArg, idArg) = arguments;
+
+            var contentId = await idArg.EvaluateAsync(context);
             var content = await ResolveContentAsync(serviceProvider, enrichedEvent.AppId.Id, contentId);
 
             if (content != null)
             {
-                var name = (await arguments.Item1.EvaluateAsync(context)).ToStringValue();
+                var name = (await nameArg.EvaluateAsync(context)).ToStringValue();
 
                 context.SetValue(name, content);
             }

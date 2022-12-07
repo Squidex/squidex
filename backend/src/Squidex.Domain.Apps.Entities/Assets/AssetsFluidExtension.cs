@@ -36,21 +36,23 @@ public sealed class AssetsFluidExtension : IFluidExtension
         AddAssetFilter(options);
         AddAssetTextFilter(options);
 
-        var args = parser.PrimaryParser.And(ZeroOrOne(parser.CommaParser)).And(parser.PrimaryParser);
-
-        parser.RegisterParserTag("asset", args, ResolveAsset);
+        parser.RegisterParserTag("asset", 
+            parser.PrimaryParser.AndSkip(ZeroOrOne(parser.CommaParser)).And(parser.PrimaryParser),
+            ResolveAsset);
     }
 
-    private async ValueTask<Completion> ResolveAsset(ValueTuple<Expression, char, Expression> arguments, TextWriter writer, TextEncoder encoder, TemplateContext context)
+    private async ValueTask<Completion> ResolveAsset(ValueTuple<Expression, Expression> arguments, TextWriter writer, TextEncoder encoder, TemplateContext context)
     {
         if (context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
         {
-            var assetId = await arguments.Item3.EvaluateAsync(context);
+            var (nameArg, idArg) = arguments;
+
+            var assetId = await idArg.EvaluateAsync(context);
             var asset = await ResolveAssetAsync(serviceProvider, enrichedEvent.AppId.Id, assetId);
 
             if (asset != null)
             {
-                var name = (await arguments.Item1.EvaluateAsync(context)).ToStringValue();
+                var name = (await nameArg.EvaluateAsync(context)).ToStringValue();
 
                 context.SetValue(name, asset);
             }
