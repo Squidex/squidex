@@ -35,6 +35,17 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
         public double Score { get; set; }
     }
 
+    private sealed class SearchOperation
+    {
+        public List<(DomainId Id, double Score)> Results { get; } = new List<(DomainId Id, double Score)>();
+
+        public string SearchTerms { get; set; }
+
+        public IAppEntity App { get; set; }
+
+        public SearchScope SearchScope { get; set; }
+    }
+
     protected MongoTextIndexBase(IMongoDatabase database)
         : base(database)
     {
@@ -131,71 +142,74 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
         Guard.NotNull(app);
         Guard.NotNull(query);
 
-        var (search, take) = query;
-
-        if (string.IsNullOrWhiteSpace(search))
+        if (string.IsNullOrWhiteSpace(query.Text))
         {
             return null;
         }
 
-        var result = new List<(DomainId Id, double Score)>();
+        var search = new SearchOperation
+        {
+            App = app,
+            SearchTerms = Tokenizer.TokenizeQuery(query.Text),
+            SearchScope = scope
+        };
 
         if (query.RequiredSchemaIds?.Count > 0)
         {
-            await SearchBySchemaAsync(result, search, app, query.RequiredSchemaIds, scope, take, 1, ct);
+            await SearchBySchemaAsync(search, query.RequiredSchemaIds, query.Take, 1, ct);
         }
         else if (query.PreferredSchemaId == null)
         {
-            await SearchByAppAsync(result, search, app, scope, take, 1, ct);
+            await SearchByAppAsync(search, query.Take, 1, ct);
         }
         else
         {
-            var halfBucket = take / 2;
+            var halfBucket = query.Take / 2;
 
             var schemaIds = Enumerable.Repeat(query.PreferredSchemaId.Value, 1);
 
-            await SearchBySchemaAsync(result, search, app, schemaIds, scope, halfBucket, 1.1, ct);
-            await SearchByAppAsync(result, search, app, scope, halfBucket, 1, ct);
+            await SearchBySchemaAsync(search, schemaIds, halfBucket, 1.1, ct);
+            await SearchByAppAsync(search, halfBucket, 1, ct);
         }
 
-        return result.OrderByDescending(x => x.Score).Select(x => x.Id).Distinct().ToList();
+        return search.Results.OrderByDescending(x => x.Score).Select(x => x.Id).Distinct().ToList();
     }
 
-    private Task SearchBySchemaAsync(List<(DomainId, double)> result, string text, IAppEntity app, IEnumerable<DomainId> schemaIds, SearchScope scope, int take, double factor,
+    private Task SearchBySchemaAsync(SearchOperation search, IEnumerable<DomainId> schemaIds, int take, double factor,
         CancellationToken ct = default)
     {
         var filter =
             Filter.And(
-                Filter.Eq(x => x.AppId, app.Id),
+                Filter.Eq(x => x.AppId, search.App.Id),
                 Filter.In(x => x.SchemaId, schemaIds),
-                Filter_ByScope(scope),
-                Filter.Text(text, "none"));
+                Filter_ByScope(search.SearchScope),
+                Filter.Text(search.SearchTerms, "none"));
 
-        return SearchAsync(result, filter, scope, take, factor, ct);
+        return SearchAsync(search, filter, take, factor, ct);
     }
 
-    private Task SearchByAppAsync(List<(DomainId, double)> result, string text, IAppEntity app, SearchScope scope, int take, double factor,
+    private Task SearchByAppAsync(SearchOperation search, int take, double factor,
         CancellationToken ct = default)
     {
         var filter =
             Filter.And(
-                Filter.Eq(x => x.AppId, app.Id),
+                Filter.Eq(x => x.AppId, search.App.Id),
                 Filter.Exists(x => x.SchemaId),
-                Filter_ByScope(scope),
-                Filter.Text(text, "none"));
+                Filter_ByScope(search.SearchScope),
+                Filter.Text(search.SearchTerms, "none"));
 
-        return SearchAsync(result, filter, scope, take, factor, ct);
+        return SearchAsync(search, filter, take, factor, ct);
     }
 
-    private async Task SearchAsync(List<(DomainId, double)> result, FilterDefinition<MongoTextIndexEntity<T>> filter, SearchScope scope, int take, double factor,
+    private async Task SearchAsync(SearchOperation search, FilterDefinition<MongoTextIndexEntity<T>> filter, int take, double factor,
         CancellationToken ct = default)
     {
         var byText =
-            await GetCollection(scope).Find(filter).Limit(take)
+            await GetCollection(search.SearchScope).Find(filter).Limit(take)
                 .Project<MongoTextResult>(Projection.Include(x => x.ContentId).MetaTextScore("score")).Sort(Sort.MetaTextScore("score"))
                 .ToListAsync(ct);
 
-        result.AddRange(byText.Select(x => (x.ContentId, x.Score * factor)));
+        search.Results.AddRange(byText.Select(x => (x.ContentId, x.Score * factor)));
     }
 
     private static FilterDefinition<MongoTextIndexEntity<T>> Filter_ByScope(SearchScope scope)

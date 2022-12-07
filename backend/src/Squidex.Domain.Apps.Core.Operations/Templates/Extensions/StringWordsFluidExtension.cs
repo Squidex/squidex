@@ -15,17 +15,17 @@ public class StringWordsFluidExtension : IFluidExtension
 {
     private static readonly FilterDelegate WordCount = (input, arguments, context) =>
     {
-        return FluidValue.Create(input.ToStringValue().WordCount());
+        return NumberValue.Create(input.ToStringValue().WordCount());
     };
 
     private static readonly FilterDelegate CharacterCount = (input, arguments, context) =>
     {
-        return FluidValue.Create(input.ToStringValue().CharacterCount());
+        return NumberValue.Create(input.ToStringValue().CharacterCount());
     };
 
-    public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
+    public void RegisterLanguageExtensions(CustomFluidParser parser, TemplateOptions options)
     {
-        TemplateContext.GlobalFilters.AddFilter("word_count", WordCount);
-        TemplateContext.GlobalFilters.AddFilter("character_count", CharacterCount);
+        options.Filters.AddFilter("word_count", WordCount);
+        options.Filters.AddFilter("character_count", CharacterCount);
     }
 }

@@ -76,8 +76,6 @@ public class AssetsFluidExtensionTests
     [Fact]
     public async Task Should_resolve_assets_in_loop()
     {
-        var (vars, assets) = SetupAssetsVars();
-
         var template = @"
                 {% for id in event.data.assets.iv %}
                     {% asset 'ref', id %}
@@ -85,27 +83,38 @@ public class AssetsFluidExtensionTests
                 {% endfor %}
             ";
 
-        var expected = $@"
-                Text: {assets[0].FileName} {assets[0].Id}
-                Text: {assets[1].FileName} {assets[1].Id}
+        await ResolveAssetsAsync(template);
+    }
+
+    [Fact]
+    public async Task Should_resolve_assets_in_loop_without_commata()
+    {
+        var template = @"
+                {% for id in event.data.assets.iv %}
+                    {% asset 'ref' id %}
+                    Text: {{ ref.fileName }} {{ ref.id }}
+                {% endfor %}
             ";
 
-        var actual = await sut.RenderAsync(template, vars);
-
-        Assert.Equal(Cleanup(expected), Cleanup(actual));
+        await ResolveAssetsAsync(template);
     }
 
     [Fact]
     public async Task Should_resolve_assets_in_loop_with_filter()
     {
-        var (vars, assets) = SetupAssetsVars();
-
         var template = @"
                 {% for id in event.data.assets.iv %}
                     {% assign ref = id | asset %}
                     Text: {{ ref.fileName }} {{ ref.id }}
                 {% endfor %}
             ";
+
+        await ResolveAssetsAsync(template);
+    }
+
+    private async Task ResolveAssetsAsync(string template)
+    {
+        var (vars, assets) = SetupAssetsVars();
 
         var expected = $@"
                 Text: {assets[0].FileName} {assets[0].Id}

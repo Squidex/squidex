@@ -15,35 +15,34 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions;
 
 public class DateTimeFluidExtension : IFluidExtension
 {
-    public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
-    {
-        TemplateContext.GlobalFilters.AddFilter("format_date", FormatDate);
-
-        TemplateContext.GlobalFilters.AddFilter("timestamp", FormatTimestamp);
-        TemplateContext.GlobalFilters.AddFilter("timestamp_sec", FormatTimestampSec);
-    }
-
-    public static FluidValue FormatTimestamp(FluidValue input, FilterArguments arguments, TemplateContext context)
-    {
-        return FormatDate(input, x => FluidValue.Create(x.ToUnixTimeMilliseconds()));
-    }
-
-    public static FluidValue FormatTimestampSec(FluidValue input, FilterArguments arguments, TemplateContext context)
-    {
-        return FormatDate(input, x => FluidValue.Create(x.ToUnixTimeMilliseconds() / 1000));
-    }
-
-    public static FluidValue FormatDate(FluidValue input, FilterArguments arguments, TemplateContext context)
+    private static readonly FilterDelegate FormatDate = (input, arguments, context) =>
     {
         if (arguments.Count == 1)
         {
-            return FormatDate(input, x => Format(arguments, x));
+            return FormatDateCore(input, x => Format(arguments, x));
         }
 
         return input;
+    };
+
+    private static readonly FilterDelegate FormatTimestamp = (input, arguments, context) =>
+    {
+        return FormatDateCore(input, x => NumberValue.Create(x.ToUnixTimeMilliseconds()));
+    };
+
+    private static readonly FilterDelegate FormatTimestampSec = (input, arguments, context) =>
+    {
+        return FormatDateCore(input, x => NumberValue.Create(x.ToUnixTimeMilliseconds() / 1000));
+    };
+
+    public void RegisterLanguageExtensions(CustomFluidParser parser, TemplateOptions options)
+    {
+        options.Filters.AddFilter("format_date", FormatDate);
+        options.Filters.AddFilter("timestamp", FormatTimestamp);
+        options.Filters.AddFilter("timestamp_sec", FormatTimestampSec);
     }
 
-    private static FluidValue FormatDate(FluidValue input, Func<DateTimeOffset, FluidValue> formatter)
+    private static ValueTask<FluidValue> FormatDateCore(FluidValue input, Func<DateTimeOffset, FluidValue> formatter)
     {
         switch (input)
         {

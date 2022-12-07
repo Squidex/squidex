@@ -34,6 +34,9 @@ public sealed class MongoTextIndex : MongoTextIndexBase<List<MongoTextIndexEntit
 
     protected override List<MongoTextIndexEntityText> BuildTexts(Dictionary<string, string> source)
     {
-        return source.Select(x => new MongoTextIndexEntityText { Text = x.Value }).ToList();
+        return source.Select(x => new MongoTextIndexEntityText
+        {
+            Text = Tokenizer.TokenizerTerms(x.Value, x.Key)
+        }).ToList();
     }
 }
