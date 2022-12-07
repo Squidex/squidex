@@ -9,26 +9,16 @@ using Squidex.Domain.Apps.Entities.MongoDb.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents.MongoDb;
 
-public class QueryParserTests
+public class TokenizerTests
 {
     [Fact]
     public void Should_eliminate_stop_words_in_implicit_english()
     {
         var source = "The only thing that matters, is time.";
 
-        var parsed = QueryParser.ParseQuery(source);
+        var parsed = Tokenizer.TokenizeQuery(source);
 
         Assert.Equal("only thing matters time", parsed);
-    }
-
-    [Fact]
-    public void Should_eliminate_stop_words_in_explicit_english2()
-    {
-        var source = "when i do this it is pretty slow";
-
-        var parsed = QueryParser.ParseQuery(source);
-
-        Assert.Equal("when i do pretty slow", parsed);
     }
 
     [Fact]
@@ -36,17 +26,27 @@ public class QueryParserTests
     {
         var source = "en:The only thing that matters, is time.";
 
-        var parsed = QueryParser.ParseQuery(source);
+        var parsed = Tokenizer.TokenizeQuery(source);
 
         Assert.Equal("only thing matters time", parsed);
     }
 
     [Fact]
-    public void Should_not_eliminate_stop_words_for_none_language()
+    public void Should_eliminate_stop_words_in_explicit_english2()
     {
-        var source = "none:The only thing that matters, is time.";
+        var source = "en:when i do this it is pretty slow";
 
-        var parsed = QueryParser.ParseQuery(source);
+        var parsed = Tokenizer.TokenizeQuery(source);
+
+        Assert.Equal("when i do pretty slow", parsed);
+    }
+
+    [Fact]
+    public void Should_not_eliminate_stop_words_for_iv_language()
+    {
+        var source = "iv:The only thing that matters, is time.";
+
+        var parsed = Tokenizer.TokenizeQuery(source);
 
         Assert.Equal("the only thing that matters is time", parsed);
     }
@@ -56,7 +56,7 @@ public class QueryParserTests
     {
         var source = "de:Nur die Zeit spielt eine Rolle";
 
-        var parsed = QueryParser.ParseQuery(source);
+        var parsed = Tokenizer.TokenizeQuery(source);
 
         Assert.Equal("zeit spielt rolle", parsed);
     }
