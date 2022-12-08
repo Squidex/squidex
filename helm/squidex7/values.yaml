@@ -55,7 +55,7 @@ ingress:
   ## If true, Squidex Ingress will be created.
   ##
   enabled: true
-
+  ingressClassName: nginx
   ## Squidex Ingress annotations
   # annotations:
   #   kubernetes.io/ingress.class: nginx
@@ -165,7 +165,7 @@ env:
 
   ## @param env.LOGGING__APPLICATIONINSIGHTS__ENABLED Enable monitoring via application insights.
   ##
-  LOGGING__APPLICATIONINSIGHTS__ENABLED: falsen
+  LOGGING__APPLICATIONINSIGHTS__ENABLED: false
   ## @param env.LOGGING__APPLICATIONINSIGHTS__CONNECTIONSTRING The connection string to application insights.
   ##
   LOGGING__APPLICATIONINSIGHTS__CONNECTIONSTRING: null # "instrumentationkey=keyvalue"
