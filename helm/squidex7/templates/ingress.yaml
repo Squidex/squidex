@@ -22,6 +22,7 @@ spec:
       secretName: {{ .secretName }}
   {{- end }}
 {{- end }}
+  ingressClassName: {{.Values.ingress.ingressClassName}}
   rules:
     - host: {{ .Values.ingress.hostName | quote }}
       http:
