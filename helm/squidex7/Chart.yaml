@@ -5,7 +5,7 @@ name: squidex7
 icon: https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-squared.png
 description: Squidex CMS v7.0 and newer
 
-version: 1.0.0
+version: 1.0.1
 appVersion: "7.0.2"
 
 home: https://squidex.io/
