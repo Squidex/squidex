@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Hosting;
 using Squidex.Infrastructure.EventSourcing;
+using tusdotnet.FileLocks;
 using tusdotnet.Interfaces;
 
 namespace Squidex.Config.Domain;
@@ -52,6 +53,9 @@ public static class AssetServices
 
         services.AddSingletonAs<AssetTusStore>()
             .As<ITusStore>().As<ITusExpirationStore>();
+
+        services.AddSingletonAs(c => InMemoryFileLockProvider.Instance)
+            .As<ITusFileLockProvider>();
 
         services.AddSingletonAs<RebuildFiles>()
             .AsSelf();
