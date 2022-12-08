@@ -7,17 +7,16 @@
 
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.IdentityServer.Controllers.Profile
+namespace Squidex.Areas.IdentityServer.Controllers.Profile;
+
+public class ChangePasswordModel
 {
-    public class ChangePasswordModel
-    {
-        [LocalizedRequired]
-        public string OldPassword { get; set; }
+    [LocalizedRequired]
+    public string OldPassword { get; set; }
 
-        [LocalizedRequired]
-        public string Password { get; set; }
+    [LocalizedRequired]
+    public string Password { get; set; }
 
-        [LocalizedCompare(nameof(Password))]
-        public string PasswordConfirm { get; set; }
-    }
+    [LocalizedCompare(nameof(Password))]
+    public string PasswordConfirm { get; set; }
 }

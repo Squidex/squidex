@@ -12,99 +12,98 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
+
+internal sealed class DataInputGraphType : InputObjectGraphType
 {
-    internal sealed class DataInputGraphType : InputObjectGraphType
+    public DataInputGraphType(Builder builder, SchemaInfo schemaInfo)
     {
-        public DataInputGraphType(Builder builder, SchemaInfo schemaInfo)
+        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
+        Name = schemaInfo.DataInputType;
+
+        foreach (var fieldInfo in schemaInfo.Fields)
         {
-            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-            Name = schemaInfo.DataInputType;
+            var resolvedType = builder.GetInputGraphType(fieldInfo);
 
-            foreach (var fieldInfo in schemaInfo.Fields)
+            if (resolvedType != null)
             {
-                var resolvedType = builder.GetInputGraphType(fieldInfo);
-
-                if (resolvedType != null)
+                var fieldGraphType = new InputObjectGraphType
                 {
-                    var fieldGraphType = new InputObjectGraphType
+                    // The name is used for equal comparison. Therefore it is important to treat it as readonly.
+                    Name = fieldInfo.LocalizedInputType
+                };
+
+                var partitioning = builder.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
+
+                foreach (var partitionKey in partitioning.AllKeys)
+                {
+                    fieldGraphType.AddField(new FieldType
                     {
-                        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-                        Name = fieldInfo.LocalizedInputType
-                    };
-
-                    var partitioning = builder.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
-
-                    foreach (var partitionKey in partitioning.AllKeys)
-                    {
-                        fieldGraphType.AddField(new FieldType
-                        {
-                            Name = partitionKey.EscapePartition(),
-                            ResolvedType = resolvedType,
-                            Resolver = null,
-                            Description = fieldInfo.Field.RawProperties.Hints
-                        }).WithSourceName(partitionKey);
-                    }
-
-                    fieldGraphType.Description = $"The structure of the {fieldInfo.DisplayName} field of the {schemaInfo.DisplayName} content input type.";
-
-                    AddField(new FieldType
-                    {
-                        Name = fieldInfo.FieldName,
-                        ResolvedType = fieldGraphType,
-                        Resolver = null
-                    }).WithSourceName(fieldInfo);
+                        Name = partitionKey.EscapePartition(),
+                        ResolvedType = resolvedType,
+                        Resolver = null,
+                        Description = fieldInfo.Field.RawProperties.Hints
+                    }).WithSourceName(partitionKey);
                 }
-            }
 
-            Description = $"The structure of the {schemaInfo.DisplayName} data input type.";
+                fieldGraphType.Description = $"The structure of the {fieldInfo.DisplayName} field of the {schemaInfo.DisplayName} content input type.";
+
+                AddField(new FieldType
+                {
+                    Name = fieldInfo.FieldName,
+                    ResolvedType = fieldGraphType,
+                    Resolver = null
+                }).WithSourceName(fieldInfo);
+            }
         }
 
-        public override object ParseDictionary(IDictionary<string, object?> value)
+        Description = $"The structure of the {schemaInfo.DisplayName} data input type.";
+    }
+
+    public override object ParseDictionary(IDictionary<string, object?> value)
+    {
+        var result = new ContentData();
+
+        static ContentFieldData ToFieldData(IDictionary<string, object> source, IComplexGraphType type)
         {
-            var result = new ContentData();
+            var result = new ContentFieldData();
 
-            static ContentFieldData ToFieldData(IDictionary<string, object> source, IComplexGraphType type)
+            foreach (var field in type.Fields)
             {
-                var result = new ContentFieldData();
-
-                foreach (var field in type.Fields)
+                if (source.TryGetValue(field.Name, out var value))
                 {
-                    if (source.TryGetValue(field.Name, out var value))
+                    if (value is IEnumerable<object> list && field.ResolvedType?.Flatten() is IComplexGraphType nestedType)
                     {
-                        if (value is IEnumerable<object> list && field.ResolvedType?.Flatten() is IComplexGraphType nestedType)
-                        {
-                            var array = new JsonArray(list.Count());
+                        var array = new JsonArray(list.Count());
 
-                            foreach (var item in list)
+                        foreach (var item in list)
+                        {
+                            if (item is JsonValue { Value: JsonObject } nested)
                             {
-                                if (item is JsonValue { Value: JsonObject } nested)
-                                {
-                                    array.Add(nested);
-                                }
+                                array.Add(nested);
                             }
+                        }
 
-                            result[field.SourceName()] = array;
-                        }
-                        else
-                        {
-                            result[field.SourceName()] = JsonGraphType.ParseJson(value);
-                        }
+                        result[field.SourceName()] = array;
                     }
-                }
-
-                return result;
-            }
-
-            foreach (var field in Fields)
-            {
-                if (field.ResolvedType is IComplexGraphType complexType && value.TryGetValue(field.Name, out var fieldValue) && fieldValue is IDictionary<string, object> nested)
-                {
-                    result[field.SourceName()] = ToFieldData(nested, complexType);
+                    else
+                    {
+                        result[field.SourceName()] = JsonGraphType.ParseJson(value);
+                    }
                 }
             }
 
             return result;
         }
+
+        foreach (var field in Fields)
+        {
+            if (field.ResolvedType is IComplexGraphType complexType && value.TryGetValue(field.Name, out var fieldValue) && fieldValue is IDictionary<string, object> nested)
+            {
+                result[field.SourceName()] = ToFieldData(nested, complexType);
+            }
+        }
+
+        return result;
     }
 }

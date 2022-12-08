@@ -10,50 +10,49 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
+namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
+
+public sealed class QueryAsStream : OperationBase
 {
-    public sealed class QueryAsStream : OperationBase
+    public override IEnumerable<CreateIndexModel<MongoContentEntity>> CreateIndexes()
     {
-        public override IEnumerable<CreateIndexModel<MongoContentEntity>> CreateIndexes()
-        {
-            yield return new CreateIndexModel<MongoContentEntity>(Index
-                .Ascending(x => x.IndexedAppId)
-                .Ascending(x => x.IsDeleted)
-                .Ascending(x => x.IndexedSchemaId));
-        }
+        yield return new CreateIndexModel<MongoContentEntity>(Index
+            .Ascending(x => x.IndexedAppId)
+            .Ascending(x => x.IsDeleted)
+            .Ascending(x => x.IndexedSchemaId));
+    }
 
-        public async IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
-            [EnumeratorCancellation] CancellationToken ct)
-        {
-            var filter = CreateFilter(appId, schemaIds);
+    public async IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
+        [EnumeratorCancellation] CancellationToken ct)
+    {
+        var filter = CreateFilter(appId, schemaIds);
 
-            using (var cursor = await Collection.Find(filter).ToCursorAsync(ct))
+        using (var cursor = await Collection.Find(filter).ToCursorAsync(ct))
+        {
+            while (await cursor.MoveNextAsync(ct))
             {
-                while (await cursor.MoveNextAsync(ct))
+                foreach (var entity in cursor.Current)
                 {
-                    foreach (var entity in cursor.Current)
-                    {
-                        yield return entity;
-                    }
+                    yield return entity;
                 }
             }
         }
+    }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, HashSet<DomainId>? schemaIds)
+    private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, HashSet<DomainId>? schemaIds)
+    {
+        var filters = new List<FilterDefinition<MongoContentEntity>>
         {
-            var filters = new List<FilterDefinition<MongoContentEntity>>
-            {
-                Filter.Gt(x => x.LastModified, default),
-                Filter.Gt(x => x.Id, default),
-                Filter.Eq(x => x.IndexedAppId, appId)
-            };
+            Filter.Gt(x => x.LastModified, default),
+            Filter.Gt(x => x.Id, default),
+            Filter.Eq(x => x.IndexedAppId, appId)
+        };
 
-            if (schemaIds != null)
-            {
-                filters.Add(Filter.In(x => x.IndexedSchemaId, schemaIds));
-            }
-
-            return Filter.And(filters);
+        if (schemaIds != null)
+        {
+            filters.Add(Filter.In(x => x.IndexedSchemaId, schemaIds));
         }
+
+        return Filter.And(filters);
     }
 }

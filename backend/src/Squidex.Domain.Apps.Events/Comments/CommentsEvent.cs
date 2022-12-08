@@ -7,12 +7,11 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Events.Comments
-{
-    public abstract class CommentsEvent : AppEvent
-    {
-        public DomainId CommentsId { get; set; }
+namespace Squidex.Domain.Apps.Events.Comments;
 
-        public DomainId CommentId { get; set; }
-    }
+public abstract class CommentsEvent : AppEvent
+{
+    public DomainId CommentsId { get; set; }
+
+    public DomainId CommentId { get; set; }
 }

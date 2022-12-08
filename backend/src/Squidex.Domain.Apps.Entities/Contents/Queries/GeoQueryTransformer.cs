@@ -11,45 +11,45 @@ using Squidex.Infrastructure.Queries;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Domain.Apps.Entities.Contents.Queries
+namespace Squidex.Domain.Apps.Entities.Contents.Queries;
+
+internal sealed class GeoQueryTransformer : AsyncTransformVisitor<ClrValue, GeoQueryTransformer.Args>
 {
-    internal sealed class GeoQueryTransformer : AsyncTransformVisitor<ClrValue, GeoQueryTransformer.Args>
+    public static readonly GeoQueryTransformer Instance = new GeoQueryTransformer();
+
+    public record struct Args(Context Context, ISchemaEntity Schema, ITextIndex TextIndex, CancellationToken CancellationToken);
+
+    private GeoQueryTransformer()
     {
-        public static readonly GeoQueryTransformer Instance = new GeoQueryTransformer();
+    }
 
-        public record struct Args(Context Context, ISchemaEntity Schema, ITextIndex TextIndex);
+    public static async Task<FilterNode<ClrValue>?> TransformAsync(FilterNode<ClrValue> filter, Context context, ISchemaEntity schema, ITextIndex textIndex,
+        CancellationToken ct)
+    {
+        var args = new Args(context, schema, textIndex, ct);
 
-        private GeoQueryTransformer()
+        return await filter.Accept(Instance, args);
+    }
+
+    public override async ValueTask<FilterNode<ClrValue>?> Visit(CompareFilter<ClrValue> nodeIn, Args args)
+    {
+        if (nodeIn.Value.Value is FilterSphere sphere)
         {
-        }
+            var field = string.Join(".", nodeIn.Path.Skip(1));
 
-        public static async Task<FilterNode<ClrValue>?> TransformAsync(FilterNode<ClrValue> filter, Context context, ISchemaEntity schema, ITextIndex textIndex)
-        {
-            var args = new Args(context, schema, textIndex);
+            var searchQuery = new GeoQuery(args.Schema.Id, field, sphere.Latitude, sphere.Longitude, sphere.Radius, 1000);
+            var searchScope = args.Context.Scope();
 
-            return await filter.Accept(Instance, args);
-        }
+            var ids = await args.TextIndex.SearchAsync(args.Context.App, searchQuery, searchScope, args.CancellationToken);
 
-        public override async ValueTask<FilterNode<ClrValue>?> Visit(CompareFilter<ClrValue> nodeIn, Args args)
-        {
-            if (nodeIn.Value.Value is FilterSphere sphere)
+            if (ids == null || ids.Count == 0)
             {
-                var field = string.Join(".", nodeIn.Path.Skip(1));
-
-                var searchQuery = new GeoQuery(args.Schema.Id, field, sphere.Latitude, sphere.Longitude, sphere.Radius, 1000);
-                var searchScope = args.Context.Scope();
-
-                var ids = await args.TextIndex.SearchAsync(args.Context.App, searchQuery, searchScope);
-
-                if (ids == null || ids.Count == 0)
-                {
-                    return ClrFilter.Eq("id", "__notfound__");
-                }
-
-                return ClrFilter.In("id", ids.Select(x => x.ToString()).ToList());
+                return ClrFilter.Eq("id", "__notfound__");
             }
 
-            return nodeIn;
+            return ClrFilter.In("id", ids.Select(x => x.ToString()).ToList());
         }
+
+        return nodeIn;
     }
 }

@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public sealed class ReadonlyOptions
 {
-    public sealed class ReadonlyOptions
-    {
-        public bool IsReadonly { get; set; }
-    }
+    public bool IsReadonly { get; set; }
 }

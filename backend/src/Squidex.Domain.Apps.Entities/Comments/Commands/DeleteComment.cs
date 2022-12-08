@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Comments.Commands
+namespace Squidex.Domain.Apps.Entities.Comments.Commands;
+
+public sealed class DeleteComment : CommentCommand
 {
-    public sealed class DeleteComment : CommentCommand
-    {
-    }
 }

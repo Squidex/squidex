@@ -9,186 +9,185 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Domain.Apps.Entities.Apps;
+
+public sealed class AppUISettings : IAppUISettings, IDeleter
 {
-    public sealed class AppUISettings : IAppUISettings, IDeleter
+    private readonly IPersistenceFactory<State> persistanceFactory;
+
+    [CollectionName("UISettings")]
+    public sealed class State
     {
-        private readonly IPersistenceFactory<State> persistanceFactory;
+        public JsonObject Settings { get; set; } = new JsonObject();
 
-        [CollectionName("UISettings")]
-        public sealed class State
+        public bool Set(JsonObject settings)
         {
-            public JsonObject Settings { get; set; } = new JsonObject();
+            var isChanged = false;
 
-            public bool Set(JsonObject settings)
+            if (!Settings.Equals(settings))
             {
-                var isChanged = false;
-
-                if (!Settings.Equals(settings))
-                {
-                    Settings = settings;
-                    isChanged = true;
-                }
-
-                return isChanged;
+                Settings = settings;
+                isChanged = true;
             }
 
-            public bool Set(string path, JsonValue value)
+            return isChanged;
+        }
+
+        public bool Set(string path, JsonValue value)
+        {
+            var container = GetContainer(path, true, out var key);
+
+            if (container == null)
             {
-                var container = GetContainer(path, true, out var key);
-
-                if (container == null)
-                {
-                    ThrowHelper.InvalidOperationException("Path does not lead to an object.");
-                    return false;
-                }
-
-                if (!container.TryGetValue(key, out var existing) || !existing.Equals(value))
-                {
-                    container[key] = value;
-                    return true;
-                }
-
+                ThrowHelper.InvalidOperationException("Path does not lead to an object.");
                 return false;
             }
 
-            public bool Remove(string path)
+            if (!container.TryGetValue(key, out var existing) || !existing.Equals(value))
             {
-                var container = GetContainer(path, false, out var key);
-
-                if (container == null)
-                {
-                    return false;
-                }
-
-                return container.Remove(key);
+                container[key] = value;
+                return true;
             }
 
-            private JsonObject? GetContainer(string path, bool add, out string key)
+            return false;
+        }
+
+        public bool Remove(string path)
+        {
+            var container = GetContainer(path, false, out var key);
+
+            if (container == null)
             {
-                Guard.NotNullOrEmpty(path);
+                return false;
+            }
 
-                var segments = path.Split('.');
+            return container.Remove(key);
+        }
 
-                key = segments[^1];
+        private JsonObject? GetContainer(string path, bool add, out string key)
+        {
+            Guard.NotNullOrEmpty(path);
 
-                var current = Settings;
+            var segments = path.Split('.');
 
-                if (segments.Length > 1)
+            key = segments[^1];
+
+            var current = Settings;
+
+            if (segments.Length > 1)
+            {
+                foreach (var segment in segments.Take(segments.Length - 1))
                 {
-                    foreach (var segment in segments.Take(segments.Length - 1))
+                    if (!current.TryGetValue(segment, out var found))
                     {
-                        if (!current.TryGetValue(segment, out var found))
+                        if (add)
                         {
-                            if (add)
-                            {
-                                found = new JsonObject();
+                            found = new JsonObject();
 
-                                current[segment] = found;
-                            }
-                            else
-                            {
-                                return null;
-                            }
-                        }
-
-                        if (found.Value is JsonObject o)
-                        {
-                            current = o;
+                            current[segment] = found;
                         }
                         else
                         {
                             return null;
                         }
                     }
+
+                    if (found.Value is JsonObject o)
+                    {
+                        current = o;
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
-
-                return current;
             }
+
+            return current;
         }
+    }
 
-        public AppUISettings(IPersistenceFactory<State> persistanceFactory)
+    public AppUISettings(IPersistenceFactory<State> persistanceFactory)
+    {
+        this.persistanceFactory = persistanceFactory;
+    }
+
+    async Task IDeleter.DeleteContributorAsync(DomainId appId, string contributorId,
+        CancellationToken ct)
+    {
+        await ClearAsync(appId, contributorId, ct);
+    }
+
+    async Task IDeleter.DeleteAppAsync(IAppEntity app,
+        CancellationToken ct)
+    {
+        await ClearAsync(app.Id, null, ct);
+
+        foreach (var userId in app.Contributors.Keys)
         {
-            this.persistanceFactory = persistanceFactory;
+            await ClearAsync(app.Id, userId, ct);
         }
+    }
 
-        async Task IDeleter.DeleteContributorAsync(DomainId appId, string contributorId,
-            CancellationToken ct)
+    public async Task<JsonObject> GetAsync(DomainId appId, string? userId,
+        CancellationToken ct = default)
+    {
+        var state = await GetStateAsync(appId, userId, ct);
+
+        return state.Value.Settings;
+    }
+
+    public async Task RemoveAsync(DomainId appId, string? userId, string path,
+        CancellationToken ct = default)
+    {
+        var state = await GetStateAsync(appId, userId, ct);
+
+        await state.UpdateAsync(s => s.Remove(path), ct: ct);
+    }
+
+    public async Task SetAsync(DomainId appId, string? userId, string path, JsonValue value,
+        CancellationToken ct = default)
+    {
+        var state = await GetStateAsync(appId, userId, ct);
+
+        await state.UpdateAsync(s => s.Set(path, value), ct: ct);
+    }
+
+    public async Task SetAsync(DomainId appId, string? userId, JsonObject settings,
+        CancellationToken ct = default)
+    {
+        var state = await GetStateAsync(appId, userId, ct);
+
+        await state.UpdateAsync(s => s.Set(settings), ct: ct);
+    }
+
+    public async Task ClearAsync(DomainId appId, string? userId,
+        CancellationToken ct = default)
+    {
+        var state = await GetStateAsync(appId, userId, ct);
+
+        await state.ClearAsync(ct);
+    }
+
+    private async Task<SimpleState<State>> GetStateAsync(DomainId appId, string? userId,
+        CancellationToken ct)
+    {
+        var state = new SimpleState<State>(persistanceFactory, GetType(), GetKey(appId, userId));
+
+        await state.LoadAsync(ct);
+
+        return state;
+    }
+
+    private static string GetKey(DomainId appId, string? userId)
+    {
+        if (!string.IsNullOrWhiteSpace(userId))
         {
-            await ClearAsync(appId, contributorId, ct);
+            return $"{appId}_{userId}";
         }
-
-        async Task IDeleter.DeleteAppAsync(IAppEntity app,
-            CancellationToken ct)
+        else
         {
-            await ClearAsync(app.Id, null, ct);
-
-            foreach (var userId in app.Contributors.Keys)
-            {
-                await ClearAsync(app.Id, userId, ct);
-            }
-        }
-
-        public async Task<JsonObject> GetAsync(DomainId appId, string? userId,
-            CancellationToken ct = default)
-        {
-            var state = await GetStateAsync(appId, userId, ct);
-
-            return state.Value.Settings;
-        }
-
-        public async Task RemoveAsync(DomainId appId, string? userId, string path,
-            CancellationToken ct = default)
-        {
-            var state = await GetStateAsync(appId, userId, ct);
-
-            await state.UpdateAsync(s => s.Remove(path), ct: ct);
-        }
-
-        public async Task SetAsync(DomainId appId, string? userId, string path, JsonValue value,
-            CancellationToken ct = default)
-        {
-            var state = await GetStateAsync(appId, userId, ct);
-
-            await state.UpdateAsync(s => s.Set(path, value), ct: ct);
-        }
-
-        public async Task SetAsync(DomainId appId, string? userId, JsonObject settings,
-            CancellationToken ct = default)
-        {
-            var state = await GetStateAsync(appId, userId, ct);
-
-            await state.UpdateAsync(s => s.Set(settings), ct: ct);
-        }
-
-        public async Task ClearAsync(DomainId appId, string? userId,
-            CancellationToken ct = default)
-        {
-            var state = await GetStateAsync(appId, userId, ct);
-
-            await state.ClearAsync(ct);
-        }
-
-        private async Task<SimpleState<State>> GetStateAsync(DomainId appId, string? userId,
-            CancellationToken ct)
-        {
-            var state = new SimpleState<State>(persistanceFactory, GetType(), GetKey(appId, userId));
-
-            await state.LoadAsync(ct);
-
-            return state;
-        }
-
-        private static string GetKey(DomainId appId, string? userId)
-        {
-            if (!string.IsNullOrWhiteSpace(userId))
-            {
-                return $"{appId}_{userId}";
-            }
-            else
-            {
-                return $"{appId}";
-            }
+            return $"{appId}";
         }
     }
 }

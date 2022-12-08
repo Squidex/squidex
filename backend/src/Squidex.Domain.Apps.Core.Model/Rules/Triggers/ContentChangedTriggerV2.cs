@@ -8,18 +8,17 @@
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Core.Rules.Triggers
+namespace Squidex.Domain.Apps.Core.Rules.Triggers;
+
+[TypeName(nameof(ContentChangedTriggerV2))]
+public sealed record ContentChangedTriggerV2 : RuleTrigger
 {
-    [TypeName(nameof(ContentChangedTriggerV2))]
-    public sealed record ContentChangedTriggerV2 : RuleTrigger
+    public ReadonlyList<ContentChangedTriggerSchemaV2>? Schemas { get; init; }
+
+    public bool HandleAll { get; init; }
+
+    public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
     {
-        public ReadonlyList<ContentChangedTriggerSchemaV2>? Schemas { get; init; }
-
-        public bool HandleAll { get; init; }
-
-        public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
-        {
-            return visitor.Visit(this);
-        }
+        return visitor.Visit(this);
     }
 }

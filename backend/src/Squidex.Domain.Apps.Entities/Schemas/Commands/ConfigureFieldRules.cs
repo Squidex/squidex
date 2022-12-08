@@ -7,22 +7,21 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
-{
-    public sealed class ConfigureFieldRules : SchemaCommand
-    {
-        public FieldRuleCommand[]? FieldRules { get; set; }
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands;
 
-        public FieldRules ToFieldRules()
+public sealed class ConfigureFieldRules : SchemaCommand
+{
+    public FieldRuleCommand[]? FieldRules { get; set; }
+
+    public FieldRules ToFieldRules()
+    {
+        if (FieldRules?.Length > 0)
         {
-            if (FieldRules?.Length > 0)
-            {
-                return new FieldRules(FieldRules.Select(x => x.ToFieldRule()).ToList());
-            }
-            else
-            {
-                return Core.Schemas.FieldRules.Empty;
-            }
+            return new FieldRules(FieldRules.Select(x => x.ToFieldRule()).ToList());
+        }
+        else
+        {
+            return Core.Schemas.FieldRules.Empty;
         }
     }
 }

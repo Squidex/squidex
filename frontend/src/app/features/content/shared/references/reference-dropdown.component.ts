@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ContentsDto } from '@app/shared';
 import { ContentDto, getContentValue, LanguageDto, LocalizerService, ResolveContents, StatefulControlComponent, Types, value$ } from '@app/shared/internal';
@@ -61,7 +61,7 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
         this.setDisabledState(value === true);
     }
 
-    public control = new FormControl('');
+    public control = new UntypedFormControl('');
 
     public get isValid() {
         return !!this.schemaId && !!this.language;

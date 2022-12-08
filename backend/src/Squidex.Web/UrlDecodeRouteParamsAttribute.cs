@@ -8,18 +8,17 @@
 using System.Web;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public class UrlDecodeRouteParamsAttribute : ActionFilterAttribute
 {
-    public class UrlDecodeRouteParamsAttribute : ActionFilterAttribute
+    public override void OnActionExecuting(ActionExecutingContext context)
     {
-        public override void OnActionExecuting(ActionExecutingContext context)
+        foreach (var (key, value) in context.ActionArguments.ToList())
         {
-            foreach (var (key, value) in context.ActionArguments.ToList())
+            if (value is string text)
             {
-                if (value is string text)
-                {
-                    context.ActionArguments[key] = HttpUtility.UrlDecode(text);
-                }
+                context.ActionArguments[key] = HttpUtility.UrlDecode(text);
             }
         }
     }

@@ -8,38 +8,37 @@
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Users;
 
-namespace Squidex.Web.Pipeline
-{
-    public sealed class SetupMiddleware
-    {
-        private readonly RequestDelegate next;
-        private bool isUserFound;
+namespace Squidex.Web.Pipeline;
 
-        public SetupMiddleware(RequestDelegate next)
+public sealed class SetupMiddleware
+{
+    private readonly RequestDelegate next;
+    private bool isUserFound;
+
+    public SetupMiddleware(RequestDelegate next)
+    {
+        this.next = next;
+    }
+
+    public async Task InvokeAsync(HttpContext context, IUserService userService)
+    {
+        if (context.Request.Query.ContainsKey("skip-setup"))
         {
-            this.next = next;
+            await next(context);
+            return;
         }
 
-        public async Task InvokeAsync(HttpContext context, IUserService userService)
+        if (!isUserFound && await userService.IsEmptyAsync(context.RequestAborted))
         {
-            if (context.Request.Query.ContainsKey("skip-setup"))
-            {
-                await next(context);
-                return;
-            }
+            var url = context.Request.PathBase.Add("/identity-server/setup");
 
-            if (!isUserFound && await userService.IsEmptyAsync(context.RequestAborted))
-            {
-                var url = context.Request.PathBase.Add("/identity-server/setup");
+            context.Response.Redirect(url);
+        }
+        else
+        {
+            isUserFound = true;
 
-                context.Response.Redirect(url);
-            }
-            else
-            {
-                isUserFound = true;
-
-                await next(context);
-            }
+            await next(context);
         }
     }
 }

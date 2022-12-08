@@ -16,132 +16,123 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Apps
+namespace Squidex.Areas.Api.Controllers.Apps;
+
+/// <summary>
+/// Update and query apps.
+/// </summary>
+[ApiExplorerSettings(GroupName = nameof(Apps))]
+public sealed class AppWorkflowsController : ApiController
 {
-    /// <summary>
-    /// Update and query apps.
-    /// </summary>
-    [ApiExplorerSettings(GroupName = nameof(Apps))]
-    public sealed class AppWorkflowsController : ApiController
+    private readonly IWorkflowsValidator workflowsValidator;
+
+    public AppWorkflowsController(ICommandBus commandBus, IWorkflowsValidator workflowsValidator)
+        : base(commandBus)
     {
-        private readonly IWorkflowsValidator workflowsValidator;
+        this.workflowsValidator = workflowsValidator;
+    }
 
-        public AppWorkflowsController(ICommandBus commandBus, IWorkflowsValidator workflowsValidator)
-            : base(commandBus)
+    /// <summary>
+    /// Get app workflow.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <response code="200">Workflows returned.</response>.
+    /// <response code="404">App not found.</response>.
+    [HttpGet]
+    [Route("apps/{app}/workflows/")]
+    [ProducesResponseType(typeof(WorkflowsDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppWorkflowsRead)]
+    [ApiCosts(0)]
+    public IActionResult GetWorkflows(string app)
+    {
+        var response = Deferred.AsyncResponse(() =>
         {
-            this.workflowsValidator = workflowsValidator;
-        }
+            return GetResponse(App);
+        });
 
-        /// <summary>
-        /// Get app workflow.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <returns>
-        /// 200 => Workflows returned.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/{app}/workflows/")]
-        [ProducesResponseType(typeof(WorkflowsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(PermissionIds.AppWorkflowsRead)]
-        [ApiCosts(0)]
-        public IActionResult GetWorkflows(string app)
-        {
-            var response = Deferred.AsyncResponse(() =>
-            {
-                return GetResponse(App);
-            });
+        Response.Headers[HeaderNames.ETag] = App.ToEtag();
 
-            Response.Headers[HeaderNames.ETag] = App.ToEtag();
+        return Ok(response);
+    }
 
-            return Ok(response);
-        }
+    /// <summary>
+    /// Create a workflow.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="request">The new workflow.</param>
+    /// <response code="200">Workflow created.</response>.
+    /// <response code="400">Workflow request not valid.</response>.
+    /// <response code="404">Workflow or app not found.</response>.
+    [HttpPost]
+    [Route("apps/{app}/workflows/")]
+    [ProducesResponseType(typeof(WorkflowsDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppWorkflowsUpdate)]
+    [ApiCosts(1)]
+    public async Task<IActionResult> PostWorkflow(string app, [FromBody] AddWorkflowDto request)
+    {
+        var command = request.ToCommand();
 
-        /// <summary>
-        /// Create a workflow.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="request">The new workflow.</param>
-        /// <returns>
-        /// 200 => Workflow created.
-        /// 400 => Workflow request not valid.
-        /// 404 => Workflow or app not found.
-        /// </returns>
-        [HttpPost]
-        [Route("apps/{app}/workflows/")]
-        [ProducesResponseType(typeof(WorkflowsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(PermissionIds.AppWorkflowsUpdate)]
-        [ApiCosts(1)]
-        public async Task<IActionResult> PostWorkflow(string app, [FromBody] AddWorkflowDto request)
-        {
-            var command = request.ToCommand();
+        var response = await InvokeCommandAsync(command);
 
-            var response = await InvokeCommandAsync(command);
+        return Ok(response);
+    }
 
-            return Ok(response);
-        }
+    /// <summary>
+    /// Update a workflow.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="id">The ID of the workflow to update.</param>
+    /// <param name="request">The new workflow.</param>
+    /// <response code="200">Workflow updated.</response>.
+    /// <response code="400">Workflow request not valid.</response>.
+    /// <response code="404">Workflow or app not found.</response>.
+    [HttpPut]
+    [Route("apps/{app}/workflows/{id}")]
+    [ProducesResponseType(typeof(WorkflowsDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppWorkflowsUpdate)]
+    [ApiCosts(1)]
+    public async Task<IActionResult> PutWorkflow(string app, DomainId id, [FromBody] UpdateWorkflowDto request)
+    {
+        var command = request.ToCommand(id);
 
-        /// <summary>
-        /// Update a workflow.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="id">The ID of the workflow to update.</param>
-        /// <param name="request">The new workflow.</param>
-        /// <returns>
-        /// 200 => Workflow updated.
-        /// 400 => Workflow request not valid.
-        /// 404 => Workflow or app not found.
-        /// </returns>
-        [HttpPut]
-        [Route("apps/{app}/workflows/{id}")]
-        [ProducesResponseType(typeof(WorkflowsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(PermissionIds.AppWorkflowsUpdate)]
-        [ApiCosts(1)]
-        public async Task<IActionResult> PutWorkflow(string app, DomainId id, [FromBody] UpdateWorkflowDto request)
-        {
-            var command = request.ToCommand(id);
+        var response = await InvokeCommandAsync(command);
 
-            var response = await InvokeCommandAsync(command);
+        return Ok(response);
+    }
 
-            return Ok(response);
-        }
+    /// <summary>
+    /// Delete a workflow.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="id">The ID of the workflow to update.</param>
+    /// <response code="200">Workflow deleted.</response>.
+    /// <response code="404">Workflow or app not found.</response>.
+    [HttpDelete]
+    [Route("apps/{app}/workflows/{id}")]
+    [ProducesResponseType(typeof(WorkflowsDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppWorkflowsUpdate)]
+    [ApiCosts(1)]
+    public async Task<IActionResult> DeleteWorkflow(string app, DomainId id)
+    {
+        var command = new DeleteWorkflow { WorkflowId = id };
 
-        /// <summary>
-        /// Delete a workflow.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="id">The ID of the workflow to update.</param>
-        /// <returns>
-        /// 200 => Workflow deleted.
-        /// 404 => Workflow or app not found.
-        /// </returns>
-        [HttpDelete]
-        [Route("apps/{app}/workflows/{id}")]
-        [ProducesResponseType(typeof(WorkflowsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(PermissionIds.AppWorkflowsUpdate)]
-        [ApiCosts(1)]
-        public async Task<IActionResult> DeleteWorkflow(string app, DomainId id)
-        {
-            var command = new DeleteWorkflow { WorkflowId = id };
+        var response = await InvokeCommandAsync(command);
 
-            var response = await InvokeCommandAsync(command);
+        return Ok(response);
+    }
 
-            return Ok(response);
-        }
+    private async Task<WorkflowsDto> InvokeCommandAsync(ICommand command)
+    {
+        var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-        private async Task<WorkflowsDto> InvokeCommandAsync(ICommand command)
-        {
-            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
+        var result = context.Result<IAppEntity>();
+        var response = await GetResponse(result);
 
-            var result = context.Result<IAppEntity>();
-            var response = await GetResponse(result);
+        return response;
+    }
 
-            return response;
-        }
-
-        private async Task<WorkflowsDto> GetResponse(IAppEntity result)
-        {
-            return await WorkflowsDto.FromAppAsync(workflowsValidator, result, Resources);
-        }
+    private async Task<WorkflowsDto> GetResponse(IAppEntity result)
+    {
+        return await WorkflowsDto.FromAppAsync(workflowsValidator, result, Resources);
     }
 }

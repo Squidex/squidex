@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public interface IApiCostsFeature
 {
-    public interface IApiCostsFeature
-    {
-        double Costs { get; }
-    }
+    double Costs { get; }
 }

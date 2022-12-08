@@ -12,18 +12,17 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Xunit;
 using GraphQLSchema = GraphQL.Types.Schema;
 using Schema = Squidex.Domain.Apps.Core.Schemas.Schema;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
+
+public class GraphQLIntrospectionTests : GraphQLTestBase
 {
-    public class GraphQLIntrospectionTests : GraphQLTestBase
+    [Fact]
+    public async Task Should_introspect()
     {
-        [Fact]
-        public async Task Should_introspect()
-        {
-            const string query = @"
+        const string query = @"
                 query IntrospectionQuery {
                   __schema {
                     queryType {
@@ -110,199 +109,198 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }";
 
-            var actual = await ExecuteAsync(new ExecutionOptions { Query = query, OperationName = "IntrospectionQuery" });
+        var actual = await ExecuteAsync(new ExecutionOptions { Query = query, OperationName = "IntrospectionQuery" });
 
-            var json = serializer.Serialize(actual);
+        var json = serializer.Serialize(actual);
 
-            Assert.NotEmpty(json);
-        }
+        Assert.NotEmpty(json);
+    }
 
-        [Fact]
-        public async Task Should_create_empty_schema()
-        {
-            var model = await CreateSut().GetSchemaAsync(TestApp.Default);
+    [Fact]
+    public async Task Should_create_empty_schema()
+    {
+        var model = await CreateSut().GetSchemaAsync(TestApp.Default);
 
-            Assert.NotNull(model);
-        }
+        Assert.NotNull(model);
+    }
 
-        [Fact]
-        public async Task Should_create_empty_schema_with_empty_schema()
-        {
-            var schema =
-                Mocks.Schema(TestApp.DefaultId,
-                    NamedId.Of(DomainId.NewGuid(), "content"),
-                    new Schema("content").Publish());
+    [Fact]
+    public async Task Should_create_empty_schema_with_empty_schema()
+    {
+        var schema =
+            Mocks.Schema(TestApp.DefaultId,
+                NamedId.Of(DomainId.NewGuid(), "content"),
+                new Schema("content").Publish());
 
-            var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
+        var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            Assert.NotNull(model);
-        }
+        Assert.NotNull(model);
+    }
 
-        [Fact]
-        public async Task Should_create_empty_schema_with_empty_schema_because_ui_field()
-        {
-            var schema =
-                Mocks.Schema(TestApp.DefaultId,
-                    NamedId.Of(DomainId.NewGuid(), "content"),
-                    new Schema("content").Publish()
-                        .AddUI(1, "ui", Partitioning.Invariant));
+    [Fact]
+    public async Task Should_create_empty_schema_with_empty_schema_because_ui_field()
+    {
+        var schema =
+            Mocks.Schema(TestApp.DefaultId,
+                NamedId.Of(DomainId.NewGuid(), "content"),
+                new Schema("content").Publish()
+                    .AddUI(1, "ui", Partitioning.Invariant));
 
-            var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
+        var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            Assert.NotNull(model);
-        }
+        Assert.NotNull(model);
+    }
 
-        [Fact]
-        public async Task Should_create_empty_schema_with_empty_schema_because_invalid_field()
-        {
-            var schema =
-                Mocks.Schema(TestApp.DefaultId,
-                    NamedId.Of(DomainId.NewGuid(), "content"),
-                    new Schema("content").Publish()
-                        .AddComponent(1, "component", Partitioning.Invariant));
+    [Fact]
+    public async Task Should_create_empty_schema_with_empty_schema_because_invalid_field()
+    {
+        var schema =
+            Mocks.Schema(TestApp.DefaultId,
+                NamedId.Of(DomainId.NewGuid(), "content"),
+                new Schema("content").Publish()
+                    .AddComponent(1, "component", Partitioning.Invariant));
 
-            var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
+        var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            Assert.NotNull(model);
-        }
+        Assert.NotNull(model);
+    }
 
-        [Fact]
-        public async Task Should_create_empty_schema_with_unpublished_schema()
-        {
-            var schema =
-                Mocks.Schema(TestApp.DefaultId,
-                    NamedId.Of(DomainId.NewGuid(), "content"),
-                    new Schema("content")
-                        .AddString(1, "myField", Partitioning.Invariant));
+    [Fact]
+    public async Task Should_create_empty_schema_with_unpublished_schema()
+    {
+        var schema =
+            Mocks.Schema(TestApp.DefaultId,
+                NamedId.Of(DomainId.NewGuid(), "content"),
+                new Schema("content")
+                    .AddString(1, "myField", Partitioning.Invariant));
 
-            var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
+        var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            Assert.NotNull(model);
-        }
+        Assert.NotNull(model);
+    }
 
-        [Fact]
-        public async Task Should_create_schema_with_reserved_schema_name()
-        {
-            var schema =
-                Mocks.Schema(TestApp.DefaultId,
-                    NamedId.Of(DomainId.NewGuid(), "content"),
-                    new Schema("content").Publish()
-                        .AddString(1, "myField", Partitioning.Invariant));
+    [Fact]
+    public async Task Should_create_schema_with_reserved_schema_name()
+    {
+        var schema =
+            Mocks.Schema(TestApp.DefaultId,
+                NamedId.Of(DomainId.NewGuid(), "content"),
+                new Schema("content").Publish()
+                    .AddString(1, "myField", Partitioning.Invariant));
 
-            var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
+        var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            Assert.Contains(graphQLSchema.AllTypes, x => x.Name == "Content2");
-        }
+        Assert.Contains(graphQLSchema.AllTypes, x => x.Name == "Content2");
+    }
 
-        [Fact]
-        public async Task Should_create_schema_with_reserved_field_name()
-        {
-            var schema =
-                Mocks.Schema(TestApp.DefaultId,
-                    NamedId.Of(DomainId.NewGuid(), "my-schema"),
-                    new Schema("my-schema").Publish()
-                        .AddString(1, "content", Partitioning.Invariant));
+    [Fact]
+    public async Task Should_create_schema_with_reserved_field_name()
+    {
+        var schema =
+            Mocks.Schema(TestApp.DefaultId,
+                NamedId.Of(DomainId.NewGuid(), "my-schema"),
+                new Schema("my-schema").Publish()
+                    .AddString(1, "content", Partitioning.Invariant));
 
-            var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
+        var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            var type = FindDataType(graphQLSchema, "MySchema");
+        var type = FindDataType(graphQLSchema, "MySchema");
 
-            Assert.Contains(type?.Fields, x => x.Name == "content");
-        }
+        Assert.Contains(type?.Fields!, x => x.Name == "content");
+    }
 
-        [Fact]
-        public async Task Should_create_schema_with_invalid_field_name()
-        {
-            var schema =
-                Mocks.Schema(TestApp.DefaultId,
-                    NamedId.Of(DomainId.NewGuid(), "my-schema"),
-                    new Schema("my-schema").Publish()
-                        .AddString(1, "2-field", Partitioning.Invariant));
+    [Fact]
+    public async Task Should_create_schema_with_invalid_field_name()
+    {
+        var schema =
+            Mocks.Schema(TestApp.DefaultId,
+                NamedId.Of(DomainId.NewGuid(), "my-schema"),
+                new Schema("my-schema").Publish()
+                    .AddString(1, "2-field", Partitioning.Invariant));
 
-            var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
+        var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            var type = FindDataType(graphQLSchema, "MySchema");
+        var type = FindDataType(graphQLSchema, "MySchema");
 
-            Assert.Contains(type?.Fields, x => x.Name == "gql_2Field");
-        }
+        Assert.Contains(type?.Fields!, x => x.Name == "gql_2Field");
+    }
 
-        [Fact]
-        public async Task Should_create_schema_with_duplicate_field_names()
-        {
-            var schema =
-                Mocks.Schema(TestApp.DefaultId,
-                    NamedId.Of(DomainId.NewGuid(), "my-schema"),
-                    new Schema("my-schema").Publish()
-                        .AddString(1, "my-field", Partitioning.Invariant)
-                        .AddString(2, "my_field", Partitioning.Invariant));
+    [Fact]
+    public async Task Should_create_schema_with_duplicate_field_names()
+    {
+        var schema =
+            Mocks.Schema(TestApp.DefaultId,
+                NamedId.Of(DomainId.NewGuid(), "my-schema"),
+                new Schema("my-schema").Publish()
+                    .AddString(1, "my-field", Partitioning.Invariant)
+                    .AddString(2, "my_field", Partitioning.Invariant));
 
-            var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
+        var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            var type = FindDataType(graphQLSchema, "MySchema");
+        var type = FindDataType(graphQLSchema, "MySchema");
 
-            Assert.Contains(type?.Fields, x => x.Name == "myField");
-            Assert.Contains(type?.Fields, x => x.Name == "myField2");
-        }
+        Assert.Contains(type?.Fields!, x => x.Name == "myField");
+        Assert.Contains(type?.Fields!, x => x.Name == "myField2");
+    }
 
-        [Fact]
-        public async Task Should_not_create_schema_With_invalid_component()
-        {
-            var schema =
-                Mocks.Schema(TestApp.DefaultId,
-                    NamedId.Of(DomainId.NewGuid(), "my-schema"),
-                    new Schema("my-schema").Publish()
-                        .AddComponent(1, "my-component", Partitioning.Invariant,
-                            new ComponentFieldProperties())
-                        .AddString(2, "my-string", Partitioning.Invariant));
+    [Fact]
+    public async Task Should_not_create_schema_With_invalid_component()
+    {
+        var schema =
+            Mocks.Schema(TestApp.DefaultId,
+                NamedId.Of(DomainId.NewGuid(), "my-schema"),
+                new Schema("my-schema").Publish()
+                    .AddComponent(1, "my-component", Partitioning.Invariant,
+                        new ComponentFieldProperties())
+                    .AddString(2, "my-string", Partitioning.Invariant));
 
-            var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
+        var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            var type = FindDataType(graphQLSchema, "MySchema");
+        var type = FindDataType(graphQLSchema, "MySchema");
 
-            Assert.DoesNotContain(type?.Fields, x => x.Name == "myComponent");
-        }
+        Assert.DoesNotContain(type?.Fields!, x => x.Name == "myComponent");
+    }
 
-        [Fact]
-        public async Task Should_not_create_schema_With_invalid_components()
-        {
-            var schema =
-                Mocks.Schema(TestApp.DefaultId,
-                    NamedId.Of(DomainId.NewGuid(), "my-schema"),
-                    new Schema("my-schema").Publish()
-                        .AddComponents(1, "my-components", Partitioning.Invariant,
-                            new ComponentsFieldProperties())
-                        .AddString(2, "my-string", Partitioning.Invariant));
+    [Fact]
+    public async Task Should_not_create_schema_With_invalid_components()
+    {
+        var schema =
+            Mocks.Schema(TestApp.DefaultId,
+                NamedId.Of(DomainId.NewGuid(), "my-schema"),
+                new Schema("my-schema").Publish()
+                    .AddComponents(1, "my-components", Partitioning.Invariant,
+                        new ComponentsFieldProperties())
+                    .AddString(2, "my-string", Partitioning.Invariant));
 
-            var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
+        var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            var type = FindDataType(graphQLSchema, "MySchema");
+        var type = FindDataType(graphQLSchema, "MySchema");
 
-            Assert.DoesNotContain(type?.Fields, x => x.Name == "myComponents");
-        }
+        Assert.DoesNotContain(type?.Fields!, x => x.Name == "myComponents");
+    }
 
-        [Fact]
-        public async Task Should_not_create_schema_With_invalid_references()
-        {
-            var schema =
-                Mocks.Schema(TestApp.DefaultId,
-                    NamedId.Of(DomainId.NewGuid(), "my-schema"),
-                    new Schema("my-schema").Publish()
-                        .AddReferences(1, "my-references", Partitioning.Invariant,
-                            new ReferencesFieldProperties { SchemaId = DomainId.NewGuid() })
-                        .AddString(2, "my-string", Partitioning.Invariant));
+    [Fact]
+    public async Task Should_not_create_schema_With_invalid_references()
+    {
+        var schema =
+            Mocks.Schema(TestApp.DefaultId,
+                NamedId.Of(DomainId.NewGuid(), "my-schema"),
+                new Schema("my-schema").Publish()
+                    .AddReferences(1, "my-references", Partitioning.Invariant,
+                        new ReferencesFieldProperties { SchemaId = DomainId.NewGuid() })
+                    .AddString(2, "my-string", Partitioning.Invariant));
 
-            var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
+        var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            var type = FindDataType(graphQLSchema, "MySchema");
+        var type = FindDataType(graphQLSchema, "MySchema");
 
-            Assert.DoesNotContain(type?.Fields, x => x.Name == "myReferences");
-        }
+        Assert.DoesNotContain(type?.Fields!, x => x.Name == "myReferences");
+    }
 
-        private static IObjectGraphType? FindDataType(GraphQLSchema graphQLSchema, string schema)
-        {
-            var type = (IObjectGraphType)graphQLSchema.AllTypes.Single(x => x.Name == schema);
+    private static IObjectGraphType? FindDataType(GraphQLSchema graphQLSchema, string schema)
+    {
+        var type = (IObjectGraphType)graphQLSchema.AllTypes.Single(x => x.Name == schema);
 
-            return (IObjectGraphType?)type.GetField("flatData")?.ResolvedType?.Flatten();
-        }
+        return (IObjectGraphType?)type.GetField("flatData")?.ResolvedType?.Flatten();
     }
 }

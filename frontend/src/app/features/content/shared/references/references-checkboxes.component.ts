@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { AppsState, ContentDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, UIOptions } from '@app/shared/internal';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
@@ -45,7 +45,7 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
         this.setDisabledState(value === true);
     }
 
-    public control = new FormControl([]);
+    public control = new UntypedFormControl([]);
 
     public get isValid() {
         return !!this.schemaId && !!this.language;

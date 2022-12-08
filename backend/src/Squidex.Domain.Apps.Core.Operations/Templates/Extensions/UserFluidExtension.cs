@@ -6,39 +6,39 @@
 // ==========================================================================
 
 using Fluid;
+using Fluid.Accessors;
 using Fluid.Values;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Core.Templates.Extensions
+namespace Squidex.Domain.Apps.Core.Templates.Extensions;
+
+public sealed class UserFluidExtension : IFluidExtension
 {
-    public sealed class UserFluidExtension : IFluidExtension
+    public void RegisterLanguageExtensions(CustomFluidParser parser, TemplateOptions options)
     {
-        public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
+        options.MemberAccessStrategy.Register<IUser>(new DelegateAccessor<IUser, FluidValue>((source, name, context) =>
         {
-            memberAccessStrategy.Register<IUser, FluidValue>((user, name) =>
+            switch (name)
             {
-                switch (name)
-                {
-                    case "id":
-                        return new StringValue(user.Id);
-                    case "email":
-                        return new StringValue(user.Email);
-                    case "name":
-                        return new StringValue(user.Claims.DisplayName());
-                    default:
+                case "id":
+                    return StringValue.Create(source.Id);
+                case "email":
+                    return StringValue.Create(source.Email);
+                case "name":
+                    return StringValue.Create(source.Claims.DisplayName());
+                default:
+                    {
+                        var claim = source.Claims.FirstOrDefault(x => string.Equals(name, x.Type, StringComparison.OrdinalIgnoreCase));
+
+                        if (claim != null)
                         {
-                            var claim = user.Claims.FirstOrDefault(x => string.Equals(name, x.Type, StringComparison.OrdinalIgnoreCase));
-
-                            if (claim != null)
-                            {
-                                return new StringValue(claim.Value);
-                            }
-
-                            return NilValue.Instance;
+                            return StringValue.Create(claim.Value);
                         }
-                }
-            });
-        }
+
+                        return NilValue.Instance;
+                    }
+            }
+        }));
     }
 }

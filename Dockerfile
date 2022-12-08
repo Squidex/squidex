@@ -1,9 +1,9 @@
 #
 # Stage 1, Build Backend
 #
-FROM mcr.microsoft.com/dotnet/sdk:6.0 as backend
+FROM mcr.microsoft.com/dotnet/sdk:7.0 as backend
 
-ARG SQUIDEX__VERSION=7.0.0
+ARG SQUIDEX__BUILD__VERSION=7.0.0
 
 WORKDIR /src
 
@@ -30,7 +30,7 @@ COPY backend .
 RUN dotnet test --no-restore --filter Category!=Dependencies
 
 # Publish
-RUN dotnet publish --no-restore src/Squidex/Squidex.csproj --output /build/ --configuration Release -p:version=$SQUIDEX__VERSION
+RUN dotnet publish --no-restore src/Squidex/Squidex.csproj --output /build/ --configuration Release -p:version=$SQUIDEX__BUILD__VERSION
 
 # Install tools
 RUN dotnet tool install --tool-path /tools dotnet-counters \
@@ -68,7 +68,9 @@ RUN cp -a build /build/
 #
 # Stage 3, Build runtime
 #
-FROM mcr.microsoft.com/dotnet/aspnet:6.0.0-bullseye-slim
+FROM mcr.microsoft.com/dotnet/aspnet:7.0-bullseye-slim
+
+ARG SQUIDEX__RUNTIME__VERSION=7.0.0
 
 # Curl for debugging and libc-dev for protobuf
 RUN apt-get update \
@@ -89,7 +91,6 @@ COPY --from=frontend /build/ wwwroot/build/
 
 EXPOSE 80
 EXPOSE 443
-EXPOSE 11111
 
 ENV DIAGNOSTICS__COUNTERSTOOL=/tools/dotnet-counters
 ENV DIAGNOSTICS__DUMPTOOL=/tools/dotnet-dump
@@ -97,3 +98,5 @@ ENV DIAGNOSTICS__GCDUMPTOOL=/tools/dotnet-gcdump
 ENV DIAGNOSTICS__TRACETOOL=/tools/dotnet-trace
 
 ENTRYPOINT ["dotnet", "Squidex.dll"]
+
+ENV EXPOSEDCONFIGURATION__VERSION=$SQUIDEX__RUNTIME__VERSION

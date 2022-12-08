@@ -9,34 +9,33 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Commands
+namespace Squidex.Domain.Apps.Entities.Contents.Commands;
+
+public sealed class UpsertContent : ContentDataCommand, ISchemaCommand
 {
-    public sealed class UpsertContent : ContentDataCommand, ISchemaCommand
+    public Status? Status { get; set; }
+
+    public bool CheckReferrers { get; set; }
+
+    public bool Patch { get;  set; }
+
+    public UpsertContent()
     {
-        public Status? Status { get; set; }
+        ContentId = DomainId.NewGuid();
+    }
 
-        public bool CheckReferrers { get; set; }
+    public CreateContent AsCreate()
+    {
+        return SimpleMapper.Map(this, new CreateContent());
+    }
 
-        public bool Patch { get;  set; }
+    public UpdateContent AsUpdate()
+    {
+        return SimpleMapper.Map(this, new UpdateContent());
+    }
 
-        public UpsertContent()
-        {
-            ContentId = DomainId.NewGuid();
-        }
-
-        public CreateContent AsCreate()
-        {
-            return SimpleMapper.Map(this, new CreateContent());
-        }
-
-        public UpdateContent AsUpdate()
-        {
-            return SimpleMapper.Map(this, new UpdateContent());
-        }
-
-        public ChangeContentStatus AsChange(Status status)
-        {
-            return SimpleMapper.Map(this, new ChangeContentStatus { Status = status });
-        }
+    public ChangeContentStatus AsChange(Status status)
+    {
+        return SimpleMapper.Map(this, new ChangeContentStatus { Status = status });
     }
 }

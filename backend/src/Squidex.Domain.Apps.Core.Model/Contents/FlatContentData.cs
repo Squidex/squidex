@@ -7,9 +7,8 @@
 
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Core.Contents
+namespace Squidex.Domain.Apps.Core.Contents;
+
+public sealed class FlatContentData : Dictionary<string, JsonValue>
 {
-    public sealed class FlatContentData : Dictionary<string, JsonValue>
-    {
-    }
 }

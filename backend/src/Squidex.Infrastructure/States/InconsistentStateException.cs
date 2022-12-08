@@ -7,40 +7,39 @@
 
 using System.Runtime.Serialization;
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Infrastructure.States;
+
+[Serializable]
+public class InconsistentStateException : Exception
 {
-    [Serializable]
-    public class InconsistentStateException : Exception
+    public long VersionCurrent { get; }
+
+    public long VersionExpected { get; }
+
+    public InconsistentStateException(long current, long expected, Exception? inner = null)
+        : base(FormatMessage(current, expected), inner)
     {
-        public long VersionCurrent { get; }
+        VersionCurrent = current;
+        VersionExpected = expected;
+    }
 
-        public long VersionExpected { get; }
+    protected InconsistentStateException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
+    {
+        VersionCurrent = info.GetInt64(nameof(VersionCurrent));
+        VersionExpected = info.GetInt64(nameof(VersionExpected));
+    }
 
-        public InconsistentStateException(long current, long expected, Exception? inner = null)
-            : base(FormatMessage(current, expected), inner)
-        {
-            VersionCurrent = current;
-            VersionExpected = expected;
-        }
+    public override void GetObjectData(SerializationInfo info, StreamingContext context)
+    {
+        info.AddValue(nameof(VersionCurrent), VersionCurrent);
+        info.AddValue(nameof(VersionExpected), VersionExpected);
 
-        protected InconsistentStateException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-            VersionCurrent = info.GetInt64(nameof(VersionCurrent));
-            VersionExpected = info.GetInt64(nameof(VersionExpected));
-        }
+        base.GetObjectData(info, context);
+    }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue(nameof(VersionCurrent), VersionCurrent);
-            info.AddValue(nameof(VersionExpected), VersionExpected);
-
-            base.GetObjectData(info, context);
-        }
-
-        private static string FormatMessage(long current, long expected)
-        {
-            return $"Requested version {expected}, but found {current}.";
-        }
+    private static string FormatMessage(long current, long expected)
+    {
+        return $"Requested version {expected}, but found {current}.";
     }
 }

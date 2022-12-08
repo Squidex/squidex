@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Tags
+namespace Squidex.Domain.Apps.Entities.Tags;
+
+public interface ITagGenerator<in T>
 {
-    public interface ITagGenerator<in T>
-    {
-        void GenerateTags(T source, HashSet<string> tags);
-    }
+    void GenerateTags(T source, HashSet<string> tags);
 }

@@ -7,20 +7,19 @@
 
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 
-namespace Squidex.Domain.Apps.Core.Rules
+namespace Squidex.Domain.Apps.Core.Rules;
+
+public interface IRuleTriggerVisitor<out T>
 {
-    public interface IRuleTriggerVisitor<out T>
-    {
-        T Visit(AssetChangedTriggerV2 trigger);
+    T Visit(AssetChangedTriggerV2 trigger);
 
-        T Visit(ContentChangedTriggerV2 trigger);
+    T Visit(ContentChangedTriggerV2 trigger);
 
-        T Visit(CommentTrigger trigger);
+    T Visit(CommentTrigger trigger);
 
-        T Visit(ManualTrigger trigger);
+    T Visit(ManualTrigger trigger);
 
-        T Visit(SchemaChangedTrigger trigger);
+    T Visit(SchemaChangedTrigger trigger);
 
-        T Visit(UsageTrigger trigger);
-    }
+    T Visit(UsageTrigger trigger);
 }

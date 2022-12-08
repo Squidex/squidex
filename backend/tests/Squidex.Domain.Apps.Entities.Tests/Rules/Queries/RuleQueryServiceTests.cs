@@ -5,55 +5,52 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Rules.Queries
+namespace Squidex.Domain.Apps.Entities.Rules.Queries;
+
+public class RuleQueryServiceTests
 {
-    public class RuleQueryServiceTests
+    private readonly CancellationTokenSource cts = new CancellationTokenSource();
+    private readonly CancellationToken ct;
+    private readonly IRulesIndex rulesIndex = A.Fake<IRulesIndex>();
+    private readonly IRuleEnricher ruleEnricher = A.Fake<IRuleEnricher>();
+    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+    private readonly Context requestContext;
+    private readonly RuleQueryService sut;
+
+    public RuleQueryServiceTests()
     {
-        private readonly CancellationTokenSource cts = new CancellationTokenSource();
-        private readonly CancellationToken ct;
-        private readonly IRulesIndex rulesIndex = A.Fake<IRulesIndex>();
-        private readonly IRuleEnricher ruleEnricher = A.Fake<IRuleEnricher>();
-        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly Context requestContext;
-        private readonly RuleQueryService sut;
+        ct = cts.Token;
 
-        public RuleQueryServiceTests()
+        requestContext = Context.Anonymous(Mocks.App(appId));
+
+        sut = new RuleQueryService(rulesIndex, ruleEnricher);
+    }
+
+    [Fact]
+    public async Task Should_get_rules_from_index_and_enrich()
+    {
+        var original = new List<IRuleEntity>
         {
-            ct = cts.Token;
+            new RuleEntity()
+        };
 
-            requestContext = Context.Anonymous(Mocks.App(appId));
-
-            sut = new RuleQueryService(rulesIndex, ruleEnricher);
-        }
-
-        [Fact]
-        public async Task Should_get_rules_from_index_and_enrich()
+        var enriched = new List<IEnrichedRuleEntity>
         {
-            var original = new List<IRuleEntity>
-            {
-                new RuleEntity()
-            };
+            new RuleEntity()
+        };
 
-            var enriched = new List<IEnrichedRuleEntity>
-            {
-                new RuleEntity()
-            };
+        A.CallTo(() => rulesIndex.GetRulesAsync(appId.Id, ct))
+            .Returns(original);
 
-            A.CallTo(() => rulesIndex.GetRulesAsync(appId.Id, ct))
-                .Returns(original);
+        A.CallTo(() => ruleEnricher.EnrichAsync(original, requestContext, ct))
+            .Returns(enriched);
 
-            A.CallTo(() => ruleEnricher.EnrichAsync(original, requestContext, ct))
-                .Returns(enriched);
+        var actual = await sut.QueryAsync(requestContext, ct);
 
-            var actual = await sut.QueryAsync(requestContext, ct);
-
-            Assert.Same(enriched, actual);
-        }
+        Assert.Same(enriched, actual);
     }
 }

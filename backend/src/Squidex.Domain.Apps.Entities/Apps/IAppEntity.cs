@@ -11,40 +11,39 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Domain.Apps.Entities.Apps;
+
+public interface IAppEntity :
+    IEntity,
+    IEntityWithCreatedBy,
+    IEntityWithLastModifiedBy,
+    IEntityWithVersion
 {
-    public interface IAppEntity :
-        IEntity,
-        IEntityWithCreatedBy,
-        IEntityWithLastModifiedBy,
-        IEntityWithVersion
-    {
-        string Name { get; }
+    string Name { get; }
 
-        string? Label { get; }
+    string? Label { get; }
 
-        string? Description { get; }
+    string? Description { get; }
 
-        DomainId? TeamId { get; }
+    DomainId? TeamId { get; }
 
-        Roles Roles { get; }
+    Roles Roles { get; }
 
-        AssignedPlan? Plan { get; }
+    AssignedPlan? Plan { get; }
 
-        Contributors Contributors { get; }
+    Contributors Contributors { get; }
 
-        AppImage? Image { get; }
+    AppImage? Image { get; }
 
-        AppClients Clients { get; }
+    AppClients Clients { get; }
 
-        AppSettings Settings { get; }
+    AppSettings Settings { get; }
 
-        AssetScripts AssetScripts { get; }
+    AssetScripts AssetScripts { get; }
 
-        LanguagesConfig Languages { get; }
+    LanguagesConfig Languages { get; }
 
-        Workflows Workflows { get; }
+    Workflows Workflows { get; }
 
-        bool IsDeleted { get; }
-    }
+    bool IsDeleted { get; }
 }

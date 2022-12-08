@@ -6,16 +6,21 @@
         (cdkDropListDropped)="changeCategory($event)">
 
         <li class="nav-item nav-heading">
-            <div class="row g-0 align-items-center mb-1">
+            <div class="row g-1 align-items-center">
                 <div class="col-auto">
                     <button type="button" class="btn btn-sm btn-decent btn-text-secondary btn-toggle" (click)="toggle()">
                         <i [class.icon-caret-right]="isCollapsed" [class.icon-caret-down]="!isCollapsed"></i> 
                     </button>
                 </div>
-                <div class="col">
-                    <div class="truncate">
-                        {{schemaCategory.displayName | sqxTranslate}}
-                    </div>
+                <div class="col pe-1">
+                    <sqx-editable-title 
+                        size="sm"
+                        [closeButton]="false"
+                        (inputTitleChange)="changeName($event)"
+                        [inputTitle]="schemaCategory.displayName | sqxTranslate"
+                        [inputTitleLength]="30"
+                        [disabled]="!schemaCategory.name">
+                    </sqx-editable-title>
                 </div>
                 <div class="col-auto">
                     <ng-container *ngIf="schemaCategory.countSchemasInSubtree > 0; else noSchemas">

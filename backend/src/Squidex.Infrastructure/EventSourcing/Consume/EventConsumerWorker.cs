@@ -9,75 +9,74 @@ using Squidex.Hosting;
 using Squidex.Infrastructure.Timers;
 using Squidex.Messaging;
 
-namespace Squidex.Infrastructure.EventSourcing.Consume
-{
-    public sealed class EventConsumerWorker :
-        IMessageHandler<EventConsumerStart>,
-        IMessageHandler<EventConsumerStop>,
-        IMessageHandler<EventConsumerReset>,
-        IBackgroundProcess
-    {
-        private readonly Dictionary<string, EventConsumerProcessor> processors = new Dictionary<string, EventConsumerProcessor>();
-        private CompletionTimer? timer;
+namespace Squidex.Infrastructure.EventSourcing.Consume;
 
-        public EventConsumerWorker(IEnumerable<IEventConsumer> eventConsumers,
-            Func<IEventConsumer, EventConsumerProcessor> factory)
+public sealed class EventConsumerWorker :
+    IMessageHandler<EventConsumerStart>,
+    IMessageHandler<EventConsumerStop>,
+    IMessageHandler<EventConsumerReset>,
+    IBackgroundProcess
+{
+    private readonly Dictionary<string, EventConsumerProcessor> processors = new Dictionary<string, EventConsumerProcessor>();
+    private CompletionTimer? timer;
+
+    public EventConsumerWorker(IEnumerable<IEventConsumer> eventConsumers,
+        Func<IEventConsumer, EventConsumerProcessor> factory)
+    {
+        foreach (var consumer in eventConsumers)
         {
-            foreach (var consumer in eventConsumers)
-            {
-                processors[consumer.Name] = factory(consumer);
-            }
+            processors[consumer.Name] = factory(consumer);
+        }
+    }
+
+    public async Task StartAsync(
+        CancellationToken ct)
+    {
+        foreach (var (_, processor) in processors)
+        {
+            await processor.InitializeAsync(ct);
+            await processor.ActivateAsync();
         }
 
-        public async Task StartAsync(
-            CancellationToken ct)
+        timer = new CompletionTimer(TimeSpan.FromSeconds(30), async ct =>
         {
             foreach (var (_, processor) in processors)
             {
-                await processor.InitializeAsync(ct);
                 await processor.ActivateAsync();
             }
+        });
+    }
 
-            timer = new CompletionTimer(TimeSpan.FromSeconds(30), async ct =>
-            {
-                foreach (var (_, processor) in processors)
-                {
-                    await processor.ActivateAsync();
-                }
-            });
-        }
+    public Task StopAsync(
+        CancellationToken ct)
+    {
+        return timer?.StopAsync() ?? Task.CompletedTask;
+    }
 
-        public Task StopAsync(
-            CancellationToken ct)
+    public async Task HandleAsync(EventConsumerStart message,
+        CancellationToken ct)
+    {
+        if (processors.TryGetValue(message.Name, out var processor))
         {
-            return timer?.StopAsync() ?? Task.CompletedTask;
+            await processor.StartAsync();
         }
+    }
 
-        public async Task HandleAsync(EventConsumerStart message,
-            CancellationToken ct)
+    public async Task HandleAsync(EventConsumerStop message,
+        CancellationToken ct)
+    {
+        if (processors.TryGetValue(message.Name, out var processor))
         {
-            if (processors.TryGetValue(message.Name, out var processor))
-            {
-                await processor.StartAsync();
-            }
+            await processor.StopAsync();
         }
+    }
 
-        public async Task HandleAsync(EventConsumerStop message,
-            CancellationToken ct)
+    public async Task HandleAsync(EventConsumerReset message,
+        CancellationToken ct)
+    {
+        if (processors.TryGetValue(message.Name, out var processor))
         {
-            if (processors.TryGetValue(message.Name, out var processor))
-            {
-                await processor.StopAsync();
-            }
-        }
-
-        public async Task HandleAsync(EventConsumerReset message,
-            CancellationToken ct)
-        {
-            if (processors.TryGetValue(message.Name, out var processor))
-            {
-                await processor.ResetAsync();
-            }
+            await processor.ResetAsync();
         }
     }
 }

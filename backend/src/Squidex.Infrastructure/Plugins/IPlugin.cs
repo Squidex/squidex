@@ -8,10 +8,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Squidex.Infrastructure.Plugins
+namespace Squidex.Infrastructure.Plugins;
+
+public interface IPlugin
 {
-    public interface IPlugin
-    {
-        void ConfigureServices(IServiceCollection services, IConfiguration config);
-    }
+    void ConfigureServices(IServiceCollection services, IConfiguration config);
 }

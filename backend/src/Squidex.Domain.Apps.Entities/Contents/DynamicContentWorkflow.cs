@@ -11,160 +11,159 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents;
+
+public sealed class DynamicContentWorkflow : IContentWorkflow
 {
-    public sealed class DynamicContentWorkflow : IContentWorkflow
+    private readonly IScriptEngine scriptEngine;
+    private readonly IAppProvider appProvider;
+
+    public DynamicContentWorkflow(IScriptEngine scriptEngine, IAppProvider appProvider)
     {
-        private readonly IScriptEngine scriptEngine;
-        private readonly IAppProvider appProvider;
+        this.scriptEngine = scriptEngine;
 
-        public DynamicContentWorkflow(IScriptEngine scriptEngine, IAppProvider appProvider)
+        this.appProvider = appProvider;
+    }
+
+    public async ValueTask<StatusInfo[]> GetAllAsync(ISchemaEntity schema)
+    {
+        var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
+
+        return workflow.Steps.Select(x => new StatusInfo(x.Key, GetColor(x.Value))).ToArray();
+    }
+
+    public async ValueTask<bool> CanPublishInitialAsync(ISchemaEntity schema, ClaimsPrincipal? user)
+    {
+        var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
+
+        return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && IsTrue(transition, null, user);
+    }
+
+    public async ValueTask<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user)
+    {
+        var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
+
+        return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, data, user);
+    }
+
+    public async ValueTask<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal? user)
+    {
+        var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
+
+        return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, content.Data, user);
+    }
+
+    public async ValueTask<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
+    {
+        var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
+
+        if (workflow.TryGetStep(status, out var step))
         {
-            this.scriptEngine = scriptEngine;
-
-            this.appProvider = appProvider;
+            return step.NoUpdate == null || !IsTrue(step.NoUpdate, content.Data, user);
         }
 
-        public async ValueTask<StatusInfo[]> GetAllAsync(ISchemaEntity schema)
+        return true;
+    }
+
+    public async ValueTask<bool> ShouldValidateAsync(ISchemaEntity schema, Status status)
+    {
+        var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
+
+        if (workflow.TryGetStep(status, out var step) && step.Validate)
         {
-            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
-
-            return workflow.Steps.Select(x => new StatusInfo(x.Key, GetColor(x.Value))).ToArray();
-        }
-
-        public async ValueTask<bool> CanPublishInitialAsync(ISchemaEntity schema, ClaimsPrincipal? user)
-        {
-            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
-
-            return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && IsTrue(transition, null, user);
-        }
-
-        public async ValueTask<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user)
-        {
-            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
-
-            return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, data, user);
-        }
-
-        public async ValueTask<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal? user)
-        {
-            var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
-
-            return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, content.Data, user);
-        }
-
-        public async ValueTask<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
-        {
-            var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
-
-            if (workflow.TryGetStep(status, out var step))
-            {
-                return step.NoUpdate == null || !IsTrue(step.NoUpdate, content.Data, user);
-            }
-
             return true;
         }
 
-        public async ValueTask<bool> ShouldValidateAsync(ISchemaEntity schema, Status status)
+        return status == Status.Published && schema.SchemaDef.Properties.ValidateOnPublish;
+    }
+
+    public async ValueTask<StatusInfo?> GetInfoAsync(IContentEntity content, Status status)
+    {
+        var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
+
+        if (workflow.TryGetStep(status, out var step))
         {
-            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
-
-            if (workflow.TryGetStep(status, out var step) && step.Validate)
-            {
-                return true;
-            }
-
-            return status == Status.Published && schema.SchemaDef.Properties.ValidateOnPublish;
+            return new StatusInfo(status, GetColor(step));
         }
 
-        public async ValueTask<StatusInfo?> GetInfoAsync(IContentEntity content, Status status)
+        return null;
+    }
+
+    public async ValueTask<Status> GetInitialStatusAsync(ISchemaEntity schema)
+    {
+        var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
+
+        var (status, _) = workflow.GetInitialStep();
+
+        return status;
+    }
+
+    public async ValueTask<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
+    {
+        var result = new List<StatusInfo>();
+
+        var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
+
+        foreach (var (to, step, transition) in workflow.GetTransitions(status))
         {
-            var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
-
-            if (workflow.TryGetStep(status, out var step))
+            if (IsTrue(transition, content.Data, user))
             {
-                return new StatusInfo(status, GetColor(step));
+                result.Add(new StatusInfo(to, GetColor(step)));
             }
-
-            return null;
         }
 
-        public async ValueTask<Status> GetInitialStatusAsync(ISchemaEntity schema)
+        return result.ToArray();
+    }
+
+    private bool IsTrue(WorkflowCondition condition, ContentData? data, ClaimsPrincipal? user)
+    {
+        if (condition?.Roles != null && user != null)
         {
-            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
-
-            var (status, _) = workflow.GetInitialStep();
-
-            return status;
+            if (!user.Claims.Any(x => x.Type == ClaimTypes.Role && condition.Roles.Contains(x.Value)))
+            {
+                return false;
+            }
         }
 
-        public async ValueTask<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
+        if (!string.IsNullOrWhiteSpace(condition?.Expression) && data != null)
         {
-            var result = new List<StatusInfo>();
-
-            var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
-
-            foreach (var (to, step, transition) in workflow.GetTransitions(status))
+            var vars = new DataScriptVars
             {
-                if (IsTrue(transition, content.Data, user))
-                {
-                    result.Add(new StatusInfo(to, GetColor(step)));
-                }
-            }
+                Data = data
+            };
 
-            return result.ToArray();
+            return scriptEngine.Evaluate(vars, condition.Expression);
         }
 
-        private bool IsTrue(WorkflowCondition condition, ContentData? data, ClaimsPrincipal? user)
+        return true;
+    }
+
+    private async ValueTask<Workflow> GetWorkflowAsync(DomainId appId, DomainId schemaId)
+    {
+        Workflow? result = null;
+
+        var app = await appProvider.GetAppAsync(appId, false);
+
+        if (app != null)
         {
-            if (condition?.Roles != null && user != null)
-            {
-                if (!user.Claims.Any(x => x.Type == ClaimTypes.Role && condition.Roles.Contains(x.Value)))
-                {
-                    return false;
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(condition?.Expression) && data != null)
-            {
-                var vars = new DataScriptVars
-                {
-                    Data = data
-                };
-
-                return scriptEngine.Evaluate(vars, condition.Expression);
-            }
-
-            return true;
-        }
-
-        private async ValueTask<Workflow> GetWorkflowAsync(DomainId appId, DomainId schemaId)
-        {
-            Workflow? result = null;
-
-            var app = await appProvider.GetAppAsync(appId, false);
-
-            if (app != null)
-            {
-                result = app.Workflows.Values.FirstOrDefault(x => x.SchemaIds.Contains(schemaId));
-
-                if (result == null)
-                {
-                    result = app.Workflows.Values.FirstOrDefault(x => x.SchemaIds.Count == 0);
-                }
-            }
+            result = app.Workflows.Values.FirstOrDefault(x => x.SchemaIds.Contains(schemaId));
 
             if (result == null)
             {
-                result = Workflow.Default;
+                result = app.Workflows.Values.FirstOrDefault(x => x.SchemaIds.Count == 0);
             }
-
-            return result;
         }
 
-        private static string GetColor(WorkflowStep step)
+        if (result == null)
         {
-            return step.Color ?? StatusColors.Draft;
+            result = Workflow.Default;
         }
+
+        return result;
+    }
+
+    private static string GetColor(WorkflowStep step)
+    {
+        return step.Color ?? StatusColors.Draft;
     }
 }

@@ -12,68 +12,67 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Domain.Apps.Core.HandleRules;
+
+public sealed class EventEnricher : IEventEnricher
 {
-    public sealed class EventEnricher : IEventEnricher
+    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
+    private readonly IMemoryCache userCache;
+    private readonly IUserResolver userResolver;
+
+    public EventEnricher(IMemoryCache userCache, IUserResolver userResolver)
     {
-        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
-        private readonly IMemoryCache userCache;
-        private readonly IUserResolver userResolver;
+        this.userCache = userCache;
+        this.userResolver = userResolver;
+    }
 
-        public EventEnricher(IMemoryCache userCache, IUserResolver userResolver)
+    public async Task EnrichAsync(EnrichedEvent enrichedEvent, Envelope<AppEvent>? @event)
+    {
+        if (@event != null)
         {
-            this.userCache = userCache;
-            this.userResolver = userResolver;
+            enrichedEvent.Timestamp = @event.Headers.Timestamp();
+
+            enrichedEvent.AppId = @event.Payload.AppId;
         }
 
-        public async Task EnrichAsync(EnrichedEvent enrichedEvent, Envelope<AppEvent>? @event)
+        if (enrichedEvent is EnrichedUserEventBase userEvent)
         {
-            if (@event != null)
+            if (@event?.Payload is SquidexEvent squidexEvent)
             {
-                enrichedEvent.Timestamp = @event.Headers.Timestamp();
-
-                enrichedEvent.AppId = @event.Payload.AppId;
+                userEvent.Actor = squidexEvent.Actor;
             }
 
-            if (enrichedEvent is EnrichedUserEventBase userEvent)
+            if (userEvent.Actor != null)
             {
-                if (@event?.Payload is SquidexEvent squidexEvent)
-                {
-                    userEvent.Actor = squidexEvent.Actor;
-                }
-
-                if (userEvent.Actor != null)
-                {
-                    userEvent.User = await FindUserAsync(userEvent.Actor);
-                }
+                userEvent.User = await FindUserAsync(userEvent.Actor);
             }
         }
+    }
 
-        private Task<IUser?> FindUserAsync(RefToken actor)
+    private Task<IUser?> FindUserAsync(RefToken actor)
+    {
+        var cacheKey = $"{typeof(EventEnricher)}_Users_{actor.Identifier}";
+
+        return userCache.GetOrCreateAsync(cacheKey, async x =>
         {
-            var cacheKey = $"{typeof(EventEnricher)}_Users_{actor.Identifier}";
+            x.AbsoluteExpirationRelativeToNow = CacheDuration;
 
-            return userCache.GetOrCreateAsync(cacheKey, async x =>
+            IUser? user;
+            try
             {
-                x.AbsoluteExpirationRelativeToNow = CacheDuration;
+                user = await userResolver.FindByIdAsync(actor.Identifier);
+            }
+            catch
+            {
+                user = null;
+            }
 
-                IUser? user;
-                try
-                {
-                    user = await userResolver.FindByIdAsync(actor.Identifier);
-                }
-                catch
-                {
-                    user = null;
-                }
+            if (user == null && actor.IsClient)
+            {
+                user = new ClientUser(actor);
+            }
 
-                if (user == null && actor.IsClient)
-                {
-                    user = new ClientUser(actor);
-                }
-
-                return user;
-            });
-        }
+            return user;
+        });
     }
 }

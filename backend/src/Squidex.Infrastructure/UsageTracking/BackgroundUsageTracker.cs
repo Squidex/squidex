@@ -9,196 +9,195 @@ using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Timers;
 
-namespace Squidex.Infrastructure.UsageTracking
+namespace Squidex.Infrastructure.UsageTracking;
+
+public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
 {
-    public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
+    private const int Intervall = 60 * 1000;
+    private readonly IUsageRepository usageRepository;
+    private readonly ILogger<BackgroundUsageTracker> log;
+    private readonly CompletionTimer timer;
+    private ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters> jobs = new ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters>();
+
+    public bool ForceWrite { get; set; }
+
+    public string FallbackCategory => "*";
+
+    public BackgroundUsageTracker(IUsageRepository usageRepository,
+        ILogger<BackgroundUsageTracker> log)
     {
-        private const int Intervall = 60 * 1000;
-        private readonly IUsageRepository usageRepository;
-        private readonly ILogger<BackgroundUsageTracker> log;
-        private readonly CompletionTimer timer;
-        private ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters> jobs = new ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters>();
+        this.usageRepository = usageRepository;
 
-        public bool ForceWrite { get; set; }
+        this.log = log;
 
-        public string FallbackCategory => "*";
+        timer = new CompletionTimer(Intervall, TrackAsync, Intervall);
+    }
 
-        public BackgroundUsageTracker(IUsageRepository usageRepository,
-            ILogger<BackgroundUsageTracker> log)
+    protected override void DisposeObject(bool disposing)
+    {
+        if (disposing)
         {
-            this.usageRepository = usageRepository;
-
-            this.log = log;
-
-            timer = new CompletionTimer(Intervall, TrackAsync, Intervall);
+            timer.StopAsync().Wait();
         }
+    }
 
-        protected override void DisposeObject(bool disposing)
+    public void Next()
+    {
+        ThrowIfDisposed();
+
+        timer.SkipCurrentDelay();
+    }
+
+    private async Task TrackAsync(
+        CancellationToken ct)
+    {
+        try
         {
-            if (disposing)
+            var localUsages = Interlocked.Exchange(ref jobs, new ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters>());
+
+            if (!localUsages.IsEmpty)
             {
-                timer.StopAsync().Wait();
-            }
-        }
+                var updates = new UsageUpdate[localUsages.Count];
+                var updateIndex = 0;
 
-        public void Next()
-        {
-            ThrowIfDisposed();
-
-            timer.SkipCurrentDelay();
-        }
-
-        private async Task TrackAsync(
-            CancellationToken ct)
-        {
-            try
-            {
-                var localUsages = Interlocked.Exchange(ref jobs, new ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters>());
-
-                if (!localUsages.IsEmpty)
+                foreach (var (key, value) in localUsages)
                 {
-                    var updates = new UsageUpdate[localUsages.Count];
-                    var updateIndex = 0;
-
-                    foreach (var (key, value) in localUsages)
+                    if (updateIndex >= updates.Length)
                     {
-                        if (updateIndex >= updates.Length)
-                        {
-                            break;
-                        }
-
-                        updates[updateIndex].Key = key.Key;
-                        updates[updateIndex].Category = key.Category;
-                        updates[updateIndex].Counters = value;
-                        updates[updateIndex].Date = key.Date;
-
-                        updateIndex++;
+                        break;
                     }
 
-                    if (ForceWrite)
-                    {
-                        ct = default;
-                    }
+                    updates[updateIndex].Key = key.Key;
+                    updates[updateIndex].Category = key.Category;
+                    updates[updateIndex].Counters = value;
+                    updates[updateIndex].Date = key.Date;
 
-                    await usageRepository.TrackUsagesAsync(updates, ct);
+                    updateIndex++;
                 }
+
+                if (ForceWrite)
+                {
+                    ct = default;
+                }
+
+                await usageRepository.TrackUsagesAsync(updates, ct);
             }
-            catch (Exception ex)
-            {
-                log.LogError(ex, "Failed to track usage in background.");
-            }
         }
-
-        public Task DeleteAsync(string key,
-            CancellationToken ct = default)
+        catch (Exception ex)
         {
-            Guard.NotNull(key);
-
-            return usageRepository.DeleteAsync(key, ct);
+            log.LogError(ex, "Failed to track usage in background.");
         }
+    }
 
-        public Task DeleteByKeyPatternAsync(string pattern,
-            CancellationToken ct = default)
-        {
-            Guard.NotNull(pattern);
+    public Task DeleteAsync(string key,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(key);
 
-            return usageRepository.DeleteByKeyPatternAsync(pattern, ct);
-        }
+        return usageRepository.DeleteAsync(key, ct);
+    }
 
-        public Task TrackAsync(DateTime date, string key, string? category, Counters counters,
-            CancellationToken ct = default)
-        {
-            Guard.NotNullOrEmpty(key);
-            Guard.NotNull(counters);
+    public Task DeleteByKeyPatternAsync(string pattern,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(pattern);
 
-            ThrowIfDisposed();
+        return usageRepository.DeleteByKeyPatternAsync(pattern, ct);
+    }
 
-            category = GetCategory(category);
+    public Task TrackAsync(DateTime date, string key, string? category, Counters counters,
+        CancellationToken ct = default)
+    {
+        Guard.NotNullOrEmpty(key);
+        Guard.NotNull(counters);
+
+        ThrowIfDisposed();
+
+        category = GetCategory(category);
 
 #pragma warning disable MA0105 // Use the lambda parameters instead of using a closure
-            jobs.AddOrUpdate((key, category, date), counters, (k, p) => p.SumUp(counters));
+        jobs.AddOrUpdate((key, category, date), counters, (k, p) => p.SumUp(counters));
 #pragma warning restore MA0105 // Use the lambda parameters instead of using a closure
 
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
+    }
 
-        public async Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate,
-            CancellationToken ct = default)
+    public async Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate,
+        CancellationToken ct = default)
+    {
+        Guard.NotNullOrEmpty(key);
+
+        ThrowIfDisposed();
+
+        var result = new Dictionary<string, List<(DateTime Date, Counters Counters)>>();
+
+        var usageData = await usageRepository.QueryAsync(key, fromDate, toDate, ct);
+        var usageGroups = usageData.GroupBy(x => GetCategory(x.Category)).ToDictionary(x => x.Key, x => x.ToList());
+
+        if (usageGroups.Keys.Count == 0)
         {
-            Guard.NotNullOrEmpty(key);
+            var enriched = new List<(DateTime Date, Counters Counters)>();
 
-            ThrowIfDisposed();
-
-            var result = new Dictionary<string, List<(DateTime Date, Counters Counters)>>();
-
-            var usageData = await usageRepository.QueryAsync(key, fromDate, toDate, ct);
-            var usageGroups = usageData.GroupBy(x => GetCategory(x.Category)).ToDictionary(x => x.Key, x => x.ToList());
-
-            if (usageGroups.Keys.Count == 0)
+            for (var date = fromDate; date <= toDate; date = date.AddDays(1))
             {
-                var enriched = new List<(DateTime Date, Counters Counters)>();
-
-                for (var date = fromDate; date <= toDate; date = date.AddDays(1))
-                {
-                    enriched.Add((date, new Counters()));
-                }
-
-                result[FallbackCategory] = enriched;
+                enriched.Add((date, new Counters()));
             }
 
-            foreach (var (category, value) in usageGroups)
+            result[FallbackCategory] = enriched;
+        }
+
+        foreach (var (category, value) in usageGroups)
+        {
+            var enriched = new List<(DateTime Date, Counters Counters)>();
+
+            for (var date = fromDate; date <= toDate; date = date.AddDays(1))
             {
-                var enriched = new List<(DateTime Date, Counters Counters)>();
+                var counters = value.Find(x => x.Date == date)?.Counters;
 
-                for (var date = fromDate; date <= toDate; date = date.AddDays(1))
-                {
-                    var counters = value.Find(x => x.Date == date)?.Counters;
-
-                    enriched.Add((date, counters ?? new Counters()));
-                }
-
-                result[category] = enriched;
+                enriched.Add((date, counters ?? new Counters()));
             }
 
-            return result;
+            result[category] = enriched;
         }
 
-        public Task<Counters> GetForMonthAsync(string key, DateTime date, string? category,
-            CancellationToken ct = default)
+        return result;
+    }
+
+    public Task<Counters> GetForMonthAsync(string key, DateTime date, string? category,
+        CancellationToken ct = default)
+    {
+        var dateFrom = new DateTime(date.Year, date.Month, 1);
+        var dateTo = dateFrom.AddMonths(1).AddDays(-1);
+
+        return GetAsync(key, dateFrom, dateTo, category, ct);
+    }
+
+    public async Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate, string? category,
+        CancellationToken ct = default)
+    {
+        Guard.NotNullOrEmpty(key);
+
+        ThrowIfDisposed();
+
+        var queried = await usageRepository.QueryAsync(key, fromDate, toDate, ct);
+
+        if (category != null)
         {
-            var dateFrom = new DateTime(date.Year, date.Month, 1);
-            var dateTo = dateFrom.AddMonths(1).AddDays(-1);
-
-            return GetAsync(key, dateFrom, dateTo, category, ct);
+            queried = queried.Where(x => string.Equals(x.Category, category, StringComparison.OrdinalIgnoreCase)).ToList();
         }
 
-        public async Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate, string? category,
-            CancellationToken ct = default)
+        var result = new Counters();
+
+        foreach (var usage in queried)
         {
-            Guard.NotNullOrEmpty(key);
-
-            ThrowIfDisposed();
-
-            var queried = await usageRepository.QueryAsync(key, fromDate, toDate, ct);
-
-            if (category != null)
-            {
-                queried = queried.Where(x => string.Equals(x.Category, category, StringComparison.OrdinalIgnoreCase)).ToList();
-            }
-
-            var result = new Counters();
-
-            foreach (var usage in queried)
-            {
-                result.SumUp(usage.Counters);
-            }
-
-            return result;
+            result.SumUp(usage.Counters);
         }
 
-        private string GetCategory(string? category)
-        {
-            return !string.IsNullOrWhiteSpace(category) ? category.Trim() : FallbackCategory;
-        }
+        return result;
+    }
+
+    private string GetCategory(string? category)
+    {
+        return !string.IsNullOrWhiteSpace(category) ? category.Trim() : FallbackCategory;
     }
 }

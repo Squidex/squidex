@@ -5,216 +5,208 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Security.Cryptography;
-using System.Text;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 
-namespace TestSuite
+namespace TestSuite;
+
+public static class ClientExtensions
 {
-    public static class ClientExtensions
+    public static async Task<bool> WaitForDeletionAsync(this IAssetsClient assetsClient, string app, string id, TimeSpan timeout)
     {
-        public static async Task<bool> WaitForDeletionAsync(this IAssetsClient assetsClient, string app, string id, TimeSpan timeout)
+        try
         {
-            try
-            {
-                using var cts = new CancellationTokenSource(timeout);
+            using var cts = new CancellationTokenSource(timeout);
 
-                while (!cts.IsCancellationRequested)
+            while (!cts.IsCancellationRequested)
+            {
+                try
                 {
-                    try
-                    {
-                        await assetsClient.GetAssetAsync(app, id, cts.Token);
-                    }
-                    catch (SquidexManagementException ex) when (ex.StatusCode == 404)
-                    {
-                        return true;
-                    }
-
-                    await Task.Delay(200, cts.Token);
+                    await assetsClient.GetAssetAsync(app, id, cts.Token);
                 }
-            }
-            catch (OperationCanceledException)
-            {
-            }
+                catch (SquidexManagementException ex) when (ex.StatusCode == 404)
+                {
+                    return true;
+                }
 
-            return false;
+                await Task.Delay(200, cts.Token);
+            }
+        }
+        catch (OperationCanceledException)
+        {
         }
 
-        public static async Task<ContentsResult<TEntity, TData>> WaitForContentAsync<TEntity, TData>(this IContentsClient<TEntity, TData> contentsClient, ContentQuery q,
-            Func<TEntity, bool> predicate, TimeSpan timeout) where TEntity : Content<TData> where TData : class, new()
+        return false;
+    }
+
+    public static async Task<ContentsResult<TEntity, TData>> WaitForContentAsync<TEntity, TData>(this IContentsClient<TEntity, TData> contentsClient, ContentQuery q, Func<TEntity, bool> predicate, TimeSpan timeout) where TEntity : Content<TData> where TData : class, new()
+    {
+        try
         {
-            try
-            {
-                using var cts = new CancellationTokenSource(timeout);
+            using var cts = new CancellationTokenSource(timeout);
 
-                while (!cts.IsCancellationRequested)
+            while (!cts.IsCancellationRequested)
+            {
+                var result = await contentsClient.GetAsync(q, null, cts.Token);
+
+                if (result.Items.Any(predicate))
                 {
-                    var result = await contentsClient.GetAsync(q, null, cts.Token);
-
-                    if (result.Items.Any(predicate))
-                    {
-                        return result;
-                    }
-
-                    await Task.Delay(200, cts.Token);
+                    return result;
                 }
-            }
-            catch (OperationCanceledException)
-            {
-            }
 
-            return new ContentsResult<TEntity, TData>();
+                await Task.Delay(200, cts.Token);
+            }
+        }
+        catch (OperationCanceledException)
+        {
         }
 
-        public static async Task<IList<SearchResultDto>> WaitForSearchAsync(this ISearchClient searchClient, string app, string query,
-            Func<SearchResultDto, bool> predicate, TimeSpan timeout)
+        return new ContentsResult<TEntity, TData>();
+    }
+
+    public static async Task<IList<SearchResultDto>> WaitForSearchAsync(this ISearchClient searchClient, string app, string query, Func<SearchResultDto, bool> predicate, TimeSpan timeout)
+    {
+        try
         {
-            try
-            {
-                using var cts = new CancellationTokenSource(timeout);
+            using var cts = new CancellationTokenSource(timeout);
 
-                while (!cts.IsCancellationRequested)
+            while (!cts.IsCancellationRequested)
+            {
+                var result = await searchClient.GetSearchResultsAsync(app, query, cts.Token);
+
+                if (result.Any(predicate))
                 {
-                    var result = await searchClient.GetSearchResultsAsync(app, query, cts.Token);
-
-                    if (result.Any(predicate))
-                    {
-                        return result.ToList();
-                    }
-
-                    await Task.Delay(200, cts.Token);
+                    return result.ToList();
                 }
-            }
-            catch (OperationCanceledException)
-            {
-            }
 
-            return new List<SearchResultDto>();
+                await Task.Delay(200, cts.Token);
+            }
+        }
+        catch (OperationCanceledException)
+        {
         }
 
-        public static async Task<IList<HistoryEventDto>> WaitForHistoryAsync(this IHistoryClient historyClient, string app, string channel,
-            Func<HistoryEventDto, bool> predicate, TimeSpan timeout)
+        return new List<SearchResultDto>();
+    }
+
+    public static async Task<IList<HistoryEventDto>> WaitForHistoryAsync(this IHistoryClient historyClient, string app, string channel, Func<HistoryEventDto, bool> predicate, TimeSpan timeout)
+    {
+        try
         {
-            try
-            {
-                using var cts = new CancellationTokenSource(timeout);
+            using var cts = new CancellationTokenSource(timeout);
 
-                while (!cts.IsCancellationRequested)
+            while (!cts.IsCancellationRequested)
+            {
+                var result = await historyClient.GetAppHistoryAsync(app, channel, cts.Token);
+
+                if (result.Any(predicate))
                 {
-                    var result = await historyClient.GetAppHistoryAsync(app, channel, cts.Token);
-
-                    if (result.Any(predicate))
-                    {
-                        return result.ToList();
-                    }
-
-                    await Task.Delay(200, cts.Token);
+                    return result.ToList();
                 }
-            }
-            catch (OperationCanceledException)
-            {
-            }
 
-            return new List<HistoryEventDto>();
+                await Task.Delay(200, cts.Token);
+            }
+        }
+        catch (OperationCanceledException)
+        {
         }
 
-        public static async Task<IDictionary<string, int>> WaitForTagsAsync(this IAssetsClient assetsClient, string app, string id,
-            TimeSpan timeout)
+        return new List<HistoryEventDto>();
+    }
+
+    public static async Task<IDictionary<string, int>> WaitForTagsAsync(this IAssetsClient assetsClient, string app, string id, TimeSpan timeout)
+    {
+        try
         {
-            try
-            {
-                using var cts = new CancellationTokenSource(timeout);
+            using var cts = new CancellationTokenSource(timeout);
 
-                while (!cts.IsCancellationRequested)
+            while (!cts.IsCancellationRequested)
+            {
+                var result = await assetsClient.GetTagsAsync(app, cts.Token);
+
+                if (result.TryGetValue(id, out var count) && count > 0)
                 {
-                    var result = await assetsClient.GetTagsAsync(app, cts.Token);
-
-                    if (result.TryGetValue(id, out var count) && count > 0)
-                    {
-                        return result;
-                    }
-
-                    await Task.Delay(200, cts.Token);
+                    return result;
                 }
-            }
-            catch (OperationCanceledException)
-            {
-            }
 
-            return await assetsClient.GetTagsAsync(app);
+                await Task.Delay(200, cts.Token);
+            }
+        }
+        catch (OperationCanceledException)
+        {
         }
 
-        public static async Task<IList<BackupJobDto>> WaitForBackupsAsync(this IBackupsClient backupsClient, string app,
-            Func<BackupJobDto, bool> predicate, TimeSpan timeout)
+        return await assetsClient.GetTagsAsync(app);
+    }
+
+    public static async Task<IList<BackupJobDto>> WaitForBackupsAsync(this IBackupsClient backupsClient, string app, Func<BackupJobDto, bool> predicate, TimeSpan timeout)
+    {
+        try
         {
-            try
-            {
-                using var cts = new CancellationTokenSource(timeout);
+            using var cts = new CancellationTokenSource(timeout);
 
-                while (!cts.IsCancellationRequested)
+            while (!cts.IsCancellationRequested)
+            {
+                var result = await backupsClient.GetBackupsAsync(app, cts.Token);
+
+                if (result.Items.Any(predicate))
                 {
-                    var result = await backupsClient.GetBackupsAsync(app, cts.Token);
-
-                    if (result.Items.Any(predicate))
-                    {
-                        return result.Items;
-                    }
-
-                    await Task.Delay(200, cts.Token);
+                    return result.Items;
                 }
-            }
-            catch (OperationCanceledException)
-            {
-            }
 
-            return null;
+                await Task.Delay(200, cts.Token);
+            }
+        }
+        catch (OperationCanceledException)
+        {
         }
 
-        public static async Task<RestoreJobDto> WaitForRestoreAsync(this IBackupsClient backupsClient,
-            Func<RestoreJobDto, bool> predicate, TimeSpan timeout)
+        return null;
+    }
+
+    public static async Task<RestoreJobDto> WaitForRestoreAsync(this IBackupsClient backupsClient, Func<RestoreJobDto, bool> predicate, TimeSpan timeout)
+    {
+        try
         {
-            try
-            {
-                using var cts = new CancellationTokenSource(timeout);
+            using var cts = new CancellationTokenSource(timeout);
 
-                while (!cts.IsCancellationRequested)
+            while (!cts.IsCancellationRequested)
+            {
+                var result = await backupsClient.GetRestoreJobAsync(cts.Token);
+
+                if (predicate(result))
                 {
-                    var result = await backupsClient.GetRestoreJobAsync(cts.Token);
-
-                    if (predicate(result))
-                    {
-                        return result;
-                    }
-
-                    await Task.Delay(200, cts.Token);
+                    return result;
                 }
-            }
-            catch (OperationCanceledException)
-            {
-            }
 
-            return null;
+                await Task.Delay(200, cts.Token);
+            }
+        }
+        catch (OperationCanceledException)
+        {
         }
 
-        public static async Task<MemoryStream> DownloadAsync(this ClientManagerFixture fixture, AssetDto asset, int? version = null)
+        return null;
+    }
+
+    public static async Task<MemoryStream> DownloadAsync(this ClientFixture fixture, AssetDto asset, int? version = null)
+    {
+        var temp = new MemoryStream();
+
+        using (var httpClient = new HttpClient())
         {
-            var temp = new MemoryStream();
+            httpClient.BaseAddress = new Uri(fixture.Url);
 
-            using (var client = new HttpClient())
+            var url = asset._links["content"].Href[1..];
+
+            if (version > 0)
             {
-                client.BaseAddress = new Uri(fixture.ServerUrl);
+                url += $"?version={version}";
+            }
 
-                var url = asset._links["content"].Href[1..];
-
-                if (version > 0)
-                {
-                    url += $"?version={version}";
-                }
-
-                var response = await client.GetAsync(url);
-
+            using (var response = await httpClient.GetAsync(url))
+            {
                 response.EnsureSuccessStatusCode();
 
                 await using (var stream = await response.Content.ReadAsStreamAsync())
@@ -222,68 +214,65 @@ namespace TestSuite
                     await stream.CopyToAsync(temp);
                 }
             }
-
-            return temp;
         }
 
-        public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string app, string path,
-            AssetDto asset, string fileName = null)
+        return temp;
+    }
+
+    public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string app, string path, AssetDto asset, string fileName = null)
+    {
+        var fileInfo = new FileInfo(path);
+
+        await using (var stream = fileInfo.OpenRead())
         {
-            var fileInfo = new FileInfo(path);
+            var upload = new FileParameter(stream, fileName ?? fileInfo.Name, asset.MimeType);
 
-            await using (var stream = fileInfo.OpenRead())
-            {
-                var upload = new FileParameter(stream, fileName ?? fileInfo.Name, asset.MimeType);
-
-                return await assetsClients.PutAssetContentAsync(app, asset.Id, upload);
-            }
+            return await assetsClients.PutAssetContentAsync(app, asset.Id, upload);
         }
+    }
 
-        public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string app, string path,
-            string mimeType, string fileName = null, string parentId = null, string id = null)
+    public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string app, string path, string fileType, string fileName = null, string parentId = null, string id = null)
+    {
+        var fileInfo = new FileInfo(path);
+
+        await using (var stream = fileInfo.OpenRead())
         {
-            var fileInfo = new FileInfo(path);
+            var upload = new FileParameter(stream, fileName ?? fileInfo.Name, fileType);
 
-            await using (var stream = fileInfo.OpenRead())
-            {
-                var upload = new FileParameter(stream, fileName ?? fileInfo.Name, mimeType);
-
-                return await assetsClients.PostAssetAsync(app, parentId, id, true, upload);
-            }
+            return await assetsClients.PostAssetAsync(app, parentId, id, true, upload);
         }
+    }
 
-        public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string app, int size,
-            string fileName = null, string parentId = null, string id = null)
+    public static async Task<AssetDto> UploadRandomFileAsync(this IAssetsClient assetsClients, string app, int size, string parentId = null, string id = null)
+    {
+        using (var stream = RandomAsset(size))
         {
-            using (var stream = RandomAsset(size))
-            {
-                var upload = new FileParameter(stream, fileName ?? RandomName(".txt"), "text/csv");
+            var upload = new FileParameter(stream, RandomName(".txt"), "text/csv");
 
-                return await assetsClients.PostAssetAsync(app, parentId, id, true, upload);
-            }
+            return await assetsClients.PostAssetAsync(app, parentId, id, true, upload);
         }
+    }
 
-        private static MemoryStream RandomAsset(int length)
+    private static MemoryStream RandomAsset(int length)
+    {
+        var stream = new MemoryStream(length);
+
+        var random = new Random();
+
+        for (var i = 0; i < length; i++)
         {
-            var stream = new MemoryStream(length);
-
-            var random = new Random();
-
-            for (var i = 0; i < length; i++)
-            {
-                stream.WriteByte((byte)random.Next());
-            }
-
-            stream.Position = 0;
-
-            return stream;
+            stream.WriteByte((byte)random.Next());
         }
 
-        private static string RandomName(string extension)
-        {
-            var fileName = $"{Guid.NewGuid()}{extension}";
+        stream.Position = 0;
 
-            return fileName;
-        }
+        return stream;
+    }
+
+    private static string RandomName(string extension)
+    {
+        var fileName = $"{Guid.NewGuid()}{extension}";
+
+        return fileName;
     }
 }

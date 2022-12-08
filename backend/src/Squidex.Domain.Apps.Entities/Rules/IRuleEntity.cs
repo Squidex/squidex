@@ -8,18 +8,17 @@
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Rules
+namespace Squidex.Domain.Apps.Entities.Rules;
+
+public interface IRuleEntity :
+    IEntity,
+    IEntityWithCreatedBy,
+    IEntityWithLastModifiedBy,
+    IEntityWithVersion
 {
-    public interface IRuleEntity :
-        IEntity,
-        IEntityWithCreatedBy,
-        IEntityWithLastModifiedBy,
-        IEntityWithVersion
-    {
-        NamedId<DomainId> AppId { get; set; }
+    NamedId<DomainId> AppId { get; set; }
 
-        Rule RuleDef { get; }
+    Rule RuleDef { get; }
 
-        bool IsDeleted { get; }
-    }
+    bool IsDeleted { get; }
 }

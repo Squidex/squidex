@@ -15,15 +15,7 @@ namespace Squidex.Shared
 
         public static ResourceManager ResourceManager
         {
-            get
-            {
-                if (resourceManager == null)
-                {
-                    resourceManager = new ResourceManager("Squidex.Shared.Texts", typeof(Texts).Assembly);
-                }
-
-                return resourceManager;
-            }
+            get => resourceManager ??= new ResourceManager("Squidex.Shared.Texts", typeof(Texts).Assembly);
         }
     }
 }

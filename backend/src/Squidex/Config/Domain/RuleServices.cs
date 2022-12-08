@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.Extensions;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -22,85 +21,79 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Config.Domain
+namespace Squidex.Config.Domain;
+
+public static class RuleServices
 {
-    public static class RuleServices
+    public static void AddSquidexRules(this IServiceCollection services, IConfiguration config)
     {
-        public static void AddSquidexRules(this IServiceCollection services, IConfiguration config)
-        {
-            services.Configure<RuleOptions>(config,
-                "rules");
+        services.Configure<RuleOptions>(config,
+            "rules");
 
-            services.AddSingletonAs<EventEnricher>()
-                .As<IEventEnricher>();
+        services.AddSingletonAs<EventEnricher>()
+            .As<IEventEnricher>();
 
-            services.AddSingletonAs<AssetChangedTriggerHandler>()
-                .As<IRuleTriggerHandler>().As<ISubscriptionEventCreator>();
+        services.AddSingletonAs<AssetChangedTriggerHandler>()
+            .As<IRuleTriggerHandler>().As<ISubscriptionEventCreator>();
 
-            services.AddSingletonAs<CommentTriggerHandler>()
-                .As<IRuleTriggerHandler>();
+        services.AddSingletonAs<CommentTriggerHandler>()
+            .As<IRuleTriggerHandler>();
 
-            services.AddSingletonAs<ContentChangedTriggerHandler>()
-                .As<IRuleTriggerHandler>().As<ISubscriptionEventCreator>();
+        services.AddSingletonAs<ContentChangedTriggerHandler>()
+            .As<IRuleTriggerHandler>().As<ISubscriptionEventCreator>();
 
-            services.AddSingletonAs<AssetsFluidExtension>()
-                .As<IFluidExtension>();
+        services.AddSingletonAs<AssetsFluidExtension>()
+            .As<IFluidExtension>();
 
-            services.AddSingletonAs<AssetsJintExtension>()
-                .As<IJintExtension>().As<IScriptDescriptor>();
+        services.AddSingletonAs<AssetsJintExtension>()
+            .As<IJintExtension>().As<IScriptDescriptor>();
 
-            services.AddSingletonAs<ReferencesFluidExtension>()
-                .As<IFluidExtension>();
+        services.AddSingletonAs<ReferencesFluidExtension>()
+            .As<IFluidExtension>();
 
-            services.AddSingletonAs<ReferencesJintExtension>()
-                .As<IJintExtension>().As<IScriptDescriptor>();
+        services.AddSingletonAs<ReferencesJintExtension>()
+            .As<IJintExtension>().As<IScriptDescriptor>();
 
-            services.AddSingletonAs<ManualTriggerHandler>()
-                .As<IRuleTriggerHandler>();
+        services.AddSingletonAs<ManualTriggerHandler>()
+            .As<IRuleTriggerHandler>();
 
-            services.AddSingletonAs<SchemaChangedTriggerHandler>()
-                .As<IRuleTriggerHandler>();
+        services.AddSingletonAs<SchemaChangedTriggerHandler>()
+            .As<IRuleTriggerHandler>();
 
-            services.AddSingletonAs<UsageTriggerHandler>()
-                .As<IRuleTriggerHandler>();
+        services.AddSingletonAs<UsageTriggerHandler>()
+            .As<IRuleTriggerHandler>();
 
-            services.AddSingletonAs<RuleQueryService>()
-                .As<IRuleQueryService>();
+        services.AddSingletonAs<RuleQueryService>()
+            .As<IRuleQueryService>();
 
-            services.AddSingletonAs<DefaultRuleRunnerService>()
-                .As<IRuleRunnerService>();
+        services.AddSingletonAs<DefaultRuleRunnerService>()
+            .As<IRuleRunnerService>();
 
-            services.AddSingletonAs<RuleEnricher>()
-                .As<IRuleEnricher>();
+        services.AddSingletonAs<RuleEnricher>()
+            .As<IRuleEnricher>();
 
-            services.AddSingletonAs<RuleEnqueuer>()
-                .As<IRuleEnqueuer>().As<IEventConsumer>();
+        services.AddSingletonAs<RuleEnqueuer>()
+            .As<IRuleEnqueuer>().As<IEventConsumer>();
 
-            services.AddSingletonAs<EventJsonSchemaGenerator>()
-                .AsSelf();
+        services.AddSingletonAs<EventJsonSchemaGenerator>()
+            .AsSelf();
 
-            services.AddSingletonAs<RuleTypeProvider>()
-                .As<ITypeProvider>().AsSelf();
+        services.AddSingletonAs<RuleTypeProvider>()
+            .As<ITypeProvider>().AsSelf();
 
-            services.AddSingletonAs<EventJintExtension>()
-                .As<IJintExtension>().As<IScriptDescriptor>();
+        services.AddSingletonAs<EventJintExtension>()
+            .As<IJintExtension>().As<IScriptDescriptor>();
 
-            services.AddSingletonAs<EventFluidExtensions>()
-                .As<IFluidExtension>();
+        services.AddSingletonAs<EventFluidExtensions>()
+            .As<IFluidExtension>();
 
-            services.AddSingletonAs<PredefinedPatternsFormatter>()
-                .As<IRuleEventFormatter>();
+        services.AddSingletonAs<PredefinedPatternsFormatter>()
+            .As<IRuleEventFormatter>();
 
-            services.AddSingletonAs<RuleService>()
-                .As<IRuleService>();
+        services.AddSingletonAs<RuleService>()
+            .As<IRuleService>();
 
-            services.AddSingletonAs<RuleEventFormatter>()
-                .AsSelf();
-
-            services.AddInitializer<RuleTypeProvider>("Serializer (Rules)", registry =>
-            {
-                RuleActionConverter.Mapping = registry.Actions.ToDictionary(x => x.Key, x => x.Value.Type);
-            }, -1);
-        }
+        services.AddSingletonAs<RuleEventFormatter>()
+            .AsSelf();
     }
 }

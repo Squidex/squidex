@@ -7,18 +7,17 @@
 
 using Squidex.Assets;
 
-namespace Squidex.Domain.Apps.Entities.TestHelpers
-{
-    public sealed class NoopAssetFile : AssetFile
-    {
-        public NoopAssetFile(string fileName = "image.png", string mimeType = "image/png", long fileSize = 1024)
-            : base(fileName, mimeType, fileSize)
-        {
-        }
+namespace Squidex.Domain.Apps.Entities.TestHelpers;
 
-        public override Stream OpenRead()
-        {
-            return new MemoryStream();
-        }
+public sealed class NoopAssetFile : AssetFile
+{
+    public NoopAssetFile(string fileName = "image.png", string mimeType = "image/png", long fileSize = 1024)
+        : base(fileName, mimeType, fileSize)
+    {
+    }
+
+    public override Stream OpenRead()
+    {
+        return new MemoryStream();
     }
 }

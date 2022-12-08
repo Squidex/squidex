@@ -1,11 +1,20 @@
 <div #container>
-    <div #inner [class.fullscreen]="snapshot.isFullscreen">
-        <iframe #iframe scrolling="no" width="100%" [style.height]="0" [attr.src]="computedUrl | sqxSafeResourceUrl"></iframe>
+    <div #inner [class.fullscreen]="snapshot.isFullscreen" [class.expanded]="isExpanded">
+        <iframe #iframe [scrolling]="!isExpanded ? 'no' : 'yes'" width="100%" [style.height]="0" [attr.src]="computedUrl | sqxSafeResourceUrl"></iframe>
     </div>
 </div>
 
 <ng-container *sqxModal="assetsDialog">
-    <sqx-assets-selector
+    <sqx-asset-selector
         (select)="pickAssets($event)">
-    </sqx-assets-selector>
+    </sqx-asset-selector>
+</ng-container>
+
+<ng-container *sqxModal="contentsDialog">
+    <sqx-content-selector 
+        (select)="pickContents($event)"
+        [language]="language"
+        [languages]="languages"
+        [schemaNames]="contentsSchemas">
+    </sqx-content-selector>
 </ng-container>

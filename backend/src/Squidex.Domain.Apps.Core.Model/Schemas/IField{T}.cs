@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public interface IField<out T> : IField
 {
-    public interface IField<out T> : IField
-    {
-        T Properties { get; }
-    }
+    T Properties { get; }
 }

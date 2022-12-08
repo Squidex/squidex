@@ -9,28 +9,27 @@ using System.Security.Claims;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Scripting
+namespace Squidex.Domain.Apps.Core.Scripting;
+
+public sealed class EventScriptVars : ScriptVars
 {
-    public sealed class EventScriptVars : ScriptVars
+    public DomainId AppId
     {
-        public DomainId AppId
-        {
-            set => SetValue(value);
-        }
+        set => SetValue(value);
+    }
 
-        public string AppName
-        {
-            set => SetValue(value);
-        }
+    public string AppName
+    {
+        set => SetValue(value);
+    }
 
-        public ClaimsPrincipal User
-        {
-            set => SetValue(value);
-        }
+    public ClaimsPrincipal User
+    {
+        set => SetValue(value);
+    }
 
-        public EnrichedEvent Event
-        {
-            set => SetValue(value);
-        }
+    public EnrichedEvent Event
+    {
+        set => SetValue(value);
     }
 }

@@ -10,47 +10,46 @@ using Squidex.Infrastructure.States;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public sealed class DefaultDomainObjectFactory : IDomainObjectFactory
 {
-    public sealed class DefaultDomainObjectFactory : IDomainObjectFactory
+    private readonly IServiceProvider serviceProvider;
+
+    private static class DefaultFactory<T>
     {
-        private readonly IServiceProvider serviceProvider;
+        private static readonly ObjectFactory ObjectFactory =
+            ActivatorUtilities.CreateFactory(typeof(T), new[] { typeof(DomainId) });
 
-        private static class DefaultFactory<T>
+        public static T Create(IServiceProvider serviceProvider, DomainId id)
         {
-            private static readonly ObjectFactory ObjectFactory =
-                ActivatorUtilities.CreateFactory(typeof(T), new[] { typeof(DomainId) });
-
-            public static T Create(IServiceProvider serviceProvider, DomainId id)
-            {
-                return (T)ObjectFactory(serviceProvider, new object[] { id });
-            }
+            return (T)ObjectFactory(serviceProvider, new object[] { id });
         }
+    }
 
-        private static class PersistenceFactory<T, TState>
+    private static class PersistenceFactory<T, TState>
+    {
+        private static readonly ObjectFactory ObjectFactory =
+            ActivatorUtilities.CreateFactory(typeof(T), new[] { typeof(DomainId), typeof(IPersistenceFactory<TState>) });
+
+        public static T Create(IServiceProvider serviceProvider, DomainId id, IPersistenceFactory<TState> persistenceFactory)
         {
-            private static readonly ObjectFactory ObjectFactory =
-                ActivatorUtilities.CreateFactory(typeof(T), new[] { typeof(DomainId), typeof(IPersistenceFactory<TState>) });
-
-            public static T Create(IServiceProvider serviceProvider, DomainId id, IPersistenceFactory<TState> persistenceFactory)
-            {
-                return (T)ObjectFactory(serviceProvider, new object[] { id, persistenceFactory });
-            }
+            return (T)ObjectFactory(serviceProvider, new object[] { id, persistenceFactory });
         }
+    }
 
-        public DefaultDomainObjectFactory(IServiceProvider serviceProvider)
-        {
-            this.serviceProvider = serviceProvider;
-        }
+    public DefaultDomainObjectFactory(IServiceProvider serviceProvider)
+    {
+        this.serviceProvider = serviceProvider;
+    }
 
-        public T Create<T>(DomainId id)
-        {
-            return DefaultFactory<T>.Create(serviceProvider, id);
-        }
+    public T Create<T>(DomainId id)
+    {
+        return DefaultFactory<T>.Create(serviceProvider, id);
+    }
 
-        public T Create<T, TState>(DomainId id, IPersistenceFactory<TState> factory)
-        {
-            return PersistenceFactory<T, TState>.Create(serviceProvider, id, factory);
-        }
+    public T Create<T, TState>(DomainId id, IPersistenceFactory<TState> factory)
+    {
+        return PersistenceFactory<T, TState>.Create(serviceProvider, id, factory);
     }
 }

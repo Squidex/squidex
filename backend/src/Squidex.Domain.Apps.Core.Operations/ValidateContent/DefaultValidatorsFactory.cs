@@ -8,21 +8,20 @@
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 
-namespace Squidex.Domain.Apps.Core.ValidateContent
-{
-    public sealed class DefaultValidatorsFactory : IValidatorsFactory
-    {
-        public IEnumerable<IValidator> CreateFieldValidators(ValidationContext context, IField field, ValidatorFactory factory)
-        {
-            if (field is IField<UIFieldProperties>)
-            {
-                yield return NoValueValidator.Instance;
-            }
-        }
+namespace Squidex.Domain.Apps.Core.ValidateContent;
 
-        public IEnumerable<IValidator> CreateValueValidators(ValidationContext context, IField field, ValidatorFactory factory)
+public sealed class DefaultValidatorsFactory : IValidatorsFactory
+{
+    public IEnumerable<IValidator> CreateFieldValidators(ValidationContext context, IField field, ValidatorFactory factory)
+    {
+        if (field is IField<UIFieldProperties>)
         {
-            return DefaultFieldValueValidatorsFactory.CreateValidators(context, field, factory);
+            yield return NoValueValidator.Instance;
         }
+    }
+
+    public IEnumerable<IValidator> CreateValueValidators(ValidationContext context, IField field, ValidatorFactory factory)
+    {
+        return DefaultFieldValueValidatorsFactory.CreateValidators(context, field, factory);
     }
 }

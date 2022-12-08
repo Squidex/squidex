@@ -9,18 +9,17 @@ using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Areas.Api.Controllers.Assets.Models
-{
-    public sealed class MoveAssetDto
-    {
-        /// <summary>
-        /// The parent folder id.
-        /// </summary>
-        public DomainId ParentId { get; set; }
+namespace Squidex.Areas.Api.Controllers.Assets.Models;
 
-        public MoveAsset ToCommand(DomainId id)
-        {
-            return SimpleMapper.Map(this, new MoveAsset { AssetId = id });
-        }
+public sealed class MoveAssetDto
+{
+    /// <summary>
+    /// The parent folder id.
+    /// </summary>
+    public DomainId ParentId { get; set; }
+
+    public MoveAsset ToCommand(DomainId id)
+    {
+        return SimpleMapper.Map(this, new MoveAsset { AssetId = id });
     }
 }

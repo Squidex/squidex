@@ -6,55 +6,53 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Options;
-using Xunit;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+public sealed class LanguagesInitializerTests
 {
-    public sealed class LanguagesInitializerTests
+    [Fact]
+    public async Task Should_add_custom_languages()
     {
-        [Fact]
-        public async Task Should_add_custom_languages()
+        var options = Options.Create(new LanguagesOptions
         {
-            var options = Options.Create(new LanguagesOptions
-            {
-                ["en-NO"] = "English (Norwegian)"
-            });
+            ["en-NO"] = "English (Norwegian)"
+        });
 
-            var sut = new LanguagesInitializer(options);
+        var sut = new LanguagesInitializer(options);
 
-            await sut.InitializeAsync(default);
+        await sut.InitializeAsync(default);
 
-            Assert.Equal("English (Norwegian)", Language.GetLanguage("en-NO").EnglishName);
-        }
+        Assert.Equal("English (Norwegian)", Language.GetLanguage("en-NO").EnglishName);
+    }
 
-        [Fact]
-        public async Task Should_not_add_invalid_languages()
+    [Fact]
+    public async Task Should_not_add_invalid_languages()
+    {
+        var options = Options.Create(new LanguagesOptions
         {
-            var options = Options.Create(new LanguagesOptions
-            {
-                ["en-Error"] = null!
-            });
+            ["en-Error"] = null!
+        });
 
-            var sut = new LanguagesInitializer(options);
+        var sut = new LanguagesInitializer(options);
 
-            await sut.InitializeAsync(default);
+        await sut.InitializeAsync(default);
 
-            Assert.False(Language.TryGetLanguage("en-Error", out _));
-        }
+        Assert.False(Language.TryGetLanguage("en-Error", out _));
+    }
 
-        [Fact]
-        public async Task Should_not_override_existing_languages()
+    [Fact]
+    public async Task Should_not_override_existing_languages()
+    {
+        var options = Options.Create(new LanguagesOptions
         {
-            var options = Options.Create(new LanguagesOptions
-            {
-                ["de"] = "German (Germany)"
-            });
+            ["de"] = "German (Germany)"
+        });
 
-            var sut = new LanguagesInitializer(options);
+        var sut = new LanguagesInitializer(options);
 
-            await sut.InitializeAsync(default);
+        await sut.InitializeAsync(default);
 
-            Assert.Equal("German", Language.GetLanguage("de").EnglishName);
-        }
+        Assert.Equal("German", Language.GetLanguage("de").EnglishName);
     }
 }

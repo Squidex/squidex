@@ -5,16 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public interface IArrayField : IField<ArrayFieldProperties>
 {
-    public interface IArrayField : IField<ArrayFieldProperties>
-    {
-        IReadOnlyList<NestedField> Fields { get; }
+    IReadOnlyList<NestedField> Fields { get; }
 
-        IReadOnlyDictionary<long, NestedField> FieldsById { get; }
+    IReadOnlyDictionary<long, NestedField> FieldsById { get; }
 
-        IReadOnlyDictionary<string, NestedField> FieldsByName { get; }
+    IReadOnlyDictionary<string, NestedField> FieldsByName { get; }
 
-        FieldCollection<NestedField> FieldCollection { get; }
-    }
+    FieldCollection<NestedField> FieldCollection { get; }
 }

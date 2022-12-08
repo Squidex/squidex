@@ -7,42 +7,40 @@
 
 using EventStore.Client;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+public sealed class GetEventStoreFixture : IAsyncLifetime
 {
-    public sealed class GetEventStoreFixture : IAsyncLifetime
+    private readonly EventStoreClientSettings settings;
+
+    public GetEventStore EventStore { get; }
+
+    public GetEventStoreFixture()
     {
-        private readonly EventStoreClientSettings settings;
+        AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
-        public GetEventStore EventStore { get; }
+        settings = EventStoreClientSettings.Create(TestConfig.Configuration["eventStore:configuration"]);
 
-        public GetEventStoreFixture()
+        EventStore = new GetEventStore(settings, TestUtils.DefaultSerializer);
+    }
+
+    public Task InitializeAsync()
+    {
+        return EventStore.InitializeAsync(default);
+    }
+
+    public async Task DisposeAsync()
+    {
+        var projectionsManager = new EventStoreProjectionManagementClient(settings);
+
+        await foreach (var projection in projectionsManager.ListAllAsync())
         {
-            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            var name = projection.Name;
 
-            settings = EventStoreClientSettings.Create(TestConfig.Configuration["eventStore:configuration"]);
-
-            EventStore = new GetEventStore(settings, TestUtils.DefaultSerializer);
-        }
-
-        public Task InitializeAsync()
-        {
-            return EventStore.InitializeAsync(default);
-        }
-
-        public async Task DisposeAsync()
-        {
-            var projectionsManager = new EventStoreProjectionManagementClient(settings);
-
-            await foreach (var projection in projectionsManager.ListAllAsync())
+            if (name.StartsWith("by-squidex-test", StringComparison.OrdinalIgnoreCase))
             {
-                var name = projection.Name;
-
-                if (name.StartsWith("by-squidex-test", StringComparison.OrdinalIgnoreCase))
-                {
-                    await projectionsManager.DisableAsync(name);
-                }
+                await projectionsManager.DisableAsync(name);
             }
         }
     }

@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public interface IMigratedStateEvent<in T>
 {
-    public interface IMigratedStateEvent<in T>
-    {
-        IEvent Migrate(T state);
-    }
+    IEvent Migrate(T state);
 }

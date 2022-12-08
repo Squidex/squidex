@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState, sorted } from '@app/shared';
+import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, FieldDto, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-field[field][languages][schema][settings]',
@@ -22,6 +21,9 @@ export class FieldComponent implements OnChanges {
     public schema!: SchemaDto;
 
     @Input()
+    public plain = false;
+
+    @Input()
     public parent?: RootFieldDto;
 
     @Input()
@@ -32,14 +34,12 @@ export class FieldComponent implements OnChanges {
 
     public dropdown = new ModalModel();
 
-    public trackByFieldFn: (_index: number, field: NestedFieldDto) => any;
-
     public isEditing = false;
     public isEditable?: boolean | null;
 
     public editForm!: EditFieldForm;
 
-    public addFieldDialog = new DialogModel();
+    public fieldWizard = new DialogModel();
 
     public get isLocalizable() {
         return (this.parent && this.parent.isLocalizable) || this.field['isLocalizable'];
@@ -48,7 +48,6 @@ export class FieldComponent implements OnChanges {
     constructor(
         private readonly schemasState: SchemasState,
     ) {
-        this.trackByFieldFn = this.trackByField.bind(this);
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -88,8 +87,8 @@ export class FieldComponent implements OnChanges {
         this.schemasState.hideField(this.schema, this.field);
     }
 
-    public sortFields(event: CdkDragDrop<ReadonlyArray<NestedFieldDto>>) {
-        this.schemasState.orderFields(this.schema, sorted(event), this.field as any).subscribe();
+    public sortFields(fields: ReadonlyArray<FieldDto>) {
+        this.schemasState.orderFields(this.schema, fields, this.field as any);
     }
 
     public lockField() {
@@ -116,9 +115,5 @@ export class FieldComponent implements OnChanges {
                     },
                 });
         }
-    }
-
-    public trackByField(_index: number, field: NestedFieldDto) {
-        return field.fieldId + this.schema.id;
     }
 }

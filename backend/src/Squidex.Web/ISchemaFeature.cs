@@ -7,10 +7,9 @@
 
 using Squidex.Domain.Apps.Entities.Schemas;
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public interface ISchemaFeature
 {
-    public interface ISchemaFeature
-    {
-        ISchemaEntity Schema { get; }
-    }
+    ISchemaEntity Schema { get; }
 }

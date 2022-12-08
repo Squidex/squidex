@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities;
+
+public interface IContextProvider
 {
-    public interface IContextProvider
-    {
-        Context Context { get; }
-    }
+    Context Context { get; }
 }

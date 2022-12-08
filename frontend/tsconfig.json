@@ -18,10 +18,11 @@
     "noUnusedParameters": false,
     "outDir": "./build",
     "sourceMap": true,
+    "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "target": "es2017",
+    "target": "es2020",
     "lib": [
       "es2020",
       "dom"

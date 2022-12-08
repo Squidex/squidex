@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Templates
+namespace Squidex.Domain.Apps.Core.Templates;
+
+public sealed class TemplateVars : Dictionary<string, object>
 {
-    public sealed class TemplateVars : Dictionary<string, object>
-    {
-    }
 }

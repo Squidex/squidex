@@ -21,6 +21,7 @@ export const Settings = {
         DISABLE_ONBOARDING: (key: any) => `squidex.onboarding.disable.${key}`,
         FIELD_ALL: (schema: any, field: any) => `squidex.schemas.${schema}.fields.${field}.show-all`,
         FIELD_COLLAPSED: (schema: any, field: any) => `squidex.schemas.${schema}.fields.${field}.closed`,
+        FIELD_EDITOR_COLLAPSED: (schema: any, field: any) => `squidex.schemas.${schema}.editor.fields.${field}.closed`,
         HIDE_MAP: 'hideMap',
         NEWS_VERSION: 'squidex.news.version',
         NOTIFICATION_VERSION: 'notifications.version',

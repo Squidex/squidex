@@ -7,54 +7,52 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Collections;
-using Xunit;
 
-namespace Squidex.Domain.Apps.Core.Model.Schemas
+namespace Squidex.Domain.Apps.Core.Model.Schemas;
+
+public class FieldCompareTests
 {
-    public class FieldCompareTests
+    [Fact]
+    public void Should_compare_two_string_fields_as_equal()
     {
-        [Fact]
-        public void Should_compare_two_string_fields_as_equal()
+        var lhs = new StringFieldProperties
         {
-            var lhs = new StringFieldProperties
+            DefaultValues = new LocalizedValue<string?>(new Dictionary<string, string?>
             {
-                DefaultValues = new LocalizedValue<string?>(new Dictionary<string, string?>
-                {
-                    ["iv"] = "ABC"
-                })
-            };
+                ["iv"] = "ABC"
+            })
+        };
 
-            var rhs = new StringFieldProperties
-            {
-                DefaultValues = new LocalizedValue<string?>(new Dictionary<string, string?>
-                {
-                    ["iv"] = "ABC"
-                })
-            };
-
-            Assert.Equal(lhs, rhs);
-        }
-
-        [Fact]
-        public void Should_compare_two_tags_fields_as_equal()
+        var rhs = new StringFieldProperties
         {
-            var lhs = new TagsFieldProperties
+            DefaultValues = new LocalizedValue<string?>(new Dictionary<string, string?>
             {
-                DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
-                {
-                    ["iv"] = ReadonlyList.Create("A", "B", "C")
-                })
-            };
+                ["iv"] = "ABC"
+            })
+        };
 
-            var rhs = new TagsFieldProperties
+        Assert.Equal(lhs, rhs);
+    }
+
+    [Fact]
+    public void Should_compare_two_tags_fields_as_equal()
+    {
+        var lhs = new TagsFieldProperties
+        {
+            DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
             {
-                DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
-                {
-                    ["iv"] = ReadonlyList.Create("A", "B", "C")
-                })
-            };
+                ["iv"] = ReadonlyList.Create("A", "B", "C")
+            })
+        };
 
-            Assert.Equal(lhs, rhs);
-        }
+        var rhs = new TagsFieldProperties
+        {
+            DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
+            {
+                ["iv"] = ReadonlyList.Create("A", "B", "C")
+            })
+        };
+
+        Assert.Equal(lhs, rhs);
     }
 }

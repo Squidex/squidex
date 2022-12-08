@@ -11,35 +11,34 @@ using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Infrastructure.Email;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Config.Domain
+namespace Squidex.Config.Domain;
+
+public static class NotificationsServices
 {
-    public static class NotificationsServices
+    public static void AddSquidexNotifications(this IServiceCollection services, IConfiguration config)
     {
-        public static void AddSquidexNotifications(this IServiceCollection services, IConfiguration config)
+        var emailOptions = config.GetSection("email:smtp").Get<SmtpOptions>() ?? new ();
+
+        if (emailOptions.IsConfigured())
         {
-            var emailOptions = config.GetSection("email:smtp").Get<SmtpOptions>() ?? new ();
+            services.AddSingleton(Options.Create(emailOptions));
 
-            if (emailOptions.IsConfigured())
-            {
-                services.AddSingleton(Options.Create(emailOptions));
+            services.Configure<EmailUserNotificationOptions>(config,
+                "email:notifications");
 
-                services.Configure<EmailUserNotificationOptions>(config,
-                    "email:notifications");
+            services.AddSingletonAs<SmtpEmailSender>()
+                .As<IEmailSender>();
 
-                services.AddSingletonAs<SmtpEmailSender>()
-                    .As<IEmailSender>();
-
-                services.AddSingletonAs<EmailUserNotifications>()
-                    .AsOptional<IUserNotifications>();
-            }
-            else
-            {
-                services.AddSingletonAs<NoopUserNotifications>()
-                    .AsOptional<IUserNotifications>();
-            }
-
-            services.AddSingletonAs<InvitationEventConsumer>()
-                .As<IEventConsumer>();
+            services.AddSingletonAs<EmailUserNotifications>()
+                .AsOptional<IUserNotifications>();
         }
+        else
+        {
+            services.AddSingletonAs<NoopUserNotifications>()
+                .AsOptional<IUserNotifications>();
+        }
+
+        services.AddSingletonAs<InvitationEventConsumer>()
+            .As<IEventConsumer>();
     }
 }

@@ -8,29 +8,28 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Squidex.Infrastructure.UsageTracking
+namespace Squidex.Infrastructure.UsageTracking;
+
+public sealed class MongoUsage
 {
-    public sealed class MongoUsage
-    {
-        [BsonId]
-        [BsonElement("_id")]
-        public string Id { get; set; }
+    [BsonId]
+    [BsonElement("_id")]
+    public string Id { get; set; }
 
-        [BsonRequired]
-        [BsonElement(nameof(Date))]
-        [BsonDateTimeOptions(DateOnly = true)]
-        public DateTime Date { get; set; }
+    [BsonRequired]
+    [BsonElement(nameof(Date))]
+    [BsonDateTimeOptions(DateOnly = true)]
+    public DateTime Date { get; set; }
 
-        [BsonRequired]
-        [BsonElement(nameof(Key))]
-        public string Key { get; set; }
+    [BsonRequired]
+    [BsonElement(nameof(Key))]
+    public string Key { get; set; }
 
-        [BsonIgnoreIfNull]
-        [BsonElement(nameof(Category))]
-        public string Category { get; set; }
+    [BsonIgnoreIfNull]
+    [BsonElement(nameof(Category))]
+    public string Category { get; set; }
 
-        [BsonRequired]
-        [BsonElement(nameof(Counters))]
-        public Counters Counters { get; set; } = new Counters();
-    }
+    [BsonRequired]
+    [BsonElement(nameof(Counters))]
+    public Counters Counters { get; set; } = new Counters();
 }

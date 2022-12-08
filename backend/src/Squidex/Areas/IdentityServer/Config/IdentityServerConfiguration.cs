@@ -10,28 +10,27 @@ using Squidex.Domain.Users.InMemory;
 using Squidex.Web;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace Squidex.Areas.IdentityServer.Config
-{
-    public static class IdentityServerConfiguration
-    {
-        public sealed class Scopes : InMemoryScopeStore
-        {
-            public Scopes()
-                : base(BuildScopes())
-            {
-            }
+namespace Squidex.Areas.IdentityServer.Config;
 
-            private static IEnumerable<(string, OpenIddictScopeDescriptor)> BuildScopes()
+public static class IdentityServerConfiguration
+{
+    public sealed class Scopes : InMemoryScopeStore
+    {
+        public Scopes()
+            : base(BuildScopes())
+        {
+        }
+
+        private static IEnumerable<(string, OpenIddictScopeDescriptor)> BuildScopes()
+        {
+            yield return (Constants.ScopeApi, new OpenIddictScopeDescriptor
             {
-                yield return (Constants.ScopeApi, new OpenIddictScopeDescriptor
+                Name = Constants.ScopeApi,
+                Resources =
                 {
-                    Name = Constants.ScopeApi,
-                    Resources =
-                    {
-                        Permissions.Prefixes.Scope + Constants.ScopeApi
-                    }
-                });
-            }
+                    Permissions.Prefixes.Scope + Constants.ScopeApi
+                }
+            });
         }
     }
 }

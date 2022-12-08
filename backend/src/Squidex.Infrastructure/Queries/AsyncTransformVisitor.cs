@@ -5,42 +5,41 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Queries
+namespace Squidex.Infrastructure.Queries;
+
+public abstract class AsyncTransformVisitor<TValue, TArgs> : FilterNodeVisitor<ValueTask<FilterNode<TValue>?>, TValue, TArgs>
 {
-    public abstract class AsyncTransformVisitor<TValue, TArgs> : FilterNodeVisitor<ValueTask<FilterNode<TValue>?>, TValue, TArgs>
+    public override ValueTask<FilterNode<TValue>?> Visit(CompareFilter<TValue> nodeIn, TArgs args)
     {
-        public override ValueTask<FilterNode<TValue>?> Visit(CompareFilter<TValue> nodeIn, TArgs args)
-        {
-            return new ValueTask<FilterNode<TValue>?>(nodeIn);
-        }
+        return new ValueTask<FilterNode<TValue>?>(nodeIn);
+    }
 
-        public override async ValueTask<FilterNode<TValue>?> Visit(LogicalFilter<TValue> nodeIn, TArgs args)
-        {
-            var pruned = new List<FilterNode<TValue>>(nodeIn.Filters.Count);
+    public override async ValueTask<FilterNode<TValue>?> Visit(LogicalFilter<TValue> nodeIn, TArgs args)
+    {
+        var pruned = new List<FilterNode<TValue>>(nodeIn.Filters.Count);
 
-            foreach (var inner in nodeIn.Filters)
+        foreach (var inner in nodeIn.Filters)
+        {
+            var transformed = await inner.Accept(this, args);
+
+            if (transformed != null)
             {
-                var transformed = await inner.Accept(this, args);
-
-                if (transformed != null)
-                {
-                    pruned.Add(transformed);
-                }
+                pruned.Add(transformed);
             }
-
-            return new LogicalFilter<TValue>(nodeIn.Type, pruned);
         }
 
-        public override async ValueTask<FilterNode<TValue>?> Visit(NegateFilter<TValue> nodeIn, TArgs args)
+        return new LogicalFilter<TValue>(nodeIn.Type, pruned);
+    }
+
+    public override async ValueTask<FilterNode<TValue>?> Visit(NegateFilter<TValue> nodeIn, TArgs args)
+    {
+        var inner = await nodeIn.Filter.Accept(this, args);
+
+        if (inner == null)
         {
-            var inner = await nodeIn.Filter.Accept(this, args);
-
-            if (inner == null)
-            {
-                return inner;
-            }
-
-            return new NegateFilter<TValue>(inner);
+            return inner;
         }
+
+        return new NegateFilter<TValue>(inner);
     }
 }

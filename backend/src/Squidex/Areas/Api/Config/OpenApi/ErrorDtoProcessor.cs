@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Xml.Linq;
 using Namotion.Reflection;
 using NJsonSchema;
 using NSwag;
@@ -12,60 +13,73 @@ using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Config.OpenApi
+namespace Squidex.Areas.Api.Config.OpenApi;
+
+public sealed class ErrorDtoProcessor : IOperationProcessor
 {
-    public sealed class ErrorDtoProcessor : IDocumentProcessor
+    public bool Process(OperationProcessorContext context)
     {
-        public void Process(DocumentProcessorContext context)
+        var operation = context.OperationDescription.Operation;
+
+        void AddResponse(string code, string description)
         {
-            var errorSchema = GetErrorSchema(context);
-
-            foreach (var operation in context.Document.Paths.Values.SelectMany(x => x.Values))
+            if (!IsErrorCode(code))
             {
-                AddErrorResponses(operation, errorSchema);
+                return;
+            }
 
-                CleanupResponses(operation);
+            if (!operation.Responses.ContainsKey(code))
+            {
+                operation.Responses.Add(code, new OpenApiResponse
+                {
+                    Description = description
+                });
             }
         }
 
-        private static void AddErrorResponses(OpenApiOperation operation, JsonSchema errorSchema)
+        var responses =
+            context.MethodInfo.GetXmlDocsElement(null)?
+                .Nodes()
+                .OfType<XElement>()
+                .Where(x => x.Name == "response")
+                .Where(x => x.Attribute("code") != null)
+                ?? Enumerable.Empty<XElement>();
+
+        foreach (var response in responses)
         {
-            if (!operation.Responses.ContainsKey("500"))
+            AddResponse(response.Attribute("code")!.Value, response.Value);
+        }
+
+        if (!string.Equals(context.OperationDescription.Method, HttpMethods.Get, StringComparison.OrdinalIgnoreCase))
+        {
+            AddResponse("400", "Validation error.");
+        }
+
+        AddResponse("500", "Operation failed.");
+
+        foreach (var (code, response) in operation.Responses)
+        {
+            if (response.Schema == null)
             {
-                const string description = "Operation failed.";
-
-                var response = new OpenApiResponse { Description = description, Schema = errorSchema };
-
-                operation.Responses["500"] = response;
-            }
-
-            foreach (var (code, response) in operation.Responses)
-            {
-                if (code != "404" && code.StartsWith("4", StringComparison.OrdinalIgnoreCase) && response.Schema == null)
+                if (IsErrorCode(code) && code != "404")
                 {
-                    response.Schema = errorSchema;
+                    response.Schema = GetErrorSchema(context);
                 }
             }
         }
 
-        private static void CleanupResponses(OpenApiOperation operation)
-        {
-            foreach (var (code, response) in operation.Responses.ToList())
-            {
-                if (string.IsNullOrWhiteSpace(response.Description) ||
-                    response.Description?.Contains("=&gt;", StringComparison.Ordinal) == true ||
-                    response.Description?.Contains("=>", StringComparison.Ordinal) == true)
-                {
-                    operation.Responses.Remove(code);
-                }
-            }
-        }
+        return true;
+    }
 
-        private static JsonSchema GetErrorSchema(DocumentProcessorContext context)
-        {
-            var errorType = typeof(ErrorDto).ToContextualType();
+    private static bool IsErrorCode(string code)
+    {
+        return !code.StartsWith("2", StringComparison.OrdinalIgnoreCase);
+    }
 
-            return context.SchemaGenerator.GenerateWithReference<JsonSchema>(errorType, context.SchemaResolver);
-        }
+    private static JsonSchema GetErrorSchema(OperationProcessorContext context)
+    {
+        var errorType = typeof(ErrorDto).ToContextualType();
+
+        return context.SchemaGenerator.GenerateWithReference<JsonSchema>(errorType, context.SchemaResolver);
     }
 }

@@ -7,20 +7,18 @@
 
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
-using Xunit;
 
-namespace Squidex.Domain.Apps.Core.Model.Apps
+namespace Squidex.Domain.Apps.Core.Model.Apps;
+
+public class AppPlanTests
 {
-    public class AppPlanTests
+    [Fact]
+    public void Should_serialize_and_deserialize()
     {
-        [Fact]
-        public void Should_serialize_and_deserialize()
-        {
-            var plan = new AssignedPlan(RefToken.Client("Me"), "free");
+        var plan = new AssignedPlan(RefToken.Client("Me"), "free");
 
-            var serialized = plan.SerializeAndDeserialize();
+        var serialized = plan.SerializeAndDeserialize();
 
-            Assert.Equal(plan, serialized);
-        }
+        Assert.Equal(plan, serialized);
     }
 }

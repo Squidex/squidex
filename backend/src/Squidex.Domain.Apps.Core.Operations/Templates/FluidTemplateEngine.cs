@@ -9,82 +9,59 @@ using Fluid;
 using Fluid.Values;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Templates
+namespace Squidex.Domain.Apps.Core.Templates;
+
+public sealed class FluidTemplateEngine : ITemplateEngine
 {
-    public sealed class FluidTemplateEngine : ITemplateEngine
+    private readonly TemplateOptions options = new TemplateOptions();
+    private readonly CustomFluidParser parser = new CustomFluidParser();
+
+    public FluidTemplateEngine(IEnumerable<IFluidExtension> extensions)
     {
-        private readonly IEnumerable<IFluidExtension> extensions;
-
-        private sealed class SquidexTemplate : BaseFluidTemplate<SquidexTemplate>
+        options.MemberAccessStrategy = new UnsafeMemberAccessStrategy
         {
-            public static void Setup(IEnumerable<IFluidExtension> extensions)
-            {
-                foreach (var extension in extensions)
-                {
-                    extension.RegisterLanguageExtensions(Factory);
-                }
-            }
+            MemberNameStrategy = MemberNameStrategies.CamelCase
+        };
 
-            public static void SetupTypes(IEnumerable<IFluidExtension> extensions)
-            {
-                var globalTypes = TemplateContext.GlobalMemberAccessStrategy;
-
-                globalTypes.MemberNameStrategy = MemberNameStrategies.CamelCase;
-
-                foreach (var extension in extensions)
-                {
-                    extension.RegisterGlobalTypes(globalTypes);
-                }
-
-                foreach (var type in SquidexCoreModel.Assembly.GetTypes().Where(x => x.IsEnum))
-                {
-                    FluidValue.SetTypeMapping(type, x => new StringValue(x.ToString()));
-                }
-
-                FluidValue.SetTypeMapping<RefTokenType>(x => new StringValue(x.ToString().ToLowerInvariant()));
-
-                globalTypes.Register<NamedId<DomainId>>();
-                globalTypes.Register<NamedId<Guid>>();
-                globalTypes.Register<NamedId<string>>();
-                globalTypes.Register<NamedId<long>>();
-                globalTypes.Register<RefToken>();
-            }
+        foreach (var extension in extensions)
+        {
+            extension.RegisterLanguageExtensions(parser, options);
         }
 
-        public FluidTemplateEngine(IEnumerable<IFluidExtension> extensions)
+        options.ValueConverters.Add(value =>
         {
-            this.extensions = extensions;
-
-            SquidexTemplate.Setup(extensions);
-            SquidexTemplate.SetupTypes(extensions);
-        }
-
-        public async Task<string> RenderAsync(string template, TemplateVars variables)
-        {
-            Guard.NotNull(variables);
-
-            if (SquidexTemplate.TryParse(template, out var parsed, out var errors))
+            if (value is RefTokenType tokenType)
             {
-                var context = new TemplateContext();
-
-                foreach (var extension in extensions)
-                {
-                    extension.BeforeRun(context);
-                }
-
-                foreach (var (key, value) in variables)
-                {
-                    context.MemberAccessStrategy.Register(value.GetType());
-
-                    context.SetValue(key, value);
-                }
-
-                var result = await parsed.RenderAsync(context);
-
-                return result;
+                return StringValue.Create(tokenType.ToString().ToLowerInvariant());
             }
 
-            throw new TemplateParseException(template, errors);
+            if (value?.GetType().IsEnum == true)
+            {
+                return new StringValue(value.ToString());
+            }
+
+            return null;
+        });
+    }
+
+    public async Task<string> RenderAsync(string template, TemplateVars variables)
+    {
+        Guard.NotNull(variables);
+
+        if (!parser.TryParse(template, out var parsed, out var error))
+        {
+            throw new TemplateParseException(template, error);
         }
+
+        var context = new TemplateContext(options);
+
+        foreach (var (key, value) in variables)
+        {
+            context.SetValue(key, value);
+        }
+
+        var result = await parsed.RenderAsync(context);
+
+        return result;
     }
 }

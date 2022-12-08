@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, Validators } from '@angular/forms';
+import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, value$ } from '@app/framework';
 import { AppLanguageDto, UpdateAppLanguageDto } from './../services/app-languages.service';
 
@@ -20,10 +20,10 @@ export class EditLanguageForm extends Form<ExtendedFormGroup, UpdateAppLanguageD
 
     constructor() {
         super(new ExtendedFormGroup({
-            isMaster: new FormControl(false,
+            isMaster: new UntypedFormControl(false,
                 Validators.nullValidator,
             ),
-            isOptional: new FormControl(false,
+            isOptional: new UntypedFormControl(false,
                 Validators.nullValidator,
             ),
         }));
@@ -49,7 +49,7 @@ type AddLanguageFormType = { language: string };
 export class AddLanguageForm extends Form<ExtendedFormGroup, AddLanguageFormType> {
     constructor() {
         super(new ExtendedFormGroup({
-            language: new FormControl(null,
+            language: new UntypedFormControl(null,
                 Validators.required,
             ),
         }));

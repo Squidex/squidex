@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure
-{
-    public interface ISurrogate<T>
-    {
-        void FromSource(T source);
+namespace Squidex.Infrastructure;
 
-        T ToSource();
-    }
+public interface ISurrogate<T>
+{
+    void FromSource(T source);
+
+    T ToSource();
 }

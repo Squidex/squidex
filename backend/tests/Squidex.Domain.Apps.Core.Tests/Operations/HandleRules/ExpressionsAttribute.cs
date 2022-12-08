@@ -8,52 +8,51 @@
 using System.Reflection;
 using Xunit.Sdk;
 
-namespace Squidex.Domain.Apps.Core.Operations.HandleRules
+namespace Squidex.Domain.Apps.Core.Operations.HandleRules;
+
+public sealed class ExpressionsAttribute : DataAttribute
 {
-    public sealed class ExpressionsAttribute : DataAttribute
+    private readonly string? script;
+    private readonly string? interpolationOld;
+    private readonly string? interpolationNew;
+    private readonly string? liquid;
+
+    public ExpressionsAttribute(string? interpolationOld, string? interpolationNew, string? script, string? liquid)
     {
-        private readonly string? script;
-        private readonly string? interpolationOld;
-        private readonly string? interpolationNew;
-        private readonly string? liquid;
+        this.liquid = liquid;
 
-        public ExpressionsAttribute(string? interpolationOld, string? interpolationNew, string? script, string? liquid)
+        this.interpolationOld = interpolationOld;
+        this.interpolationNew = interpolationNew;
+
+        this.script = script;
+    }
+
+    public override IEnumerable<object[]> GetData(MethodInfo testMethod)
+    {
+        if (interpolationOld != null)
         {
-            this.liquid = liquid;
-
-            this.interpolationOld = interpolationOld;
-            this.interpolationNew = interpolationNew;
-
-            this.script = script;
+            yield return new object[] { interpolationOld };
         }
 
-        public override IEnumerable<object[]> GetData(MethodInfo testMethod)
+        if (interpolationNew != null)
         {
-            if (interpolationOld != null)
-            {
-                yield return new object[] { interpolationOld };
-            }
+            yield return new object[] { interpolationNew };
+        }
 
-            if (interpolationNew != null)
+        if (script != null)
+        {
+            yield return new object[]
             {
-                yield return new object[] { interpolationNew };
-            }
+                $"Script(`{script}`)"
+            };
+        }
 
-            if (script != null)
+        if (liquid != null)
+        {
+            yield return new object[]
             {
-                yield return new object[]
-                {
-                    $"Script(`{script}`)"
-                };
-            }
-
-            if (liquid != null)
-            {
-                yield return new object[]
-                {
-                    $"Liquid({liquid})"
-                };
-            }
+                $"Liquid({liquid})"
+            };
         }
     }
 }

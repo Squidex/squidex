@@ -8,36 +8,35 @@
 using Microsoft.AspNetCore.Http;
 using RequestContext = Squidex.Domain.Apps.Entities.Context;
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public static class ContextExtensions
 {
-    public static class ContextExtensions
+    public static RequestContext Context(this HttpContext httpContext)
     {
-        public static RequestContext Context(this HttpContext httpContext)
+        var context = httpContext.Features.Get<RequestContext>();
+
+        if (context == null)
         {
-            var context = httpContext.Features.Get<RequestContext>();
+            context = new RequestContext(httpContext.User, null!).WithHeaders(httpContext);
 
-            if (context == null)
-            {
-                context = new RequestContext(httpContext.User, null!).WithHeaders(httpContext);
-
-                httpContext.Features.Set(context);
-            }
-
-            return context;
+            httpContext.Features.Set(context);
         }
 
-        public static RequestContext WithHeaders(this RequestContext context, HttpContext httpContext)
+        return context;
+    }
+
+    public static RequestContext WithHeaders(this RequestContext context, HttpContext httpContext)
+    {
+        return context.Clone(builder =>
         {
-            return context.Clone(builder =>
+            foreach (var (key, value) in httpContext.Request.Headers)
             {
-                foreach (var (key, value) in httpContext.Request.Headers)
+                if (key.StartsWith("X-", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (key.StartsWith("X-", StringComparison.OrdinalIgnoreCase))
-                    {
-                        builder.SetHeader(key, value.ToString());
-                    }
+                    builder.SetHeader(key, value.ToString());
                 }
-            });
-        }
+            }
+        });
     }
 }

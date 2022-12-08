@@ -9,20 +9,19 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Commands
+namespace Squidex.Domain.Apps.Entities.Contents.Commands;
+
+public sealed class CreateContent : ContentDataCommand, ISchemaCommand
 {
-    public sealed class CreateContent : ContentDataCommand, ISchemaCommand
+    public Status? Status { get; set; }
+
+    public CreateContent()
     {
-        public Status? Status { get; set; }
+        ContentId = DomainId.NewGuid();
+    }
 
-        public CreateContent()
-        {
-            ContentId = DomainId.NewGuid();
-        }
-
-        public ChangeContentStatus AsChange(Status status)
-        {
-            return SimpleMapper.Map(this, new ChangeContentStatus { Status = status });
-        }
+    public ChangeContentStatus AsChange(Status status)
+    {
+        return SimpleMapper.Map(this, new ChangeContentStatus { Status = status });
     }
 }

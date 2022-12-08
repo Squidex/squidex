@@ -5,18 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Xunit;
+namespace Squidex.Web;
 
-namespace Squidex.Web
+public class ApiCostsAttributeTests
 {
-    public class ApiCostsAttributeTests
+    [Fact]
+    public void Should_assign_costs()
     {
-        [Fact]
-        public void Should_assign_costs()
-        {
-            var sut = new ApiCostsAttribute(10.5);
+        var sut = new ApiCostsAttribute(10.5);
 
-            Assert.Equal(10.5, sut.Costs);
-        }
+        Assert.Equal(10.5, sut.Costs);
     }
 }

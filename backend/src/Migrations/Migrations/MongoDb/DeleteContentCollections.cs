@@ -8,24 +8,23 @@
 using MongoDB.Driver;
 using Squidex.Infrastructure.Migrations;
 
-namespace Migrations.Migrations.MongoDb
+namespace Migrations.Migrations.MongoDb;
+
+public sealed class DeleteContentCollections : IMigration
 {
-    public sealed class DeleteContentCollections : IMigration
+    private readonly IMongoDatabase database;
+
+    public DeleteContentCollections(IMongoDatabase database)
     {
-        private readonly IMongoDatabase database;
+        this.database = database;
+    }
 
-        public DeleteContentCollections(IMongoDatabase database)
-        {
-            this.database = database;
-        }
-
-        public async Task UpdateAsync(
-            CancellationToken ct)
-        {
-            await database.DropCollectionAsync("States_Contents", ct);
-            await database.DropCollectionAsync("States_Contents_Archive", ct);
-            await database.DropCollectionAsync("State_Content_Draft", ct);
-            await database.DropCollectionAsync("State_Content_Published", ct);
-        }
+    public async Task UpdateAsync(
+        CancellationToken ct)
+    {
+        await database.DropCollectionAsync("States_Contents", ct);
+        await database.DropCollectionAsync("States_Contents_Archive", ct);
+        await database.DropCollectionAsync("State_Content_Draft", ct);
+        await database.DropCollectionAsync("State_Content_Published", ct);
     }
 }

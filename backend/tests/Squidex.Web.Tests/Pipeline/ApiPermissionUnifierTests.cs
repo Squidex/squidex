@@ -8,52 +8,50 @@
 using System.Security.Claims;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
-using Xunit;
 
-namespace Squidex.Web.Pipeline
+namespace Squidex.Web.Pipeline;
+
+public class ApiPermissionUnifierTests
 {
-    public class ApiPermissionUnifierTests
+    private readonly ApiPermissionUnifier sut = new ApiPermissionUnifier();
+
+    [Theory]
+    [InlineData("administrator")]
+    [InlineData("ADMINISTRATOR")]
+    public async Task Should_add_admin_permission_if_user_is_in_role(string role)
     {
-        private readonly ApiPermissionUnifier sut = new ApiPermissionUnifier();
+        var userIdentity = new ClaimsIdentity();
+        var userPrincipal = new ClaimsPrincipal(userIdentity);
 
-        [Theory]
-        [InlineData("administrator")]
-        [InlineData("ADMINISTRATOR")]
-        public async Task Should_add_admin_permission_if_user_is_in_role(string role)
-        {
-            var userIdentity = new ClaimsIdentity();
-            var userPrincipal = new ClaimsPrincipal(userIdentity);
+        userIdentity.AddClaim(new Claim(userIdentity.RoleClaimType, role));
 
-            userIdentity.AddClaim(new Claim(userIdentity.RoleClaimType, role));
+        var actual = await sut.TransformAsync(userPrincipal);
 
-            var actual = await sut.TransformAsync(userPrincipal);
+        Assert.Equal(PermissionIds.Admin, actual.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.Permissions)?.Value);
+        Assert.Equal(role, actual.Claims.FirstOrDefault(x => x.Type == userIdentity.RoleClaimType)?.Value);
+    }
 
-            Assert.Equal(PermissionIds.Admin, actual.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.Permissions)?.Value);
-            Assert.Equal(role, actual.Claims.FirstOrDefault(x => x.Type == userIdentity.RoleClaimType)?.Value);
-        }
+    [Fact]
+    public async Task Should_not_add_admin_persmission_if_user_has_other_role()
+    {
+        var userIdentity = new ClaimsIdentity();
+        var userPrincipal = new ClaimsPrincipal(userIdentity);
 
-        [Fact]
-        public async Task Should_not_add_admin_persmission_if_user_has_other_role()
-        {
-            var userIdentity = new ClaimsIdentity();
-            var userPrincipal = new ClaimsPrincipal(userIdentity);
+        userIdentity.AddClaim(new Claim(userIdentity.RoleClaimType, "Developer"));
 
-            userIdentity.AddClaim(new Claim(userIdentity.RoleClaimType, "Developer"));
+        var actual = await sut.TransformAsync(userPrincipal);
 
-            var actual = await sut.TransformAsync(userPrincipal);
+        Assert.Single(actual.Claims);
+    }
 
-            Assert.Single(actual.Claims);
-        }
+    [Fact]
+    public async Task Should_not_add_admin_persmission_if_user_has_no_role()
+    {
+        var userIdentity = new ClaimsIdentity();
+        var userPrincipal = new ClaimsPrincipal(userIdentity);
 
-        [Fact]
-        public async Task Should_not_add_admin_persmission_if_user_has_no_role()
-        {
-            var userIdentity = new ClaimsIdentity();
-            var userPrincipal = new ClaimsPrincipal(userIdentity);
+        var actual = await sut.TransformAsync(userPrincipal);
 
-            var actual = await sut.TransformAsync(userPrincipal);
-
-            Assert.Empty(actual.Claims);
-        }
+        Assert.Empty(actual.Claims);
     }
 }

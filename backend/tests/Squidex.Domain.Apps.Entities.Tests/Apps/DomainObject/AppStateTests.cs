@@ -8,35 +8,33 @@
 using System.Text.Json.Serialization;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Json;
-using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
+namespace Squidex.Domain.Apps.Entities.Apps.DomainObject;
+
+public class AppStateTests
 {
-    public class AppStateTests
+    private readonly IJsonSerializer serializer = TestUtils.CreateSerializer(options =>
     {
-        private readonly IJsonSerializer serializer = TestUtils.CreateSerializer(options =>
-        {
-            options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-        });
+        options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
 
-        [Fact]
-        public void Should_deserialize_state()
-        {
-            var json = File.ReadAllText("Apps/DomainObject/AppState.json");
+    [Fact]
+    public void Should_deserialize_state()
+    {
+        var json = File.ReadAllText("Apps/DomainObject/AppState.json");
 
-            var deserialized = serializer.Deserialize<AppDomainObject.State>(json);
+        var deserialized = serializer.Deserialize<AppDomainObject.State>(json);
 
-            Assert.NotNull(deserialized);
-        }
+        Assert.NotNull(deserialized);
+    }
 
-        [Fact]
-        public void Should_serialize_deserialize_state()
-        {
-            var json = File.ReadAllText("Apps/DomainObject/AppState.json").CleanJson();
+    [Fact]
+    public void Should_serialize_deserialize_state()
+    {
+        var json = File.ReadAllText("Apps/DomainObject/AppState.json").CleanJson();
 
-            var serialized = serializer.Serialize(serializer.Deserialize<AppDomainObject.State>(json), true);
+        var serialized = serializer.Serialize(serializer.Deserialize<AppDomainObject.State>(json), true);
 
-            Assert.Equal(json, serialized);
-        }
+        Assert.Equal(json, serialized);
     }
 }

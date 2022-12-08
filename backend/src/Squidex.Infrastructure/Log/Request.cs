@@ -9,14 +9,13 @@ using NodaTime;
 
 #pragma warning disable SA1401 // Fields should be private
 
-namespace Squidex.Infrastructure.Log
+namespace Squidex.Infrastructure.Log;
+
+public sealed class Request
 {
-    public sealed class Request
-    {
-        public Instant Timestamp;
+    public Instant Timestamp;
 
-        public string Key;
+    public string Key;
 
-        public Dictionary<string, string> Properties = new Dictionary<string, string>();
-    }
+    public Dictionary<string, string> Properties = new Dictionary<string, string>();
 }

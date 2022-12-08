@@ -7,13 +7,12 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Apps
-{
-    [EventType(nameof(AppUpdated))]
-    public sealed class AppUpdated : AppEvent
-    {
-        public string Label { get; set; }
+namespace Squidex.Domain.Apps.Events.Apps;
 
-        public string Description { get; set; }
-    }
+[EventType(nameof(AppUpdated))]
+public sealed class AppUpdated : AppEvent
+{
+    public string Label { get; set; }
+
+    public string Description { get; set; }
 }

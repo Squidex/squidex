@@ -7,8 +7,7 @@
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Infrastructure.Queries
-{
-    public sealed record FilterField(FilterSchema Schema, string Path, string? Description = null,
-        bool IsNullable = false);
-}
+namespace Squidex.Infrastructure.Queries;
+
+public sealed record FilterField(FilterSchema Schema, string Path, string? Description = null,
+    bool IsNullable = false);

@@ -11,58 +11,57 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Squidex.Infrastructure;
 using Squidex.Log;
 
-namespace Squidex.Extensions.APM.Stackdriver
+namespace Squidex.Extensions.APM.Stackdriver;
+
+internal sealed class StackdriverExceptionHandler : ILogAppender
 {
-    internal sealed class StackdriverExceptionHandler : ILogAppender
+    private readonly IContextExceptionLogger logger;
+    private readonly HttpContextWrapper httpContextWrapper;
+
+    public sealed class HttpContextWrapper : IContextWrapper
     {
-        private readonly IContextExceptionLogger logger;
-        private readonly HttpContextWrapper httpContextWrapper;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public sealed class HttpContextWrapper : IContextWrapper
+        internal HttpContextWrapper(IHttpContextAccessor httpContextAccessor)
         {
-            private readonly IHttpContextAccessor httpContextAccessor;
-
-            internal HttpContextWrapper(IHttpContextAccessor httpContextAccessor)
-            {
-                this.httpContextAccessor = httpContextAccessor;
-            }
-
-            public string GetHttpMethod()
-            {
-                return httpContextAccessor.HttpContext?.Request?.Method ?? string.Empty;
-            }
-
-            public string GetUri()
-            {
-                return httpContextAccessor.HttpContext?.Request?.GetDisplayUrl() ?? string.Empty;
-            }
-
-            public string GetUserAgent()
-            {
-                return httpContextAccessor.HttpContext?.Request?.Headers["User-Agent"].ToString() ?? string.Empty;
-            }
+            this.httpContextAccessor = httpContextAccessor;
         }
 
-        public StackdriverExceptionHandler(IContextExceptionLogger logger, IHttpContextAccessor httpContextAccessor)
+        public string GetHttpMethod()
         {
-            this.logger = logger;
-
-            httpContextWrapper = new HttpContextWrapper(httpContextAccessor);
+            return httpContextAccessor.HttpContext?.Request?.Method ?? string.Empty;
         }
 
-        public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception exception)
+        public string GetUri()
         {
-            try
+            return httpContextAccessor.HttpContext?.Request?.GetDisplayUrl() ?? string.Empty;
+        }
+
+        public string GetUserAgent()
+        {
+            return httpContextAccessor.HttpContext?.Request?.Headers["User-Agent"].ToString() ?? string.Empty;
+        }
+    }
+
+    public StackdriverExceptionHandler(IContextExceptionLogger logger, IHttpContextAccessor httpContextAccessor)
+    {
+        this.logger = logger;
+
+        httpContextWrapper = new HttpContextWrapper(httpContextAccessor);
+    }
+
+    public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception exception)
+    {
+        try
+        {
+            if (exception != null && exception is not DomainException && exception is not OperationCanceledException)
             {
-                if (exception != null && exception is not DomainException && exception is not OperationCanceledException)
-                {
-                    logger.Log(exception, httpContextWrapper);
-                }
+                logger.Log(exception, httpContextWrapper);
             }
-            catch
-            {
-                return;
-            }
+        }
+        catch
+        {
+            return;
         }
     }
 }

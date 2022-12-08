@@ -10,19 +10,18 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.Api.Controllers.Assets.Models
-{
-    public sealed class RenameAssetFolderDto
-    {
-        /// <summary>
-        /// The name of the folder.
-        /// </summary>
-        [LocalizedRequired]
-        public string FolderName { get; set; }
+namespace Squidex.Areas.Api.Controllers.Assets.Models;
 
-        public RenameAssetFolder ToCommand(DomainId id)
-        {
-            return SimpleMapper.Map(this, new RenameAssetFolder { AssetFolderId = id });
-        }
+public sealed class RenameAssetFolderDto
+{
+    /// <summary>
+    /// The name of the folder.
+    /// </summary>
+    [LocalizedRequired]
+    public string FolderName { get; set; }
+
+    public RenameAssetFolder ToCommand(DomainId id)
+    {
+        return SimpleMapper.Map(this, new RenameAssetFolder { AssetFolderId = id });
     }
 }

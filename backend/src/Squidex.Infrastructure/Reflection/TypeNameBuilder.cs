@@ -7,28 +7,26 @@
 
 using Squidex.Text;
 
-namespace Squidex.Infrastructure.Reflection
+namespace Squidex.Infrastructure.Reflection;
+
+public static class TypeNameBuilder
 {
-    public static class TypeNameBuilder
+    public static string TypeName(this Type type, bool camelCase, params string[] suffixes)
     {
-        public static string TypeName(this Type type, bool camelCase, params string[] suffixes)
+        var typeName = type.Name;
+
+        if (suffixes != null)
         {
-            var typeName = type.Name;
-
-            if (suffixes != null)
+            foreach (var suffix in suffixes)
             {
-                foreach (var suffix in suffixes)
+                if (typeName.EndsWith(suffix, StringComparison.Ordinal))
                 {
-                    if (typeName.EndsWith(suffix, StringComparison.Ordinal))
-                    {
-                        typeName = typeName[..^suffix.Length];
-
-                        break;
-                    }
+                    typeName = typeName[..^suffix.Length];
+                    break;
                 }
             }
-
-            return camelCase ? typeName.ToCamelCase() : typeName;
         }
+
+        return camelCase ? typeName.ToCamelCase() : typeName;
     }
 }

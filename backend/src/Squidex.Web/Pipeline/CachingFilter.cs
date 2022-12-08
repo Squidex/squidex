@@ -12,46 +12,47 @@ using Microsoft.Net.Http.Headers;
 
 #pragma warning disable MA0073 // Avoid comparison with bool constant
 
-namespace Squidex.Web.Pipeline
+namespace Squidex.Web.Pipeline;
+
+public sealed class CachingFilter : IAsyncActionFilter
 {
-    public sealed class CachingFilter : IAsyncActionFilter
+    private readonly CachingManager cachingManager;
+
+    public CachingFilter(CachingManager cachingManager)
     {
-        private readonly CachingManager cachingManager;
+        this.cachingManager = cachingManager;
+    }
 
-        public CachingFilter(CachingManager cachingManager)
+    public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    {
+        var httpContext = context.HttpContext;
+
+        cachingManager.Start(httpContext);
+
+        var resultContext = await next();
+
+        cachingManager.Finish(httpContext);
+
+        if (httpContext.Response.HasStarted == false &&
+            httpContext.Response.Headers.TryGetString(HeaderNames.ETag, out var etag) &&
+            IsCacheable(httpContext, etag))
         {
-            this.cachingManager = cachingManager;
+            resultContext.Result = new StatusCodeResult(304);
+        }
+    }
+
+    private static bool IsCacheable(HttpContext httpContext, string etag)
+    {
+        if (!HttpMethods.IsGet(httpContext.Request.Method) || httpContext.Response.StatusCode != 200)
+        {
+            return false;
         }
 
-        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        if (!httpContext.Request.Headers.TryGetString(HeaderNames.IfNoneMatch, out var noneMatchValue))
         {
-            var httpContext = context.HttpContext;
-
-            cachingManager.Start(httpContext);
-
-            var resultContext = await next();
-
-            if (httpContext.Response.HasStarted == false &&
-                httpContext.Response.Headers.TryGetString(HeaderNames.ETag, out var etag) &&
-                IsCacheable(httpContext, etag))
-            {
-                resultContext.Result = new StatusCodeResult(304);
-            }
+            return false;
         }
 
-        private static bool IsCacheable(HttpContext httpContext, string etag)
-        {
-            if (!HttpMethods.IsGet(httpContext.Request.Method) || httpContext.Response.StatusCode != 200)
-            {
-                return false;
-            }
-
-            if (!httpContext.Request.Headers.TryGetString(HeaderNames.IfNoneMatch, out var noneMatchValue))
-            {
-                return false;
-            }
-
-            return ETagUtils.IsSameEtag(noneMatchValue, etag);
-        }
+        return ETagUtils.IsSameEtag(noneMatchValue, etag);
     }
 }

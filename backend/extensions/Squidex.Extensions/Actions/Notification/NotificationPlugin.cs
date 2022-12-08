@@ -9,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.Notification
+namespace Squidex.Extensions.Actions.Notification;
+
+public sealed class NotificationPlugin : IPlugin
 {
-    public sealed class NotificationPlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddRuleAction<NotificationAction, NotificationActionHandler>();
-        }
+        services.AddRuleAction<NotificationAction, NotificationActionHandler>();
     }
 }

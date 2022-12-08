@@ -8,20 +8,19 @@
 using Squidex.Domain.Users;
 using Squidex.Shared.Users;
 
-namespace Squidex.Config.Authentication
+namespace Squidex.Config.Authentication;
+
+public static class IdentityServices
 {
-    public static class IdentityServices
+    public static void AddSquidexIdentity(this IServiceCollection services, IConfiguration config)
     {
-        public static void AddSquidexIdentity(this IServiceCollection services, IConfiguration config)
-        {
-            services.Configure<MyIdentityOptions>(config,
-                "identity");
+        services.Configure<MyIdentityOptions>(config,
+            "identity");
 
-            services.AddSingletonAs<DefaultUserResolver>()
-                .AsOptional<IUserResolver>();
+        services.AddSingletonAs<DefaultUserResolver>()
+            .AsOptional<IUserResolver>();
 
-            services.AddSingletonAs<DefaultUserPictureStore>()
-                .AsOptional<IUserPictureStore>();
-        }
+        services.AddSingletonAs<DefaultUserPictureStore>()
+            .AsOptional<IUserPictureStore>();
     }
 }

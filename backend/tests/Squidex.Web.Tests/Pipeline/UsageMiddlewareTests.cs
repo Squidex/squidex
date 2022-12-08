@@ -6,235 +6,232 @@
 // ==========================================================================
 
 using System.Text;
-using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Xunit;
 
-namespace Squidex.Web.Pipeline
+namespace Squidex.Web.Pipeline;
+
+public class UsageMiddlewareTests
 {
-    public class UsageMiddlewareTests
+    private readonly IAppLogStore usageLog = A.Fake<IAppLogStore>();
+    private readonly IUsageGate usageGate = A.Fake<IUsageGate>();
+    private readonly IClock clock = A.Fake<IClock>();
+    private readonly Instant instant = SystemClock.Instance.GetCurrentInstant();
+    private readonly HttpContext httpContext = new DefaultHttpContext();
+    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+    private readonly RequestDelegate next;
+    private readonly UsageMiddleware sut;
+    private bool isNextCalled;
+
+    public UsageMiddlewareTests()
     {
-        private readonly IAppLogStore appLogStore = A.Fake<IAppLogStore>();
-        private readonly IAppUsageGate appUsageGate = A.Fake<IAppUsageGate>();
-        private readonly IClock clock = A.Fake<IClock>();
-        private readonly Instant instant = SystemClock.Instance.GetCurrentInstant();
-        private readonly HttpContext httpContext = new DefaultHttpContext();
-        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly RequestDelegate next;
-        private readonly UsageMiddleware sut;
-        private bool isNextCalled;
+        A.CallTo(() => clock.GetCurrentInstant())
+            .Returns(instant);
 
-        public UsageMiddlewareTests()
+        next = x =>
         {
-            A.CallTo(() => clock.GetCurrentInstant())
-                .Returns(instant);
+            isNextCalled = true;
 
-            next = x =>
-            {
-                isNextCalled = true;
+            return Task.CompletedTask;
+        };
 
-                return Task.CompletedTask;
-            };
-
-            sut = new UsageMiddleware(appLogStore, appUsageGate)
-            {
-                Clock = clock
-            };
-        }
-
-        [Fact]
-        public async Task Should_not_track_if_app_not_defined()
+        sut = new UsageMiddleware(usageLog, usageGate)
         {
-            await sut.InvokeAsync(httpContext, next);
+            Clock = clock
+        };
+    }
 
-            Assert.True(isNextCalled);
+    [Fact]
+    public async Task Should_not_track_if_app_not_defined()
+    {
+        await sut.InvokeAsync(httpContext, next);
 
-            var date = instant.ToDateTimeUtc().Date;
+        Assert.True(isNextCalled);
 
-            A.CallTo(() => appUsageGate.TrackRequestAsync(A<IAppEntity>._, A<string>._, A<DateTime>._, A<double>._, A<long>._, A<long>._, default))
-                .MustNotHaveHappened();
-        }
+        var date = instant.ToDateTimeUtc().Date;
 
-        [Fact]
-        public async Task Should_not_track_if_call_blocked()
+        A.CallTo(() => usageGate.TrackRequestAsync(A<IAppEntity>._, A<string>._, A<DateTime>._, A<double>._, A<long>._, A<long>._, default))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_track_if_call_blocked()
+    {
+        var app = Mocks.App(appId);
+
+        httpContext.Features.Set<IAppFeature>(new AppFeature(app));
+        httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
+
+        httpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+
+        await sut.InvokeAsync(httpContext, next);
+
+        Assert.True(isNextCalled);
+
+        var date = instant.ToDateTimeUtc().Date;
+
+        A.CallTo(() => usageGate.TrackRequestAsync(app, A<string>._, date, A<double>._, A<long>._, A<long>._, default))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_track_if_calls_left()
+    {
+        var app = Mocks.App(appId);
+
+        httpContext.Features.Set<IAppFeature>(new AppFeature(app));
+        httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
+
+        await sut.InvokeAsync(httpContext, next);
+
+        Assert.True(isNextCalled);
+
+        var date = instant.ToDateTimeUtc().Date;
+
+        A.CallTo(() => usageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, A<long>._, default))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_track_request_bytes()
+    {
+        var app = Mocks.App(appId);
+
+        httpContext.Features.Set<IAppFeature>(new AppFeature(app));
+        httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
+        httpContext.Request.ContentLength = 1024;
+
+        await sut.InvokeAsync(httpContext, next);
+
+        Assert.True(isNextCalled);
+
+        var date = instant.ToDateTimeUtc().Date;
+
+        A.CallTo(() => usageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 1024, default))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_track_response_bytes_with_writer()
+    {
+        var app = Mocks.App(appId);
+
+        httpContext.Features.Set<IAppFeature>(new AppFeature(app));
+        httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
+
+        await sut.InvokeAsync(httpContext, async x =>
         {
-            var app = Mocks.App(appId);
+            await x.Response.BodyWriter.WriteAsync(Encoding.Default.GetBytes("Hello World"), httpContext.RequestAborted);
 
-            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
-            httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
+            await next(x);
+        });
 
-            httpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        Assert.True(isNextCalled);
 
-            await sut.InvokeAsync(httpContext, next);
+        var date = instant.ToDateTimeUtc().Date;
 
-            Assert.True(isNextCalled);
+        A.CallTo(() => usageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 11, default))
+            .MustHaveHappened();
+    }
 
-            var date = instant.ToDateTimeUtc().Date;
+    [Fact]
+    public async Task Should_track_response_bytes_with_stream()
+    {
+        var app = Mocks.App(appId);
 
-            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, A<double>._, A<long>._, A<long>._, default))
-                .MustNotHaveHappened();
-        }
+        httpContext.Features.Set<IAppFeature>(new AppFeature(app));
+        httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
-        [Fact]
-        public async Task Should_track_if_calls_left()
+        await sut.InvokeAsync(httpContext, async x =>
         {
-            var app = Mocks.App(appId);
+            await x.Response.Body.WriteAsync(Encoding.Default.GetBytes("Hello World"), httpContext.RequestAborted);
 
-            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
-            httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
+            await next(x);
+        });
 
-            await sut.InvokeAsync(httpContext, next);
+        Assert.True(isNextCalled);
 
-            Assert.True(isNextCalled);
+        var date = instant.ToDateTimeUtc().Date;
 
-            var date = instant.ToDateTimeUtc().Date;
+        A.CallTo(() => usageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 11, default))
+            .MustHaveHappened();
+    }
 
-            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, A<long>._, default))
-                .MustHaveHappened();
-        }
+    [Fact]
+    public async Task Should_track_response_bytes_with_file()
+    {
+        var app = Mocks.App(appId);
 
-        [Fact]
-        public async Task Should_track_request_bytes()
+        httpContext.Features.Set<IAppFeature>(new AppFeature(app));
+        httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
+
+        var tempFileName = Path.GetTempFileName();
+        try
         {
-            var app = Mocks.App(appId);
-
-            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
-            httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
-            httpContext.Request.ContentLength = 1024;
-
-            await sut.InvokeAsync(httpContext, next);
-
-            Assert.True(isNextCalled);
-
-            var date = instant.ToDateTimeUtc().Date;
-
-            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 1024, default))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_track_response_bytes_with_writer()
-        {
-            var app = Mocks.App(appId);
-
-            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
-            httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
+            await File.WriteAllTextAsync(tempFileName, "Hello World", httpContext.RequestAborted);
 
             await sut.InvokeAsync(httpContext, async x =>
             {
-                await x.Response.BodyWriter.WriteAsync(Encoding.Default.GetBytes("Hello World"), httpContext.RequestAborted);
+                await x.Response.SendFileAsync(tempFileName, 0, new FileInfo(tempFileName).Length, httpContext.RequestAborted);
 
                 await next(x);
             });
-
-            Assert.True(isNextCalled);
-
-            var date = instant.ToDateTimeUtc().Date;
-
-            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 11, default))
-                .MustHaveHappened();
         }
-
-        [Fact]
-        public async Task Should_track_response_bytes_with_stream()
+        finally
         {
-            var app = Mocks.App(appId);
-
-            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
-            httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
-
-            await sut.InvokeAsync(httpContext, async x =>
-            {
-                await x.Response.Body.WriteAsync(Encoding.Default.GetBytes("Hello World"), httpContext.RequestAborted);
-
-                await next(x);
-            });
-
-            Assert.True(isNextCalled);
-
-            var date = instant.ToDateTimeUtc().Date;
-
-            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 11, default))
-                .MustHaveHappened();
+            File.Delete(tempFileName);
         }
 
-        [Fact]
-        public async Task Should_track_response_bytes_with_file()
-        {
-            var app = Mocks.App(appId);
+        Assert.True(isNextCalled);
 
-            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
-            httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
+        var date = instant.ToDateTimeUtc().Date;
 
-            var tempFileName = Path.GetTempFileName();
-            try
-            {
-                await File.WriteAllTextAsync(tempFileName, "Hello World", httpContext.RequestAborted);
+        A.CallTo(() => usageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 11, default))
+            .MustHaveHappened();
+    }
 
-                await sut.InvokeAsync(httpContext, async x =>
-                {
-                    await x.Response.SendFileAsync(tempFileName, 0, new FileInfo(tempFileName).Length, httpContext.RequestAborted);
+    [Fact]
+    public async Task Should_not_track_if_costs_are_zero()
+    {
+        var app = Mocks.App(appId);
 
-                    await next(x);
-                });
-            }
-            finally
-            {
-                File.Delete(tempFileName);
-            }
+        httpContext.Features.Set<IAppFeature>(new AppFeature(app));
+        httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(0));
 
-            Assert.True(isNextCalled);
+        await sut.InvokeAsync(httpContext, next);
 
-            var date = instant.ToDateTimeUtc().Date;
+        Assert.True(isNextCalled);
 
-            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, 13, A<long>._, 11, default))
-                .MustHaveHappened();
-        }
+        var date = instant.ToDateTimeUtc().Date;
 
-        [Fact]
-        public async Task Should_not_track_if_costs_are_zero()
-        {
-            var app = Mocks.App(appId);
+        A.CallTo(() => usageGate.TrackRequestAsync(app, A<string>._, date, A<double>._, A<long>._, A<long>._, default))
+            .MustNotHaveHappened();
+    }
 
-            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
-            httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(0));
+    [Fact]
+    public async Task Should_log_request_even_if_costs_are_zero()
+    {
+        var app = Mocks.App(appId);
 
-            await sut.InvokeAsync(httpContext, next);
+        httpContext.Features.Set<IAppFeature>(new AppFeature(app));
+        httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(0));
 
-            Assert.True(isNextCalled);
+        httpContext.Request.Method = "GET";
+        httpContext.Request.Path = "/my-path";
 
-            var date = instant.ToDateTimeUtc().Date;
+        await sut.InvokeAsync(httpContext, next);
 
-            A.CallTo(() => appUsageGate.TrackRequestAsync(app, A<string>._, date, A<double>._, A<long>._, A<long>._, default))
-                .MustNotHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_log_request_even_if_costs_are_zero()
-        {
-            var app = Mocks.App(appId);
-
-            httpContext.Features.Set<IAppFeature>(new AppFeature(app));
-            httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(0));
-
-            httpContext.Request.Method = "GET";
-            httpContext.Request.Path = "/my-path";
-
-            await sut.InvokeAsync(httpContext, next);
-
-            A.CallTo(() => appLogStore.LogAsync(appId.Id,
-                A<RequestLog>.That.Matches(x =>
-                    x.Timestamp == instant &&
-                    x.RequestMethod == "GET" &&
-                    x.RequestPath == "/my-path" &&
-                    x.Costs == 0),
-                default))
-                .MustHaveHappened();
-        }
+        A.CallTo(() => usageLog.LogAsync(appId.Id,
+            A<RequestLog>.That.Matches(x =>
+                x.Timestamp == instant &&
+                x.RequestMethod == "GET" &&
+                x.RequestPath == "/my-path" &&
+                x.Costs == 0),
+            default))
+            .MustHaveHappened();
     }
 }

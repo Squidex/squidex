@@ -19,145 +19,144 @@ using Squidex.Infrastructure.States;
 
 #pragma warning disable MA0022 // Return Task.FromResult instead of returning null
 
-namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
+namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
+
+public partial class RuleDomainObject : DomainObject<RuleDomainObject.State>
 {
-    public partial class RuleDomainObject : DomainObject<RuleDomainObject.State>
+    private readonly IServiceProvider serviceProvider;
+
+    public RuleDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<RuleDomainObject> log,
+        IServiceProvider serviceProvider)
+        : base(id, persistence, log)
     {
-        private readonly IServiceProvider serviceProvider;
+        this.serviceProvider = serviceProvider;
+    }
 
-        public RuleDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<RuleDomainObject> log,
-            IServiceProvider serviceProvider)
-            : base(id, persistence, log)
+    protected override bool IsDeleted(State snapshot)
+    {
+        return snapshot.IsDeleted;
+    }
+
+    protected override bool CanAcceptCreation(ICommand command)
+    {
+        return command is RuleCommandBase;
+    }
+
+    protected override bool CanAccept(ICommand command)
+    {
+        return command is RuleCommand ruleCommand &&
+            ruleCommand.AppId.Equals(Snapshot.AppId) &&
+            ruleCommand.RuleId.Equals(Snapshot.Id);
+    }
+
+    public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+        CancellationToken ct)
+    {
+        switch (command)
         {
-            this.serviceProvider = serviceProvider;
+            case CreateRule createRule:
+                return CreateReturnAsync(createRule, async (c, ct) =>
+                {
+                    await GuardRule.CanCreate(c, AppProvider());
+
+                    Create(c);
+
+                    return Snapshot;
+                }, ct);
+
+            case UpdateRule updateRule:
+                return UpdateReturnAsync(updateRule, async (c, ct) =>
+                {
+                    await GuardRule.CanUpdate(c, Snapshot, AppProvider());
+
+                    Update(c);
+
+                    return Snapshot;
+                }, ct);
+
+            case EnableRule enable:
+                return UpdateReturn(enable, c =>
+                {
+                    Enable(c);
+
+                    return Snapshot;
+                }, ct);
+
+            case DisableRule disable:
+                return UpdateReturn(disable, c =>
+                {
+                    Disable(c);
+
+                    return Snapshot;
+                }, ct);
+
+            case DeleteRule delete:
+                return Update(delete, c =>
+                {
+                    Delete(c);
+                }, ct);
+
+            case TriggerRule triggerRule:
+                return UpdateReturnAsync(triggerRule, async (c, ct) =>
+                {
+                    await Trigger(triggerRule);
+
+                    return true;
+                }, ct);
+
+            default:
+                ThrowHelper.NotSupportedException();
+                return default!;
         }
+    }
 
-        protected override bool IsDeleted(State snapshot)
-        {
-            return snapshot.IsDeleted;
-        }
+    private async Task Trigger(TriggerRule command)
+    {
+        var @event = new RuleManuallyTriggered();
 
-        protected override bool CanAcceptCreation(ICommand command)
-        {
-            return command is RuleCommandBase;
-        }
+        SimpleMapper.Map(command, @event);
+        SimpleMapper.Map(Snapshot, @event);
 
-        protected override bool CanAccept(ICommand command)
-        {
-            return command is RuleCommand ruleCommand &&
-                ruleCommand.AppId.Equals(Snapshot.AppId) &&
-                ruleCommand.RuleId.Equals(Snapshot.Id);
-        }
+        await RuleEnqueuer().EnqueueAsync(Snapshot.RuleDef, Snapshot.Id, Envelope.Create(@event));
+    }
 
-        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
-            CancellationToken ct)
-        {
-            switch (command)
-            {
-                case CreateRule createRule:
-                    return CreateReturnAsync(createRule, async (c, ct) =>
-                    {
-                        await GuardRule.CanCreate(c, AppProvider());
+    private IRuleEnqueuer RuleEnqueuer()
+    {
+        return serviceProvider.GetRequiredService<IRuleEnqueuer>();
+    }
 
-                        Create(c);
+    private void Create(CreateRule command)
+    {
+        Raise(command, new RuleCreated());
+    }
 
-                        return Snapshot;
-                    }, ct);
+    private void Update(UpdateRule command)
+    {
+        Raise(command, new RuleUpdated());
+    }
 
-                case UpdateRule updateRule:
-                    return UpdateReturnAsync(updateRule, async (c, ct) =>
-                    {
-                        await GuardRule.CanUpdate(c, Snapshot, AppProvider());
+    private void Enable(EnableRule command)
+    {
+        Raise(command, new RuleEnabled());
+    }
 
-                        Update(c);
+    private void Disable(DisableRule command)
+    {
+        Raise(command, new RuleDisabled());
+    }
 
-                        return Snapshot;
-                    }, ct);
+    private void Delete(DeleteRule command)
+    {
+        Raise(command, new RuleDeleted());
+    }
 
-                case EnableRule enable:
-                    return UpdateReturn(enable, c =>
-                    {
-                        Enable(c);
+    private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
+    {
+        RaiseEvent(Envelope.Create(SimpleMapper.Map(command, @event)));
+    }
 
-                        return Snapshot;
-                    }, ct);
-
-                case DisableRule disable:
-                    return UpdateReturn(disable, c =>
-                    {
-                        Disable(c);
-
-                        return Snapshot;
-                    }, ct);
-
-                case DeleteRule delete:
-                    return Update(delete, c =>
-                    {
-                        Delete(c);
-                    }, ct);
-
-                case TriggerRule triggerRule:
-                    return UpdateReturnAsync(triggerRule, async (c, ct) =>
-                    {
-                        await Trigger(triggerRule);
-
-                        return true;
-                    }, ct);
-
-                default:
-                    ThrowHelper.NotSupportedException();
-                    return default!;
-            }
-        }
-
-        private async Task Trigger(TriggerRule command)
-        {
-            var @event = new RuleManuallyTriggered();
-
-            SimpleMapper.Map(command, @event);
-            SimpleMapper.Map(Snapshot, @event);
-
-            await RuleEnqueuer().EnqueueAsync(Snapshot.RuleDef, Snapshot.Id, Envelope.Create(@event));
-        }
-
-        private IRuleEnqueuer RuleEnqueuer()
-        {
-            return serviceProvider.GetRequiredService<IRuleEnqueuer>();
-        }
-
-        private void Create(CreateRule command)
-        {
-            Raise(command, new RuleCreated());
-        }
-
-        private void Update(UpdateRule command)
-        {
-            Raise(command, new RuleUpdated());
-        }
-
-        private void Enable(EnableRule command)
-        {
-            Raise(command, new RuleEnabled());
-        }
-
-        private void Disable(DisableRule command)
-        {
-            Raise(command, new RuleDisabled());
-        }
-
-        private void Delete(DeleteRule command)
-        {
-            Raise(command, new RuleDeleted());
-        }
-
-        private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
-        {
-            RaiseEvent(Envelope.Create(SimpleMapper.Map(command, @event)));
-        }
-
-        private IAppProvider AppProvider()
-        {
-            return serviceProvider.GetRequiredService<IAppProvider>();
-        }
+    private IAppProvider AppProvider()
+    {
+        return serviceProvider.GetRequiredService<IAppProvider>();
     }
 }

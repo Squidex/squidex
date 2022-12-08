@@ -6,7 +6,7 @@
  */
 
 import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { AppSettingsDto, FieldDto, LanguageDto, SchemaDto } from '@app/shared';
 
 @Component({
@@ -22,7 +22,7 @@ export class FieldFormComponent implements AfterViewInit {
     public isEditable?: boolean | null;
 
     @Input()
-    public fieldForm!: FormGroup;
+    public fieldForm!: UntypedFormGroup;
 
     @Input()
     public field!: FieldDto;

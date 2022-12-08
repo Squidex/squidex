@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Infrastructure.States;
+
+public interface IOnRead
 {
-    public interface IOnRead
-    {
-        ValueTask OnReadAsync();
-    }
+    ValueTask OnReadAsync();
 }

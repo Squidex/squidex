@@ -7,14 +7,13 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Assets.Commands
+namespace Squidex.Domain.Apps.Entities.Assets.Commands;
+
+public sealed class BulkUpdateAssets : SquidexCommand, IAppCommand
 {
-    public sealed class BulkUpdateAssets : SquidexCommand, IAppCommand
-    {
-        public NamedId<DomainId> AppId { get; set; }
+    public NamedId<DomainId> AppId { get; set; }
 
-        public bool CheckReferrers { get; set; }
+    public bool CheckReferrers { get; set; }
 
-        public BulkUpdateJob[]? Jobs { get; set; }
-    }
+    public BulkUpdateJob[]? Jobs { get; set; }
 }

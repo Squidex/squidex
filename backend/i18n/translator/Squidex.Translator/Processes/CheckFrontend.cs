@@ -8,98 +8,97 @@
 using System.Text.RegularExpressions;
 using Squidex.Translator.State;
 
-namespace Squidex.Translator.Processes
+namespace Squidex.Translator.Processes;
+
+public class CheckFrontend
 {
-    public class CheckFrontend
+    private readonly TranslationService service;
+    private readonly DirectoryInfo folder;
+
+    public CheckFrontend(DirectoryInfo folder, TranslationService service)
     {
-        private readonly TranslationService service;
-        private readonly DirectoryInfo folder;
+        this.folder = Frontend.GetFolder(folder);
 
-        public CheckFrontend(DirectoryInfo folder, TranslationService service)
+        this.service = service;
+    }
+
+    public void Run()
+    {
+        var all = new HashSet<string>();
+
+        foreach (var (file, relativeName) in Frontend.GetTemplateFiles(folder))
         {
-            this.folder = Frontend.GetFolder(folder);
+            var translations = GetTranslationsInTemplate(file);
 
-            this.service = service;
-        }
-
-        public void Run()
-        {
-            var all = new HashSet<string>();
-
-            foreach (var (file, relativeName) in Frontend.GetTemplateFiles(folder))
+            foreach (var translation in translations)
             {
-                var translations = GetTranslationsInTemplate(file);
-
-                foreach (var translation in translations)
-                {
-                    all.Add(translation);
-                }
-
-                Helper.CheckForFile(service, relativeName, translations);
+                all.Add(translation);
             }
 
-            foreach (var (file, relativeName) in Frontend.GetTypescriptFiles(folder))
-            {
-                var translations = GetTranslationsInTypescript(file);
-
-                foreach (var translation in translations)
-                {
-                    all.Add(translation);
-                }
-
-                Helper.CheckForFile(service, relativeName, translations);
-            }
-
-            Helper.CheckUnused(service, all);
-            Helper.CheckOtherLocales(service);
-
-            service.Save();
+            Helper.CheckForFile(service, relativeName, translations);
         }
 
-        private static HashSet<string> GetTranslationsInTemplate(FileInfo file)
+        foreach (var (file, relativeName) in Frontend.GetTypescriptFiles(folder))
         {
-            var content = File.ReadAllText(file.FullName);
+            var translations = GetTranslationsInTypescript(file);
 
-            var translations = new HashSet<string>();
-
-            void AddTranslations(string regex)
+            foreach (var translation in translations)
             {
-                var matches = Regex.Matches(content, regex, RegexOptions.Singleline | RegexOptions.ExplicitCapture);
-
-                foreach (Match match in matches)
-                {
-                    translations.Add(match.Groups["Key"].Value);
-                }
+                all.Add(translation);
             }
 
-            AddTranslations("\"i18n\\:(?<Key>[^\"]+)\"");
-            AddTranslations("'i18n\\:(?<Key>[^\']+)'");
-            AddTranslations("'(?<Key>[^\']+)' \\| sqxTranslate");
-
-            return translations;
+            Helper.CheckForFile(service, relativeName, translations);
         }
 
-        private static HashSet<string> GetTranslationsInTypescript(FileInfo file)
+        Helper.CheckUnused(service, all);
+        Helper.CheckOtherLocales(service);
+
+        service.Save();
+    }
+
+    private static HashSet<string> GetTranslationsInTemplate(FileInfo file)
+    {
+        var content = File.ReadAllText(file.FullName);
+
+        var translations = new HashSet<string>();
+
+        void AddTranslations(string regex)
         {
-            var content = File.ReadAllText(file.FullName);
+            var matches = Regex.Matches(content, regex, RegexOptions.Singleline | RegexOptions.ExplicitCapture);
 
-            var translations = new HashSet<string>();
-
-            void AddTranslations(string regex)
+            foreach (Match match in matches)
             {
-                var matches = Regex.Matches(content, regex, RegexOptions.Singleline | RegexOptions.ExplicitCapture);
-
-                foreach (Match match in matches)
-                {
-                    translations.Add(match.Groups["Key"].Value);
-                }
+                translations.Add(match.Groups["Key"].Value);
             }
-
-            AddTranslations("'i18n\\:(?<Key>[^\']+)'");
-            AddTranslations("localizer.get\\('(?<Key>[^\']+)'\\)");
-            AddTranslations("localizer.getOrKey\\('(?<Key>[^\']+)'\\)");
-
-            return translations;
         }
+
+        AddTranslations("\"i18n\\:(?<Key>[^\"]+)\"");
+        AddTranslations("'i18n\\:(?<Key>[^\']+)'");
+        AddTranslations("'(?<Key>[^\']+)' \\| sqxTranslate");
+
+        return translations;
+    }
+
+    private static HashSet<string> GetTranslationsInTypescript(FileInfo file)
+    {
+        var content = File.ReadAllText(file.FullName);
+
+        var translations = new HashSet<string>();
+
+        void AddTranslations(string regex)
+        {
+            var matches = Regex.Matches(content, regex, RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+
+            foreach (Match match in matches)
+            {
+                translations.Add(match.Groups["Key"].Value);
+            }
+        }
+
+        AddTranslations("'i18n\\:(?<Key>[^\']+)'");
+        AddTranslations("localizer.get\\('(?<Key>[^\']+)'\\)");
+        AddTranslations("localizer.getOrKey\\('(?<Key>[^\']+)'\\)");
+
+        return translations;
     }
 }

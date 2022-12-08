@@ -5,38 +5,37 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Translator.Processes
+namespace Squidex.Translator.Processes;
+
+public static class Frontend
 {
-    public static class Frontend
+    public static DirectoryInfo GetFolder(DirectoryInfo folder)
     {
-        public static DirectoryInfo GetFolder(DirectoryInfo folder)
-        {
-            return new DirectoryInfo(Path.Combine(folder.FullName, "frontend", "src", "app"));
-        }
+        return new DirectoryInfo(Path.Combine(folder.FullName, "frontend", "src", "app"));
+    }
 
-        public static IEnumerable<(FileInfo, string)> GetTypescriptFiles(DirectoryInfo folder)
-        {
-            var files = folder.GetFiles(@"*.ts", SearchOption.AllDirectories);
+    public static IEnumerable<(FileInfo, string)> GetTypescriptFiles(DirectoryInfo folder)
+    {
+        var files = folder.GetFiles(@"*.ts", SearchOption.AllDirectories);
 
-            foreach (var file in files)
+        foreach (var file in files)
+        {
+            if (file.Name.EndsWith(".spec.ts", StringComparison.OrdinalIgnoreCase))
             {
-                if (file.Name.EndsWith(".spec.ts", StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                yield return (file, Helper.RelativeName(file, folder));
+                continue;
             }
+
+            yield return (file, Helper.RelativeName(file, folder));
         }
+    }
 
-        public static IEnumerable<(FileInfo, string)> GetTemplateFiles(DirectoryInfo folder)
+    public static IEnumerable<(FileInfo, string)> GetTemplateFiles(DirectoryInfo folder)
+    {
+        var files = folder.GetFiles(@"*.html", SearchOption.AllDirectories);
+
+        foreach (var file in files)
         {
-            var files = folder.GetFiles(@"*.html", SearchOption.AllDirectories);
-
-            foreach (var file in files)
-            {
-                yield return (file, Helper.RelativeName(file, folder));
-            }
+            yield return (file, Helper.RelativeName(file, folder));
         }
     }
 }

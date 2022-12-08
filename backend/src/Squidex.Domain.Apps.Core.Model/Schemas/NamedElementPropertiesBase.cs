@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Schemas
-{
-    public abstract record NamedElementPropertiesBase
-    {
-        public string? Label { get; init; }
+namespace Squidex.Domain.Apps.Core.Schemas;
 
-        public string? Hints { get; init; }
-    }
+public abstract record NamedElementPropertiesBase
+{
+    public string? Label { get; init; }
+
+    public string? Hints { get; init; }
 }

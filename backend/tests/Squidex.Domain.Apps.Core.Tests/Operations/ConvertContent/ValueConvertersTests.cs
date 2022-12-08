@@ -5,273 +5,270 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
-using Xunit;
 
-namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
+namespace Squidex.Domain.Apps.Core.Operations.ConvertContent;
+
+public class ValueConvertersTests
 {
-    public class ValueConvertersTests
+    private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
+    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+    private readonly DomainId id1 = DomainId.NewGuid();
+    private readonly DomainId id2 = DomainId.NewGuid();
+
+    private readonly RootField<StringFieldProperties> stringField
+        = Fields.String(1, "1", Partitioning.Invariant);
+
+    private readonly RootField<NumberFieldProperties> numberField
+        = Fields.Number(1, "1", Partitioning.Invariant);
+
+    public ValueConvertersTests()
     {
-        private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
-        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly DomainId id1 = DomainId.NewGuid();
-        private readonly DomainId id2 = DomainId.NewGuid();
+        A.CallTo(() => urlGenerator.AssetContent(appId, A<string>._))
+            .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<string>(1)}");
+    }
 
-        private readonly RootField<StringFieldProperties> stringField
-            = Fields.String(1, "1", Partitioning.Invariant);
+    [Fact]
+    public void Should_return_true_if_field_hidden()
+    {
+        var source = JsonValue.Create(123);
 
-        private readonly RootField<NumberFieldProperties> numberField
-            = Fields.Number(1, "1", Partitioning.Invariant);
+        var (remove, _) =
+            ExcludeHidden.Instance
+                .ConvertValue(stringField.Hide(), source, null);
 
-        public ValueConvertersTests()
+        Assert.True(remove);
+    }
+
+    [Fact]
+    public void Should_return_true_if_field_has_wrong_type()
+    {
+        var source = JsonValue.Create("invalid");
+
+        var (remove, _) =
+            new ExcludeChangedTypes(TestUtils.DefaultSerializer)
+                .ConvertValue(numberField, source, numberField);
+
+        Assert.True(remove);
+    }
+
+    [Theory]
+    [InlineData("assets")]
+    [InlineData("*")]
+    public void Should_convert_asset_ids_to_urls(string path)
+    {
+        var field = Fields.Assets(1, "assets", Partitioning.Invariant);
+
+        var source =
+            JsonValue.Array(
+                id1,
+                id2);
+
+        var (_, actual) =
+            new ResolveAssetUrls(appId, urlGenerator, HashSet.Of(path))
+                .ConvertValue(field, source, null);
+
+        var expected =
+            JsonValue.Array(
+                $"url/to/{id1}",
+                $"url/to/{id2}");
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Theory]
+    [InlineData("other")]
+    [InlineData("**")]
+    public void Should_not_convert_asset_ids_if_field_name_does_not_match(string path)
+    {
+        var field = Fields.Assets(1, "assets", Partitioning.Invariant);
+
+        var source =
+            JsonValue.Array(
+                id1,
+                id2);
+
+        var (_, actual) =
+            new ResolveAssetUrls(appId, urlGenerator, HashSet.Of(path))
+                .ConvertValue(field, source, null);
+
+        var expected = source;
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Theory]
+    [InlineData("parent.assets")]
+    [InlineData("*")]
+    public void Should_convert_nested_asset_ids_to_urls(string path)
+    {
+        var field = Fields.Array(1, "parent", Partitioning.Invariant, null, null, Fields.Assets(11, "assets"));
+
+        var source =
+            JsonValue.Array(
+                id1,
+                id2);
+
+        var (_, actual) =
+            new ResolveAssetUrls(appId, urlGenerator, HashSet.Of(path))
+                .ConvertValue(field.FieldsByName["assets"], source, field);
+
+        var expected =
+            JsonValue.Array(
+                $"url/to/{id1}",
+                $"url/to/{id2}");
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Theory]
+    [InlineData("assets")]
+    [InlineData("parent")]
+    [InlineData("parent.other")]
+    [InlineData("other.assets")]
+    public void Should_not_convert_nested_asset_ids_if_field_name_does_not_match(string path)
+    {
+        var field = Fields.Array(1, "parent", Partitioning.Invariant, null, null, Fields.Assets(11, "assets"));
+
+        var source =
+            JsonValue.Array(
+                id1,
+                id2);
+
+        var (_, actual) =
+            new ResolveAssetUrls(appId, urlGenerator, HashSet.Of(path))
+                .ConvertValue(field, source, null);
+
+        var expected = source;
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void Should_add_schema_name_if_component()
+    {
+        var field = Fields.Component(1, "component", Partitioning.Invariant);
+
+        var componentId = DomainId.NewGuid();
+        var component = new Schema("my-component");
+        var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
-            A.CallTo(() => urlGenerator.AssetContent(appId, A<string>._))
-                .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<string>(1)}");
-        }
+            [componentId] = component
+        });
 
-        [Fact]
-        public void Should_return_true_if_field_hidden()
+        var source =
+            new JsonObject()
+                .Add(Component.Discriminator, componentId);
+
+        var actual =
+            new AddSchemaNames(components)
+                .ConvertItem(field, source);
+
+        var expected =
+            new JsonObject()
+                .Add(Component.Discriminator, componentId)
+                .Add("schemaName", component.Name);
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void Should_not_add_schema_name_if_field_already_exists()
+    {
+        var field = Fields.Component(1, "component", Partitioning.Invariant);
+
+        var componentId = DomainId.NewGuid();
+        var component = new Schema("my-component");
+        var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
-            var source = JsonValue.Create(123);
+            [componentId] = component
+        });
 
-            var (remove, _) =
-                ExcludeHidden.Instance
-                    .ConvertValue(stringField.Hide(), source, null);
+        var source =
+            new JsonObject()
+                .Add(Component.Discriminator, componentId)
+                .Add("schemaName", "existing");
 
-            Assert.True(remove);
-        }
+        var actual =
+            new AddSchemaNames(components)
+                .ConvertItem(field, source);
 
-        [Fact]
-        public void Should_return_true_if_field_has_wrong_type()
+        var expected = source;
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void Should_not_add_schema_name_if_array_field()
+    {
+        var field = Fields.Array(1, "component", Partitioning.Invariant);
+
+        var componentId = DomainId.NewGuid();
+        var component = new Schema("my-component");
+        var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
-            var source = JsonValue.Create("invalid");
+            [componentId] = component
+        });
 
-            var (remove, _) =
-                new ExcludeChangedTypes(TestUtils.DefaultSerializer)
-                    .ConvertValue(numberField, source, numberField);
+        var source =
+            new JsonObject()
+                .Add(Component.Discriminator, componentId);
 
-            Assert.True(remove);
-        }
+        var actual =
+            new AddSchemaNames(components)
+                .ConvertItem(field, source);
 
-        [Theory]
-        [InlineData("assets")]
-        [InlineData("*")]
-        public void Should_convert_asset_ids_to_urls(string path)
+        var expected = source;
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void Should_not_add_schema_name_if_not_a_component()
+    {
+        var field = Fields.Component(1, "component", Partitioning.Invariant);
+
+        var componentId = DomainId.NewGuid();
+        var component = new Schema("my-component");
+        var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
-            var field = Fields.Assets(1, "assets", Partitioning.Invariant);
+            [componentId] = component
+        });
 
-            var source =
-                JsonValue.Array(
-                    id1,
-                    id2);
+        var source =
+            new JsonObject();
 
-            var (_, actual) =
-                new ResolveAssetUrls(appId, urlGenerator, HashSet.Of(path))
-                    .ConvertValue(field, source, null);
+        var actual =
+            new AddSchemaNames(components)
+                .ConvertItem(field, source);
 
-            var expected =
-                JsonValue.Array(
-                    $"url/to/{id1}",
-                    $"url/to/{id2}");
+        var expected = source;
 
-            Assert.Equal(expected, actual);
-        }
+        Assert.Equal(expected, actual);
+    }
 
-        [Theory]
-        [InlineData("other")]
-        [InlineData("**")]
-        public void Should_not_convert_asset_ids_if_field_name_does_not_match(string path)
-        {
-            var field = Fields.Assets(1, "assets", Partitioning.Invariant);
+    [Fact]
+    public void Should_not_add_schema_name_if_component_not_found()
+    {
+        var field = Fields.Component(1, "component", Partitioning.Invariant);
 
-            var source =
-                JsonValue.Array(
-                    id1,
-                    id2);
+        var componentId = DomainId.NewGuid();
 
-            var (_, actual) =
-                new ResolveAssetUrls(appId, urlGenerator, HashSet.Of(path))
-                    .ConvertValue(field, source, null);
+        var source =
+            new JsonObject()
+                .Add(Component.Discriminator, componentId);
 
-            var expected = source;
+        var actual =
+            new AddSchemaNames(ResolvedComponents.Empty)
+                .ConvertItem(field, source);
 
-            Assert.Equal(expected, actual);
-        }
+        var expected = source;
 
-        [Theory]
-        [InlineData("parent.assets")]
-        [InlineData("*")]
-        public void Should_convert_nested_asset_ids_to_urls(string path)
-        {
-            var field = Fields.Array(1, "parent", Partitioning.Invariant, null, null, Fields.Assets(11, "assets"));
-
-            var source =
-                JsonValue.Array(
-                    id1,
-                    id2);
-
-            var (_, actual) =
-                new ResolveAssetUrls(appId, urlGenerator, HashSet.Of(path))
-                    .ConvertValue(field.FieldsByName["assets"], source, field);
-
-            var expected =
-                JsonValue.Array(
-                    $"url/to/{id1}",
-                    $"url/to/{id2}");
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Theory]
-        [InlineData("assets")]
-        [InlineData("parent")]
-        [InlineData("parent.other")]
-        [InlineData("other.assets")]
-        public void Should_not_convert_nested_asset_ids_if_field_name_does_not_match(string path)
-        {
-            var field = Fields.Array(1, "parent", Partitioning.Invariant, null, null, Fields.Assets(11, "assets"));
-
-            var source =
-                JsonValue.Array(
-                    id1,
-                    id2);
-
-            var (_, actual) =
-                new ResolveAssetUrls(appId, urlGenerator, HashSet.Of(path))
-                    .ConvertValue(field, source, null);
-
-            var expected = source;
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Should_add_schema_name_if_component()
-        {
-            var field = Fields.Component(1, "component", Partitioning.Invariant);
-
-            var componentId = DomainId.NewGuid();
-            var component = new Schema("my-component");
-            var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
-            {
-                [componentId] = component
-            });
-
-            var source =
-                new JsonObject()
-                    .Add(Component.Discriminator, componentId);
-
-            var actual =
-                new AddSchemaNames(components)
-                    .ConvertItem(field, source);
-
-            var expected =
-                new JsonObject()
-                    .Add(Component.Discriminator, componentId)
-                    .Add("schemaName", component.Name);
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Should_not_add_schema_name_if_field_already_exists()
-        {
-            var field = Fields.Component(1, "component", Partitioning.Invariant);
-
-            var componentId = DomainId.NewGuid();
-            var component = new Schema("my-component");
-            var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
-            {
-                [componentId] = component
-            });
-
-            var source =
-                new JsonObject()
-                    .Add(Component.Discriminator, componentId)
-                    .Add("schemaName", "existing");
-
-            var actual =
-                new AddSchemaNames(components)
-                    .ConvertItem(field, source);
-
-            var expected = source;
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Should_not_add_schema_name_if_array_field()
-        {
-            var field = Fields.Array(1, "component", Partitioning.Invariant);
-
-            var componentId = DomainId.NewGuid();
-            var component = new Schema("my-component");
-            var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
-            {
-                [componentId] = component
-            });
-
-            var source =
-                new JsonObject()
-                    .Add(Component.Discriminator, componentId);
-
-            var actual =
-                new AddSchemaNames(components)
-                    .ConvertItem(field, source);
-
-            var expected = source;
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Should_not_add_schema_name_if_not_a_component()
-        {
-            var field = Fields.Component(1, "component", Partitioning.Invariant);
-
-            var componentId = DomainId.NewGuid();
-            var component = new Schema("my-component");
-            var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
-            {
-                [componentId] = component
-            });
-
-            var source =
-                new JsonObject();
-
-            var actual =
-                new AddSchemaNames(components)
-                    .ConvertItem(field, source);
-
-            var expected = source;
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Should_not_add_schema_name_if_component_not_found()
-        {
-            var field = Fields.Component(1, "component", Partitioning.Invariant);
-
-            var componentId = DomainId.NewGuid();
-
-            var source =
-                new JsonObject()
-                    .Add(Component.Discriminator, componentId);
-
-            var actual =
-                new AddSchemaNames(ResolvedComponents.Empty)
-                    .ConvertItem(field, source);
-
-            var expected = source;
-
-            Assert.Equal(expected, actual);
-        }
+        Assert.Equal(expected, actual);
     }
 }

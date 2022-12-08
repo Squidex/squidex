@@ -7,10 +7,8 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { HelpComponent, LoadSchemasGuard, SchemaMustExistGuard, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { ArrayValidationComponent, AssetsUIComponent, AssetsValidationComponent, BooleanUIComponent, BooleanValidationComponent, ComponentsUIComponent, ComponentsValidationComponent, DateTimeUIComponent, DateTimeValidationComponent, FieldComponent, FieldFormCommonComponent, FieldFormComponent, FieldFormUIComponent, FieldFormValidationComponent, FieldListComponent, FieldWizardComponent, GeolocationUIComponent, GeolocationValidationComponent, JsonMoreComponent, JsonUIComponent, JsonValidationComponent, NumberUIComponent, NumberValidationComponent, ReferencesUIComponent, ReferencesValidationComponent, SchemaEditFormComponent, SchemaExportFormComponent, SchemaFieldRulesFormComponent, SchemaFieldsComponent, SchemaFormComponent, SchemaPageComponent, SchemaPreviewUrlsFormComponent, SchemaScriptNamePipe, SchemaScriptsFormComponent, SchemasPageComponent, SchemaUIFormComponent, StringUIComponent, StringValidationComponent, TagsUIComponent, TagsValidationComponent } from './declarations';
-import { ComponentUIComponent } from './pages/schema/fields/types/component-ui.component';
-import { ComponentValidationComponent } from './pages/schema/fields/types/component-validation.component';
+import { HelpComponent, HistoryComponent, LoadSchemasGuard, SchemaMustExistGuard, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
+import { ArrayValidationComponent, AssetsUIComponent, AssetsValidationComponent, BooleanUIComponent, BooleanValidationComponent, ComponentsUIComponent, ComponentsValidationComponent, ComponentUIComponent, ComponentValidationComponent, DateTimeUIComponent, DateTimeValidationComponent, FieldComponent, FieldFormCommonComponent, FieldFormComponent, FieldFormUIComponent, FieldFormValidationComponent, FieldGroupComponent, FieldListComponent, FieldWizardComponent, GeolocationUIComponent, GeolocationValidationComponent, JsonMoreComponent, JsonUIComponent, JsonValidationComponent, NumberUIComponent, NumberValidationComponent, ReferencesUIComponent, ReferencesValidationComponent, SchemaEditFormComponent, SchemaExportFormComponent, SchemaFieldRulesFormComponent, SchemaFieldsComponent, SchemaFormComponent, SchemaPageComponent, SchemaPreviewUrlsFormComponent, SchemaScriptNamePipe, SchemaScriptsFormComponent, SchemasPageComponent, SchemaUIFormComponent, SortableFieldListComponent, StringUIComponent, StringValidationComponent, TagsUIComponent, TagsValidationComponent } from './declarations';
 
 const routes: Routes = [
     {
@@ -28,6 +26,13 @@ const routes: Routes = [
                         component: HelpComponent,
                         data: {
                             helpPage: '05-integrated/schemas',
+                        },
+                    },
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'schemas.{schemaId}',
                         },
                     },
                 ],
@@ -58,6 +63,7 @@ const routes: Routes = [
         DateTimeUIComponent,
         DateTimeValidationComponent,
         FieldComponent,
+        FieldGroupComponent,
         FieldFormCommonComponent,
         FieldFormComponent,
         FieldFormUIComponent,
@@ -84,6 +90,7 @@ const routes: Routes = [
         SchemaScriptNamePipe,
         SchemasPageComponent,
         SchemaUIFormComponent,
+        SortableFieldListComponent,
         StringUIComponent,
         StringValidationComponent,
         TagsUIComponent,

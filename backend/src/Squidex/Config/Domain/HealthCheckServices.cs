@@ -7,17 +7,16 @@
 
 using Squidex.Infrastructure.Diagnostics;
 
-namespace Squidex.Config.Domain
-{
-    public static class HealthCheckServices
-    {
-        public static void AddSquidexHealthChecks(this IServiceCollection services, IConfiguration config)
-        {
-            services.Configure<GCHealthCheckOptions>(config,
-                "diagnostics:gc");
+namespace Squidex.Config.Domain;
 
-            services.AddHealthChecks()
-                .AddCheck<GCHealthCheck>("GC", tags: new[] { "node" });
-        }
+public static class HealthCheckServices
+{
+    public static void AddSquidexHealthChecks(this IServiceCollection services, IConfiguration config)
+    {
+        services.Configure<GCHealthCheckOptions>(config,
+            "diagnostics:gc");
+
+        services.AddHealthChecks()
+            .AddCheck<GCHealthCheck>("GC", tags: new[] { "node" });
     }
 }

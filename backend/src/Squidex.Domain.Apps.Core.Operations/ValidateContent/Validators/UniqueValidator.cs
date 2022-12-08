@@ -11,56 +11,55 @@ using Squidex.Infrastructure.Translations;
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
+namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
+
+public delegate Task<IReadOnlyList<ContentIdStatus>> CheckUniqueness(FilterNode<ClrValue> filter);
+
+public sealed class UniqueValidator : IValidator
 {
-    public delegate Task<IReadOnlyList<ContentIdStatus>> CheckUniqueness(FilterNode<ClrValue> filter);
+    private readonly CheckUniqueness checkUniqueness;
 
-    public sealed class UniqueValidator : IValidator
+    public UniqueValidator(CheckUniqueness checkUniqueness)
     {
-        private readonly CheckUniqueness checkUniqueness;
+        this.checkUniqueness = checkUniqueness;
+    }
 
-        public UniqueValidator(CheckUniqueness checkUniqueness)
+    public void Validate(object? value, ValidationContext context)
+    {
+        var count = context.Path.Count();
+
+        if (value != null && (count == 0 || (count == 2 && context.Path.Last() == InvariantPartitioning.Key)))
         {
-            this.checkUniqueness = checkUniqueness;
-        }
+            FilterNode<ClrValue>? filter = null;
 
-        public void Validate(object? value, ValidationContext context)
-        {
-            var count = context.Path.Count();
-
-            if (value != null && (count == 0 || (count == 2 && context.Path.Last() == InvariantPartitioning.Key)))
+            if (value is string s)
             {
-                FilterNode<ClrValue>? filter = null;
+                filter = ClrFilter.Eq(Path(context), s);
+            }
+            else if (value is double d)
+            {
+                filter = ClrFilter.Eq(Path(context), d);
+            }
 
-                if (value is string s)
-                {
-                    filter = ClrFilter.Eq(Path(context), s);
-                }
-                else if (value is double d)
-                {
-                    filter = ClrFilter.Eq(Path(context), d);
-                }
-
-                if (filter != null)
-                {
-                    context.Root.AddTask(ct => ValidateCoreAsync(context, filter));
-                }
+            if (filter != null)
+            {
+                context.Root.AddTask(ct => ValidateCoreAsync(context, filter));
             }
         }
+    }
 
-        private async Task ValidateCoreAsync(ValidationContext context, FilterNode<ClrValue> filter)
+    private async Task ValidateCoreAsync(ValidationContext context, FilterNode<ClrValue> filter)
+    {
+        var found = await checkUniqueness(filter);
+
+        if (found.Any(x => x.Id != context.Root.ContentId))
         {
-            var found = await checkUniqueness(filter);
-
-            if (found.Any(x => x.Id != context.Root.ContentId))
-            {
-                context.AddError(context.Path, T.Get("contents.validation.unique"));
-            }
+            context.AddError(context.Path, T.Get("contents.validation.unique"));
         }
+    }
 
-        private static List<string> Path(ValidationContext context)
-        {
-            return Enumerable.Repeat("Data", 1).Union(context.Path).ToList();
-        }
+    private static List<string> Path(ValidationContext context)
+    {
+        return Enumerable.Repeat("Data", 1).Union(context.Path).ToList();
     }
 }

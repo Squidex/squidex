@@ -8,26 +8,25 @@
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public interface IBackupReader : IDisposable
 {
-    public interface IBackupReader : IDisposable
-    {
-        int ReadAttachments { get; }
+    int ReadAttachments { get; }
 
-        int ReadEvents { get; }
+    int ReadEvents { get; }
 
-        Task<Stream> OpenBlobAsync(string name,
-            CancellationToken ct = default);
+    Task<Stream> OpenBlobAsync(string name,
+        CancellationToken ct = default);
 
-        Task<T> ReadJsonAsync<T>(string name,
-            CancellationToken ct = default);
+    Task<T> ReadJsonAsync<T>(string name,
+        CancellationToken ct = default);
 
-        Task<bool> HasFileAsync(string name,
-            CancellationToken ct = default);
+    Task<bool> HasFileAsync(string name,
+        CancellationToken ct = default);
 
-        IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(
-            IEventStreamNames eventStreamNames,
-            IEventFormatter eventFormatter,
-            CancellationToken ct = default);
-    }
+    IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(
+        IEventStreamNames eventStreamNames,
+        IEventFormatter eventFormatter,
+        CancellationToken ct = default);
 }

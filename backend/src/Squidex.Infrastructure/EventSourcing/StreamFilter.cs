@@ -7,16 +7,15 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+public static class StreamFilter
 {
-    public static class StreamFilter
+    public static bool IsAll([NotNullWhen(false)] string? filter)
     {
-        public static bool IsAll([NotNullWhen(false)] string? filter)
-        {
-            return string.IsNullOrWhiteSpace(filter)
-                || string.Equals(filter, ".*", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(filter, "(.*)", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(filter, "(.*?)", StringComparison.OrdinalIgnoreCase);
-        }
+        return string.IsNullOrWhiteSpace(filter)
+            || string.Equals(filter, ".*", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(filter, "(.*)", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(filter, "(.*?)", StringComparison.OrdinalIgnoreCase);
     }
 }

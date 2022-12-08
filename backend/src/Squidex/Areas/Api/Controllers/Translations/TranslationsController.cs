@@ -12,41 +12,38 @@ using Squidex.Shared;
 using Squidex.Text.Translations;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Translations
+namespace Squidex.Areas.Api.Controllers.Translations;
+
+/// <summary>
+/// Manage translations.
+/// </summary>
+[ApiExplorerSettings(GroupName = nameof(Translations))]
+public sealed class TranslationsController : ApiController
 {
-    /// <summary>
-    /// Manage translations.
-    /// </summary>
-    [ApiExplorerSettings(GroupName = nameof(Translations))]
-    public sealed class TranslationsController : ApiController
+    private readonly ITranslator translator;
+
+    public TranslationsController(ICommandBus commandBus, ITranslator translator)
+        : base(commandBus)
     {
-        private readonly ITranslator translator;
+        this.translator = translator;
+    }
 
-        public TranslationsController(ICommandBus commandBus, ITranslator translator)
-            : base(commandBus)
-        {
-            this.translator = translator;
-        }
+    /// <summary>
+    /// Translate a text.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="request">The translation request.</param>
+    /// <response code="200">Text translated.</response>.
+    [HttpPost]
+    [Route("apps/{app}/translations/")]
+    [ProducesResponseType(typeof(TranslationDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppTranslate)]
+    [ApiCosts(0)]
+    public async Task<IActionResult> PostTranslation(string app, [FromBody] TranslateDto request)
+    {
+        var result = await translator.TranslateAsync(request.Text, request.TargetLanguage, request.SourceLanguage, HttpContext.RequestAborted);
+        var response = TranslationDto.FromDomain(result);
 
-        /// <summary>
-        /// Translate a text.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="request">The translation request.</param>
-        /// <returns>
-        /// 200 => Text translated.
-        /// </returns>
-        [HttpPost]
-        [Route("apps/{app}/translations/")]
-        [ProducesResponseType(typeof(TranslationDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(PermissionIds.AppTranslate)]
-        [ApiCosts(0)]
-        public async Task<IActionResult> PostTranslation(string app, [FromBody] TranslateDto request)
-        {
-            var result = await translator.TranslateAsync(request.Text, request.TargetLanguage, request.SourceLanguage, HttpContext.RequestAborted);
-            var response = TranslationDto.FromDomain(result);
-
-            return Ok(response);
-        }
+        return Ok(response);
     }
 }

@@ -7,20 +7,19 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Repositories
+namespace Squidex.Domain.Apps.Entities.Apps.Repositories;
+
+public interface IAppRepository
 {
-    public interface IAppRepository
-    {
-        Task<List<IAppEntity>> QueryAllAsync(string contributorId, IEnumerable<string> names,
-            CancellationToken ct = default);
+    Task<List<IAppEntity>> QueryAllAsync(string contributorId, IEnumerable<string> names,
+        CancellationToken ct = default);
 
-        Task<List<IAppEntity>> QueryAllAsync(DomainId teamId,
-            CancellationToken ct = default);
+    Task<List<IAppEntity>> QueryAllAsync(DomainId teamId,
+        CancellationToken ct = default);
 
-        Task<IAppEntity?> FindAsync(DomainId id,
-            CancellationToken ct = default);
+    Task<IAppEntity?> FindAsync(DomainId id,
+        CancellationToken ct = default);
 
-        Task<IAppEntity?> FindAsync(string name,
-            CancellationToken ct = default);
-    }
+    Task<IAppEntity?> FindAsync(string name,
+        CancellationToken ct = default);
 }

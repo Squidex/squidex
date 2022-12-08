@@ -10,25 +10,24 @@ using OpenIddict.Abstractions;
 using OpenIddict.Server;
 using static OpenIddict.Server.OpenIddictServerEvents;
 
-namespace Squidex.Areas.IdentityServer.Config
+namespace Squidex.Areas.IdentityServer.Config;
+
+public sealed class AlwaysAddTokenHandler : IOpenIddictServerHandler<ProcessSignInContext>
 {
-    public sealed class AlwaysAddTokenHandler : IOpenIddictServerHandler<ProcessSignInContext>
+    public ValueTask HandleAsync(ProcessSignInContext context)
     {
-        public ValueTask HandleAsync(ProcessSignInContext context)
+        if (context == null)
         {
-            if (context == null)
-            {
-                return default;
-            }
-
-            if (!string.IsNullOrWhiteSpace(context.Response.AccessToken))
-            {
-                var scopes = context.AccessTokenPrincipal?.GetScopes() ?? ImmutableArray<string>.Empty;
-
-                context.Response.Scope = string.Join(" ", scopes);
-            }
-
             return default;
         }
+
+        if (!string.IsNullOrWhiteSpace(context.Response.AccessToken))
+        {
+            var scopes = context.AccessTokenPrincipal?.GetScopes() ?? ImmutableArray<string>.Empty;
+
+            context.Response.Scope = string.Join(" ", scopes);
+        }
+
+        return default;
     }
 }

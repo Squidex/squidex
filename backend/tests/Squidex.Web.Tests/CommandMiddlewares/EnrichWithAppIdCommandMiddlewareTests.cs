@@ -5,67 +5,64 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Xunit;
 
-namespace Squidex.Web.CommandMiddlewares
+namespace Squidex.Web.CommandMiddlewares;
+
+public class EnrichWithAppIdCommandMiddlewareTests
 {
-    public class EnrichWithAppIdCommandMiddlewareTests
+    private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
+    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+    private readonly Context requestContext;
+    private readonly EnrichWithAppIdCommandMiddleware sut;
+
+    public EnrichWithAppIdCommandMiddlewareTests()
     {
-        private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
-        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly Context requestContext;
-        private readonly EnrichWithAppIdCommandMiddleware sut;
+        requestContext = Context.Anonymous(Mocks.App(appId));
 
-        public EnrichWithAppIdCommandMiddlewareTests()
-        {
-            requestContext = Context.Anonymous(Mocks.App(appId));
+        A.CallTo(() => contextProvider.Context)
+            .Returns(requestContext);
 
-            A.CallTo(() => contextProvider.Context)
-                .Returns(requestContext);
+        sut = new EnrichWithAppIdCommandMiddleware(contextProvider);
+    }
 
-            sut = new EnrichWithAppIdCommandMiddleware(contextProvider);
-        }
+    [Fact]
+    public async Task Should_throw_exception_if_app_not_found()
+    {
+        A.CallTo(() => contextProvider.Context)
+            .Returns(Context.Anonymous(null!));
 
-        [Fact]
-        public async Task Should_throw_exception_if_app_not_found()
-        {
-            A.CallTo(() => contextProvider.Context)
-                .Returns(Context.Anonymous(null!));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => HandleAsync(new CreateContent()));
+    }
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => HandleAsync(new CreateContent()));
-        }
+    [Fact]
+    public async Task Should_assign_named_id_to_command()
+    {
+        var context = await HandleAsync(new CreateContent());
 
-        [Fact]
-        public async Task Should_assign_named_id_to_command()
-        {
-            var context = await HandleAsync(new CreateContent());
+        Assert.Equal(appId, ((IAppCommand)context.Command).AppId);
+    }
 
-            Assert.Equal(appId, ((IAppCommand)context.Command).AppId);
-        }
+    [Fact]
+    public async Task Should_not_override_existing_named_id()
+    {
+        var customId = NamedId.Of(DomainId.NewGuid(), "other-app");
 
-        [Fact]
-        public async Task Should_not_override_existing_named_id()
-        {
-            var customId = NamedId.Of(DomainId.NewGuid(), "other-app");
+        var context = await HandleAsync(new CreateContent { AppId = customId });
 
-            var context = await HandleAsync(new CreateContent { AppId = customId });
+        Assert.Equal(customId, ((IAppCommand)context.Command).AppId);
+    }
 
-            Assert.Equal(customId, ((IAppCommand)context.Command).AppId);
-        }
+    private async Task<CommandContext> HandleAsync(ICommand command)
+    {
+        var commandContext = new CommandContext(command, A.Fake<ICommandBus>());
 
-        private async Task<CommandContext> HandleAsync(ICommand command)
-        {
-            var commandContext = new CommandContext(command, A.Fake<ICommandBus>());
+        await sut.HandleAsync(commandContext, default);
 
-            await sut.HandleAsync(commandContext, default);
-
-            return commandContext;
-        }
+        return commandContext;
     }
 }

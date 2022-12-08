@@ -7,10 +7,9 @@
 
 using NodaTime;
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public interface ITimestampCommand : ICommand
 {
-    public interface ITimestampCommand : ICommand
-    {
-        Instant Timestamp { get; set; }
-    }
+    Instant Timestamp { get; set; }
 }

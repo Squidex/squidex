@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps;
+
+[EventType(nameof(AppDeleted))]
+public sealed class AppDeleted : AppEvent
 {
-    [EventType(nameof(AppDeleted))]
-    public sealed class AppDeleted : AppEvent
-    {
-    }
 }

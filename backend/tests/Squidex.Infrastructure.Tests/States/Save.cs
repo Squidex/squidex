@@ -7,50 +7,49 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Infrastructure.States;
+
+public static class Save
 {
-    public static class Save
+    public static SnapshotInstance<T> Snapshot<T>(T initial)
     {
-        public static SnapshotInstance<T> Snapshot<T>(T initial)
+        return new SnapshotInstance<T>(initial);
+    }
+
+    public static EventsInstance Events(int keep = int.MaxValue)
+    {
+        return new EventsInstance(keep);
+    }
+
+    public sealed class SnapshotInstance<T>
+    {
+        public T Value { get; set; }
+
+        public HandleSnapshot<T> Write { get; }
+
+        public SnapshotInstance(T initial)
         {
-            return new SnapshotInstance<T>(initial);
-        }
+            Value = initial;
 
-        public static EventsInstance Events(int keep = int.MaxValue)
-        {
-            return new EventsInstance(keep);
-        }
-
-        public sealed class SnapshotInstance<T>
-        {
-            public T Value { get; set; }
-
-            public HandleSnapshot<T> Write { get; }
-
-            public SnapshotInstance(T initial)
+            Write = (state, _) =>
             {
-                Value = initial;
-
-                Write = (state, _) =>
-                {
-                    Value = state;
-                };
-            }
+                Value = state;
+            };
         }
+    }
 
-        public sealed class EventsInstance : List<IEvent>
+    public sealed class EventsInstance : List<IEvent>
+    {
+        public HandleEvent Write { get; }
+
+        public EventsInstance(int keep = int.MaxValue)
         {
-            public HandleEvent Write { get; }
-
-            public EventsInstance(int keep = int.MaxValue)
+            Write = @event =>
             {
-                Write = @event =>
-                {
-                    Add(@event.Payload);
+                Add(@event.Payload);
 
-                    return Count < keep;
-                };
-            }
+                return Count < keep;
+            };
         }
     }
 }

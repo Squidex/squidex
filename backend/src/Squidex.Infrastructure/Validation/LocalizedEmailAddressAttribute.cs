@@ -9,21 +9,20 @@ using System.ComponentModel.DataAnnotations;
 using Squidex.Infrastructure.Translations;
 using Squidex.Text;
 
-namespace Squidex.Infrastructure.Validation
+namespace Squidex.Infrastructure.Validation;
+
+[AttributeUsage(AttributeTargets.Property)]
+public class LocalizedEmailAddressAttribute : ValidationAttribute
 {
-    [AttributeUsage(AttributeTargets.Property)]
-    public class LocalizedEmailAddressAttribute : ValidationAttribute
+    public override bool IsValid(object? value)
     {
-        public override bool IsValid(object? value)
-        {
-            return value is not string s || s.IsEmail();
-        }
+        return value is not string s || s.IsEmail();
+    }
 
-        public override string FormatErrorMessage(string name)
-        {
-            var property = T.Get($"common.{name.ToCamelCase()}", name);
+    public override string FormatErrorMessage(string name)
+    {
+        var property = T.Get($"common.{name.ToCamelCase()}", name);
 
-            return T.Get("annotations_EmailAddress", base.FormatErrorMessage(name), new { name = property });
-        }
+        return T.Get("annotations_EmailAddress", base.FormatErrorMessage(name), new { name = property });
     }
 }

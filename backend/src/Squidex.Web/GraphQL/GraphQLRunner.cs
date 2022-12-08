@@ -10,27 +10,26 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 
-namespace Squidex.Web.GraphQL
+namespace Squidex.Web.GraphQL;
+
+public sealed class GraphQLRunner
 {
-    public sealed class GraphQLRunner
+    private readonly GraphQLHttpMiddleware<DummySchema> middleware;
+
+    public GraphQLRunner(IServiceProvider serviceProvider)
     {
-        private readonly GraphQLHttpMiddleware<DummySchema> middleware;
+        RequestDelegate next = x => Task.CompletedTask;
 
-        public GraphQLRunner(IServiceProvider serviceProvider)
+        var options = new GraphQLHttpMiddlewareOptions
         {
-            RequestDelegate next = x => Task.CompletedTask;
+            DefaultResponseContentType = new MediaTypeHeaderValue("application/json")
+        };
 
-            var options = new GraphQLHttpMiddlewareOptions
-            {
-                DefaultResponseContentType = new MediaTypeHeaderValue("application/json")
-            };
+        middleware = ActivatorUtilities.CreateInstance<GraphQLHttpMiddleware<DummySchema>>(serviceProvider, next, options);
+    }
 
-            middleware = ActivatorUtilities.CreateInstance<GraphQLHttpMiddleware<DummySchema>>(serviceProvider, next, options);
-        }
-
-        public Task InvokeAsync(HttpContext context)
-        {
-            return middleware.InvokeAsync(context);
-        }
+    public Task InvokeAsync(HttpContext context)
+    {
+        return middleware.InvokeAsync(context);
     }
 }

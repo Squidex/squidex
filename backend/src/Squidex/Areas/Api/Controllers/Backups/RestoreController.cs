@@ -13,62 +13,58 @@ using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Backups
+namespace Squidex.Areas.Api.Controllers.Backups;
+
+/// <summary>
+/// Update and query backups for apps.
+/// </summary>
+[ApiExplorerSettings(GroupName = nameof(Backups))]
+[ApiModelValidation(true)]
+public class RestoreController : ApiController
 {
-    /// <summary>
-    /// Update and query backups for apps.
-    /// </summary>
-    [ApiExplorerSettings(GroupName = nameof(Backups))]
-    [ApiModelValidation(true)]
-    public class RestoreController : ApiController
+    private readonly IBackupService backupService;
+
+    public RestoreController(ICommandBus commandBus, IBackupService backupService)
+        : base(commandBus)
     {
-        private readonly IBackupService backupService;
+        this.backupService = backupService;
+    }
 
-        public RestoreController(ICommandBus commandBus, IBackupService backupService)
-            : base(commandBus)
+    /// <summary>
+    /// Get current restore status.
+    /// </summary>
+    /// <response code="200">Status returned.</response>.
+    [HttpGet]
+    [Route("apps/restore/")]
+    [ProducesResponseType(typeof(RestoreJobDto), StatusCodes.Status200OK)]
+    [ApiPermission(PermissionIds.AdminRestore)]
+    public async Task<IActionResult> GetRestoreJob()
+    {
+        var job = await backupService.GetRestoreAsync(HttpContext.RequestAborted);
+
+        if (job == null)
         {
-            this.backupService = backupService;
+            return NotFound();
         }
 
-        /// <summary>
-        /// Get current restore status.
-        /// </summary>
-        /// <returns>
-        /// 200 => Status returned.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/restore/")]
-        [ProducesResponseType(typeof(RestoreJobDto), StatusCodes.Status200OK)]
-        [ApiPermission(PermissionIds.AdminRestore)]
-        public async Task<IActionResult> GetRestoreJob()
-        {
-            var job = await backupService.GetRestoreAsync(HttpContext.RequestAborted);
+        var response = RestoreJobDto.FromDomain(job);
 
-            if (job == null)
-            {
-                return NotFound();
-            }
+        return Ok(response);
+    }
 
-            var response = RestoreJobDto.FromDomain(job);
+    /// <summary>
+    /// Restore a backup.
+    /// </summary>
+    /// <param name="request">The backup to restore.</param>
+    /// <response code="204">Restore operation started.</response>.
+    [HttpPost]
+    [Route("apps/restore/")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ApiPermission(PermissionIds.AdminRestore)]
+    public async Task<IActionResult> PostRestoreJob([FromBody] RestoreRequestDto request)
+    {
+        await backupService.StartRestoreAsync(User.Token()!, request.Url, request.Name, HttpContext.RequestAborted);
 
-            return Ok(response);
-        }
-
-        /// <summary>
-        /// Restore a backup.
-        /// </summary>
-        /// <param name="request">The backup to restore.</param>
-        /// <returns>
-        /// 204 => Restore operation started.
-        /// </returns>
-        [HttpPost]
-        [Route("apps/restore/")]
-        [ApiPermission(PermissionIds.AdminRestore)]
-        public async Task<IActionResult> PostRestoreJob([FromBody] RestoreRequestDto request)
-        {
-            await backupService.StartRestoreAsync(User.Token()!, request.Url, request.Name);
-
-            return NoContent();
-        }
+        return NoContent();
     }
 }

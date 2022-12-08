@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public enum StringContentType
 {
-    public enum StringContentType
-    {
-        Unspecified,
-        Html,
-        Markdown
-    }
+    Unspecified,
+    Html,
+    Markdown
 }

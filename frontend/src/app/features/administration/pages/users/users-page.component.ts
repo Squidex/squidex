@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { UserDto, UsersState } from '@app/features/administration/internal';
 import { ResourceOwner, Router2State } from '@app/framework';
 
@@ -19,7 +19,7 @@ import { ResourceOwner, Router2State } from '@app/framework';
     ],
 })
 export class UsersPageComponent extends ResourceOwner implements OnInit {
-    public usersFilter = new FormControl();
+    public usersFilter = new UntypedFormControl();
 
     constructor(
         public readonly usersRoute: Router2State,

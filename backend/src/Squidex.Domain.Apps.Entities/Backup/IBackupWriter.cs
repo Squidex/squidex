@@ -7,21 +7,20 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public interface IBackupWriter : IDisposable
 {
-    public interface IBackupWriter : IDisposable
-    {
-        int WrittenAttachments { get; }
+    int WrittenAttachments { get; }
 
-        int WrittenEvents { get; }
+    int WrittenEvents { get; }
 
-        Task<Stream> OpenBlobAsync(string name,
-            CancellationToken ct = default);
+    Task<Stream> OpenBlobAsync(string name,
+        CancellationToken ct = default);
 
-        void WriteEvent(StoredEvent storedEvent,
-            CancellationToken ct = default);
+    void WriteEvent(StoredEvent storedEvent,
+        CancellationToken ct = default);
 
-        Task WriteJsonAsync(string name, object value,
-            CancellationToken ct = default);
-    }
+    Task WriteJsonAsync(string name, object value,
+        CancellationToken ct = default);
 }

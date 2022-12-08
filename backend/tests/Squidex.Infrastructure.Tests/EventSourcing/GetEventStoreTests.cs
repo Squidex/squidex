@@ -5,25 +5,22 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Xunit;
-
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+[Trait("Category", "Dependencies")]
+public class GetEventStoreTests : EventStoreTests<GetEventStore>, IClassFixture<GetEventStoreFixture>
 {
-    [Trait("Category", "Dependencies")]
-    public class GetEventStoreTests : EventStoreTests<GetEventStore>, IClassFixture<GetEventStoreFixture>
+    public GetEventStoreFixture _ { get; }
+
+    public GetEventStoreTests(GetEventStoreFixture fixture)
     {
-        public GetEventStoreFixture _ { get; }
+        _ = fixture;
+    }
 
-        public GetEventStoreTests(GetEventStoreFixture fixture)
-        {
-            _ = fixture;
-        }
-
-        public override GetEventStore CreateStore()
-        {
-            return _.EventStore;
-        }
+    public override GetEventStore CreateStore()
+    {
+        return _.EventStore;
     }
 }

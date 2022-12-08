@@ -5,16 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Scripting
+namespace Squidex.Domain.Apps.Core.Scripting;
+
+public enum JsonType
 {
-    public enum JsonType
-    {
-        Any,
-        Array,
-        Boolean,
-        Function,
-        Number,
-        Object,
-        String
-    }
+    Any,
+    Array,
+    Boolean,
+    Function,
+    Number,
+    Object,
+    String
 }

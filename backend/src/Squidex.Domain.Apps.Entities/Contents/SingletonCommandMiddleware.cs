@@ -13,37 +13,36 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents;
+
+public sealed class SingletonCommandMiddleware : ICommandMiddleware
 {
-    public sealed class SingletonCommandMiddleware : ICommandMiddleware
+    public async Task HandleAsync(CommandContext context, NextDelegate next,
+        CancellationToken ct)
     {
-        public async Task HandleAsync(CommandContext context, NextDelegate next,
-            CancellationToken ct)
+        await next(context, ct);
+
+        if (context.IsCompleted && context.Command is CreateSchema { Type: SchemaType.Singleton } createSchema)
         {
-            await next(context, ct);
+            var schemaId = NamedId.Of(createSchema.SchemaId, createSchema.Name);
 
-            if (context.IsCompleted && context.Command is CreateSchema { Type: SchemaType.Singleton } createSchema)
+            var data = new ContentData();
+
+            var contentId = schemaId.Id;
+            var content = new CreateContent
             {
-                var schemaId = NamedId.Of(createSchema.SchemaId, createSchema.Name);
+                Data = data,
+                ContentId = contentId,
+                DoNotScript = true,
+                DoNotValidate = true,
+                SchemaId = schemaId,
+                Status = Status.Published
+            };
 
-                var data = new ContentData();
+            SimpleMapper.Map(createSchema, content);
 
-                var contentId = schemaId.Id;
-                var content = new CreateContent
-                {
-                    Data = data,
-                    ContentId = contentId,
-                    DoNotScript = true,
-                    DoNotValidate = true,
-                    SchemaId = schemaId,
-                    Status = Status.Published
-                };
-
-                SimpleMapper.Map(createSchema, content);
-
-                // Always create the corresponding content and therefore do not pass over cancellation token.
-                await context.CommandBus.PublishAsync(content, default);
-            }
+            // Always create the corresponding content and therefore do not pass over cancellation token.
+            await context.CommandBus.PublishAsync(content, default);
         }
     }
 }

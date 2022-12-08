@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas;
+
+[EventType(nameof(FieldEnabled))]
+public sealed class FieldEnabled : FieldEvent
 {
-    [EventType(nameof(FieldEnabled))]
-    public sealed class FieldEnabled : FieldEvent
-    {
-    }
 }

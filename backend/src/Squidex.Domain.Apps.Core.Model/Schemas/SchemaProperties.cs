@@ -7,20 +7,19 @@
 
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public sealed record SchemaProperties : NamedElementPropertiesBase
 {
-    public sealed record SchemaProperties : NamedElementPropertiesBase
-    {
-        public static readonly SchemaProperties Empty = new SchemaProperties();
+    public static readonly SchemaProperties Empty = new SchemaProperties();
 
-        public ReadonlyList<string>? Tags { get; init; }
+    public ReadonlyList<string>? Tags { get; init; }
 
-        public string? ContentsSidebarUrl { get; init; }
+    public string? ContentsSidebarUrl { get; init; }
 
-        public string? ContentSidebarUrl { get; init; }
+    public string? ContentSidebarUrl { get; init; }
 
-        public string? ContentEditorUrl { get; init; }
+    public string? ContentEditorUrl { get; init; }
 
-        public bool ValidateOnPublish { get; init; }
-    }
+    public bool ValidateOnPublish { get; init; }
 }

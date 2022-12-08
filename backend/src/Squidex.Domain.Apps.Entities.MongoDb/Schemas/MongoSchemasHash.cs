@@ -15,130 +15,129 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.ObjectPool;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
+namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas;
+
+public sealed class MongoSchemasHash : MongoRepositoryBase<MongoSchemasHashEntity>, ISchemasHash, IEventConsumer, IDeleter
 {
-    public sealed class MongoSchemasHash : MongoRepositoryBase<MongoSchemasHashEntity>, ISchemasHash, IEventConsumer, IDeleter
+    public int BatchSize
     {
-        public int BatchSize
-        {
-            get => 1000;
-        }
+        get => 1000;
+    }
 
-        public int BatchDelay
-        {
-            get => 500;
-        }
+    public int BatchDelay
+    {
+        get => 500;
+    }
 
-        public string Name
-        {
-            get => GetType().Name;
-        }
+    public string Name
+    {
+        get => GetType().Name;
+    }
 
-        public string EventsFilter
-        {
-            get => "^schema-";
-        }
+    public string EventsFilter
+    {
+        get => "^schema-";
+    }
 
-        public MongoSchemasHash(IMongoDatabase database)
-            : base(database)
-        {
-        }
+    public MongoSchemasHash(IMongoDatabase database)
+        : base(database)
+    {
+    }
 
-        protected override string CollectionName()
-        {
-            return "SchemasHash";
-        }
+    protected override string CollectionName()
+    {
+        return "SchemasHash";
+    }
 
-        async Task IDeleter.DeleteAppAsync(IAppEntity app,
-            CancellationToken ct)
-        {
-            await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
-        }
+    async Task IDeleter.DeleteAppAsync(IAppEntity app,
+        CancellationToken ct)
+    {
+        await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
+    }
 
-        public Task On(IEnumerable<Envelope<IEvent>> events)
-        {
-            var writes = new List<WriteModel<MongoSchemasHashEntity>>();
+    public Task On(IEnumerable<Envelope<IEvent>> events)
+    {
+        var writes = new List<WriteModel<MongoSchemasHashEntity>>();
 
-            foreach (var @event in events)
+        foreach (var @event in events)
+        {
+            if (@event.Headers.Restored())
             {
-                if (@event.Headers.Restored())
-                {
-                    continue;
-                }
-
-                if (@event.Payload is SchemaEvent schemaEvent)
-                {
-                    writes.Add(
-                        new UpdateOneModel<MongoSchemasHashEntity>(
-                            Filter.Eq(x => x.AppId, schemaEvent.AppId.Id),
-                            Update
-                                .Set($"s.{schemaEvent.SchemaId.Id}", @event.Headers.EventStreamNumber())
-                                .Set(x => x.Updated, @event.Headers.Timestamp()))
-                        {
-                            IsUpsert = true
-                        });
-                }
+                continue;
             }
 
-            if (writes.Count == 0)
+            if (@event.Payload is SchemaEvent schemaEvent)
             {
-                return Task.CompletedTask;
+                writes.Add(
+                    new UpdateOneModel<MongoSchemasHashEntity>(
+                        Filter.Eq(x => x.AppId, schemaEvent.AppId.Id),
+                        Update
+                            .Set($"s.{schemaEvent.SchemaId.Id}", @event.Headers.EventStreamNumber())
+                            .Set(x => x.Updated, @event.Headers.Timestamp()))
+                    {
+                        IsUpsert = true
+                    });
             }
-
-            return Collection.BulkWriteAsync(writes, BulkUnordered);
         }
 
-        public async Task<(Instant Create, string Hash)> GetCurrentHashAsync(IAppEntity app,
-            CancellationToken ct = default)
+        if (writes.Count == 0)
         {
-            Guard.NotNull(app);
-
-            var entity = await Collection.Find(x => x.AppId == app.Id).FirstOrDefaultAsync(ct);
-
-            if (entity == null)
-            {
-                return (default, string.Empty);
-            }
-
-            var ids =
-                entity.SchemaVersions.Select(x => (x.Key, x.Value))
-                    .Union(Enumerable.Repeat((app.Id.ToString(), app.Version), 1));
-
-            var hash = CreateHash(ids);
-
-            return (entity.Updated, hash);
+            return Task.CompletedTask;
         }
 
-        public ValueTask<string> ComputeHashAsync(IAppEntity app, IEnumerable<ISchemaEntity> schemas,
-            CancellationToken ct = default)
+        return Collection.BulkWriteAsync(writes, BulkUnordered);
+    }
+
+    public async Task<(Instant Create, string Hash)> GetCurrentHashAsync(IAppEntity app,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(app);
+
+        var entity = await Collection.Find(x => x.AppId == app.Id).FirstOrDefaultAsync(ct);
+
+        if (entity == null)
         {
-            var ids =
-                schemas.Select(x => (x.Id.ToString(), x.Version))
-                    .Union(Enumerable.Repeat((app.Id.ToString(), app.Version), 1));
-
-            var hash = CreateHash(ids);
-
-            return new ValueTask<string>(hash);
+            return (default, string.Empty);
         }
 
-        private static string CreateHash(IEnumerable<(string, long)> ids)
-        {
-            var sb = DefaultPools.StringBuilder.Get();
-            try
-            {
-                foreach (var (id, version) in ids.OrderBy(x => x.Item1))
-                {
-                    sb.Append(id);
-                    sb.Append(version);
-                    sb.Append(';');
-                }
+        var ids =
+            entity.SchemaVersions.Select(x => (x.Key, x.Value))
+                .Union(Enumerable.Repeat((app.Id.ToString(), app.Version), 1));
 
-                return sb.ToString().ToSha256Base64();
-            }
-            finally
+        var hash = CreateHash(ids);
+
+        return (entity.Updated, hash);
+    }
+
+    public ValueTask<string> ComputeHashAsync(IAppEntity app, IEnumerable<ISchemaEntity> schemas,
+        CancellationToken ct = default)
+    {
+        var ids =
+            schemas.Select(x => (x.Id.ToString(), x.Version))
+                .Union(Enumerable.Repeat((app.Id.ToString(), app.Version), 1));
+
+        var hash = CreateHash(ids);
+
+        return new ValueTask<string>(hash);
+    }
+
+    private static string CreateHash(IEnumerable<(string, long)> ids)
+    {
+        var sb = DefaultPools.StringBuilder.Get();
+        try
+        {
+            foreach (var (id, version) in ids.OrderBy(x => x.Item1))
             {
-                DefaultPools.StringBuilder.Return(sb);
+                sb.Append(id);
+                sb.Append(version);
+                sb.Append(';');
             }
+
+            return sb.ToString().ToSha256Base64();
+        }
+        finally
+        {
+            DefaultPools.StringBuilder.Return(sb);
         }
     }
 }

@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Migrations
+namespace Squidex.Infrastructure.Migrations;
+
+public interface IMigrationPath
 {
-    public interface IMigrationPath
-    {
-        (int Version, IEnumerable<IMigration>? Migrations) GetNext(int version);
-    }
+    (int Version, IEnumerable<IMigration>? Migrations) GetNext(int version);
 }

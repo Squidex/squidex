@@ -7,34 +7,33 @@
 
 using NodaTime;
 
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Domain.Apps.Entities.Apps;
+
+public struct RequestLog
 {
-    public struct RequestLog
-    {
-        public Instant Timestamp;
+    public Instant Timestamp;
 
-        public string? RequestMethod;
+    public string? RequestMethod;
 
-        public string? RequestPath;
+    public string? RequestPath;
 
-        public string? UserId;
+    public string? UserId;
 
-        public string? UserClientId;
+    public string? UserClientId;
 
-        public string? CacheServer;
+    public string? CacheServer;
 
-        public string? CacheStatus;
+    public string? CacheStatus;
 
-        public int StatusCode;
+    public int StatusCode;
 
-        public int CacheTTL;
+    public int CacheTTL;
 
-        public long CacheHits;
+    public long CacheHits;
 
-        public long ElapsedMs;
+    public long ElapsedMs;
 
-        public long Bytes;
+    public long Bytes;
 
-        public double Costs;
-    }
+    public double Costs;
 }

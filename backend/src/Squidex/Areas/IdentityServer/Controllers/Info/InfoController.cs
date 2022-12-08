@@ -8,17 +8,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Shared.Identity;
 
-namespace Squidex.Areas.IdentityServer.Controllers.Info
-{
-    public sealed class InfoController : IdentityServerController
-    {
-        [Route("info")]
-        [HttpGet]
-        public IActionResult Info()
-        {
-            var displayName = User.Claims.DisplayName();
+namespace Squidex.Areas.IdentityServer.Controllers.Info;
 
-            return Ok(new { displayName });
-        }
+public sealed class InfoController : IdentityServerController
+{
+    [Route("info")]
+    [HttpGet]
+    public IActionResult Info()
+    {
+        var displayName = User.Claims.DisplayName();
+
+        return Ok(new { displayName });
     }
 }

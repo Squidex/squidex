@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Contents
+namespace Squidex.Domain.Apps.Events.Contents;
+
+[EventType(nameof(ContentDraftDeleted))]
+public sealed class ContentDraftDeleted : ContentEvent
 {
-    [EventType(nameof(ContentDraftDeleted))]
-    public sealed class ContentDraftDeleted : ContentEvent
-    {
-    }
 }

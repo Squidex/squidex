@@ -5,72 +5,86 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Queries
+using System.Text;
+
+namespace Squidex.Infrastructure.Queries;
+
+public class Query<TValue>
 {
-    public class Query<TValue>
+    public FilterNode<TValue>? Filter { get; set; }
+
+    public string? FullText { get; set; }
+
+    public long Skip { get; set; }
+
+    public long Take { get; set; } = long.MaxValue;
+
+    public long Random { get; set; }
+
+    public long Top
     {
-        public FilterNode<TValue>? Filter { get; set; }
+        set => Take = value;
+    }
 
-        public string? FullText { get; set; }
+    public List<SortNode>? Sort { get; set; } = new List<SortNode>();
 
-        public long Skip { get; set; }
+    public HashSet<string> GetAllFields()
+    {
+        var result = new HashSet<string>();
 
-        public long Take { get; set; } = long.MaxValue;
-
-        public long Top
+        if (Sort != null)
         {
-            set => Take = value;
+            foreach (var sorting in Sort)
+            {
+                result.Add(sorting.Path.ToString());
+            }
         }
 
-        public List<SortNode>? Sort { get; set; } = new List<SortNode>();
+        Filter?.AddFields(result);
 
-        public HashSet<string> GetAllFields()
+        return result;
+    }
+
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+
+        if (Filter != null)
         {
-            var result = new HashSet<string>();
-
-            if (Sort != null)
-            {
-                foreach (var sorting in Sort)
-                {
-                    result.Add(sorting.Path.ToString());
-                }
-            }
-
-            Filter?.AddFields(result);
-
-            return result;
+            sb.AppendIfNotEmpty("; ");
+            sb.Append($"Filter: {Filter}");
         }
 
-        public override string ToString()
+        if (FullText != null)
         {
-            var parts = new List<string>();
-
-            if (Filter != null)
-            {
-                parts.Add($"Filter: {Filter}");
-            }
-
-            if (FullText != null)
-            {
-                parts.Add($"FullText: '{FullText.Replace("'", "\'", StringComparison.Ordinal)}'");
-            }
-
-            if (Skip > 0)
-            {
-                parts.Add($"Skip: {Skip}");
-            }
-
-            if (Take < long.MaxValue)
-            {
-                parts.Add($"Take: {Take}");
-            }
-
-            if (Sort != null && Sort.Count > 0)
-            {
-                parts.Add($"Sort: {string.Join(", ", Sort)}");
-            }
-
-            return string.Join("; ", parts);
+            sb.AppendIfNotEmpty("; ");
+            sb.Append($"FullText: '{FullText.Replace("'", "\'", StringComparison.Ordinal)}'");
         }
+
+        if (Skip > 0)
+        {
+            sb.AppendIfNotEmpty("; ");
+            sb.Append($"Skip: {Skip}");
+        }
+
+        if (Take < long.MaxValue)
+        {
+            sb.AppendIfNotEmpty("; ");
+            sb.Append($"Take: {Take}");
+        }
+
+        if (Random > 0)
+        {
+            sb.AppendIfNotEmpty("; ");
+            sb.Append($"Random: {Random}");
+        }
+
+        if (Sort != null && Sort.Count > 0)
+        {
+            sb.AppendIfNotEmpty("; ");
+            sb.Append($"Sort: {string.Join(", ", Sort)}");
+        }
+
+        return sb.ToString();
     }
 }

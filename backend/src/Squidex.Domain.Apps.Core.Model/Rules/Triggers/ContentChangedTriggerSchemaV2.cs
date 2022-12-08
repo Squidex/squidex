@@ -7,12 +7,11 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Rules.Triggers
-{
-    public sealed record ContentChangedTriggerSchemaV2
-    {
-        public DomainId SchemaId { get; init; }
+namespace Squidex.Domain.Apps.Core.Rules.Triggers;
 
-        public string? Condition { get; init; }
-    }
+public sealed record ContentChangedTriggerSchemaV2
+{
+    public DomainId SchemaId { get; init; }
+
+    public string? Condition { get; init; }
 }

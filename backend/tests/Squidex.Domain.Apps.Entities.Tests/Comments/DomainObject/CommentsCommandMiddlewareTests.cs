@@ -5,159 +5,156 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
-using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
+namespace Squidex.Domain.Apps.Entities.Comments.DomainObject;
+
+public class CommentsCommandMiddlewareTests
 {
-    public class CommentsCommandMiddlewareTests
+    private readonly CancellationTokenSource cts = new CancellationTokenSource();
+    private readonly CancellationToken ct;
+    private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
+    private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
+    private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
+    private readonly RefToken actor = RefToken.User("me");
+    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+    private readonly DomainId commentsId = DomainId.NewGuid();
+    private readonly DomainId commentId = DomainId.NewGuid();
+    private readonly CommentsCommandMiddleware sut;
+
+    public CommentsCommandMiddlewareTests()
     {
-        private readonly CancellationTokenSource cts = new CancellationTokenSource();
-        private readonly CancellationToken ct;
-        private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
-        private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-        private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-        private readonly RefToken actor = RefToken.User("me");
-        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly DomainId commentsId = DomainId.NewGuid();
-        private readonly DomainId commentId = DomainId.NewGuid();
-        private readonly CommentsCommandMiddleware sut;
+        ct = cts.Token;
 
-        public CommentsCommandMiddlewareTests()
+        A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, default))
+            .Returns(Task.FromResult<IUser?>(null));
+
+        sut = new CommentsCommandMiddleware(domainObjectFactory, userResolver);
+    }
+
+    [Fact]
+    public async Task Should_invoke_domain_object_for_comments_command()
+    {
+        var command = CreateCommentsCommand(new CreateComment());
+        var context = CrateCommandContext(command);
+
+        var domainObject = A.Fake<CommentsStream>();
+
+        A.CallTo(() => domainObject.ExecuteAsync(command, ct))
+            .Returns(CommandResult.Empty(commentsId, 0, 0));
+
+        A.CallTo(() => domainObjectFactory.Create<CommentsStream>(commentsId))
+            .Returns(domainObject);
+
+        var isNextCalled = false;
+
+        await sut.HandleAsync(context, (c, ct) =>
         {
-            ct = cts.Token;
+            isNextCalled = true;
 
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, default))
-                .Returns(Task.FromResult<IUser?>(null));
+            return Task.CompletedTask;
+        }, ct);
 
-            sut = new CommentsCommandMiddleware(domainObjectFactory, userResolver);
-        }
+        Assert.True(isNextCalled);
+    }
 
-        [Fact]
-        public async Task Should_invoke_domain_object_for_comments_command()
+    [Fact]
+    public async Task Should_enrich_with_mentioned_user_ids_if_found()
+    {
+        SetupUser("id1", "mail1@squidex.io");
+        SetupUser("id2", "mail2@squidex.io");
+
+        var command = CreateCommentsCommand(new CreateComment
         {
-            var command = CreateCommentsCommand(new CreateComment());
-            var context = CrateCommandContext(command);
+            Text = "Hi @mail1@squidex.io, @mail2@squidex.io and @notfound@squidex.io",
+            IsMention = false
+        });
 
-            var domainObject = A.Fake<CommentsStream>();
+        var context = CrateCommandContext(command);
 
-            A.CallTo(() => domainObject.ExecuteAsync(command, ct))
-                .Returns(CommandResult.Empty(commentsId, 0, 0));
+        await sut.HandleAsync(context, ct);
 
-            A.CallTo(() => domainObjectFactory.Create<CommentsStream>(commentsId))
-                .Returns(domainObject);
+        Assert.Equal(command.Mentions, new[] { "id1", "id2" });
+    }
 
-            var isNextCalled = false;
+    [Fact]
+    public async Task Should_not_invoke_commands_for_mentioned_users()
+    {
+        SetupUser("id1", "mail1@squidex.io");
+        SetupUser("id2", "mail2@squidex.io");
 
-            await sut.HandleAsync(context, (c, ct) =>
-            {
-                isNextCalled = true;
-
-                return Task.CompletedTask;
-            }, ct);
-
-            Assert.True(isNextCalled);
-        }
-
-        [Fact]
-        public async Task Should_enrich_with_mentioned_user_ids_if_found()
+        var command = CreateCommentsCommand(new CreateComment
         {
-            SetupUser("id1", "mail1@squidex.io");
-            SetupUser("id2", "mail2@squidex.io");
+            Text = "Hi @mail1@squidex.io and @mail2@squidex.io",
+            IsMention = false
+        });
 
-            var command = CreateCommentsCommand(new CreateComment
-            {
-                Text = "Hi @mail1@squidex.io, @mail2@squidex.io and @notfound@squidex.io",
-                IsMention = false
-            });
+        var context = CrateCommandContext(command);
 
-            var context = CrateCommandContext(command);
+        await sut.HandleAsync(context, ct);
 
-            await sut.HandleAsync(context, ct);
+        A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
 
-            Assert.Equal(command.Mentions, new[] { "id1", "id2" });
-        }
-
-        [Fact]
-        public async Task Should_not_invoke_commands_for_mentioned_users()
+    [Fact]
+    public async Task Should_not_enrich_with_mentioned_user_ids_if_invalid_mentioned_tags_used()
+    {
+        var command = CreateCommentsCommand(new CreateComment
         {
-            SetupUser("id1", "mail1@squidex.io");
-            SetupUser("id2", "mail2@squidex.io");
+            Text = "Hi invalid@squidex.io",
+            IsMention = false
+        });
 
-            var command = CreateCommentsCommand(new CreateComment
-            {
-                Text = "Hi @mail1@squidex.io and @mail2@squidex.io",
-                IsMention = false
-            });
+        var context = CrateCommandContext(command);
 
-            var context = CrateCommandContext(command);
+        await sut.HandleAsync(context, ct);
 
-            await sut.HandleAsync(context, ct);
+        A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
-                .MustNotHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_not_enrich_with_mentioned_user_ids_if_invalid_mentioned_tags_used()
+    [Fact]
+    public async Task Should_not_enrich_with_mentioned_user_ids_for_notification()
+    {
+        var command = CreateCommentsCommand(new CreateComment
         {
-            var command = CreateCommentsCommand(new CreateComment
-            {
-                Text = "Hi invalid@squidex.io",
-                IsMention = false
-            });
+            Text = "Hi @invalid@squidex.io",
+            IsMention = true
+        });
 
-            var context = CrateCommandContext(command);
+        var context = CrateCommandContext(command);
 
-            await sut.HandleAsync(context, ct);
+        await sut.HandleAsync(context, ct);
 
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, A<CancellationToken>._))
-                .MustNotHaveHappened();
-        }
+        A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
 
-        [Fact]
-        public async Task Should_not_enrich_with_mentioned_user_ids_for_notification()
-        {
-            var command = CreateCommentsCommand(new CreateComment
-            {
-                Text = "Hi @invalid@squidex.io",
-                IsMention = true
-            });
+    private CommandContext CrateCommandContext(ICommand command)
+    {
+        return new CommandContext(command, commandBus);
+    }
 
-            var context = CrateCommandContext(command);
+    private void SetupUser(string id, string email)
+    {
+        var user = UserMocks.User(id, email);
 
-            await sut.HandleAsync(context, ct);
+        A.CallTo(() => userResolver.FindByIdOrEmailAsync(email, default))
+            .Returns(user);
+    }
 
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, A<CancellationToken>._))
-                .MustNotHaveHappened();
-        }
+    private T CreateCommentsCommand<T>(T command) where T : CommentCommand
+    {
+        command.Actor = actor;
+        command.AppId = appId;
+        command.CommentsId = commentsId;
+        command.CommentId = commentId;
 
-        private CommandContext CrateCommandContext(ICommand command)
-        {
-            return new CommandContext(command, commandBus);
-        }
-
-        private void SetupUser(string id, string email)
-        {
-            var user = UserMocks.User(id, email);
-
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(email, default))
-                .Returns(user);
-        }
-
-        private T CreateCommentsCommand<T>(T command) where T : CommentCommand
-        {
-            command.Actor = actor;
-            command.AppId = appId;
-            command.CommentsId = commentsId;
-            command.CommentId = commentId;
-
-            return command;
-        }
+        return command;
     }
 }

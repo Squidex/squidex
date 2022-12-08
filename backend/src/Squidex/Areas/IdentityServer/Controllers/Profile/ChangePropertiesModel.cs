@@ -7,17 +7,16 @@
 
 using Squidex.Domain.Users;
 
-namespace Squidex.Areas.IdentityServer.Controllers.Profile
+namespace Squidex.Areas.IdentityServer.Controllers.Profile;
+
+public class ChangePropertiesModel
 {
-    public class ChangePropertiesModel
+    public List<UserProperty> Properties { get; set; }
+
+    public UserValues ToValues()
     {
-        public List<UserProperty> Properties { get; set; }
+        var properties = Properties?.Select(x => x.ToTuple()).ToList() ?? new List<(string Name, string Value)>();
 
-        public UserValues ToValues()
-        {
-            var properties = Properties?.Select(x => x.ToTuple()).ToList() ?? new List<(string Name, string Value)>();
-
-            return new UserValues { Properties = properties };
-        }
+        return new UserValues { Properties = properties };
     }
 }

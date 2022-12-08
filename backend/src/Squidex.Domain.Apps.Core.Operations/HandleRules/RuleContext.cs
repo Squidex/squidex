@@ -8,18 +8,17 @@
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Domain.Apps.Core.HandleRules;
+
+public readonly struct RuleContext
 {
-    public struct RuleContext
-    {
-        public NamedId<DomainId> AppId { get; init; }
+    public NamedId<DomainId> AppId { get; init; }
 
-        public DomainId RuleId { get; init; }
+    public DomainId RuleId { get; init; }
 
-        public Rule Rule { get; init; }
+    public Rule Rule { get; init; }
 
-        public bool IncludeSkipped { get; init; }
+    public bool IncludeSkipped { get; init; }
 
-        public bool IncludeStale { get; init; }
-    }
+    public bool IncludeStale { get; init; }
 }

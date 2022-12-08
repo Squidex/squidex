@@ -13,73 +13,72 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Entities.Teams.DomainObject
+namespace Squidex.Domain.Apps.Entities.Teams.DomainObject;
+
+public partial class TeamDomainObject
 {
-    public partial class TeamDomainObject
+    public sealed class State : DomainObjectState<State>, ITeamEntity
     {
-        public sealed class State : DomainObjectState<State>, ITeamEntity
+        public string Name { get; set; }
+
+        public Contributors Contributors { get; set; } = Contributors.Empty;
+
+        public AssignedPlan? Plan { get; set; }
+
+        [JsonIgnore]
+        public DomainId UniqueId
         {
-            public string Name { get; set; }
+            get => Id;
+        }
 
-            public Contributors Contributors { get; set; } = Contributors.Empty;
-
-            public AssignedPlan? Plan { get; set; }
-
-            [JsonIgnore]
-            public DomainId UniqueId
+        public override bool ApplyEvent(IEvent @event)
+        {
+            switch (@event)
             {
-                get => Id;
+                case TeamCreated e:
+                    {
+                        Id = e.TeamId;
+
+                        SimpleMapper.Map(e, this);
+                        return true;
+                    }
+
+                case TeamUpdated e when Is.Change(Name, e.Name):
+                    {
+                        SimpleMapper.Map(e, this);
+                        return true;
+                    }
+
+                case TeamPlanChanged e when Is.Change(Plan?.PlanId, e.PlanId):
+                    return UpdatePlan(e.ToPlan());
+
+                case TeamPlanReset e when Plan != null:
+                    return UpdatePlan(null);
+
+                case TeamContributorAssigned e:
+                    return UpdateContributors(e, (e, c) => c.Assign(e.ContributorId, e.Role));
+
+                case TeamContributorRemoved e:
+                    return UpdateContributors(e, (e, c) => c.Remove(e.ContributorId));
             }
 
-            public override bool ApplyEvent(IEvent @event)
-            {
-                switch (@event)
-                {
-                    case TeamCreated e:
-                        {
-                            Id = e.TeamId;
+            return false;
+        }
 
-                            SimpleMapper.Map(e, this);
-                            return true;
-                        }
+        private bool UpdateContributors<T>(T @event, Func<T, Contributors, Contributors> update)
+        {
+            var previous = Contributors;
 
-                    case TeamUpdated e when Is.Change(Name, e.Name):
-                        {
-                            SimpleMapper.Map(e, this);
-                            return true;
-                        }
+            Contributors = update(@event, previous);
 
-                    case TeamPlanChanged e when Is.Change(Plan?.PlanId, e.PlanId):
-                        return UpdatePlan(e.ToPlan());
+            return !ReferenceEquals(previous, Contributors);
+        }
 
-                    case TeamPlanReset e when Plan != null:
-                        return UpdatePlan(null);
+        private bool UpdatePlan(AssignedPlan? plan)
+        {
+            Plan = plan;
 
-                    case TeamContributorAssigned e:
-                        return UpdateContributors(e, (e, c) => c.Assign(e.ContributorId, e.Role));
-
-                    case TeamContributorRemoved e:
-                        return UpdateContributors(e, (e, c) => c.Remove(e.ContributorId));
-                }
-
-                return false;
-            }
-
-            private bool UpdateContributors<T>(T @event, Func<T, Contributors, Contributors> update)
-            {
-                var previous = Contributors;
-
-                Contributors = update(@event, previous);
-
-                return !ReferenceEquals(previous, Contributors);
-            }
-
-            private bool UpdatePlan(AssignedPlan? plan)
-            {
-                Plan = plan;
-
-                return true;
-            }
+            return true;
         }
     }
 }

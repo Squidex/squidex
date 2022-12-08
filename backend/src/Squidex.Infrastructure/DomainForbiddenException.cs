@@ -7,21 +7,20 @@
 
 using System.Runtime.Serialization;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+[Serializable]
+public class DomainForbiddenException : DomainException
 {
-    [Serializable]
-    public class DomainForbiddenException : DomainException
+    private const string ValidationError = "FORBIDDEN";
+
+    public DomainForbiddenException(string message, Exception? inner = null)
+        : base(message, ValidationError, inner)
     {
-        private const string ValidationError = "FORBIDDEN";
+    }
 
-        public DomainForbiddenException(string message, Exception? inner = null)
-            : base(message, ValidationError, inner)
-        {
-        }
-
-        protected DomainForbiddenException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
+    protected DomainForbiddenException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
+    {
     }
 }

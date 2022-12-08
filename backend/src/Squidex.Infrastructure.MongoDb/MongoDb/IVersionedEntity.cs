@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.MongoDb
-{
-    public interface IVersionedEntity<T>
-    {
-        T DocumentId { get; set; }
+namespace Squidex.Infrastructure.MongoDb;
 
-        long Version { get; set; }
-    }
+public interface IVersionedEntity<T>
+{
+    T DocumentId { get; set; }
+
+    long Version { get; set; }
 }

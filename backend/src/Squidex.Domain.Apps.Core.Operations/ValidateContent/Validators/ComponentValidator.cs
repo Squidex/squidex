@@ -8,25 +8,24 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
+namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
+
+public sealed class ComponentValidator : IValidator
 {
-    public sealed class ComponentValidator : IValidator
+    private readonly Func<Schema, IValidator?> validatorFactory;
+
+    public ComponentValidator(Func<Schema, IValidator?> validatorFactory)
     {
-        private readonly Func<Schema, IValidator?> validatorFactory;
+        this.validatorFactory = validatorFactory;
+    }
 
-        public ComponentValidator(Func<Schema, IValidator?> validatorFactory)
+    public void Validate(object? value, ValidationContext context)
+    {
+        if (value is Component component)
         {
-            this.validatorFactory = validatorFactory;
-        }
+            var validator = validatorFactory(component.Schema);
 
-        public void Validate(object? value, ValidationContext context)
-        {
-            if (value is Component component)
-            {
-                var validator = validatorFactory(component.Schema);
-
-                validator?.Validate(component.Data, context);
-            }
+            validator?.Validate(component.Data, context);
         }
     }
 }

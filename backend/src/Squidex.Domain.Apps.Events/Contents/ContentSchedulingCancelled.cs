@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Contents
+namespace Squidex.Domain.Apps.Events.Contents;
+
+[EventType(nameof(ContentSchedulingCancelled))]
+public sealed class ContentSchedulingCancelled : ContentEvent
 {
-    [EventType(nameof(ContentSchedulingCancelled))]
-    public sealed class ContentSchedulingCancelled : ContentEvent
-    {
-    }
 }

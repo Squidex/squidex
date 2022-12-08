@@ -48,6 +48,7 @@ export class DialogModel implements Openable {
 }
 
 export class ModalModel implements Openable {
+    private static openModal?: ModalModel | null = null;
     private readonly isOpen$: BehaviorSubject<boolean>;
 
     public get isOpenChanges(): Observable<boolean> {
@@ -64,11 +65,11 @@ export class ModalModel implements Openable {
 
     public show(): ModalModel {
         if (!this.isOpen$.value) {
-            if (openModal && openModal !== this) {
-                openModal.hide();
+            if (ModalModel.openModal && ModalModel.openModal !== this) {
+                ModalModel.openModal.hide();
             }
 
-            openModal = this;
+            ModalModel.openModal = this;
 
             this.isOpen$.next(true);
         }
@@ -78,8 +79,8 @@ export class ModalModel implements Openable {
 
     public hide(): ModalModel {
         if (this.isOpen$.value) {
-            if (openModal === this) {
-                openModal = null;
+            if (ModalModel.openModal === this) {
+                ModalModel.openModal = null;
             }
 
             this.isOpen$.next(false);
@@ -98,5 +99,3 @@ export class ModalModel implements Openable {
         return this;
     }
 }
-
-let openModal: ModalModel | null = null;

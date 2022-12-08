@@ -8,32 +8,31 @@
 using System.Security.Claims;
 using Squidex.Infrastructure.Security;
 
-namespace Squidex.Domain.Users
+namespace Squidex.Domain.Users;
+
+public sealed class UserValues
 {
-    public sealed class UserValues
-    {
-        public string? DisplayName { get; set; }
+    public string? DisplayName { get; set; }
 
-        public string? PictureUrl { get; set; }
+    public string? PictureUrl { get; set; }
 
-        public string? Password { get; set; }
+    public string? Password { get; set; }
 
-        public string? ClientSecret { get; set; }
+    public string? ClientSecret { get; set; }
 
-        public string Email { get; set; }
+    public string Email { get; set; }
 
-        public bool? Hidden { get; set; }
+    public bool? Hidden { get; set; }
 
-        public bool? Invited { get; set; }
+    public bool? Invited { get; set; }
 
-        public bool? Consent { get; set; }
+    public bool? Consent { get; set; }
 
-        public bool? ConsentForEmails { get; set; }
+    public bool? ConsentForEmails { get; set; }
 
-        public PermissionSet? Permissions { get; set; }
+    public PermissionSet? Permissions { get; set; }
 
-        public List<Claim>? CustomClaims { get; set; }
+    public List<Claim>? CustomClaims { get; set; }
 
-        public List<(string Name, string Value)>? Properties { get; set; }
-    }
+    public List<(string Name, string Value)>? Properties { get; set; }
 }

@@ -8,13 +8,12 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Apps
-{
-    [EventType(nameof(AppWorkflowAdded))]
-    public sealed class AppWorkflowAdded : AppEvent
-    {
-        public DomainId WorkflowId { get; set; }
+namespace Squidex.Domain.Apps.Events.Apps;
 
-        public string Name { get; set; }
-    }
+[EventType(nameof(AppWorkflowAdded))]
+public sealed class AppWorkflowAdded : AppEvent
+{
+    public DomainId WorkflowId { get; set; }
+
+    public string Name { get; set; }
 }

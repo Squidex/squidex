@@ -7,13 +7,12 @@
 
 using MongoDB.Driver;
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Infrastructure.States;
+
+public sealed class MongoSnapshotStore<T> : MongoSnapshotStoreBase<T, MongoState<T>>
 {
-    public sealed class MongoSnapshotStore<T> : MongoSnapshotStoreBase<T, MongoState<T>>
+    public MongoSnapshotStore(IMongoDatabase database)
+        : base(database)
     {
-        public MongoSnapshotStore(IMongoDatabase database)
-            : base(database)
-        {
-        }
     }
 }

@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, forwardRef, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { merge, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { Keys, ModalModel, RelativePosition, StatefulControlComponent, Types } from '@app/framework/internal';
@@ -100,7 +100,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
 
     public suggestionsModal = new ModalModel();
 
-    public queryInput = new FormControl();
+    public queryInput = new UntypedFormControl();
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {

@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents.Commands
+namespace Squidex.Domain.Apps.Entities.Contents.Commands;
+
+public sealed class DeleteContentDraft : ContentCommand
 {
-    public sealed class DeleteContentDraft : ContentCommand
-    {
-    }
 }

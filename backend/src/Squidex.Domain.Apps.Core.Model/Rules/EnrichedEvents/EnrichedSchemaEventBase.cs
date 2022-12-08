@@ -7,11 +7,10 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
+namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+
+public abstract class EnrichedSchemaEventBase : EnrichedUserEventBase
 {
-    public abstract class EnrichedSchemaEventBase : EnrichedUserEventBase
-    {
-        [FieldDescription(nameof(FieldDescriptions.EntityVersion))]
-        public NamedId<DomainId> SchemaId { get; set; }
-    }
+    [FieldDescription(nameof(FieldDescriptions.EntityVersion))]
+    public NamedId<DomainId> SchemaId { get; set; }
 }

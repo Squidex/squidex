@@ -6,7 +6,7 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, TextMeasurer, Types } from '@app/framework/internal';
 
@@ -126,7 +126,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public suggestionsSorted: ReadonlyArray<TagValue> = [];
     public suggestionsModal = new ModalModel();
 
-    public addInput = new FormControl();
+    public addInput = new UntypedFormControl();
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {

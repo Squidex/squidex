@@ -9,70 +9,69 @@ using System.Security.Claims;
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.Infrastructure.Json
+namespace Squidex.Infrastructure.Json;
+
+public sealed class ClaimsPrincipalSurrogate : List<ClaimsIdentitySurrogate>, ISurrogate<ClaimsPrincipal>
 {
-    public sealed class ClaimsPrincipalSurrogate : List<ClaimsIdentitySurrogate>, ISurrogate<ClaimsPrincipal>
+    public void FromSource(ClaimsPrincipal source)
     {
-        public void FromSource(ClaimsPrincipal source)
+        foreach (var identity in source.Identities)
         {
-            foreach (var identity in source.Identities)
-            {
-                var surrogate = new ClaimsIdentitySurrogate();
+            var surrogate = new ClaimsIdentitySurrogate();
 
-                surrogate.FromSource(identity);
+            surrogate.FromSource(identity);
 
-                Add(surrogate);
-            }
-        }
-
-        public ClaimsPrincipal ToSource()
-        {
-            return new ClaimsPrincipal(this.Select(x => x.ToSource()));
+            Add(surrogate);
         }
     }
 
-    public sealed class ClaimsIdentitySurrogate : ISurrogate<ClaimsIdentity>
+    public ClaimsPrincipal ToSource()
     {
-        public string? AuthenticationType { get; set; }
+        return new ClaimsPrincipal(this.Select(x => x.ToSource()));
+    }
+}
 
-        public ClaimSurrogate[] Claims { get; set; }
+public sealed class ClaimsIdentitySurrogate : ISurrogate<ClaimsIdentity>
+{
+    public string? AuthenticationType { get; set; }
 
-        public void FromSource(ClaimsIdentity source)
+    public ClaimSurrogate[] Claims { get; set; }
+
+    public void FromSource(ClaimsIdentity source)
+    {
+        AuthenticationType = source.AuthenticationType;
+
+        Claims = source.Claims.Select(claim =>
         {
-            AuthenticationType = source.AuthenticationType;
+            var surrogate = new ClaimSurrogate();
 
-            Claims = source.Claims.Select(claim =>
-            {
-                var surrogate = new ClaimSurrogate();
+            surrogate.FromSource(claim);
 
-                surrogate.FromSource(claim);
-
-                return surrogate;
-            }).ToArray();
-        }
-
-        public ClaimsIdentity ToSource()
-        {
-            return new ClaimsIdentity(Claims.Select(x => x.ToSource()), AuthenticationType);
-        }
+            return surrogate;
+        }).ToArray();
     }
 
-    public sealed class ClaimSurrogate : ISurrogate<Claim>
+    public ClaimsIdentity ToSource()
     {
-        public string Type { get; set; }
+        return new ClaimsIdentity(Claims.Select(x => x.ToSource()), AuthenticationType);
+    }
+}
 
-        public string Value { get; set; }
+public sealed class ClaimSurrogate : ISurrogate<Claim>
+{
+    public string Type { get; set; }
 
-        public void FromSource(Claim source)
-        {
-            Type = source.Type;
+    public string Value { get; set; }
 
-            Value = source.Value;
-        }
+    public void FromSource(Claim source)
+    {
+        Type = source.Type;
 
-        public Claim ToSource()
-        {
-            return new Claim(Type, Value);
-        }
+        Value = source.Value;
+    }
+
+    public Claim ToSource()
+    {
+        return new Claim(Type, Value);
     }
 }

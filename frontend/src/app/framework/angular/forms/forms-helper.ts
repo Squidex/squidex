@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AbstractControl, FormArray, FormGroup, ValidatorFn } from '@angular/forms';
+import { AbstractControl, UntypedFormArray, UntypedFormGroup, ValidatorFn } from '@angular/forms';
 import { combineLatest, Observable } from 'rxjs';
 import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { Types } from './../../utils/types';
@@ -15,9 +15,9 @@ export interface FocusComponent {
 }
 
 export function formControls(form: AbstractControl): ReadonlyArray<AbstractControl> {
-    if (Types.is(form, FormGroup)) {
+    if (Types.is(form, UntypedFormGroup)) {
         return Object.values(form.controls);
-    } else if (Types.is(form, FormArray)) {
+    } else if (Types.is(form, UntypedFormArray)) {
         return form.controls;
     } else {
         return [];
@@ -51,7 +51,7 @@ export function getControlPath(control: AbstractControl | undefined | null, apiC
 
     let name = '';
 
-    if (control.parent instanceof FormGroup) {
+    if (control.parent instanceof UntypedFormGroup) {
         for (const key in control.parent.controls) {
             if (control.parent.controls[key] === control) {
                 name = key;
@@ -168,13 +168,13 @@ export function hasNonCustomError(form: AbstractControl) {
         }
     }
 
-    if (Types.is(form, FormGroup)) {
+    if (Types.is(form, UntypedFormGroup)) {
         for (const key in form.controls) {
             if (hasNonCustomError(form.controls[key])) {
                 return true;
             }
         }
-    } else if (Types.is(form, FormArray)) {
+    } else if (Types.is(form, UntypedFormArray)) {
         for (const control of form.controls) {
             if (hasNonCustomError(control)) {
                 return true;

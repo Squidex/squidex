@@ -7,72 +7,70 @@
 
 using NodaTime;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
-namespace Squidex.Infrastructure.MongoDb
+namespace Squidex.Infrastructure.MongoDb;
+
+public class InstantSerializerTests
 {
-    public class InstantSerializerTests
+    public InstantSerializerTests()
     {
-        public InstantSerializerTests()
+        TestUtils.SetupBson();
+    }
+
+    [Fact]
+    public void Should_serialize_and_deserialize()
+    {
+        var source = new Entities.DefaultEntity<Instant>
         {
-            TestUtils.SetupBson();
-        }
+            Value = GetTime()
+        };
 
-        [Fact]
-        public void Should_serialize_and_deserialize()
+        var deserialized = source.SerializeAndDeserializeBson();
+
+        Assert.Equal(source.Value, deserialized.Value);
+    }
+
+    [Fact]
+    public void Should_serialize_and_deserialize_as_string()
+    {
+        var source = new Entities.StringEntity<Instant>
         {
-            var source = new Entities.DefaultEntity<Instant>
-            {
-                Value = GetTime()
-            };
+            Value = GetTime()
+        };
 
-            var deserialized = source.SerializeAndDeserializeBson();
+        var deserialized = source.SerializeAndDeserializeBson();
 
-            Assert.Equal(source.Value, deserialized.Value);
-        }
+        Assert.Equal(source.Value, deserialized.Value);
+    }
 
-        [Fact]
-        public void Should_serialize_and_deserialize_as_string()
+    [Fact]
+    public void Should_serialize_and_deserialize_as_int64()
+    {
+        var source = new Entities.Int64Entity<Instant>
         {
-            var source = new Entities.StringEntity<Instant>
-            {
-                Value = GetTime()
-            };
+            Value = GetTime()
+        };
 
-            var deserialized = source.SerializeAndDeserializeBson();
+        var deserialized = source.SerializeAndDeserializeBson();
 
-            Assert.Equal(source.Value, deserialized.Value);
-        }
+        Assert.Equal(source.Value, deserialized.Value);
+    }
 
-        [Fact]
-        public void Should_serialize_and_deserialize_as_int64()
+    [Fact]
+    public void Should_serialize_and_deserialize_as_datetime()
+    {
+        var source = new Entities.DateTimeEntity<Instant>
         {
-            var source = new Entities.Int64Entity<Instant>
-            {
-                Value = GetTime()
-            };
+            Value = GetTime()
+        };
 
-            var deserialized = source.SerializeAndDeserializeBson();
+        var deserialized = source.SerializeAndDeserializeBson();
 
-            Assert.Equal(source.Value, deserialized.Value);
-        }
+        Assert.Equal(source.Value, deserialized.Value);
+    }
 
-        [Fact]
-        public void Should_serialize_and_deserialize_as_datetime()
-        {
-            var source = new Entities.DateTimeEntity<Instant>
-            {
-                Value = GetTime()
-            };
-
-            var deserialized = source.SerializeAndDeserializeBson();
-
-            Assert.Equal(source.Value, deserialized.Value);
-        }
-
-        private static Instant GetTime()
-        {
-            return SystemClock.Instance.GetCurrentInstant().WithoutNs();
-        }
+    private static Instant GetTime()
+    {
+        return SystemClock.Instance.GetCurrentInstant().WithoutNs();
     }
 }

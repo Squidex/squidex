@@ -3,19 +3,19 @@
 @{
     ViewBag.Title = T.Get("setup.title");
 
-    void RenderValidation(string field)
-    {
-        @if (ViewContext.ViewData.ModelState[field]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
-        {
-            <div class="errors-container">
+void RenderValidation(string field)
+{
+    @if (ViewContext.ViewData.ModelState[field]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+{
+    <div class="errors-container">
                 <span class="errors">@Html.ValidationMessage(field)</span>
             </div>
-        }
-    }
+}
+}
 
-    void RenderRuleAsSuccess(string message)
-    {
-        <div class="row mt-4">
+void RenderRuleAsSuccess(string message)
+{
+    <div class="row mt-4">
             <div class="col-auto">
                 <div class="status-icon status-icon-success mt-2">
                     <i class="icon-checkmark"></i>
@@ -28,11 +28,11 @@
                 </div>
             </div>
         </div>
-    }
+}
 
-    void RenderRuleAsCritical(string message)
-    {
-        <div class="row mt-4">
+void RenderRuleAsCritical(string message)
+{
+    <div class="row mt-4">
             <div class="col-auto">
                 <div class="status-icon status-icon-failed mt-2">
                     <i class="icon-exclamation"></i>
@@ -45,11 +45,11 @@
                 </div>
             </div>
         </div>
-    }
+}
 
-    void RenderRuleAsWarning(string message)
-    {
-        <div class="row mt-4">
+void RenderRuleAsWarning(string message)
+{
+    <div class="row mt-4">
             <div class="col-auto">
                 <div class="status-icon status-icon-warning mt-2">
                     <i class="icon-exclamation"></i>
@@ -62,7 +62,7 @@
                 </div>
             </div>
         </div>
-    }
+}
 }
 
 <h1>@T.Get("setup.headline")</h1>
@@ -77,50 +77,50 @@
     <h2>@T.Get("setup.rules.headline")</h2>
 
     @if (Model!.IsValidHttps)
-    {
-        RenderRuleAsSuccess(T.Get("setup.ruleHttps.success"));
-    }
-    else
-    {
-        RenderRuleAsCritical(T.Get("setup.ruleHttps.failure"));
-    }
+{
+RenderRuleAsSuccess(T.Get("setup.ruleHttps.success"));
+}
+else
+{
+RenderRuleAsCritical(T.Get("setup.ruleHttps.failure"));
+}
 
     @if (Model!.BaseUrlConfigured == Model!.BaseUrlCurrent)
-    {
-        RenderRuleAsSuccess(T.Get("setup.ruleUrl.success"));
-    }
-    else
-    {
-        RenderRuleAsCritical(T.Get("setup.ruleUrl.failure", new { actual = Model!.BaseUrlCurrent, configured = Model!.BaseUrlConfigured }));
-    }
+{
+RenderRuleAsSuccess(T.Get("setup.ruleUrl.success"));
+}
+else
+{
+RenderRuleAsCritical(T.Get("setup.ruleUrl.failure", new { actual = Model!.BaseUrlCurrent, configured = Model!.BaseUrlConfigured }));
+}
 
     @if (Model!.EverybodyCanCreateApps)
-    {
-        RenderRuleAsWarning(T.Get("setup.ruleAppCreation.warningAdmins"));
-    }
-    else
-    {
-        RenderRuleAsWarning(T.Get("setup.ruleAppCreation.warningAll"));
-    }
+{
+RenderRuleAsWarning(T.Get("setup.ruleAppCreation.warningAdmins"));
+}
+else
+{
+RenderRuleAsWarning(T.Get("setup.ruleAppCreation.warningAll"));
+}
 
     @if (Model!.EverybodyCanCreateTeams)
-    {
-        RenderRuleAsWarning(T.Get("setup.ruleTeamCreation.warningAdmins"));
-    }
-    else
-    {
-        RenderRuleAsWarning(T.Get("setup.ruleTeamCreation.warningAll"));
-    }
+{
+RenderRuleAsWarning(T.Get("setup.ruleTeamCreation.warningAdmins"));
+}
+else
+{
+RenderRuleAsWarning(T.Get("setup.ruleTeamCreation.warningAll"));
+}
 
     @if (Model!.IsAssetStoreFtp)
-    {
-        RenderRuleAsWarning(T.Get("setup.ruleFtp.warning"));
-    }
+{
+RenderRuleAsWarning(T.Get("setup.ruleFtp.warning"));
+}
 
     @if (Model!.IsAssetStoreFile)
-    {
-        RenderRuleAsWarning(T.Get("setup.ruleFolder.warning"));
-    }
+{
+RenderRuleAsWarning(T.Get("setup.ruleFolder.warning"));
+}
 </div>
 
 <hr />
@@ -129,8 +129,8 @@
     <h2 class="mb-3">@T.Get("setup.createUser.headline")</h2>
 
     @if (Model!.HasExternalLogin)
-    {
-        <div>
+{
+    <div>
             <small class="form-text text-muted mt-2 mb-2">@T.Get("setup.createUser.loginHint")</small>
 
             <div class="mt-3">
@@ -139,27 +139,27 @@
                 </a>
             </div>
         </div>
-    }
+}
 
     @if (Model!.HasExternalLogin && Model!.HasPasswordAuth)
-    {
-        <div class="profile-separator">
+{
+    <div class="profile-separator">
             <div class="profile-separator-text">@T.Get("setup.createUser.separator")</div>
         </div>
-    }
+}
 
     @if (Model!.HasPasswordAuth)
-    {
-        <h3>@T.Get("setup.createUser.headlineCreate")</h3>
+{
+    <h3>@T.Get("setup.createUser.headlineCreate")</h3>
 
-        @if (!string.IsNullOrWhiteSpace(Model!.ErrorMessage))
-        {
-            <div class="form-alert form-alert-error">
+    @if (!string.IsNullOrWhiteSpace(Model!.ErrorMessage))
+{
+    <div class="form-alert form-alert-error">
                 @Model!.ErrorMessage
             </div>
-        }
+}
 
-        <form class="profile-form" asp-controller="Setup" asp-action="Setup" method="post">
+    <form class="profile-form" asp-controller="Setup" asp-action="Setup" method="post">
             <div class="form-group">
                 <label for="email">@T.Get("common.email")</label>
 
@@ -188,12 +188,12 @@
                 <button type="submit" class="btn btn-success">@T.Get("setup.createUser.button")</button>
             </div>
         </form>
-    }
+}
 
     @if (!Model!.HasExternalLogin && !Model!.HasPasswordAuth)
-    {
-        <div>
+{
+    <div>
             @T.Get("setup.createUser.failure")
         </div>
-    }
+}
 </div>

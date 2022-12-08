@@ -8,38 +8,37 @@
 using System.ComponentModel;
 using System.Globalization;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+public sealed class DomainIdTypeConverter : TypeConverter
 {
-    public sealed class DomainIdTypeConverter : TypeConverter
+    public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
     {
-        public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
+        return sourceType == typeof(string) || sourceType == typeof(Guid);
+    }
+
+    public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType)
+    {
+        return destinationType == typeof(string);
+    }
+
+    public override object ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
+    {
+        if (value is string text)
         {
-            return sourceType == typeof(string) || sourceType == typeof(Guid);
+            return DomainId.Create(text);
         }
 
-        public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType)
+        if (value is Guid guid)
         {
-            return destinationType == typeof(string);
+            return DomainId.Create(guid);
         }
 
-        public override object ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
-        {
-            if (value is string text)
-            {
-                return DomainId.Create(text);
-            }
+        return DomainId.Empty;
+    }
 
-            if (value is Guid guid)
-            {
-                return DomainId.Create(guid);
-            }
-
-            return DomainId.Empty;
-        }
-
-        public override object ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type? destinationType)
-        {
-            return value?.ToString()!;
-        }
+    public override object ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type? destinationType)
+    {
+        return value?.ToString()!;
     }
 }

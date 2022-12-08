@@ -7,16 +7,15 @@
 
 using Squidex.Domain.Apps.Core.Rules;
 
-namespace Squidex.Domain.Apps.Entities.Rules.Commands
+namespace Squidex.Domain.Apps.Entities.Rules.Commands;
+
+public abstract class RuleEditCommand : RuleCommand
 {
-    public abstract class RuleEditCommand : RuleCommand
-    {
-        public string? Name { get; set; }
+    public string? Name { get; set; }
 
-        public RuleTrigger? Trigger { get; set; }
+    public RuleTrigger? Trigger { get; set; }
 
-        public RuleAction? Action { get; set; }
+    public RuleAction? Action { get; set; }
 
-        public bool? IsEnabled { get; set; }
-    }
+    public bool? IsEnabled { get; set; }
 }

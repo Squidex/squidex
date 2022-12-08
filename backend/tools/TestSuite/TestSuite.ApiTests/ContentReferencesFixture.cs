@@ -7,13 +7,12 @@
 
 using TestSuite.Fixtures;
 
-namespace TestSuite.ApiTests
+namespace TestSuite.ApiTests;
+
+public sealed class ContentReferencesFixture : TestSchemaWithReferencesFixtureBase
 {
-    public sealed class ContentReferencesFixture : TestSchemaWithReferencesFixtureBase
+    public ContentReferencesFixture()
+        : base("my-references")
     {
-        public ContentReferencesFixture()
-            : base("my-references")
-        {
-        }
     }
 }

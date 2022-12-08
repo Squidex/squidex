@@ -7,11 +7,10 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Teams
+namespace Squidex.Domain.Apps.Events.Teams;
+
+[EventType(nameof(TeamUpdated))]
+public sealed class TeamUpdated : TeamEvent
 {
-    [EventType(nameof(TeamUpdated))]
-    public sealed class TeamUpdated : TeamEvent
-    {
-        public string Name { get; set; }
-    }
+    public string Name { get; set; }
 }

@@ -65,6 +65,12 @@ export class SchemaCategoryComponent implements OnChanges {
         }
     }
 
+    public changeName(name: string) {
+        if (name !== this.schemaCategory.displayName) {
+            this.schemasState.renameCategory(this.schemaCategory.displayName, name);
+        }
+    }
+
     public changeCategory(drag: CdkDragDrop<any>) {
         if (drag.previousContainer !== drag.container) {
             this.schemasState.changeCategory(drag.item.data, this.schemaCategory.name);

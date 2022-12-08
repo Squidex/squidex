@@ -5,20 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Queries
+namespace Squidex.Infrastructure.Queries;
+
+public enum FilterSchemaType
 {
-    public enum FilterSchemaType
-    {
-        Any,
-        Boolean,
-        Date,
-        DateTime,
-        GeoObject,
-        Guid,
-        Number,
-        Object,
-        ObjectArray,
-        String,
-        StringArray
-    }
+    Any,
+    Boolean,
+    Date,
+    DateTime,
+    GeoObject,
+    Guid,
+    Number,
+    Object,
+    ObjectArray,
+    String,
+    StringArray
 }

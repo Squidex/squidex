@@ -9,25 +9,24 @@ using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure.Commands;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Docs
+namespace Squidex.Areas.Api.Controllers.Docs;
+
+public sealed class DocsController : ApiController
 {
-    public sealed class DocsController : ApiController
+    public DocsController(ICommandBus commandBus)
+        : base(commandBus)
     {
-        public DocsController(ICommandBus commandBus)
-            : base(commandBus)
-        {
-        }
+    }
 
-        [HttpGet]
-        [Route("docs/")]
-        public IActionResult Docs()
+    [HttpGet]
+    [Route("docs/")]
+    public IActionResult Docs()
+    {
+        var vm = new DocsVM
         {
-            var vm = new DocsVM
-            {
-                Specification = "~/api/swagger/v1/swagger.json"
-            };
+            Specification = "~/api/swagger/v1/swagger.json"
+        };
 
-            return View(nameof(Docs), vm);
-        }
+        return View(nameof(Docs), vm);
     }
 }

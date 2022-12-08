@@ -7,107 +7,105 @@
 
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
-using Xunit;
 
-namespace Squidex.Infrastructure.MongoDb
+namespace Squidex.Infrastructure.MongoDb;
+
+public class TypeConverterStringSerializerTests
 {
-    public class TypeConverterStringSerializerTests
+    private sealed record ValueHolder<T>
     {
-        private sealed record ValueHolder<T>
+        public T Value { get; set; }
+    }
+
+    public TypeConverterStringSerializerTests()
+    {
+        BsonStringSerializer<TimeSpan>.Register();
+        BsonStringSerializer<RefToken>.Register();
+    }
+
+    [Fact]
+    public void Should_serialize_struct()
+    {
+        var source = new ValueHolder<TimeSpan>
         {
-            public T Value { get; set; }
+            Value = TimeSpan.Zero
+        };
+
+        var deserialized = SerializeAndDeserializeBson(source);
+
+        Assert.Equal(source, deserialized);
+    }
+
+    [Fact]
+    public void Should_serialize_nullable_struct()
+    {
+        var source = new ValueHolder<TimeSpan?>
+        {
+            Value = TimeSpan.Zero
+        };
+
+        var deserialized = SerializeAndDeserializeBson(source);
+
+        Assert.Equal(source, deserialized);
+    }
+
+    [Fact]
+    public void Should_serialize_nullable_null_struct()
+    {
+        var source = new ValueHolder<TimeSpan?>
+        {
+            Value = null
+        };
+
+        var deserialized = SerializeAndDeserializeBson(source);
+
+        Assert.Equal(source, deserialized);
+    }
+
+    [Fact]
+    public void Should_serialize_class()
+    {
+        var source = new ValueHolder<RefToken>
+        {
+            Value = RefToken.Client("client")
+        };
+
+        var deserialized = SerializeAndDeserializeBson(source);
+
+        Assert.Equal(source, deserialized);
+    }
+
+    [Fact]
+    public void Should_serialize_null_class()
+    {
+        var source = new ValueHolder<RefToken?>
+        {
+            Value = null
+        };
+
+        var deserialized = SerializeAndDeserializeBson(source);
+
+        Assert.Equal(source, deserialized);
+    }
+
+    private static T SerializeAndDeserializeBson<T>(T value)
+    {
+        var stream = new MemoryStream();
+
+        using (var writer = new BsonBinaryWriter(stream))
+        {
+            BsonSerializer.Serialize(writer, value);
+
+            writer.Flush();
         }
 
-        public TypeConverterStringSerializerTests()
+        stream.Position = 0;
+
+        using (var reader = new BsonBinaryReader(stream))
         {
-            BsonStringSerializer<TimeSpan>.Register();
-            BsonStringSerializer<RefToken>.Register();
-        }
+            var actual = BsonSerializer.Deserialize<T>(reader);
 
-        [Fact]
-        public void Should_serialize_struct()
-        {
-            var source = new ValueHolder<TimeSpan>
-            {
-                Value = TimeSpan.Zero
-            };
-
-            var deserialized = SerializeAndDeserializeBson(source);
-
-            Assert.Equal(source, deserialized);
-        }
-
-        [Fact]
-        public void Should_serialize_nullable_struct()
-        {
-            var source = new ValueHolder<TimeSpan?>
-            {
-                Value = TimeSpan.Zero
-            };
-
-            var deserialized = SerializeAndDeserializeBson(source);
-
-            Assert.Equal(source, deserialized);
-        }
-
-        [Fact]
-        public void Should_serialize_nullable_null_struct()
-        {
-            var source = new ValueHolder<TimeSpan?>
-            {
-                Value = null
-            };
-
-            var deserialized = SerializeAndDeserializeBson(source);
-
-            Assert.Equal(source, deserialized);
-        }
-
-        [Fact]
-        public void Should_serialize_class()
-        {
-            var source = new ValueHolder<RefToken>
-            {
-                Value = RefToken.Client("client")
-            };
-
-            var deserialized = SerializeAndDeserializeBson(source);
-
-            Assert.Equal(source, deserialized);
-        }
-
-        [Fact]
-        public void Should_serialize_null_class()
-        {
-            var source = new ValueHolder<RefToken?>
-            {
-                Value = null
-            };
-
-            var deserialized = SerializeAndDeserializeBson(source);
-
-            Assert.Equal(source, deserialized);
-        }
-
-        private static T SerializeAndDeserializeBson<T>(T value)
-        {
-            var stream = new MemoryStream();
-
-            using (var writer = new BsonBinaryWriter(stream))
-            {
-                BsonSerializer.Serialize(writer, value);
-
-                writer.Flush();
-            }
-
-            stream.Position = 0;
-
-            using (var reader = new BsonBinaryReader(stream))
-            {
-                var actual = BsonSerializer.Deserialize<T>(reader);
-
-                return actual;
-            }
+            return actual;
         }
     }
 }

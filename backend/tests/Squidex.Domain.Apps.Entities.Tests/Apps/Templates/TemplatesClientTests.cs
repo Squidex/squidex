@@ -5,76 +5,80 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Microsoft.Extensions.Options;
-using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Templates
+namespace Squidex.Domain.Apps.Entities.Apps.Templates;
+
+public class TemplatesClientTests
 {
-    public class TemplatesClientTests
+    private readonly TemplatesClient sut;
+
+    private sealed class CustomHttpClient : HttpClient
     {
-        private readonly TemplatesClient sut;
-
-        public TemplatesClientTests()
+        protected override void Dispose(bool disposing)
         {
-            var httpClientFactory = A.Fake<IHttpClientFactory>();
+        }
+    }
 
-            A.CallTo(() => httpClientFactory.CreateClient(null))
-                .Returns(new HttpClient());
+    public TemplatesClientTests()
+    {
+        var httpClientFactory = A.Fake<IHttpClientFactory>();
 
-            sut = new TemplatesClient(httpClientFactory, Options.Create(new TemplatesOptions
+        A.CallTo(() => httpClientFactory.CreateClient(A<string>._))
+            .Returns(new CustomHttpClient());
+
+        sut = new TemplatesClient(httpClientFactory, Options.Create(new TemplatesOptions
+        {
+            Repositories = new[]
             {
-                Repositories = new[]
+                new TemplateRepository
                 {
-                    new TemplateRepository
-                    {
-                        ContentUrl = "https://raw.githubusercontent.com/Squidex/templates/main"
-                    }
+                    ContentUrl = "https://raw.githubusercontent.com/Squidex/templates/main"
                 }
-            }));
-        }
-
-        [Fact]
-        public async Task Should_get_templates()
-        {
-            var templates = await sut.GetTemplatesAsync();
-
-            Assert.NotEmpty(templates);
-            Assert.Contains(templates, x => x.IsStarter);
-        }
-
-        [Fact]
-        public async Task Should_get_details_from_templates()
-        {
-            var templates = await sut.GetTemplatesAsync();
-
-            foreach (var template in templates)
-            {
-                var details = await sut.GetDetailAsync(template.Name);
-
-                Assert.NotNull(details);
             }
-        }
+        }));
+    }
 
-        [Fact]
-        public async Task Should_get_repository_from_templates()
+    [Fact]
+    public async Task Should_get_templates()
+    {
+        var templates = await sut.GetTemplatesAsync();
+
+        Assert.NotEmpty(templates);
+        Assert.Contains(templates, x => x.IsStarter);
+    }
+
+    [Fact]
+    public async Task Should_get_details_from_templates()
+    {
+        var templates = await sut.GetTemplatesAsync();
+
+        foreach (var template in templates)
         {
-            var templates = await sut.GetTemplatesAsync();
+            var details = await sut.GetDetailAsync(template.Name);
 
-            foreach (var template in templates)
-            {
-                var repository = await sut.GetRepositoryUrl(template.Name);
-
-                Assert.NotNull(repository);
-            }
+            Assert.NotNull(details);
         }
+    }
 
-        [Fact]
-        public async Task Should_return_null_details_if_not_found()
+    [Fact]
+    public async Task Should_get_repository_from_templates()
+    {
+        var templates = await sut.GetTemplatesAsync();
+
+        foreach (var template in templates)
         {
-            var details = await sut.GetDetailAsync("invalid");
+            var repository = await sut.GetRepositoryUrl(template.Name);
 
-            Assert.Null(details);
+            Assert.NotNull(repository);
         }
+    }
+
+    [Fact]
+    public async Task Should_return_null_details_if_not_found()
+    {
+        var details = await sut.GetDetailAsync("invalid");
+
+        Assert.Null(details);
     }
 }

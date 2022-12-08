@@ -14,158 +14,143 @@ using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.UI
+namespace Squidex.Areas.Api.Controllers.UI;
+
+public sealed class UIController : ApiController
 {
-    public sealed class UIController : ApiController
+    private static readonly Permission CreateAppPermission = new Permission(PermissionIds.AdminAppCreate);
+    private static readonly Permission CreateTeamPermission = new Permission(PermissionIds.AdminTeamCreate);
+    private readonly MyUIOptions uiOptions;
+    private readonly IAppUISettings appUISettings;
+
+    public UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions, IAppUISettings appUISettings)
+        : base(commandBus)
     {
-        private static readonly Permission CreateAppPermission = new Permission(PermissionIds.AdminAppCreate);
-        private static readonly Permission CreateTeamPermission = new Permission(PermissionIds.AdminTeamCreate);
-        private readonly MyUIOptions uiOptions;
-        private readonly IAppUISettings appUISettings;
+        this.uiOptions = uiOptions.Value;
 
-        public UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions, IAppUISettings appUISettings)
-            : base(commandBus)
+        this.appUISettings = appUISettings;
+    }
+
+    /// <summary>
+    /// Get ui settings.
+    /// </summary>
+    /// <response code="200">UI settings returned.</response>.
+    [HttpGet]
+    [Route("ui/settings/")]
+    [ProducesResponseType(typeof(UISettingsDto), StatusCodes.Status200OK)]
+    [ApiPermission]
+    public IActionResult GetSettings()
+    {
+        var result = new UISettingsDto
         {
-            this.uiOptions = uiOptions.Value;
+            CanCreateApps = !uiOptions.OnlyAdminsCanCreateApps || Context.UserPermissions.Includes(CreateAppPermission),
+            CanCreateTeams = !uiOptions.OnlyAdminsCanCreateApps || Context.UserPermissions.Includes(CreateTeamPermission),
+        };
 
-            this.appUISettings = appUISettings;
-        }
+        return Ok(result);
+    }
 
-        /// <summary>
-        /// Get ui settings.
-        /// </summary>
-        /// <returns>
-        /// 200 => UI settings returned.
-        /// </returns>
-        [HttpGet]
-        [Route("ui/settings/")]
-        [ProducesResponseType(typeof(UISettingsDto), StatusCodes.Status200OK)]
-        [ApiPermission]
-        public IActionResult GetSettings()
-        {
-            var result = new UISettingsDto
-            {
-                CanCreateApps = !uiOptions.OnlyAdminsCanCreateApps || Context.UserPermissions.Includes(CreateAppPermission),
-                CanCreateTeams = !uiOptions.OnlyAdminsCanCreateApps || Context.UserPermissions.Includes(CreateTeamPermission),
-            };
+    /// <summary>
+    /// Get ui settings.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <response code="200">UI settings returned.</response>.
+    /// <response code="404">App not found.</response>.
+    [HttpGet]
+    [Route("apps/{app}/ui/settings/")]
+    [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status200OK)]
+    [ApiPermission]
+    public async Task<IActionResult> GetSettings(string app)
+    {
+        var result = await appUISettings.GetAsync(AppId, null, HttpContext.RequestAborted);
 
-            return Ok(result);
-        }
+        return Ok(result);
+    }
 
-        /// <summary>
-        /// Get ui settings.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <returns>
-        /// 200 => UI settings returned.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/{app}/ui/settings/")]
-        [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status200OK)]
-        [ApiPermission]
-        public async Task<IActionResult> GetSettings(string app)
-        {
-            var result = await appUISettings.GetAsync(AppId, null, HttpContext.RequestAborted);
+    /// <summary>
+    /// Get my ui settings.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <response code="200">UI settings returned.</response>.
+    /// <response code="404">App not found.</response>.
+    [HttpGet]
+    [Route("apps/{app}/ui/settings/me")]
+    [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status200OK)]
+    [ApiPermission]
+    public async Task<IActionResult> GetUserSettings(string app)
+    {
+        var result = await appUISettings.GetAsync(AppId, UserId, HttpContext.RequestAborted);
 
-            return Ok(result);
-        }
+        return Ok(result);
+    }
 
-        /// <summary>
-        /// Get my ui settings.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <returns>
-        /// 200 => UI settings returned.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/{app}/ui/settings/me")]
-        [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status200OK)]
-        [ApiPermission]
-        public async Task<IActionResult> GetUserSettings(string app)
-        {
-            var result = await appUISettings.GetAsync(AppId, UserId, HttpContext.RequestAborted);
+    /// <summary>
+    /// Set ui settings.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="key">The name of the setting.</param>
+    /// <param name="request">The request with the value to update.</param>
+    /// <response code="200">UI setting set.</response>.
+    /// <response code="404">App not found.</response>.
+    [HttpPut]
+    [Route("apps/{app}/ui/settings/{key}")]
+    [ApiPermission]
+    public async Task<IActionResult> PutSetting(string app, string key, [FromBody] UpdateSettingDto request)
+    {
+        await appUISettings.SetAsync(AppId, null, key, request.Value, HttpContext.RequestAborted);
 
-            return Ok(result);
-        }
+        return NoContent();
+    }
 
-        /// <summary>
-        /// Set ui settings.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="key">The name of the setting.</param>
-        /// <param name="request">The request with the value to update.</param>
-        /// <returns>
-        /// 200 => UI setting set.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpPut]
-        [Route("apps/{app}/ui/settings/{key}")]
-        [ApiPermission]
-        public async Task<IActionResult> PutSetting(string app, string key, [FromBody] UpdateSettingDto request)
-        {
-            await appUISettings.SetAsync(AppId, null, key, request.Value, HttpContext.RequestAborted);
+    /// <summary>
+    /// Set my ui settings.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="key">The name of the setting.</param>
+    /// <param name="request">The request with the value to update.</param>
+    /// <response code="200">UI setting set.</response>.
+    /// <response code="404">App not found.</response>.
+    [HttpPut]
+    [Route("apps/{app}/ui/settings/me/{key}")]
+    [ApiPermission]
+    public async Task<IActionResult> PutUserSetting(string app, string key, [FromBody] UpdateSettingDto request)
+    {
+        await appUISettings.SetAsync(AppId, UserId, key, request.Value, HttpContext.RequestAborted);
 
-            return NoContent();
-        }
+        return NoContent();
+    }
 
-        /// <summary>
-        /// Set my ui settings.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="key">The name of the setting.</param>
-        /// <param name="request">The request with the value to update.</param>
-        /// <returns>
-        /// 200 => UI setting set.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpPut]
-        [Route("apps/{app}/ui/settings/me/{key}")]
-        [ApiPermission]
-        public async Task<IActionResult> PutUserSetting(string app, string key, [FromBody] UpdateSettingDto request)
-        {
-            await appUISettings.SetAsync(AppId, UserId, key, request.Value, HttpContext.RequestAborted);
+    /// <summary>
+    /// Remove ui settings.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="key">The name of the setting.</param>
+    /// <response code="200">UI setting removed.</response>.
+    /// <response code="404">App not found.</response>.
+    [HttpDelete]
+    [Route("apps/{app}/ui/settings/{key}")]
+    [ApiPermission]
+    public async Task<IActionResult> DeleteSetting(string app, string key)
+    {
+        await appUISettings.RemoveAsync(AppId, null, key, HttpContext.RequestAborted);
 
-            return NoContent();
-        }
+        return NoContent();
+    }
 
-        /// <summary>
-        /// Remove ui settings.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="key">The name of the setting.</param>
-        /// <returns>
-        /// 200 => UI setting removed.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpDelete]
-        [Route("apps/{app}/ui/settings/{key}")]
-        [ApiPermission]
-        public async Task<IActionResult> DeleteSetting(string app, string key)
-        {
-            await appUISettings.RemoveAsync(AppId, null, key, HttpContext.RequestAborted);
+    /// <summary>
+    /// Remove my ui settings.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="key">The name of the setting.</param>
+    /// <response code="200">UI setting removed.</response>.
+    /// <response code="404">App not found.</response>.
+    [HttpDelete]
+    [Route("apps/{app}/ui/settings/me/{key}")]
+    [ApiPermission]
+    public async Task<IActionResult> DeleteUserSetting(string app, string key)
+    {
+        await appUISettings.RemoveAsync(AppId, UserId, key, HttpContext.RequestAborted);
 
-            return NoContent();
-        }
-
-        /// <summary>
-        /// Remove my ui settings.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="key">The name of the setting.</param>
-        /// <returns>
-        /// 200 => UI setting removed.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpDelete]
-        [Route("apps/{app}/ui/settings/me/{key}")]
-        [ApiPermission]
-        public async Task<IActionResult> DeleteUserSetting(string app, string key)
-        {
-            await appUISettings.RemoveAsync(AppId, UserId, key, HttpContext.RequestAborted);
-
-            return NoContent();
-        }
+        return NoContent();
     }
 }

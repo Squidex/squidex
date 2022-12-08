@@ -13,49 +13,48 @@ using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
-namespace Squidex.Areas.IdentityServer.Config
+namespace Squidex.Areas.IdentityServer.Config;
+
+public static class ApplicationExtensions
 {
-    public static class ApplicationExtensions
+    public static OpenIddictApplicationDescriptor SetAdmin(this OpenIddictApplicationDescriptor application)
     {
-        public static OpenIddictApplicationDescriptor SetAdmin(this OpenIddictApplicationDescriptor application)
-        {
-            application.Properties[SquidexClaimTypes.Permissions] = CreateParameter(Enumerable.Repeat(PermissionIds.All, 1));
+        application.Properties[SquidexClaimTypes.Permissions] = CreateParameter(Enumerable.Repeat(PermissionIds.All, 1));
 
-            return application;
+        return application;
+    }
+
+    public static OpenIddictApplicationDescriptor CopyClaims(this OpenIddictApplicationDescriptor application, IUser claims)
+    {
+        foreach (var group in claims.Claims.GroupBy(x => x.Type))
+        {
+            application.Properties[group.Key] = CreateParameter(group.Select(x => x.Value));
         }
 
-        public static OpenIddictApplicationDescriptor CopyClaims(this OpenIddictApplicationDescriptor application, IUser claims)
+        return application;
+    }
+
+    private static JsonElement CreateParameter(IEnumerable<string> values)
+    {
+        return (JsonElement)new OpenIddictParameter(values.ToArray());
+    }
+
+    public static IEnumerable<Claim> Claims(this IReadOnlyDictionary<string, JsonElement> properties)
+    {
+        foreach (var (key, value) in properties)
         {
-            foreach (var group in claims.Claims.GroupBy(x => x.Type))
+            var values = (string[]?)new OpenIddictParameter(value);
+
+            if (values != null)
             {
-                application.Properties[group.Key] = CreateParameter(group.Select(x => x.Value));
-            }
-
-            return application;
-        }
-
-        private static JsonElement CreateParameter(IEnumerable<string> values)
-        {
-            return (JsonElement)new OpenIddictParameter(values.ToArray());
-        }
-
-        public static IEnumerable<Claim> Claims(this IReadOnlyDictionary<string, JsonElement> properties)
-        {
-            foreach (var (key, value) in properties)
-            {
-                var values = (string[]?)new OpenIddictParameter(value);
-
-                if (values != null)
+                foreach (var claimValue in values)
                 {
-                    foreach (var claimValue in values)
+                    if (key == SquidexClaimTypes.DisplayName)
                     {
-                        if (key == SquidexClaimTypes.DisplayName)
-                        {
-                            yield return new Claim(OpenIdClaims.Name, claimValue);
-                        }
-
-                        yield return new Claim(key, claimValue);
+                        yield return new Claim(OpenIdClaims.Name, claimValue);
                     }
+
+                    yield return new Claim(key, claimValue);
                 }
             }
         }

@@ -10,58 +10,57 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
+namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards;
+
+public static class GuardHelper
 {
-    public static class GuardHelper
+    public static IArrayField GetArrayFieldOrThrow(Schema schema, long parentId, bool allowLocked)
     {
-        public static IArrayField GetArrayFieldOrThrow(Schema schema, long parentId, bool allowLocked)
+        if (!schema.FieldsById.TryGetValue(parentId, out var rootField) || rootField is not IArrayField arrayField)
         {
-            if (!schema.FieldsById.TryGetValue(parentId, out var rootField) || rootField is not IArrayField arrayField)
-            {
-                throw new DomainObjectNotFoundException(parentId.ToString(CultureInfo.InvariantCulture));
-            }
-
-            if (!allowLocked)
-            {
-                EnsureNotLocked(arrayField);
-            }
-
-            return arrayField;
+            throw new DomainObjectNotFoundException(parentId.ToString(CultureInfo.InvariantCulture));
         }
 
-        public static IField GetFieldOrThrow(Schema schema, long fieldId, long? parentId, bool allowLocked)
+        if (!allowLocked)
         {
-            if (parentId != null)
-            {
-                var arrayField = GetArrayFieldOrThrow(schema, parentId.Value, allowLocked);
+            EnsureNotLocked(arrayField);
+        }
 
-                if (!arrayField.FieldsById.TryGetValue(fieldId, out var nestedField))
-                {
-                    throw new DomainObjectNotFoundException(fieldId.ToString(CultureInfo.InvariantCulture));
-                }
+        return arrayField;
+    }
 
-                return nestedField;
-            }
+    public static IField GetFieldOrThrow(Schema schema, long fieldId, long? parentId, bool allowLocked)
+    {
+        if (parentId != null)
+        {
+            var arrayField = GetArrayFieldOrThrow(schema, parentId.Value, allowLocked);
 
-            if (!schema.FieldsById.TryGetValue(fieldId, out var field))
+            if (!arrayField.FieldsById.TryGetValue(fieldId, out var nestedField))
             {
                 throw new DomainObjectNotFoundException(fieldId.ToString(CultureInfo.InvariantCulture));
             }
 
-            if (!allowLocked)
-            {
-                EnsureNotLocked(field);
-            }
-
-            return field;
+            return nestedField;
         }
 
-        private static void EnsureNotLocked(IField field)
+        if (!schema.FieldsById.TryGetValue(fieldId, out var field))
         {
-            if (field.IsLocked)
-            {
-                throw new DomainException(T.Get("schemas.fieldIsLocked"));
-            }
+            throw new DomainObjectNotFoundException(fieldId.ToString(CultureInfo.InvariantCulture));
+        }
+
+        if (!allowLocked)
+        {
+            EnsureNotLocked(field);
+        }
+
+        return field;
+    }
+
+    private static void EnsureNotLocked(IField field)
+    {
+        if (field.IsLocked)
+        {
+            throw new DomainException(T.Get("schemas.fieldIsLocked"));
         }
     }
 }

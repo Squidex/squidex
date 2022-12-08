@@ -7,15 +7,14 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Comments
+namespace Squidex.Domain.Apps.Events.Comments;
+
+[EventType(nameof(CommentCreated))]
+public sealed class CommentCreated : CommentsEvent
 {
-    [EventType(nameof(CommentCreated))]
-    public sealed class CommentCreated : CommentsEvent
-    {
-        public string Text { get; set; }
+    public string Text { get; set; }
 
-        public string[]? Mentions { get; set; }
+    public string[]? Mentions { get; set; }
 
-        public Uri? Url { get; set; }
-    }
+    public Uri? Url { get; set; }
 }

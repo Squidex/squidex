@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public enum ReferencesFieldEditor
 {
-    public enum ReferencesFieldEditor
-    {
-        List,
-        Dropdown,
-        Tags,
-        Checkboxes,
-        Input
-    }
+    List,
+    Dropdown,
+    Tags,
+    Checkboxes,
+    Input
 }

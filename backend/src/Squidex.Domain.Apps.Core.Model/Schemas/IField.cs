@@ -5,16 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public interface IField : IFieldSettings
 {
-    public interface IField : IFieldSettings
-    {
-        long Id { get; }
+    long Id { get; }
 
-        string Name { get; }
+    string Name { get; }
 
-        FieldProperties RawProperties { get; }
+    FieldProperties RawProperties { get; }
 
-        T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, TArgs args);
-    }
+    T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, TArgs args);
 }

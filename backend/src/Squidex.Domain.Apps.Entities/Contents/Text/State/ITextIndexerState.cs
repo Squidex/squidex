@@ -7,17 +7,16 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text.State
+namespace Squidex.Domain.Apps.Entities.Contents.Text.State;
+
+public interface ITextIndexerState
 {
-    public interface ITextIndexerState
-    {
-        Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids,
-            CancellationToken ct = default);
+    Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids,
+        CancellationToken ct = default);
 
-        Task SetAsync(List<TextContentState> updates,
-            CancellationToken ct = default);
+    Task SetAsync(List<TextContentState> updates,
+        CancellationToken ct = default);
 
-        Task ClearAsync(
-            CancellationToken ct = default);
-    }
+    Task ClearAsync(
+        CancellationToken ct = default);
 }

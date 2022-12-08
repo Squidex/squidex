@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public enum SchemaType
 {
-    public enum SchemaType
-    {
-        Default,
-        Singleton,
-        Component
-    }
+    Default,
+    Singleton,
+    Component
 }

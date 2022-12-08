@@ -12,36 +12,35 @@ using Squidex.Infrastructure.States;
 
 #pragma warning disable CS0649
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Assets;
+
+public partial class AssetUsageTracker : IDeleter
 {
-    public partial class AssetUsageTracker : IDeleter
+    private readonly IAssetLoader assetLoader;
+    private readonly ISnapshotStore<State> store;
+    private readonly ITagService tagService;
+    private readonly IUsageGate usageGate;
+
+    [CollectionName("Index_TagHistory")]
+    public sealed class State
     {
-        private readonly IAssetLoader assetLoader;
-        private readonly ISnapshotStore<State> store;
-        private readonly ITagService tagService;
-        private readonly IAppUsageGate appUsageGate;
+        public HashSet<string>? Tags { get; set; }
+    }
 
-        [CollectionName("Index_TagHistory")]
-        public sealed class State
-        {
-            public HashSet<string>? Tags { get; set; }
-        }
+    public AssetUsageTracker(IUsageGate usageGate, IAssetLoader assetLoader, ITagService tagService,
+        ISnapshotStore<State> store)
+    {
+        this.usageGate = usageGate;
+        this.assetLoader = assetLoader;
+        this.tagService = tagService;
+        this.store = store;
 
-        public AssetUsageTracker(IAppUsageGate appUsageGate, IAssetLoader assetLoader, ITagService tagService,
-            ISnapshotStore<State> store)
-        {
-            this.appUsageGate = appUsageGate;
-            this.assetLoader = assetLoader;
-            this.tagService = tagService;
-            this.store = store;
+        ClearCache();
+    }
 
-            ClearCache();
-        }
-
-        Task IDeleter.DeleteAppAsync(IAppEntity app,
-            CancellationToken ct)
-        {
-            return appUsageGate.DeleteAssetUsageAsync(app.Id, ct);
-        }
+    Task IDeleter.DeleteAppAsync(IAppEntity app,
+        CancellationToken ct)
+    {
+        return usageGate.DeleteAssetUsageAsync(app.Id, ct);
     }
 }

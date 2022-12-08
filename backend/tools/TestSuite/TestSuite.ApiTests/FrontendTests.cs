@@ -11,51 +11,50 @@ using TestSuite.Fixtures;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 
-namespace TestSuite.ApiTests
+namespace TestSuite.ApiTests;
+
+public sealed class FrontendTests : IClassFixture<ClientFixture>
 {
-    public sealed class FrontendTests : IClassFixture<ClientFixture>
+    public ClientFixture _ { get; }
+
+    public FrontendTests(ClientFixture fixture)
     {
-        public ClientFixture _ { get; }
+        _ = fixture;
+    }
 
-        public FrontendTests(ClientFixture fixture)
+    [Theory]
+    [InlineData("Frontend_Home", "")]
+    [InlineData("Frontend_Login", "identity-server/account/login")]
+    public async Task Should_render_properly(string name, string url)
+    {
+        using (var browserFetcher = new BrowserFetcher())
         {
-            _ = fixture;
+            await browserFetcher.DownloadAsync();
         }
 
-        [Theory]
-        [InlineData("Frontend_Home", "")]
-        [InlineData("Frontend_Login", "identity-server/account/login")]
-        public async Task Should_render_properly(string name, string url)
+        await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
         {
-            using (var browserFetcher = new BrowserFetcher())
+            Headless = true,
+            DefaultViewport = new ViewPortOptions
             {
-                await browserFetcher.DownloadAsync();
+                Height = 800,
+                IsLandscape = true,
+                IsMobile = false,
+                Width = 1000
+            },
+            Args = new string[]
+            {
+                "--no-sandbox"
             }
+        });
 
-            await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
-            {
-                Headless = true,
-                DefaultViewport = new ViewPortOptions
-                {
-                    Height = 800,
-                    IsLandscape = true,
-                    IsMobile = false,
-                    Width = 1000
-                },
-                Args = new string[]
-                {
-                    "--no-sandbox"
-                }
-            });
+        await using var page = await browser.NewPageAsync();
 
-            await using var page = await browser.NewPageAsync();
+        await page.GoToAsync(_.ClientManager.Options.Url + url + "?skip-setup");
+        await page.ScreenshotAsync($"__{name}.jpg");
 
-            await page.GoToAsync(_.ClientManager.Options.Url + url + "?skip-setup");
-            await page.ScreenshotAsync($"__{name}.jpg");
+        var diff = ImageSharpCompare.CalcDiff($"__{name}.jpg", $"Assets/{name}.jpg");
 
-            var diff = ImageSharpCompare.CalcDiff($"__{name}.jpg", $"Assets/{name}.jpg");
-
-            Assert.InRange(diff.MeanError, 0, 10);
-        }
+        Assert.InRange(diff.MeanError, 0, 10);
     }
 }

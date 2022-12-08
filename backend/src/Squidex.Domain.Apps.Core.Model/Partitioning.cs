@@ -9,34 +9,33 @@ using Squidex.Infrastructure;
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.Domain.Apps.Core
+namespace Squidex.Domain.Apps.Core;
+
+public delegate IFieldPartitioning PartitionResolver(Partitioning key);
+
+public sealed record Partitioning
 {
-    public delegate IFieldPartitioning PartitionResolver(Partitioning key);
+    public static readonly Partitioning Invariant = new Partitioning("invariant");
+    public static readonly Partitioning Language = new Partitioning("language");
 
-    public sealed record Partitioning
+    public string Key { get; }
+
+    public Partitioning(string key)
     {
-        public static readonly Partitioning Invariant = new Partitioning("invariant");
-        public static readonly Partitioning Language = new Partitioning("language");
+        Guard.NotNullOrEmpty(key);
 
-        public string Key { get; }
+        Key = key;
+    }
 
-        public Partitioning(string key)
-        {
-            Guard.NotNullOrEmpty(key);
+    public override string ToString()
+    {
+        return Key;
+    }
 
-            Key = key;
-        }
+    public static Partitioning FromString(string? value)
+    {
+        var isLanguage = string.Equals(value, Language.Key, StringComparison.OrdinalIgnoreCase);
 
-        public override string ToString()
-        {
-            return Key;
-        }
-
-        public static Partitioning FromString(string? value)
-        {
-            var isLanguage = string.Equals(value, Language.Key, StringComparison.OrdinalIgnoreCase);
-
-            return isLanguage ? Language : Invariant;
-        }
+        return isLanguage ? Language : Invariant;
     }
 }

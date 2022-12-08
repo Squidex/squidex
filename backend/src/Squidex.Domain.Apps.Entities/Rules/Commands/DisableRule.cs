@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Rules.Commands
+namespace Squidex.Domain.Apps.Entities.Rules.Commands;
+
+public sealed class DisableRule : RuleCommand
 {
-    public sealed class DisableRule : RuleCommand
-    {
-    }
 }

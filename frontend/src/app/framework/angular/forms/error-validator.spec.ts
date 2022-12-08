@@ -5,17 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormArray, FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormArray, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { ErrorDto } from '@app/framework/internal';
 import { ErrorValidator } from './error-validator';
 
 describe('ErrorValidator', () => {
     const validator = new ErrorValidator();
 
-    const control = new FormGroup({
-        nested1: new FormArray([
-            new FormGroup({
-                nested2: new FormControl(),
+    const control = new UntypedFormGroup({
+        nested1: new UntypedFormArray([
+            new UntypedFormGroup({
+                nested2: new UntypedFormControl(),
             }),
         ]),
     });

@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities;
+
+public interface IEntityWithCreatedBy
 {
-    public interface IEntityWithCreatedBy
-    {
-        RefToken CreatedBy { get; }
-    }
+    RefToken CreatedBy { get; }
 }

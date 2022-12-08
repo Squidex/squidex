@@ -9,118 +9,117 @@ using System.Runtime.CompilerServices;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Infrastructure.States;
+
+public abstract class MongoSnapshotStoreBase<T, TState> : MongoRepositoryBase<TState>, ISnapshotStore<T> where TState : MongoState<T>, new()
 {
-    public abstract class MongoSnapshotStoreBase<T, TState> : MongoRepositoryBase<TState>, ISnapshotStore<T> where TState : MongoState<T>, new()
+    protected MongoSnapshotStoreBase(IMongoDatabase database)
+        : base(database)
     {
-        protected MongoSnapshotStoreBase(IMongoDatabase database)
-            : base(database)
+    }
+
+    protected override string CollectionName()
+    {
+        var attribute = typeof(T).GetCustomAttributes(true).OfType<CollectionNameAttribute>().FirstOrDefault();
+
+        var name = attribute?.Name ?? typeof(T).Name;
+
+        return $"States_{name}";
+    }
+
+    public async Task<SnapshotResult<T>> ReadAsync(DomainId key,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/ReadAsync"))
         {
-        }
+            var existing =
+                await Collection.Find(x => x.DocumentId.Equals(key))
+                    .FirstOrDefaultAsync(ct);
 
-        protected override string CollectionName()
-        {
-            var attribute = typeof(T).GetCustomAttributes(true).OfType<CollectionNameAttribute>().FirstOrDefault();
-
-            var name = attribute?.Name ?? typeof(T).Name;
-
-            return $"States_{name}";
-        }
-
-        public async Task<SnapshotResult<T>> ReadAsync(DomainId key,
-            CancellationToken ct = default)
-        {
-            using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/ReadAsync"))
+            if (existing != null)
             {
-                var existing =
-                    await Collection.Find(x => x.DocumentId.Equals(key))
-                        .FirstOrDefaultAsync(ct);
-
-                if (existing != null)
+                if (existing.Document is IOnRead onRead)
                 {
-                    if (existing.Document is IOnRead onRead)
-                    {
-                        await onRead.OnReadAsync();
-                    }
-
-                    return new SnapshotResult<T>(existing.DocumentId, existing.Document, existing.Version);
+                    await onRead.OnReadAsync();
                 }
 
-                return new SnapshotResult<T>(default, default!, EtagVersion.Empty);
+                return new SnapshotResult<T>(existing.DocumentId, existing.Document, existing.Version);
             }
+
+            return new SnapshotResult<T>(default, default!, EtagVersion.Empty);
         }
+    }
 
-        public async Task WriteAsync(SnapshotWriteJob<T> job,
-            CancellationToken ct = default)
+    public async Task WriteAsync(SnapshotWriteJob<T> job,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/WriteAsync"))
         {
-            using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/WriteAsync"))
-            {
-                var entityJob = job.As(CreateDocument(job.Key, job.Value, job.OldVersion));
+            var entityJob = job.As(CreateDocument(job.Key, job.Value, job.OldVersion));
 
-                await Collection.UpsertVersionedAsync(entityJob, ct);
-            }
+            await Collection.UpsertVersionedAsync(entityJob, ct);
         }
+    }
 
-        public async Task WriteManyAsync(IEnumerable<SnapshotWriteJob<T>> jobs,
-            CancellationToken ct = default)
+    public async Task WriteManyAsync(IEnumerable<SnapshotWriteJob<T>> jobs,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/WriteManyAsync"))
         {
-            using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/WriteManyAsync"))
-            {
-                var writes = jobs.Select(x =>
-                    new ReplaceOneModel<TState>(Filter.Eq(y => y.DocumentId, x.Key), CreateDocument(x.Key, x.Value, x.NewVersion))
-                    {
-                        IsUpsert = true
-                    }).ToList();
-
-                if (writes.Count == 0)
+            var writes = jobs.Select(x =>
+                new ReplaceOneModel<TState>(Filter.Eq(y => y.DocumentId, x.Key), CreateDocument(x.Key, x.Value, x.NewVersion))
                 {
-                    return;
+                    IsUpsert = true
+                }).ToList();
+
+            if (writes.Count == 0)
+            {
+                return;
+            }
+
+            await Collection.BulkWriteAsync(writes, BulkUnordered, ct);
+        }
+    }
+
+    public async Task RemoveAsync(DomainId key,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/RemoveAsync"))
+        {
+            await Collection.DeleteOneAsync(x => x.DocumentId.Equals(key), ct);
+        }
+    }
+
+    public async IAsyncEnumerable<SnapshotResult<T>> ReadAllAsync(
+        [EnumeratorCancellation] CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/ReadAllAsync"))
+        {
+            var find = Collection.Find(FindAll, Batching.Options);
+
+            await foreach (var document in find.ToAsyncEnumerable(ct))
+            {
+                if (document.Document is IOnRead onRead)
+                {
+                    await onRead.OnReadAsync();
                 }
 
-                await Collection.BulkWriteAsync(writes, BulkUnordered, ct);
+                yield return new SnapshotResult<T>(document.DocumentId, document.Document, document.Version, true);
             }
         }
+    }
 
-        public async Task RemoveAsync(DomainId key,
-            CancellationToken ct = default)
+    private static TState CreateDocument(DomainId id, T doc, long version)
+    {
+        var result = new TState
         {
-            using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/RemoveAsync"))
-            {
-                await Collection.DeleteOneAsync(x => x.DocumentId.Equals(key), ct);
-            }
-        }
+            Document = doc,
+            DocumentId = id,
+            Version = version
+        };
 
-        public async IAsyncEnumerable<SnapshotResult<T>> ReadAllAsync(
-            [EnumeratorCancellation] CancellationToken ct = default)
-        {
-            using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/ReadAllAsync"))
-            {
-                var find = Collection.Find(FindAll, Batching.Options);
+        result.Prepare();
 
-                await foreach (var document in find.ToAsyncEnumerable(ct))
-                {
-                    if (document.Document is IOnRead onRead)
-                    {
-                        await onRead.OnReadAsync();
-                    }
-
-                    yield return new SnapshotResult<T>(document.DocumentId, document.Document, document.Version, true);
-                }
-            }
-        }
-
-        private static TState CreateDocument(DomainId id, T doc, long version)
-        {
-            var result = new TState
-            {
-                Document = doc,
-                DocumentId = id,
-                Version = version
-            };
-
-            result.Prepare();
-
-            return result;
-        }
+        return result;
     }
 }

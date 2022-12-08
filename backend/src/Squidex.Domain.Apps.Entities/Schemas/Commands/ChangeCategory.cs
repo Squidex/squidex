@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands;
+
+public sealed class ChangeCategory : SchemaCommand
 {
-    public sealed class ChangeCategory : SchemaCommand
-    {
-        public string? Name { get; set; }
-    }
+    public string? Name { get; set; }
 }

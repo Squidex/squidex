@@ -5,159 +5,156 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Xunit;
 
 #pragma warning disable CA2012 // Use ValueTasks correctly
 
-namespace Squidex.Domain.Apps.Entities.Contents.Queries
+namespace Squidex.Domain.Apps.Entities.Contents.Queries;
+
+public class EnrichWithWorkflowsTests
 {
-    public class EnrichWithWorkflowsTests
+    private readonly IContentWorkflow workflow = A.Fake<IContentWorkflow>();
+    private readonly Context requestContext;
+    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+    private readonly RefToken user = RefToken.User("me");
+    private readonly EnrichWithWorkflows sut;
+
+    public EnrichWithWorkflowsTests()
     {
-        private readonly IContentWorkflow workflow = A.Fake<IContentWorkflow>();
-        private readonly Context requestContext;
-        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-        private readonly RefToken user = RefToken.User("me");
-        private readonly EnrichWithWorkflows sut;
+        requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
-        public EnrichWithWorkflowsTests()
+        sut = new EnrichWithWorkflows(workflow);
+    }
+
+    [Fact]
+    public async Task Should_enrich_content_with_next_statuses()
+    {
+        var content = new ContentEntity { SchemaId = schemaId };
+
+        var nexts = new[]
         {
-            requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId));
+            new StatusInfo(Status.Published, StatusColors.Published)
+        };
 
-            sut = new EnrichWithWorkflows(workflow);
-        }
+        A.CallTo(() => workflow.GetNextAsync(content, content.Status, requestContext.UserPrincipal))
+            .Returns(nexts);
 
-        [Fact]
-        public async Task Should_enrich_content_with_next_statuses()
-        {
-            var content = new ContentEntity { SchemaId = schemaId };
+        await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
 
-            var nexts = new[]
-            {
-                new StatusInfo(Status.Published, StatusColors.Published)
-            };
+        Assert.Equal(nexts, content.NextStatuses);
+    }
 
-            A.CallTo(() => workflow.GetNextAsync(content, content.Status, requestContext.UserPrincipal))
-                .Returns(nexts);
+    [Fact]
+    public async Task Should_enrich_content_with_next_statuses_if_draft_singleton()
+    {
+        var content = new ContentEntity { SchemaId = schemaId, IsSingleton = true, Status = Status.Draft };
 
-            await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
+        await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
 
-            Assert.Equal(nexts, content.NextStatuses);
-        }
+        Assert.Equal(Status.Published, content.NextStatuses?.Single().Status);
 
-        [Fact]
-        public async Task Should_enrich_content_with_next_statuses_if_draft_singleton()
-        {
-            var content = new ContentEntity { SchemaId = schemaId, IsSingleton = true, Status = Status.Draft };
+        A.CallTo(() => workflow.GetNextAsync(content, A<Status>._, requestContext.UserPrincipal))
+            .MustNotHaveHappened();
+    }
 
-            await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
+    [Fact]
+    public async Task Should_enrich_content_with_next_statuses_if_published_singleton()
+    {
+        var content = new ContentEntity { SchemaId = schemaId, IsSingleton = true, Status = Status.Published };
 
-            Assert.Equal(Status.Published, content.NextStatuses?.Single().Status);
+        await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
 
-            A.CallTo(() => workflow.GetNextAsync(content, A<Status>._, requestContext.UserPrincipal))
-                .MustNotHaveHappened();
-        }
+        Assert.Empty(content.NextStatuses!);
 
-        [Fact]
-        public async Task Should_enrich_content_with_next_statuses_if_published_singleton()
-        {
-            var content = new ContentEntity { SchemaId = schemaId, IsSingleton = true, Status = Status.Published };
+        A.CallTo(() => workflow.GetNextAsync(content, A<Status>._, requestContext.UserPrincipal))
+            .MustNotHaveHappened();
+    }
 
-            await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
+    [Fact]
+    public async Task Should_enrich_content_with_status_color()
+    {
+        var content = new ContentEntity { SchemaId = schemaId };
 
-            Assert.Empty(content.NextStatuses);
+        A.CallTo(() => workflow.GetInfoAsync(content, content.Status))
+            .Returns(new StatusInfo(Status.Published, StatusColors.Published));
 
-            A.CallTo(() => workflow.GetNextAsync(content, A<Status>._, requestContext.UserPrincipal))
-                .MustNotHaveHappened();
-        }
+        await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
 
-        [Fact]
-        public async Task Should_enrich_content_with_status_color()
-        {
-            var content = new ContentEntity { SchemaId = schemaId };
+        Assert.Equal(StatusColors.Published, content.StatusColor);
+    }
 
-            A.CallTo(() => workflow.GetInfoAsync(content, content.Status))
-                .Returns(new StatusInfo(Status.Published, StatusColors.Published));
+    [Fact]
+    public async Task Should_enrich_content_with_new_status_color()
+    {
+        var content = new ContentEntity { SchemaId = schemaId, NewStatus = Status.Archived };
 
-            await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
+        A.CallTo(() => workflow.GetInfoAsync(content, content.NewStatus.Value))
+            .Returns(new StatusInfo(Status.Published, StatusColors.Archived));
 
-            Assert.Equal(StatusColors.Published, content.StatusColor);
-        }
+        await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
 
-        [Fact]
-        public async Task Should_enrich_content_with_new_status_color()
-        {
-            var content = new ContentEntity { SchemaId = schemaId, NewStatus = Status.Archived };
+        Assert.Equal(StatusColors.Archived, content.NewStatusColor);
+    }
 
-            A.CallTo(() => workflow.GetInfoAsync(content, content.NewStatus.Value))
-                .Returns(new StatusInfo(Status.Published, StatusColors.Archived));
+    [Fact]
+    public async Task Should_enrich_content_with_scheduled_status_color()
+    {
+        var content = new ContentEntity { SchemaId = schemaId, ScheduleJob = ScheduleJob.Build(Status.Archived, user, default) };
 
-            await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
+        A.CallTo(() => workflow.GetInfoAsync(content, content.ScheduleJob.Status))
+            .Returns(new StatusInfo(Status.Published, StatusColors.Archived));
 
-            Assert.Equal(StatusColors.Archived, content.NewStatusColor);
-        }
+        await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
 
-        [Fact]
-        public async Task Should_enrich_content_with_scheduled_status_color()
-        {
-            var content = new ContentEntity { SchemaId = schemaId, ScheduleJob = ScheduleJob.Build(Status.Archived, user, default) };
+        Assert.Equal(StatusColors.Archived, content.ScheduledStatusColor);
+    }
 
-            A.CallTo(() => workflow.GetInfoAsync(content, content.ScheduleJob.Status))
-                .Returns(new StatusInfo(Status.Published, StatusColors.Archived));
+    [Fact]
+    public async Task Should_enrich_content_with_default_color_if_not_found()
+    {
+        var content = new ContentEntity { SchemaId = schemaId };
 
-            await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
+        A.CallTo(() => workflow.GetInfoAsync(content, content.Status))
+            .Returns(ValueTask.FromResult<StatusInfo?>(null!));
 
-            Assert.Equal(StatusColors.Archived, content.ScheduledStatusColor);
-        }
+        var ctx = requestContext.Clone(b => b.WithResolveFlow(false));
 
-        [Fact]
-        public async Task Should_enrich_content_with_default_color_if_not_found()
-        {
-            var content = new ContentEntity { SchemaId = schemaId };
+        await sut.EnrichAsync(ctx, new[] { content }, null!, default);
 
-            A.CallTo(() => workflow.GetInfoAsync(content, content.Status))
-                .Returns(ValueTask.FromResult<StatusInfo?>(null!));
+        Assert.Equal(StatusColors.Draft, content.StatusColor);
+    }
 
-            var ctx = requestContext.Clone(b => b.WithResolveFlow(false));
+    [Fact]
+    public async Task Should_enrich_content_with_can_update()
+    {
+        var content = new ContentEntity { SchemaId = schemaId };
 
-            await sut.EnrichAsync(ctx, new[] { content }, null!, default);
+        A.CallTo(() => workflow.CanUpdateAsync(content, content.Status, requestContext.UserPrincipal))
+            .Returns(true);
 
-            Assert.Equal(StatusColors.Draft, content.StatusColor);
-        }
+        var ctx = requestContext.Clone(b => b.WithResolveFlow(false));
 
-        [Fact]
-        public async Task Should_enrich_content_with_can_update()
-        {
-            var content = new ContentEntity { SchemaId = schemaId };
+        await sut.EnrichAsync(ctx, new[] { content }, null!, default);
 
-            A.CallTo(() => workflow.CanUpdateAsync(content, content.Status, requestContext.UserPrincipal))
-                .Returns(true);
+        Assert.True(content.CanUpdate);
+    }
 
-            var ctx = requestContext.Clone(b => b.WithResolveFlow(false));
+    [Fact]
+    public async Task Should_not_enrich_content_with_can_update_if_disabled_in_context()
+    {
+        var content = new ContentEntity { SchemaId = schemaId };
 
-            await sut.EnrichAsync(ctx, new[] { content }, null!, default);
+        var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId)).Clone(b => b.WithResolveFlow(false));
 
-            Assert.True(content.CanUpdate);
-        }
+        await sut.EnrichAsync(ctx, new[] { content }, null!, default);
 
-        [Fact]
-        public async Task Should_not_enrich_content_with_can_update_if_disabled_in_context()
-        {
-            var content = new ContentEntity { SchemaId = schemaId };
+        Assert.False(content.CanUpdate);
 
-            var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId)).Clone(b => b.WithResolveFlow(false));
-
-            await sut.EnrichAsync(ctx, new[] { content }, null!, default);
-
-            Assert.False(content.CanUpdate);
-
-            A.CallTo(() => workflow.CanUpdateAsync(content, A<Status>._, requestContext.UserPrincipal))
-                .MustNotHaveHappened();
-        }
+        A.CallTo(() => workflow.CanUpdateAsync(content, A<Status>._, requestContext.UserPrincipal))
+            .MustNotHaveHappened();
     }
 }

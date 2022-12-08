@@ -14,83 +14,82 @@ using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Extensions.Assets.Azure
+namespace Squidex.Extensions.Assets.Azure;
+
+public sealed class AzureMetadataSource : IAssetMetadataSource
 {
-    public sealed class AzureMetadataSource : IAssetMetadataSource
+    private const long MaxSize = 5 * 1025 * 1024;
+    private readonly ILogger<AzureMetadataSource> log;
+    private readonly ComputerVisionClient client;
+    private readonly char[] trimChars =
     {
-        private const long MaxSize = 5 * 1025 * 1024;
-        private readonly ILogger<AzureMetadataSource> log;
-        private readonly ComputerVisionClient client;
-        private readonly char[] trimChars =
+        ' ',
+        '_',
+        '-'
+    };
+    private readonly List<VisualFeatureTypes?> features = new List<VisualFeatureTypes?>
+    {
+        VisualFeatureTypes.Categories,
+        VisualFeatureTypes.Description,
+        VisualFeatureTypes.Color
+    };
+
+    public int Order => int.MaxValue;
+
+    public AzureMetadataSource(IOptions<AzureMetadataSourceOptions> options,
+        ILogger<AzureMetadataSource> log)
+    {
+        client = new ComputerVisionClient(new ApiKeyServiceClientCredentials(options.Value.ApiKey))
         {
-            ' ',
-            '_',
-            '-'
+            Endpoint = options.Value.Endpoint
         };
-        private readonly List<VisualFeatureTypes?> features = new List<VisualFeatureTypes?>
-        {
-            VisualFeatureTypes.Categories,
-            VisualFeatureTypes.Description,
-            VisualFeatureTypes.Color
-        };
 
-        public int Order => int.MaxValue;
+        this.log = log;
+    }
 
-        public AzureMetadataSource(IOptions<AzureMetadataSourceOptions> options,
-            ILogger<AzureMetadataSource> log)
+    public async Task EnhanceAsync(UploadAssetCommand command,
+        CancellationToken ct)
+    {
+        try
         {
-            client = new ComputerVisionClient(new ApiKeyServiceClientCredentials(options.Value.ApiKey))
+            if (command.Type == AssetType.Image && command.File.FileSize <= MaxSize)
             {
-                Endpoint = options.Value.Endpoint
-            };
-
-            this.log = log;
-        }
-
-        public async Task EnhanceAsync(UploadAssetCommand command,
-            CancellationToken ct)
-        {
-            try
-            {
-                if (command.Type == AssetType.Image && command.File.FileSize <= MaxSize)
+                await using (var stream = command.File.OpenRead())
                 {
-                    await using (var stream = command.File.OpenRead())
+                    var result = await client.AnalyzeImageInStreamAsync(stream, features, cancellationToken: ct);
+
+                    command.Tags ??= new HashSet<string>();
+
+                    if (result.Color?.DominantColorForeground != null)
                     {
-                        var result = await client.AnalyzeImageInStreamAsync(stream, features, cancellationToken: ct);
+                        command.Tags.Add($"color/{result.Color.DominantColorForeground.Trim(trimChars).ToLowerInvariant()}");
+                    }
 
-                        command.Tags ??= new HashSet<string>();
-
-                        if (result.Color?.DominantColorForeground != null)
+                    if (result.Categories != null)
+                    {
+                        foreach (var category in result.Categories.OrderByDescending(x => x.Score).Take(3))
                         {
-                            command.Tags.Add($"color/{result.Color.DominantColorForeground.Trim(trimChars).ToLowerInvariant()}");
+                            command.Tags.Add($"category/{category.Name.Trim(trimChars).ToLowerInvariant()}");
                         }
+                    }
 
-                        if (result.Categories != null)
-                        {
-                            foreach (var category in result.Categories.OrderByDescending(x => x.Score).Take(3))
-                            {
-                                command.Tags.Add($"category/{category.Name.Trim(trimChars).ToLowerInvariant()}");
-                            }
-                        }
+                    var description = result.Description?.Captions.MaxBy(x => x.Confidence)?.Text;
 
-                        var description = result.Description?.Captions.MaxBy(x => x.Confidence)?.Text;
-
-                        if (description != null)
-                        {
-                            command.Metadata["caption"] = JsonValue.Create(description);
-                        }
+                    if (description != null)
+                    {
+                        command.Metadata["caption"] = JsonValue.Create(description);
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                log.LogError(ex, "Failed to enrich asset.");
-            }
         }
-
-        public IEnumerable<string> Format(IAssetEntity asset)
+        catch (Exception ex)
         {
-            yield break;
+            log.LogError(ex, "Failed to enrich asset.");
         }
+    }
+
+    public IEnumerable<string> Format(IAssetEntity asset)
+    {
+        yield break;
     }
 }

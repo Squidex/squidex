@@ -10,115 +10,114 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities;
+
+public record Q
 {
-    public record Q
+    public static Q Empty => new Q();
+
+    public ClrQuery Query { get; init; } = new ClrQuery();
+
+    public IReadOnlyList<DomainId>? Ids { get; init; }
+
+    public DomainId Referencing { get; init; }
+
+    public DomainId Reference { get; init; }
+
+    public string? QueryAsOdata { get; init; }
+
+    public string? QueryAsJson { get; init; }
+
+    public Instant? ScheduledFrom { get; init; }
+
+    public Instant? ScheduledTo { get; init; }
+
+    public Query<JsonValue>? JsonQuery { get; init; }
+
+    public RefToken? CreatedBy { get; init; }
+
+    public bool NoTotal { get; init; }
+
+    public bool NoSlowTotal { get; init; }
+
+    private Q()
     {
-        public static Q Empty => new Q();
+    }
 
-        public ClrQuery Query { get; init; } = new ClrQuery();
+    public Q WithQuery(ClrQuery query)
+    {
+        Guard.NotNull(query);
 
-        public IReadOnlyList<DomainId>? Ids { get; init; }
+        return this with { Query = query };
+    }
 
-        public DomainId Referencing { get; init; }
+    public Q WithoutTotal(bool value = true)
+    {
+        return this with { NoTotal = value };
+    }
 
-        public DomainId Reference { get; init; }
+    public Q WithoutSlowTotal(bool value = true)
+    {
+        return this with { NoSlowTotal = value };
+    }
 
-        public string? QueryAsOdata { get; init; }
+    public Q WithODataQuery(string? query)
+    {
+        return this with { QueryAsOdata = query };
+    }
 
-        public string? QueryAsJson { get; init; }
+    public Q WithJsonQuery(string? query)
+    {
+        return this with { QueryAsJson = query };
+    }
 
-        public Instant? ScheduledFrom { get; init; }
+    public Q WithJsonQuery(Query<JsonValue>? query)
+    {
+        return this with { JsonQuery = query };
+    }
 
-        public Instant? ScheduledTo { get; init; }
+    public Q WithReferencing(DomainId id)
+    {
+        return this with { Referencing = id };
+    }
 
-        public Query<JsonValue>? JsonQuery { get; init; }
+    public Q WithReference(DomainId id)
+    {
+        return this with { Reference = id };
+    }
 
-        public RefToken? CreatedBy { get; init; }
+    public Q WithIds(params DomainId[] ids)
+    {
+        return this with { Ids = ids?.ToList() };
+    }
 
-        public bool NoTotal { get; init; }
+    public Q WithIds(IEnumerable<DomainId> ids)
+    {
+        return this with { Ids = ids?.ToList() };
+    }
 
-        public bool NoSlowTotal { get; init; }
+    public Q WithSchedule(Instant from, Instant to)
+    {
+        return this with { ScheduledFrom = from, ScheduledTo = to };
+    }
 
-        private Q()
+    public Q WithIds(string? ids)
+    {
+        if (string.IsNullOrWhiteSpace(ids))
         {
+            return this with { Ids = null };
         }
 
-        public Q WithQuery(ClrQuery query)
-        {
-            Guard.NotNull(query);
+        var idsList = new List<DomainId>();
 
-            return this with { Query = query };
-        }
-
-        public Q WithoutTotal(bool value = true)
+        if (!string.IsNullOrEmpty(ids))
         {
-            return this with { NoTotal = value };
-        }
-
-        public Q WithoutSlowTotal(bool value = true)
-        {
-            return this with { NoSlowTotal = value };
-        }
-
-        public Q WithODataQuery(string? query)
-        {
-            return this with { QueryAsOdata = query };
-        }
-
-        public Q WithJsonQuery(string? query)
-        {
-            return this with { QueryAsJson = query };
-        }
-
-        public Q WithJsonQuery(Query<JsonValue>? query)
-        {
-            return this with { JsonQuery = query };
-        }
-
-        public Q WithReferencing(DomainId id)
-        {
-            return this with { Referencing = id };
-        }
-
-        public Q WithReference(DomainId id)
-        {
-            return this with { Reference = id };
-        }
-
-        public Q WithIds(params DomainId[] ids)
-        {
-            return this with { Ids = ids?.ToList() };
-        }
-
-        public Q WithIds(IEnumerable<DomainId> ids)
-        {
-            return this with { Ids = ids?.ToList() };
-        }
-
-        public Q WithSchedule(Instant from, Instant to)
-        {
-            return this with { ScheduledFrom = from, ScheduledTo = to };
-        }
-
-        public Q WithIds(string? ids)
-        {
-            if (string.IsNullOrWhiteSpace(ids))
+            foreach (var id in ids.Split(','))
             {
-                return this with { Ids = null };
+                idsList.Add(DomainId.Create(id));
             }
-
-            var idsList = new List<DomainId>();
-
-            if (!string.IsNullOrEmpty(ids))
-            {
-                foreach (var id in ids.Split(','))
-                {
-                    idsList.Add(DomainId.Create(id));
-                }
-            }
-
-            return this with { Ids = idsList };
         }
+
+        return this with { Ids = idsList };
     }
 }

@@ -7,24 +7,23 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Infrastructure.States;
+
+public interface IPersistence<in TState>
 {
-    public interface IPersistence<in TState>
-    {
-        long Version { get; }
+    long Version { get; }
 
-        bool IsSnapshotStale { get; }
+    bool IsSnapshotStale { get; }
 
-        Task DeleteAsync(
-            CancellationToken ct = default);
+    Task DeleteAsync(
+        CancellationToken ct = default);
 
-        Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events,
-            CancellationToken ct = default);
+    Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events,
+        CancellationToken ct = default);
 
-        Task WriteSnapshotAsync(TState state,
-            CancellationToken ct = default);
+    Task WriteSnapshotAsync(TState state,
+        CancellationToken ct = default);
 
-        Task ReadAsync(long expectedVersion = EtagVersion.Any,
-            CancellationToken ct = default);
-    }
+    Task ReadAsync(long expectedVersion = EtagVersion.Any,
+        CancellationToken ct = default);
 }

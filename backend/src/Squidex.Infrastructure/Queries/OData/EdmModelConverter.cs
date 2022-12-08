@@ -8,118 +8,117 @@
 using Microsoft.OData.Edm;
 using Squidex.Text;
 
-namespace Squidex.Infrastructure.Queries.OData
+namespace Squidex.Infrastructure.Queries.OData;
+
+public static class EdmModelConverter
 {
-    public static class EdmModelConverter
+    private const int MaxDepth = 7;
+
+    public static EdmModel ConvertToEdm(this QueryModel queryModel, string modelName, string name)
     {
-        private const int MaxDepth = 7;
+        var model = new EdmModel();
 
-        public static EdmModel ConvertToEdm(this QueryModel queryModel, string modelName, string name)
+        var entityType = new EdmEntityType(modelName, name);
+        var entityPath = new Stack<string>();
+
+        void Convert(EdmStructuredType target, FilterSchema schema)
         {
-            var model = new EdmModel();
-
-            var entityType = new EdmEntityType(modelName, name);
-            var entityPath = new Stack<string>();
-
-            void Convert(EdmStructuredType target, FilterSchema schema)
+            if (schema.Fields == null)
             {
-                if (schema.Fields == null)
-                {
-                    return;
-                }
-
-                foreach (var field in FilterSchema.GetConflictFreeFields(schema.Fields))
-                {
-                    var fieldName = field.Path.EscapeEdmField();
-
-                    switch (field.Schema.Type)
-                    {
-                        case FilterSchemaType.Boolean:
-                            target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.Boolean, field.IsNullable);
-                            break;
-                        case FilterSchemaType.DateTime:
-                            target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.DateTimeOffset, field.IsNullable);
-                            break;
-                        case FilterSchemaType.GeoObject:
-                            target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.GeographyPoint, field.IsNullable);
-                            break;
-                        case FilterSchemaType.Guid:
-                            target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.Guid, field.IsNullable);
-                            break;
-                        case FilterSchemaType.Number:
-                            target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.Double, field.IsNullable);
-                            break;
-                        case FilterSchemaType.String:
-                        case FilterSchemaType.StringArray:
-                            target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.String, field.IsNullable);
-                            break;
-                        case FilterSchemaType.Object:
-                        case FilterSchemaType.ObjectArray:
-                            {
-                                if (field.Schema.Fields == null || field.Schema.Fields.Count == 0 || entityPath.Count >= MaxDepth)
-                                {
-                                    break;
-                                }
-
-                                entityPath.Push(fieldName);
-
-                                var typeName = string.Join("_", entityPath.Reverse().Select(x => x.EscapeEdmField().ToPascalCase()));
-
-                                var result = model.SchemaElements.OfType<EdmComplexType>().FirstOrDefault(x => x.Name == typeName);
-
-                                if (result == null)
-                                {
-                                    result = new EdmComplexType(modelName, typeName);
-
-                                    model.AddElement(result);
-
-                                    Convert(result, field.Schema);
-                                }
-
-                                target.AddStructuralProperty(fieldName, new EdmComplexTypeReference(result, field.IsNullable));
-
-                                entityPath.Pop();
-                                break;
-                            }
-
-                        case FilterSchemaType.Any:
-                            {
-                                var result = model.SchemaElements.OfType<EdmComplexType>().FirstOrDefault(x => x.Name == "Any");
-
-                                if (result == null)
-                                {
-                                    result = new EdmComplexType("Squidex", "Any", null, false, true);
-
-                                    model.AddElement(result);
-                                }
-
-                                target.AddStructuralProperty(fieldName, new EdmComplexTypeReference(result, field.IsNullable));
-                                break;
-                            }
-                    }
-                }
+                return;
             }
 
-            Convert(entityType, queryModel.Schema);
+            foreach (var field in FilterSchema.GetConflictFreeFields(schema.Fields))
+            {
+                var fieldName = field.Path.EscapeEdmField();
 
-            var container = new EdmEntityContainer("Squidex", "Container");
+                switch (field.Schema.Type)
+                {
+                    case FilterSchemaType.Boolean:
+                        target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.Boolean, field.IsNullable);
+                        break;
+                    case FilterSchemaType.DateTime:
+                        target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.DateTimeOffset, field.IsNullable);
+                        break;
+                    case FilterSchemaType.GeoObject:
+                        target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.GeographyPoint, field.IsNullable);
+                        break;
+                    case FilterSchemaType.Guid:
+                        target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.Guid, field.IsNullable);
+                        break;
+                    case FilterSchemaType.Number:
+                        target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.Double, field.IsNullable);
+                        break;
+                    case FilterSchemaType.String:
+                    case FilterSchemaType.StringArray:
+                        target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.String, field.IsNullable);
+                        break;
+                    case FilterSchemaType.Object:
+                    case FilterSchemaType.ObjectArray:
+                        {
+                            if (field.Schema.Fields == null || field.Schema.Fields.Count == 0 || entityPath.Count >= MaxDepth)
+                            {
+                                break;
+                            }
 
-            container.AddEntitySet("ContentSet", entityType);
+                            entityPath.Push(fieldName);
 
-            model.AddElement(container);
-            model.AddElement(entityType);
+                            var typeName = string.Join("_", entityPath.Reverse().Select(x => x.EscapeEdmField().ToPascalCase()));
 
-            return model;
+                            var result = model.SchemaElements.OfType<EdmComplexType>().FirstOrDefault(x => x.Name == typeName);
+
+                            if (result == null)
+                            {
+                                result = new EdmComplexType(modelName, typeName);
+
+                                model.AddElement(result);
+
+                                Convert(result, field.Schema);
+                            }
+
+                            target.AddStructuralProperty(fieldName, new EdmComplexTypeReference(result, field.IsNullable));
+
+                            entityPath.Pop();
+                            break;
+                        }
+
+                    case FilterSchemaType.Any:
+                        {
+                            var result = model.SchemaElements.OfType<EdmComplexType>().FirstOrDefault(x => x.Name == "Any");
+
+                            if (result == null)
+                            {
+                                result = new EdmComplexType("Squidex", "Any", null, false, true);
+
+                                model.AddElement(result);
+                            }
+
+                            target.AddStructuralProperty(fieldName, new EdmComplexTypeReference(result, field.IsNullable));
+                            break;
+                        }
+                }
+            }
         }
 
-        public static string EscapeEdmField(this string field)
-        {
-            return field.Replace("-", "_", StringComparison.Ordinal);
-        }
+        Convert(entityType, queryModel.Schema);
 
-        public static string UnescapeEdmField(this string field)
-        {
-            return field.Replace("_", "-", StringComparison.Ordinal);
-        }
+        var container = new EdmEntityContainer("Squidex", "Container");
+
+        container.AddEntitySet("ContentSet", entityType);
+
+        model.AddElement(container);
+        model.AddElement(entityType);
+
+        return model;
+    }
+
+    public static string EscapeEdmField(this string field)
+    {
+        return field.Replace("-", "_", StringComparison.Ordinal);
+    }
+
+    public static string UnescapeEdmField(this string field)
+    {
+        return field.Replace("_", "-", StringComparison.Ordinal);
     }
 }

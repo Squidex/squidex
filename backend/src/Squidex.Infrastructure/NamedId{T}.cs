@@ -9,83 +9,71 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 #pragma warning disable MA0048 // File name must match type name
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+public delegate bool Parser<T>(ReadOnlySpan<char> input, out T result);
+
+[TypeConverter(typeof(NamedIdTypeConverter))]
+public sealed record NamedId<T>(T Id, string Name) where T : notnull
 {
-    public delegate bool Parser<T>(ReadOnlySpan<char> input, out T result);
+    private static readonly int GuidLength = Guid.Empty.ToString().Length;
 
-    [TypeConverter(typeof(NamedIdTypeConverter))]
-    public sealed record NamedId<T> where T : notnull
+    public string Name { get; init; } = Guard.NotNullOrEmpty(Name);
+
+    public override string ToString()
     {
-        private static readonly int GuidLength = Guid.Empty.ToString().Length;
+        return $"{Id},{Name}";
+    }
 
-        public T Id { get; }
-
-        public string Name { get; }
-
-        public NamedId(T id, string name)
+    public static bool TryParse(string value, Parser<T> parser, [MaybeNullWhen(false)] out NamedId<T> result)
+    {
+        if (value != null)
         {
-            Guard.NotNull(id);
-            Guard.NotNull(name);
+            var span = value.AsSpan();
 
-            Id = id;
-
-            Name = name;
-        }
-
-        public override string ToString()
-        {
-            return $"{Id},{Name}";
-        }
-
-        public static bool TryParse(string value, Parser<T> parser, [MaybeNullWhen(false)] out NamedId<T> result)
-        {
-            if (value != null)
+            if (typeof(T) == typeof(Guid))
             {
-                var span = value.AsSpan();
-
-                if (typeof(T) == typeof(Guid))
+                if (value.Length > GuidLength + 1 && value[GuidLength] == ',')
                 {
-                    if (value.Length > GuidLength + 1 && value[GuidLength] == ',')
+                    if (parser(span[..GuidLength], out var id))
                     {
-                        if (parser(span[..GuidLength], out var id))
-                        {
-                            result = new NamedId<T>(id, value[(GuidLength + 1)..]);
+                        result = new NamedId<T>(id, value[(GuidLength + 1)..]);
 
-                            return true;
-                        }
-                    }
-                }
-                else
-                {
-                    var index = value.IndexOf(',', StringComparison.Ordinal);
-
-                    if (index > 0 && index < value.Length - 1)
-                    {
-                        if (parser(span[..index], out var id))
-                        {
-                            result = new NamedId<T>(id, value[(index + 1)..]);
-
-                            return true;
-                        }
+                        return true;
                     }
                 }
             }
-
-            result = null!;
-
-            return false;
-        }
-
-        public static NamedId<T> Parse(string value, Parser<T> parser)
-        {
-            if (!TryParse(value, parser, out var result))
+            else
             {
-                ThrowHelper.ArgumentException("Named id must have at least 2 parts divided by commata.", nameof(value));
-                return default!;
-            }
+                var index = value.IndexOf(',', StringComparison.Ordinal);
 
-            return result;
+                if (index > 0 && index < value.Length - 1)
+                {
+                    if (parser(span[..index], out var id))
+                    {
+                        result = new NamedId<T>(id, value[(index + 1)..]);
+
+                        return true;
+                    }
+                }
+            }
         }
+
+        result = null!;
+
+        return false;
+    }
+
+    public static NamedId<T> Parse(string value, Parser<T> parser)
+    {
+        if (!TryParse(value, parser, out var result))
+        {
+            ThrowHelper.ArgumentException("Named id must have at least 2 parts divided by commata.", nameof(value));
+            return default!;
+        }
+
+        return result;
     }
 }

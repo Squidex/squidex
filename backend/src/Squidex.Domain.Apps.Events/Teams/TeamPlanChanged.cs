@@ -8,16 +8,15 @@
 using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Teams
-{
-    [EventType(nameof(TeamPlanChanged))]
-    public sealed class TeamPlanChanged : TeamEvent
-    {
-        public string PlanId { get; set; }
+namespace Squidex.Domain.Apps.Events.Teams;
 
-        public AssignedPlan ToPlan()
-        {
-            return new AssignedPlan(Actor, PlanId);
-        }
+[EventType(nameof(TeamPlanChanged))]
+public sealed class TeamPlanChanged : TeamEvent
+{
+    public string PlanId { get; set; }
+
+    public AssignedPlan ToPlan()
+    {
+        return new AssignedPlan(Actor, PlanId);
     }
 }

@@ -10,34 +10,33 @@ using Microsoft.Extensions.Options;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 
-namespace Squidex.Extensions.Actions
+namespace Squidex.Extensions.Actions;
+
+internal sealed class ClientPool<TKey, TClient>
 {
-    internal sealed class ClientPool<TKey, TClient>
+    private static readonly TimeSpan TimeToLive = TimeSpan.FromMinutes(30);
+    private readonly MemoryCache memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+    private readonly Func<TKey, Task<TClient>> factory;
+
+    public ClientPool(Func<TKey, TClient> factory)
     {
-        private static readonly TimeSpan TimeToLive = TimeSpan.FromMinutes(30);
-        private readonly MemoryCache memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-        private readonly Func<TKey, Task<TClient>> factory;
+        this.factory = x => Task.FromResult(factory(x));
+    }
 
-        public ClientPool(Func<TKey, TClient> factory)
+    public ClientPool(Func<TKey, Task<TClient>> factory)
+    {
+        this.factory = factory;
+    }
+
+    public async Task<TClient> GetClientAsync(TKey key)
+    {
+        if (!memoryCache.TryGetValue<TClient>(key, out var client))
         {
-            this.factory = x => Task.FromResult(factory(x));
+            client = await factory(key);
+
+            memoryCache.Set(key, client, TimeToLive);
         }
 
-        public ClientPool(Func<TKey, Task<TClient>> factory)
-        {
-            this.factory = factory;
-        }
-
-        public async Task<TClient> GetClientAsync(TKey key)
-        {
-            if (!memoryCache.TryGetValue<TClient>(key, out var client))
-            {
-                client = await factory(key);
-
-                memoryCache.Set(key, client, TimeToLive);
-            }
-
-            return client;
-        }
+        return client;
     }
 }

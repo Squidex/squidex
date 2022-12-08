@@ -10,47 +10,46 @@ using Microsoft.OData.UriParser;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Infrastructure.Queries.OData
+namespace Squidex.Infrastructure.Queries.OData;
+
+public static class FilterBuilder
 {
-    public static class FilterBuilder
+    public static void ParseFilter(this ODataUriParser query, ClrQuery result)
     {
-        public static void ParseFilter(this ODataUriParser query, ClrQuery result)
+        SearchClause searchClause;
+        try
         {
-            SearchClause searchClause;
-            try
-            {
-                searchClause = query.ParseSearch();
-            }
-            catch (ODataException ex)
-            {
-                var error = T.Get("common.odataSearchNotValid", new { message = ex.Message });
+            searchClause = query.ParseSearch();
+        }
+        catch (ODataException ex)
+        {
+            var error = T.Get("common.odataSearchNotValid", new { message = ex.Message });
 
-                throw new ValidationException(error, ex);
-            }
+            throw new ValidationException(error, ex);
+        }
 
-            if (searchClause != null)
-            {
-                result.FullText = SearchTermVisitor.Visit(searchClause.Expression).ToString();
-            }
+        if (searchClause != null)
+        {
+            result.FullText = SearchTermVisitor.Visit(searchClause.Expression).ToString();
+        }
 
-            FilterClause filterClause;
-            try
-            {
-                filterClause = query.ParseFilter();
-            }
-            catch (ODataException ex)
-            {
-                var error = T.Get("common.odataFilterNotValid", new { message = ex.Message });
+        FilterClause filterClause;
+        try
+        {
+            filterClause = query.ParseFilter();
+        }
+        catch (ODataException ex)
+        {
+            var error = T.Get("common.odataFilterNotValid", new { message = ex.Message });
 
-                throw new ValidationException(error, ex);
-            }
+            throw new ValidationException(error, ex);
+        }
 
-            if (filterClause != null)
-            {
-                var filter = FilterVisitor.Visit(filterClause.Expression);
+        if (filterClause != null)
+        {
+            var filter = FilterVisitor.Visit(filterClause.Expression);
 
-                result.Filter = Optimizer<ClrValue>.Optimize(filter);
-            }
+            result.Filter = Optimizer<ClrValue>.Optimize(filter);
         }
     }
 }

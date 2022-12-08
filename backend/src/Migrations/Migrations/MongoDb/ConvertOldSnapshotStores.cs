@@ -10,31 +10,30 @@ using MongoDB.Driver;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.MongoDb;
 
-namespace Migrations.Migrations.MongoDb
+namespace Migrations.Migrations.MongoDb;
+
+public sealed class ConvertOldSnapshotStores : MongoBase<BsonDocument>, IMigration
 {
-    public sealed class ConvertOldSnapshotStores : MongoBase<BsonDocument>, IMigration
+    private readonly IMongoDatabase database;
+
+    public ConvertOldSnapshotStores(IMongoDatabase database)
     {
-        private readonly IMongoDatabase database;
+        this.database = database;
+    }
 
-        public ConvertOldSnapshotStores(IMongoDatabase database)
+    public Task UpdateAsync(
+        CancellationToken ct)
+    {
+        // Do not resolve in constructor, because most of the time it is not executed anyway.
+        var collections = new[]
         {
-            this.database = database;
-        }
+            "States_Apps",
+            "States_Rules",
+            "States_Schemas"
+        }.Select(x => database.GetCollection<BsonDocument>(x));
 
-        public Task UpdateAsync(
-            CancellationToken ct)
-        {
-            // Do not resolve in constructor, because most of the time it is not executed anyway.
-            var collections = new[]
-            {
-                "States_Apps",
-                "States_Rules",
-                "States_Schemas"
-            }.Select(x => database.GetCollection<BsonDocument>(x));
+        var update = Update.Rename("State", "Doc");
 
-            var update = Update.Rename("State", "Doc");
-
-            return Task.WhenAll(collections.Select(x => x.UpdateManyAsync(FindAll, update, cancellationToken: ct)));
-        }
+        return Task.WhenAll(collections.Select(x => x.UpdateManyAsync(FindAll, update, cancellationToken: ct)));
     }
 }

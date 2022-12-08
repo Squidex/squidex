@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Diagnostics
+namespace Squidex.Infrastructure.Diagnostics;
+
+public sealed class GCHealthCheckOptions
 {
-    public sealed class GCHealthCheckOptions
-    {
-        public long ThresholdInMB { get; set; } = 8192;
-    }
+    public long ThresholdInMB { get; set; } = 8192;
 }

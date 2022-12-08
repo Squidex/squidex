@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Rules
+namespace Squidex.Domain.Apps.Entities.Rules;
+
+public enum RuleJobResult
 {
-    public enum RuleJobResult
-    {
-        Pending,
-        Success,
-        Retry,
-        Failed,
-        Cancelled
-    }
+    Pending,
+    Success,
+    Retry,
+    Failed,
+    Cancelled
 }

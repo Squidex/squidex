@@ -9,60 +9,59 @@ using System.Resources.NetStandard;
 using System.Text.RegularExpressions;
 using Squidex.Translator.State;
 
-namespace Squidex.Translator.Processes
+namespace Squidex.Translator.Processes;
+
+public sealed class GenerateBackendResources
 {
-    public sealed class GenerateBackendResources
+    private readonly TranslationService service;
+    private readonly DirectoryInfo folder;
+
+    public GenerateBackendResources(DirectoryInfo folder, TranslationService service)
     {
-        private readonly TranslationService service;
-        private readonly DirectoryInfo folder;
+        this.folder = new DirectoryInfo(Path.Combine(folder.FullName, "backend", "src", "Squidex.Shared"));
 
-        public GenerateBackendResources(DirectoryInfo folder, TranslationService service)
+        this.service = service;
+    }
+
+    public void Run()
+    {
+        foreach (var locale in service.SupportedLocales)
         {
-            this.folder = new DirectoryInfo(Path.Combine(folder.FullName, "backend", "src", "Squidex.Shared"));
+            var name = locale ==
+                service.MainLocale ?
+                    $"Texts.resx" :
+                    $"Texts.{locale}.resx";
 
-            this.service = service;
-        }
+            var fullName = Path.Combine(folder.FullName, name);
 
-        public void Run()
-        {
-            foreach (var locale in service.SupportedLocales)
+            using (var writer = new ResXResourceWriter(fullName))
             {
-                var name = locale ==
-                    service.MainLocale ?
-                        $"Texts.resx" :
-                        $"Texts.{locale}.resx";
+                var texts = service.GetTextsWithFallback(locale);
 
-                var fullName = Path.Combine(folder.FullName, name);
-
-                using (var writer = new ResXResourceWriter(fullName))
+                foreach (var (key, value) in texts)
                 {
-                    var texts = service.GetTextsWithFallback(locale);
+                    writer.AddResource(key, value);
 
-                    foreach (var (key, value) in texts)
+                    if (key.StartsWith("annotations_", StringComparison.OrdinalIgnoreCase))
                     {
-                        writer.AddResource(key, value);
+                        var i = 0;
 
-                        if (key.StartsWith("annotations_", StringComparison.OrdinalIgnoreCase))
-                        {
-                            var i = 0;
+                        var dotnetKey = $"dotnet_{key}";
+                        var dotnetValue = Regex.Replace(value, "{[^}]*}", m => $"{{{i++}}}");
 
-                            var dotnetKey = $"dotnet_{key}";
-                            var dotnetValue = Regex.Replace(value, "{[^}]*}", m => $"{{{i++}}}");
-
-                            writer.AddResource(dotnetKey, dotnetValue);
-                        }
+                        writer.AddResource(dotnetKey, dotnetValue);
                     }
                 }
-
-                var text = File.ReadAllText(fullName);
-
-                text = text.Replace("System.Resources.NetStandard.ResXResourceReader, System.Resources.NetStandard, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089", StringComparison.Ordinal);
-                text = text.Replace("System.Resources.NetStandard.ResXResourceWriter, System.Resources.NetStandard, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089", StringComparison.Ordinal);
-
-                File.WriteAllText(fullName, text);
             }
 
-            service.Save();
+            var text = File.ReadAllText(fullName);
+
+            text = text.Replace("System.Resources.NetStandard.ResXResourceReader, System.Resources.NetStandard, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089", StringComparison.Ordinal);
+            text = text.Replace("System.Resources.NetStandard.ResXResourceWriter, System.Resources.NetStandard, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089", StringComparison.Ordinal);
+
+            File.WriteAllText(fullName, text);
         }
+
+        service.Save();
     }
 }

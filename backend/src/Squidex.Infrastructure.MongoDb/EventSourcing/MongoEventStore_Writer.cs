@@ -10,164 +10,163 @@ using MongoDB.Driver;
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+public partial class MongoEventStore
 {
-    public partial class MongoEventStore
+    private const int MaxCommitSize = 100;
+    private const int MaxWriteAttempts = 20;
+    private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
+
+    public Task DeleteStreamAsync(string streamName,
+        CancellationToken ct = default)
     {
-        private const int MaxCommitSize = 100;
-        private const int MaxWriteAttempts = 20;
-        private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
+        Guard.NotNullOrEmpty(streamName);
 
-        public Task DeleteStreamAsync(string streamName,
-            CancellationToken ct = default)
+        return Collection.DeleteManyAsync(x => x.EventStream == streamName, ct);
+    }
+
+    public Task DeleteAsync(string streamFilter,
+        CancellationToken ct = default)
+    {
+        Guard.NotNullOrEmpty(streamFilter);
+
+        return Collection.DeleteManyAsync(FilterExtensions.ByStream(streamFilter), ct);
+    }
+
+    public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events,
+        CancellationToken ct = default)
+    {
+        return AppendAsync(commitId, streamName, EtagVersion.Any, events, ct);
+    }
+
+    public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events,
+        CancellationToken ct = default)
+    {
+        Guard.NotEmpty(commitId);
+        Guard.NotNullOrEmpty(streamName);
+        Guard.NotNull(events);
+        Guard.GreaterEquals(expectedVersion, EtagVersion.Any);
+
+        using (Telemetry.Activities.StartActivity("MongoEventStore/AppendAsync"))
         {
-            Guard.NotNullOrEmpty(streamName);
-
-            return Collection.DeleteManyAsync(x => x.EventStream == streamName, ct);
-        }
-
-        public Task DeleteAsync(string streamFilter,
-            CancellationToken ct = default)
-        {
-            Guard.NotNullOrEmpty(streamFilter);
-
-            return Collection.DeleteManyAsync(FilterExtensions.ByStream(streamFilter), ct);
-        }
-
-        public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events,
-            CancellationToken ct = default)
-        {
-            return AppendAsync(commitId, streamName, EtagVersion.Any, events, ct);
-        }
-
-        public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events,
-            CancellationToken ct = default)
-        {
-            Guard.NotEmpty(commitId);
-            Guard.NotNullOrEmpty(streamName);
-            Guard.NotNull(events);
-            Guard.GreaterEquals(expectedVersion, EtagVersion.Any);
-
-            using (Telemetry.Activities.StartActivity("MongoEventStore/AppendAsync"))
+            if (events.Count == 0)
             {
-                if (events.Count == 0)
+                return;
+            }
+
+            var currentVersion = await GetEventStreamOffsetAsync(streamName, ct);
+
+            if (expectedVersion > EtagVersion.Any && expectedVersion != currentVersion)
+            {
+                throw new WrongEventVersionException(currentVersion, expectedVersion);
+            }
+
+            var commit = BuildCommit(commitId, streamName, expectedVersion >= -1 ? expectedVersion : currentVersion, events);
+
+            for (var attempt = 1; attempt <= MaxWriteAttempts; attempt++)
+            {
+                try
                 {
+                    await Collection.InsertOneAsync(commit, cancellationToken: ct);
+
+                    if (!CanUseChangeStreams)
+                    {
+                        notifier.NotifyEventsStored(streamName);
+                    }
+
                     return;
                 }
-
-                var currentVersion = await GetEventStreamOffsetAsync(streamName, ct);
-
-                if (expectedVersion > EtagVersion.Any && expectedVersion != currentVersion)
+                catch (MongoWriteException ex)
                 {
-                    throw new WrongEventVersionException(currentVersion, expectedVersion);
-                }
-
-                var commit = BuildCommit(commitId, streamName, expectedVersion >= -1 ? expectedVersion : currentVersion, events);
-
-                for (var attempt = 1; attempt <= MaxWriteAttempts; attempt++)
-                {
-                    try
+                    if (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
                     {
-                        await Collection.InsertOneAsync(commit, cancellationToken: ct);
+                        currentVersion = await GetEventStreamOffsetAsync(streamName, ct);
 
-                        if (!CanUseChangeStreams)
+                        if (expectedVersion > EtagVersion.Any)
                         {
-                            notifier.NotifyEventsStored(streamName);
+                            throw new WrongEventVersionException(currentVersion, expectedVersion);
                         }
 
-                        return;
+                        if (attempt >= MaxWriteAttempts)
+                        {
+                            throw new TimeoutException("Could not acquire a free slot for the commit within the provided time.");
+                        }
                     }
-                    catch (MongoWriteException ex)
+                    else
                     {
-                        if (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
-                        {
-                            currentVersion = await GetEventStreamOffsetAsync(streamName, ct);
-
-                            if (expectedVersion > EtagVersion.Any)
-                            {
-                                throw new WrongEventVersionException(currentVersion, expectedVersion);
-                            }
-
-                            if (attempt >= MaxWriteAttempts)
-                            {
-                                throw new TimeoutException("Could not acquire a free slot for the commit within the provided time.");
-                            }
-                        }
-                        else
-                        {
-                            throw;
-                        }
+                        throw;
                     }
                 }
             }
         }
+    }
 
-        public async Task AppendUnsafeAsync(IEnumerable<EventCommit> commits,
-            CancellationToken ct = default)
+    public async Task AppendUnsafeAsync(IEnumerable<EventCommit> commits,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(commits);
+
+        using (Telemetry.Activities.StartActivity("MongoEventStore/AppendUnsafeAsync"))
         {
-            Guard.NotNull(commits);
+            var writes = new List<WriteModel<MongoEventCommit>>();
 
-            using (Telemetry.Activities.StartActivity("MongoEventStore/AppendUnsafeAsync"))
+            foreach (var commit in commits)
             {
-                var writes = new List<WriteModel<MongoEventCommit>>();
+                var document = BuildCommit(commit.Id, commit.StreamName, commit.Offset, commit.Events);
 
-                foreach (var commit in commits)
-                {
-                    var document = BuildCommit(commit.Id, commit.StreamName, commit.Offset, commit.Events);
-
-                    writes.Add(new InsertOneModel<MongoEventCommit>(document));
-                }
-
-                if (writes.Count > 0)
-                {
-                    await Collection.BulkWriteAsync(writes, BulkUnordered, ct);
-                }
-            }
-        }
-
-        private async Task<long> GetEventStreamOffsetAsync(string streamName,
-            CancellationToken ct = default)
-        {
-            var document =
-                await Collection.Find(Filter.Eq(x => x.EventStream, streamName))
-                    .Project<BsonDocument>(Projection
-                        .Include(x => x.EventStreamOffset)
-                        .Include(x => x.EventsCount))
-                    .Sort(Sort.Descending(x => x.EventStreamOffset)).Limit(1)
-                    .FirstOrDefaultAsync(ct);
-
-            if (document != null)
-            {
-                return document[nameof(MongoEventCommit.EventStreamOffset)].ToInt64() + document[nameof(MongoEventCommit.EventsCount)].ToInt64();
+                writes.Add(new InsertOneModel<MongoEventCommit>(document));
             }
 
-            return EtagVersion.Empty;
-        }
-
-        private static MongoEventCommit BuildCommit(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
-        {
-            var commitEvents = new MongoEvent[events.Count];
-
-            var i = 0;
-
-            foreach (var e in events)
+            if (writes.Count > 0)
             {
-                var mongoEvent = MongoEvent.FromEventData(e);
-
-                commitEvents[i++] = mongoEvent;
+                await Collection.BulkWriteAsync(writes, BulkUnordered, ct);
             }
-
-            var mongoCommit = new MongoEventCommit
-            {
-                Id = commitId,
-                Events = commitEvents,
-                EventsCount = events.Count,
-                EventStream = streamName,
-                EventStreamOffset = expectedVersion,
-                Timestamp = EmptyTimestamp
-            };
-
-            return mongoCommit;
         }
+    }
+
+    private async Task<long> GetEventStreamOffsetAsync(string streamName,
+        CancellationToken ct = default)
+    {
+        var document =
+            await Collection.Find(Filter.Eq(x => x.EventStream, streamName))
+                .Project<BsonDocument>(Projection
+                    .Include(x => x.EventStreamOffset)
+                    .Include(x => x.EventsCount))
+                .Sort(Sort.Descending(x => x.EventStreamOffset)).Limit(1)
+                .FirstOrDefaultAsync(ct);
+
+        if (document != null)
+        {
+            return document[nameof(MongoEventCommit.EventStreamOffset)].ToInt64() + document[nameof(MongoEventCommit.EventsCount)].ToInt64();
+        }
+
+        return EtagVersion.Empty;
+    }
+
+    private static MongoEventCommit BuildCommit(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
+    {
+        var commitEvents = new MongoEvent[events.Count];
+
+        var i = 0;
+
+        foreach (var e in events)
+        {
+            var mongoEvent = MongoEvent.FromEventData(e);
+
+            commitEvents[i++] = mongoEvent;
+        }
+
+        var mongoCommit = new MongoEventCommit
+        {
+            Id = commitId,
+            Events = commitEvents,
+            EventsCount = events.Count,
+            EventStream = streamName,
+            EventStreamOffset = expectedVersion,
+            Timestamp = EmptyTimestamp
+        };
+
+        return mongoCommit;
     }
 }

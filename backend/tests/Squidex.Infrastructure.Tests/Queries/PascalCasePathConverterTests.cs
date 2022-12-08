@@ -5,28 +5,25 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Xunit;
+namespace Squidex.Infrastructure.Queries;
 
-namespace Squidex.Infrastructure.Queries
+public class PascalCasePathConverterTests
 {
-    public class PascalCasePathConverterTests
+    [Fact]
+    public void Should_convert_property()
     {
-        [Fact]
-        public void Should_convert_property()
-        {
-            var source = ClrFilter.Eq("property", 1);
-            var actual = PascalCasePathConverter<ClrValue>.Transform(source);
+        var source = ClrFilter.Eq("property", 1);
+        var actual = PascalCasePathConverter<ClrValue>.Transform(source);
 
-            Assert.Equal("Property == 1", actual!.ToString());
-        }
+        Assert.Equal("Property == 1", actual!.ToString());
+    }
 
-        [Fact]
-        public void Should_convert_properties()
-        {
-            var source = ClrFilter.Eq("root.child", 1);
-            var actual = PascalCasePathConverter<ClrValue>.Transform(source);
+    [Fact]
+    public void Should_convert_properties()
+    {
+        var source = ClrFilter.Eq("root.child", 1);
+        var actual = PascalCasePathConverter<ClrValue>.Transform(source);
 
-            Assert.Equal("Root.Child == 1", actual!.ToString());
-        }
+        Assert.Equal("Root.Child == 1", actual!.ToString());
     }
 }

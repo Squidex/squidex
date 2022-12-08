@@ -8,33 +8,32 @@
 using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Templates.Models
+namespace Squidex.Areas.Api.Controllers.Templates.Models;
+
+public class TemplateDetailsDto : Resource
 {
-    public class TemplateDetailsDto : Resource
+    /// <summary>
+    /// The details of the template.
+    /// </summary>
+    [LocalizedRequired]
+    public string Details { get; set; }
+
+    public static TemplateDetailsDto FromDomain(string name, string details, Resources resources)
     {
-        /// <summary>
-        /// The details of the template.
-        /// </summary>
-        [LocalizedRequired]
-        public string Details { get; set; }
-
-        public static TemplateDetailsDto FromDomain(string name, string details, Resources resources)
+        var result = new TemplateDetailsDto
         {
-            var result = new TemplateDetailsDto
-            {
-                Details = details
-            };
+            Details = details
+        };
 
-            return result.CreateLinks(name, resources);
-        }
+        return result.CreateLinks(name, resources);
+    }
 
-        private TemplateDetailsDto CreateLinks(string name, Resources resources)
-        {
-            var values = new { name };
+    private TemplateDetailsDto CreateLinks(string name, Resources resources)
+    {
+        var values = new { name };
 
-            AddSelfLink(resources.Url<TemplatesController>(c => nameof(c.GetTemplate), values));
+        AddSelfLink(resources.Url<TemplatesController>(c => nameof(c.GetTemplate), values));
 
-            return this;
-        }
+        return this;
     }
 }

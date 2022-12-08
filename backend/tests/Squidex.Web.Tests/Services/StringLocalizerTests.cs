@@ -7,49 +7,47 @@
 
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
-using Xunit;
 
-namespace Squidex.Web.Services
+namespace Squidex.Web.Services;
+
+public class StringLocalizerTests
 {
-    public class StringLocalizerTests
+    private readonly StringLocalizer sut;
+
+    public StringLocalizerTests()
     {
-        private readonly StringLocalizer sut;
+        var translations = new ResourcesLocalizer(Texts.ResourceManager);
 
-        public StringLocalizerTests()
-        {
-            var translations = new ResourcesLocalizer(Texts.ResourceManager);
+        sut = new StringLocalizer(translations);
+    }
 
-            sut = new StringLocalizer(translations);
-        }
+    [Fact]
+    public void Should_provide_translation()
+    {
+        var key = "annotations_Required";
 
-        [Fact]
-        public void Should_provide_translation()
-        {
-            var key = "annotations_Required";
+        var name = sut[key];
 
-            var name = sut[key];
+        Assert.Equal("The field '{0}' is required.", name);
+    }
 
-            Assert.Equal("The field '{0}' is required.", name);
-        }
+    [Fact]
+    public void Should_format_translation()
+    {
+        var key = "annotations_Required";
 
-        [Fact]
-        public void Should_format_translation()
-        {
-            var key = "annotations_Required";
+        var name = sut[key, "MyField"];
 
-            var name = sut[key, "MyField"];
+        Assert.Equal("The field 'MyField' is required.", name);
+    }
 
-            Assert.Equal("The field 'MyField' is required.", name);
-        }
+    [Fact]
+    public void Should_translate_property_name()
+    {
+        var key = "annotations_Required";
 
-        [Fact]
-        public void Should_translate_property_name()
-        {
-            var key = "annotations_Required";
+        var name = sut[key, "ClientId"];
 
-            var name = sut[key, "ClientId"];
-
-            Assert.Equal("The field 'Client ID' is required.", name);
-        }
+        Assert.Equal("The field 'Client ID' is required.", name);
     }
 }

@@ -5,41 +5,40 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public sealed class InMemoryCommandBus : ICommandBus
 {
-    public sealed class InMemoryCommandBus : ICommandBus
+    private readonly NextDelegate pipeline;
+
+    public InMemoryCommandBus(IEnumerable<ICommandMiddleware> middlewares)
     {
-        private readonly NextDelegate pipeline;
+        var reverseMiddlewares = middlewares.Reverse().ToList();
 
-        public InMemoryCommandBus(IEnumerable<ICommandMiddleware> middlewares)
+        NextDelegate next = (c, ct) => Task.CompletedTask;
+
+        foreach (var middleware in reverseMiddlewares)
         {
-            var reverseMiddlewares = middlewares.Reverse().ToList();
-
-            NextDelegate next = (c, ct) => Task.CompletedTask;
-
-            foreach (var middleware in middlewares.Reverse())
-            {
-                next = Create(next, middleware);
-            }
-
-            pipeline = next;
+            next = Create(next, middleware);
         }
 
-        private static NextDelegate Create(NextDelegate next, ICommandMiddleware middleware)
-        {
-            return (c, ct) => middleware.HandleAsync(c, next, ct);
-        }
+        pipeline = next;
+    }
 
-        public async Task<CommandContext> PublishAsync(ICommand command,
-            CancellationToken ct)
-        {
-            Guard.NotNull(command);
+    private static NextDelegate Create(NextDelegate next, ICommandMiddleware middleware)
+    {
+        return (c, ct) => middleware.HandleAsync(c, next, ct);
+    }
 
-            var context = new CommandContext(command, this);
+    public async Task<CommandContext> PublishAsync(ICommand command,
+        CancellationToken ct)
+    {
+        Guard.NotNull(command);
 
-            await pipeline(context, ct);
+        var context = new CommandContext(command, this);
 
-            return context;
-        }
+        await pipeline(context, ct);
+
+        return context;
     }
 }

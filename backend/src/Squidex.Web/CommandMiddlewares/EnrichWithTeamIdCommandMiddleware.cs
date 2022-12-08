@@ -10,46 +10,45 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Web.CommandMiddlewares
+namespace Squidex.Web.CommandMiddlewares;
+
+public sealed class EnrichWithTeamIdCommandMiddleware : ICommandMiddleware
 {
-    public sealed class EnrichWithTeamIdCommandMiddleware : ICommandMiddleware
+    private readonly IHttpContextAccessor httpContextAccessor;
+
+    public EnrichWithTeamIdCommandMiddleware(IHttpContextAccessor httpContextAccessor)
     {
-        private readonly IHttpContextAccessor httpContextAccessor;
+        this.httpContextAccessor = httpContextAccessor;
+    }
 
-        public EnrichWithTeamIdCommandMiddleware(IHttpContextAccessor httpContextAccessor)
+    public Task HandleAsync(CommandContext context, NextDelegate next,
+        CancellationToken ct)
+    {
+        if (httpContextAccessor.HttpContext == null)
         {
-            this.httpContextAccessor = httpContextAccessor;
-        }
-
-        public Task HandleAsync(CommandContext context, NextDelegate next,
-            CancellationToken ct)
-        {
-            if (httpContextAccessor.HttpContext == null)
-            {
-                return next(context, ct);
-            }
-
-            if (context.Command is ITeamCommand teamCommand && teamCommand.TeamId == default)
-            {
-                var teamId = GetTeamId();
-
-                teamCommand.TeamId = teamId;
-            }
-
             return next(context, ct);
         }
 
-        private DomainId GetTeamId()
+        if (context.Command is ITeamCommand teamCommand && teamCommand.TeamId == default)
         {
-            var feature = httpContextAccessor.HttpContext?.Features.Get<ITeamFeature>();
+            var teamId = GetTeamId();
 
-            if (feature == null)
-            {
-                ThrowHelper.InvalidOperationException("Cannot resolve team.");
-                return default!;
-            }
-
-            return feature.Team.Id;
+            teamCommand.TeamId = teamId;
         }
+
+        return next(context, ct);
+    }
+
+    private DomainId GetTeamId()
+    {
+        var feature = httpContextAccessor.HttpContext?.Features.Get<ITeamFeature>();
+
+        if (feature == null)
+        {
+            ThrowHelper.InvalidOperationException("Cannot resolve team.");
+            return default!;
+        }
+
+        return feature.Team.Id;
     }
 }

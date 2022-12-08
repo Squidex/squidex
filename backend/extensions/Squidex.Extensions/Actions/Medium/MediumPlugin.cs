@@ -9,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.Medium
+namespace Squidex.Extensions.Actions.Medium;
+
+public sealed class MediumPlugin : IPlugin
 {
-    public sealed class MediumPlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddRuleAction<MediumAction, MediumActionHandler>();
-        }
+        services.AddRuleAction<MediumAction, MediumActionHandler>();
     }
 }

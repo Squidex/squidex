@@ -13,6 +13,8 @@ insert_final_newline = true
 indent_style = space
 indent_size = 4
 
+csharp_style_namespace_declarations = file_scoped
+
 # FAILING ANALYZERS
 dotnet_diagnostic.RECS0002.severity = none
 dotnet_diagnostic.RECS0117.severity = none
@@ -165,6 +167,9 @@ dotnet_diagnostic.SA1601.severity = none
 
 # SA1602: Enumeration items should be documented
 dotnet_diagnostic.SA1602.severity = none
+
+# SA1615: Element return value should be documented
+dotnet_diagnostic.SA1615.severity = none
 
 # SA1623: Property summary documentation should match accessors
 dotnet_diagnostic.SA1623.severity = none

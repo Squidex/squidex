@@ -7,10 +7,9 @@
 
 using Squidex.Domain.Apps.Core.Apps;
 
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Domain.Apps.Entities.Apps;
+
+public sealed class InitialSettings
 {
-    public sealed class InitialSettings
-    {
-        public AppSettings Settings { get; set; }
-    }
+    public AppSettings Settings { get; set; }
 }

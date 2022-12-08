@@ -7,11 +7,10 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Teams
+namespace Squidex.Domain.Apps.Events.Teams;
+
+[EventType(nameof(TeamContributorRemoved))]
+public sealed class TeamContributorRemoved : TeamEvent
 {
-    [EventType(nameof(TeamContributorRemoved))]
-    public sealed class TeamContributorRemoved : TeamEvent
-    {
-        public string ContributorId { get; set; }
-    }
+    public string ContributorId { get; set; }
 }

@@ -7,11 +7,10 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps;
+
+[EventType(nameof(AppRoleAdded))]
+public sealed class AppRoleAdded : AppEvent
 {
-    [EventType(nameof(AppRoleAdded))]
-    public sealed class AppRoleAdded : AppEvent
-    {
-        public string Name { get; set; }
-    }
+    public string Name { get; set; }
 }

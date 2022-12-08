@@ -7,19 +7,30 @@
 
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
+public sealed class EventTypeAttribute : TypeNameAttribute
 {
-    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public sealed class EventTypeAttribute : TypeNameAttribute
+    private const string Suffix = "Event";
+
+    public EventTypeAttribute(string typeName, int version = 1)
+        : base(CreateTypeName(typeName, version))
     {
-        public EventTypeAttribute(string typeName, int version = 1)
-            : base(CreateTypeName(typeName, version))
+    }
+
+    private static string CreateTypeName(string typeName, int version)
+    {
+        if (!typeName.EndsWith(Suffix, StringComparison.OrdinalIgnoreCase))
         {
+            typeName += Suffix;
         }
 
-        private static string CreateTypeName(string typeName, int version)
+        if (version > 1)
         {
-            return $"{typeName}Event" + (version > 1 ? $"V{version}" : string.Empty);
+            typeName = $"{typeName}V{version}";
         }
+
+        return typeName;
     }
 }

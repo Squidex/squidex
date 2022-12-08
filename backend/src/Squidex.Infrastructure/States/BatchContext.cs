@@ -9,105 +9,104 @@ using Squidex.Infrastructure.EventSourcing;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Infrastructure.States;
+
+public sealed class BatchContext<T> : IBatchContext<T>
 {
-    public sealed class BatchContext<T> : IBatchContext<T>
+    private static readonly List<Envelope<IEvent>> EmptyStream = new List<Envelope<IEvent>>();
+    private readonly Type owner;
+    private readonly IEventFormatter eventFormatter;
+    private readonly IEventStore eventStore;
+    private readonly IEventStreamNames eventStreamNames;
+    private readonly ISnapshotStore<T> snapshotStore;
+    private readonly Dictionary<DomainId, (long, List<Envelope<IEvent>>)> events = new Dictionary<DomainId, (long, List<Envelope<IEvent>>)>();
+    private Dictionary<DomainId, SnapshotWriteJob<T>>? snapshots;
+
+    public ISnapshotStore<T> Snapshots => snapshotStore;
+
+    internal BatchContext(
+        Type owner,
+        IEventFormatter eventFormatter,
+        IEventStore eventStore,
+        IEventStreamNames eventStreamNames,
+        ISnapshotStore<T> snapshotStore)
     {
-        private static readonly List<Envelope<IEvent>> EmptyStream = new List<Envelope<IEvent>>();
-        private readonly Type owner;
-        private readonly IEventFormatter eventFormatter;
-        private readonly IEventStore eventStore;
-        private readonly IEventStreamNames eventStreamNames;
-        private readonly ISnapshotStore<T> snapshotStore;
-        private readonly Dictionary<DomainId, (long, List<Envelope<IEvent>>)> events = new Dictionary<DomainId, (long, List<Envelope<IEvent>>)>();
-        private Dictionary<DomainId, SnapshotWriteJob<T>>? snapshots;
+        this.owner = owner;
+        this.eventFormatter = eventFormatter;
+        this.eventStore = eventStore;
+        this.eventStreamNames = eventStreamNames;
+        this.snapshotStore = snapshotStore;
+    }
 
-        public ISnapshotStore<T> Snapshots => snapshotStore;
+    internal void Add(DomainId key, T snapshot, long version)
+    {
+        snapshots ??= new ();
 
-        internal BatchContext(
-            Type owner,
-            IEventFormatter eventFormatter,
-            IEventStore eventStore,
-            IEventStreamNames eventStreamNames,
-            ISnapshotStore<T> snapshotStore)
+        if (!snapshots.TryGetValue(key, out var existing) || existing.NewVersion < version)
         {
-            this.owner = owner;
-            this.eventFormatter = eventFormatter;
-            this.eventStore = eventStore;
-            this.eventStreamNames = eventStreamNames;
-            this.snapshotStore = snapshotStore;
+            snapshots[key] = new SnapshotWriteJob<T>(key, snapshot, version);
+        }
+    }
+
+    public async Task LoadAsync(IEnumerable<DomainId> ids)
+    {
+        var streamNames = ids.ToDictionary(x => x, x => eventStreamNames.GetStreamName(owner, x.ToString()));
+
+        if (streamNames.Count == 0)
+        {
+            return;
         }
 
-        internal void Add(DomainId key, T snapshot, long version)
-        {
-            snapshots ??= new ();
+        var streams = await eventStore.QueryManyAsync(streamNames.Values);
 
-            if (!snapshots.TryGetValue(key, out var existing) || existing.NewVersion < version)
+        foreach (var (id, streamName) in streamNames)
+        {
+            if (streams.TryGetValue(streamName, out var data))
             {
-                snapshots[key] = new SnapshotWriteJob<T>(key, snapshot, version);
+                var stream = data.Select(eventFormatter.ParseIfKnown).NotNull().ToList();
+
+                events[id] = (data.Count - 1, stream);
+            }
+            else
+            {
+                events[id] = (EtagVersion.Empty, EmptyStream);
             }
         }
+    }
 
-        public async Task LoadAsync(IEnumerable<DomainId> ids)
+    public async ValueTask DisposeAsync()
+    {
+        await CommitAsync();
+    }
+
+    public Task CommitAsync()
+    {
+        var current = Interlocked.Exchange(ref snapshots, null!);
+
+        if (current == null || current.Count == 0)
         {
-            var streamNames = ids.ToDictionary(x => x, x => eventStreamNames.GetStreamName(owner, x.ToString()));
-
-            if (streamNames.Count == 0)
-            {
-                return;
-            }
-
-            var streams = await eventStore.QueryManyAsync(streamNames.Values);
-
-            foreach (var (id, streamName) in streamNames)
-            {
-                if (streams.TryGetValue(streamName, out var data))
-                {
-                    var stream = data.Select(eventFormatter.ParseIfKnown).NotNull().ToList();
-
-                    events[id] = (data.Count - 1, stream);
-                }
-                else
-                {
-                    events[id] = (EtagVersion.Empty, EmptyStream);
-                }
-            }
+            return Task.CompletedTask;
         }
 
-        public async ValueTask DisposeAsync()
-        {
-            await CommitAsync();
-        }
+        return snapshotStore.WriteManyAsync(current.Values);
+    }
 
-        public Task CommitAsync()
-        {
-            var current = Interlocked.Exchange(ref snapshots, null!);
+    public IPersistence<T> WithEventSourcing(Type owner, DomainId key, HandleEvent? applyEvent)
+    {
+        var (version, streamEvents) = events[key];
 
-            if (current == null || current.Count == 0)
-            {
-                return Task.CompletedTask;
-            }
+        return new BatchPersistence<T>(key, this, version, streamEvents, applyEvent);
+    }
 
-            return snapshotStore.WriteManyAsync(current.Values);
-        }
+    public IPersistence<T> WithSnapshotsAndEventSourcing(Type owner, DomainId key, HandleSnapshot<T>? applySnapshot, HandleEvent? applyEvent)
+    {
+        var (version, streamEvents) = events[key];
 
-        public IPersistence<T> WithEventSourcing(Type owner, DomainId key, HandleEvent? applyEvent)
-        {
-            var (version, streamEvents) = events[key];
+        return new BatchPersistence<T>(key, this, version, streamEvents, applyEvent);
+    }
 
-            return new BatchPersistence<T>(key, this, version, streamEvents, applyEvent);
-        }
-
-        public IPersistence<T> WithSnapshotsAndEventSourcing(Type owner, DomainId key, HandleSnapshot<T>? applySnapshot, HandleEvent? applyEvent)
-        {
-            var (version, streamEvents) = events[key];
-
-            return new BatchPersistence<T>(key, this, version, streamEvents, applyEvent);
-        }
-
-        public IPersistence<T> WithSnapshots(Type owner, DomainId key, HandleSnapshot<T>? applySnapshot)
-        {
-            throw new NotSupportedException();
-        }
+    public IPersistence<T> WithSnapshots(Type owner, DomainId key, HandleSnapshot<T>? applySnapshot)
+    {
+        throw new NotSupportedException();
     }
 }

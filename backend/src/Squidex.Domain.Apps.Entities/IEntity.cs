@@ -8,14 +8,13 @@
 using NodaTime;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities;
+
+public interface IEntity : IWithId<DomainId>
 {
-    public interface IEntity : IWithId<DomainId>
-    {
-        Instant Created { get; }
+    Instant Created { get; }
 
-        Instant LastModified { get; }
+    Instant LastModified { get; }
 
-        DomainId UniqueId { get; }
-    }
+    DomainId UniqueId { get; }
 }

@@ -8,13 +8,12 @@
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 
-namespace Squidex.Domain.Apps.Core.TestHelpers
+namespace Squidex.Domain.Apps.Core.TestHelpers;
+
+public class TranslationsFixture
 {
-    public class TranslationsFixture
+    public TranslationsFixture()
     {
-        public TranslationsFixture()
-        {
-            T.Setup(new ResourcesLocalizer(Texts.ResourceManager));
-        }
+        T.Setup(new ResourcesLocalizer(Texts.ResourceManager));
     }
 }

@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Translator.State
+namespace Squidex.Translator.State;
+
+public sealed class TranslationsToIgnore : SortedDictionary<string, SortedSet<string>>
 {
-    public sealed class TranslationsToIgnore : SortedDictionary<string, SortedSet<string>>
-    {
-    }
 }

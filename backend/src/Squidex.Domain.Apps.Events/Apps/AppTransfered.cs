@@ -8,11 +8,10 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps;
+
+[EventType(nameof(AppTransfered))]
+public sealed class AppTransfered : AppEvent
 {
-    [EventType(nameof(AppTransfered))]
-    public sealed class AppTransfered : AppEvent
-    {
-        public DomainId? TeamId { get; set; }
-    }
+    public DomainId? TeamId { get; set; }
 }

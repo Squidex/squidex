@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps;
+
+[EventType(nameof(AppImageRemoved))]
+public sealed class AppImageRemoved : AppEvent
 {
-    [EventType(nameof(AppImageRemoved))]
-    public sealed class AppImageRemoved : AppEvent
-    {
-    }
 }

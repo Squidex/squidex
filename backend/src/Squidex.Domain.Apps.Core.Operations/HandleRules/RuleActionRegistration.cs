@@ -7,17 +7,16 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Domain.Apps.Core.HandleRules;
+
+public sealed class RuleActionRegistration
 {
-    public sealed class RuleActionRegistration
+    public Type ActionType { get; }
+
+    internal RuleActionRegistration(Type actionType)
     {
-        public Type ActionType { get; }
+        Guard.NotNull(actionType);
 
-        internal RuleActionRegistration(Type actionType)
-        {
-            Guard.NotNull(actionType);
-
-            ActionType = actionType;
-        }
+        ActionType = actionType;
     }
 }

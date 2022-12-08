@@ -9,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.Webhook
+namespace Squidex.Extensions.Actions.Webhook;
+
+public sealed class WebhookPlugin : IPlugin
 {
-    public sealed class WebhookPlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddRuleAction<WebhookAction, WebhookActionHandler>();
-        }
+        services.AddRuleAction<WebhookAction, WebhookActionHandler>();
     }
 }

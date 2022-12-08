@@ -15,161 +15,160 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Domain.Apps.Entities.Apps;
+
+public sealed class BackupApps : IBackupHandler
 {
-    public sealed class BackupApps : IBackupHandler
+    private const string SettingsFile = "Settings.json";
+    private const string AvatarFile = "Avatar.image";
+    private readonly Rebuilder rebuilder;
+    private readonly IAppImageStore appImageStore;
+    private readonly IAppsIndex appsIndex;
+    private readonly IAppUISettings appUISettings;
+    private string? appReservation;
+
+    public string Name { get; } = "Apps";
+
+    public BackupApps(
+        Rebuilder rebuilder,
+        IAppImageStore appImageStore,
+        IAppsIndex appsIndex,
+        IAppUISettings appUISettings)
     {
-        private const string SettingsFile = "Settings.json";
-        private const string AvatarFile = "Avatar.image";
-        private readonly Rebuilder rebuilder;
-        private readonly IAppImageStore appImageStore;
-        private readonly IAppsIndex appsIndex;
-        private readonly IAppUISettings appUISettings;
-        private string? appReservation;
+        this.appsIndex = appsIndex;
+        this.appImageStore = appImageStore;
+        this.appUISettings = appUISettings;
+        this.rebuilder = rebuilder;
+    }
 
-        public string Name { get; } = "Apps";
-
-        public BackupApps(
-            Rebuilder rebuilder,
-            IAppImageStore appImageStore,
-            IAppsIndex appsIndex,
-            IAppUISettings appUISettings)
+    public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context,
+        CancellationToken ct)
+    {
+        switch (@event.Payload)
         {
-            this.appsIndex = appsIndex;
-            this.appImageStore = appImageStore;
-            this.appUISettings = appUISettings;
-            this.rebuilder = rebuilder;
+            case AppContributorAssigned appContributorAssigned:
+                context.UserMapping.Backup(appContributorAssigned.ContributorId);
+                break;
+            case AppImageUploaded:
+                await WriteAssetAsync(context.AppId, context.Writer, ct);
+                break;
         }
+    }
 
-        public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context,
-            CancellationToken ct)
+    public async Task BackupAsync(BackupContext context,
+        CancellationToken ct)
+    {
+        var json = await appUISettings.GetAsync(context.AppId, null, ct);
+
+        await context.Writer.WriteJsonAsync(SettingsFile, json, ct);
+    }
+
+    public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
+        CancellationToken ct)
+    {
+        switch (@event.Payload)
         {
-            switch (@event.Payload)
-            {
-                case AppContributorAssigned appContributorAssigned:
-                    context.UserMapping.Backup(appContributorAssigned.ContributorId);
-                    break;
-                case AppImageUploaded:
-                    await WriteAssetAsync(context.AppId, context.Writer, ct);
-                    break;
-            }
-        }
-
-        public async Task BackupAsync(BackupContext context,
-            CancellationToken ct)
-        {
-            var json = await appUISettings.GetAsync(context.AppId, null, ct);
-
-            await context.Writer.WriteJsonAsync(SettingsFile, json, ct);
-        }
-
-        public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
-            CancellationToken ct)
-        {
-            switch (@event.Payload)
-            {
-                case AppCreated appCreated:
-                    {
-                        await ReserveAppAsync(context.AppId, appCreated.Name, ct);
-
-                        break;
-                    }
-
-                case AppImageUploaded:
-                    {
-                        await ReadAssetAsync(context.AppId, context.Reader, ct);
-
-                        break;
-                    }
-
-                case AppContributorAssigned contributorAssigned:
-                    {
-                        if (!context.UserMapping.TryMap(contributorAssigned.ContributorId, out var user) || user.Equals(context.Initiator))
-                        {
-                            return false;
-                        }
-
-                        contributorAssigned.ContributorId = user.Identifier;
-                        break;
-                    }
-
-                case AppContributorRemoved contributorRemoved:
-                    {
-                        if (!context.UserMapping.TryMap(contributorRemoved.ContributorId, out var user) || user.Equals(context.Initiator))
-                        {
-                            return false;
-                        }
-
-                        contributorRemoved.ContributorId = user.Identifier;
-                        break;
-                    }
-            }
-
-            return true;
-        }
-
-        public async Task RestoreAsync(RestoreContext context,
-            CancellationToken ct)
-        {
-            var json = await context.Reader.ReadJsonAsync<JsonObject>(SettingsFile, ct);
-
-            await appUISettings.SetAsync(context.AppId, null, json, ct);
-        }
-
-        private async Task ReserveAppAsync(DomainId appId, string appName,
-            CancellationToken ct)
-        {
-            appReservation = await appsIndex.ReserveAsync(appId, appName, ct);
-
-            if (appReservation == null)
-            {
-                throw new BackupRestoreException("The app id or name is not available.");
-            }
-        }
-
-        public async Task CleanupRestoreErrorAsync(DomainId appId)
-        {
-            await appsIndex.RemoveReservationAsync(appReservation);
-        }
-
-        public async Task CompleteRestoreAsync(RestoreContext context, string appName)
-        {
-            await rebuilder.InsertManyAsync<AppDomainObject, AppDomainObject.State>(Enumerable.Repeat(context.AppId, 1), 1, default);
-
-            await appsIndex.RemoveReservationAsync(appReservation);
-        }
-
-        private async Task WriteAssetAsync(DomainId appId, IBackupWriter writer,
-            CancellationToken ct)
-        {
-            try
-            {
-                await using (var stream = await writer.OpenBlobAsync(AvatarFile, ct))
+            case AppCreated appCreated:
                 {
-                    await appImageStore.DownloadAsync(appId, stream, ct);
+                    await ReserveAppAsync(context.AppId, appCreated.Name, ct);
+
+                    break;
                 }
-            }
-            catch (AssetNotFoundException)
-            {
-            }
+
+            case AppImageUploaded:
+                {
+                    await ReadAssetAsync(context.AppId, context.Reader, ct);
+
+                    break;
+                }
+
+            case AppContributorAssigned contributorAssigned:
+                {
+                    if (!context.UserMapping.TryMap(contributorAssigned.ContributorId, out var user) || user.Equals(context.Initiator))
+                    {
+                        return false;
+                    }
+
+                    contributorAssigned.ContributorId = user.Identifier;
+                    break;
+                }
+
+            case AppContributorRemoved contributorRemoved:
+                {
+                    if (!context.UserMapping.TryMap(contributorRemoved.ContributorId, out var user) || user.Equals(context.Initiator))
+                    {
+                        return false;
+                    }
+
+                    contributorRemoved.ContributorId = user.Identifier;
+                    break;
+                }
         }
 
-        private async Task ReadAssetAsync(DomainId appId, IBackupReader reader,
-            CancellationToken ct)
+        return true;
+    }
+
+    public async Task RestoreAsync(RestoreContext context,
+        CancellationToken ct)
+    {
+        var json = await context.Reader.ReadJsonAsync<JsonObject>(SettingsFile, ct);
+
+        await appUISettings.SetAsync(context.AppId, null, json, ct);
+    }
+
+    private async Task ReserveAppAsync(DomainId appId, string appName,
+        CancellationToken ct)
+    {
+        appReservation = await appsIndex.ReserveAsync(appId, appName, ct);
+
+        if (appReservation == null)
         {
-            try
+            throw new BackupRestoreException("The app id or name is not available.");
+        }
+    }
+
+    public async Task CleanupRestoreErrorAsync(DomainId appId)
+    {
+        await appsIndex.RemoveReservationAsync(appReservation);
+    }
+
+    public async Task CompleteRestoreAsync(RestoreContext context, string appName)
+    {
+        await rebuilder.InsertManyAsync<AppDomainObject, AppDomainObject.State>(Enumerable.Repeat(context.AppId, 1), 1, default);
+
+        await appsIndex.RemoveReservationAsync(appReservation);
+    }
+
+    private async Task WriteAssetAsync(DomainId appId, IBackupWriter writer,
+        CancellationToken ct)
+    {
+        try
+        {
+            await using (var stream = await writer.OpenBlobAsync(AvatarFile, ct))
             {
-                await using (var stream = await reader.OpenBlobAsync(AvatarFile, ct))
-                {
-                    await appImageStore.UploadAsync(appId, stream, ct);
-                }
+                await appImageStore.DownloadAsync(appId, stream, ct);
             }
-            catch (AssetAlreadyExistsException)
+        }
+        catch (AssetNotFoundException)
+        {
+        }
+    }
+
+    private async Task ReadAssetAsync(DomainId appId, IBackupReader reader,
+        CancellationToken ct)
+    {
+        try
+        {
+            await using (var stream = await reader.OpenBlobAsync(AvatarFile, ct))
             {
+                await appImageStore.UploadAsync(appId, stream, ct);
             }
-            catch (FileNotFoundException)
-            {
-            }
+        }
+        catch (AssetAlreadyExistsException)
+        {
+        }
+        catch (FileNotFoundException)
+        {
         }
     }
 }

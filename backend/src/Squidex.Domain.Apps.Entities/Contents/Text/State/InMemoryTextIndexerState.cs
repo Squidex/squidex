@@ -7,56 +7,55 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text.State
+namespace Squidex.Domain.Apps.Entities.Contents.Text.State;
+
+public sealed class InMemoryTextIndexerState : ITextIndexerState
 {
-    public sealed class InMemoryTextIndexerState : ITextIndexerState
+    private readonly Dictionary<DomainId, TextContentState> states = new Dictionary<DomainId, TextContentState>();
+
+    public Task ClearAsync(
+        CancellationToken ct = default)
     {
-        private readonly Dictionary<DomainId, TextContentState> states = new Dictionary<DomainId, TextContentState>();
+        states.Clear();
 
-        public Task ClearAsync(
-            CancellationToken ct = default)
+        return Task.CompletedTask;
+    }
+
+    public Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(ids);
+
+        var result = new Dictionary<DomainId, TextContentState>();
+
+        foreach (var id in ids)
         {
-            states.Clear();
-
-            return Task.CompletedTask;
-        }
-
-        public Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids,
-            CancellationToken ct = default)
-        {
-            Guard.NotNull(ids);
-
-            var result = new Dictionary<DomainId, TextContentState>();
-
-            foreach (var id in ids)
+            if (states.TryGetValue(id, out var state))
             {
-                if (states.TryGetValue(id, out var state))
-                {
-                    result.Add(id, state);
-                }
+                result.Add(id, state);
             }
-
-            return Task.FromResult(result);
         }
 
-        public Task SetAsync(List<TextContentState> updates,
-            CancellationToken ct = default)
+        return Task.FromResult(result);
+    }
+
+    public Task SetAsync(List<TextContentState> updates,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(updates);
+
+        foreach (var update in updates)
         {
-            Guard.NotNull(updates);
-
-            foreach (var update in updates)
+            if (update.IsDeleted)
             {
-                if (update.IsDeleted)
-                {
-                    states.Remove(update.UniqueContentId);
-                }
-                else
-                {
-                    states[update.UniqueContentId] = update;
-                }
+                states.Remove(update.UniqueContentId);
             }
-
-            return Task.CompletedTask;
+            else
+            {
+                states[update.UniqueContentId] = update;
+            }
         }
+
+        return Task.CompletedTask;
     }
 }

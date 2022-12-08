@@ -1,8 +1,12 @@
 <div class="card">
     <div class="card-header">
-        <div class="row g-0">
+        <div class="row g-1">
             <div class="col col-name">
-                <sqx-editable-title [name]="client.name" (nameChange)="rename($event)" [disabled]="!client.canUpdate">
+                <sqx-editable-title 
+                    [disabled]="!client.canUpdate"
+                    (inputTitleChange)="rename($event)"
+                    [inputTitle]="client.name"
+                    [inputTitleLength]="100">
                 </sqx-editable-title>
             </div>
             <div class="col-auto">
@@ -10,7 +14,7 @@
                     {{ 'clients.connect' | sqxTranslate }}
                 </button>
             </div>
-            <div class="col-auto cell-actions">
+            <div class="col-auto">
                 <button type="button" class="btn btn-text-danger" [disabled]="!client.canRevoke"
                     (sqxConfirmClick)="revoke()"
                     confirmTitle="i18n:clients.deleteConfirmTitle"

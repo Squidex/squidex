@@ -8,54 +8,53 @@
 using System.Text.RegularExpressions;
 using Squidex.Translator.State;
 
-namespace Squidex.Translator.Processes
+namespace Squidex.Translator.Processes;
+
+public class TranslateTypescript
 {
-    public class TranslateTypescript
+    private readonly TranslationService service;
+    private readonly DirectoryInfo folder;
+
+    public TranslateTypescript(DirectoryInfo folder, TranslationService service)
     {
-        private readonly TranslationService service;
-        private readonly DirectoryInfo folder;
+        this.folder = Frontend.GetFolder(folder);
 
-        public TranslateTypescript(DirectoryInfo folder, TranslationService service)
+        this.service = service;
+    }
+
+    public void Run()
+    {
+        foreach (var (file, relativeName) in Frontend.GetTypescriptFiles(folder))
         {
-            this.folder = Frontend.GetFolder(folder);
+            var content = File.ReadAllText(file.FullName);
 
-            this.service = service;
-        }
+            var isReplaced = false;
 
-        public void Run()
-        {
-            foreach (var (file, relativeName) in Frontend.GetTypescriptFiles(folder))
+            content = Regex.Replace(content, "'[^']*'", match =>
             {
-                var content = File.ReadAllText(file.FullName);
+                var value = match.Value[1..^1];
 
-                var isReplaced = false;
+                string result = null;
 
-                content = Regex.Replace(content, "'[^']*'", match =>
+                if (value.IsPotentialMultiWordText())
                 {
-                    var value = match.Value[1..^1];
-
-                    string result = null;
-
-                    if (value.IsPotentialMultiWordText())
+                    service.Translate(relativeName, value, "Code", key =>
                     {
-                        service.Translate(relativeName, value, "Code", key =>
-                        {
-                            result = $"\'i18n:{key}\'";
+                        result = $"\'i18n:{key}\'";
 
-                            isReplaced = true;
-                        });
-                    }
-
-                    return result ?? $"'{value}'";
-                });
-
-                if (isReplaced)
-                {
-                    Console.WriteLine("-----------------------------");
-                    Console.WriteLine("FILE {0} done", relativeName);
-
-                    File.WriteAllText(file.FullName, content);
+                        isReplaced = true;
+                    });
                 }
+
+                return result ?? $"'{value}'";
+            });
+
+            if (isReplaced)
+            {
+                Console.WriteLine("-----------------------------");
+                Console.WriteLine("FILE {0} done", relativeName);
+
+                File.WriteAllText(file.FullName, content);
             }
         }
     }

@@ -6,49 +6,33 @@
 // ==========================================================================
 
 using System.Runtime.Serialization;
-using System.Text;
 
-namespace Squidex.Domain.Apps.Core.Templates
+namespace Squidex.Domain.Apps.Core.Templates;
+
+[Serializable]
+public class TemplateParseException : Exception
 {
-    [Serializable]
-    public class TemplateParseException : Exception
+    public string Error { get; set; }
+
+    public TemplateParseException(string template, string error, Exception? inner = null)
+        : base(BuildErrorMessage(error, template), inner)
     {
-        public IReadOnlyList<string> Errors { get; }
+        Error = error;
+    }
 
-        public TemplateParseException(string template, IEnumerable<string> errors, Exception? inner = null)
-            : base(BuildErrorMessage(errors, template), inner)
-        {
-            Errors = errors.ToList();
-        }
+    protected TemplateParseException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
+    {
+        Error = info.GetString(nameof(Error)) ?? string.Empty;
+    }
 
-        protected TemplateParseException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-            Errors = (info.GetValue(nameof(Errors), typeof(List<string>)) as List<string>) ?? new List<string>();
-        }
+    public override void GetObjectData(SerializationInfo info, StreamingContext context)
+    {
+        info.AddValue(nameof(Error), Error);
+    }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue(nameof(Errors), Errors.ToList());
-        }
-
-        private static string BuildErrorMessage(IEnumerable<string> errors, string template)
-        {
-            var sb = new StringBuilder();
-
-            sb.AppendLine("Failed to parse template");
-
-            foreach (var error in errors)
-            {
-                sb.Append(" * ");
-                sb.AppendLine(error);
-            }
-
-            sb.AppendLine();
-            sb.AppendLine("Template:");
-            sb.AppendLine(template);
-
-            return sb.ToString();
-        }
+    private static string BuildErrorMessage(string error, string template)
+    {
+        return $"Failed to parse template with <{error}>, template: {template}.";
     }
 }

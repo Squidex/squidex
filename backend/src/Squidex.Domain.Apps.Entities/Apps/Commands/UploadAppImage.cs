@@ -7,10 +7,9 @@
 
 using Squidex.Assets;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands
+namespace Squidex.Domain.Apps.Entities.Apps.Commands;
+
+public sealed class UploadAppImage : AppCommand
 {
-    public sealed class UploadAppImage : AppCommand
-    {
-        public AssetFile File { get; set; }
-    }
+    public AssetFile File { get; set; }
 }

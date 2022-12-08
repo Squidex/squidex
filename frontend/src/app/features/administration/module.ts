@@ -7,7 +7,7 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
+import { HelpComponent, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
 import { AdministrationAreaComponent, EventConsumerComponent, EventConsumersPageComponent, EventConsumersService, EventConsumersState, RestorePageComponent, UserComponent, UserMustExistGuard, UserPageComponent, UsersPageComponent, UsersService, UsersState } from './declarations';
 
 const routes: Routes = [
@@ -17,29 +17,50 @@ const routes: Routes = [
         children: [
             {
                 path: '',
+                pathMatch: 'full',
+                redirectTo: 'users',
+            },
+            {
+                path: 'event-consumers',
+                component: EventConsumersPageComponent,
                 children: [
                     {
-                        path: 'event-consumers',
-                        component: EventConsumersPageComponent,
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/admin-consumers',
+                        },
+                    },
+                ],
+            },
+            {
+                path: 'restore',
+                component: RestorePageComponent,
+                children: [
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/admin-restore',
+                        },
+                    },
+                ],
+            },
+            {
+                path: 'users',
+                component: UsersPageComponent,
+                children: [
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/admin-users',
+                        },
                     },
                     {
-                        path: 'restore',
-                        component: RestorePageComponent,
-                    },
-                    {
-                        path: 'users',
-                        component: UsersPageComponent,
-                        children: [
-                            {
-                                path: ':userId',
-                                component: UserPageComponent,
-                                canActivate: [UserMustExistGuard],
-                            },
-                        ],
-                    },
-                    {
-                        path: '',
-                        redirectTo: 'users',
+                        path: ':userId',
+                        component: UserPageComponent,
+                        canActivate: [UserMustExistGuard],
                     },
                 ],
             },

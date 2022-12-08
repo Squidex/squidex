@@ -25,4 +25,7 @@ export class FormAlertComponent {
 
     @Input()
     public light?: boolean | null;
+
+    @Input()
+    public large?: boolean | null;
 }

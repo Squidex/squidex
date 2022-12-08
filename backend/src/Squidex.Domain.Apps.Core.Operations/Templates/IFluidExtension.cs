@@ -7,20 +7,15 @@
 
 using Fluid;
 
-namespace Squidex.Domain.Apps.Core.Templates
+namespace Squidex.Domain.Apps.Core.Templates;
+
+public interface IFluidExtension
 {
-    public interface IFluidExtension
+    void RegisterLanguageExtensions(CustomFluidParser parser, TemplateOptions options)
     {
-        void RegisterLanguageExtensions(FluidParserFactory factory)
-        {
-        }
+    }
 
-        void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
-        {
-        }
-
-        void BeforeRun(TemplateContext templateContext)
-        {
-        }
+    void BeforeRun(TemplateContext templateContext)
+    {
     }
 }

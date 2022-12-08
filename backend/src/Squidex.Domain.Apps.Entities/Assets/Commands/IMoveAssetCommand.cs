@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Assets.Commands
+namespace Squidex.Domain.Apps.Entities.Assets.Commands;
+
+public interface IMoveAssetCommand : IAppCommand
 {
-    public interface IMoveAssetCommand : IAppCommand
-    {
-        DomainId ParentId { get; set; }
-    }
+    DomainId ParentId { get; set; }
 }

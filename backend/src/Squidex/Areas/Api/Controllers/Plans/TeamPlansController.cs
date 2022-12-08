@@ -12,109 +12,104 @@ using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Plans
+namespace Squidex.Areas.Api.Controllers.Plans;
+
+/// <summary>
+/// Update and query plans.
+/// </summary>
+[ApiExplorerSettings(GroupName = nameof(Plans))]
+public sealed class TeamPlansController : ApiController
 {
-    /// <summary>
-    /// Update and query plans.
-    /// </summary>
-    [ApiExplorerSettings(GroupName = nameof(Plans))]
-    public sealed class TeamPlansController : ApiController
+    private readonly IUsageGate appUsageGate;
+    private readonly IBillingPlans billingPlans;
+    private readonly IBillingManager billingManager;
+
+    public TeamPlansController(ICommandBus commandBus,
+        IUsageGate appUsageGate,
+        IBillingPlans billingPlans,
+        IBillingManager billingManager)
+        : base(commandBus)
     {
-        private readonly IAppUsageGate appUsageGate;
-        private readonly IBillingPlans billingPlans;
-        private readonly IBillingManager billingManager;
+        this.appUsageGate = appUsageGate;
+        this.billingPlans = billingPlans;
+        this.billingManager = billingManager;
+    }
 
-        public TeamPlansController(ICommandBus commandBus,
-            IAppUsageGate appUsageGate,
-            IBillingPlans billingPlans,
-            IBillingManager billingManager)
-            : base(commandBus)
+    /// <summary>
+    /// Get team plan information.
+    /// </summary>
+    /// <param name="team">The name of the team.</param>
+    /// <response code="200">Team plan information returned.</response>.
+    /// <response code="404">Team not found.</response>.
+    [HttpGet]
+    [Route("teams/{team}/plans/")]
+    [ProducesResponseType(typeof(PlansDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.TeamPlansRead)]
+    [ApiCosts(0)]
+    public IActionResult GetTeamPlans(string team)
+    {
+        var response = Deferred.AsyncResponse(async () =>
         {
-            this.appUsageGate = appUsageGate;
-            this.billingPlans = billingPlans;
-            this.billingManager = billingManager;
-        }
+            var plans = billingPlans.GetAvailablePlans();
 
-        /// <summary>
-        /// Get team plan information.
-        /// </summary>
-        /// <param name="team">The name of the team.</param>
-        /// <returns>
-        /// 200 => Team plan information returned.
-        /// 404 => Team not found.
-        /// </returns>
-        [HttpGet]
-        [Route("teams/{team}/plans/")]
-        [ProducesResponseType(typeof(PlansDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(PermissionIds.TeamPlansRead)]
-        [ApiCosts(0)]
-        public IActionResult GetTeamPlans(string team)
-        {
-            var response = Deferred.AsyncResponse(async () =>
+            var (plan, link, referral) =
+                await AsyncHelper.WhenAll(
+                    appUsageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted),
+                    billingManager.GetPortalLinkAsync(UserId, Team, HttpContext.RequestAborted),
+                    billingManager.GetReferralInfoAsync(UserId, Team, HttpContext.RequestAborted));
+
+            PlansLockedReason GetLocked()
             {
-                var owner = Team.Plan?.Owner.Identifier;
-
-                var (_, planId) = await appUsageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
-
-                var lockedReason = PlansLockedReason.None;
-
                 if (!Resources.CanChangeTeamPlan)
                 {
-                    lockedReason = PlansLockedReason.NoPermission;
-                }
-                else if (owner != null && !string.Equals(owner, UserId, StringComparison.OrdinalIgnoreCase))
-                {
-                    lockedReason = PlansLockedReason.NotOwner;
+                    return PlansLockedReason.NoPermission;
                 }
 
-                var linkUrl = (Uri?)null;
-
-                if (lockedReason == PlansLockedReason.None)
-                {
-                    linkUrl = await billingManager.GetPortalLinkAsync(UserId, Team, HttpContext.RequestAborted);
-                }
-
-                var plans = billingPlans.GetAvailablePlans();
-
-                return PlansDto.FromDomain(plans.ToArray(), owner, planId, linkUrl, lockedReason);
-            });
-
-            Response.Headers[HeaderNames.ETag] = Team.ToEtag();
-
-            return Ok(response);
-        }
-
-        /// <summary>
-        /// Change the team plan.
-        /// </summary>
-        /// <param name="team">The name of the team.</param>
-        /// <param name="request">Plan object that needs to be changed.</param>
-        /// <returns>
-        /// 200 => Plan changed or redirect url returned.
-        /// 404 => Team not found.
-        /// </returns>
-        [HttpPut]
-        [Route("teams/{team}/plan/")]
-        [ProducesResponseType(typeof(PlanChangedDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(PermissionIds.TeamPlansChange)]
-        [ApiCosts(0)]
-        public async Task<IActionResult> PutTeamPlan(string team, [FromBody] ChangePlanDto request)
-        {
-            var command = SimpleMapper.Map(request, new ChangePlan());
-
-            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
-
-            string? redirectUri = null;
-
-            if (context.PlainResult is PlanChangedResult result)
-            {
-                redirectUri = result.RedirectUri?.ToString();
+                return PlansLockedReason.None;
             }
 
-            return Ok(new PlanChangedDto { RedirectUri = redirectUri });
+            return PlansDto.FromDomain(
+                plans.ToArray(), null,
+                plan.PlanId,
+                referral,
+                link,
+                GetLocked());
+        });
+
+        Response.Headers[HeaderNames.ETag] = Team.ToEtag();
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Change the team plan.
+    /// </summary>
+    /// <param name="team">The name of the team.</param>
+    /// <param name="request">Plan object that needs to be changed.</param>
+    /// <response code="200">Plan changed or redirect url returned.</response>.
+    /// <response code="404">Team not found.</response>.
+    [HttpPut]
+    [Route("teams/{team}/plan/")]
+    [ProducesResponseType(typeof(PlanChangedDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.TeamPlansChange)]
+    [ApiCosts(0)]
+    public async Task<IActionResult> PutTeamPlan(string team, [FromBody] ChangePlanDto request)
+    {
+        var command = SimpleMapper.Map(request, new ChangePlan());
+
+        var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
+
+        string? redirectUri = null;
+
+        if (context.PlainResult is PlanChangedResult result)
+        {
+            redirectUri = result.RedirectUri?.ToString();
         }
+
+        return Ok(new PlanChangedDto { RedirectUri = redirectUri });
     }
 }

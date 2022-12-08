@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -22,7 +22,7 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
     public addSchemaDialog = new DialogModel();
     public addCategoryForm = new CreateCategoryForm();
 
-    public schemasFilter = new FormControl();
+    public schemasFilter = new UntypedFormControl();
 
     public categories =
         combineLatest([

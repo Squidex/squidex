@@ -19,256 +19,255 @@ using Squidex.Shared.Users;
 
 #pragma warning disable MA0040 // Flow the cancellation token
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public sealed partial class BackupProcessor
 {
-    public sealed partial class BackupProcessor
+    private readonly IBackupArchiveLocation backupArchiveLocation;
+    private readonly IBackupArchiveStore backupArchiveStore;
+    private readonly IBackupHandlerFactory backupHandlerFactory;
+    private readonly IEventFormatter eventFormatter;
+    private readonly IEventStore eventStore;
+    private readonly IUserResolver userResolver;
+    private readonly ILogger<BackupProcessor> log;
+    private readonly SimpleState<BackupState> state;
+    private readonly ReentrantScheduler scheduler = new ReentrantScheduler(1);
+    private readonly DomainId appId;
+    private Run? currentRun;
+
+    public IClock Clock { get; set; } = SystemClock.Instance;
+
+    public BackupProcessor(
+        DomainId appId,
+        IBackupArchiveLocation backupArchiveLocation,
+        IBackupArchiveStore backupArchiveStore,
+        IBackupHandlerFactory backupHandlerFactory,
+        IEventFormatter eventFormatter,
+        IEventStore eventStore,
+        IPersistenceFactory<BackupState> persistenceFactory,
+        IUserResolver userResolver,
+        ILogger<BackupProcessor> log)
     {
-        private readonly IBackupArchiveLocation backupArchiveLocation;
-        private readonly IBackupArchiveStore backupArchiveStore;
-        private readonly IBackupHandlerFactory backupHandlerFactory;
-        private readonly IEventFormatter eventFormatter;
-        private readonly IEventStore eventStore;
-        private readonly IUserResolver userResolver;
-        private readonly ILogger<BackupProcessor> log;
-        private readonly SimpleState<BackupState> state;
-        private readonly ReentrantScheduler scheduler = new ReentrantScheduler(1);
-        private readonly DomainId appId;
-        private Run? currentRun;
+        this.appId = appId;
+        this.backupArchiveLocation = backupArchiveLocation;
+        this.backupArchiveStore = backupArchiveStore;
+        this.backupHandlerFactory = backupHandlerFactory;
+        this.eventFormatter = eventFormatter;
+        this.eventStore = eventStore;
+        this.userResolver = userResolver;
+        this.log = log;
 
-        public IClock Clock { get; set; } = SystemClock.Instance;
+        // Enable locking for the parallel operations that might write stuff.
+        state = new SimpleState<BackupState>(persistenceFactory, GetType(), appId, true);
+    }
 
-        public BackupProcessor(
-            DomainId appId,
-            IBackupArchiveLocation backupArchiveLocation,
-            IBackupArchiveStore backupArchiveStore,
-            IBackupHandlerFactory backupHandlerFactory,
-            IEventFormatter eventFormatter,
-            IEventStore eventStore,
-            IPersistenceFactory<BackupState> persistenceFactory,
-            IUserResolver userResolver,
-            ILogger<BackupProcessor> log)
+    public async Task LoadAsync(
+        CancellationToken ct)
+    {
+        await state.LoadAsync(ct);
+
+        if (state.Value.Jobs.RemoveAll(x => x.Stopped == null) > 0)
         {
-            this.appId = appId;
-            this.backupArchiveLocation = backupArchiveLocation;
-            this.backupArchiveStore = backupArchiveStore;
-            this.backupHandlerFactory = backupHandlerFactory;
-            this.eventFormatter = eventFormatter;
-            this.eventStore = eventStore;
-            this.userResolver = userResolver;
-            this.log = log;
+            // This should actually never happen, so we log with warning.
+            log.LogWarning("Removed unfinished backups for app {appId} after start.", appId);
 
-            // Enable locking for the parallel operations that might write stuff.
-            state = new SimpleState<BackupState>(persistenceFactory, GetType(), appId, true);
+            await state.WriteAsync(ct);
         }
+    }
 
-        public async Task LoadAsync(
-            CancellationToken ct)
+    public Task ClearAsync()
+    {
+        return scheduler.ScheduleAsync(async _ =>
         {
-            await state.LoadAsync(ct);
+            log.LogInformation("Clearing backups for app {appId}.", appId);
 
-            if (state.Value.Jobs.RemoveAll(x => x.Stopped == null) > 0)
+            foreach (var backup in state.Value.Jobs)
             {
-                // This should actually never happen, so we log with warning.
-                log.LogWarning("Removed unfinished backups for app {appId} after start.", appId);
-
-                await state.WriteAsync(ct);
+                await backupArchiveStore.DeleteAsync(backup.Id, default);
             }
-        }
 
-        public Task ClearAsync()
+            await state.ClearAsync(default);
+        });
+    }
+
+    public Task BackupAsync(RefToken actor,
+        CancellationToken ct)
+    {
+        return scheduler.ScheduleAsync(async _ =>
         {
-            return scheduler.ScheduleAsync(async _ =>
+            if (currentRun != null)
             {
-                log.LogInformation("Clearing backups for app {appId}.", appId);
+                throw new DomainException(T.Get("backups.alreadyRunning"));
+            }
 
-                foreach (var backup in state.Value.Jobs)
-                {
-                    await backupArchiveStore.DeleteAsync(backup.Id, default);
-                }
+            state.Value.EnsureCanStart();
 
-                await state.ClearAsync(default);
-            });
-        }
-
-        public Task BackupAsync(RefToken actor,
-            CancellationToken ct)
-        {
-            return scheduler.ScheduleAsync(async _ =>
+            // Set the current run first to indicate that we are running a rule at the moment.
+            var run = currentRun = new Run(ct)
             {
-                if (currentRun != null)
+                Actor = actor,
+                Job = new BackupJob
                 {
-                    throw new DomainException(T.Get("backups.alreadyRunning"));
-                }
+                    Id = DomainId.NewGuid(),
+                    Started = Clock.GetCurrentInstant(),
+                    Status = JobStatus.Started
+                },
+                Handlers = backupHandlerFactory.CreateMany()
+            };
 
-                state.Value.EnsureCanStart();
+            log.LogInformation("Starting new backup with backup id '{backupId}' for app {appId}.", run.Job.Id, appId);
 
-                // Set the current run first to indicate that we are running a rule at the moment.
-                var run = currentRun = new Run(ct)
-                {
-                    Actor = actor,
-                    Job = new BackupJob
-                    {
-                        Id = DomainId.NewGuid(),
-                        Started = Clock.GetCurrentInstant(),
-                        Status = JobStatus.Started
-                    },
-                    Handlers = backupHandlerFactory.CreateMany()
-                };
-
-                log.LogInformation("Starting new backup with backup id '{backupId}' for app {appId}.", run.Job.Id, appId);
-
-                state.Value.Jobs.Insert(0, run.Job);
-                try
-                {
-                    await ProcessAsync(run, run.CancellationToken);
-                }
-                finally
-                {
-                    // Unset the run to indicate that we are done.
-                    currentRun.Dispose();
-                    currentRun = null;
-                }
-            }, ct);
-        }
-
-        private async Task ProcessAsync(Run run,
-            CancellationToken ct)
-        {
+            state.Value.Jobs.Insert(0, run.Job);
             try
             {
-                await state.WriteAsync(run.CancellationToken);
+                await ProcessAsync(run, run.CancellationToken);
+            }
+            finally
+            {
+                // Unset the run to indicate that we are done.
+                currentRun.Dispose();
+                currentRun = null;
+            }
+        }, ct);
+    }
 
-                await using (var stream = backupArchiveLocation.OpenStream(run.Job.Id))
+    private async Task ProcessAsync(Run run,
+        CancellationToken ct)
+    {
+        try
+        {
+            await state.WriteAsync(run.CancellationToken);
+
+            await using (var stream = backupArchiveLocation.OpenStream(run.Job.Id))
+            {
+                using (var writer = await backupArchiveLocation.OpenWriterAsync(stream, ct))
                 {
-                    using (var writer = await backupArchiveLocation.OpenWriterAsync(stream, ct))
+                    await writer.WriteVersionAsync();
+
+                    var backupUsers = new UserMapping(run.Actor);
+                    var backupContext = new BackupContext(appId, backupUsers, writer);
+
+                    await foreach (var storedEvent in eventStore.QueryAllAsync(GetFilter(), ct: ct))
                     {
-                        await writer.WriteVersionAsync();
+                        var @event = eventFormatter.Parse(storedEvent);
 
-                        var backupUsers = new UserMapping(run.Actor);
-                        var backupContext = new BackupContext(appId, backupUsers, writer);
-
-                        await foreach (var storedEvent in eventStore.QueryAllAsync(GetFilter(), ct: ct))
+                        if (@event.Payload is SquidexEvent { Actor: { } } squidexEvent)
                         {
-                            var @event = eventFormatter.Parse(storedEvent);
-
-                            if (@event.Payload is SquidexEvent { Actor: { } } squidexEvent)
-                            {
-                                backupUsers.Backup(squidexEvent.Actor);
-                            }
-
-                            foreach (var handler in run.Handlers)
-                            {
-                                await handler.BackupEventAsync(@event, backupContext, ct);
-                            }
-
-                            writer.WriteEvent(storedEvent, ct);
-
-                            await LogAsync(run, writer.WrittenEvents, writer.WrittenAttachments);
+                            backupUsers.Backup(squidexEvent.Actor);
                         }
 
                         foreach (var handler in run.Handlers)
                         {
-                            ct.ThrowIfCancellationRequested();
-
-                            await handler.BackupAsync(backupContext, ct);
+                            await handler.BackupEventAsync(@event, backupContext, ct);
                         }
 
-                        foreach (var handler in run.Handlers)
-                        {
-                            ct.ThrowIfCancellationRequested();
+                        writer.WriteEvent(storedEvent, ct);
 
-                            await handler.CompleteBackupAsync(backupContext);
-                        }
-
-                        await backupUsers.StoreAsync(writer, userResolver, ct);
+                        await LogAsync(run, writer.WrittenEvents, writer.WrittenAttachments);
                     }
 
-                    stream.Position = 0;
+                    foreach (var handler in run.Handlers)
+                    {
+                        ct.ThrowIfCancellationRequested();
 
-                    ct.ThrowIfCancellationRequested();
+                        await handler.BackupAsync(backupContext, ct);
+                    }
 
-                    await backupArchiveStore.UploadAsync(run.Job.Id, stream, ct);
+                    foreach (var handler in run.Handlers)
+                    {
+                        ct.ThrowIfCancellationRequested();
+
+                        await handler.CompleteBackupAsync(backupContext);
+                    }
+
+                    await backupUsers.StoreAsync(writer, userResolver, ct);
                 }
 
-                await SetStatusAsync(run, JobStatus.Completed);
-            }
-            catch (Exception ex)
-            {
-                await SetStatusAsync(run, JobStatus.Failed);
+                stream.Position = 0;
 
-                log.LogError(ex, "Failed to make backup with backup id '{backupId}'.", run.Job.Id);
+                ct.ThrowIfCancellationRequested();
+
+                await backupArchiveStore.UploadAsync(run.Job.Id, stream, ct);
             }
+
+            await SetStatusAsync(run, JobStatus.Completed);
         }
-
-        private string GetFilter()
+        catch (Exception ex)
         {
-            return $"^[^\\-]*-{Regex.Escape(appId.ToString())}";
+            await SetStatusAsync(run, JobStatus.Failed);
+
+            log.LogError(ex, "Failed to make backup with backup id '{backupId}'.", run.Job.Id);
         }
+    }
 
-        public Task DeleteAsync(DomainId id)
+    private string GetFilter()
+    {
+        return $"^[^\\-]*-{Regex.Escape(appId.ToString())}";
+    }
+
+    public Task DeleteAsync(DomainId id)
+    {
+        return scheduler.ScheduleAsync(async _ =>
         {
-            return scheduler.ScheduleAsync(async _ =>
+            var job = state.Value.Jobs.Find(x => x.Id == id);
+
+            if (job == null)
             {
-                var job = state.Value.Jobs.Find(x => x.Id == id);
-
-                if (job == null)
-                {
-                    throw new DomainObjectNotFoundException(id.ToString());
-                }
-
-                log.LogInformation("Deleting backup with backup id '{backupId}' for app {appId}.", job.Id, appId);
-
-                if (currentRun?.Job == job)
-                {
-                    currentRun.Cancel();
-                }
-                else
-                {
-                    await RemoveAsync(job);
-                }
-            });
-        }
-
-        private async Task RemoveAsync(BackupJob job)
-        {
-            try
-            {
-                await backupArchiveStore.DeleteAsync(job.Id);
-            }
-            catch (Exception ex)
-            {
-                log.LogError(ex, "Failed to make remove with backup id '{backupId}'.", job.Id);
+                throw new DomainObjectNotFoundException(id.ToString());
             }
 
-            state.Value.Jobs.Remove(job);
+            log.LogInformation("Deleting backup with backup id '{backupId}' for app {appId}.", job.Id, appId);
 
-            await state.WriteAsync();
-        }
-
-        private Task SetStatusAsync(Run run, JobStatus status)
-        {
-            var now = Clock.GetCurrentInstant();
-
-            run.Job.Status = status;
-
-            if (status == JobStatus.Failed || status == JobStatus.Completed)
+            if (currentRun?.Job == job)
             {
-                run.Job.Stopped = now;
+                currentRun.Cancel();
             }
-            else if (status == JobStatus.Started)
+            else
             {
-                run.Job.Started = now;
+                await RemoveAsync(job);
             }
+        });
+    }
 
-            return state.WriteAsync(ct: default);
-        }
-
-        private Task LogAsync(Run run, int numEvents, int numAttachments)
+    private async Task RemoveAsync(BackupJob job)
+    {
+        try
         {
-            run.Job.HandledEvents = numEvents;
-            run.Job.HandledAssets = numAttachments;
-
-            return state.WriteAsync(100, run.CancellationToken);
+            await backupArchiveStore.DeleteAsync(job.Id);
         }
+        catch (Exception ex)
+        {
+            log.LogError(ex, "Failed to make remove with backup id '{backupId}'.", job.Id);
+        }
+
+        state.Value.Jobs.Remove(job);
+
+        await state.WriteAsync();
+    }
+
+    private Task SetStatusAsync(Run run, JobStatus status)
+    {
+        var now = Clock.GetCurrentInstant();
+
+        run.Job.Status = status;
+
+        if (status == JobStatus.Failed || status == JobStatus.Completed)
+        {
+            run.Job.Stopped = now;
+        }
+        else if (status == JobStatus.Started)
+        {
+            run.Job.Started = now;
+        }
+
+        return state.WriteAsync(ct: default);
+    }
+
+    private Task LogAsync(Run run, int numEvents, int numAttachments)
+    {
+        run.Job.HandledEvents = numEvents;
+        run.Job.HandledAssets = numAttachments;
+
+        return state.WriteAsync(100, run.CancellationToken);
     }
 }

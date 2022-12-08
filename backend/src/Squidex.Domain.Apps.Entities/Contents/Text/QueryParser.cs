@@ -7,74 +7,73 @@
 
 using System.Text;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Domain.Apps.Entities.Contents.Text;
+
+public sealed class QueryParser
 {
-    public sealed class QueryParser
+    private readonly Func<string, string> fieldProvider;
+
+    public QueryParser(Func<string, string> fieldProvider)
     {
-        private readonly Func<string, string> fieldProvider;
+        this.fieldProvider = fieldProvider;
+    }
 
-        public QueryParser(Func<string, string> fieldProvider)
+    public Query? Parse(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
         {
-            this.fieldProvider = fieldProvider;
+            return null;
         }
 
-        public Query? Parse(string text)
+        text = text.Trim();
+        text = ConvertFieldNames(text);
+
+        return new Query
         {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return null;
-            }
+            Text = text
+        };
+    }
 
-            text = text.Trim();
-            text = ConvertFieldNames(text);
+    private string ConvertFieldNames(string query)
+    {
+        var indexOfColon = query.IndexOf(':', StringComparison.Ordinal);
 
-            return new Query
-            {
-                Text = text
-            };
+        if (indexOfColon < 0)
+        {
+            return query;
         }
 
-        private string ConvertFieldNames(string query)
+        var sb = new StringBuilder();
+
+        int position = 0, lastIndexOfColon = 0;
+
+        while (indexOfColon >= 0)
         {
-            var indexOfColon = query.IndexOf(':', StringComparison.Ordinal);
+            lastIndexOfColon = indexOfColon;
 
-            if (indexOfColon < 0)
+            int i;
+            for (i = indexOfColon - 1; i >= position; i--)
             {
-                return query;
-            }
+                var c = query[i];
 
-            var sb = new StringBuilder();
-
-            int position = 0, lastIndexOfColon = 0;
-
-            while (indexOfColon >= 0)
-            {
-                lastIndexOfColon = indexOfColon;
-
-                int i;
-                for (i = indexOfColon - 1; i >= position; i--)
+                if (!char.IsLetter(c) && c != '-' && c != '_')
                 {
-                    var c = query[i];
-
-                    if (!char.IsLetter(c) && c != '-' && c != '_')
-                    {
-                        break;
-                    }
+                    break;
                 }
-
-                i++;
-
-                sb.Append(query[position..i]);
-                sb.Append(fieldProvider(query[i..indexOfColon]));
-
-                position = indexOfColon + 1;
-
-                indexOfColon = query.IndexOf(':', position);
             }
 
-            sb.Append(query[lastIndexOfColon..]);
+            i++;
 
-            return sb.ToString();
+            sb.Append(query[position..i]);
+            sb.Append(fieldProvider(query[i..indexOfColon]));
+
+            position = indexOfColon + 1;
+
+            indexOfColon = query.IndexOf(':', position);
         }
+
+        sb.Append(query[lastIndexOfColon..]);
+
+        return sb.ToString();
     }
 }

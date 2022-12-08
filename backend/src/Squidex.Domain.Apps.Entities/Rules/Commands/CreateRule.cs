@@ -7,13 +7,12 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Rules.Commands
+namespace Squidex.Domain.Apps.Entities.Rules.Commands;
+
+public sealed class CreateRule : RuleEditCommand
 {
-    public sealed class CreateRule : RuleEditCommand
+    public CreateRule()
     {
-        public CreateRule()
-        {
-            RuleId = DomainId.NewGuid();
-        }
+        RuleId = DomainId.NewGuid();
     }
 }

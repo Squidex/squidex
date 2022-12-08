@@ -114,7 +114,6 @@ export class AppRouteReuseStrategy extends BaseRouteReuseStrategy {
         { provide: UIOptions, useFactory: configUIOptions },
         { provide: APP_BASE_HREF, useValue: basePath() },
     ],
-    entryComponents: [AppComponent],
 })
 export class AppModule {
     public ngDoBootstrap(appRef: ApplicationRef) {
@@ -122,7 +121,7 @@ export class AppModule {
             appRef.bootstrap(AppComponent);
         } catch (e) {
             // eslint-disable-next-line no-console
-            console.log('Application element not found');
+            console.log('Application element not found.');
         }
     }
 }

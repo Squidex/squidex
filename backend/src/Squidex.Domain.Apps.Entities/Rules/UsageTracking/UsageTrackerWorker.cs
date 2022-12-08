@@ -14,162 +14,161 @@ using Squidex.Infrastructure.Timers;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Messaging;
 
-namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
+namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking;
+
+public sealed class UsageTrackerWorker : IMessageHandler<UsageTrackingMessage>, IBackgroundProcess
 {
-    public sealed class UsageTrackerWorker : IMessageHandler<UsageTrackingMessage>, IBackgroundProcess
+    private readonly SimpleState<State> state;
+    private readonly IApiUsageTracker usageTracker;
+    private CompletionTimer timer;
+
+    public sealed class Target
     {
-        private readonly SimpleState<State> state;
-        private readonly IApiUsageTracker usageTracker;
-        private CompletionTimer timer;
+        public NamedId<DomainId> AppId { get; set; }
 
-        public sealed class Target
+        public int Limits { get; set; }
+
+        public int? NumDays { get; set; }
+
+        public DateTime? Triggered { get; set; }
+
+        public Target SetApp(NamedId<DomainId> appId)
         {
-            public NamedId<DomainId> AppId { get; set; }
+            AppId = appId;
 
-            public int Limits { get; set; }
+            return this;
+        }
 
-            public int? NumDays { get; set; }
+        public Target SetLimit(int value)
+        {
+            Limits = value;
 
-            public DateTime? Triggered { get; set; }
+            return this;
+        }
 
-            public Target SetApp(NamedId<DomainId> appId)
+        public Target SetNumDays(int? value)
+        {
+            NumDays = value;
+
+            return this;
+        }
+    }
+
+    [CollectionName("UsageTracker")]
+    public sealed class State
+    {
+        public Dictionary<DomainId, Target> Targets { get; set; } = new Dictionary<DomainId, Target>();
+    }
+
+    public UsageTrackerWorker(IPersistenceFactory<State> persistenceFactory, IApiUsageTracker usageTracker)
+    {
+        this.usageTracker = usageTracker;
+
+        state = new SimpleState<State>(persistenceFactory, GetType(), "Default");
+    }
+
+    public async Task StartAsync(
+        CancellationToken ct)
+    {
+        await state.LoadAsync(ct);
+
+        timer = new CompletionTimer((int)TimeSpan.FromMinutes(10).TotalMilliseconds, _ => CheckUsagesAsync());
+    }
+
+    public Task StopAsync(
+        CancellationToken ct)
+    {
+        return timer?.StopAsync() ?? Task.CompletedTask;
+    }
+
+    public async Task CheckUsagesAsync()
+    {
+        var today = DateTime.Today;
+
+        foreach (var (key, target) in state.Value.Targets)
+        {
+            var from = GetFromDate(today, target.NumDays);
+
+            if (target.Triggered == null || target.Triggered < from)
             {
-                AppId = appId;
+                var costs = await usageTracker.GetMonthCallsAsync(target.AppId.Id.ToString(), today, null);
 
-                return this;
-            }
+                var limit = target.Limits;
 
-            public Target SetLimit(int value)
-            {
-                Limits = value;
-
-                return this;
-            }
-
-            public Target SetNumDays(int? value)
-            {
-                NumDays = value;
-
-                return this;
-            }
-        }
-
-        [CollectionName("UsageTracker")]
-        public sealed class State
-        {
-            public Dictionary<DomainId, Target> Targets { get; set; } = new Dictionary<DomainId, Target>();
-        }
-
-        public UsageTrackerWorker(IPersistenceFactory<State> persistenceFactory, IApiUsageTracker usageTracker)
-        {
-            this.usageTracker = usageTracker;
-
-            state = new SimpleState<State>(persistenceFactory, GetType(), "Default");
-        }
-
-        public async Task StartAsync(
-            CancellationToken ct)
-        {
-            await state.LoadAsync(ct);
-
-            timer = new CompletionTimer((int)TimeSpan.FromMinutes(10).TotalMilliseconds, _ => CheckUsagesAsync());
-        }
-
-        public Task StopAsync(
-            CancellationToken ct)
-        {
-            return timer?.StopAsync() ?? Task.CompletedTask;
-        }
-
-        public async Task CheckUsagesAsync()
-        {
-            var today = DateTime.Today;
-
-            foreach (var (key, target) in state.Value.Targets)
-            {
-                var from = GetFromDate(today, target.NumDays);
-
-                if (target.Triggered == null || target.Triggered < from)
+                if (costs > limit)
                 {
-                    var costs = await usageTracker.GetMonthCallsAsync(target.AppId.Id.ToString(), today, null);
+                    target.Triggered = today;
 
-                    var limit = target.Limits;
-
-                    if (costs > limit)
+                    var @event = new AppUsageExceeded
                     {
-                        target.Triggered = today;
+                        AppId = target.AppId,
+                        CallsCurrent = costs,
+                        CallsLimit = limit,
+                        RuleId = key
+                    };
 
-                        var @event = new AppUsageExceeded
-                        {
-                            AppId = target.AppId,
-                            CallsCurrent = costs,
-                            CallsLimit = limit,
-                            RuleId = key
-                        };
-
-                        await state.WriteEventAsync(Envelope.Create<IEvent>(@event));
-                    }
+                    await state.WriteEventAsync(Envelope.Create<IEvent>(@event));
                 }
             }
-
-            await state.WriteAsync();
         }
 
-        private static DateTime GetFromDate(DateTime today, int? numDays)
+        await state.WriteAsync();
+    }
+
+    private static DateTime GetFromDate(DateTime today, int? numDays)
+    {
+        if (numDays != null)
         {
-            if (numDays != null)
-            {
-                return today.AddDays(-numDays.Value).AddDays(1);
-            }
-            else
-            {
-                return new DateTime(today.Year, today.Month, 1);
-            }
+            return today.AddDays(-numDays.Value).AddDays(1);
         }
-
-        public Task HandleAsync(UsageTrackingMessage message,
-            CancellationToken ct)
+        else
         {
-            switch (message)
-            {
-                case UsageTrackingAdd add:
-                    return HandleAsync(add, ct);
-                case UsageTrackingRemove remove:
-                    return HandleAsync(remove, ct);
-                case UsageTrackingUpdate update:
-                    return HandleAsync(update, ct);
-                default:
-                    return Task.CompletedTask;
-            }
+            return new DateTime(today.Year, today.Month, 1);
         }
+    }
 
-        public Task HandleAsync(UsageTrackingAdd message,
-            CancellationToken ct)
+    public Task HandleAsync(UsageTrackingMessage message,
+        CancellationToken ct)
+    {
+        switch (message)
         {
-            UpdateTarget(message.RuleId, t => t.SetApp(message.AppId).SetLimit(message.Limits).SetNumDays(message.NumDays));
-
-            return state.WriteAsync(ct);
+            case UsageTrackingAdd add:
+                return HandleAsync(add, ct);
+            case UsageTrackingRemove remove:
+                return HandleAsync(remove, ct);
+            case UsageTrackingUpdate update:
+                return HandleAsync(update, ct);
+            default:
+                return Task.CompletedTask;
         }
+    }
 
-        public Task HandleAsync(UsageTrackingUpdate message,
-            CancellationToken ct)
-        {
-            UpdateTarget(message.RuleId, t => t.SetLimit(message.Limits).SetNumDays(message.NumDays));
+    public Task HandleAsync(UsageTrackingAdd message,
+        CancellationToken ct)
+    {
+        UpdateTarget(message.RuleId, t => t.SetApp(message.AppId).SetLimit(message.Limits).SetNumDays(message.NumDays));
 
-            return state.WriteAsync(ct);
-        }
+        return state.WriteAsync(ct);
+    }
 
-        public Task HandleAsync(UsageTrackingRemove message,
-            CancellationToken ct)
-        {
-            state.Value.Targets.Remove(message.RuleId);
+    public Task HandleAsync(UsageTrackingUpdate message,
+        CancellationToken ct)
+    {
+        UpdateTarget(message.RuleId, t => t.SetLimit(message.Limits).SetNumDays(message.NumDays));
 
-            return state.WriteAsync(ct);
-        }
+        return state.WriteAsync(ct);
+    }
 
-        private void UpdateTarget(DomainId ruleId, Action<Target> updater)
-        {
-            updater(state.Value.Targets.GetOrAddNew(ruleId));
-        }
+    public Task HandleAsync(UsageTrackingRemove message,
+        CancellationToken ct)
+    {
+        state.Value.Targets.Remove(message.RuleId);
+
+        return state.WriteAsync(ct);
+    }
+
+    private void UpdateTarget(DomainId ruleId, Action<Target> updater)
+    {
+        updater(state.Value.Targets.GetOrAddNew(ruleId));
     }
 }

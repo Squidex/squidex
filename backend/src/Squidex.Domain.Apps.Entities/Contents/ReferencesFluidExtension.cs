@@ -8,119 +8,99 @@
 using System.Text.Encodings.Web;
 using Fluid;
 using Fluid.Ast;
-using Fluid.Tags;
 using Fluid.Values;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
+using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Infrastructure;
+using static Parlot.Fluent.Parsers;
 
 #pragma warning disable CA1826 // Do not use Enumerable methods on indexable collections
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents;
+
+public sealed class ReferencesFluidExtension : IFluidExtension
 {
-    public sealed class ReferencesFluidExtension : IFluidExtension
+    private readonly IServiceProvider serviceProvider;
+
+    public ReferencesFluidExtension(IServiceProvider serviceProvider)
     {
-        private static readonly FluidValue ErrorNullReference = FluidValue.Create(null);
-        private readonly IServiceProvider serviceProvider;
+        this.serviceProvider = serviceProvider;
+    }
 
-        private sealed class ReferenceTag : ArgumentsTag
+    public void RegisterLanguageExtensions(CustomFluidParser parser, TemplateOptions options)
+    {
+        AddReferenceFilter(options);
+
+        parser.RegisterParserTag("reference",
+            parser.PrimaryParser.AndSkip(ZeroOrOne(parser.CommaParser)).And(parser.PrimaryParser), 
+            ResolveReference);
+    }
+
+    private async ValueTask<Completion> ResolveReference(ValueTuple<Expression, Expression> arguments, TextWriter writer, TextEncoder encoder, TemplateContext context)
+    {
+        if (context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
         {
-            private readonly IServiceProvider serviceProvider;
+            var (nameArg, idArg) = arguments;
 
-            public ReferenceTag(IServiceProvider serviceProvider)
+            var contentId = await idArg.EvaluateAsync(context);
+            var content = await ResolveContentAsync(serviceProvider, enrichedEvent.AppId.Id, contentId);
+
+            if (content != null)
             {
-                this.serviceProvider = serviceProvider;
+                var name = (await nameArg.EvaluateAsync(context)).ToStringValue();
+
+                context.SetValue(name, content);
             }
+        }
 
-            public override async ValueTask<Completion> WriteToAsync(TextWriter writer,
-                TextEncoder encoder, TemplateContext context, FilterArgument[] arguments)
+        return Completion.Normal;
+    }
+
+    private void AddReferenceFilter(TemplateOptions options)
+    {
+        options.Filters.AddFilter("reference", async (input, arguments, context) =>
+        {
+            if (context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
             {
-                if (arguments.Length == 2 && context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
+                var content = await ResolveContentAsync(serviceProvider, enrichedEvent.AppId.Id, input);
+
+                if (content == null)
                 {
-                    var id = await arguments[1].Expression.EvaluateAsync(context);
-
-                    var content = await ResolveContentAsync(serviceProvider, enrichedEvent.AppId.Id, id);
-
-                    if (content != null)
-                    {
-                        var name = (await arguments[0].Expression.EvaluateAsync(context)).ToStringValue();
-
-                        context.SetValue(name, content);
-                    }
+                    return NilValue.Instance;
                 }
 
-                return Completion.Normal;
-            }
-        }
-
-        public ReferencesFluidExtension(IServiceProvider serviceProvider)
-        {
-            this.serviceProvider = serviceProvider;
-        }
-
-        public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
-        {
-            memberAccessStrategy.Register<IContentEntity>();
-            memberAccessStrategy.Register<IWithId<DomainId>>();
-            memberAccessStrategy.Register<IEntity>();
-            memberAccessStrategy.Register<IEntityWithCreatedBy>();
-            memberAccessStrategy.Register<IEntityWithLastModifiedBy>();
-            memberAccessStrategy.Register<IEntityWithVersion>();
-            memberAccessStrategy.Register<IEnrichedContentEntity>();
-
-            AddReferenceFilter();
-        }
-
-        private void AddReferenceFilter()
-        {
-            TemplateContext.GlobalFilters.AddAsyncFilter("reference", async (input, arguments, context) =>
-            {
-                if (context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
-                {
-                    var content = await ResolveContentAsync(serviceProvider, enrichedEvent.AppId.Id, input);
-
-                    if (content == null)
-                    {
-                        return ErrorNullReference;
-                    }
-
-                    return FluidValue.Create(content);
-                }
-
-                return ErrorNullReference;
-            });
-        }
-
-        public void RegisterLanguageExtensions(FluidParserFactory factory)
-        {
-            factory.RegisterTag("reference", new ReferenceTag(serviceProvider));
-        }
-
-        private static async Task<IContentEntity?> ResolveContentAsync(IServiceProvider serviceProvider, DomainId appId, FluidValue id)
-        {
-            var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
-
-            var app = await appProvider.GetAppAsync(appId);
-
-            if (app == null)
-            {
-                return null;
+                return FluidValue.Create(content, options);
             }
 
-            var domainId = DomainId.Create(id.ToStringValue());
+            return NilValue.Instance;
+        });
+    }
 
-            var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
+    private static async Task<IContentEntity?> ResolveContentAsync(IServiceProvider serviceProvider, DomainId appId, FluidValue id)
+    {
+        var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
 
-            var requestContext =
-                Context.Admin(app).Clone(b => b
-                    .WithoutContentEnrichment()
-                    .WithUnpublished()
-                    .WithoutTotal());
+        var app = await appProvider.GetAppAsync(appId);
 
-            var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(domainId));
-
-            return contents.FirstOrDefault();
+        if (app == null)
+        {
+            return null;
         }
+
+        var domainId = DomainId.Create(id.ToStringValue());
+
+        var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
+
+        var requestContext =
+            Context.Admin(app).Clone(b => b
+                .WithoutContentEnrichment()
+                .WithUnpublished()
+                .WithoutTotal());
+
+        var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(domainId));
+
+        return contents.FirstOrDefault();
     }
 }

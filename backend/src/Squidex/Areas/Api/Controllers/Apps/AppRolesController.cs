@@ -15,160 +15,149 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Apps
+namespace Squidex.Areas.Api.Controllers.Apps;
+
+/// <summary>
+/// Update and query apps.
+/// </summary>
+[ApiExplorerSettings(GroupName = nameof(Apps))]
+public sealed class AppRolesController : ApiController
 {
-    /// <summary>
-    /// Update and query apps.
-    /// </summary>
-    [ApiExplorerSettings(GroupName = nameof(Apps))]
-    public sealed class AppRolesController : ApiController
+    private readonly RolePermissionsProvider permissionsProvider;
+
+    public AppRolesController(ICommandBus commandBus, RolePermissionsProvider permissionsProvider)
+        : base(commandBus)
     {
-        private readonly RolePermissionsProvider permissionsProvider;
+        this.permissionsProvider = permissionsProvider;
+    }
 
-        public AppRolesController(ICommandBus commandBus, RolePermissionsProvider permissionsProvider)
-            : base(commandBus)
+    /// <summary>
+    /// Get app roles.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <response code="200">Roles returned.</response>.
+    /// <response code="404">App not found.</response>.
+    [HttpGet]
+    [Route("apps/{app}/roles/")]
+    [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppRolesRead)]
+    [ApiCosts(0)]
+    public IActionResult GetRoles(string app)
+    {
+        var response = Deferred.Response(() =>
         {
-            this.permissionsProvider = permissionsProvider;
-        }
+            return GetResponse(App);
+        });
 
-        /// <summary>
-        /// Get app roles.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <returns>
-        /// 200 => Roles returned.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/{app}/roles/")]
-        [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(PermissionIds.AppRolesRead)]
-        [ApiCosts(0)]
-        public IActionResult GetRoles(string app)
+        Response.Headers[HeaderNames.ETag] = App.ToEtag();
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Get app permissions.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <response code="200">App permissions returned.</response>.
+    /// <response code="404">App not found.</response>.
+    [HttpGet]
+    [Route("apps/{app}/roles/permissions")]
+    [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppRolesRead)]
+    [ApiCosts(0)]
+    public IActionResult GetPermissions(string app)
+    {
+        var response = Deferred.AsyncResponse(() =>
         {
-            var response = Deferred.Response(() =>
-            {
-                return GetResponse(App);
-            });
+            return permissionsProvider.GetPermissionsAsync(App);
+        });
 
-            Response.Headers[HeaderNames.ETag] = App.ToEtag();
+        Response.Headers[HeaderNames.ETag] = string.Concat(response).ToSha256Base64();
 
-            return Ok(response);
-        }
+        return Ok(response);
+    }
 
-        /// <summary>
-        /// Get app permissions.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <returns>
-        /// 200 => App permissions returned.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/{app}/roles/permissions")]
-        [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(PermissionIds.AppRolesRead)]
-        [ApiCosts(0)]
-        public IActionResult GetPermissions(string app)
-        {
-            var response = Deferred.AsyncResponse(() =>
-            {
-                return permissionsProvider.GetPermissionsAsync(App);
-            });
+    /// <summary>
+    /// Add role to app.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="request">Role object that needs to be added to the app.</param>
+    /// <response code="201">Role created.</response>.
+    /// <response code="400">Role request not valid.</response>.
+    /// <response code="404">App not found.</response>.
+    [HttpPost]
+    [Route("apps/{app}/roles/")]
+    [ProducesResponseType(typeof(RolesDto), 201)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppRolesCreate)]
+    [ApiCosts(1)]
+    public async Task<IActionResult> PostRole(string app, [FromBody] AddRoleDto request)
+    {
+        var command = request.ToCommand();
 
-            Response.Headers[HeaderNames.ETag] = string.Concat(response).ToSha256Base64();
+        var response = await InvokeCommandAsync(command);
 
-            return Ok(response);
-        }
+        return CreatedAtAction(nameof(GetRoles), new { app }, response);
+    }
 
-        /// <summary>
-        /// Add role to app.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="request">Role object that needs to be added to the app.</param>
-        /// <returns>
-        /// 201 => Role created.
-        /// 400 => Role request not valid.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpPost]
-        [Route("apps/{app}/roles/")]
-        [ProducesResponseType(typeof(RolesDto), 201)]
-        [ApiPermissionOrAnonymous(PermissionIds.AppRolesCreate)]
-        [ApiCosts(1)]
-        public async Task<IActionResult> PostRole(string app, [FromBody] AddRoleDto request)
-        {
-            var command = request.ToCommand();
+    /// <summary>
+    /// Update an app role.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="roleName">The name of the role to be updated.</param>
+    /// <param name="request">Role to be updated for the app.</param>
+    /// <response code="200">Role updated.</response>.
+    /// <response code="400">Role request not valid.</response>.
+    /// <response code="404">Role or app not found.</response>.
+    [HttpPut]
+    [Route("apps/{app}/roles/{roleName}/")]
+    [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppRolesUpdate)]
+    [ApiCosts(1)]
+    [UrlDecodeRouteParams]
+    public async Task<IActionResult> PutRole(string app, string roleName, [FromBody] UpdateRoleDto request)
+    {
+        var command = request.ToCommand(roleName);
 
-            var response = await InvokeCommandAsync(command);
+        var response = await InvokeCommandAsync(command);
 
-            return CreatedAtAction(nameof(GetRoles), new { app }, response);
-        }
+        return Ok(response);
+    }
 
-        /// <summary>
-        /// Update an app role.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="roleName">The name of the role to be updated.</param>
-        /// <param name="request">Role to be updated for the app.</param>
-        /// <returns>
-        /// 200 => Role updated.
-        /// 400 => Role request not valid.
-        /// 404 => Role or app not found.
-        /// </returns>
-        [HttpPut]
-        [Route("apps/{app}/roles/{roleName}/")]
-        [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(PermissionIds.AppRolesUpdate)]
-        [ApiCosts(1)]
-        [UrlDecodeRouteParams]
-        public async Task<IActionResult> PutRole(string app, string roleName, [FromBody] UpdateRoleDto request)
-        {
-            var command = request.ToCommand(roleName);
+    /// <summary>
+    /// Remove role from app.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="roleName">The name of the role.</param>
+    /// <response code="200">Role deleted.</response>.
+    /// <response code="400">Role is in use by contributor or client or a default role.</response>.
+    /// <response code="404">Role or app not found.</response>.
+    [HttpDelete]
+    [Route("apps/{app}/roles/{roleName}/")]
+    [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppRolesDelete)]
+    [ApiCosts(1)]
+    [UrlDecodeRouteParams]
+    public async Task<IActionResult> DeleteRole(string app, string roleName)
+    {
+        var command = new DeleteRole { Name = roleName };
 
-            var response = await InvokeCommandAsync(command);
+        var response = await InvokeCommandAsync(command);
 
-            return Ok(response);
-        }
+        return Ok(response);
+    }
 
-        /// <summary>
-        /// Remove role from app.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="roleName">The name of the role.</param>
-        /// <returns>
-        /// 200 => Role deleted.
-        /// 400 => Role is in use by contributor or client or a default role.
-        /// 404 => Role or app not found.
-        /// </returns>
-        [HttpDelete]
-        [Route("apps/{app}/roles/{roleName}/")]
-        [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(PermissionIds.AppRolesDelete)]
-        [ApiCosts(1)]
-        [UrlDecodeRouteParams]
-        public async Task<IActionResult> DeleteRole(string app, string roleName)
-        {
-            var command = new DeleteRole { Name = roleName };
+    private async Task<RolesDto> InvokeCommandAsync(ICommand command)
+    {
+        var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-            var response = await InvokeCommandAsync(command);
+        var result = context.Result<IAppEntity>();
+        var response = GetResponse(result);
 
-            return Ok(response);
-        }
+        return response;
+    }
 
-        private async Task<RolesDto> InvokeCommandAsync(ICommand command)
-        {
-            var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
-
-            var result = context.Result<IAppEntity>();
-            var response = GetResponse(result);
-
-            return response;
-        }
-
-        private RolesDto GetResponse(IAppEntity result)
-        {
-            return RolesDto.FromDomain(result, Resources);
-        }
+    private RolesDto GetResponse(IAppEntity result)
+    {
+        return RolesDto.FromDomain(result, Resources);
     }
 }

@@ -9,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.CreateContent
+namespace Squidex.Extensions.Actions.CreateContent;
+
+public sealed class CreateContentPlugin : IPlugin
 {
-    public sealed class CreateContentPlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddRuleAction<CreateContentAction, CreateContentActionHandler>();
-        }
+        services.AddRuleAction<CreateContentAction, CreateContentActionHandler>();
     }
 }

@@ -7,24 +7,23 @@
 
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.IdentityServer.Controllers.Profile
+namespace Squidex.Areas.IdentityServer.Controllers.Profile;
+
+public sealed class UserProperty
 {
-    public sealed class UserProperty
+    [LocalizedRequired]
+    public string Name { get; set; }
+
+    [LocalizedRequired]
+    public string Value { get; set; }
+
+    public (string Name, string Value) ToTuple()
     {
-        [LocalizedRequired]
-        public string Name { get; set; }
+        return (Name, Value);
+    }
 
-        [LocalizedRequired]
-        public string Value { get; set; }
-
-        public (string Name, string Value) ToTuple()
-        {
-            return (Name, Value);
-        }
-
-        public static UserProperty FromTuple((string Name, string Value) value)
-        {
-            return new UserProperty { Name = value.Name, Value = value.Value };
-        }
+    public static UserProperty FromTuple((string Name, string Value) value)
+    {
+        return new UserProperty { Name = value.Name, Value = value.Value };
     }
 }

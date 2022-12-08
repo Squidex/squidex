@@ -11,22 +11,21 @@ using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 using Squidex.Web;
 
-namespace Squidex.Config.Domain
+namespace Squidex.Config.Domain;
+
+public static class SubscriptionServices
 {
-    public static class SubscriptionServices
+    public static void AddSquidexSubscriptions(this IServiceCollection services, IConfiguration config)
     {
-        public static void AddSquidexSubscriptions(this IServiceCollection services, IConfiguration config)
-        {
-            services.AddSingletonAs(c => c.GetRequiredService<IOptions<UsageOptions>>()?.Value?.Plans.OrEmpty()!);
+        services.AddSingletonAs(c => c.GetRequiredService<IOptions<UsageOptions>>()?.Value?.Plans.OrEmpty()!);
 
-            services.AddSingletonAs<ConfigPlansProvider>()
-                .AsOptional<IBillingPlans>();
+        services.AddSingletonAs<ConfigPlansProvider>()
+            .AsOptional<IBillingPlans>();
 
-            services.AddSingletonAs<NoopBillingManager>()
-                .AsOptional<IBillingManager>();
+        services.AddSingletonAs<NoopBillingManager>()
+            .AsOptional<IBillingManager>();
 
-            services.AddSingletonAs<UsageGate>()
-                .AsOptional<IAppUsageGate>().As<IAssetUsageTracker>();
-        }
+        services.AddSingletonAs<UsageGate>()
+            .AsOptional<IUsageGate>().As<IAssetUsageTracker>();
     }
 }

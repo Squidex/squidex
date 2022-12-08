@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Web.Pipeline
+namespace Squidex.Web.Pipeline;
+
+public sealed class RequestLogOptions
 {
-    public sealed class RequestLogOptions
-    {
-        public bool LogRequests { get; set; }
-    }
+    public bool LogRequests { get; set; }
 }

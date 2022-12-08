@@ -7,13 +7,12 @@
 
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Areas.Api.Controllers.UI.Models
+namespace Squidex.Areas.Api.Controllers.UI.Models;
+
+public sealed class UpdateSettingDto
 {
-    public sealed class UpdateSettingDto
-    {
-        /// <summary>
-        /// The value for the setting.
-        /// </summary>
-        public JsonValue Value { get; set; }
-    }
+    /// <summary>
+    /// The value for the setting.
+    /// </summary>
+    public JsonValue Value { get; set; }
 }

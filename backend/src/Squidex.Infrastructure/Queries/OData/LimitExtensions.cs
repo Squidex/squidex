@@ -5,30 +5,46 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using Microsoft.OData.UriParser;
 
-namespace Squidex.Infrastructure.Queries.OData
+namespace Squidex.Infrastructure.Queries.OData;
+
+public static class LimitExtensions
 {
-    public static class LimitExtensions
+    public static void ParseTake(this ODataUriParser query, ClrQuery result)
     {
-        public static void ParseTake(this ODataUriParser query, ClrQuery result)
-        {
-            var top = query.ParseTop();
+        var top = query.ParseTop();
 
-            if (top != null)
-            {
-                result.Take = top.Value;
-            }
+        if (top != null)
+        {
+            result.Take = top.Value;
         }
+    }
 
-        public static void ParseSkip(this ODataUriParser query, ClrQuery result)
+    public static void ParseSkip(this ODataUriParser query, ClrQuery result)
+    {
+        var skip = query.ParseSkip();
+
+        if (skip != null)
         {
-            var skip = query.ParseSkip();
+            result.Skip = skip.Value;
+        }
+    }
 
-            if (skip != null)
-            {
-                result.Skip = skip.Value;
-            }
+    public static void ParseRandom(this ODataUriParser query, ClrQuery result)
+    {
+        var customQueries = query.CustomQueryOptions;
+
+        var randomQuery = customQueries.FirstOrDefault(x =>
+            string.Equals(x.Key, "random", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(x.Key, "randomCount", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(x.Key, "$random", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(x.Key, "$randomCount", StringComparison.OrdinalIgnoreCase));
+
+        if (int.TryParse(randomQuery.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var random))
+        {
+            result.Random = random;
         }
     }
 }

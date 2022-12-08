@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Events.Assets
+namespace Squidex.Domain.Apps.Events.Assets;
+
+public abstract class AssetFolderEvent : AppEvent
 {
-    public abstract class AssetFolderEvent : AppEvent
-    {
-        public DomainId AssetFolderId { get; set; }
-    }
+    public DomainId AssetFolderId { get; set; }
 }

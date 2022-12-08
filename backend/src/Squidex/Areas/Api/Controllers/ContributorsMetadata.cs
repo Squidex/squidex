@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Areas.Api.Controllers
+namespace Squidex.Areas.Api.Controllers;
+
+public sealed class ContributorsMetadata
 {
-    public sealed class ContributorsMetadata
-    {
-        /// <summary>
-        /// Indicates whether the user has been invited.
-        /// </summary>
-        public string IsInvited { get; set; }
-    }
+    /// <summary>
+    /// Indicates whether the user has been invited.
+    /// </summary>
+    public string IsInvited { get; set; }
 }

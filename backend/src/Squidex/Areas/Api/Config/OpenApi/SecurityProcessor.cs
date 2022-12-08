@@ -10,51 +10,33 @@ using NSwag.Generation.Processors.Security;
 using Squidex.Hosting;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Config.OpenApi
+namespace Squidex.Areas.Api.Config.OpenApi;
+
+public sealed class SecurityProcessor : SecurityDefinitionAppender
 {
-    public sealed class SecurityProcessor : SecurityDefinitionAppender
+    public SecurityProcessor(IUrlGenerator urlGenerator)
+        : base(Constants.SecurityDefinition, new[] { Constants.ScopeApi }, CreateOAuthSchema(urlGenerator))
     {
-        public SecurityProcessor(IUrlGenerator urlGenerator)
-            : base(Constants.SecurityDefinition, Enumerable.Empty<string>(), CreateOAuthSchema(urlGenerator))
+    }
+
+    private static OpenApiSecurityScheme CreateOAuthSchema(IUrlGenerator urlGenerator)
+    {
+        string BuildUrl(string endpoint)
         {
+            return urlGenerator.BuildUrl($"/{Constants.PrefixIdentityServer}/{endpoint}", false);
         }
 
-        private static OpenApiSecurityScheme CreateOAuthSchema(IUrlGenerator urlGenerator)
+        var security = new OpenApiSecurityScheme
         {
-            var security = new OpenApiSecurityScheme
-            {
-                Type = OpenApiSecuritySchemeType.OAuth2
-            };
+            Type = OpenApiSecuritySchemeType.OpenIdConnect,
 
-            var tokenUrl = urlGenerator.BuildUrl($"/{Constants.PrefixIdentityServer}/connect/token", false);
+            // The discovery endpoint
+            OpenIdConnectUrl = BuildUrl(".well-known/openid-configuration"),
 
-            security.TokenUrl = tokenUrl;
+            // Just described the token URL again.
+            Description = Properties.Resources.OpenApiSecurity.Replace("<TOKEN_URL>", BuildUrl($"connect/token"), StringComparison.Ordinal)
+        };
 
-            SetupDescription(security, tokenUrl);
-            SetupFlow(security);
-            SetupScopes(security);
-
-            return security;
-        }
-
-        private static void SetupFlow(OpenApiSecurityScheme security)
-        {
-            security.Flow = OpenApiOAuth2Flow.Application;
-        }
-
-        private static void SetupScopes(OpenApiSecurityScheme security)
-        {
-            security.Scopes = new Dictionary<string, string>
-            {
-                [Constants.ScopeApi] = "Read and write access to the API"
-            };
-        }
-
-        private static void SetupDescription(OpenApiSecurityScheme securityScheme, string tokenUrl)
-        {
-            var securityText = Properties.Resources.OpenApiSecurity.Replace("<TOKEN_URL>", tokenUrl, StringComparison.Ordinal);
-
-            securityScheme.Description = securityText;
-        }
+        return security;
     }
 }

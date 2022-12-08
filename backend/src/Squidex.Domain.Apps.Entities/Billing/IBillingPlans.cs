@@ -5,18 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Billing
+namespace Squidex.Domain.Apps.Entities.Billing;
+
+public interface IBillingPlans
 {
-    public interface IBillingPlans
-    {
-        IEnumerable<Plan> GetAvailablePlans();
+    IEnumerable<Plan> GetAvailablePlans();
 
-        bool IsConfiguredPlan(string? planId);
+    bool IsConfiguredPlan(string? planId);
 
-        Plan? GetPlan(string? planId);
+    Plan? GetPlan(string? planId);
 
-        Plan GetFreePlan();
+    Plan GetFreePlan();
 
-        (Plan Plan, string PlanId) GetActualPlan(string? planId);
-    }
+    (Plan Plan, string PlanId) GetActualPlan(string? planId);
 }

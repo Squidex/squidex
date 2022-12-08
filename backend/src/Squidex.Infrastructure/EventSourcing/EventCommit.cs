@@ -7,22 +7,21 @@
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+public sealed record EventCommit(Guid Id, string StreamName, long Offset, ICollection<EventData> Events)
 {
-    public sealed record EventCommit(Guid Id, string StreamName, long Offset, ICollection<EventData> Events)
+    public static EventCommit Create(Guid id, string streamName, long offset, EventData @event)
     {
-        public static EventCommit Create(Guid id, string streamName, long offset, EventData @event)
-        {
-            return new EventCommit(id, streamName, offset, new List<EventData> { @event });
-        }
+        return new EventCommit(id, streamName, offset, new List<EventData> { @event });
+    }
 
-        public static EventCommit Create(string streamName, long offset, Envelope<IEvent> envelope, IEventFormatter eventFormatter)
-        {
-            var id = Guid.NewGuid();
+    public static EventCommit Create(string streamName, long offset, Envelope<IEvent> envelope, IEventFormatter eventFormatter)
+    {
+        var id = Guid.NewGuid();
 
-            var eventData = eventFormatter.ToEventData(envelope, id);
+        var eventData = eventFormatter.ToEventData(envelope, id);
 
-            return new EventCommit(id, streamName, offset, new List<EventData> { eventData });
-        }
+        return new EventCommit(id, streamName, offset, new List<EventData> { eventData });
     }
 }

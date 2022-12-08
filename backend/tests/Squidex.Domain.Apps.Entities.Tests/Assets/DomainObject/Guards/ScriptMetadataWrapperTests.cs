@@ -7,107 +7,105 @@
 
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure.Json.Objects;
-using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
+namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
+
+public class ScriptMetadataWrapperTests
 {
-    public class ScriptMetadataWrapperTests
+    private readonly AssetMetadata metadata = new AssetMetadata();
+    private readonly ScriptMetadataWrapper sut;
+
+    public ScriptMetadataWrapperTests()
     {
-        private readonly AssetMetadata metadata = new AssetMetadata();
-        private readonly ScriptMetadataWrapper sut;
+        sut = new ScriptMetadataWrapper(metadata);
+    }
 
-        public ScriptMetadataWrapperTests()
+    [Fact]
+    public void Should_add_value()
+    {
+        sut.Add("key", 1);
+
+        Assert.Equal(JsonValue.Create(1), metadata["key"]);
+        Assert.Equal(JsonValue.Create(1), sut["key"]);
+
+        Assert.True(metadata.ContainsKey("key"));
+        Assert.True(sut.ContainsKey("key"));
+
+        Assert.Single(metadata);
+        Assert.Single(sut);
+    }
+
+    [Fact]
+    public void Should_set_value()
+    {
+        sut["key"] = 1;
+
+        Assert.Equal(JsonValue.Create(1), metadata["key"]);
+        Assert.Equal(JsonValue.Create(1), sut["key"]);
+
+        Assert.True(metadata.ContainsKey("key"));
+        Assert.True(sut.ContainsKey("key"));
+
+        Assert.Single(metadata);
+        Assert.Single(sut);
+    }
+
+    [Fact]
+    public void Should_provide_keys()
+    {
+        sut["key1"] = 1;
+        sut["key2"] = 2;
+
+        Assert.Equal(new[]
         {
-            sut = new ScriptMetadataWrapper(metadata);
-        }
+            "key1",
+            "key2"
+        }, sut.Keys.ToArray());
+    }
 
-        [Fact]
-        public void Should_add_value()
+    [Fact]
+    public void Should_provide_values()
+    {
+        sut["key1"] = 1;
+        sut["key2"] = 2;
+
+        Assert.Equal(new object[]
         {
-            sut.Add("key", 1);
+            JsonValue.Create(1),
+            JsonValue.Create(2)
+        }, sut.Values.ToArray());
+    }
 
-            Assert.Equal(JsonValue.Create(1), metadata["key"]);
-            Assert.Equal(JsonValue.Create(1), sut["key"]);
+    [Fact]
+    public void Should_enumerate_values()
+    {
+        sut["key1"] = 1;
+        sut["key2"] = 2;
 
-            Assert.True(metadata.ContainsKey("key"));
-            Assert.True(sut.ContainsKey("key"));
-
-            Assert.Single(metadata);
-            Assert.Single(sut);
-        }
-
-        [Fact]
-        public void Should_set_value()
+        Assert.Equal(new[]
         {
-            sut["key"] = 1;
+            new KeyValuePair<string, object?>("key1", JsonValue.Create(1)),
+            new KeyValuePair<string, object?>("key2", JsonValue.Create(2))
+        }, sut.ToArray());
+    }
 
-            Assert.Equal(JsonValue.Create(1), metadata["key"]);
-            Assert.Equal(JsonValue.Create(1), sut["key"]);
+    [Fact]
+    public void Should_remove_value()
+    {
+        sut["key"] = 1;
+        sut.Remove("key");
 
-            Assert.True(metadata.ContainsKey("key"));
-            Assert.True(sut.ContainsKey("key"));
+        Assert.Empty(metadata);
+        Assert.Empty(sut);
+    }
 
-            Assert.Single(metadata);
-            Assert.Single(sut);
-        }
+    [Fact]
+    public void Should_clear_collection()
+    {
+        sut["key"] = 1;
+        sut.Clear();
 
-        [Fact]
-        public void Should_provide_keys()
-        {
-            sut["key1"] = 1;
-            sut["key2"] = 2;
-
-            Assert.Equal(new[]
-            {
-                "key1",
-                "key2"
-            }, sut.Keys.ToArray());
-        }
-
-        [Fact]
-        public void Should_provide_values()
-        {
-            sut["key1"] = 1;
-            sut["key2"] = 2;
-
-            Assert.Equal(new object[]
-            {
-                JsonValue.Create(1),
-                JsonValue.Create(2)
-            }, sut.Values.ToArray());
-        }
-
-        [Fact]
-        public void Should_enumerate_values()
-        {
-            sut["key1"] = 1;
-            sut["key2"] = 2;
-
-            Assert.Equal(new[]
-            {
-                new KeyValuePair<string, object?>("key1", JsonValue.Create(1)),
-                new KeyValuePair<string, object?>("key2", JsonValue.Create(2))
-            }, sut.ToArray());
-        }
-
-        [Fact]
-        public void Should_remove_value()
-        {
-            sut["key"] = 1;
-            sut.Remove("key");
-
-            Assert.Empty(metadata);
-            Assert.Empty(sut);
-        }
-
-        [Fact]
-        public void Should_clear_collection()
-        {
-            sut["key"] = 1;
-            sut.Clear();
-
-            Assert.Empty(metadata);
-            Assert.Empty(sut);
-        }
+        Assert.Empty(metadata);
+        Assert.Empty(sut);
     }
 }

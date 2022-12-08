@@ -11,19 +11,18 @@ using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Assets.Azure
-{
-    public sealed class AzureMetadataSourcePlugin : IPlugin
-    {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            var options = config.GetSection("assets:azurecognitive").Get<AzureMetadataSourceOptions>() ?? new ();
+namespace Squidex.Extensions.Assets.Azure;
 
-            if (options.IsConfigured())
-            {
-                services.AddSingleton<IAssetMetadataSource, AzureMetadataSource>();
-                services.AddSingleton(Options.Create(options));
-            }
+public sealed class AzureMetadataSourcePlugin : IPlugin
+{
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
+    {
+        var options = config.GetSection("assets:azurecognitive").Get<AzureMetadataSourceOptions>() ?? new ();
+
+        if (options.IsConfigured())
+        {
+            services.AddSingleton<IAssetMetadataSource, AzureMetadataSource>();
+            services.AddSingleton(Options.Create(options));
         }
     }
 }

@@ -73,6 +73,9 @@ describe('PlansService', () => {
                         maxContributors: 6500,
                     },
                 ],
+                referral: {
+                    code: 'CODE',
+                },
                 locked: 'ManagedByTeam',
             }, {
                 headers: {
@@ -87,18 +90,27 @@ describe('PlansService', () => {
                     planOwner: '456',
                     plans: [
                         new PlanDto(
-                            'free', 'Free', '14 €',
+                            'free',
+                            'Free',
+                            '14 €',
                             'Change for 14 € per month?',
-                            'free_yearly', '120 €',
+                            'free_yearly',
+                            '120 €',
                             'Change for 120 € per year?',
                             128, 1000, 1500, 2500),
                         new PlanDto(
-                            'professional', 'Professional', '18 €',
+                            'professional',
+                            'Professional',
+                            '18 €',
                             'Change for 18 € per month?',
-                            'professional_yearly', '160 €',
+                            'professional_yearly',
+                            '160 €',
                             'Change for 160 € per year?',
                             512, 4000, 5500, 6500),
                     ],
+                    referral: {
+                        code: 'CODE',
+                    } as any,
                     locked: 'ManagedByTeam',
                 },
                 version: new Version('2'),

@@ -8,20 +8,19 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Domain.Apps.Entities.Apps;
+
+public interface IAppUISettings
 {
-    public interface IAppUISettings
-    {
-        Task<JsonObject> GetAsync(DomainId appId, string? userId,
-            CancellationToken ct = default);
+    Task<JsonObject> GetAsync(DomainId appId, string? userId,
+        CancellationToken ct = default);
 
-        Task SetAsync(DomainId appId, string? userId, string path, JsonValue value,
-            CancellationToken ct = default);
+    Task SetAsync(DomainId appId, string? userId, string path, JsonValue value,
+        CancellationToken ct = default);
 
-        Task SetAsync(DomainId appId, string? userId, JsonObject settings,
-            CancellationToken ct = default);
+    Task SetAsync(DomainId appId, string? userId, JsonObject settings,
+        CancellationToken ct = default);
 
-        Task RemoveAsync(DomainId appId, string? userId, string path,
-            CancellationToken ct = default);
-    }
+    Task RemoveAsync(DomainId appId, string? userId, string path,
+        CancellationToken ct = default);
 }

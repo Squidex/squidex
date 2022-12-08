@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+public sealed class LanguagesOptions : Dictionary<string, string>
 {
-    public sealed class LanguagesOptions : Dictionary<string, string>
-    {
-    }
 }

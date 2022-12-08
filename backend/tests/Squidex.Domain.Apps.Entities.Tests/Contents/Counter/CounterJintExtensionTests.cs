@@ -5,125 +5,122 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
-using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Counter
+namespace Squidex.Domain.Apps.Entities.Contents.Counter;
+
+public class CounterJintExtensionTests
 {
-    public class CounterJintExtensionTests
+    private readonly ICounterService counterService = A.Fake<ICounterService>();
+    private readonly JintScriptEngine sut;
+
+    public CounterJintExtensionTests()
     {
-        private readonly ICounterService counterService = A.Fake<ICounterService>();
-        private readonly JintScriptEngine sut;
-
-        public CounterJintExtensionTests()
+        var extensions = new IJintExtension[]
         {
-            var extensions = new IJintExtension[]
+            new CounterJintExtension(counterService)
+        };
+
+        sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+            Options.Create(new JintScriptOptions
             {
-                new CounterJintExtension(counterService)
-            };
+                TimeoutScript = TimeSpan.FromSeconds(2),
+                TimeoutExecution = TimeSpan.FromSeconds(10)
+            }), extensions);
+    }
 
-            sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
-                Options.Create(new JintScriptOptions
-                {
-                    TimeoutScript = TimeSpan.FromSeconds(2),
-                    TimeoutExecution = TimeSpan.FromSeconds(10)
-                }), extensions);
-        }
+    [Fact]
+    public void Should_reset_counter()
+    {
+        var appId = DomainId.NewGuid();
 
-        [Fact]
-        public void Should_reset_counter()
-        {
-            var appId = DomainId.NewGuid();
+        A.CallTo(() => counterService.ResetAsync(appId, "my", 4, default))
+            .Returns(3);
 
-            A.CallTo(() => counterService.ResetAsync(appId, "my", 4, default))
-                .Returns(3);
-
-            const string script = @"
+        const string script = @"
                 return resetCounter('my', 4);
             ";
 
-            var vars = new ScriptVars
-            {
-                ["appId"] = appId
-            };
-
-            var actual = sut.Execute(vars, script).ToString();
-
-            Assert.Equal("3", actual);
-        }
-
-        [Fact]
-        public async Task Should_reset_counter_with_callback()
+        var vars = new ScriptVars
         {
-            var appId = DomainId.NewGuid();
+            ["appId"] = appId
+        };
 
-            A.CallTo(() => counterService.ResetAsync(appId, "my", 4, A<CancellationToken>._))
-                .Returns(3);
+        var actual = sut.Execute(vars, script).ToString();
 
-            const string script = @"
+        Assert.Equal("3", actual);
+    }
+
+    [Fact]
+    public async Task Should_reset_counter_with_callback()
+    {
+        var appId = DomainId.NewGuid();
+
+        A.CallTo(() => counterService.ResetAsync(appId, "my", 4, A<CancellationToken>._))
+            .Returns(3);
+
+        const string script = @"
                 resetCounterV2('my', function(actual) {
                     complete(actual);
                 }, 4);
             ";
 
-            var vars = new ScriptVars
-            {
-                ["appId"] = appId
-            };
-
-            var actual = (await sut.ExecuteAsync(vars, script)).ToString();
-
-            Assert.Equal("3", actual);
-        }
-
-        [Fact]
-        public void Should_increment_counter()
+        var vars = new ScriptVars
         {
-            var appId = DomainId.NewGuid();
+            ["appId"] = appId
+        };
 
-            A.CallTo(() => counterService.IncrementAsync(appId, "my", A<CancellationToken>._))
-                .Returns(3);
+        var actual = (await sut.ExecuteAsync(vars, script)).ToString();
 
-            const string script = @"
+        Assert.Equal("3", actual);
+    }
+
+    [Fact]
+    public void Should_increment_counter()
+    {
+        var appId = DomainId.NewGuid();
+
+        A.CallTo(() => counterService.IncrementAsync(appId, "my", A<CancellationToken>._))
+            .Returns(3);
+
+        const string script = @"
                 return incrementCounter('my');
             ";
 
-            var vars = new ScriptVars
-            {
-                ["appId"] = appId
-            };
-
-            var actual = sut.Execute(vars, script).ToString();
-
-            Assert.Equal("3", actual);
-        }
-
-        [Fact]
-        public async Task Should_increment_counter_with_callback()
+        var vars = new ScriptVars
         {
-            var appId = DomainId.NewGuid();
+            ["appId"] = appId
+        };
 
-            A.CallTo(() => counterService.IncrementAsync(appId, "my", A<CancellationToken>._))
-                .Returns(3);
+        var actual = sut.Execute(vars, script).ToString();
 
-            const string script = @"
+        Assert.Equal("3", actual);
+    }
+
+    [Fact]
+    public async Task Should_increment_counter_with_callback()
+    {
+        var appId = DomainId.NewGuid();
+
+        A.CallTo(() => counterService.IncrementAsync(appId, "my", A<CancellationToken>._))
+            .Returns(3);
+
+        const string script = @"
                 incrementCounter('my', function (actual) {
                     complete(actual);
                 });
             ";
 
-            var vars = new ScriptVars
-            {
-                ["appId"] = appId
-            };
+        var vars = new ScriptVars
+        {
+            ["appId"] = appId
+        };
 
-            var actual = (await sut.ExecuteAsync(vars, script)).ToString();
+        var actual = (await sut.ExecuteAsync(vars, script)).ToString();
 
-            Assert.Equal("3", actual);
-        }
+        Assert.Equal("3", actual);
     }
 }

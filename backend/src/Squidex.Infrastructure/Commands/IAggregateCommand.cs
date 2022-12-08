@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public interface IAggregateCommand : ICommand
 {
-    public interface IAggregateCommand : ICommand
-    {
-        DomainId AggregateId { get; }
-    }
+    DomainId AggregateId { get; }
 }

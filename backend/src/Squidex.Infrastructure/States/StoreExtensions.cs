@@ -7,14 +7,13 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Infrastructure.States;
+
+public static class StoreExtensions
 {
-    public static class StoreExtensions
+    public static Task WriteEventAsync<T>(this IPersistence<T> persistence, Envelope<IEvent> @event,
+        CancellationToken ct = default)
     {
-        public static Task WriteEventAsync<T>(this IPersistence<T> persistence, Envelope<IEvent> @event,
-            CancellationToken ct = default)
-        {
-            return persistence.WriteEventsAsync(new[] { @event }, ct);
-        }
+        return persistence.WriteEventsAsync(new[] { @event }, ct);
     }
 }

@@ -7,54 +7,53 @@
 
 using System.IO.Pipelines;
 
-namespace Squidex.Web.Pipeline
+namespace Squidex.Web.Pipeline;
+
+public sealed class UsagePipeWriter : PipeWriter
 {
-    public sealed class UsagePipeWriter : PipeWriter
+    private readonly PipeWriter inner;
+    private long bytesWritten;
+
+    public long BytesWritten
     {
-        private readonly PipeWriter inner;
-        private long bytesWritten;
+        get => bytesWritten;
+    }
 
-        public long BytesWritten
-        {
-            get => bytesWritten;
-        }
+    public UsagePipeWriter(PipeWriter inner)
+    {
+        this.inner = inner;
+    }
 
-        public UsagePipeWriter(PipeWriter inner)
-        {
-            this.inner = inner;
-        }
+    public override void Advance(int bytes)
+    {
+        inner.Advance(bytes);
 
-        public override void Advance(int bytes)
-        {
-            inner.Advance(bytes);
+        bytesWritten += bytes;
+    }
 
-            bytesWritten += bytes;
-        }
+    public override void CancelPendingFlush()
+    {
+        inner.CancelPendingFlush();
+    }
 
-        public override void CancelPendingFlush()
-        {
-            inner.CancelPendingFlush();
-        }
+    public override void Complete(Exception? exception = null)
+    {
+        inner.Complete();
+    }
 
-        public override void Complete(Exception? exception = null)
-        {
-            inner.Complete();
-        }
+    public override ValueTask<FlushResult> FlushAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return inner.FlushAsync(cancellationToken);
+    }
 
-        public override ValueTask<FlushResult> FlushAsync(
-            CancellationToken cancellationToken = default)
-        {
-            return inner.FlushAsync(cancellationToken);
-        }
+    public override Memory<byte> GetMemory(int sizeHint = 0)
+    {
+        return inner.GetMemory(sizeHint);
+    }
 
-        public override Memory<byte> GetMemory(int sizeHint = 0)
-        {
-            return inner.GetMemory(sizeHint);
-        }
-
-        public override Span<byte> GetSpan(int sizeHint = 0)
-        {
-            return inner.GetSpan(sizeHint);
-        }
+    public override Span<byte> GetSpan(int sizeHint = 0)
+    {
+        return inner.GetSpan(sizeHint);
     }
 }

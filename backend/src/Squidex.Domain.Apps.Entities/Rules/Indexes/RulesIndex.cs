@@ -8,31 +8,30 @@
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Rules.Indexes
+namespace Squidex.Domain.Apps.Entities.Rules.Indexes;
+
+public sealed class RulesIndex : IRulesIndex
 {
-    public sealed class RulesIndex : IRulesIndex
+    private readonly IRuleRepository ruleRepository;
+
+    public RulesIndex(IRuleRepository ruleRepository)
     {
-        private readonly IRuleRepository ruleRepository;
+        this.ruleRepository = ruleRepository;
+    }
 
-        public RulesIndex(IRuleRepository ruleRepository)
+    public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("RulesIndex/GetRulesAsync"))
         {
-            this.ruleRepository = ruleRepository;
-        }
+            var rules = await ruleRepository.QueryAllAsync(appId, ct);
 
-        public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId,
-            CancellationToken ct = default)
-        {
-            using (Telemetry.Activities.StartActivity("RulesIndex/GetRulesAsync"))
-            {
-                var rules = await ruleRepository.QueryAllAsync(appId, ct);
-
-                return rules.Where(IsValid).ToList();
-            }
+            return rules.Where(IsValid).ToList();
         }
+    }
 
-        private static bool IsValid(IRuleEntity? rule)
-        {
-            return rule is { Version: > EtagVersion.Empty, IsDeleted: false };
-        }
+    private static bool IsValid(IRuleEntity? rule)
+    {
+        return rule is { Version: > EtagVersion.Empty, IsDeleted: false };
     }
 }

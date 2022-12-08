@@ -5,11 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents;
+
+public enum SearchScope
 {
-    public enum SearchScope
-    {
-        All,
-        Published
-    }
+    All,
+    Published
 }

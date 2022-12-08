@@ -15,23 +15,29 @@
 
     &-buttons,
     &-buttons-compare {
-        background: $color-white;
         display: flex;
         flex-grow: 1;
         flex-wrap: nowrap;
         justify-content: right;
-        margin: 0;
+        margin-bottom: 0;
         margin-top: -1px;
         white-space: nowrap;
         z-index: 1;
     }
 
+    &-inner {
+        background: $color-white;
+        height: 2.125rem;
+    }
+
     &-buttons {
-        @include absolute(-.75rem, 4.25rem);
+        @include absolute(-.75rem, 4.25rem, null, 0);
+        overflow: hidden;
     }
 
     &-buttons-compare {
-        @include absolute(-.75rem, 0);
+        @include absolute(-.75rem, 0, null, 0);
+        overflow: hidden;
     }
 }
 

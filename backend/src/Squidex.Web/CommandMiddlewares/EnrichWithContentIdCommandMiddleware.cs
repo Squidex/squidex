@@ -8,24 +8,23 @@
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Web.CommandMiddlewares
+namespace Squidex.Web.CommandMiddlewares;
+
+public sealed class EnrichWithContentIdCommandMiddleware : ICommandMiddleware
 {
-    public sealed class EnrichWithContentIdCommandMiddleware : ICommandMiddleware
+    private const string SingletonId = "_schemaId_";
+
+    public Task HandleAsync(CommandContext context, NextDelegate next,
+        CancellationToken ct)
     {
-        private const string SingletonId = "_schemaId_";
-
-        public Task HandleAsync(CommandContext context, NextDelegate next,
-            CancellationToken ct)
+        if (context.Command is ContentCommand contentCommand and not CreateContent)
         {
-            if (context.Command is ContentCommand contentCommand and not CreateContent)
+            if (contentCommand.ContentId.ToString().Equals(SingletonId, StringComparison.Ordinal))
             {
-                if (contentCommand.ContentId.ToString().Equals(SingletonId, StringComparison.Ordinal))
-                {
-                    contentCommand.ContentId = contentCommand.SchemaId.Id;
-                }
+                contentCommand.ContentId = contentCommand.SchemaId.Id;
             }
-
-            return next(context, ct);
         }
+
+        return next(context, ct);
     }
 }

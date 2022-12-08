@@ -14,143 +14,140 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Apps
+namespace Squidex.Areas.Api.Controllers.Apps;
+
+/// <summary>
+/// Update and query apps.
+/// </summary>
+[ApiExplorerSettings(GroupName = nameof(Apps))]
+public sealed class AppImageController : ApiController
 {
-    /// <summary>
-    /// Update and query apps.
-    /// </summary>
-    [ApiExplorerSettings(GroupName = nameof(Apps))]
-    public sealed class AppImageController : ApiController
+    private readonly IAppImageStore appImageStore;
+    private readonly IAssetStore assetStore;
+    private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
+
+    public AppImageController(ICommandBus commandBus,
+        IAppImageStore appImageStore,
+        IAssetStore assetStore,
+        IAssetThumbnailGenerator assetThumbnailGenerator)
+        : base(commandBus)
     {
-        private readonly IAppImageStore appImageStore;
-        private readonly IAssetStore assetStore;
-        private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
+        this.appImageStore = appImageStore;
+        this.assetStore = assetStore;
+        this.assetThumbnailGenerator = assetThumbnailGenerator;
+    }
 
-        public AppImageController(ICommandBus commandBus,
-            IAppImageStore appImageStore,
-            IAssetStore assetStore,
-            IAssetThumbnailGenerator assetThumbnailGenerator)
-            : base(commandBus)
+    /// <summary>
+    /// Get the app image.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <response code="200">App image found and content or (resized) image returned.</response>.
+    /// <response code="404">App not found.</response>.
+    [HttpGet]
+    [Route("apps/{app}/image")]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
+    [AllowAnonymous]
+    [ApiCosts(0)]
+    public IActionResult GetImage(string app)
+    {
+        if (App.Image == null)
         {
-            this.appImageStore = appImageStore;
-            this.assetStore = assetStore;
-            this.assetThumbnailGenerator = assetThumbnailGenerator;
+            return NotFound();
         }
 
-        /// <summary>
-        /// Get the app image.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <returns>
-        /// 200 => App image found and content or (resized) image returned.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/{app}/image")]
-        [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
-        [AllowAnonymous]
-        [ApiCosts(0)]
-        public IActionResult GetImage(string app)
+        var etag = App.Image.Etag;
+
+        Response.Headers[HeaderNames.ETag] = etag;
+
+        var callback = new FileCallback(async (body, range, ct) =>
         {
-            if (App.Image == null)
+            var resizedAsset = $"{App.Id}_{etag}_Resized";
+
+            try
             {
-                return NotFound();
+                await assetStore.DownloadAsync(resizedAsset, body, ct: ct);
             }
-
-            var etag = App.Image.Etag;
-
-            Response.Headers[HeaderNames.ETag] = etag;
-
-            var callback = new FileCallback(async (body, range, ct) =>
+            catch (AssetNotFoundException)
             {
-                var resizedAsset = $"{App.Id}_{etag}_Resized";
+                await ResizeAsync(resizedAsset, App.Image.MimeType, body, ct);
+            }
+        });
 
-                try
-                {
-                    await assetStore.DownloadAsync(resizedAsset, body, ct: ct);
-                }
-                catch (AssetNotFoundException)
-                {
-                    await ResizeAsync(resizedAsset, App.Image.MimeType, body, ct);
-                }
-            });
-
-            return new FileCallbackResult(App.Image.MimeType, callback)
-            {
-                ErrorAs404 = true
-            };
-        }
-
-        private async Task ResizeAsync(string resizedAsset, string mimeType, Stream target,
-            CancellationToken ct)
+        return new FileCallbackResult(App.Image.MimeType, callback)
         {
+            ErrorAs404 = true
+        };
+    }
+
+    private async Task ResizeAsync(string resizedAsset, string mimeType, Stream target,
+        CancellationToken ct)
+    {
 #pragma warning disable MA0040 // Flow the cancellation token
-            using var activity = Telemetry.Activities.StartActivity("Resize");
+        using var activity = Telemetry.Activities.StartActivity("Resize");
 
-            await using var assetOriginal = new TempAssetFile(resizedAsset, mimeType, 0);
-            await using var assetResized = new TempAssetFile(resizedAsset, mimeType, 0);
+        await using var assetOriginal = new TempAssetFile(resizedAsset, mimeType, 0);
+        await using var assetResized = new TempAssetFile(resizedAsset, mimeType, 0);
 
-            var resizeOptions = new ResizeOptions
+        var resizeOptions = new ResizeOptions
+        {
+            TargetWidth = 50,
+            TargetHeight = 50
+        };
+
+        using (Telemetry.Activities.StartActivity("Read"))
+        {
+            await using (var originalStream = assetOriginal.OpenWrite())
             {
-                TargetWidth = 50,
-                TargetHeight = 50
-            };
-
-            using (Telemetry.Activities.StartActivity("Read"))
-            {
-                await using (var originalStream = assetOriginal.OpenWrite())
-                {
-                    await appImageStore.DownloadAsync(App.Id, originalStream, ct);
-                }
+                await appImageStore.DownloadAsync(App.Id, originalStream, ct);
             }
+        }
 
-            using (Telemetry.Activities.StartActivity("Resize"))
+        using (Telemetry.Activities.StartActivity("Resize"))
+        {
+            try
             {
-                try
+                await using (var originalStream = assetOriginal.OpenRead())
                 {
-                    await using (var originalStream = assetOriginal.OpenRead())
+                    await using (var resizeStream = assetResized.OpenWrite())
                     {
-                        await using (var resizeStream = assetResized.OpenWrite())
-                        {
-                            await assetThumbnailGenerator.CreateThumbnailAsync(originalStream, mimeType, resizeStream, resizeOptions, ct);
-                        }
-                    }
-                }
-                catch
-                {
-                    await using (var originalStream = assetOriginal.OpenRead())
-                    {
-                        await using (var resizeStream = assetResized.OpenWrite())
-                        {
-                            await originalStream.CopyToAsync(resizeStream);
-                        }
+                        await assetThumbnailGenerator.CreateThumbnailAsync(originalStream, mimeType, resizeStream, resizeOptions, ct);
                     }
                 }
             }
-
-            using (Telemetry.Activities.StartActivity("Save"))
+            catch
             {
-                try
+                await using (var originalStream = assetOriginal.OpenRead())
                 {
-                    await using (var resizeStream = assetResized.OpenRead())
+                    await using (var resizeStream = assetResized.OpenWrite())
                     {
-                        await assetStore.UploadAsync(resizedAsset, resizeStream);
+                        await originalStream.CopyToAsync(resizeStream);
                     }
                 }
-                catch (AssetAlreadyExistsException)
-                {
-                    return;
-                }
             }
+        }
 
-            using (Telemetry.Activities.StartActivity("Write"))
+        using (Telemetry.Activities.StartActivity("Save"))
+        {
+            try
             {
                 await using (var resizeStream = assetResized.OpenRead())
                 {
-                    await resizeStream.CopyToAsync(target, ct);
+                    await assetStore.UploadAsync(resizedAsset, resizeStream);
                 }
             }
-#pragma warning restore MA0040 // Flow the cancellation token
+            catch (AssetAlreadyExistsException)
+            {
+                return;
+            }
         }
+
+        using (Telemetry.Activities.StartActivity("Write"))
+        {
+            await using (var resizeStream = assetResized.OpenRead())
+            {
+                await resizeStream.CopyToAsync(target, ct);
+            }
+        }
+#pragma warning restore MA0040 // Flow the cancellation token
     }
 }

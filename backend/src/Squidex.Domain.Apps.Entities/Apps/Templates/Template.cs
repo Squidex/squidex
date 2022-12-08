@@ -7,7 +7,6 @@
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Domain.Apps.Entities.Apps.Templates
-{
-    public sealed record Template(string Name, string Title, string Description, bool IsStarter);
-}
+namespace Squidex.Domain.Apps.Entities.Apps.Templates;
+
+public sealed record Template(string Name, string Title, string Description, bool IsStarter);

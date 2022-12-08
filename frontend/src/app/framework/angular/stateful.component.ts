@@ -49,7 +49,7 @@ export class ResourceOwner implements OnDestroy {
 }
 
 @Directive()
-export abstract class StatefulComponent<T = any> extends State<T> implements OnDestroy {
+export abstract class StatefulComponent<T extends {} = object> extends State<T> implements OnDestroy {
     private readonly subscriptions = new ResourceOwner();
     private readonly subscription: Subscription;
 

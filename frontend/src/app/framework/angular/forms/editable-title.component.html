@@ -1,32 +1,41 @@
-<div class="title">
-    <form *ngIf="renaming; else noRenaming" (ngSubmit)="rename()">
-        <div class="row g-0">
-            <div class="col">
-                <div class="form-group me-2">
-                    <sqx-control-errors for="name"></sqx-control-errors>
-                    
-                    <input type="text" class="form-control" [formControl]="renameForm" [maxLength]="maxLength" sqxFocusOnInit (keydown)="onKeyDown($event)" spellcheck="false">
-                </div>
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary me-1" [disabled]="!renameForm.valid || !renameForm.dirty">
-                    {{ 'common.save' | sqxTranslate }}
-                </button>
-        
-                <button type="button" class="btn btn-text-secondary btn-cancel me-4" (click)="toggleRename()">
-                    <i class="icon-close"></i>
-                </button>
+<form *ngIf="renaming; else noRenaming" (ngSubmit)="rename()">
+    <div class="row g-1 align-items-center">
+        <div class="col">
+            <div class="form-group">
+                <sqx-control-errors [for]="renameForm"></sqx-control-errors>
+                
+                <input class="form-control form-control-{{size}}" [formControl]="renameForm" [maxLength]="inputTitleLength" sqxFocusOnInit (keydown)="onKeyDown($event)" spellcheck="false">
             </div>
         </div>
-    </form>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary btn-{{size}}" [disabled]="!renameForm.valid || !renameForm.dirty">
+                <i class="icon-checkmark"></i>
+            </button>
+        </div>
+        <div class="col-auto" *ngIf="closeButton">
+            <button type="button" class="btn btn-text-secondary btn-{{size}} btn-cancel" (click)="toggleRename()">
+                <i class="icon-close"></i>
+            </button>
+        </div>
+    </div>
+</form>
 
-    <ng-template #noRenaming>
-        <div class="title-view">
-            <h3 class="title-name" [class.fallback]="!name" (dblclick)="toggleRename()">
-                {{name || fallback}}
+<ng-template #noRenaming>
+    <div class="row g-0 align-items-center title-view d-nowrap">
+        <div class="col">
+            <h3 class="truncate {{size}}" [class.fallback]="!inputTitle" (dblclick)="toggleRename()">
+                {{inputTitle || displayFallback}}
             </h3>
-
-            <i class="title-edit icon-pencil" *ngIf="!disabled" (click)="toggleRename()"></i>
         </div>
-    </ng-template>
-</div>
+        <div class="col-auto title-edit" *ngIf="!disabled" >
+            <button type="button" class="btn btn-text-secondary btn-{{size}}" (click)="toggleRename()">
+                <i class="icon-pencil text-decent"></i>
+            </button>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-text-secondary btn-{{size}} btn-placeholder" (click)="toggleRename()">
+                &nbsp;
+            </button>
+        </div>
+    </div>
+</ng-template>

@@ -8,20 +8,19 @@
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
+namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields;
+
+public sealed class GeolocationFieldPropertiesDto : FieldPropertiesDto
 {
-    public sealed class GeolocationFieldPropertiesDto : FieldPropertiesDto
+    /// <summary>
+    /// The editor that is used to manage this field.
+    /// </summary>
+    public GeolocationFieldEditor Editor { get; set; }
+
+    public override FieldProperties ToProperties()
     {
-        /// <summary>
-        /// The editor that is used to manage this field.
-        /// </summary>
-        public GeolocationFieldEditor Editor { get; set; }
+        var result = SimpleMapper.Map(this, new GeolocationFieldProperties());
 
-        public override FieldProperties ToProperties()
-        {
-            var result = SimpleMapper.Map(this, new GeolocationFieldProperties());
-
-            return result;
-        }
+        return result;
     }
 }

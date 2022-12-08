@@ -11,74 +11,73 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public class ApiPermissionAttribute : AuthorizeAttribute, IAsyncActionFilter
 {
-    public class ApiPermissionAttribute : AuthorizeAttribute, IAsyncActionFilter
+    private readonly string[] permissionIds;
+
+    public IEnumerable<string> PermissionIds
     {
-        private readonly string[] permissionIds;
+        get => permissionIds;
+    }
 
-        public IEnumerable<string> PermissionIds
+    public ApiPermissionAttribute(params string[] ids)
+    {
+        AuthenticationSchemes = Constants.ApiSecurityScheme;
+
+        permissionIds = ids;
+    }
+
+    public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    {
+        if (permissionIds.Length > 0)
         {
-            get => permissionIds;
-        }
+            var permissions = context.HttpContext.Context().UserPermissions;
 
-        public ApiPermissionAttribute(params string[] ids)
-        {
-            AuthenticationSchemes = Constants.ApiSecurityScheme;
+            var hasPermission = false;
 
-            permissionIds = ids;
-        }
-
-        public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
-        {
-            if (permissionIds.Length > 0)
+            if (permissions != null)
             {
-                var permissions = context.HttpContext.Context().UserPermissions;
-
-                var hasPermission = false;
-
-                if (permissions != null)
+                foreach (var id in permissionIds)
                 {
-                    foreach (var id in permissionIds)
+                    var app = context.HttpContext.Features.Get<IAppFeature>()?.App.Name;
+
+                    if (string.IsNullOrWhiteSpace(app))
                     {
-                        var app = context.HttpContext.Features.Get<IAppFeature>()?.App.Name;
-
-                        if (string.IsNullOrWhiteSpace(app))
-                        {
-                            app = Permission.Any;
-                        }
-
-                        var schema = context.HttpContext.Features.Get<ISchemaFeature>()?.Schema.SchemaDef.Name;
-
-                        if (string.IsNullOrWhiteSpace(schema))
-                        {
-                            schema = Permission.Any;
-                        }
-
-                        var team = context.HttpContext.Features.Get<ITeamFeature>()?.Team.Id.ToString();
-
-                        if (string.IsNullOrWhiteSpace(team))
-                        {
-                            team = Permission.Any;
-                        }
-
-                        if (permissions.Allows(id, app, schema, team))
-                        {
-                            hasPermission = true;
-                            break;
-                        }
+                        app = Permission.Any;
                     }
-                }
 
-                if (!hasPermission)
-                {
-                    context.Result = new StatusCodeResult(403);
+                    var schema = context.HttpContext.Features.Get<ISchemaFeature>()?.Schema.SchemaDef.Name;
 
-                    return Task.CompletedTask;
+                    if (string.IsNullOrWhiteSpace(schema))
+                    {
+                        schema = Permission.Any;
+                    }
+
+                    var team = context.HttpContext.Features.Get<ITeamFeature>()?.Team.Id.ToString();
+
+                    if (string.IsNullOrWhiteSpace(team))
+                    {
+                        team = Permission.Any;
+                    }
+
+                    if (permissions.Allows(id, app, schema, team))
+                    {
+                        hasPermission = true;
+                        break;
+                    }
                 }
             }
 
-            return next();
+            if (!hasPermission)
+            {
+                context.Result = new StatusCodeResult(403);
+
+                return Task.CompletedTask;
+            }
         }
+
+        return next();
     }
 }

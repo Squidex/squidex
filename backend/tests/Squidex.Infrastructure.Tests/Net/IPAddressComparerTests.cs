@@ -6,38 +6,36 @@
 // ==========================================================================
 
 using System.Net;
-using Xunit;
 
-namespace Squidex.Infrastructure.Net
+namespace Squidex.Infrastructure.Net;
+
+public class IPAddressComparerTests
 {
-    public class IPAddressComparerTests
+    [Fact]
+    public void Should_sort_ip_addresses()
     {
-        [Fact]
-        public void Should_sort_ip_addresses()
+        var source = new[]
         {
-            var source = new[]
-            {
-                IPAddress.IPv6Loopback,
-                IPAddress.Parse("127.0.0.200"),
-                IPAddress.Parse("127.0.0.255"),
-                IPAddress.Parse("129.0.0.1"),
-                IPAddress.Parse("127.0.0.1"),
-                IPAddress.Parse("127.0.0.200")
-            };
+            IPAddress.IPv6Loopback,
+            IPAddress.Parse("127.0.0.200"),
+            IPAddress.Parse("127.0.0.255"),
+            IPAddress.Parse("129.0.0.1"),
+            IPAddress.Parse("127.0.0.1"),
+            IPAddress.Parse("127.0.0.200")
+        };
 
-            var sorted = source.OrderBy(x => x, IPAddressComparer.Instance);
+        var sorted = source.OrderBy(x => x, IPAddressComparer.Instance);
 
-            var expected = new[]
-            {
-                IPAddress.Parse("127.0.0.1"),
-                IPAddress.Parse("127.0.0.200"),
-                IPAddress.Parse("127.0.0.200"),
-                IPAddress.Parse("127.0.0.255"),
-                IPAddress.Parse("129.0.0.1"),
-                IPAddress.IPv6Loopback
-            };
+        var expected = new[]
+        {
+            IPAddress.Parse("127.0.0.1"),
+            IPAddress.Parse("127.0.0.200"),
+            IPAddress.Parse("127.0.0.200"),
+            IPAddress.Parse("127.0.0.255"),
+            IPAddress.Parse("129.0.0.1"),
+            IPAddress.IPv6Loopback
+        };
 
-            Assert.Equal(expected, sorted);
-        }
+        Assert.Equal(expected, sorted);
     }
 }

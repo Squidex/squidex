@@ -8,22 +8,21 @@
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Assets;
+
+public interface IAssetEntity :
+    IEntity,
+    IEntityWithCreatedBy,
+    IEntityWithLastModifiedBy,
+    IEntityWithVersion,
+    IEntityWithTags,
+    IAssetInfo
 {
-    public interface IAssetEntity :
-        IEntity,
-        IEntityWithCreatedBy,
-        IEntityWithLastModifiedBy,
-        IEntityWithVersion,
-        IEntityWithTags,
-        IAssetInfo
-    {
-        NamedId<DomainId> AppId { get; }
+    NamedId<DomainId> AppId { get; }
 
-        DomainId ParentId { get; }
+    DomainId ParentId { get; }
 
-        bool IsProtected { get; }
+    bool IsProtected { get; }
 
-        long FileVersion { get; }
-    }
+    long FileVersion { get; }
 }

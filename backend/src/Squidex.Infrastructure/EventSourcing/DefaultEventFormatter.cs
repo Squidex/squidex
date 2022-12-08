@@ -9,77 +9,75 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+public sealed class DefaultEventFormatter : IEventFormatter
 {
-    public sealed class DefaultEventFormatter : IEventFormatter
+    private readonly IJsonSerializer serializer;
+    private readonly TypeRegistry typeRegistry;
+
+    public DefaultEventFormatter(TypeRegistry typeRegistry, IJsonSerializer serializer)
     {
-        private readonly IJsonSerializer serializer;
-        private readonly TypeNameRegistry typeNameRegistry;
+        this.typeRegistry = typeRegistry;
+        this.serializer = serializer;
+    }
 
-        public DefaultEventFormatter(TypeNameRegistry typeNameRegistry, IJsonSerializer serializer)
+    public Envelope<IEvent>? ParseIfKnown(StoredEvent storedEvent)
+    {
+        return ParseCore(storedEvent);
+    }
+
+    public Envelope<IEvent> Parse(StoredEvent storedEvent)
+    {
+        var envelope = ParseCore(storedEvent);
+
+        if (envelope == null)
         {
-            this.typeNameRegistry = typeNameRegistry;
-            this.serializer = serializer;
+            ThrowHelper.InvalidOperationException($"Cannot find event with type name '{storedEvent.Data.Type}'.");
+            return default!;
         }
 
-        public Envelope<IEvent>? ParseIfKnown(StoredEvent storedEvent)
+        return envelope;
+    }
+
+    private Envelope<IEvent>? ParseCore(StoredEvent storedEvent)
+    {
+        Guard.NotNull(storedEvent);
+
+        if (!typeRegistry.TryGetType<IEvent>(storedEvent.Data.Type, out var type))
         {
-            return ParseCore(storedEvent);
+            return null;
         }
 
-        public Envelope<IEvent> Parse(StoredEvent storedEvent)
+        var payload = serializer.Deserialize<IEvent>(storedEvent.Data.Payload, type);
+
+        if (payload is IMigrated<IEvent> migratedEvent)
         {
-            var envelope = ParseCore(storedEvent);
-
-            if (envelope == null)
-            {
-                throw new TypeNameNotFoundException($"Cannot find event with type name '{storedEvent.Data.Type}'.");
-            }
-
-            return envelope;
+            payload = migratedEvent.Migrate();
         }
 
-        private Envelope<IEvent>? ParseCore(StoredEvent storedEvent)
+        var envelope = new Envelope<IEvent>(payload, storedEvent.Data.Headers);
+
+        envelope.SetEventPosition(storedEvent.EventPosition);
+        envelope.SetEventStreamNumber(storedEvent.EventStreamNumber);
+
+        return envelope;
+    }
+
+    public EventData ToEventData(Envelope<IEvent> envelope, Guid commitId, bool migrate = true)
+    {
+        var payload = envelope.Payload;
+
+        if (migrate && payload is IMigrated<IEvent> migratedEvent)
         {
-            Guard.NotNull(storedEvent);
-
-            var payloadType = typeNameRegistry.GetTypeOrNull(storedEvent.Data.Type);
-
-            if (payloadType == null)
-            {
-                return null;
-            }
-
-            var payloadValue = serializer.Deserialize<IEvent>(storedEvent.Data.Payload, payloadType);
-
-            if (payloadValue is IMigrated<IEvent> migratedEvent)
-            {
-                payloadValue = migratedEvent.Migrate();
-            }
-
-            var envelope = new Envelope<IEvent>(payloadValue, storedEvent.Data.Headers);
-
-            envelope.SetEventPosition(storedEvent.EventPosition);
-            envelope.SetEventStreamNumber(storedEvent.EventStreamNumber);
-
-            return envelope;
+            payload = migratedEvent.Migrate();
         }
 
-        public EventData ToEventData(Envelope<IEvent> envelope, Guid commitId, bool migrate = true)
-        {
-            var payloadValue = envelope.Payload;
+        var payloadType = typeRegistry.GetName<IEvent>(payload.GetType());
+        var payloadJson = serializer.Serialize(envelope.Payload, envelope.Payload.GetType());
 
-            if (migrate && payloadValue is IMigrated<IEvent> migratedEvent)
-            {
-                payloadValue = migratedEvent.Migrate();
-            }
+        envelope.SetCommitId(commitId);
 
-            var payloadType = typeNameRegistry.GetName(payloadValue.GetType());
-            var payloadJson = serializer.Serialize(envelope.Payload, envelope.Payload.GetType());
-
-            envelope.SetCommitId(commitId);
-
-            return new EventData(payloadType, envelope.Headers, payloadJson);
-        }
+        return new EventData(payloadType, envelope.Headers, payloadJson);
     }
 }

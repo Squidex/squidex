@@ -6,42 +6,41 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl, ValidatorFn, Validators } from '@angular/forms';
 import { Keys } from '@app/framework/internal';
 
 @Component({
-    selector: 'sqx-editable-title[name]',
+    selector: 'sqx-editable-title[inputTitle]',
     styleUrls: ['./editable-title.component.scss'],
     templateUrl: './editable-title.component.html',
 })
 export class EditableTitleComponent {
     @Output()
-    public nameChange = new EventEmitter<string>();
+    public inputTitleChange = new EventEmitter<string>();
+
+    @Input()
+    public inputTitle!: string;
+
+    @Input()
+    public inputTitleLength = 20;
+
+    @Input()
+    public inputTitleRequired = true;
 
     @Input()
     public disabled?: boolean | null;
 
     @Input()
-    public fallback = '';
+    public closeButton = true;
 
     @Input()
-    public name!: string;
+    public size: 'sm' | 'md' | 'lg' = 'md';
 
     @Input()
-    public maxLength = 20;
-
-    @Input()
-    public set isRequired(value: boolean) {
-        const validator =
-            value ?
-            Validators.required :
-            Validators.nullValidator;
-
-        this.renameForm.setValidators(validator);
-    }
+    public displayFallback = '';
 
     public renaming = false;
-    public renameForm = new FormControl();
+    public renameForm = new FormControl<string>('');
 
     public onKeyDown(event: KeyboardEvent) {
         if (Keys.isEscape(event)) {
@@ -54,7 +53,21 @@ export class EditableTitleComponent {
             return;
         }
 
-        this.renameForm.setValue(this.name || '');
+        if (!this.renaming) {
+            let validators: ValidatorFn[] = [];
+
+            if (this.inputTitleLength) {
+                validators.push(Validators.maxLength(this.inputTitleLength));
+            }
+
+            if (this.inputTitleRequired) {
+                validators.push(Validators.required);
+            }
+
+            this.renameForm.setValidators(validators);
+        }
+
+        this.renameForm.setValue(this.inputTitle || '');
         this.renaming = !this.renaming;
     }
 
@@ -64,10 +77,10 @@ export class EditableTitleComponent {
         }
 
         if (this.renameForm.valid) {
-            const name = this.renameForm.value;
+            const text = this.renameForm.value || '';
 
-            this.nameChange.emit(name);
-            this.name = name;
+            this.inputTitleChange.emit(text);
+            this.inputTitle = text;
 
             this.renaming = false;
         }

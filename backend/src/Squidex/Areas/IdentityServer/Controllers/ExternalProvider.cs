@@ -5,19 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Areas.IdentityServer.Controllers
+namespace Squidex.Areas.IdentityServer.Controllers;
+
+public class ExternalProvider
 {
-    public class ExternalProvider
+    public string DisplayName { get; }
+
+    public string AuthenticationScheme { get; }
+
+    public ExternalProvider(string authenticationSchema, string displayName)
     {
-        public string DisplayName { get; }
+        AuthenticationScheme = authenticationSchema;
 
-        public string AuthenticationScheme { get; }
-
-        public ExternalProvider(string authenticationSchema, string displayName)
-        {
-            AuthenticationScheme = authenticationSchema;
-
-            DisplayName = displayName;
-        }
+        DisplayName = displayName;
     }
 }

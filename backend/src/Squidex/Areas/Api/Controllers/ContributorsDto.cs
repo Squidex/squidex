@@ -15,110 +15,109 @@ using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers
+namespace Squidex.Areas.Api.Controllers;
+
+public sealed class ContributorsDto : Resource
 {
-    public sealed class ContributorsDto : Resource
+    /// <summary>
+    /// The contributors.
+    /// </summary>
+    [LocalizedRequired]
+    public ContributorDto[] Items { get; set; }
+
+    /// <summary>
+    /// The maximum number of allowed contributors.
+    /// </summary>
+    public long MaxContributors { get; set; }
+
+    /// <summary>
+    /// The metadata to provide information about this request.
+    /// </summary>
+    [JsonPropertyName("_meta")]
+    public ContributorsMetadata? Metadata { get; set; }
+
+    public static async Task<ContributorsDto> FromDomainAsync(IAppEntity app, Resources resources, IUserResolver userResolver, Plan plan, bool invited)
     {
-        /// <summary>
-        /// The contributors.
-        /// </summary>
-        [LocalizedRequired]
-        public ContributorDto[] Items { get; set; }
+        var users = await userResolver.QueryManyAsync(app.Contributors.Keys.ToArray());
 
-        /// <summary>
-        /// The maximum number of allowed contributors.
-        /// </summary>
-        public long MaxContributors { get; set; }
-
-        /// <summary>
-        /// The metadata to provide information about this request.
-        /// </summary>
-        [JsonPropertyName("_meta")]
-        public ContributorsMetadata? Metadata { get; set; }
-
-        public static async Task<ContributorsDto> FromDomainAsync(IAppEntity app, Resources resources, IUserResolver userResolver, Plan plan, bool invited)
+        var result = new ContributorsDto
         {
-            var users = await userResolver.QueryManyAsync(app.Contributors.Keys.ToArray());
+            Items = app.Contributors
+                .Select(x => ContributorDto.FromDomain(x.Key, x.Value))
+                .Select(x => x.CreateUser(users))
+                .Select(x => x.CreateAppLinks(resources))
+                .OrderBy(x => x.ContributorName)
+                .ToArray()
+        };
 
-            var result = new ContributorsDto
+        result.CreateInvited(invited);
+        result.CreatePlan(plan);
+
+        return result.CreateAppLinks(resources);
+    }
+
+    public static async Task<ContributorsDto> FromDomainAsync(ITeamEntity team, Resources resources, IUserResolver userResolver, bool invited)
+    {
+        var users = await userResolver.QueryManyAsync(team.Contributors.Keys.ToArray());
+
+        var result = new ContributorsDto
+        {
+            Items = team.Contributors
+                .Select(x => ContributorDto.FromDomain(x.Key, x.Value))
+                .Select(x => x.CreateUser(users))
+                .Select(x => x.CreateTeamLinks(resources))
+                .OrderBy(x => x.ContributorName)
+                .ToArray()
+        };
+
+        result.CreateInvited(invited);
+
+        return result.CreateTeamLinks(resources);
+    }
+
+    private void CreatePlan(Plan plan)
+    {
+        MaxContributors = plan.MaxContributors;
+    }
+
+    private void CreateInvited(bool isInvited)
+    {
+        if (isInvited)
+        {
+            Metadata = new ContributorsMetadata
             {
-                Items = app.Contributors
-                    .Select(x => ContributorDto.FromDomain(x.Key, x.Value))
-                    .Select(x => x.CreateUser(users))
-                    .Select(x => x.CreateAppLinks(resources))
-                    .OrderBy(x => x.ContributorName)
-                    .ToArray()
+                IsInvited = "true"
             };
-
-            result.CreateInvited(invited);
-            result.CreatePlan(plan);
-
-            return result.CreateAppLinks(resources);
         }
+    }
 
-        public static async Task<ContributorsDto> FromDomainAsync(ITeamEntity team, Resources resources, IUserResolver userResolver, bool invited)
+    private ContributorsDto CreateAppLinks(Resources resources)
+    {
+        var values = new { app = resources.App };
+
+        AddSelfLink(resources.Url<AppContributorsController>(x => nameof(x.GetContributors), values));
+
+        if (resources.CanAssignContributor && (MaxContributors < 0 || Items.Length < MaxContributors))
         {
-            var users = await userResolver.QueryManyAsync(team.Contributors.Keys.ToArray());
-
-            var result = new ContributorsDto
-            {
-                Items = team.Contributors
-                    .Select(x => ContributorDto.FromDomain(x.Key, x.Value))
-                    .Select(x => x.CreateUser(users))
-                    .Select(x => x.CreateTeamLinks(resources))
-                    .OrderBy(x => x.ContributorName)
-                    .ToArray()
-            };
-
-            result.CreateInvited(invited);
-
-            return result.CreateTeamLinks(resources);
+            AddPostLink("create",
+                resources.Url<AppContributorsController>(x => nameof(x.PostContributor), values));
         }
 
-        private void CreatePlan(Plan plan)
+        return this;
+    }
+
+    private ContributorsDto CreateTeamLinks(Resources resources)
+    {
+        var values = new { team = resources.Team };
+
+        AddSelfLink(resources.Url<TeamContributorsController>(x => nameof(x.GetContributors), values));
+
+        if (resources.CanAssignTeamContributor)
         {
-            MaxContributors = plan.MaxContributors;
+            AddPostLink("create",
+                resources.Url<TeamContributorsController>(x => nameof(x.PostContributor), values));
         }
 
-        private void CreateInvited(bool isInvited)
-        {
-            if (isInvited)
-            {
-                Metadata = new ContributorsMetadata
-                {
-                    IsInvited = "true"
-                };
-            }
-        }
-
-        private ContributorsDto CreateAppLinks(Resources resources)
-        {
-            var values = new { app = resources.App };
-
-            AddSelfLink(resources.Url<AppContributorsController>(x => nameof(x.GetContributors), values));
-
-            if (resources.CanAssignContributor && (MaxContributors < 0 || Items.Length < MaxContributors))
-            {
-                AddPostLink("create",
-                    resources.Url<AppContributorsController>(x => nameof(x.PostContributor), values));
-            }
-
-            return this;
-        }
-
-        private ContributorsDto CreateTeamLinks(Resources resources)
-        {
-            var values = new { team = resources.Team };
-
-            AddSelfLink(resources.Url<TeamContributorsController>(x => nameof(x.GetContributors), values));
-
-            if (resources.CanAssignTeamContributor)
-            {
-                AddPostLink("create",
-                    resources.Url<TeamContributorsController>(x => nameof(x.PostContributor), values));
-            }
-
-            return this;
-        }
+        return this;
     }
 }

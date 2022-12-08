@@ -9,41 +9,40 @@ using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Model;
 
-namespace TestSuite.Fixtures
+namespace TestSuite.Fixtures;
+
+public abstract class TestSchemaFixtureBase : CreatedAppFixture
 {
-    public abstract class TestSchemaFixtureBase : CreatedAppFixture
+    public IContentsClient<TestEntity, TestEntityData> Contents { get; private set; }
+
+    public string SchemaName { get; }
+
+    protected TestSchemaFixtureBase(string schemaName)
     {
-        public IContentsClient<TestEntity, TestEntityData> Contents { get; private set; }
+        SchemaName = schemaName;
+    }
 
-        public string SchemaName { get; }
+    public override async Task InitializeAsync()
+    {
+        await base.InitializeAsync();
 
-        protected TestSchemaFixtureBase(string schemaName)
+        await Factories.CreateAsync($"{nameof(TestEntity)}_{SchemaName}", async () =>
         {
-            SchemaName = schemaName;
-        }
-
-        public override async Task InitializeAsync()
-        {
-            await base.InitializeAsync();
-
-            await Factories.CreateAsync($"{nameof(TestEntity)}_{SchemaName}", async () =>
+            try
             {
-                try
+                await TestEntity.CreateSchemaAsync(Schemas, AppName, SchemaName);
+            }
+            catch (SquidexManagementException ex)
+            {
+                if (ex.StatusCode != 400)
                 {
-                    await TestEntity.CreateSchemaAsync(Schemas, AppName, SchemaName);
+                    throw;
                 }
-                catch (SquidexManagementException ex)
-                {
-                    if (ex.StatusCode != 400)
-                    {
-                        throw;
-                    }
-                }
+            }
 
-                return true;
-            });
+            return true;
+        });
 
-            Contents = ClientManager.CreateContentsClient<TestEntity, TestEntityData>(SchemaName);
-        }
+        Contents = ClientManager.CreateContentsClient<TestEntity, TestEntityData>(SchemaName);
     }
 }

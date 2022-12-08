@@ -5,108 +5,107 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Security
+namespace Squidex.Infrastructure.Security;
+
+public sealed partial class Permission : IComparable<Permission>, IEquatable<Permission>
 {
-    public sealed partial class Permission : IComparable<Permission>, IEquatable<Permission>
+    public const string Any = "*";
+    public const string Exclude = "^";
+
+    private Part[] path;
+
+    public string Id { get; }
+
+    private Part[] Path
     {
-        public const string Any = "*";
-        public const string Exclude = "^";
+        get => path ??= Part.ParsePath(Id);
+    }
 
-        private Part[] path;
+    public Permission(string id)
+    {
+        Guard.NotNullOrEmpty(id);
 
-        public string Id { get; }
+        Id = id;
+    }
 
-        private Part[] Path
+    public bool Allows(Permission permission)
+    {
+        if (permission == null)
         {
-            get => path ??= Part.ParsePath(Id);
+            return false;
         }
 
-        public Permission(string id)
-        {
-            Guard.NotNullOrEmpty(id);
+        return Covers(Path, permission.Path);
+    }
 
-            Id = id;
+    public bool Includes(Permission permission)
+    {
+        if (permission == null)
+        {
+            return false;
         }
 
-        public bool Allows(Permission permission)
+        return PartialCovers(Path, permission.Path);
+    }
+
+    private static bool Covers(Part[] given, Part[] requested)
+    {
+        if (given.Length > requested.Length)
         {
-            if (permission == null)
+            return false;
+        }
+
+        for (var i = 0; i < given.Length; i++)
+        {
+            if (!Part.Intersects(ref given[i], ref requested[i], false))
             {
                 return false;
             }
-
-            return Covers(Path, permission.Path);
         }
 
-        public bool Includes(Permission permission)
+        return true;
+    }
+
+    private static bool PartialCovers(Part[] given, Part[] requested)
+    {
+        for (var i = 0; i < Math.Min(given.Length, requested.Length); i++)
         {
-            if (permission == null)
+            if (!Part.Intersects(ref given[i], ref requested[i], true))
             {
                 return false;
             }
-
-            return PartialCovers(Path, permission.Path);
         }
 
-        private static bool Covers(Part[] given, Part[] requested)
-        {
-            if (given.Length > requested.Length)
-            {
-                return false;
-            }
+        return true;
+    }
 
-            for (var i = 0; i < given.Length; i++)
-            {
-                if (!Part.Intersects(ref given[i], ref requested[i], false))
-                {
-                    return false;
-                }
-            }
+    public bool StartsWith(string test)
+    {
+        return Id.StartsWith(test, StringComparison.OrdinalIgnoreCase);
+    }
 
-            return true;
-        }
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as Permission);
+    }
 
-        private static bool PartialCovers(Part[] given, Part[] requested)
-        {
-            for (var i = 0; i < Math.Min(given.Length, requested.Length); i++)
-            {
-                if (!Part.Intersects(ref given[i], ref requested[i], true))
-                {
-                    return false;
-                }
-            }
+    public bool Equals(Permission? other)
+    {
+        return other != null && other.Id.Equals(Id, StringComparison.Ordinal);
+    }
 
-            return true;
-        }
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode(StringComparison.Ordinal);
+    }
 
-        public bool StartsWith(string test)
-        {
-            return Id.StartsWith(test, StringComparison.OrdinalIgnoreCase);
-        }
+    public override string ToString()
+    {
+        return Id;
+    }
 
-        public override bool Equals(object? obj)
-        {
-            return Equals(obj as Permission);
-        }
-
-        public bool Equals(Permission? other)
-        {
-            return other != null && other.Id.Equals(Id, StringComparison.Ordinal);
-        }
-
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode(StringComparison.Ordinal);
-        }
-
-        public override string ToString()
-        {
-            return Id;
-        }
-
-        public int CompareTo(Permission? other)
-        {
-            return other == null ? -1 : string.Compare(Id, other.Id, StringComparison.Ordinal);
-        }
+    public int CompareTo(Permission? other)
+    {
+        return other == null ? -1 : string.Compare(Id, other.Id, StringComparison.Ordinal);
     }
 }

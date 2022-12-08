@@ -8,17 +8,16 @@
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Domain.Apps.Core.HandleRules;
+
+public interface IRuleActionHandler
 {
-    public interface IRuleActionHandler
-    {
-        Type ActionType { get; }
+    Type ActionType { get; }
 
-        Type DataType { get; }
+    Type DataType { get; }
 
-        Task<(string Description, object Data)> CreateJobAsync(EnrichedEvent @event, RuleAction action);
+    Task<(string Description, object Data)> CreateJobAsync(EnrichedEvent @event, RuleAction action);
 
-        Task<Result> ExecuteJobAsync(object data,
-            CancellationToken ct = default);
-    }
+    Task<Result> ExecuteJobAsync(object data,
+        CancellationToken ct = default);
 }

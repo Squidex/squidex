@@ -12,35 +12,34 @@ using OpenTelemetry.Trace;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.APM.ApplicationInsights
+namespace Squidex.Extensions.APM.ApplicationInsights;
+
+public sealed class ApplicationInsightsPlugin : IPlugin
 {
-    public sealed class ApplicationInsightsPlugin : IPlugin
+    private sealed class Configurator : ITelemetryConfigurator
     {
-        private sealed class Configurator : ITelemetryConfigurator
+        private readonly IConfiguration config;
+
+        public Configurator(IConfiguration config)
         {
-            private readonly IConfiguration config;
-
-            public Configurator(IConfiguration config)
-            {
-                this.config = config;
-            }
-
-            public void Configure(TracerProviderBuilder builder)
-            {
-                builder.AddAzureMonitorTraceExporter(options =>
-                {
-                    config.GetSection("logging:applicationInsights").Bind(options);
-                });
-            }
+            this.config = config;
         }
 
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
+        public void Configure(TracerProviderBuilder builder)
         {
-            if (config.GetValue<bool>("logging:applicationInsights:enabled"))
+            builder.AddAzureMonitorTraceExporter(options =>
             {
-                services.AddSingleton<ITelemetryConfigurator,
-                    Configurator>();
-            }
+                config.GetSection("logging:applicationInsights").Bind(options);
+            });
+        }
+    }
+
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
+    {
+        if (config.GetValue<bool>("logging:applicationInsights:enabled"))
+        {
+            services.AddSingleton<ITelemetryConfigurator,
+                Configurator>();
         }
     }
 }

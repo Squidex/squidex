@@ -8,91 +8,90 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+[TypeConverter(typeof(RefTokenTypeConverter))]
+public sealed record RefToken
 {
-    [TypeConverter(typeof(RefTokenTypeConverter))]
-    public sealed record RefToken
+    private static readonly char[] TrimChars = { ' ', ':' };
+
+    public RefTokenType Type { get; }
+
+    public string Identifier { get; }
+
+    public bool IsClient
     {
-        private static readonly char[] TrimChars = { ' ', ':' };
+        get => Type == RefTokenType.Client;
+    }
 
-        public RefTokenType Type { get; }
+    public bool IsUser
+    {
+        get => Type == RefTokenType.Subject;
+    }
 
-        public string Identifier { get; }
+    public RefToken(RefTokenType type, string identifier)
+    {
+        Guard.NotNullOrEmpty(identifier);
 
-        public bool IsClient
+        Type = type;
+
+        Identifier = identifier;
+    }
+
+    public static RefToken Client(string identifier)
+    {
+        return new RefToken(RefTokenType.Client, identifier);
+    }
+
+    public static RefToken User(string identifier)
+    {
+        return new RefToken(RefTokenType.Subject, identifier);
+    }
+
+    public override string ToString()
+    {
+        return $"{Type.ToString().ToLowerInvariant()}:{Identifier}";
+    }
+
+    public static bool TryParse(string? value, [MaybeNullWhen(false)] out RefToken result)
+    {
+        value = value?.Trim(TrimChars);
+
+        if (string.IsNullOrWhiteSpace(value))
         {
-            get => Type == RefTokenType.Client;
+            result = null!;
+            return false;
         }
 
-        public bool IsUser
+        value = value.Trim();
+
+        var idx = value.IndexOf(':', StringComparison.Ordinal);
+
+        if (idx > 0 && idx < value.Length - 1)
         {
-            get => Type == RefTokenType.Subject;
-        }
-
-        public RefToken(RefTokenType type, string identifier)
-        {
-            Guard.NotNullOrEmpty(identifier);
-
-            Type = type;
-
-            Identifier = identifier;
-        }
-
-        public static RefToken Client(string identifier)
-        {
-            return new RefToken(RefTokenType.Client, identifier);
-        }
-
-        public static RefToken User(string identifier)
-        {
-            return new RefToken(RefTokenType.Subject, identifier);
-        }
-
-        public override string ToString()
-        {
-            return $"{Type.ToString().ToLowerInvariant()}:{Identifier}";
-        }
-
-        public static bool TryParse(string? value, [MaybeNullWhen(false)] out RefToken result)
-        {
-            value = value?.Trim(TrimChars);
-
-            if (string.IsNullOrWhiteSpace(value))
+            if (!Enum.TryParse<RefTokenType>(value[..idx], true, out var type))
             {
-                result = null!;
-                return false;
+                type = RefTokenType.Subject;
             }
 
-            value = value.Trim();
-
-            var idx = value.IndexOf(':', StringComparison.Ordinal);
-
-            if (idx > 0 && idx < value.Length - 1)
-            {
-                if (!Enum.TryParse<RefTokenType>(value[..idx], true, out var type))
-                {
-                    type = RefTokenType.Subject;
-                }
-
-                result = new RefToken(type, value[(idx + 1)..]);
-            }
-            else
-            {
-                result = new RefToken(RefTokenType.Subject, value);
-            }
-
-            return true;
+            result = new RefToken(type, value[(idx + 1)..]);
         }
-
-        public static RefToken Parse(string value)
+        else
         {
-            if (!TryParse(value, out var result))
-            {
-                ThrowHelper.ArgumentException("Ref token cannot be null or empty.", nameof(value));
-                return default!;
-            }
-
-            return result;
+            result = new RefToken(RefTokenType.Subject, value);
         }
+
+        return true;
+    }
+
+    public static RefToken Parse(string value)
+    {
+        if (!TryParse(value, out var result))
+        {
+            ThrowHelper.ArgumentException("Ref token cannot be null or empty.", nameof(value));
+            return default!;
+        }
+
+        return result;
     }
 }

@@ -7,16 +7,15 @@
 
 using Squidex.Infrastructure.Translations;
 
-namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
+namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
+
+public class RequiredValidator : IValidator
 {
-    public class RequiredValidator : IValidator
+    public void Validate(object? value, ValidationContext context)
     {
-        public void Validate(object? value, ValidationContext context)
+        if (value.IsNullOrUndefined() && !context.IsOptional)
         {
-            if (value.IsNullOrUndefined() && !context.IsOptional)
-            {
-                context.AddError(context.Path, T.Get("contents.validation.required"));
-            }
+            context.AddError(context.Path, T.Get("contents.validation.required"));
         }
     }
 }

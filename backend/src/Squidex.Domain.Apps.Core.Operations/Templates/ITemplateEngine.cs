@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Templates
+namespace Squidex.Domain.Apps.Core.Templates;
+
+public interface ITemplateEngine
 {
-    public interface ITemplateEngine
-    {
-        Task<string> RenderAsync(string template, TemplateVars variables);
-    }
+    Task<string> RenderAsync(string template, TemplateVars variables);
 }

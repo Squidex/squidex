@@ -9,32 +9,31 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.Api.Controllers.Apps.Models
+namespace Squidex.Areas.Api.Controllers.Apps.Models;
+
+public sealed class EditorDto
 {
-    public sealed class EditorDto
+    /// <summary>
+    /// The name of the editor.
+    /// </summary>
+    [LocalizedRequired]
+    public string Name { get; set; }
+
+    /// <summary>
+    /// The url to the editor.
+    /// </summary>
+    [LocalizedRequired]
+    public string Url { get; set; }
+
+    public static EditorDto FromDomain(Editor editor)
     {
-        /// <summary>
-        /// The name of the editor.
-        /// </summary>
-        [LocalizedRequired]
-        public string Name { get; set; }
+        var result = SimpleMapper.Map(editor, new EditorDto());
 
-        /// <summary>
-        /// The url to the editor.
-        /// </summary>
-        [LocalizedRequired]
-        public string Url { get; set; }
+        return result;
+    }
 
-        public static EditorDto FromDomain(Editor editor)
-        {
-            var result = SimpleMapper.Map(editor, new EditorDto());
-
-            return result;
-        }
-
-        public Editor ToEditor()
-        {
-            return new Editor(Name, Url);
-        }
+    public Editor ToEditor()
+    {
+        return new Editor(Name, Url);
     }
 }

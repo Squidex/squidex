@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
+namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+
+public enum EnrichedSchemaEventType
 {
-    public enum EnrichedSchemaEventType
-    {
-        Created,
-        Deleted,
-        Published,
-        Unpublished,
-        Updated
-    }
+    Created,
+    Deleted,
+    Published,
+    Unpublished,
+    Updated
 }

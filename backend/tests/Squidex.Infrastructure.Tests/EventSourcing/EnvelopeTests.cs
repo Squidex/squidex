@@ -6,25 +6,23 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.EventSourcing;
+
+public class EnvelopeTests
 {
-    public class EnvelopeTests
+    public class MyEvent : IEvent
     {
-        public class MyEvent : IEvent
-        {
-            public int Value { get; set; }
-        }
+        public int Value { get; set; }
+    }
 
-        [Fact]
-        public void Should_serialize_and_deserialize()
-        {
-            var value = Envelope.Create(new MyEvent { Value = 1 });
+    [Fact]
+    public void Should_serialize_and_deserialize()
+    {
+        var value = Envelope.Create(new MyEvent { Value = 1 });
 
-            var deserialized = value.SerializeAndDeserialize();
+        var deserialized = value.SerializeAndDeserialize();
 
-            Assert.Equal(1, deserialized.Payload.Value);
-        }
+        Assert.Equal(1, deserialized.Payload.Value);
     }
 }

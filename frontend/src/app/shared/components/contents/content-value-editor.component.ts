@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, MathHelper } from '@app/shared/internal';
 
 @Component({
@@ -20,7 +20,7 @@ export class ContentValueEditorComponent {
     public field!: FieldDto;
 
     @Input()
-    public form!: FormGroup;
+    public form!: UntypedFormGroup;
 
     public readonly uniqueId = MathHelper.guid();
 }

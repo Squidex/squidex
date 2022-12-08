@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public interface IFieldSettings
 {
-    public interface IFieldSettings
-    {
-        bool IsLocked { get; }
+    bool IsLocked { get; }
 
-        bool IsDisabled { get; }
+    bool IsDisabled { get; }
 
-        bool IsHidden { get; }
-    }
+    bool IsHidden { get; }
 }

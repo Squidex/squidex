@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Domain.Apps.Core.HandleRules;
+
+[AttributeUsage(AttributeTargets.Property)]
+public sealed class FormattableAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Property)]
-    public sealed class FormattableAttribute : Attribute
-    {
-    }
 }

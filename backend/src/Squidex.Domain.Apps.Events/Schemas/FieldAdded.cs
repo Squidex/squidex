@@ -8,15 +8,14 @@
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas;
+
+[EventType(nameof(FieldAdded))]
+public sealed class FieldAdded : FieldEvent
 {
-    [EventType(nameof(FieldAdded))]
-    public sealed class FieldAdded : FieldEvent
-    {
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public string? Partitioning { get; set; }
+    public string? Partitioning { get; set; }
 
-        public FieldProperties Properties { get; set; }
-    }
+    public FieldProperties Properties { get; set; }
 }

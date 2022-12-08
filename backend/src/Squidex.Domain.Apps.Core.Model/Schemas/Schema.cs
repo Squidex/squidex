@@ -9,283 +9,282 @@ using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public sealed class Schema
 {
-    public sealed class Schema
+    public SchemaType Type { get; }
+
+    public string Name { get; }
+
+    public string? Category { get; private set; }
+
+    public bool IsPublished { get; private set; }
+
+    public FieldCollection<RootField> FieldCollection { get; private set; } = FieldCollection<RootField>.Empty;
+
+    public FieldRules FieldRules { get; private set; } = FieldRules.Empty;
+
+    public FieldNames FieldsInLists { get; private set; } = FieldNames.Empty;
+
+    public FieldNames FieldsInReferences { get; private set; } = FieldNames.Empty;
+
+    public SchemaScripts Scripts { get; private set; } = new SchemaScripts();
+
+    public SchemaProperties Properties { get; private set; } = new SchemaProperties();
+
+    public ReadonlyDictionary<string, string> PreviewUrls { get; private set; } = ReadonlyDictionary.Empty<string, string>();
+
+    public IReadOnlyList<RootField> Fields
     {
-        public SchemaType Type { get; }
+        get => FieldCollection.Ordered;
+    }
 
-        public string Name { get; }
+    public IReadOnlyDictionary<long, RootField> FieldsById
+    {
+        get => FieldCollection.ById;
+    }
 
-        public string? Category { get; private set; }
+    public IReadOnlyDictionary<string, RootField> FieldsByName
+    {
+        get => FieldCollection.ByName;
+    }
 
-        public bool IsPublished { get; private set; }
+    public Schema(string name, SchemaProperties? properties = null, SchemaType type = SchemaType.Default)
+    {
+        Guard.NotNullOrEmpty(name);
 
-        public FieldCollection<RootField> FieldCollection { get; private set; } = FieldCollection<RootField>.Empty;
+        Name = name;
 
-        public FieldRules FieldRules { get; private set; } = FieldRules.Empty;
-
-        public FieldNames FieldsInLists { get; private set; } = FieldNames.Empty;
-
-        public FieldNames FieldsInReferences { get; private set; } = FieldNames.Empty;
-
-        public SchemaScripts Scripts { get; private set; } = new SchemaScripts();
-
-        public SchemaProperties Properties { get; private set; } = new SchemaProperties();
-
-        public ReadonlyDictionary<string, string> PreviewUrls { get; private set; } = ReadonlyDictionary.Empty<string, string>();
-
-        public IReadOnlyList<RootField> Fields
+        if (properties != null)
         {
-            get => FieldCollection.Ordered;
+            Properties = properties;
         }
 
-        public IReadOnlyDictionary<long, RootField> FieldsById
+        Type = type;
+    }
+
+    public Schema(string name, RootField[] fields, SchemaProperties? properties, bool isPublished = false, SchemaType type = SchemaType.Default)
+        : this(name, properties, type)
+    {
+        Guard.NotNull(fields);
+
+        FieldCollection = new FieldCollection<RootField>(fields);
+
+        IsPublished = isPublished;
+    }
+
+    [Pure]
+    public Schema Update(SchemaProperties? newProperties)
+    {
+        newProperties ??= new SchemaProperties();
+
+        if (Properties.Equals(newProperties))
         {
-            get => FieldCollection.ById;
+            return this;
         }
 
-        public IReadOnlyDictionary<string, RootField> FieldsByName
+        return Clone(clone =>
         {
-            get => FieldCollection.ByName;
+            clone.Properties = newProperties;
+        });
+    }
+
+    [Pure]
+    public Schema SetScripts(SchemaScripts? newScripts)
+    {
+        newScripts ??= new SchemaScripts();
+
+        if (Scripts.Equals(newScripts))
+        {
+            return this;
         }
 
-        public Schema(string name, SchemaProperties? properties = null, SchemaType type = SchemaType.Default)
+        return Clone(clone =>
         {
-            Guard.NotNullOrEmpty(name);
+            clone.Scripts = newScripts;
+        });
+    }
 
-            Name = name;
+    [Pure]
+    public Schema SetFieldsInLists(FieldNames? names)
+    {
+        names ??= FieldNames.Empty;
 
-            if (properties != null)
-            {
-                Properties = properties;
-            }
-
-            Type = type;
+        if (FieldsInLists.SequenceEqual(names))
+        {
+            return this;
         }
 
-        public Schema(string name, RootField[] fields, SchemaProperties? properties, bool isPublished = false, SchemaType type = SchemaType.Default)
-            : this(name, properties, type)
+        return Clone(clone =>
         {
-            Guard.NotNull(fields);
+            clone.FieldsInLists = names;
+        });
+    }
 
-            FieldCollection = new FieldCollection<RootField>(fields);
+    [Pure]
+    public Schema SetFieldsInLists(params string[] names)
+    {
+        return SetFieldsInLists(new FieldNames(names));
+    }
 
-            IsPublished = isPublished;
+    [Pure]
+    public Schema SetFieldsInReferences(FieldNames? names)
+    {
+        names ??= FieldNames.Empty;
+
+        if (FieldsInReferences.SequenceEqual(names))
+        {
+            return this;
         }
 
-        [Pure]
-        public Schema Update(SchemaProperties? newProperties)
+        return Clone(clone =>
         {
-            newProperties ??= new SchemaProperties();
+            clone.FieldsInReferences = names;
+        });
+    }
 
-            if (Properties.Equals(newProperties))
-            {
-                return this;
-            }
+    [Pure]
+    public Schema SetFieldsInReferences(params string[] names)
+    {
+        return SetFieldsInReferences(new FieldNames(names));
+    }
 
-            return Clone(clone =>
-            {
-                clone.Properties = newProperties;
-            });
+    [Pure]
+    public Schema SetFieldRules(FieldRules? rules)
+    {
+        rules ??= FieldRules.Empty;
+
+        if (FieldRules.Equals(rules))
+        {
+            return this;
         }
 
-        [Pure]
-        public Schema SetScripts(SchemaScripts? newScripts)
+        return Clone(clone =>
         {
-            newScripts ??= new SchemaScripts();
+            clone.FieldRules = rules;
+        });
+    }
 
-            if (Scripts.Equals(newScripts))
-            {
-                return this;
-            }
+    [Pure]
+    public Schema SetFieldRules(params FieldRule[] rules)
+    {
+        return SetFieldRules(new FieldRules(rules));
+    }
 
-            return Clone(clone =>
-            {
-                clone.Scripts = newScripts;
-            });
+    [Pure]
+    public Schema Publish()
+    {
+        if (IsPublished)
+        {
+            return this;
         }
 
-        [Pure]
-        public Schema SetFieldsInLists(FieldNames? names)
+        return Clone(clone =>
         {
-            names ??= FieldNames.Empty;
+            clone.IsPublished = true;
+        });
+    }
 
-            if (FieldsInLists.SequenceEqual(names))
-            {
-                return this;
-            }
-
-            return Clone(clone =>
-            {
-                clone.FieldsInLists = names;
-            });
+    [Pure]
+    public Schema Unpublish()
+    {
+        if (!IsPublished)
+        {
+            return this;
         }
 
-        [Pure]
-        public Schema SetFieldsInLists(params string[] names)
+        return Clone(clone =>
         {
-            return SetFieldsInLists(new FieldNames(names));
+            clone.IsPublished = false;
+        });
+    }
+
+    [Pure]
+    public Schema ChangeCategory(string? category)
+    {
+        if (string.Equals(Category, category, StringComparison.Ordinal))
+        {
+            return this;
         }
 
-        [Pure]
-        public Schema SetFieldsInReferences(FieldNames? names)
+        return Clone(clone =>
         {
-            names ??= FieldNames.Empty;
+            clone.Category = category;
+        });
+    }
 
-            if (FieldsInReferences.SequenceEqual(names))
-            {
-                return this;
-            }
+    [Pure]
+    public Schema SetPreviewUrls(ReadonlyDictionary<string, string>? previewUrls)
+    {
+        previewUrls ??= ReadonlyDictionary.Empty<string, string>();
 
-            return Clone(clone =>
-            {
-                clone.FieldsInReferences = names;
-            });
+        if (PreviewUrls.Equals(previewUrls))
+        {
+            return this;
         }
 
-        [Pure]
-        public Schema SetFieldsInReferences(params string[] names)
+        return Clone(clone =>
         {
-            return SetFieldsInReferences(new FieldNames(names));
+            clone.PreviewUrls = previewUrls;
+        });
+    }
+
+    [Pure]
+    public Schema DeleteField(long fieldId)
+    {
+        if (!FieldsById.TryGetValue(fieldId, out var field))
+        {
+            return this;
         }
 
-        [Pure]
-        public Schema SetFieldRules(FieldRules? rules)
+        return Clone(clone =>
         {
-            rules ??= FieldRules.Empty;
+            clone.FieldCollection = FieldCollection.Remove(fieldId);
+            clone.FieldsInLists = FieldsInLists.Remove(field.Name);
+            clone.FieldsInReferences = FieldsInReferences.Remove(field.Name);
+        });
+    }
 
-            if (FieldRules.Equals(rules))
-            {
-                return this;
-            }
+    [Pure]
+    public Schema ReorderFields(List<long> ids)
+    {
+        return UpdateFields(f => f.Reorder(ids));
+    }
 
-            return Clone(clone =>
-            {
-                clone.FieldRules = rules;
-            });
+    [Pure]
+    public Schema AddField(RootField field)
+    {
+        return UpdateFields(f => f.Add(field));
+    }
+
+    [Pure]
+    public Schema UpdateField(long fieldId, Func<RootField, RootField> updater)
+    {
+        return UpdateFields(f => f.Update(fieldId, updater));
+    }
+
+    private Schema UpdateFields(Func<FieldCollection<RootField>, FieldCollection<RootField>> updater)
+    {
+        var newFields = updater(FieldCollection);
+
+        if (ReferenceEquals(newFields, FieldCollection))
+        {
+            return this;
         }
 
-        [Pure]
-        public Schema SetFieldRules(params FieldRule[] rules)
+        return Clone(clone =>
         {
-            return SetFieldRules(new FieldRules(rules));
-        }
+            clone.FieldCollection = newFields;
+        });
+    }
 
-        [Pure]
-        public Schema Publish()
-        {
-            if (IsPublished)
-            {
-                return this;
-            }
+    private Schema Clone(Action<Schema> updater)
+    {
+        var clone = (Schema)MemberwiseClone();
 
-            return Clone(clone =>
-            {
-                clone.IsPublished = true;
-            });
-        }
+        updater(clone);
 
-        [Pure]
-        public Schema Unpublish()
-        {
-            if (!IsPublished)
-            {
-                return this;
-            }
-
-            return Clone(clone =>
-            {
-                clone.IsPublished = false;
-            });
-        }
-
-        [Pure]
-        public Schema ChangeCategory(string? category)
-        {
-            if (string.Equals(Category, category, StringComparison.Ordinal))
-            {
-                return this;
-            }
-
-            return Clone(clone =>
-            {
-                clone.Category = category;
-            });
-        }
-
-        [Pure]
-        public Schema SetPreviewUrls(ReadonlyDictionary<string, string>? previewUrls)
-        {
-            previewUrls ??= ReadonlyDictionary.Empty<string, string>();
-
-            if (PreviewUrls.Equals(previewUrls))
-            {
-                return this;
-            }
-
-            return Clone(clone =>
-            {
-                clone.PreviewUrls = previewUrls;
-            });
-        }
-
-        [Pure]
-        public Schema DeleteField(long fieldId)
-        {
-            if (!FieldsById.TryGetValue(fieldId, out var field))
-            {
-                return this;
-            }
-
-            return Clone(clone =>
-            {
-                clone.FieldCollection = FieldCollection.Remove(fieldId);
-                clone.FieldsInLists = FieldsInLists.Remove(field.Name);
-                clone.FieldsInReferences = FieldsInReferences.Remove(field.Name);
-            });
-        }
-
-        [Pure]
-        public Schema ReorderFields(List<long> ids)
-        {
-            return UpdateFields(f => f.Reorder(ids));
-        }
-
-        [Pure]
-        public Schema AddField(RootField field)
-        {
-            return UpdateFields(f => f.Add(field));
-        }
-
-        [Pure]
-        public Schema UpdateField(long fieldId, Func<RootField, RootField> updater)
-        {
-            return UpdateFields(f => f.Update(fieldId, updater));
-        }
-
-        private Schema UpdateFields(Func<FieldCollection<RootField>, FieldCollection<RootField>> updater)
-        {
-            var newFields = updater(FieldCollection);
-
-            if (ReferenceEquals(newFields, FieldCollection))
-            {
-                return this;
-            }
-
-            return Clone(clone =>
-            {
-                clone.FieldCollection = newFields;
-            });
-        }
-
-        private Schema Clone(Action<Schema> updater)
-        {
-            var clone = (Schema)MemberwiseClone();
-
-            updater(clone);
-
-            return clone;
-        }
+        return clone;
     }
 }

@@ -7,24 +7,23 @@
 
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public sealed class FieldRules : ReadonlyList<FieldRule>
 {
-    public sealed class FieldRules : ReadonlyList<FieldRule>
+    public static readonly FieldRules Empty = new FieldRules(new List<FieldRule>());
+
+    public FieldRules()
     {
-        public static readonly FieldRules Empty = new FieldRules(new List<FieldRule>());
+    }
 
-        public FieldRules()
-        {
-        }
+    public FieldRules(IList<FieldRule> list)
+        : base(list)
+    {
+    }
 
-        public FieldRules(IList<FieldRule> list)
-            : base(list)
-        {
-        }
-
-        public static FieldRules Create(params FieldRule[] rules)
-        {
-            return new FieldRules(rules.ToArray());
-        }
+    public static FieldRules Create(params FieldRule[] rules)
+    {
+        return new FieldRules(rules.ToArray());
     }
 }

@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+public interface IWithId<out T>
 {
-    public interface IWithId<out T>
-    {
-        T Id { get; }
-    }
+    T Id { get; }
 }

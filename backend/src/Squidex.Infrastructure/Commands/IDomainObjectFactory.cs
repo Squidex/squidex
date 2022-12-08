@@ -7,12 +7,11 @@
 
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Infrastructure.Commands
-{
-    public interface IDomainObjectFactory
-    {
-        T Create<T>(DomainId id);
+namespace Squidex.Infrastructure.Commands;
 
-        T Create<T, TState>(DomainId id, IPersistenceFactory<TState> factory);
-    }
+public interface IDomainObjectFactory
+{
+    T Create<T>(DomainId id);
+
+    T Create<T, TState>(DomainId id, IPersistenceFactory<TState> factory);
 }

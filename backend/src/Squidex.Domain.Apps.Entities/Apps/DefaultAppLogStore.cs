@@ -12,167 +12,165 @@ using CsvHelper.Configuration;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
-namespace Squidex.Domain.Apps.Entities.Apps
-{
-    public sealed class DefaultAppLogStore : IAppLogStore, IDeleter
-    {
-        private const string FieldAuthClientId = "AuthClientId";
-        private const string FieldAuthUserId = "AuthUserId";
-        private const string FieldBytes = "Bytes";
-        private const string FieldCosts = "Costs";
-        private const string FieldCacheStatus = "CacheStatus";
-        private const string FieldCacheServer = "CacheServer";
-        private const string FieldCacheTTL = "CacheTTL";
-        private const string FieldCacheHits = "CacheHits";
-        private const string FieldRequestElapsedMs = "RequestElapsedMs";
-        private const string FieldRequestMethod = "RequestMethod";
-        private const string FieldRequestPath = "RequestPath";
-        private const string FieldStatusCode = "StatusCode";
-        private const string FieldTimestamp = "Timestamp";
+namespace Squidex.Domain.Apps.Entities.Apps;
 
-        private static readonly CsvConfiguration CsvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
+public sealed class DefaultAppLogStore : IAppLogStore, IDeleter
+{
+    private const string FieldAuthClientId = "AuthClientId";
+    private const string FieldAuthUserId = "AuthUserId";
+    private const string FieldBytes = "Bytes";
+    private const string FieldCosts = "Costs";
+    private const string FieldCacheStatus = "CacheStatus";
+    private const string FieldCacheServer = "CacheServer";
+    private const string FieldCacheTTL = "CacheTTL";
+    private const string FieldCacheHits = "CacheHits";
+    private const string FieldRequestElapsedMs = "RequestElapsedMs";
+    private const string FieldRequestMethod = "RequestMethod";
+    private const string FieldRequestPath = "RequestPath";
+    private const string FieldStatusCode = "StatusCode";
+    private const string FieldTimestamp = "Timestamp";
+
+    private static readonly CsvConfiguration CsvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
+    {
+        DetectDelimiter = false,
+        Delimiter = "|"
+    };
+
+    private readonly IRequestLogStore requestLogStore;
+
+    public DefaultAppLogStore(IRequestLogStore requestLogStore)
+    {
+        this.requestLogStore = requestLogStore;
+    }
+
+    Task IDeleter.DeleteAppAsync(IAppEntity app,
+        CancellationToken ct)
+    {
+        return requestLogStore.DeleteAsync(app.Id.ToString(), ct);
+    }
+
+    public Task LogAsync(DomainId appId, RequestLog request,
+        CancellationToken ct = default)
+    {
+        if (!requestLogStore.IsEnabled)
         {
-            DetectDelimiter = false,
-            Delimiter = "|",
-            LeaveOpen = true
+            return Task.CompletedTask;
+        }
+
+        var storedRequest = new Request
+        {
+            Key = appId.ToString(),
+            Timestamp = request.Timestamp
         };
 
-        private readonly IRequestLogStore requestLogStore;
+        Append(storedRequest, FieldAuthClientId, request.UserClientId);
+        Append(storedRequest, FieldAuthUserId, request.UserId);
+        Append(storedRequest, FieldBytes, request.Bytes);
+        Append(storedRequest, FieldCacheHits, request.CacheHits);
+        Append(storedRequest, FieldCacheServer, request.CacheServer);
+        Append(storedRequest, FieldCacheStatus, request.CacheStatus);
+        Append(storedRequest, FieldCacheTTL, request.CacheTTL);
+        Append(storedRequest, FieldCosts, request.Costs);
+        Append(storedRequest, FieldRequestElapsedMs, request.ElapsedMs);
+        Append(storedRequest, FieldRequestMethod, request.RequestMethod);
+        Append(storedRequest, FieldRequestPath, request.RequestPath);
+        Append(storedRequest, FieldStatusCode, request.StatusCode);
 
-        public DefaultAppLogStore(IRequestLogStore requestLogStore)
-        {
-            this.requestLogStore = requestLogStore;
-        }
+        return requestLogStore.LogAsync(storedRequest, ct);
+    }
 
-        Task IDeleter.DeleteAppAsync(IAppEntity app,
-            CancellationToken ct)
-        {
-            return requestLogStore.DeleteAsync(app.Id.ToString(), ct);
-        }
+    public async Task ReadLogAsync(DomainId appId, DateTime fromDate, DateTime toDate, Stream stream,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(appId);
 
-        public Task LogAsync(DomainId appId, RequestLog request,
-            CancellationToken ct = default)
+        var writer = new StreamWriter(stream, Encoding.UTF8, 4096, true);
+        try
         {
-            if (!requestLogStore.IsEnabled)
+            await using (var csv = new CsvWriter(writer, CsvConfiguration, true))
             {
-                return Task.CompletedTask;
-            }
+                csv.WriteField(FieldTimestamp);
+                csv.WriteField(FieldRequestPath);
+                csv.WriteField(FieldRequestMethod);
+                csv.WriteField(FieldRequestElapsedMs);
+                csv.WriteField(FieldCosts);
+                csv.WriteField(FieldAuthClientId);
+                csv.WriteField(FieldAuthUserId);
+                csv.WriteField(FieldBytes);
+                csv.WriteField(FieldCacheHits);
+                csv.WriteField(FieldCacheServer);
+                csv.WriteField(FieldCacheStatus);
+                csv.WriteField(FieldCacheTTL);
+                csv.WriteField(FieldStatusCode);
 
-            var storedRequest = new Request
-            {
-                Key = appId.ToString(),
-                Timestamp = request.Timestamp
-            };
+                await csv.NextRecordAsync();
 
-            Append(storedRequest, FieldAuthClientId, request.UserClientId);
-            Append(storedRequest, FieldAuthUserId, request.UserId);
-            Append(storedRequest, FieldBytes, request.Bytes);
-            Append(storedRequest, FieldCacheHits, request.CacheHits);
-            Append(storedRequest, FieldCacheServer, request.CacheServer);
-            Append(storedRequest, FieldCacheStatus, request.CacheStatus);
-            Append(storedRequest, FieldCacheTTL, request.CacheTTL);
-            Append(storedRequest, FieldCosts, request.Costs);
-            Append(storedRequest, FieldRequestElapsedMs, request.ElapsedMs);
-            Append(storedRequest, FieldRequestMethod, request.RequestMethod);
-            Append(storedRequest, FieldRequestPath, request.RequestPath);
-            Append(storedRequest, FieldStatusCode, request.StatusCode);
-
-            return requestLogStore.LogAsync(storedRequest, ct);
-        }
-
-        public async Task ReadLogAsync(DomainId appId, DateTime fromDate, DateTime toDate, Stream stream,
-            CancellationToken ct = default)
-        {
-            Guard.NotNull(appId);
-
-            var writer = new StreamWriter(stream, Encoding.UTF8, 4096, true);
-            try
-            {
-                await using (var csv = new CsvWriter(writer, CsvConfiguration))
+                await foreach (var request in requestLogStore.QueryAllAsync(appId.ToString(), fromDate, toDate, ct))
                 {
-                    csv.WriteField(FieldTimestamp);
-                    csv.WriteField(FieldRequestPath);
-                    csv.WriteField(FieldRequestMethod);
-                    csv.WriteField(FieldRequestElapsedMs);
-                    csv.WriteField(FieldCosts);
-                    csv.WriteField(FieldAuthClientId);
-                    csv.WriteField(FieldAuthUserId);
-                    csv.WriteField(FieldBytes);
-                    csv.WriteField(FieldCacheHits);
-                    csv.WriteField(FieldCacheServer);
-                    csv.WriteField(FieldCacheStatus);
-                    csv.WriteField(FieldCacheTTL);
-                    csv.WriteField(FieldStatusCode);
+                    csv.WriteField(request.Timestamp.ToString());
+                    csv.WriteField(GetString(request, FieldRequestPath));
+                    csv.WriteField(GetString(request, FieldRequestMethod));
+                    csv.WriteField(GetDouble(request, FieldRequestElapsedMs));
+                    csv.WriteField(GetDouble(request, FieldCosts));
+                    csv.WriteField(GetString(request, FieldAuthClientId));
+                    csv.WriteField(GetString(request, FieldAuthUserId));
+                    csv.WriteField(GetLong(request, FieldBytes));
+                    csv.WriteField(GetLong(request, FieldCacheHits));
+                    csv.WriteField(GetString(request, FieldCacheServer));
+                    csv.WriteField(GetString(request, FieldCacheStatus));
+                    csv.WriteField(GetLong(request, FieldCacheTTL));
+                    csv.WriteField(GetLong(request, FieldStatusCode));
 
                     await csv.NextRecordAsync();
-
-                    await foreach (var request in requestLogStore.QueryAllAsync(appId.ToString(), fromDate, toDate, ct))
-                    {
-                        csv.WriteField(request.Timestamp.ToString());
-                        csv.WriteField(GetString(request, FieldRequestPath));
-                        csv.WriteField(GetString(request, FieldRequestMethod));
-                        csv.WriteField(GetDouble(request, FieldRequestElapsedMs));
-                        csv.WriteField(GetDouble(request, FieldCosts));
-                        csv.WriteField(GetString(request, FieldAuthClientId));
-                        csv.WriteField(GetString(request, FieldAuthUserId));
-                        csv.WriteField(GetLong(request, FieldBytes));
-                        csv.WriteField(GetLong(request, FieldCacheHits));
-                        csv.WriteField(GetString(request, FieldCacheServer));
-                        csv.WriteField(GetString(request, FieldCacheStatus));
-                        csv.WriteField(GetLong(request, FieldCacheTTL));
-                        csv.WriteField(GetLong(request, FieldStatusCode));
-
-                        await csv.NextRecordAsync();
-                    }
                 }
             }
-            finally
-            {
-                await writer.FlushAsync();
-            }
         }
-
-        private static void Append(Request request, string key, string? value)
+        finally
         {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                request.Properties[key] = value;
-            }
+            await writer.FlushAsync();
         }
+    }
 
-        private static void Append(Request request, string key, object? value)
+    private static void Append(Request request, string key, string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
         {
-            if (value != null)
-            {
-                Append(request, key, Convert.ToString(value, CultureInfo.InvariantCulture));
-            }
+            request.Properties[key] = value;
         }
+    }
 
-        private static string? GetString(Request request, string key)
+    private static void Append(Request request, string key, object? value)
+    {
+        if (value != null)
         {
-            return request.Properties.GetValueOrDefault(key, string.Empty);
+            Append(request, key, Convert.ToString(value, CultureInfo.InvariantCulture));
         }
+    }
 
-        private static double? GetDouble(Request request, string key)
+    private static string? GetString(Request request, string key)
+    {
+        return request.Properties.GetValueOrDefault(key, string.Empty);
+    }
+
+    private static double? GetDouble(Request request, string key)
+    {
+        if (request.Properties.TryGetValue(key, out var value) &&
+            double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
         {
-            if (request.Properties.TryGetValue(key, out var value) &&
-                double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
-            {
-                return result;
-            }
-
-            return null;
+            return result;
         }
 
-        private static long? GetLong(Request request, string key)
+        return null;
+    }
+
+    private static long? GetLong(Request request, string key)
+    {
+        if (request.Properties.TryGetValue(key, out var value) &&
+            long.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
         {
-            if (request.Properties.TryGetValue(key, out var value) &&
-                long.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
-            {
-                return result;
-            }
-
-            return null;
+            return result;
         }
+
+        return null;
     }
 }

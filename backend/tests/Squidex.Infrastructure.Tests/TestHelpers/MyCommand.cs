@@ -8,14 +8,13 @@
 using NodaTime;
 using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Infrastructure.TestHelpers
+namespace Squidex.Infrastructure.TestHelpers;
+
+public class MyCommand : IAggregateCommand, ITimestampCommand
 {
-    public class MyCommand : IAggregateCommand, ITimestampCommand
-    {
-        public DomainId AggregateId { get; set; }
+    public DomainId AggregateId { get; set; }
 
-        public long ExpectedVersion { get; set; } = EtagVersion.Any;
+    public long ExpectedVersion { get; set; } = EtagVersion.Any;
 
-        public Instant Timestamp { get; set; }
-    }
+    public Instant Timestamp { get; set; }
 }

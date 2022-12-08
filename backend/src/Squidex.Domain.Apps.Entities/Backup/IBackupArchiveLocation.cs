@@ -7,16 +7,15 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public interface IBackupArchiveLocation
 {
-    public interface IBackupArchiveLocation
-    {
-        Stream OpenStream(DomainId backupId);
+    Stream OpenStream(DomainId backupId);
 
-        Task<IBackupWriter> OpenWriterAsync(Stream stream,
-            CancellationToken ct);
+    Task<IBackupWriter> OpenWriterAsync(Stream stream,
+        CancellationToken ct);
 
-        Task<IBackupReader> OpenReaderAsync(Uri url, DomainId id,
-            CancellationToken ct);
-    }
+    Task<IBackupReader> OpenReaderAsync(Uri url, DomainId id,
+        CancellationToken ct);
 }

@@ -6,62 +6,67 @@
 // ==========================================================================
 
 using Fluid;
+using Fluid.Accessors;
 using Fluid.Values;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Core.Templates.Extensions
+namespace Squidex.Domain.Apps.Core.Templates.Extensions;
+
+public sealed class ContentFluidExtension : IFluidExtension
 {
-    public sealed class ContentFluidExtension : IFluidExtension
+    public void RegisterLanguageExtensions(CustomFluidParser parser, TemplateOptions options)
     {
-        public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
+        options.ValueConverters.Add(source =>
         {
-            FluidValue.SetTypeMapping<ContentData>(x => new ObjectValue(x));
-            FluidValue.SetTypeMapping<ContentFieldData>(x => new ObjectValue(x));
-            FluidValue.SetTypeMapping<JsonObject>(x => new ObjectValue(x));
-            FluidValue.SetTypeMapping<JsonArray>(x => new JsonArrayFluidValue(x));
-
-            FluidValue.SetTypeMapping<JsonValue>(source =>
+            switch (source)
             {
-                switch (source.Value)
-                {
-                    case null:
-                        return FluidValue.Create(null);
-                    case bool b:
-                        return FluidValue.Create(b);
-                    case double n:
-                        return FluidValue.Create(n);
-                    case string s:
-                        return FluidValue.Create(s);
-                    case JsonObject o:
-                        return new ObjectValue(o);
-                    case JsonArray a:
-                        return new JsonArrayFluidValue(a);
-                }
+                case ContentData d:
+                    return new ObjectValue(d);
+                case ContentFieldData f:
+                    return new ObjectValue(f);
+                case JsonArray a:
+                    return new JsonArrayFluidValue(a, options);
+                case JsonObject o:
+                    return new ObjectValue(o);
+                case JsonValue v:
+                    switch (v.Value)
+                    {
+                        case null:
+                            return NilValue.Instance;
+                        case bool b:
+                            return BooleanValue.Create(b);
+                        case double n:
+                            return NumberValue.Create((decimal)n);
+                        case string s:
+                            return StringValue.Create(s);
+                        case JsonArray a:
+                            return new JsonArrayFluidValue(a, options);
+                        case JsonObject o:
+                            return new ObjectValue(o);
+                    }
 
-                ThrowHelper.InvalidOperationException();
-                return default!;
-            });
+                    ThrowHelper.InvalidOperationException();
+                    break;
+            }
 
-            memberAccessStrategy.Register<JsonValue, object?>((value, name) =>
-            {
-                if (value.Value is JsonObject o)
-                {
-                    return o.GetValueOrDefault(name);
-                }
+            return null;
+        });
 
-                return null;
-            });
+        options.MemberAccessStrategy.Register<ContentData>("*", new DelegateAccessor<ContentData, object?>((source, name, context) =>
+        {
+            return source.GetValueOrDefault(name);
+        }));
 
-            memberAccessStrategy.Register<ContentData, object?>(
-                (value, name) => value.GetValueOrDefault(name));
+        options.MemberAccessStrategy.Register<ContentFieldData>("*", new DelegateAccessor<ContentFieldData, object?>((source, name, context) =>
+        {
+            return source.GetValueOrDefault(name);
+        }));
 
-            memberAccessStrategy.Register<ContentFieldData, object?>(
-                (value, name) => value.GetValueOrDefault(name).Value);
-
-            memberAccessStrategy.Register<JsonObject, object?>(
-                (value, name) => value.GetValueOrDefault(name).Value);
-        }
+        options.MemberAccessStrategy.Register<JsonObject>("*", new DelegateAccessor<JsonObject, object?>((source, name, context) =>
+        {
+            return source.GetValueOrDefault(name);
+        }));
     }
 }

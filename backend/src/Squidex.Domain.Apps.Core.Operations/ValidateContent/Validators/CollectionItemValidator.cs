@@ -8,32 +8,31 @@
 using System.Collections;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
+namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
+
+public sealed class CollectionItemValidator : IValidator
 {
-    public sealed class CollectionItemValidator : IValidator
+    private readonly IValidator itemValidator;
+
+    public CollectionItemValidator(IValidator itemValidator)
     {
-        private readonly IValidator itemValidator;
+        Guard.NotNull(itemValidator);
 
-        public CollectionItemValidator(IValidator itemValidator)
+        this.itemValidator = itemValidator;
+    }
+
+    public void Validate(object? value, ValidationContext context)
+    {
+        if (value is ICollection { Count: > 0 } items)
         {
-            Guard.NotNull(itemValidator);
+            var itemIndex = 1;
 
-            this.itemValidator = itemValidator;
-        }
-
-        public void Validate(object? value, ValidationContext context)
-        {
-            if (value is ICollection { Count: > 0 } items)
+            foreach (var item in items)
             {
-                var itemIndex = 1;
+                var itemContext = context.Nested($"[{itemIndex}]");
 
-                foreach (var item in items)
-                {
-                    var itemContext = context.Nested($"[{itemIndex}]");
-
-                    itemValidator.Validate(item, itemContext);
-                    itemIndex++;
-                }
+                itemValidator.Validate(item, itemContext);
+                itemIndex++;
             }
         }
     }

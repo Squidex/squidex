@@ -7,26 +7,25 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Squidex.Domain.Apps.Core.Scripting
+namespace Squidex.Domain.Apps.Core.Scripting;
+
+public class ScriptVars : ScriptContext
 {
-    public class ScriptVars : ScriptContext
+    public void SetValue(object? value, [CallerMemberName] string? key = null)
     {
-        public void SetValue(object? value, [CallerMemberName] string? key = null)
+        if (key != null)
         {
-            if (key != null)
-            {
-                this[key] = value;
-            }
+            this[key] = value;
+        }
+    }
+
+    public T GetValue<T>([CallerMemberName] string? key = null)
+    {
+        if (key != null && TryGetValue(key, out var temp) && temp is T result)
+        {
+            return result;
         }
 
-        public T GetValue<T>([CallerMemberName] string? key = null)
-        {
-            if (key != null && TryGetValue(key, out var temp) && temp is T result)
-            {
-                return result;
-            }
-
-            return default!;
-        }
+        return default!;
     }
 }

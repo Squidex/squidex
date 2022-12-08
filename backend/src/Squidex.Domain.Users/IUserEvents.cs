@@ -7,28 +7,27 @@
 
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Users
+namespace Squidex.Domain.Users;
+
+public interface IUserEvents
 {
-    public interface IUserEvents
+    Task OnUserRegisteredAsync(IUser user)
     {
-        Task OnUserRegisteredAsync(IUser user)
-        {
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
+    }
 
-        Task OnUserUpdatedAsync(IUser user, IUser previous)
-        {
-            return Task.CompletedTask;
-        }
+    Task OnUserUpdatedAsync(IUser user, IUser previous)
+    {
+        return Task.CompletedTask;
+    }
 
-        Task OnUserDeletedAsync(IUser user)
-        {
-            return Task.CompletedTask;
-        }
+    Task OnUserDeletedAsync(IUser user)
+    {
+        return Task.CompletedTask;
+    }
 
-        Task OnConsentGivenAsync(IUser user)
-        {
-            return Task.CompletedTask;
-        }
+    Task OnConsentGivenAsync(IUser user)
+    {
+        return Task.CompletedTask;
     }
 }

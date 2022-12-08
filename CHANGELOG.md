@@ -4,6 +4,58 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.3.0] - 2022-18-11
+
+This version is all about the Update to .NET 7. If you host Squidex with Containers, e.g. with Docker Compose, Kubernetes or Managed Containers nothing changes. But if you host Squidex yourself in IIS or Linux, you have to ensure that you use the latest runtime.
+
+### Changed
+
+* **Runtime**: Migration to .NET 7
+* **API**: New system how to manage type names, e.g. for field types, rule actions and so on, with the goal to improve serialization performance.
+
+## [7.2.0] - 2022-11-11
+
+### Fixed 
+
+* **Assets**: Configured timeout for queries was ignored.
+* **Assets**: Several fixes for tags which was causing duplicate tag names when a tag was renamed.
+* **Backups**: Fix timeout handling for backups to mark timed out backups as failed.
+* **Contents**: Configured timeout for queries was ignored.
+* **Contents**: Disable component fields when field is disabled.
+* **Contents**: Disable drag and drop for array editors, when the array field is disabled.
+* **Contents**: Fix generated OpenApi specs.
+* **Contents**: Fix geo queries (latitude and longitude) was swapped.
+* **Rules**: Fixes cache duration for rule handling.
+* **Templates**: Updated the template system to create a new temporary folder for each operation to query the repository.
+* **UI**: More help pages.
+* **UI**: More history pages.
+* **UI**: Several fixes to handle schema fields.
+* **UI**: Use a fallback image, if the app image cannot be loaded.
+
+### Changed
+
+* **API**: Better status handling for exceptions.
+* **API**: Move to file scoped namespaces.
+* **Backups**: More logs for the backup.
+* **Contents**: Mark content-version endpoint as obsolete.
+* **Helm**: Document helm parameters.
+* **Rules**: Dedicated Rule action for OpenSearch.
+* **Rules**: More logs for rule enqueuer.
+* **UI**: Updated Angular to 15.0
+* **UI**: Updated Bootstrap.
+
+### Added
+
+* **Billing**: Introducing teams to manage subscriptions across teams.
+* **Billing**: Several changes to introduce a referral program.
+* **Contents**: Button to show or hide the input for custom ID.
+* **Contents**: Column to show the translation status.
+* **Contents**: Define a custom GraphQL schema for JSON fields.
+* **Contents**: New endpoint to fetch a specific content by version.
+* **Contents**: OpenAPI definitions for the bulkd endpoint.
+* **OpenAPI**: Add more controllers to OpenAPI spec.
+* **Users**: Added tests for user management.
+
 ## [7.1.0] - 2022-09-01
 
 ### Fixed

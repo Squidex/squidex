@@ -8,7 +8,7 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Types } from './../utils/types';
 
-export function sorted<T>(event: CdkDragDrop<ReadonlyArray<T>>): ReadonlyArray<T> {
+export function sorted<T>(event: CdkDragDrop<ReadonlyArray<T>>): T[] {
     const items = <T[]>event.container.data;
 
     moveItemInArray(items, event.previousIndex, event.currentIndex);

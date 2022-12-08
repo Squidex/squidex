@@ -12,7 +12,7 @@
 }
 
 :host ::ng-deep {
-    @import '~cropperjs/dist/cropper';
+    @import 'cropperjs/dist/cropper';
 
     img {
         background-image: $asset-background;

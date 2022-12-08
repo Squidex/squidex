@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands;
+
+public sealed class UpsertSchemaNestedField : UpsertSchemaFieldBase
 {
-    public sealed class UpsertSchemaNestedField : UpsertSchemaFieldBase
-    {
-    }
 }

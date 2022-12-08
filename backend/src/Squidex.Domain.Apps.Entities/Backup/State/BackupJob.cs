@@ -8,20 +8,19 @@
 using NodaTime;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Backup.State
+namespace Squidex.Domain.Apps.Entities.Backup.State;
+
+public sealed class BackupJob : IBackupJob
 {
-    public sealed class BackupJob : IBackupJob
-    {
-        public DomainId Id { get; set; }
+    public DomainId Id { get; set; }
 
-        public Instant Started { get; set; }
+    public Instant Started { get; set; }
 
-        public Instant? Stopped { get; set; }
+    public Instant? Stopped { get; set; }
 
-        public int HandledEvents { get; set; }
+    public int HandledEvents { get; set; }
 
-        public int HandledAssets { get; set; }
+    public int HandledAssets { get; set; }
 
-        public JobStatus Status { get; set; }
-    }
+    public JobStatus Status { get; set; }
 }

@@ -7,11 +7,10 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Comments
+namespace Squidex.Domain.Apps.Entities.Comments;
+
+public interface IWatchingService
 {
-    public interface IWatchingService
-    {
-        Task<string[]> GetWatchingUsersAsync(DomainId appId, string? resource, string userId,
-            CancellationToken ct = default);
-    }
+    Task<string[]> GetWatchingUsersAsync(DomainId appId, string? resource, string userId,
+        CancellationToken ct = default);
 }

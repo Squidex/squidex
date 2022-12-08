@@ -8,13 +8,12 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Contents
-{
-    [EventType(nameof(ContentUpdated))]
-    public sealed class ContentUpdated : ContentEvent
-    {
-        public ContentData Data { get; set; }
+namespace Squidex.Domain.Apps.Events.Contents;
 
-        public bool NewVersion { get; set; }
-    }
+[EventType(nameof(ContentUpdated))]
+public sealed class ContentUpdated : ContentEvent
+{
+    public ContentData Data { get; set; }
+
+    public bool NewVersion { get; set; }
 }

@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
-{
-    public sealed class UpsertSchemaField : UpsertSchemaFieldBase
-    {
-        public string Partitioning { get; set; }
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands;
 
-        public UpsertSchemaNestedField[]? Nested { get; set; }
-    }
+public sealed class UpsertSchemaField : UpsertSchemaFieldBase
+{
+    public string Partitioning { get; set; }
+
+    public UpsertSchemaNestedField[]? Nested { get; set; }
 }

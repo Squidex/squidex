@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { FormArrayTemplate, TemplatedFormArray } from './templated-form-array';
 
 describe('TemplatedFormArray', () => {
@@ -14,8 +14,8 @@ describe('TemplatedFormArray', () => {
         public removeCalled: number[] = [];
 
         public createControl() {
-            return new FormGroup({
-                value: new FormControl(),
+            return new UntypedFormGroup({
+                value: new UntypedFormControl(),
             });
         }
 

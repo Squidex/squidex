@@ -7,22 +7,21 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public sealed class RestoreContext : BackupContextBase
 {
-    public sealed class RestoreContext : BackupContextBase
+    public IBackupReader Reader { get; }
+
+    public DomainId PreviousAppId { get; set; }
+
+    public RestoreContext(DomainId appId, IUserMapping userMapping, IBackupReader reader, DomainId previousAppId)
+        : base(appId, userMapping)
     {
-        public IBackupReader Reader { get; }
+        Guard.NotNull(reader);
 
-        public DomainId PreviousAppId { get; set; }
+        Reader = reader;
 
-        public RestoreContext(DomainId appId, IUserMapping userMapping, IBackupReader reader, DomainId previousAppId)
-            : base(appId, userMapping)
-        {
-            Guard.NotNull(reader);
-
-            Reader = reader;
-
-            PreviousAppId = previousAppId;
-        }
+        PreviousAppId = previousAppId;
     }
 }

@@ -13,156 +13,155 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
+namespace Squidex.Domain.Apps.Entities.Comments.DomainObject;
+
+public class CommentsStream : IAggregate
 {
-    public class CommentsStream : IAggregate
+    private readonly List<Envelope<CommentsEvent>> uncommittedEvents = new List<Envelope<CommentsEvent>>();
+    private readonly List<Envelope<CommentsEvent>> events = new List<Envelope<CommentsEvent>>();
+    private readonly DomainId key;
+    private readonly IEventFormatter eventFormatter;
+    private readonly IEventStore eventStore;
+    private readonly string streamName;
+    private long version = EtagVersion.Empty;
+
+    private long Version => version;
+
+    public CommentsStream(
+        DomainId key,
+        IEventFormatter eventFormatter,
+        IEventStore eventStore)
     {
-        private readonly List<Envelope<CommentsEvent>> uncommittedEvents = new List<Envelope<CommentsEvent>>();
-        private readonly List<Envelope<CommentsEvent>> events = new List<Envelope<CommentsEvent>>();
-        private readonly DomainId key;
-        private readonly IEventFormatter eventFormatter;
-        private readonly IEventStore eventStore;
-        private readonly string streamName;
-        private long version = EtagVersion.Empty;
+        this.key = key;
+        this.eventFormatter = eventFormatter;
+        this.eventStore = eventStore;
 
-        private long Version => version;
+        streamName = $"comments-{key}";
+    }
 
-        public CommentsStream(
-            DomainId key,
-            IEventFormatter eventFormatter,
-            IEventStore eventStore)
+    public virtual async Task LoadAsync(
+        CancellationToken ct)
+    {
+        var storedEvents = await eventStore.QueryReverseAsync(streamName, 100, ct);
+
+        foreach (var @event in storedEvents)
         {
-            this.key = key;
-            this.eventFormatter = eventFormatter;
-            this.eventStore = eventStore;
+            var parsedEvent = eventFormatter.Parse(@event);
 
-            streamName = $"comments-{key}";
+            version = @event.EventStreamNumber;
+
+            events.Add(parsedEvent.To<CommentsEvent>());
         }
+    }
 
-        public virtual async Task LoadAsync(
-            CancellationToken ct)
+    public virtual async Task<CommandResult> ExecuteAsync(IAggregateCommand command,
+        CancellationToken ct)
+    {
+        await LoadAsync(ct);
+
+        switch (command)
         {
-            var storedEvents = await eventStore.QueryReverseAsync(streamName, 100, ct);
-
-            foreach (var @event in storedEvents)
-            {
-                var parsedEvent = eventFormatter.Parse(@event);
-
-                version = @event.EventStreamNumber;
-
-                events.Add(parsedEvent.To<CommentsEvent>());
-            }
-        }
-
-        public virtual async Task<CommandResult> ExecuteAsync(IAggregateCommand command,
-            CancellationToken ct)
-        {
-            await LoadAsync(ct);
-
-            switch (command)
-            {
-                case CreateComment createComment:
-                    return await Upsert(createComment, c =>
-                    {
-                        GuardComments.CanCreate(c);
-
-                        Create(c);
-                    }, ct);
-
-                case UpdateComment updateComment:
-                    return await Upsert(updateComment, c =>
-                    {
-                        GuardComments.CanUpdate(c, key.ToString(), events);
-
-                        Update(c);
-                    }, ct);
-
-                case DeleteComment deleteComment:
-                    return await Upsert(deleteComment, c =>
-                    {
-                        GuardComments.CanDelete(c, key.ToString(), events);
-
-                        Delete(c);
-                    }, ct);
-
-                default:
-                    ThrowHelper.NotSupportedException();
-                    return null!;
-            }
-        }
-
-        private async Task<CommandResult> Upsert<TCommand>(TCommand command, Action<TCommand> handler,
-            CancellationToken ct) where TCommand : CommentsCommand
-        {
-            Guard.NotNull(command);
-            Guard.NotNull(handler);
-
-            if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
-            {
-                throw new DomainObjectVersionException(key.ToString(), Version, command.ExpectedVersion);
-            }
-
-            var previousVersion = version;
-
-            try
-            {
-                handler(command);
-
-                if (uncommittedEvents.Count > 0)
+            case CreateComment createComment:
+                return await Upsert(createComment, c =>
                 {
-                    var commitId = Guid.NewGuid();
+                    GuardComments.CanCreate(c);
 
-                    var eventData = uncommittedEvents.Select(x => eventFormatter.ToEventData(x, commitId)).ToList();
+                    Create(c);
+                }, ct);
 
-                    await eventStore.AppendAsync(commitId, streamName, previousVersion, eventData, ct);
-                }
+            case UpdateComment updateComment:
+                return await Upsert(updateComment, c =>
+                {
+                    GuardComments.CanUpdate(c, key.ToString(), events);
 
-                events.AddRange(uncommittedEvents);
+                    Update(c);
+                }, ct);
 
-                return CommandResult.Empty(key, Version, previousVersion);
-            }
-            catch
+            case DeleteComment deleteComment:
+                return await Upsert(deleteComment, c =>
+                {
+                    GuardComments.CanDelete(c, key.ToString(), events);
+
+                    Delete(c);
+                }, ct);
+
+            default:
+                ThrowHelper.NotSupportedException();
+                return null!;
+        }
+    }
+
+    private async Task<CommandResult> Upsert<TCommand>(TCommand command, Action<TCommand> handler,
+        CancellationToken ct) where TCommand : CommentsCommand
+    {
+        Guard.NotNull(command);
+        Guard.NotNull(handler);
+
+        if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
+        {
+            throw new DomainObjectVersionException(key.ToString(), Version, command.ExpectedVersion);
+        }
+
+        var previousVersion = version;
+
+        try
+        {
+            handler(command);
+
+            if (uncommittedEvents.Count > 0)
             {
-                version = previousVersion;
+                var commitId = Guid.NewGuid();
 
-                throw;
+                var eventData = uncommittedEvents.Select(x => eventFormatter.ToEventData(x, commitId)).ToList();
+
+                await eventStore.AppendAsync(commitId, streamName, previousVersion, eventData, ct);
             }
-            finally
-            {
-                uncommittedEvents.Clear();
-            }
-        }
 
-        public void Create(CreateComment command)
+            events.AddRange(uncommittedEvents);
+
+            return CommandResult.Empty(key, Version, previousVersion);
+        }
+        catch
         {
-            RaiseEvent(SimpleMapper.Map(command, new CommentCreated()));
-        }
+            version = previousVersion;
 
-        public void Update(UpdateComment command)
+            throw;
+        }
+        finally
         {
-            RaiseEvent(SimpleMapper.Map(command, new CommentUpdated()));
+            uncommittedEvents.Clear();
         }
+    }
 
-        public void Delete(DeleteComment command)
-        {
-            RaiseEvent(SimpleMapper.Map(command, new CommentDeleted()));
-        }
+    public void Create(CreateComment command)
+    {
+        RaiseEvent(SimpleMapper.Map(command, new CommentCreated()));
+    }
 
-        private void RaiseEvent(CommentsEvent @event)
-        {
-            uncommittedEvents.Add(Envelope.Create(@event));
+    public void Update(UpdateComment command)
+    {
+        RaiseEvent(SimpleMapper.Map(command, new CommentUpdated()));
+    }
 
-            version++;
-        }
+    public void Delete(DeleteComment command)
+    {
+        RaiseEvent(SimpleMapper.Map(command, new CommentDeleted()));
+    }
 
-        public virtual List<Envelope<CommentsEvent>> GetUncommittedEvents()
-        {
-            return uncommittedEvents;
-        }
+    private void RaiseEvent(CommentsEvent @event)
+    {
+        uncommittedEvents.Add(Envelope.Create(@event));
 
-        public virtual CommentsResult GetComments(long sinceVersion = EtagVersion.Any)
-        {
-            return CommentsResult.FromEvents(events, Version, (int)sinceVersion);
-        }
+        version++;
+    }
+
+    public virtual List<Envelope<CommentsEvent>> GetUncommittedEvents()
+    {
+        return uncommittedEvents;
+    }
+
+    public virtual CommentsResult GetComments(long sinceVersion = EtagVersion.Any)
+    {
+        return CommentsResult.FromEvents(events, Version, (int)sinceVersion);
     }
 }

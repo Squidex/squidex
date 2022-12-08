@@ -14,52 +14,51 @@ using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Plans
-{
-    public sealed class RestrictAppsCommandMiddleware : ICommandMiddleware
-    {
-        private readonly RestrictAppsOptions usageOptions;
-        private readonly IUserResolver userResolver;
+namespace Squidex.Domain.Apps.Entities.Apps.Plans;
 
-        public RestrictAppsCommandMiddleware(IOptions<RestrictAppsOptions> usageOptions, IUserResolver userResolver)
+public sealed class RestrictAppsCommandMiddleware : ICommandMiddleware
+{
+    private readonly RestrictAppsOptions usageOptions;
+    private readonly IUserResolver userResolver;
+
+    public RestrictAppsCommandMiddleware(IOptions<RestrictAppsOptions> usageOptions, IUserResolver userResolver)
+    {
+        this.usageOptions = usageOptions.Value;
+        this.userResolver = userResolver;
+    }
+
+    public async Task HandleAsync(CommandContext context, NextDelegate next,
+        CancellationToken ct)
+    {
+        if (usageOptions.MaximumNumberOfApps <= 0 || context.Command is not CreateApp createApp || createApp.Actor.IsClient)
         {
-            this.usageOptions = usageOptions.Value;
-            this.userResolver = userResolver;
+            await next(context, ct);
+            return;
         }
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next,
-            CancellationToken ct)
+        var totalApps = 0;
+
+        var user = await userResolver.FindByIdAsync(createApp.Actor.Identifier, ct);
+
+        if (user != null)
         {
-            if (usageOptions.MaximumNumberOfApps <= 0 || context.Command is not CreateApp createApp || createApp.Actor.IsClient)
+            totalApps = user.Claims.GetTotalApps();
+
+            if (totalApps >= usageOptions.MaximumNumberOfApps)
             {
-                await next(context, ct);
-                return;
+                throw new ValidationException(T.Get("apps.maximumTotalReached"));
             }
+        }
 
-            var totalApps = 0;
+        await next(context, ct);
 
-            var user = await userResolver.FindByIdAsync(createApp.Actor.Identifier, ct);
+        if (context.IsCompleted && user != null)
+        {
+            var newAppsCount = totalApps + 1;
+            var newAppsValue = newAppsCount.ToString(CultureInfo.InvariantCulture);
 
-            if (user != null)
-            {
-                totalApps = user.Claims.GetTotalApps();
-
-                if (totalApps >= usageOptions.MaximumNumberOfApps)
-                {
-                    throw new ValidationException(T.Get("apps.maximumTotalReached"));
-                }
-            }
-
-            await next(context, ct);
-
-            if (context.IsCompleted && user != null)
-            {
-                var newAppsCount = totalApps + 1;
-                var newAppsValue = newAppsCount.ToString(CultureInfo.InvariantCulture);
-
-                // Always update the user and therefore do nto pass cancellation token.
-                await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.TotalApps, newAppsValue, true, default);
-            }
+            // Always update the user and therefore do nto pass cancellation token.
+            await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.TotalApps, newAppsValue, true, default);
         }
     }
 }

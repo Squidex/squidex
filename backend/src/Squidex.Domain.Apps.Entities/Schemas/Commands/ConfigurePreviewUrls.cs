@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands;
+
+public sealed class ConfigurePreviewUrls : SchemaCommand
 {
-    public sealed class ConfigurePreviewUrls : SchemaCommand
-    {
-        public ReadonlyDictionary<string, string>? PreviewUrls { get; set; }
-    }
+    public ReadonlyDictionary<string, string>? PreviewUrls { get; set; }
 }

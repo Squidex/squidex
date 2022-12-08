@@ -13,101 +13,100 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
 
-namespace Squidex.Extensions.Validation
+namespace Squidex.Extensions.Validation;
+
+internal sealed class CompositeUniqueValidator : IValidator
 {
-    internal sealed class CompositeUniqueValidator : IValidator
+    private readonly string tag;
+    private readonly IContentRepository contentRepository;
+
+    public CompositeUniqueValidator(string tag, IContentRepository contentRepository)
     {
-        private readonly string tag;
-        private readonly IContentRepository contentRepository;
+        this.tag = tag;
 
-        public CompositeUniqueValidator(string tag, IContentRepository contentRepository)
+        this.contentRepository = contentRepository;
+    }
+
+    public void Validate(object value, ValidationContext context)
+    {
+        if (value is ContentData data)
         {
-            this.tag = tag;
-
-            this.contentRepository = contentRepository;
+            context.Root.AddTask(async ct => await ValidateAsync(data, context));
         }
+    }
 
-        public void Validate(object value, ValidationContext context)
+    private async Task ValidateAsync(ContentData data, ValidationContext context)
+    {
+        var validateableFields = context.Root.Schema.Fields.Where(IsValidateableField);
+
+        var filters = new List<FilterNode<ClrValue>>();
+
+        foreach (var field in validateableFields)
         {
-            if (value is ContentData data)
+            var fieldValue = TryGetValue(field, data);
+
+            if (fieldValue != null)
             {
-                context.Root.AddTask(async ct => await ValidateAsync(data, context));
+                filters.Add(ClrFilter.Eq($"data.{field.Name}.iv", fieldValue));
             }
         }
 
-        private async Task ValidateAsync(ContentData data, ValidationContext context)
+        if (filters.Count > 0)
         {
-            var validateableFields = context.Root.Schema.Fields.Where(IsValidateableField);
+            var filter = ClrFilter.And(filters);
 
-            var filters = new List<FilterNode<ClrValue>>();
+            var found = await contentRepository.QueryIdsAsync(context.Root.AppId.Id, context.Root.SchemaId.Id, filter);
 
-            foreach (var field in validateableFields)
+            if (found.Any(x => x.Id != context.Root.ContentId))
             {
-                var fieldValue = TryGetValue(field, data);
+                context.AddError(Enumerable.Empty<string>(), "A content with the same values already exist.");
+            }
+        }
+    }
 
-                if (fieldValue != null)
+    private static ClrValue TryGetValue(IRootField field, ContentData data)
+    {
+        var value = JsonValue.Null;
+
+        if (data.TryGetValue(field.Name, out var fieldValue))
+        {
+            if (fieldValue.TryGetValue(InvariantPartitioning.Key, out var temp) && temp != default)
+            {
+                value = temp;
+            }
+        }
+
+        switch (field.RawProperties)
+        {
+            case BooleanFieldProperties when value.Value is bool b:
+                return b;
+            case BooleanFieldProperties when value.Value == default:
+                return ClrValue.Null;
+            case NumberFieldProperties when value.Value is double n:
+                return n;
+            case NumberFieldProperties when value.Value == default:
+                return ClrValue.Null;
+            case StringFieldProperties when value.Value is string s:
+                return s;
+            case StringFieldProperties when value.Value == default:
+                return ClrValue.Null;
+            case ReferencesFieldProperties when value.Value is JsonArray a:
+                if (a.FirstOrDefault().Value is string first)
                 {
-                    filters.Add(ClrFilter.Eq($"data.{field.Name}.iv", fieldValue));
+                    return first;
                 }
-            }
 
-            if (filters.Count > 0)
-            {
-                var filter = ClrFilter.And(filters);
-
-                var found = await contentRepository.QueryIdsAsync(context.Root.AppId.Id, context.Root.SchemaId.Id, filter);
-
-                if (found.Any(x => x.Id != context.Root.ContentId))
-                {
-                    context.AddError(Enumerable.Empty<string>(), "A content with the same values already exist.");
-                }
-            }
+                break;
         }
 
-        private static ClrValue TryGetValue(IRootField field, ContentData data)
-        {
-            var value = JsonValue.Null;
+        return null;
+    }
 
-            if (data.TryGetValue(field.Name, out var fieldValue))
-            {
-                if (fieldValue.TryGetValue(InvariantPartitioning.Key, out var temp) && temp != default)
-                {
-                    value = temp;
-                }
-            }
-
-            switch (field.RawProperties)
-            {
-                case BooleanFieldProperties when value.Value is bool b:
-                    return b;
-                case BooleanFieldProperties when value.Value == default:
-                    return ClrValue.Null;
-                case NumberFieldProperties when value.Value is double n:
-                    return n;
-                case NumberFieldProperties when value.Value == default:
-                    return ClrValue.Null;
-                case StringFieldProperties when value.Value is string s:
-                    return s;
-                case StringFieldProperties when value.Value == default:
-                    return ClrValue.Null;
-                case ReferencesFieldProperties when value.Value is JsonArray a:
-                    if (a.FirstOrDefault().Value is string first)
-                    {
-                        return first;
-                    }
-
-                    break;
-            }
-
-            return null;
-        }
-
-        private bool IsValidateableField(IRootField field)
-        {
-            return
-                field.Partitioning == Partitioning.Invariant &&
-                field.RawProperties.Tags?.Contains(tag) == true &&
-                field.RawProperties is BooleanFieldProperties or NumberFieldProperties or ReferencesFieldProperties or StringFieldProperties;
-        }
+    private bool IsValidateableField(IRootField field)
+    {
+        return
+            field.Partitioning == Partitioning.Invariant &&
+            field.RawProperties.Tags?.Contains(tag) == true &&
+            field.RawProperties is BooleanFieldProperties or NumberFieldProperties or ReferencesFieldProperties or StringFieldProperties;
     }
 }

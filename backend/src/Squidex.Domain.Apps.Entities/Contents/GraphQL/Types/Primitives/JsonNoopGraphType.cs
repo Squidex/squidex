@@ -8,31 +8,30 @@
 using GraphQL.Types;
 using GraphQLParser.AST;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
+
+public class JsonNoopGraphType : ScalarGraphType
 {
-    public class JsonNoopGraphType : ScalarGraphType
+    public JsonNoopGraphType()
     {
-        public JsonNoopGraphType()
-        {
-            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-            Name = "JsonScalar";
+        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
+        Name = "JsonScalar";
 
-            Description = "Unstructured Json object";
-        }
+        Description = "Unstructured Json object";
+    }
 
-        public override object? ParseLiteral(GraphQLValue value)
-        {
-            return value;
-        }
+    public override object? ParseLiteral(GraphQLValue value)
+    {
+        return value;
+    }
 
-        public override object? ParseValue(object? value)
-        {
-            return value;
-        }
+    public override object? ParseValue(object? value)
+    {
+        return value;
+    }
 
-        public override object? Serialize(object? value)
-        {
-            return value;
-        }
+    public override object? Serialize(object? value)
+    {
+        return value;
     }
 }

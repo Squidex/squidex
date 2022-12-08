@@ -7,10 +7,9 @@
 
 using Squidex.Domain.Apps.Entities.Billing;
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public sealed class UsageOptions
 {
-    public sealed class UsageOptions
-    {
-        public Plan[] Plans { get; set; }
-    }
+    public Plan[] Plans { get; set; }
 }

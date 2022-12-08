@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Caching
-{
-    public interface IQueryCache<TKey, T> where TKey : notnull where T : class, IWithId<TKey>
-    {
-        void SetMany(IEnumerable<(TKey, T?)> results,
-            TimeSpan? permanentDuration = null);
+namespace Squidex.Infrastructure.Caching;
 
-        Task<List<T>> CacheOrQueryAsync(IEnumerable<TKey> keys, Func<IEnumerable<TKey>, Task<IEnumerable<T>>> query,
-            TimeSpan? permanentDuration = null);
-    }
+public interface IQueryCache<TKey, T> where TKey : notnull where T : class, IWithId<TKey>
+{
+    void SetMany(IEnumerable<(TKey, T?)> results,
+        TimeSpan? permanentDuration = null);
+
+    Task<List<T>> CacheOrQueryAsync(IEnumerable<TKey> keys, Func<IEnumerable<TKey>, Task<IEnumerable<T>>> query,
+        TimeSpan? permanentDuration = null);
 }

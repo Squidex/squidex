@@ -7,17 +7,16 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps;
+
+[EventType(nameof(AppContributorAssigned), 2)]
+public sealed class AppContributorAssigned : AppEvent
 {
-    [EventType(nameof(AppContributorAssigned), 2)]
-    public sealed class AppContributorAssigned : AppEvent
-    {
-        public string ContributorId { get; set; }
+    public string ContributorId { get; set; }
 
-        public string Role { get; set; }
+    public string Role { get; set; }
 
-        public bool IsCreated { get; set; }
+    public bool IsCreated { get; set; }
 
-        public bool IsAdded { get; set; }
-    }
+    public bool IsAdded { get; set; }
 }

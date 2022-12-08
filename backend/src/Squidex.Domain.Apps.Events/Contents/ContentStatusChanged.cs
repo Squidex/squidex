@@ -8,15 +8,14 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Contents
+namespace Squidex.Domain.Apps.Events.Contents;
+
+[EventType(nameof(ContentStatusChanged), 2)]
+public sealed class ContentStatusChanged : ContentEvent
 {
-    [EventType(nameof(ContentStatusChanged), 2)]
-    public sealed class ContentStatusChanged : ContentEvent
-    {
-        public StatusChange Change { get; set; }
+    public StatusChange Change { get; set; }
 
-        public Status Status { get; set; }
+    public Status Status { get; set; }
 
-        public bool NewVersion { get; set; }
-    }
+    public bool NewVersion { get; set; }
 }

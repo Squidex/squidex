@@ -7,18 +7,17 @@
 
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Core.Rules.Triggers
+namespace Squidex.Domain.Apps.Core.Rules.Triggers;
+
+[TypeName(nameof(UsageTrigger))]
+public sealed record UsageTrigger : RuleTrigger
 {
-    [TypeName(nameof(UsageTrigger))]
-    public sealed record UsageTrigger : RuleTrigger
+    public int Limit { get; init; }
+
+    public int? NumDays { get; init; }
+
+    public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
     {
-        public int Limit { get; init; }
-
-        public int? NumDays { get; init; }
-
-        public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
-        {
-            return visitor.Visit(this);
-        }
+        return visitor.Visit(this);
     }
 }

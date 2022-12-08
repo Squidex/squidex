@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using NodaTime;
@@ -16,136 +15,134 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Shared.Users;
-using Xunit;
 
-namespace Squidex.Domain.Apps.Core.Operations.HandleRules
+namespace Squidex.Domain.Apps.Core.Operations.HandleRules;
+
+public class EventEnricherTests
 {
-    public class EventEnricherTests
+    private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
+    private readonly EventEnricher sut;
+
+    public EventEnricherTests()
     {
-        private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-        private readonly EventEnricher sut;
+        var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 
-        public EventEnricherTests()
-        {
-            var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+        sut = new EventEnricher(cache, userResolver);
+    }
 
-            sut = new EventEnricher(cache, userResolver);
-        }
+    [Fact]
+    public async Task Should_enrich_with_timestamp()
+    {
+        var timestamp = SystemClock.Instance.GetCurrentInstant().WithoutMs();
 
-        [Fact]
-        public async Task Should_enrich_with_timestamp()
-        {
-            var timestamp = SystemClock.Instance.GetCurrentInstant().WithoutMs();
+        var @event =
+            Envelope.Create<AppEvent>(new ContentCreated())
+                .SetTimestamp(timestamp);
 
-            var @event =
-                Envelope.Create<AppEvent>(new ContentCreated())
-                    .SetTimestamp(timestamp);
+        var enrichedEvent = new EnrichedContentEvent();
 
-            var enrichedEvent = new EnrichedContentEvent();
+        await sut.EnrichAsync(enrichedEvent, @event);
 
-            await sut.EnrichAsync(enrichedEvent, @event);
+        Assert.Equal(timestamp, enrichedEvent.Timestamp);
+    }
 
-            Assert.Equal(timestamp, enrichedEvent.Timestamp);
-        }
+    [Fact]
+    public async Task Should_enrich_with_appId()
+    {
+        var appId = NamedId.Of(DomainId.NewGuid(), "my-app");
 
-        [Fact]
-        public async Task Should_enrich_with_appId()
-        {
-            var appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        var @event =
+            Envelope.Create<AppEvent>(new ContentCreated
+            {
+                AppId = appId
+            });
 
-            var @event =
-                Envelope.Create<AppEvent>(new ContentCreated
-                {
-                    AppId = appId
-                });
+        var enrichedEvent = new EnrichedContentEvent();
 
-            var enrichedEvent = new EnrichedContentEvent();
+        await sut.EnrichAsync(enrichedEvent, @event);
 
-            await sut.EnrichAsync(enrichedEvent, @event);
+        Assert.Equal(appId, enrichedEvent.AppId);
+    }
 
-            Assert.Equal(appId, enrichedEvent.AppId);
-        }
+    [Fact]
+    public async Task Should_not_enrich_with_user_if_token_is_null()
+    {
+        RefToken actor = null!;
 
-        [Fact]
-        public async Task Should_not_enrich_with_user_if_token_is_null()
-        {
-            RefToken actor = null!;
+        var @event =
+            Envelope.Create<AppEvent>(new ContentCreated
+            {
+                Actor = actor
+            });
 
-            var @event =
-                Envelope.Create<AppEvent>(new ContentCreated
-                {
-                    Actor = actor
-                });
+        var enrichedEvent = new EnrichedContentEvent();
 
-            var enrichedEvent = new EnrichedContentEvent();
+        await sut.EnrichAsync(enrichedEvent, @event);
 
-            await sut.EnrichAsync(enrichedEvent, @event);
+        Assert.Null(enrichedEvent.User);
 
-            Assert.Null(enrichedEvent.User);
+        A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
 
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
-                .MustNotHaveHappened();
-        }
+    [Fact]
+    public async Task Should_enrich_with_user()
+    {
+        var actor = RefToken.Client("me");
 
-        [Fact]
-        public async Task Should_enrich_with_user()
-        {
-            var actor = RefToken.Client("me");
+        var user = A.Dummy<IUser>();
 
-            var user = A.Dummy<IUser>();
+        A.CallTo(() => userResolver.FindByIdAsync(actor.Identifier, default))
+            .Returns(user);
 
-            A.CallTo(() => userResolver.FindByIdAsync(actor.Identifier, default))
-                .Returns(user);
+        var @event =
+            Envelope.Create<AppEvent>(new ContentCreated
+            {
+                Actor = actor
+            });
 
-            var @event =
-                Envelope.Create<AppEvent>(new ContentCreated
-                {
-                    Actor = actor
-                });
+        var enrichedEvent = new EnrichedContentEvent();
 
-            var enrichedEvent = new EnrichedContentEvent();
+        await sut.EnrichAsync(enrichedEvent, @event);
 
-            await sut.EnrichAsync(enrichedEvent, @event);
+        Assert.Equal(user, enrichedEvent.User);
 
-            Assert.Equal(user, enrichedEvent.User);
+        A.CallTo(() => userResolver.FindByIdAsync(A<string>._, default))
+            .MustHaveHappenedOnceExactly();
+    }
 
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, default))
-                .MustHaveHappenedOnceExactly();
-        }
+    [Fact]
+    public async Task Should_enrich_with_user_and_cache()
+    {
+        var actor = RefToken.Client("me");
 
-        [Fact]
-        public async Task Should_enrich_with_user_and_cache()
-        {
-            var actor = RefToken.Client("me");
+        var user = A.Dummy<IUser>();
 
-            var user = A.Dummy<IUser>();
+        A.CallTo(() => userResolver.FindByIdAsync(actor.Identifier, default))
+            .Returns(user);
 
-            A.CallTo(() => userResolver.FindByIdAsync(actor.Identifier, default))
-                .Returns(user);
+        var event1 =
+            Envelope.Create<AppEvent>(new ContentCreated
+            {
+                Actor = actor
+            });
 
-            var event1 =
-                Envelope.Create<AppEvent>(new ContentCreated
-                {
-                    Actor = actor
-                });
+        var event2 =
+            Envelope.Create<AppEvent>(new ContentCreated
+            {
+                Actor = actor
+            });
 
-            var event2 =
-                Envelope.Create<AppEvent>(new ContentCreated
-                {
-                    Actor = actor
-                });
+        var enrichedEvent1 = new EnrichedContentEvent();
+        var enrichedEvent2 = new EnrichedContentEvent();
 
-            var enrichedEvent1 = new EnrichedContentEvent();
-            var enrichedEvent2 = new EnrichedContentEvent();
+        await sut.EnrichAsync(enrichedEvent1, event1);
+        await sut.EnrichAsync(enrichedEvent2, event2);
 
-            await sut.EnrichAsync(enrichedEvent1, event1);
-            await sut.EnrichAsync(enrichedEvent2, event2);
+        Assert.Equal(user, enrichedEvent1.User);
+        Assert.Equal(user, enrichedEvent2.User);
 
-            Assert.Equal(user, enrichedEvent1.User);
-            Assert.Equal(user, enrichedEvent2.User);
-
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, default))
-                .MustHaveHappenedOnceExactly();
-        }
+        A.CallTo(() => userResolver.FindByIdAsync(A<string>._, default))
+            .MustHaveHappenedOnceExactly();
     }
 }

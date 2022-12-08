@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Schemas
+namespace Squidex.Domain.Apps.Events.Schemas;
+
+[EventType(nameof(SchemaPublished))]
+public sealed class SchemaPublished : SchemaEvent
 {
-    [EventType(nameof(SchemaPublished))]
-    public sealed class SchemaPublished : SchemaEvent
-    {
-    }
 }

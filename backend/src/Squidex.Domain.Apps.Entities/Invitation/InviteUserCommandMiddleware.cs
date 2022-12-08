@@ -13,78 +13,77 @@ using Squidex.Shared.Users;
 using AssignAppContributor = Squidex.Domain.Apps.Entities.Apps.Commands.AssignContributor;
 using AssignTeamContributor = Squidex.Domain.Apps.Entities.Teams.Commands.AssignContributor;
 
-namespace Squidex.Domain.Apps.Entities.Invitation
+namespace Squidex.Domain.Apps.Entities.Invitation;
+
+public sealed class InviteUserCommandMiddleware : ICommandMiddleware
 {
-    public sealed class InviteUserCommandMiddleware : ICommandMiddleware
+    private readonly IUserResolver userResolver;
+
+    public InviteUserCommandMiddleware(IUserResolver userResolver)
     {
-        private readonly IUserResolver userResolver;
+        this.userResolver = userResolver;
+    }
 
-        public InviteUserCommandMiddleware(IUserResolver userResolver)
+    public async Task HandleAsync(CommandContext context, NextDelegate next,
+        CancellationToken ct)
+    {
+        if (context.Command is AssignAppContributor assignAppContributor)
         {
-            this.userResolver = userResolver;
-        }
+            var (userId, created) =
+                await ResolveUserAsync(
+                    assignAppContributor.ContributorId,
+                    assignAppContributor.Invite,
+                    ct);
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next,
-            CancellationToken ct)
-        {
-            if (context.Command is AssignAppContributor assignAppContributor)
+            assignAppContributor.ContributorId = userId;
+
+            await next(context, ct);
+
+            if (created && context.PlainResult is IAppEntity app)
             {
-                var (userId, created) =
-                    await ResolveUserAsync(
-                        assignAppContributor.ContributorId,
-                        assignAppContributor.Invite,
-                        ct);
-
-                assignAppContributor.ContributorId = userId;
-
-                await next(context, ct);
-
-                if (created && context.PlainResult is IAppEntity app)
-                {
-                    context.Complete(new InvitedResult<IAppEntity> { Entity = app });
-                }
-            }
-            else if (context.Command is AssignTeamContributor assignTeamContributor)
-            {
-                var (userId, created) =
-                    await ResolveUserAsync(
-                        assignTeamContributor.ContributorId,
-                        assignTeamContributor.Invite,
-                        ct);
-
-                assignTeamContributor.ContributorId = userId;
-
-                await next(context, ct);
-
-                if (created && context.PlainResult is ITeamEntity team)
-                {
-                    context.Complete(new InvitedResult<ITeamEntity> { Entity = team });
-                }
-            }
-            else
-            {
-                await next(context, ct);
+                context.Complete(new InvitedResult<IAppEntity> { Entity = app });
             }
         }
-
-        private async Task<(string Id, bool)> ResolveUserAsync(string id, bool invite,
-            CancellationToken ct)
+        else if (context.Command is AssignTeamContributor assignTeamContributor)
         {
-            if (!id.IsEmail())
+            var (userId, created) =
+                await ResolveUserAsync(
+                    assignTeamContributor.ContributorId,
+                    assignTeamContributor.Invite,
+                    ct);
+
+            assignTeamContributor.ContributorId = userId;
+
+            await next(context, ct);
+
+            if (created && context.PlainResult is ITeamEntity team)
             {
-                return (id, false);
+                context.Complete(new InvitedResult<ITeamEntity> { Entity = team });
             }
-
-            if (invite)
-            {
-                var (createdUser, created) = await userResolver.CreateUserIfNotExistsAsync(id, true, ct);
-
-                return (createdUser?.Id ?? id, created);
-            }
-
-            var user = await userResolver.FindByIdOrEmailAsync(id, ct);
-
-            return (user?.Id ?? id, false);
         }
+        else
+        {
+            await next(context, ct);
+        }
+    }
+
+    private async Task<(string Id, bool)> ResolveUserAsync(string id, bool invite,
+        CancellationToken ct)
+    {
+        if (!id.IsEmail())
+        {
+            return (id, false);
+        }
+
+        if (invite)
+        {
+            var (createdUser, created) = await userResolver.CreateUserIfNotExistsAsync(id, true, ct);
+
+            return (createdUser?.Id ?? id, created);
+        }
+
+        var user = await userResolver.FindByIdOrEmailAsync(id, ct);
+
+        return (user?.Id ?? id, false);
     }
 }

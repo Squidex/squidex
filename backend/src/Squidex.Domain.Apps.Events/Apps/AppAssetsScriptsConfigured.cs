@@ -8,11 +8,10 @@
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps;
+
+[EventType(nameof(AppAssetsScriptsConfigured))]
+public sealed class AppAssetsScriptsConfigured : AppEvent
 {
-    [EventType(nameof(AppAssetsScriptsConfigured))]
-    public sealed class AppAssetsScriptsConfigured : AppEvent
-    {
-        public AssetScripts? Scripts { get; set; }
-    }
+    public AssetScripts? Scripts { get; set; }
 }

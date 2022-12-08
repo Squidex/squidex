@@ -9,13 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.Prerender
+namespace Squidex.Extensions.Actions.Prerender;
+
+public sealed class PrerenderPlugin : IPlugin
 {
-    public sealed class PrerenderPlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
-        {
-            services.AddRuleAction<PrerenderAction, PrerenderActionHandler>();
-        }
+        services.AddRuleAction<PrerenderAction, PrerenderActionHandler>();
     }
 }

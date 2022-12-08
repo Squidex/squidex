@@ -63,6 +63,10 @@
         color: inherit;
     }
 
+    &.large {
+        font-size: 1rem;
+    }
+
     a {
         color: inherit;
     }
@@ -669,5 +673,15 @@ $icon-size: 4.5rem;
 
     .form-control {
         border-bottom-width: 1px;
+    }
+}
+
+.form-control {
+    &[readonly] {
+        color: $input-disabled-color;
+        background-color: $input-disabled-bg;
+        border-color: $input-disabled-border-color;
+        border-radius: inherit;
+        opacity: 1;
     }
 }

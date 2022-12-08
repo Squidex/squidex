@@ -9,42 +9,41 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Apps.Models
+namespace Squidex.Areas.Api.Controllers.Apps.Models;
+
+public sealed class ClientsDto : Resource
 {
-    public sealed class ClientsDto : Resource
+    /// <summary>
+    /// The clients.
+    /// </summary>
+    [LocalizedRequired]
+    public ClientDto[] Items { get; set; }
+
+    public static ClientsDto FromApp(IAppEntity app, Resources resources)
     {
-        /// <summary>
-        /// The clients.
-        /// </summary>
-        [LocalizedRequired]
-        public ClientDto[] Items { get; set; }
-
-        public static ClientsDto FromApp(IAppEntity app, Resources resources)
+        var result = new ClientsDto
         {
-            var result = new ClientsDto
-            {
-                Items = app.Clients
-                    .Select(x => ClientDto.FromClient(x.Key, x.Value))
-                    .Select(x => x.CreateLinks(resources))
-                    .ToArray()
-            };
+            Items = app.Clients
+                .Select(x => ClientDto.FromClient(x.Key, x.Value))
+                .Select(x => x.CreateLinks(resources))
+                .ToArray()
+        };
 
-            return result.CreateLinks(resources);
+        return result.CreateLinks(resources);
+    }
+
+    private ClientsDto CreateLinks(Resources resources)
+    {
+        var values = new { app = resources.App };
+
+        AddSelfLink(resources.Url<AppClientsController>(x => nameof(x.GetClients), values));
+
+        if (resources.CanCreateClient)
+        {
+            AddPostLink("create",
+                resources.Url<AppClientsController>(x => nameof(x.PostClient), values));
         }
 
-        private ClientsDto CreateLinks(Resources resources)
-        {
-            var values = new { app = resources.App };
-
-            AddSelfLink(resources.Url<AppClientsController>(x => nameof(x.GetClients), values));
-
-            if (resources.CanCreateClient)
-            {
-                AddPostLink("create",
-                    resources.Url<AppClientsController>(x => nameof(x.PostClient), values));
-            }
-
-            return this;
-        }
+        return this;
     }
 }

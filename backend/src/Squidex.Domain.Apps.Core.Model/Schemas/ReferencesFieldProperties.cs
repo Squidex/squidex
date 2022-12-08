@@ -8,65 +8,64 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Domain.Apps.Core.Schemas;
+
+public sealed record ReferencesFieldProperties : FieldProperties
 {
-    public sealed record ReferencesFieldProperties : FieldProperties
+    public LocalizedValue<ReadonlyList<string>?> DefaultValues { get; init; }
+
+    public ReadonlyList<string>? DefaultValue { get; init; }
+
+    public int? MinItems { get; init; }
+
+    public int? MaxItems { get; init; }
+
+    public bool ResolveReference { get; init; }
+
+    public bool AllowDuplicates { get; init; }
+
+    public bool MustBePublished { get; init; }
+
+    public ReferencesFieldEditor Editor { get; init; }
+
+    public DomainId SchemaId
     {
-        public LocalizedValue<ReadonlyList<string>?> DefaultValues { get; init; }
-
-        public ReadonlyList<string>? DefaultValue { get; init; }
-
-        public int? MinItems { get; init; }
-
-        public int? MaxItems { get; init; }
-
-        public bool ResolveReference { get; init; }
-
-        public bool AllowDuplicates { get; init; }
-
-        public bool MustBePublished { get; init; }
-
-        public ReferencesFieldEditor Editor { get; init; }
-
-        public DomainId SchemaId
+        init
         {
-            init
+            if (value != default)
             {
-                if (value != default)
-                {
-                    SchemaIds = ReadonlyList.Create(value);
-                }
-                else
-                {
-                    SchemaIds = null;
-                }
+                SchemaIds = ReadonlyList.Create(value);
             }
-            get
+            else
             {
-                return SchemaIds?.FirstOrDefault() ?? default;
+                SchemaIds = null;
             }
         }
-
-        public ReadonlyList<DomainId>? SchemaIds { get; init; }
-
-        public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
+        get
         {
-            return visitor.Visit(this, args);
+            return SchemaIds?.FirstOrDefault() ?? default;
         }
+    }
 
-        public override T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, IField field, TArgs args)
-        {
-            return visitor.Visit((IField<ReferencesFieldProperties>)field, args);
-        }
+    public ReadonlyList<DomainId>? SchemaIds { get; init; }
 
-        public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
-        {
-            return Fields.References(id, name, partitioning, this, settings);
-        }
+    public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
+    {
+        return visitor.Visit(this, args);
+    }
 
-        public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)
-        {
-            return Fields.References(id, name, this, settings);
-        }
+    public override T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, IField field, TArgs args)
+    {
+        return visitor.Visit((IField<ReferencesFieldProperties>)field, args);
+    }
+
+    public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
+    {
+        return Fields.References(id, name, partitioning, this, settings);
+    }
+
+    public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)
+    {
+        return Fields.References(id, name, this, settings);
     }
 }

@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands
+namespace Squidex.Domain.Apps.Entities.Apps.Commands;
+
+public sealed class RevokeClient : AppCommand
 {
-    public sealed class RevokeClient : AppCommand
-    {
-        public string Id { get; set; }
-    }
+    public string Id { get; set; }
 }

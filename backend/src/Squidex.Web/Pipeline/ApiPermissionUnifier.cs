@@ -10,22 +10,21 @@ using Microsoft.AspNetCore.Authentication;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 
-namespace Squidex.Web.Pipeline
+namespace Squidex.Web.Pipeline;
+
+public sealed class ApiPermissionUnifier : IClaimsTransformation
 {
-    public sealed class ApiPermissionUnifier : IClaimsTransformation
+    private const string AdministratorRole = "ADMINISTRATOR";
+
+    public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
     {
-        private const string AdministratorRole = "ADMINISTRATOR";
+        var identity = principal.Identities.First();
 
-        public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
+        if (string.Equals(identity.FindFirst(identity.RoleClaimType)?.Value, AdministratorRole, StringComparison.OrdinalIgnoreCase))
         {
-            var identity = principal.Identities.First();
-
-            if (string.Equals(identity.FindFirst(identity.RoleClaimType)?.Value, AdministratorRole, StringComparison.OrdinalIgnoreCase))
-            {
-                identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, PermissionIds.Admin));
-            }
-
-            return Task.FromResult(principal);
+            identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, PermissionIds.Admin));
         }
+
+        return Task.FromResult(principal);
     }
 }

@@ -8,21 +8,20 @@
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Domain.Apps.Core.HandleRules;
+
+public interface IRuleService
 {
-    public interface IRuleService
-    {
-        bool CanCreateSnapshotEvents(RuleContext context);
+    bool CanCreateSnapshotEvents(RuleContext context);
 
-        string GetName(AppEvent @event);
+    string GetName(AppEvent @event);
 
-        IAsyncEnumerable<JobResult> CreateSnapshotJobsAsync(RuleContext context,
-            CancellationToken ct = default);
+    IAsyncEnumerable<JobResult> CreateSnapshotJobsAsync(RuleContext context,
+        CancellationToken ct = default);
 
-        IAsyncEnumerable<JobResult> CreateJobsAsync(Envelope<IEvent> @event, RuleContext context,
-            CancellationToken ct = default);
+    IAsyncEnumerable<JobResult> CreateJobsAsync(Envelope<IEvent> @event, RuleContext context,
+        CancellationToken ct = default);
 
-        Task<(Result Result, TimeSpan Elapsed)> InvokeAsync(string actionName, string job,
-            CancellationToken ct = default);
-    }
+    Task<(Result Result, TimeSpan Elapsed)> InvokeAsync(string actionName, string job,
+        CancellationToken ct = default);
 }

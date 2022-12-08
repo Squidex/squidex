@@ -8,11 +8,10 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps;
+
+[EventType(nameof(AppMasterLanguageSet))]
+public sealed class AppMasterLanguageSet : AppEvent
 {
-    [EventType(nameof(AppMasterLanguageSet))]
-    public sealed class AppMasterLanguageSet : AppEvent
-    {
-        public Language Language { get; set; }
-    }
+    public Language Language { get; set; }
 }

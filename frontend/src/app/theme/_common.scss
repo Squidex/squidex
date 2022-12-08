@@ -22,7 +22,7 @@ body {
 }
 
 hr {
-    background-color: $color-border;
+    border-color: $color-border;
 }
 
 // Common style for user email.
@@ -126,6 +126,10 @@ hr {
         margin: .25rem 0;
         padding-left: .5rem;
         padding-right: 3rem;
+    }
+
+    a {
+        white-space: nowrap;
     }
 
     table {
@@ -322,7 +326,7 @@ hr {
     }
 
     &-pending {
-        color: inherit;
+        color: $color-text;
     }
 
     &-warning {

@@ -8,87 +8,86 @@
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Squidex.Infrastructure.Caching
+namespace Squidex.Infrastructure.Caching;
+
+public class QueryCache<TKey, T> : IQueryCache<TKey, T> where TKey : notnull where T : class, IWithId<TKey>
 {
-    public class QueryCache<TKey, T> : IQueryCache<TKey, T> where TKey : notnull where T : class, IWithId<TKey>
+    private readonly ConcurrentDictionary<TKey, T?> entries = new ConcurrentDictionary<TKey, T?>();
+    private readonly IMemoryCache? memoryCache;
+
+    public QueryCache(IMemoryCache? memoryCache = null)
     {
-        private readonly ConcurrentDictionary<TKey, T?> entries = new ConcurrentDictionary<TKey, T?>();
-        private readonly IMemoryCache? memoryCache;
+        this.memoryCache = memoryCache;
+    }
 
-        public QueryCache(IMemoryCache? memoryCache = null)
+    public void SetMany(IEnumerable<(TKey, T?)> results,
+        TimeSpan? permanentDuration = null)
+    {
+        Guard.NotNull(results);
+
+        foreach (var (key, value) in results)
         {
-            this.memoryCache = memoryCache;
+            Set(key, value, permanentDuration);
         }
+    }
 
-        public void SetMany(IEnumerable<(TKey, T?)> results,
-            TimeSpan? permanentDuration = null)
+    private void Set(TKey key, T? value,
+        TimeSpan? permanentDuration = null)
+    {
+        entries[key] = value;
+
+        if (memoryCache != null && permanentDuration > TimeSpan.Zero)
         {
-            Guard.NotNull(results);
+            memoryCache.Set(key, value, permanentDuration.Value);
+        }
+    }
 
-            foreach (var (key, value) in results)
+    public async Task<List<T>> CacheOrQueryAsync(IEnumerable<TKey> keys, Func<IEnumerable<TKey>, Task<IEnumerable<T>>> query,
+        TimeSpan? permanentDuration = null)
+    {
+        Guard.NotNull(keys);
+        Guard.NotNull(query);
+
+        var items = GetMany(keys, permanentDuration.HasValue);
+
+        var pendingIds = new HashSet<TKey>(keys.Where(key => !items.ContainsKey(key)));
+
+        if (pendingIds.Count > 0)
+        {
+            var queried = (await query(pendingIds)).ToDictionary(x => x.Id);
+
+            foreach (var id in pendingIds)
             {
-                Set(key, value, permanentDuration);
+                queried.TryGetValue(id, out var item);
+
+                items[id] = item;
+
+                Set(id, item, permanentDuration);
             }
         }
 
-        private void Set(TKey key, T? value,
-            TimeSpan? permanentDuration = null)
-        {
-            entries[key] = value;
+        return items.Values.NotNull().ToList();
+    }
 
-            if (memoryCache != null && permanentDuration > TimeSpan.Zero)
+    private Dictionary<TKey, T?> GetMany(IEnumerable<TKey> keys,
+        bool fromPermanentCache = false)
+    {
+        var result = new Dictionary<TKey, T?>();
+
+        foreach (var key in keys)
+        {
+            if (entries.TryGetValue(key, out var value))
             {
-                memoryCache.Set(key, value, permanentDuration.Value);
+                result[key] = value;
+            }
+            else if (fromPermanentCache && memoryCache != null && memoryCache.TryGetValue(key, out value))
+            {
+                result[key] = value;
+
+                entries[key] = value;
             }
         }
 
-        public async Task<List<T>> CacheOrQueryAsync(IEnumerable<TKey> keys, Func<IEnumerable<TKey>, Task<IEnumerable<T>>> query,
-            TimeSpan? permanentDuration = null)
-        {
-            Guard.NotNull(keys);
-            Guard.NotNull(query);
-
-            var items = GetMany(keys, permanentDuration.HasValue);
-
-            var pendingIds = new HashSet<TKey>(keys.Where(key => !items.ContainsKey(key)));
-
-            if (pendingIds.Count > 0)
-            {
-                var queried = (await query(pendingIds)).ToDictionary(x => x.Id);
-
-                foreach (var id in pendingIds)
-                {
-                    queried.TryGetValue(id, out var item);
-
-                    items[id] = item;
-
-                    Set(id, item, permanentDuration);
-                }
-            }
-
-            return items.Values.NotNull().ToList();
-        }
-
-        private Dictionary<TKey, T?> GetMany(IEnumerable<TKey> keys,
-            bool fromPermanentCache = false)
-        {
-            var result = new Dictionary<TKey, T?>();
-
-            foreach (var key in keys)
-            {
-                if (entries.TryGetValue(key, out var value))
-                {
-                    result[key] = value;
-                }
-                else if (fromPermanentCache && memoryCache != null && memoryCache.TryGetValue(key, out value))
-                {
-                    result[key] = value;
-
-                    entries[key] = value;
-                }
-            }
-
-            return result;
-        }
+        return result;
     }
 }

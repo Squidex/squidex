@@ -6,20 +6,18 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public class CommandResultTests
 {
-    public class CommandResultTests
+    [Fact]
+    public void Should_serialize_and_deserialize()
     {
-        [Fact]
-        public void Should_serialize_and_deserialize()
-        {
-            var sut = new CommandResult(DomainId.NewGuid(), 3, 2, null!);
+        var sut = new CommandResult(DomainId.NewGuid(), 3, 2, null!);
 
-            var serialized = sut.SerializeAndDeserialize();
+        var serialized = sut.SerializeAndDeserialize();
 
-            Assert.Equal(sut, serialized);
-        }
+        Assert.Equal(sut, serialized);
     }
 }

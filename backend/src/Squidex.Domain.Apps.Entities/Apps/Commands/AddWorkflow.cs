@@ -7,17 +7,16 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands
+namespace Squidex.Domain.Apps.Entities.Apps.Commands;
+
+public sealed class AddWorkflow : AppCommand
 {
-    public sealed class AddWorkflow : AppCommand
+    public DomainId WorkflowId { get; set; }
+
+    public string Name { get; set; }
+
+    public AddWorkflow()
     {
-        public DomainId WorkflowId { get; set; }
-
-        public string Name { get; set; }
-
-        public AddWorkflow()
-        {
-            WorkflowId = DomainId.NewGuid();
-        }
+        WorkflowId = DomainId.NewGuid();
     }
 }

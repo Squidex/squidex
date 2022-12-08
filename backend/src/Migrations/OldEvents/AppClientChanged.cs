@@ -10,24 +10,23 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 
-namespace Migrations.OldEvents
+namespace Migrations.OldEvents;
+
+[EventType(nameof(AppClientChanged))]
+[Obsolete("New Event introduced")]
+public sealed class AppClientChanged : AppEvent, IMigrated<IEvent>
 {
-    [EventType(nameof(AppClientChanged))]
-    [Obsolete("New Event introduced")]
-    public sealed class AppClientChanged : AppEvent, IMigrated<IEvent>
+    public string Id { get; set; }
+
+    public bool IsReader { get; set; }
+
+    public IEvent Migrate()
     {
-        public string Id { get; set; }
+        var permission =
+            IsReader ?
+            AppClientPermission.Reader :
+            AppClientPermission.Editor;
 
-        public bool IsReader { get; set; }
-
-        public IEvent Migrate()
-        {
-            var permission =
-                IsReader ?
-                AppClientPermission.Reader :
-                AppClientPermission.Editor;
-
-            return SimpleMapper.Map(this, new AppClientUpdated { Permission = permission });
-        }
+        return SimpleMapper.Map(this, new AppClientUpdated { Permission = permission });
     }
 }

@@ -5,47 +5,44 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using NodaTime;
 using Squidex.Infrastructure.TestHelpers;
-using Xunit;
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Commands;
+
+public class EnrichWithTimestampCommandMiddlewareTests
 {
-    public class EnrichWithTimestampCommandMiddlewareTests
+    private readonly IClock clock = A.Fake<IClock>();
+    private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
+    private readonly EnrichWithTimestampCommandMiddleware sut;
+
+    public EnrichWithTimestampCommandMiddlewareTests()
     {
-        private readonly IClock clock = A.Fake<IClock>();
-        private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
-        private readonly EnrichWithTimestampCommandMiddleware sut;
+        A.CallTo(() => clock.GetCurrentInstant())
+            .Returns(SystemClock.Instance.GetCurrentInstant().WithoutMs());
 
-        public EnrichWithTimestampCommandMiddlewareTests()
+        sut = new EnrichWithTimestampCommandMiddleware
         {
-            A.CallTo(() => clock.GetCurrentInstant())
-                .Returns(SystemClock.Instance.GetCurrentInstant().WithoutMs());
+            Clock = clock
+        };
+    }
 
-            sut = new EnrichWithTimestampCommandMiddleware
-            {
-                Clock = clock
-            };
-        }
+    [Fact]
+    public async Task Should_set_timestamp_for_timestamp_command()
+    {
+        var command = new MyCommand();
 
-        [Fact]
-        public async Task Should_set_timestamp_for_timestamp_command()
-        {
-            var command = new MyCommand();
+        await sut.HandleAsync(new CommandContext(command, commandBus), default);
 
-            await sut.HandleAsync(new CommandContext(command, commandBus), default);
+        Assert.Equal(clock.GetCurrentInstant(), command.Timestamp);
+    }
 
-            Assert.Equal(clock.GetCurrentInstant(), command.Timestamp);
-        }
+    [Fact]
+    public async Task Should_do_nothing_for_normal_command()
+    {
+        await sut.HandleAsync(new CommandContext(A.Dummy<ICommand>(), commandBus), default);
 
-        [Fact]
-        public async Task Should_do_nothing_for_normal_command()
-        {
-            await sut.HandleAsync(new CommandContext(A.Dummy<ICommand>(), commandBus), default);
-
-            A.CallTo(() => clock.GetCurrentInstant())
-                .MustNotHaveHappened();
-        }
+        A.CallTo(() => clock.GetCurrentInstant())
+            .MustNotHaveHappened();
     }
 }

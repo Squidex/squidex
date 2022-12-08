@@ -8,13 +8,12 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Contents
-{
-    [EventType(nameof(ContentDraftCreated))]
-    public sealed class ContentDraftCreated : ContentEvent
-    {
-        public ContentData? MigratedData { get; set; }
+namespace Squidex.Domain.Apps.Events.Contents;
 
-        public Status Status { get; set; }
-    }
+[EventType(nameof(ContentDraftCreated))]
+public sealed class ContentDraftCreated : ContentEvent
+{
+    public ContentData? MigratedData { get; set; }
+
+    public Status Status { get; set; }
 }

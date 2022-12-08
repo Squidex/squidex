@@ -8,11 +8,10 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Assets
+namespace Squidex.Domain.Apps.Events.Assets;
+
+[EventType(nameof(AssetMoved))]
+public sealed class AssetMoved : AssetEvent
 {
-    [EventType(nameof(AssetMoved))]
-    public sealed class AssetMoved : AssetEvent
-    {
-        public DomainId ParentId { get; set; }
-    }
+    public DomainId ParentId { get; set; }
 }

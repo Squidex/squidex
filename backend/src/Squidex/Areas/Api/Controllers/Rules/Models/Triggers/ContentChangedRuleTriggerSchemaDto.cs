@@ -9,30 +9,29 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
+namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers;
+
+public sealed class ContentChangedRuleTriggerSchemaDto
 {
-    public sealed class ContentChangedRuleTriggerSchemaDto
+    /// <summary>
+    /// The ID of the schema.
+    /// </summary>
+    public DomainId SchemaId { get; set; }
+
+    /// <summary>
+    /// Javascript condition when to trigger.
+    /// </summary>
+    public string? Condition { get; set; }
+
+    public ContentChangedTriggerSchemaV2 ToTrigger()
     {
-        /// <summary>
-        /// The ID of the schema.
-        /// </summary>
-        public DomainId SchemaId { get; set; }
+        return SimpleMapper.Map(this, new ContentChangedTriggerSchemaV2());
+    }
 
-        /// <summary>
-        /// Javascript condition when to trigger.
-        /// </summary>
-        public string? Condition { get; set; }
+    public static ContentChangedRuleTriggerSchemaDto FromDomain(ContentChangedTriggerSchemaV2 trigger)
+    {
+        var result = SimpleMapper.Map(trigger, new ContentChangedRuleTriggerSchemaDto());
 
-        public ContentChangedTriggerSchemaV2 ToTrigger()
-        {
-            return SimpleMapper.Map(this, new ContentChangedTriggerSchemaV2());
-        }
-
-        public static ContentChangedRuleTriggerSchemaDto FromDomain(ContentChangedTriggerSchemaV2 trigger)
-        {
-            var result = SimpleMapper.Map(trigger, new ContentChangedRuleTriggerSchemaDto());
-
-            return result;
-        }
+        return result;
     }
 }

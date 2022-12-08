@@ -28,13 +28,14 @@
 		<ng-container *ngIf="field.properties.editorUrl; else noEditor">
             <sqx-iframe-editor [url]="field.properties.editorUrl" #editor
                 [context]="formContext"
-                [expanded]="isExpanded"
-                (expandedChange)="toggleExpanded()"
+                [isExpanded]="isExpanded"
+                (isExpandedChange)="toggleExpanded()"
                 [formControlBinding]="$any(fieldForm)"
                 [formValue]="form.valueChanges | async"
                 [formIndex]="index"
                 [formField]="formModel.field.name"
-                [language]="language.iso2Code">
+                [language]="language"
+                [languages]="languages">
             </sqx-iframe-editor>
 		</ng-container>
 
@@ -173,10 +174,10 @@
 				<ng-container *ngSwitchCase="'String'">
 					<ng-container [ngSwitch]="field.rawProperties.editor">
 						<ng-container *ngSwitchCase="'Input'">
-							<input class="form-control" type="text" [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder">
+							<input class="form-control" [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder">
 						</ng-container>
 						<ng-container *ngSwitchCase="'Slug'">
-							<input class="form-control" type="text" [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder" sqxTransformInput="Slugify">
+							<input class="form-control" [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder" sqxTransformInput="Slugify">
 						</ng-container>
 						<ng-container *ngSwitchCase="'TextArea'">
 							<textarea class="form-control" [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder" rows="5"></textarea>

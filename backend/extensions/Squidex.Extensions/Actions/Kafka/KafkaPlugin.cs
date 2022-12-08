@@ -10,21 +10,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.Kafka
+namespace Squidex.Extensions.Actions.Kafka;
+
+public sealed class KafkaPlugin : IPlugin
 {
-    public sealed class KafkaPlugin : IPlugin
+    public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration config)
+        var options = config.GetSection("kafka").Get<KafkaProducerOptions>() ?? new ();
+
+        if (options.IsProducerConfigured())
         {
-            var options = config.GetSection("kafka").Get<KafkaProducerOptions>() ?? new ();
+            services.AddRuleAction<KafkaAction, KafkaActionHandler>();
 
-            if (options.IsProducerConfigured())
-            {
-                services.AddRuleAction<KafkaAction, KafkaActionHandler>();
-
-                services.AddSingleton<KafkaProducer>();
-                services.AddSingleton(Options.Create(options));
-            }
+            services.AddSingleton<KafkaProducer>();
+            services.AddSingleton(Options.Create(options));
         }
     }
 }

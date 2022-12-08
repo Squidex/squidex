@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { Types } from '@app/framework';
 import { ContentDto, ContentsDto, LanguageDto, LocalizerService, ResolveContents, StatefulControlComponent } from '@app/shared/internal';
@@ -54,7 +54,7 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
         this.setDisabledState(value === true);
     }
 
-    public control = new FormControl([]);
+    public control = new UntypedFormControl([]);
 
     public get isValid() {
         return !!this.schemaId && !!this.language;

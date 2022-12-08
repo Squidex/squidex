@@ -12,73 +12,72 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure.Commands;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Contents
+namespace Squidex.Areas.Api.Controllers.Contents;
+
+public sealed class ContentOpenApiController : ApiController
 {
-    public sealed class ContentOpenApiController : ApiController
+    private readonly IAppProvider appProvider;
+    private readonly SchemasOpenApiGenerator schemasOpenApiGenerator;
+
+    public ContentOpenApiController(ICommandBus commandBus, IAppProvider appProvider,
+        SchemasOpenApiGenerator schemasOpenApiGenerator)
+        : base(commandBus)
     {
-        private readonly IAppProvider appProvider;
-        private readonly SchemasOpenApiGenerator schemasOpenApiGenerator;
+        this.appProvider = appProvider;
+        this.schemasOpenApiGenerator = schemasOpenApiGenerator;
+    }
 
-        public ContentOpenApiController(ICommandBus commandBus, IAppProvider appProvider,
-            SchemasOpenApiGenerator schemasOpenApiGenerator)
-            : base(commandBus)
+    [HttpGet]
+    [Route("content/{app}/docs/")]
+    [ApiCosts(0)]
+    [AllowAnonymous]
+    public IActionResult Docs(string app)
+    {
+        var vm = new DocsVM
         {
-            this.appProvider = appProvider;
-            this.schemasOpenApiGenerator = schemasOpenApiGenerator;
-        }
+            Specification = $"~/api/content/{app}/swagger/v1/swagger.json"
+        };
 
-        [HttpGet]
-        [Route("content/{app}/docs/")]
-        [ApiCosts(0)]
-        [AllowAnonymous]
-        public IActionResult Docs(string app)
+        return View(nameof(Docs), vm);
+    }
+
+    [HttpGet]
+    [Route("content/{app}/docs/flat/")]
+    [ApiCosts(0)]
+    [AllowAnonymous]
+    public IActionResult DocsFlat(string app)
+    {
+        var vm = new DocsVM
         {
-            var vm = new DocsVM
-            {
-                Specification = $"~/api/content/{app}/swagger/v1/swagger.json"
-            };
+            Specification = $"~/api/content/{app}/flat/swagger/v1/swagger.json"
+        };
 
-            return View(nameof(Docs), vm);
-        }
+        return View(nameof(Docs), vm);
+    }
 
-        [HttpGet]
-        [Route("content/{app}/docs/flat/")]
-        [ApiCosts(0)]
-        [AllowAnonymous]
-        public IActionResult DocsFlat(string app)
-        {
-            var vm = new DocsVM
-            {
-                Specification = $"~/api/content/{app}/flat/swagger/v1/swagger.json"
-            };
+    [HttpGet]
+    [Route("content/{app}/swagger/v1/swagger.json")]
+    [ApiCosts(0)]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetOpenApi(string app)
+    {
+        var schemas = await appProvider.GetSchemasAsync(AppId, HttpContext.RequestAborted);
 
-            return View(nameof(Docs), vm);
-        }
+        var openApiDocument = await schemasOpenApiGenerator.GenerateAsync(HttpContext, App, schemas, false);
 
-        [HttpGet]
-        [Route("content/{app}/swagger/v1/swagger.json")]
-        [ApiCosts(0)]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetOpenApi(string app)
-        {
-            var schemas = await appProvider.GetSchemasAsync(AppId, HttpContext.RequestAborted);
+        return Content(openApiDocument.ToJson(), "application/json");
+    }
 
-            var openApiDocument = await schemasOpenApiGenerator.GenerateAsync(HttpContext, App, schemas, false);
+    [HttpGet]
+    [Route("content/{app}/flat/swagger/v1/swagger.json")]
+    [ApiCosts(0)]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetFlatOpenApi(string app)
+    {
+        var schemas = await appProvider.GetSchemasAsync(AppId, HttpContext.RequestAborted);
 
-            return Content(openApiDocument.ToJson(), "application/json");
-        }
+        var openApiDocument = await schemasOpenApiGenerator.GenerateAsync(HttpContext, App, schemas, true);
 
-        [HttpGet]
-        [Route("content/{app}/flat/swagger/v1/swagger.json")]
-        [ApiCosts(0)]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetFlatOpenApi(string app)
-        {
-            var schemas = await appProvider.GetSchemasAsync(AppId, HttpContext.RequestAborted);
-
-            var openApiDocument = await schemasOpenApiGenerator.GenerateAsync(HttpContext, App, schemas, true);
-
-            return Content(openApiDocument.ToJson(), "application/json");
-        }
+        return Content(openApiDocument.ToJson(), "application/json");
     }
 }

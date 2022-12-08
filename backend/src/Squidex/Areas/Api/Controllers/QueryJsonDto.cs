@@ -9,10 +9,9 @@ using NJsonSchema.Annotations;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
 
-namespace Squidex.Areas.Api.Controllers
+namespace Squidex.Areas.Api.Controllers;
+
+[JsonSchemaFlatten]
+public sealed class QueryJsonDto : Query<JsonValue>
 {
-    [JsonSchemaFlatten]
-    public sealed class QueryJsonDto : Query<JsonValue>
-    {
-    }
 }

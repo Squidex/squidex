@@ -8,7 +8,7 @@
     <div *ngSwitchCase="'Completed'" class="status-icon status-icon-success status-icon-{{size}}" [title]="statusText">
         <i class="icon-checkmark"></i>
     </div>
-    <div *ngSwitchDefault class="status status-icon-status-icon status-icon-{{size}} spin" [title]="statusText">
-        <i class="icon-hour-glass"></i>
+    <div *ngSwitchDefault class="status-icon status-icon-pending status-icon-{{size}} spin" [title]="statusText">
+        <i class="icon-hourglass_top"></i>
     </div>
 </ng-container>

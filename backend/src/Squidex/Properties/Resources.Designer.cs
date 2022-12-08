@@ -19,7 +19,7 @@ namespace Squidex.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -109,19 +109,13 @@ namespace Squidex.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Squidex uses oauth2 client authentication. Read more about it at: https://oauth.net/2/ and https://tools.ietf.org/html/rfc6750.
+        ///   Looks up a localized string similar to Squidex uses OpenId Connect (OIDC) with the Client Credentials Flow (defined in OAuth 2.0 RFC 6749, section 4.4).
         ///
-        ///To retrieve an access token, the client id must make a request to the token url. For example:
+        ///The OpenId Connect Client Credentials flow can be used for machine to machine authentication. In this grant a specific user is not authorized but rather the credentials are verified and a generic `access_token` is returned.
         ///
-        ///    $ curl
-        ///        -X POST &apos;&lt;TOKEN_URL&gt;&apos; 
-        ///        -H &apos;Content-Type: application/x-www-form-urlencoded&apos; 
-        ///        -d &apos;grant_type=client_credentials&amp;
-        ///            client_id=[CLIENT_ID]&amp;
-        ///            client_secret=[CLIENT_SECRET]&amp;
-        ///			scope=squidex-api&apos;
+        ///The `access_token` is a signed JSON Web Token (JWT) which contains expiry information. 
         ///
-        ///You must send this token in  [rest of string was truncated]&quot;;.
+        ///To retrieve an access token you must pass the Client ID and Client Secret to  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string OpenApiSecurity {
             get {

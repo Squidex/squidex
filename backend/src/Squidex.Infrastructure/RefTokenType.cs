@@ -5,11 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+public enum RefTokenType
 {
-    public enum RefTokenType
-    {
-        Subject,
-        Client
-    }
+    Subject,
+    Client
 }

@@ -8,44 +8,43 @@
 using System.Runtime.Serialization;
 using Squidex.Infrastructure.Translations;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+[Serializable]
+public class DomainObjectVersionException : DomainObjectException
 {
-    [Serializable]
-    public class DomainObjectVersionException : DomainObjectException
+    private const string ExposedErrorCode = "OBJECT_VERSION_CONFLICT";
+
+    public long CurrentVersion { get; }
+
+    public long ExpectedVersion { get; }
+
+    public DomainObjectVersionException(string id, long currentVersion, long expectedVersion, Exception? inner = null)
+        : base(FormatMessage(id, currentVersion, expectedVersion), id, ExposedErrorCode, inner)
     {
-        private const string ExposedErrorCode = "OBJECT_VERSION_CONFLICT";
+        CurrentVersion = currentVersion;
 
-        public long CurrentVersion { get; }
+        ExpectedVersion = expectedVersion;
+    }
 
-        public long ExpectedVersion { get; }
+    protected DomainObjectVersionException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
+    {
+        CurrentVersion = info.GetInt64(nameof(CurrentVersion));
 
-        public DomainObjectVersionException(string id, long currentVersion, long expectedVersion, Exception? inner = null)
-            : base(FormatMessage(id, currentVersion, expectedVersion), id, ExposedErrorCode, inner)
-        {
-            CurrentVersion = currentVersion;
+        ExpectedVersion = info.GetInt64(nameof(ExpectedVersion));
+    }
 
-            ExpectedVersion = expectedVersion;
-        }
+    public override void GetObjectData(SerializationInfo info, StreamingContext context)
+    {
+        info.AddValue(nameof(CurrentVersion), CurrentVersion);
+        info.AddValue(nameof(ExpectedVersion), ExpectedVersion);
 
-        protected DomainObjectVersionException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-            CurrentVersion = info.GetInt64(nameof(CurrentVersion));
+        base.GetObjectData(info, context);
+    }
 
-            ExpectedVersion = info.GetInt64(nameof(ExpectedVersion));
-        }
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue(nameof(CurrentVersion), CurrentVersion);
-            info.AddValue(nameof(ExpectedVersion), ExpectedVersion);
-
-            base.GetObjectData(info, context);
-        }
-
-        private static string FormatMessage(string id, long currentVersion, long expectedVersion)
-        {
-            return T.Get("exceptions.domainObjectVersion", new { id, currentVersion, expectedVersion });
-        }
+    private static string FormatMessage(string id, long currentVersion, long expectedVersion)
+    {
+        return T.Get("exceptions.domainObjectVersion", new { id, currentVersion, expectedVersion });
     }
 }

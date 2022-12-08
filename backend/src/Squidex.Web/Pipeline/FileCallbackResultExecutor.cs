@@ -11,54 +11,53 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using Squidex.Assets;
 
-namespace Squidex.Web.Pipeline
+namespace Squidex.Web.Pipeline;
+
+public sealed class FileCallbackResultExecutor : FileResultExecutorBase
 {
-    public sealed class FileCallbackResultExecutor : FileResultExecutorBase
+    public FileCallbackResultExecutor(ILoggerFactory loggerFactory)
+        : base(CreateLogger<FileCallbackResultExecutor>(loggerFactory))
     {
-        public FileCallbackResultExecutor(ILoggerFactory loggerFactory)
-            : base(CreateLogger<FileCallbackResultExecutor>(loggerFactory))
+    }
+
+    public async Task ExecuteAsync(ActionContext context, FileCallbackResult result)
+    {
+        try
         {
+            var (range, _, serveBody) = SetHeadersAndLog(context, result, result.FileSize, result.FileSize != null);
+
+            if (!string.IsNullOrWhiteSpace(result.FileDownloadName) && result.SendInline)
+            {
+                var headerValue = new ContentDispositionHeaderValue("inline");
+
+                headerValue.SetHttpFileName(result.FileDownloadName);
+
+                context.HttpContext.Response.Headers[HeaderNames.ContentDisposition] = headerValue.ToString();
+            }
+
+            if (serveBody)
+            {
+                var bytesRange = new BytesRange(range?.From, range?.To);
+
+                await result.Callback(context.HttpContext.Response.Body, bytesRange, context.HttpContext.RequestAborted);
+            }
         }
-
-        public async Task ExecuteAsync(ActionContext context, FileCallbackResult result)
+        catch (OperationCanceledException)
         {
-            try
+            return;
+        }
+        catch (Exception e)
+        {
+            if (!context.HttpContext.Response.HasStarted && result.ErrorAs404)
             {
-                var (range, _, serveBody) = SetHeadersAndLog(context, result, result.FileSize, result.FileSize != null);
+                context.HttpContext.Response.Headers.Clear();
+                context.HttpContext.Response.StatusCode = 404;
 
-                if (!string.IsNullOrWhiteSpace(result.FileDownloadName) && result.SendInline)
-                {
-                    var headerValue = new ContentDispositionHeaderValue("inline");
-
-                    headerValue.SetHttpFileName(result.FileDownloadName);
-
-                    context.HttpContext.Response.Headers[HeaderNames.ContentDisposition] = headerValue.ToString();
-                }
-
-                if (serveBody)
-                {
-                    var bytesRange = new BytesRange(range?.From, range?.To);
-
-                    await result.Callback(context.HttpContext.Response.Body, bytesRange, context.HttpContext.RequestAborted);
-                }
+                Logger.LogCritical(new EventId(99), e, "Failed to send result.");
             }
-            catch (OperationCanceledException)
+            else
             {
-                return;
-            }
-            catch (Exception e)
-            {
-                if (!context.HttpContext.Response.HasStarted && result.ErrorAs404)
-                {
-                    context.HttpContext.Response.Headers.Clear();
-                    context.HttpContext.Response.StatusCode = 404;
-
-                    Logger.LogCritical(new EventId(99), e, "Failed to send result.");
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
         }
     }

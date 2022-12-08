@@ -7,18 +7,17 @@
 
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
-namespace Squidex.Domain.Apps.Core.HandleRules
-{
-    public interface IRuleEventFormatter
-    {
-        (bool Match, string?, int ReplacedLength) Format(EnrichedEvent @event, string text)
-        {
-            return default;
-        }
+namespace Squidex.Domain.Apps.Core.HandleRules;
 
-        (bool Match, ValueTask<string?>) Format(EnrichedEvent @event, object value, string[] path)
-        {
-            return default;
-        }
+public interface IRuleEventFormatter
+{
+    (bool Match, string?, int ReplacedLength) Format(EnrichedEvent @event, string text)
+    {
+        return default;
+    }
+
+    (bool Match, ValueTask<string?>) Format(EnrichedEvent @event, object value, string[] path)
+    {
+        return default;
     }
 }

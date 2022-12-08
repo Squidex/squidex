@@ -8,11 +8,10 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Events.Apps;
+
+[EventType(nameof(AppWorkflowDeleted))]
+public sealed class AppWorkflowDeleted : AppEvent
 {
-    [EventType(nameof(AppWorkflowDeleted))]
-    public sealed class AppWorkflowDeleted : AppEvent
-    {
-        public DomainId WorkflowId { get; set; }
-    }
+    public DomainId WorkflowId { get; set; }
 }

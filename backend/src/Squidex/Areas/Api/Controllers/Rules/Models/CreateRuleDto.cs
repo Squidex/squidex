@@ -5,36 +5,33 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text.Json.Serialization;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Infrastructure.Validation;
 
-namespace Squidex.Areas.Api.Controllers.Rules.Models
+namespace Squidex.Areas.Api.Controllers.Rules.Models;
+
+public sealed class CreateRuleDto
 {
-    public sealed class CreateRuleDto
+    /// <summary>
+    /// The trigger properties.
+    /// </summary>
+    [LocalizedRequired]
+    public RuleTriggerDto Trigger { get; set; }
+
+    /// <summary>
+    /// The action properties.
+    /// </summary>
+    [LocalizedRequired]
+    public RuleAction Action { get; set; }
+
+    public Rule ToRule()
     {
-        /// <summary>
-        /// The trigger properties.
-        /// </summary>
-        [LocalizedRequired]
-        public RuleTriggerDto Trigger { get; set; }
+        return new Rule(Trigger.ToTrigger(), Action);
+    }
 
-        /// <summary>
-        /// The action properties.
-        /// </summary>
-        [LocalizedRequired]
-        [JsonConverter(typeof(RuleActionConverter))]
-        public RuleAction Action { get; set; }
-
-        public Rule ToRule()
-        {
-            return new Rule(Trigger.ToTrigger(), Action);
-        }
-
-        public CreateRule ToCommand()
-        {
-            return new CreateRule { Action = Action, Trigger = Trigger?.ToTrigger() };
-        }
+    public CreateRule ToCommand()
+    {
+        return new CreateRule { Action = Action, Trigger = Trigger?.ToTrigger() };
     }
 }

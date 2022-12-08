@@ -12,79 +12,78 @@ using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
+namespace Squidex.Domain.Apps.Entities.MongoDb.Rules;
+
+public sealed class MongoRuleStatisticsCollection : MongoRepositoryBase<RuleStatistics>
 {
-    public sealed class MongoRuleStatisticsCollection : MongoRepositoryBase<RuleStatistics>
+    static MongoRuleStatisticsCollection()
     {
-        static MongoRuleStatisticsCollection()
+        BsonClassMap.RegisterClassMap<RuleStatistics>(cm =>
         {
-            BsonClassMap.RegisterClassMap<RuleStatistics>(cm =>
-            {
-                cm.AutoMap();
+            cm.AutoMap();
 
-                cm.SetIgnoreExtraElements(true);
-            });
-        }
+            cm.SetIgnoreExtraElements(true);
+        });
+    }
 
-        public MongoRuleStatisticsCollection(IMongoDatabase database)
-            : base(database)
-        {
-        }
+    public MongoRuleStatisticsCollection(IMongoDatabase database)
+        : base(database)
+    {
+    }
 
-        protected override string CollectionName()
-        {
-            return "RuleStatistics";
-        }
+    protected override string CollectionName()
+    {
+        return "RuleStatistics";
+    }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<RuleStatistics> collection,
-            CancellationToken ct)
-        {
-            return collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<RuleStatistics>(
-                    Index
-                        .Ascending(x => x.AppId)
-                        .Ascending(x => x.RuleId)),
-                cancellationToken: ct);
-        }
+    protected override Task SetupCollectionAsync(IMongoCollection<RuleStatistics> collection,
+        CancellationToken ct)
+    {
+        return collection.Indexes.CreateOneAsync(
+            new CreateIndexModel<RuleStatistics>(
+                Index
+                    .Ascending(x => x.AppId)
+                    .Ascending(x => x.RuleId)),
+            cancellationToken: ct);
+    }
 
-        public async Task DeleteAppAsync(DomainId appId,
-            CancellationToken ct)
-        {
-            await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, appId), ct);
-        }
+    public async Task DeleteAppAsync(DomainId appId,
+        CancellationToken ct)
+    {
+        await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, appId), ct);
+    }
 
-        public async Task<IReadOnlyList<RuleStatistics>> QueryByAppAsync(DomainId appId,
-            CancellationToken ct)
-        {
-            var statistics = await Collection.Find(x => x.AppId == appId).ToListAsync(ct);
+    public async Task<IReadOnlyList<RuleStatistics>> QueryByAppAsync(DomainId appId,
+        CancellationToken ct)
+    {
+        var statistics = await Collection.Find(x => x.AppId == appId).ToListAsync(ct);
 
-            return statistics;
-        }
+        return statistics;
+    }
 
-        public Task IncrementSuccessAsync(DomainId appId, DomainId ruleId, Instant now,
-            CancellationToken ct)
-        {
-            return Collection.UpdateOneAsync(
-                x => x.AppId == appId && x.RuleId == ruleId,
-                Update
-                    .Inc(x => x.NumSucceeded, 1)
-                    .Set(x => x.LastExecuted, now)
-                    .SetOnInsert(x => x.AppId, appId)
-                    .SetOnInsert(x => x.RuleId, ruleId),
-                Upsert, ct);
-        }
+    public Task IncrementSuccessAsync(DomainId appId, DomainId ruleId, Instant now,
+        CancellationToken ct)
+    {
+        return Collection.UpdateOneAsync(
+            x => x.AppId == appId && x.RuleId == ruleId,
+            Update
+                .Inc(x => x.NumSucceeded, 1)
+                .Set(x => x.LastExecuted, now)
+                .SetOnInsert(x => x.AppId, appId)
+                .SetOnInsert(x => x.RuleId, ruleId),
+            Upsert, ct);
+    }
 
-        public Task IncrementFailedAsync(DomainId appId, DomainId ruleId, Instant now,
-            CancellationToken ct)
-        {
-            return Collection.UpdateOneAsync(
-                x => x.AppId == appId && x.RuleId == ruleId,
-                Update
-                    .Inc(x => x.NumFailed, 1)
-                    .Set(x => x.LastExecuted, now)
-                    .SetOnInsert(x => x.AppId, appId)
-                    .SetOnInsert(x => x.RuleId, ruleId),
-                Upsert, ct);
-        }
+    public Task IncrementFailedAsync(DomainId appId, DomainId ruleId, Instant now,
+        CancellationToken ct)
+    {
+        return Collection.UpdateOneAsync(
+            x => x.AppId == appId && x.RuleId == ruleId,
+            Update
+                .Inc(x => x.NumFailed, 1)
+                .Set(x => x.LastExecuted, now)
+                .SetOnInsert(x => x.AppId, appId)
+                .SetOnInsert(x => x.RuleId, ruleId),
+            Upsert, ct);
     }
 }

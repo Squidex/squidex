@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { EMPTY, Observable, of } from 'rxjs';
+import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
 import { AddFieldDto, CreateSchemaDto, FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from './../services/schemas.service';
@@ -186,6 +186,31 @@ export class SchemasState extends State<Snapshot> {
         }, 'Category Removed');
     }
 
+    public renameCategory(oldName: string, name: string) {
+        const schemas = this.snapshot.schemas.filter(x => x.category === oldName);
+
+        return forkJoin(schemas.map(s => this.schemasService.putCategory(this.appName, s, { name }, s.version))).pipe(
+            tap(updated => {
+                this.next(s => {
+                    let { schemas, selectedSchema } = s;
+
+                    for (const schema of updated) {
+                        schemas = schemas.replacedBy('id', schema).sortedByString(x => x.displayName);
+
+                        selectedSchema =
+                            schema &&
+                            selectedSchema &&
+                            selectedSchema.id === schema.id ?
+                            schema :
+                            selectedSchema;
+                    }
+
+                    return { ...s, schemas, selectedSchema };
+                }, 'Updated');
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
     public publish(schema: SchemaDto): Observable<SchemaDto> {
         return this.schemasService.publishSchema(this.appName, schema, schema.version).pipe(
             tap(updated => {
@@ -266,7 +291,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public orderFields(schema: SchemaDto, fields: ReadonlyArray<any>, parent?: RootFieldDto): Observable<SchemaDto> {
+    public orderFields(schema: SchemaDto, fields: ReadonlyArray<FieldDto>, parent?: RootFieldDto): Observable<SchemaDto> {
         return this.schemasService.putFieldOrdering(this.appName, parent || schema, fields.map(t => t.fieldId), schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');

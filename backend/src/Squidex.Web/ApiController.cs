@@ -16,117 +16,116 @@ using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+[Area("api")]
+[ApiController]
+[ApiExceptionFilter]
+[ApiModelValidation(false)]
+[Route(Constants.PrefixApi)]
+public abstract class ApiController : Controller
 {
-    [Area("api")]
-    [ApiController]
-    [ApiExceptionFilter]
-    [ApiModelValidation(false)]
-    [Route(Constants.PrefixApi)]
-    public abstract class ApiController : Controller
+    private readonly Lazy<Resources> resources;
+
+    protected ICommandBus CommandBus { get; }
+
+    protected IAppEntity App
     {
-        private readonly Lazy<Resources> resources;
-
-        protected ICommandBus CommandBus { get; }
-
-        protected IAppEntity App
+        get
         {
-            get
+            var app = HttpContext.Features.Get<IAppFeature>()?.App;
+
+            if (app == null)
             {
-                var app = HttpContext.Features.Get<IAppFeature>()?.App;
-
-                if (app == null)
-                {
-                    ThrowHelper.InvalidOperationException("Not in a app context.");
-                    return default!;
-                }
-
-                return app;
+                ThrowHelper.InvalidOperationException("Not in a app context.");
+                return default!;
             }
-        }
 
-        protected ITeamEntity Team
+            return app;
+        }
+    }
+
+    protected ITeamEntity Team
+    {
+        get
         {
-            get
+            var team = HttpContext.Features.Get<ITeamFeature>()?.Team;
+
+            if (team == null)
             {
-                var team = HttpContext.Features.Get<ITeamFeature>()?.Team;
-
-                if (team == null)
-                {
-                    ThrowHelper.InvalidOperationException("Not in a team context.");
-                    return default!;
-                }
-
-                return team;
+                ThrowHelper.InvalidOperationException("Not in a team context.");
+                return default!;
             }
-        }
 
-        protected ISchemaEntity Schema
+            return team;
+        }
+    }
+
+    protected ISchemaEntity Schema
+    {
+        get
         {
-            get
+            var schema = HttpContext.Features.Get<ISchemaFeature>()?.Schema;
+
+            if (schema == null)
             {
-                var schema = HttpContext.Features.Get<ISchemaFeature>()?.Schema;
-
-                if (schema == null)
-                {
-                    ThrowHelper.InvalidOperationException("Not in a schema context.");
-                    return default!;
-                }
-
-                return schema;
+                ThrowHelper.InvalidOperationException("Not in a schema context.");
+                return default!;
             }
-        }
 
-        protected string UserId
+            return schema;
+        }
+    }
+
+    protected string UserId
+    {
+        get
         {
-            get
+            var subject = User.OpenIdSubject();
+
+            if (string.IsNullOrWhiteSpace(subject))
             {
-                var subject = User.OpenIdSubject();
-
-                if (string.IsNullOrWhiteSpace(subject))
-                {
-                    throw new DomainForbiddenException(T.Get("common.httpOnlyAsUser"));
-                }
-
-                return subject;
+                throw new DomainForbiddenException(T.Get("common.httpOnlyAsUser"));
             }
-        }
 
-        protected bool IsFrontend
-        {
-            get => HttpContext.User.IsInClient(DefaultClients.Frontend);
+            return subject;
         }
+    }
 
-        protected string UserOrClientId
-        {
-            get => HttpContext.User.UserOrClientId()!;
-        }
+    protected bool IsFrontend
+    {
+        get => HttpContext.User.IsInClient(DefaultClients.Frontend);
+    }
 
-        protected Resources Resources
-        {
-            get => resources.Value;
-        }
+    protected string UserOrClientId
+    {
+        get => HttpContext.User.UserOrClientId()!;
+    }
 
-        protected Context Context
-        {
-            get => HttpContext.Context();
-        }
+    protected Resources Resources
+    {
+        get => resources.Value;
+    }
 
-        protected DomainId AppId
-        {
-            get => App.Id;
-        }
+    protected Context Context
+    {
+        get => HttpContext.Context();
+    }
 
-        protected DomainId TeamId
-        {
-            get => Team.Id;
-        }
+    protected DomainId AppId
+    {
+        get => App.Id;
+    }
 
-        protected ApiController(ICommandBus commandBus)
-        {
-            CommandBus = commandBus;
+    protected DomainId TeamId
+    {
+        get => Team.Id;
+    }
 
-            resources = new Lazy<Resources>(() => new Resources(this));
-        }
+    protected ApiController(ICommandBus commandBus)
+    {
+        CommandBus = commandBus;
+
+        resources = new Lazy<Resources>(() => new Resources(this));
     }
 }

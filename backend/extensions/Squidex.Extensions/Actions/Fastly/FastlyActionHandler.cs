@@ -11,64 +11,63 @@ using Squidex.Infrastructure;
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.Extensions.Actions.Fastly
+namespace Squidex.Extensions.Actions.Fastly;
+
+public sealed class FastlyActionHandler : RuleActionHandler<FastlyAction, FastlyJob>
 {
-    public sealed class FastlyActionHandler : RuleActionHandler<FastlyAction, FastlyJob>
+    private const string Description = "Purge key in fastly";
+
+    private readonly IHttpClientFactory httpClientFactory;
+
+    public FastlyActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
+        : base(formatter)
     {
-        private const string Description = "Purge key in fastly";
+        this.httpClientFactory = httpClientFactory;
+    }
 
-        private readonly IHttpClientFactory httpClientFactory;
+    protected override (string Description, FastlyJob Data) CreateJob(EnrichedEvent @event, FastlyAction action)
+    {
+        var id = string.Empty;
 
-        public FastlyActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
-            : base(formatter)
+        if (@event is IEnrichedEntityEvent entityEvent)
         {
-            this.httpClientFactory = httpClientFactory;
+            id = DomainId.Combine(@event.AppId.Id, entityEvent.Id).ToString();
         }
 
-        protected override (string Description, FastlyJob Data) CreateJob(EnrichedEvent @event, FastlyAction action)
+        var ruleJob = new FastlyJob
         {
-            var id = string.Empty;
+            Key = id,
+            FastlyApiKey = action.ApiKey,
+            FastlyServiceID = action.ServiceId
+        };
 
-            if (@event is IEnrichedEntityEvent entityEvent)
-            {
-                id = DomainId.Combine(@event.AppId.Id, entityEvent.Id).ToString();
-            }
+        return (Description, ruleJob);
+    }
 
-            var ruleJob = new FastlyJob
-            {
-                Key = id,
-                FastlyApiKey = action.ApiKey,
-                FastlyServiceID = action.ServiceId
-            };
-
-            return (Description, ruleJob);
-        }
-
-        protected override async Task<Result> ExecuteJobAsync(FastlyJob job,
-            CancellationToken ct = default)
+    protected override async Task<Result> ExecuteJobAsync(FastlyJob job,
+        CancellationToken ct = default)
+    {
+        using (var httpClient = httpClientFactory.CreateClient())
         {
-            using (var httpClient = httpClientFactory.CreateClient())
+            httpClient.Timeout = TimeSpan.FromSeconds(2);
+
+            var requestUrl = $"https://api.fastly.com/service/{job.FastlyServiceID}/purge/{job.Key}";
+
+            using (var request = new HttpRequestMessage(HttpMethod.Post, requestUrl))
             {
-                httpClient.Timeout = TimeSpan.FromSeconds(2);
+                request.Headers.Add("Fastly-Key", job.FastlyApiKey);
 
-                var requestUrl = $"https://api.fastly.com/service/{job.FastlyServiceID}/purge/{job.Key}";
-
-                using (var request = new HttpRequestMessage(HttpMethod.Post, requestUrl))
-                {
-                    request.Headers.Add("Fastly-Key", job.FastlyApiKey);
-
-                    return await httpClient.OneWayRequestAsync(request, ct: ct);
-                }
+                return await httpClient.OneWayRequestAsync(request, ct: ct);
             }
         }
     }
+}
 
-    public sealed class FastlyJob
-    {
-        public string FastlyApiKey { get; set; }
+public sealed class FastlyJob
+{
+    public string FastlyApiKey { get; set; }
 
-        public string FastlyServiceID { get; set; }
+    public string FastlyServiceID { get; set; }
 
-        public string Key { get; set; }
-    }
+    public string Key { get; set; }
 }

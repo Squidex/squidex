@@ -7,14 +7,14 @@
 
 /* eslint-disable no-useless-escape */
 
-import { FormControl, Validators } from '@angular/forms';
+import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, TemplatedFormArray, ValidatorsEx } from '@app/framework';
 import { AppDto, AppSettingsDto, CreateAppDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto } from './../services/apps.service';
 
 export class CreateAppForm extends Form<ExtendedFormGroup, CreateAppDto> {
     constructor() {
         super(new ExtendedFormGroup({
-            name: new FormControl('', [
+            name: new UntypedFormControl('', [
                 Validators.required,
                 Validators.maxLength(40),
                 ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:apps.appNameValidationMessage'),
@@ -26,7 +26,7 @@ export class CreateAppForm extends Form<ExtendedFormGroup, CreateAppDto> {
 export class TransferAppForm extends Form<ExtendedFormGroup, TransferToTeamDto, AppDto> {
     constructor() {
         super(new ExtendedFormGroup({
-            teamId: new FormControl('',
+            teamId: new UntypedFormControl('',
                 Validators.required,
             ),
         }));
@@ -36,10 +36,10 @@ export class TransferAppForm extends Form<ExtendedFormGroup, TransferToTeamDto, 
 export class UpdateAppForm extends Form<ExtendedFormGroup, UpdateAppDto, AppDto> {
     constructor() {
         super(new ExtendedFormGroup({
-            label: new FormControl('',
+            label: new UntypedFormControl('',
                 Validators.maxLength(40),
             ),
-            description: new FormControl('',
+            description: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
         }));
@@ -68,10 +68,10 @@ export class EditAppSettingsForm extends Form<ExtendedFormGroup, UpdateAppSettin
             patterns: new TemplatedFormArray(
                 PatternTemplate.INSTANCE,
             ),
-            hideScheduler: new FormControl(false,
+            hideScheduler: new UntypedFormControl(false,
                 Validators.nullValidator,
             ),
-            hideDateTimeButtons: new FormControl(false,
+            hideDateTimeButtons: new UntypedFormControl(false,
                 Validators.nullValidator,
             ),
             editors: new TemplatedFormArray(
@@ -86,13 +86,13 @@ class PatternTemplate {
 
     public createControl() {
         return new ExtendedFormGroup({
-            name: new FormControl('',
+            name: new UntypedFormControl('',
                 Validators.required,
             ),
-            regex: new FormControl('',
+            regex: new UntypedFormControl('',
                 Validators.required,
             ),
-            message: new FormControl('',
+            message: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
         });
@@ -104,10 +104,10 @@ class EditorTemplate {
 
     public createControl() {
         return new ExtendedFormGroup({
-            name: new FormControl('',
+            name: new UntypedFormControl('',
                 Validators.required,
             ),
-            url: new FormControl('',
+            url: new UntypedFormControl('',
                 Validators.required,
             ),
         });

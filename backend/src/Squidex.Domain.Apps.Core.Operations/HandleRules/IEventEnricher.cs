@@ -9,10 +9,9 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Domain.Apps.Core.HandleRules;
+
+public interface IEventEnricher
 {
-    public interface IEventEnricher
-    {
-        Task EnrichAsync(EnrichedEvent enrichedEvent, Envelope<AppEvent>? @event);
-    }
+    Task EnrichAsync(EnrichedEvent enrichedEvent, Envelope<AppEvent>? @event);
 }

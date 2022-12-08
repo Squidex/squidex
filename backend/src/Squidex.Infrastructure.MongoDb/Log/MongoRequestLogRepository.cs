@@ -10,78 +10,77 @@ using MongoDB.Driver;
 using NodaTime;
 using Squidex.Infrastructure.MongoDb;
 
-namespace Squidex.Infrastructure.Log
+namespace Squidex.Infrastructure.Log;
+
+public sealed class MongoRequestLogRepository : MongoRepositoryBase<MongoRequest>, IRequestLogRepository
 {
-    public sealed class MongoRequestLogRepository : MongoRepositoryBase<MongoRequest>, IRequestLogRepository
+    private readonly RequestLogStoreOptions options;
+
+    public MongoRequestLogRepository(IMongoDatabase database, IOptions<RequestLogStoreOptions> options)
+        : base(database)
     {
-        private readonly RequestLogStoreOptions options;
+        Guard.NotNull(options);
 
-        public MongoRequestLogRepository(IMongoDatabase database, IOptions<RequestLogStoreOptions> options)
-            : base(database)
+        this.options = options.Value;
+    }
+
+    protected override string CollectionName()
+    {
+        return "RequestLog";
+    }
+
+    protected override Task SetupCollectionAsync(IMongoCollection<MongoRequest> collection,
+        CancellationToken ct)
+    {
+        return collection.Indexes.CreateManyAsync(new[]
         {
-            Guard.NotNull(options);
+            new CreateIndexModel<MongoRequest>(
+                Index
+                    .Ascending(x => x.Key)
+                    .Ascending(x => x.Timestamp)),
+            new CreateIndexModel<MongoRequest>(
+                Index
+                    .Ascending(x => x.Timestamp),
+                new CreateIndexOptions
+                {
+                    ExpireAfter = TimeSpan.FromDays(options.StoreRetentionInDays)
+                })
+        }, ct);
+    }
 
-            this.options = options.Value;
+    public Task InsertManyAsync(IEnumerable<Request> items,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(items);
+
+        var entities = items.Select(MongoRequest.FromRequest).ToList();
+
+        if (entities.Count == 0)
+        {
+            return Task.CompletedTask;
         }
 
-        protected override string CollectionName()
-        {
-            return "RequestLog";
-        }
+        return Collection.InsertManyAsync(entities, InsertUnordered, ct);
+    }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoRequest> collection,
-            CancellationToken ct)
-        {
-            return collection.Indexes.CreateManyAsync(new[]
-            {
-                new CreateIndexModel<MongoRequest>(
-                    Index
-                        .Ascending(x => x.Key)
-                        .Ascending(x => x.Timestamp)),
-                new CreateIndexModel<MongoRequest>(
-                    Index
-                        .Ascending(x => x.Timestamp),
-                    new CreateIndexOptions
-                    {
-                        ExpireAfter = TimeSpan.FromDays(options.StoreRetentionInDays)
-                    })
-            }, ct);
-        }
+    public Task DeleteAsync(string key,
+        CancellationToken ct = default)
+    {
+        Guard.NotNullOrEmpty(key);
 
-        public Task InsertManyAsync(IEnumerable<Request> items,
-            CancellationToken ct = default)
-        {
-            Guard.NotNull(items);
+        return Collection.DeleteManyAsync(Filter.Eq(x => x.Key, key), ct);
+    }
 
-            var entities = items.Select(MongoRequest.FromRequest).ToList();
+    public IAsyncEnumerable<Request> QueryAllAsync(string key, DateTime fromDate, DateTime toDate,
+        CancellationToken ct = default)
+    {
+        Guard.NotNullOrEmpty(key);
 
-            if (entities.Count == 0)
-            {
-                return Task.CompletedTask;
-            }
+        var timestampStart = Instant.FromDateTimeUtc(fromDate);
+        var timestampEnd = Instant.FromDateTimeUtc(toDate.AddDays(1));
 
-            return Collection.InsertManyAsync(entities, InsertUnordered, ct);
-        }
+        var find = Collection.Find(x => x.Key == key && x.Timestamp >= timestampStart && x.Timestamp < timestampEnd);
 
-        public Task DeleteAsync(string key,
-            CancellationToken ct = default)
-        {
-            Guard.NotNullOrEmpty(key);
-
-            return Collection.DeleteManyAsync(Filter.Eq(x => x.Key, key), ct);
-        }
-
-        public IAsyncEnumerable<Request> QueryAllAsync(string key, DateTime fromDate, DateTime toDate,
-            CancellationToken ct = default)
-        {
-            Guard.NotNullOrEmpty(key);
-
-            var timestampStart = Instant.FromDateTimeUtc(fromDate);
-            var timestampEnd = Instant.FromDateTimeUtc(toDate.AddDays(1));
-
-            var find = Collection.Find(x => x.Key == key && x.Timestamp >= timestampStart && x.Timestamp < timestampEnd);
-
-            return find.ToAsyncEnumerable(ct).Select(x => x.ToRequest());
-        }
+        return find.ToAsyncEnumerable(ct).Select(x => x.ToRequest());
     }
 }

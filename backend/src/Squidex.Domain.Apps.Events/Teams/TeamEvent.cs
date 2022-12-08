@@ -7,10 +7,9 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Events.Teams
+namespace Squidex.Domain.Apps.Events.Teams;
+
+public abstract class TeamEvent : SquidexEvent
 {
-    public abstract class TeamEvent : SquidexEvent
-    {
-        public DomainId TeamId { get; set; }
-    }
+    public DomainId TeamId { get; set; }
 }

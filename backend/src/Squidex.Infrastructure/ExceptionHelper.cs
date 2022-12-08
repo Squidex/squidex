@@ -5,20 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+public static class ExceptionHelper
 {
-    public static class ExceptionHelper
+    public static bool Is<T>(this Exception ex) where T : Exception
     {
-        public static bool Is<T>(this Exception ex) where T : Exception
+        if (ex is AggregateException aggregateException)
         {
-            if (ex is AggregateException aggregateException)
-            {
-                aggregateException = aggregateException.Flatten();
+            aggregateException = aggregateException.Flatten();
 
-                return aggregateException.InnerExceptions.Count == 1 && Is<T>(aggregateException.InnerExceptions[0]);
-            }
-
-            return ex is T;
+            return aggregateException.InnerExceptions.Count == 1 && Is<T>(aggregateException.InnerExceptions[0]);
         }
+
+        return ex is T;
     }
 }

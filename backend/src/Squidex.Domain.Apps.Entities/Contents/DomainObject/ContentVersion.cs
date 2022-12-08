@@ -8,31 +8,30 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
+namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
+
+public sealed class ContentVersion
 {
-    public sealed class ContentVersion
+    public Status Status { get; }
+
+    public ContentData Data { get; }
+
+    public ContentVersion(Status status, ContentData data)
     {
-        public Status Status { get; }
+        Guard.NotNull(data);
 
-        public ContentData Data { get; }
+        Status = status;
 
-        public ContentVersion(Status status, ContentData data)
-        {
-            Guard.NotNull(data);
+        Data = data;
+    }
 
-            Status = status;
+    public ContentVersion WithStatus(Status status)
+    {
+        return new ContentVersion(status, Data);
+    }
 
-            Data = data;
-        }
-
-        public ContentVersion WithStatus(Status status)
-        {
-            return new ContentVersion(status, Data);
-        }
-
-        public ContentVersion WithData(ContentData data)
-        {
-            return new ContentVersion(Status, data);
-        }
+    public ContentVersion WithData(ContentData data)
+    {
+        return new ContentVersion(Status, data);
     }
 }

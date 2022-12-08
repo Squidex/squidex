@@ -8,25 +8,24 @@
 using CommandDotNet;
 using CommandDotNet.FluentValidation;
 
-namespace Squidex.Translator
-{
-    public static class Program
-    {
-        public static int Main(string[] args)
-        {
-            try
-            {
-                var appRunner =
-                    new AppRunner<Commands>()
-                        .UseFluentValidation(true);
+namespace Squidex.Translator;
 
-                return appRunner.Run(args);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("ERROR: {0}", ex);
-                return -1;
-            }
+public static class Program
+{
+    public static int Main(string[] args)
+    {
+        try
+        {
+            var appRunner =
+                new AppRunner<Commands>()
+                    .UseFluentValidation(true);
+
+            return appRunner.Run(args);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR: {0}", ex);
+            return -1;
         }
     }
 }

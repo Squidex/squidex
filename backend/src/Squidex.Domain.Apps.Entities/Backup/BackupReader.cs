@@ -14,118 +14,117 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Domain.Apps.Entities.Backup;
+
+public sealed class BackupReader : DisposableObjectBase, IBackupReader
 {
-    public sealed class BackupReader : DisposableObjectBase, IBackupReader
+    private readonly ZipArchive archive;
+    private readonly IJsonSerializer serializer;
+    private int readEvents;
+    private int readAttachments;
+
+    public int ReadEvents
     {
-        private readonly ZipArchive archive;
-        private readonly IJsonSerializer serializer;
-        private int readEvents;
-        private int readAttachments;
+        get => readEvents;
+    }
 
-        public int ReadEvents
+    public int ReadAttachments
+    {
+        get => readAttachments;
+    }
+
+    public BackupReader(IJsonSerializer serializer, Stream stream)
+    {
+        Guard.NotNull(serializer);
+
+        this.serializer = serializer;
+
+        archive = new ZipArchive(stream, ZipArchiveMode.Read, false);
+    }
+
+    protected override void DisposeObject(bool disposing)
+    {
+        if (disposing)
         {
-            get => readEvents;
+            archive.Dispose();
+        }
+    }
+
+    public Task<Stream> OpenBlobAsync(string name,
+        CancellationToken ct = default)
+    {
+        Guard.NotNullOrEmpty(name);
+
+        var entry = GetEntry(name);
+
+        return Task.FromResult(entry.Open());
+    }
+
+    public async Task<T> ReadJsonAsync<T>(string name,
+        CancellationToken ct = default)
+    {
+        Guard.NotNullOrEmpty(name);
+
+        var entry = GetEntry(name);
+
+        await using (var stream = entry.Open())
+        {
+            return serializer.Deserialize<T>(stream, null);
+        }
+    }
+
+    public Task<bool> HasFileAsync(string name,
+        CancellationToken ct = default)
+    {
+        Guard.NotNullOrEmpty(name);
+
+        var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
+
+        return Task.FromResult(attachmentEntry?.Length > 0);
+    }
+
+    private ZipArchiveEntry GetEntry(string name)
+    {
+        var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
+
+        if (attachmentEntry == null || attachmentEntry.Length == 0)
+        {
+            throw new FileNotFoundException("Cannot find attachment.", name);
         }
 
-        public int ReadAttachments
+        readAttachments++;
+
+        return attachmentEntry;
+    }
+
+    public async IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(
+        IEventStreamNames eventStreamNames,
+        IEventFormatter eventFormatter,
+        [EnumeratorCancellation] CancellationToken ct = default)
+    {
+        Guard.NotNull(eventFormatter);
+        Guard.NotNull(eventStreamNames);
+
+        while (!ct.IsCancellationRequested)
         {
-            get => readAttachments;
-        }
+            var entry = archive.GetEntry(ArchiveHelper.GetEventPath(readEvents));
 
-        public BackupReader(IJsonSerializer serializer, Stream stream)
-        {
-            Guard.NotNull(serializer);
-
-            this.serializer = serializer;
-
-            archive = new ZipArchive(stream, ZipArchiveMode.Read, false);
-        }
-
-        protected override void DisposeObject(bool disposing)
-        {
-            if (disposing)
+            if (entry == null)
             {
-                archive.Dispose();
+                break;
             }
-        }
-
-        public Task<Stream> OpenBlobAsync(string name,
-            CancellationToken ct = default)
-        {
-            Guard.NotNullOrEmpty(name);
-
-            var entry = GetEntry(name);
-
-            return Task.FromResult(entry.Open());
-        }
-
-        public async Task<T> ReadJsonAsync<T>(string name,
-            CancellationToken ct = default)
-        {
-            Guard.NotNullOrEmpty(name);
-
-            var entry = GetEntry(name);
 
             await using (var stream = entry.Open())
             {
-                return serializer.Deserialize<T>(stream, null);
-            }
-        }
+                var storedEvent = serializer.Deserialize<CompatibleStoredEvent>(stream).ToStoredEvent();
 
-        public Task<bool> HasFileAsync(string name,
-            CancellationToken ct = default)
-        {
-            Guard.NotNullOrEmpty(name);
+                var eventStream = storedEvent.StreamName;
+                var eventEnvelope = eventFormatter.Parse(storedEvent);
 
-            var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
-
-            return Task.FromResult(attachmentEntry?.Length > 0);
-        }
-
-        private ZipArchiveEntry GetEntry(string name)
-        {
-            var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
-
-            if (attachmentEntry == null || attachmentEntry.Length == 0)
-            {
-                throw new FileNotFoundException("Cannot find attachment.", name);
+                yield return (eventStream, eventEnvelope);
             }
 
-            readAttachments++;
-
-            return attachmentEntry;
-        }
-
-        public async IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(
-            IEventStreamNames eventStreamNames,
-            IEventFormatter eventFormatter,
-            [EnumeratorCancellation] CancellationToken ct = default)
-        {
-            Guard.NotNull(eventFormatter);
-            Guard.NotNull(eventStreamNames);
-
-            while (!ct.IsCancellationRequested)
-            {
-                var entry = archive.GetEntry(ArchiveHelper.GetEventPath(readEvents));
-
-                if (entry == null)
-                {
-                    break;
-                }
-
-                await using (var stream = entry.Open())
-                {
-                    var storedEvent = serializer.Deserialize<CompatibleStoredEvent>(stream).ToStoredEvent();
-
-                    var eventStream = storedEvent.StreamName;
-                    var eventEnvelope = eventFormatter.Parse(storedEvent);
-
-                    yield return (eventStream, eventEnvelope);
-                }
-
-                readEvents++;
-            }
+            readEvents++;
         }
     }
 }

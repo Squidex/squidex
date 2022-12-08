@@ -1,0 +1,27 @@
+<div class="nested-field" *ngIf="fieldGroup.separator">
+    <span class="nested-field-line-h"></span>
+
+    <sqx-field [field]="$any(fieldGroup.separator)" [languages]="languages" [parent]="parent" [plain]="true" [schema]="schema" [settings]="settings">
+        <div class="d-flex align-items-center">
+            <i cdkDragHandle class="icon-drag2 drag-handle"></i>
+    
+            <button type="button" class="btn btn-sm btn-text-secondary ms-2" (click)="toggle()">
+                <i [class.icon-caret-right]="snapshot.isCollapsed" [class.icon-caret-down]="!snapshot.isCollapsed"></i> 
+            </button>
+        </div>
+    </sqx-field>
+</div>
+
+<div *ngIf="!snapshot.isCollapsed" class="field-group nested-field" [class.field-placeholder]="fieldGroup.fields.length === 0 && !fieldsEmpty"
+    cdkDropList
+    [cdkDropListDisabled]="!sortable"
+    [cdkDropListData]="fieldGroup.fields"
+    (cdkDropListDropped)="sorted.emit($event)">
+    <div *ngFor="let field of fieldGroup.fields; trackBy: trackByFieldFn" class="nested-field table-drag" cdkDrag cdkDragLockAxis="y">
+        <span class="nested-field-line-h"></span>
+
+        <sqx-field [field]="$any(field)" [languages]="languages" [parent]="parent" [schema]="schema" [settings]="settings">
+            <i cdkDragHandle class="icon-drag2 drag-handle"></i>
+        </sqx-field>
+    </div>
+</div>

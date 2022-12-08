@@ -17,206 +17,205 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents;
+
+public sealed class BackupContents : IBackupHandler
 {
-    public sealed class BackupContents : IBackupHandler
+    private const int BatchSize = 100;
+    private const string UrlsFile = "Urls.json";
+    private readonly Dictionary<DomainId, HashSet<DomainId>> contentIdsBySchemaId = new Dictionary<DomainId, HashSet<DomainId>>();
+    private readonly Rebuilder rebuilder;
+    private readonly IUrlGenerator urlGenerator;
+    private Urls? assetsUrlNew;
+    private Urls? assetsUrlOld;
+
+    public string Name { get; } = "Contents";
+
+    public sealed class Urls
     {
-        private const int BatchSize = 100;
-        private const string UrlsFile = "Urls.json";
-        private readonly Dictionary<DomainId, HashSet<DomainId>> contentIdsBySchemaId = new Dictionary<DomainId, HashSet<DomainId>>();
-        private readonly Rebuilder rebuilder;
-        private readonly IUrlGenerator urlGenerator;
-        private Urls? assetsUrlNew;
-        private Urls? assetsUrlOld;
+        public string Assets { get; set; }
 
-        public string Name { get; } = "Contents";
+        public string AssetsApp { get; set; }
+    }
 
-        public sealed class Urls
+    public BackupContents(Rebuilder rebuilder, IUrlGenerator urlGenerator)
+    {
+        this.rebuilder = rebuilder;
+        this.urlGenerator = urlGenerator;
+    }
+
+    public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context,
+        CancellationToken ct)
+    {
+        if (@event.Payload is AppCreated appCreated)
         {
-            public string Assets { get; set; }
+            var urls = GetUrls(appCreated.Name);
 
-            public string AssetsApp { get; set; }
+            await context.Writer.WriteJsonAsync(UrlsFile, urls, ct);
+        }
+    }
+
+    public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
+        CancellationToken ct)
+    {
+        switch (@event.Payload)
+        {
+            case AppCreated appCreated:
+                assetsUrlNew = GetUrls(appCreated.Name);
+                assetsUrlOld = await ReadUrlsAsync(context.Reader, ct);
+                break;
+            case SchemaDeleted schemaDeleted:
+                contentIdsBySchemaId.Remove(schemaDeleted.SchemaId.Id);
+                break;
+            case ContentCreated contentCreated:
+                contentIdsBySchemaId.GetOrAddNew(contentCreated.SchemaId.Id)
+                    .Add(@event.Headers.AggregateId());
+
+                if (assetsUrlNew != null && assetsUrlOld != null)
+                {
+                    ReplaceAssetUrl(contentCreated.Data);
+                }
+
+                break;
+            case ContentUpdated contentUpdated:
+                if (assetsUrlNew != null && assetsUrlOld != null)
+                {
+                    ReplaceAssetUrl(contentUpdated.Data);
+                }
+
+                break;
         }
 
-        public BackupContents(Rebuilder rebuilder, IUrlGenerator urlGenerator)
-        {
-            this.rebuilder = rebuilder;
-            this.urlGenerator = urlGenerator;
-        }
+        return true;
+    }
 
-        public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context,
-            CancellationToken ct)
+    private void ReplaceAssetUrl(ContentData data)
+    {
+        foreach (var field in data.Values)
         {
-            if (@event.Payload is AppCreated appCreated)
+            if (field != null)
             {
-                var urls = GetUrls(appCreated.Name);
-
-                await context.Writer.WriteJsonAsync(UrlsFile, urls, ct);
+                ReplaceAssetUrl(field);
             }
         }
+    }
 
-        public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
-            CancellationToken ct)
+    private void ReplaceAssetUrl(IDictionary<string, JsonValue> source)
+    {
+        List<(string, string)>? replacements = null;
+
+        foreach (var (key, value) in source)
         {
-            switch (@event.Payload)
+            switch (value.Value)
             {
-                case AppCreated appCreated:
-                    assetsUrlNew = GetUrls(appCreated.Name);
-                    assetsUrlOld = await ReadUrlsAsync(context.Reader, ct);
-                    break;
-                case SchemaDeleted schemaDeleted:
-                    contentIdsBySchemaId.Remove(schemaDeleted.SchemaId.Id);
-                    break;
-                case ContentCreated contentCreated:
-                    contentIdsBySchemaId.GetOrAddNew(contentCreated.SchemaId.Id)
-                        .Add(@event.Headers.AggregateId());
-
-                    if (assetsUrlNew != null && assetsUrlOld != null)
+                case string s:
                     {
-                        ReplaceAssetUrl(contentCreated.Data);
+                        var newValue = s.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
+
+                        if (!ReferenceEquals(newValue, s))
+                        {
+                            replacements ??= new List<(string, string)>();
+                            replacements.Add((key, newValue));
+                            break;
+                        }
+
+                        newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets, StringComparison.Ordinal);
+
+                        if (!ReferenceEquals(newValue, s))
+                        {
+                            replacements ??= new List<(string, string)>();
+                            replacements.Add((key, newValue));
+                            break;
+                        }
                     }
 
                     break;
-                case ContentUpdated contentUpdated:
-                    if (assetsUrlNew != null && assetsUrlOld != null)
+
+                case JsonArray a:
+                    ReplaceAssetUrl(a);
+                    break;
+
+                case JsonObject o:
+                    ReplaceAssetUrl(o);
+                    break;
+            }
+        }
+
+        if (replacements != null)
+        {
+            foreach (var (key, newValue) in replacements)
+            {
+                source[key] = newValue;
+            }
+        }
+    }
+
+    private void ReplaceAssetUrl(List<JsonValue> source)
+    {
+        for (var i = 0; i < source.Count; i++)
+        {
+            var value = source[i];
+
+            switch (value.Value)
+            {
+                case string s:
                     {
-                        ReplaceAssetUrl(contentUpdated.Data);
+                        var newValue = s.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
+
+                        if (!ReferenceEquals(newValue, s))
+                        {
+                            source[i] = newValue;
+                            break;
+                        }
+
+                        newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets, StringComparison.Ordinal);
+
+                        if (!ReferenceEquals(newValue, s))
+                        {
+                            source[i] = newValue;
+                            break;
+                        }
                     }
 
                     break;
+
+                case JsonObject o:
+                    ReplaceAssetUrl(o);
+                    break;
             }
-
-            return true;
         }
+    }
 
-        private void ReplaceAssetUrl(ContentData data)
+    public async Task RestoreAsync(RestoreContext context,
+        CancellationToken ct)
+    {
+        var ids = contentIdsBySchemaId.Values.SelectMany(x => x);
+
+        if (ids.Any())
         {
-            foreach (var field in data.Values)
-            {
-                if (field != null)
-                {
-                    ReplaceAssetUrl(field);
-                }
-            }
+            await rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(ids, BatchSize, ct);
         }
+    }
 
-        private void ReplaceAssetUrl(IDictionary<string, JsonValue> source)
+    private static async Task<Urls?> ReadUrlsAsync(IBackupReader reader,
+        CancellationToken ct)
+    {
+        try
         {
-            List<(string, string)>? replacements = null;
-
-            foreach (var (key, value) in source)
-            {
-                switch (value.Value)
-                {
-                    case string s:
-                        {
-                            var newValue = s.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
-
-                            if (!ReferenceEquals(newValue, s))
-                            {
-                                replacements ??= new List<(string, string)>();
-                                replacements.Add((key, newValue));
-                                break;
-                            }
-
-                            newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets, StringComparison.Ordinal);
-
-                            if (!ReferenceEquals(newValue, s))
-                            {
-                                replacements ??= new List<(string, string)>();
-                                replacements.Add((key, newValue));
-                                break;
-                            }
-                        }
-
-                        break;
-
-                    case JsonArray a:
-                        ReplaceAssetUrl(a);
-                        break;
-
-                    case JsonObject o:
-                        ReplaceAssetUrl(o);
-                        break;
-                }
-            }
-
-            if (replacements != null)
-            {
-                foreach (var (key, newValue) in replacements)
-                {
-                    source[key] = newValue;
-                }
-            }
+            return await reader.ReadJsonAsync<Urls>(UrlsFile, ct);
         }
-
-        private void ReplaceAssetUrl(List<JsonValue> source)
+        catch
         {
-            for (var i = 0; i < source.Count; i++)
-            {
-                var value = source[i];
-
-                switch (value.Value)
-                {
-                    case string s:
-                        {
-                            var newValue = s.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
-
-                            if (!ReferenceEquals(newValue, s))
-                            {
-                                source[i] = newValue;
-                                break;
-                            }
-
-                            newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets, StringComparison.Ordinal);
-
-                            if (!ReferenceEquals(newValue, s))
-                            {
-                                source[i] = newValue;
-                                break;
-                            }
-                        }
-
-                        break;
-
-                    case JsonObject o:
-                        ReplaceAssetUrl(o);
-                        break;
-                }
-            }
+            return null;
         }
+    }
 
-        public async Task RestoreAsync(RestoreContext context,
-            CancellationToken ct)
+    private Urls GetUrls(string appName)
+    {
+        return new Urls
         {
-            var ids = contentIdsBySchemaId.Values.SelectMany(x => x);
-
-            if (ids.Any())
-            {
-                await rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(ids, BatchSize, ct);
-            }
-        }
-
-        private static async Task<Urls?> ReadUrlsAsync(IBackupReader reader,
-            CancellationToken ct)
-        {
-            try
-            {
-                return await reader.ReadJsonAsync<Urls>(UrlsFile, ct);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        private Urls GetUrls(string appName)
-        {
-            return new Urls
-            {
-                Assets = urlGenerator.AssetContentBase(),
-                AssetsApp = urlGenerator.AssetContentBase(appName)
-            };
-        }
+            Assets = urlGenerator.AssetContentBase(),
+            AssetsApp = urlGenerator.AssetContentBase(appName)
+        };
     }
 }

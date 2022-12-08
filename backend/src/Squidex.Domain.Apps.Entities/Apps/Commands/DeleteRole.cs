@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands
+namespace Squidex.Domain.Apps.Entities.Apps.Commands;
+
+public sealed class DeleteRole : AppCommand
 {
-    public sealed class DeleteRole : AppCommand
-    {
-        public string Name { get; set; }
-    }
+    public string Name { get; set; }
 }

@@ -730,11 +730,17 @@
   <data name="history.apps.clientUpdated" xml:space="preserve">
     <value>Aggiornato client {[Id]}</value>
   </data>
+  <data name="history.apps.common.updated" xml:space="preserve">
+    <value>updated general settings</value>
+  </data>
   <data name="history.apps.contributoreAssigned" xml:space="preserve">
     <value>Associato {user:[Contributor]} al ruolo {[Role]}</value>
   </data>
   <data name="history.apps.contributoreRemoved" xml:space="preserve">
     <value>Rimosso {user:[Contributor]} dall'app</value>
+  </data>
+  <data name="history.apps.created" xml:space="preserve">
+    <value>created the app.</value>
   </data>
   <data name="history.apps.imageRemoved" xml:space="preserve">
     <value>removed app image</value>
@@ -775,8 +781,14 @@
   <data name="history.apps.transfered" xml:space="preserve">
     <value>updated app to client</value>
   </data>
-  <data name="history.apps.updated" xml:space="preserve">
-    <value>updated general settings</value>
+  <data name="history.apps.workflowAdded" xml:space="preserve">
+    <value>added workflow {[Name]}.</value>
+  </data>
+  <data name="history.apps.workflowDeleted" xml:space="preserve">
+    <value>deleted a workflow.</value>
+  </data>
+  <data name="history.apps.workflowUpdated" xml:space="preserve">
+    <value>updated a workflow.</value>
   </data>
   <data name="history.assets.replaced" xml:space="preserve">
     <value>ha sostituito la risorsa.</value>
@@ -854,19 +866,22 @@
     <value>ha cambiato lo stato del contenuto {[Schema]} in {[Status]}.</value>
   </data>
   <data name="history.teams.contributoreAssigned" xml:space="preserve">
-    <value>assigned {user:[Contributor]} as {[Role]}</value>
+    <value>assigned {user:[Contributor]} as {[Role]}.</value>
   </data>
   <data name="history.teams.contributoreRemoved" xml:space="preserve">
-    <value>removed {user:[Contributor]} from team</value>
+    <value>removed {user:[Contributor]} from team.</value>
+  </data>
+  <data name="history.teams.created" xml:space="preserve">
+    <value>has created team {[Name]}.</value>
   </data>
   <data name="history.teams.planChanged" xml:space="preserve">
-    <value>changed plan to {[Plan]}</value>
+    <value>changed plan to {[Plan]}.</value>
   </data>
   <data name="history.teams.planReset" xml:space="preserve">
-    <value>resetted plan</value>
+    <value>resetted plan.</value>
   </data>
   <data name="history.teams.updated" xml:space="preserve">
-    <value>updated general settings</value>
+    <value>updated general settings and renamed name to {[Name]}.</value>
   </data>
   <data name="login.githubPrivateEmail" xml:space="preserve">
     <value>Il tuo indirizzo email è impostato su privato in Github. Impostalo come pubblico per poter utilizzare il login Github.</value>

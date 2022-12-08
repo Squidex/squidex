@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { TeamPlansService } from '@app/features/teams/internal';
-import { DialogService, LoadingState, PlanDto, PlanLockedReason, shareSubscribed, State, TeamsState, Version } from '@app/shared';
+import { DialogService, LoadingState, PlanDto, PlanLockedReason, ReferralDto, shareSubscribed, State, TeamsState, Version } from '@app/shared';
 
 export interface PlanInfo {
     // The plan.
@@ -31,6 +31,9 @@ interface Snapshot extends LoadingState {
 
     // The portal link if available.
     portalLink?: string;
+
+    // The referral info.
+    referral?: ReferralDto;
 
     // The reason why the plan cannot be changed.
     locked?: PlanLockedReason;
@@ -55,6 +58,9 @@ export class TeamPlansState extends State<Snapshot> {
 
     public locked =
         this.project(x => x.locked);
+
+    public referral =
+        this.project(x => x.referral);
 
     public portalLink =
         this.project(x => x.portalLink);
@@ -100,6 +106,7 @@ export class TeamPlansState extends State<Snapshot> {
                     planOwner: payload.planOwner,
                     plans,
                     portalLink: payload.portalLink,
+                    referral: payload.referral,
                     version,
                 }, 'Loading Success');
             }),

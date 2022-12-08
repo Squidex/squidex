@@ -7,30 +7,29 @@
 
 using Squidex.Domain.Apps.Core.Contents;
 
-namespace Squidex.Areas.Api.Controllers.Apps.Models
+namespace Squidex.Areas.Api.Controllers.Apps.Models;
+
+public sealed class WorkflowTransitionDto
 {
-    public sealed class WorkflowTransitionDto
+    /// <summary>
+    /// The optional expression.
+    /// </summary>
+    public string? Expression { get; set; }
+
+    /// <summary>
+    /// The optional restricted role.
+    /// </summary>
+    public string[]? Roles { get; set; }
+
+    public static WorkflowTransitionDto FromDomain(WorkflowTransition transition)
     {
-        /// <summary>
-        /// The optional expression.
-        /// </summary>
-        public string? Expression { get; set; }
+        var result = new WorkflowTransitionDto { Expression = transition.Expression, Roles = transition.Roles?.ToArray() };
 
-        /// <summary>
-        /// The optional restricted role.
-        /// </summary>
-        public string[]? Roles { get; set; }
+        return result;
+    }
 
-        public static WorkflowTransitionDto FromDomain(WorkflowTransition transition)
-        {
-            var result = new WorkflowTransitionDto { Expression = transition.Expression, Roles = transition.Roles?.ToArray() };
-
-            return result;
-        }
-
-        public WorkflowTransition ToWorkflowTransition()
-        {
-            return WorkflowTransition.When(Expression, Roles);
-        }
+    public WorkflowTransition ToWorkflowTransition()
+    {
+        return WorkflowTransition.When(Expression, Roles);
     }
 }

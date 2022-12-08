@@ -9,13 +9,12 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Core.Subscriptions
-{
-    public interface ISubscriptionEventCreator
-    {
-        bool Handles(AppEvent @event);
+namespace Squidex.Domain.Apps.Core.Subscriptions;
 
-        ValueTask<EnrichedEvent?> CreateEnrichedEventsAsync(Envelope<AppEvent> @event,
-            CancellationToken ct);
-    }
+public interface ISubscriptionEventCreator
+{
+    bool Handles(AppEvent @event);
+
+    ValueTask<EnrichedEvent?> CreateEnrichedEventsAsync(Envelope<AppEvent> @event,
+        CancellationToken ct);
 }

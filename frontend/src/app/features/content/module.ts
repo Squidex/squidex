@@ -18,9 +18,6 @@ const routes: Routes = [
         canActivate: [LoadLanguagesGuard, LoadSchemasGuard],
         children: [
             {
-                path: '',
-            },
-            {
                 path: '__calendar',
                 component: CalendarPageComponent,
             },

@@ -8,90 +8,89 @@
 using Squidex.Caching;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text.State
+namespace Squidex.Domain.Apps.Entities.Contents.Text.State;
+
+public sealed class CachingTextIndexerState : ITextIndexerState
 {
-    public sealed class CachingTextIndexerState : ITextIndexerState
+    private readonly ITextIndexerState inner;
+    private readonly LRUCache<DomainId, Tuple<TextContentState?>> cache = new LRUCache<DomainId, Tuple<TextContentState?>>(10000);
+
+    public CachingTextIndexerState(ITextIndexerState inner)
     {
-        private readonly ITextIndexerState inner;
-        private readonly LRUCache<DomainId, Tuple<TextContentState?>> cache = new LRUCache<DomainId, Tuple<TextContentState?>>(10000);
+        Guard.NotNull(inner);
 
-        public CachingTextIndexerState(ITextIndexerState inner)
+        this.inner = inner;
+    }
+
+    public async Task ClearAsync(
+        CancellationToken ct = default)
+    {
+        await inner.ClearAsync(ct);
+
+        cache.Clear();
+    }
+
+    public async Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(ids);
+
+        var missingIds = new HashSet<DomainId>();
+
+        var result = new Dictionary<DomainId, TextContentState>();
+
+        foreach (var id in ids)
         {
-            Guard.NotNull(inner);
-
-            this.inner = inner;
-        }
-
-        public async Task ClearAsync(
-            CancellationToken ct = default)
-        {
-            await inner.ClearAsync(ct);
-
-            cache.Clear();
-        }
-
-        public async Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids,
-            CancellationToken ct = default)
-        {
-            Guard.NotNull(ids);
-
-            var missingIds = new HashSet<DomainId>();
-
-            var result = new Dictionary<DomainId, TextContentState>();
-
-            foreach (var id in ids)
+            if (cache.TryGetValue(id, out var state))
             {
-                if (cache.TryGetValue(id, out var state))
+                if (state.Item1 != null)
                 {
-                    if (state.Item1 != null)
-                    {
-                        result[id] = state.Item1;
-                    }
-                }
-                else
-                {
-                    missingIds.Add(id);
+                    result[id] = state.Item1;
                 }
             }
-
-            if (missingIds.Count > 0)
+            else
             {
-                var fromInner = await inner.GetAsync(missingIds, ct);
-
-                foreach (var (id, state) in fromInner)
-                {
-                    result[id] = state;
-                }
-
-                foreach (var id in missingIds)
-                {
-                    var state = fromInner.GetValueOrDefault(id);
-
-                    cache.Set(id, Tuple.Create<TextContentState?>(state));
-                }
+                missingIds.Add(id);
             }
-
-            return result;
         }
 
-        public Task SetAsync(List<TextContentState> updates,
-            CancellationToken ct = default)
+        if (missingIds.Count > 0)
         {
-            Guard.NotNull(updates);
+            var fromInner = await inner.GetAsync(missingIds, ct);
 
-            foreach (var update in updates)
+            foreach (var (id, state) in fromInner)
             {
-                if (update.IsDeleted)
-                {
-                    cache.Set(update.UniqueContentId, Tuple.Create<TextContentState?>(null));
-                }
-                else
-                {
-                    cache.Set(update.UniqueContentId, Tuple.Create<TextContentState?>(update));
-                }
+                result[id] = state;
             }
 
-            return inner.SetAsync(updates, ct);
+            foreach (var id in missingIds)
+            {
+                var state = fromInner.GetValueOrDefault(id);
+
+                cache.Set(id, Tuple.Create<TextContentState?>(state));
+            }
         }
+
+        return result;
+    }
+
+    public Task SetAsync(List<TextContentState> updates,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(updates);
+
+        foreach (var update in updates)
+        {
+            if (update.IsDeleted)
+            {
+                cache.Set(update.UniqueContentId, Tuple.Create<TextContentState?>(null));
+            }
+            else
+            {
+                cache.Set(update.UniqueContentId, Tuple.Create<TextContentState?>(update));
+            }
+        }
+
+        return inner.SetAsync(updates, ct);
     }
 }

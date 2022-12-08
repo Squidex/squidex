@@ -6,7 +6,7 @@
  */
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { FieldDto, ResourceOwner, SchemaTagSource, STRING_FIELD_EDITORS, StringFieldPropertiesDto, valueProjection$ } from '@app/shared';
 
@@ -19,7 +19,7 @@ export class StringUIComponent extends ResourceOwner implements OnChanges {
     public readonly editors = STRING_FIELD_EDITORS;
 
     @Input()
-    public fieldForm!: FormGroup;
+    public fieldForm!: UntypedFormGroup;
 
     @Input()
     public field!: FieldDto;

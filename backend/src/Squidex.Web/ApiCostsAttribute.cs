@@ -8,17 +8,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Web.Pipeline;
 
-namespace Squidex.Web
-{
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public sealed class ApiCostsAttribute : ServiceFilterAttribute, IApiCostsFeature
-    {
-        public double Costs { get; }
+namespace Squidex.Web;
 
-        public ApiCostsAttribute(double costs)
-            : base(typeof(ApiCostsFilter))
-        {
-            Costs = costs;
-        }
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+public sealed class ApiCostsAttribute : ServiceFilterAttribute, IApiCostsFeature
+{
+    public double Costs { get; }
+
+    public ApiCostsAttribute(double costs)
+        : base(typeof(ApiCostsFilter))
+    {
+        Costs = costs;
     }
 }

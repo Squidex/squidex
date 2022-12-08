@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.ValidateContent
+namespace Squidex.Domain.Apps.Core.ValidateContent;
+
+public interface IValidator
 {
-    public interface IValidator
-    {
-        void Validate(object? value, ValidationContext context);
-    }
+    void Validate(object? value, ValidationContext context);
 }

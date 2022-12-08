@@ -7,11 +7,10 @@
 
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Comments
+namespace Squidex.Domain.Apps.Events.Comments;
+
+[EventType(nameof(CommentUpdated))]
+public sealed class CommentUpdated : CommentsEvent
 {
-    [EventType(nameof(CommentUpdated))]
-    public sealed class CommentUpdated : CommentsEvent
-    {
-        public string Text { get; set; }
-    }
+    public string Text { get; set; }
 }

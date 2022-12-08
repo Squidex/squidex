@@ -10,20 +10,19 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
+namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields;
+
+public sealed class ComponentFieldPropertiesDto : FieldPropertiesDto
 {
-    public sealed class ComponentFieldPropertiesDto : FieldPropertiesDto
+    /// <summary>
+    /// The ID of the embedded schemas.
+    /// </summary>
+    public ReadonlyList<DomainId>? SchemaIds { get; set; }
+
+    public override FieldProperties ToProperties()
     {
-        /// <summary>
-        /// The ID of the embedded schemas.
-        /// </summary>
-        public ReadonlyList<DomainId>? SchemaIds { get; set; }
+        var result = SimpleMapper.Map(this, new ComponentFieldProperties());
 
-        public override FieldProperties ToProperties()
-        {
-            var result = SimpleMapper.Map(this, new ComponentFieldProperties());
-
-            return result;
-        }
+        return result;
     }
 }

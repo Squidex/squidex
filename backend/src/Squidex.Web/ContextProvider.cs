@@ -8,34 +8,33 @@
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
 
-namespace Squidex.Web
+namespace Squidex.Web;
+
+public sealed class ContextProvider : IContextProvider
 {
-    public sealed class ContextProvider : IContextProvider
+    private readonly IHttpContextAccessor httpContextAccessor;
+    private readonly AsyncLocal<Context> asyncLocal = new AsyncLocal<Context>();
+
+    public Context Context
     {
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly AsyncLocal<Context> asyncLocal = new AsyncLocal<Context>();
-
-        public Context Context
+        get
         {
-            get
+            if (httpContextAccessor.HttpContext == null)
             {
-                if (httpContextAccessor.HttpContext == null)
+                if (asyncLocal.Value == null)
                 {
-                    if (asyncLocal.Value == null)
-                    {
-                        asyncLocal.Value = Context.Anonymous(null!);
-                    }
-
-                    return asyncLocal.Value;
+                    asyncLocal.Value = Context.Anonymous(null!);
                 }
 
-                return httpContextAccessor.HttpContext.Context();
+                return asyncLocal.Value;
             }
-        }
 
-        public ContextProvider(IHttpContextAccessor httpContextAccessor)
-        {
-            this.httpContextAccessor = httpContextAccessor;
+            return httpContextAccessor.HttpContext.Context();
         }
+    }
+
+    public ContextProvider(IHttpContextAccessor httpContextAccessor)
+    {
+        this.httpContextAccessor = httpContextAccessor;
     }
 }

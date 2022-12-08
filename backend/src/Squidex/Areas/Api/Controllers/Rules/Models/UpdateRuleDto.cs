@@ -5,44 +5,41 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text.Json.Serialization;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Areas.Api.Controllers.Rules.Models
+namespace Squidex.Areas.Api.Controllers.Rules.Models;
+
+public sealed class UpdateRuleDto
 {
-    public sealed class UpdateRuleDto
+    /// <summary>
+    /// Optional rule name.
+    /// </summary>
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// The trigger properties.
+    /// </summary>
+    public RuleTriggerDto? Trigger { get; set; }
+
+    /// <summary>
+    /// The action properties.
+    /// </summary>
+    public RuleAction? Action { get; set; }
+
+    /// <summary>
+    /// Enable or disable the rule.
+    /// </summary>
+    public bool? IsEnabled { get; set; }
+
+    public UpdateRule ToCommand(DomainId id)
     {
-        /// <summary>
-        /// Optional rule name.
-        /// </summary>
-        public string? Name { get; set; }
+        var command = SimpleMapper.Map(this, new UpdateRule { RuleId = id });
 
-        /// <summary>
-        /// The trigger properties.
-        /// </summary>
-        public RuleTriggerDto? Trigger { get; set; }
+        command.Trigger = Trigger?.ToTrigger();
 
-        /// <summary>
-        /// The action properties.
-        /// </summary>
-        [JsonConverter(typeof(RuleActionConverter))]
-        public RuleAction? Action { get; set; }
-
-        /// <summary>
-        /// Enable or disable the rule.
-        /// </summary>
-        public bool? IsEnabled { get; set; }
-
-        public UpdateRule ToCommand(DomainId id)
-        {
-            var command = SimpleMapper.Map(this, new UpdateRule { RuleId = id });
-
-            command.Trigger = Trigger?.ToTrigger();
-
-            return command;
-        }
+        return command;
     }
 }

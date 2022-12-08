@@ -8,158 +8,157 @@
 using System.Threading.Channels;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Infrastructure.EventSourcing.Consume
+namespace Squidex.Infrastructure.EventSourcing.Consume;
+
+internal sealed class BatchSubscription : IEventSubscriber<ParsedEvent>, IEventSubscription
 {
-    internal sealed class BatchSubscription : IEventSubscriber<ParsedEvent>, IEventSubscription
+    private readonly IEventSubscription eventSubscription;
+    private readonly Channel<object> taskQueue;
+    private readonly Channel<object> batchQueue;
+    private readonly Task handleTask;
+    private readonly CancellationTokenSource completed = new CancellationTokenSource();
+
+    public BatchSubscription(
+        IEventConsumer eventConsumer,
+        IEventSubscriber<ParsedEvents> eventSubscriber,
+        EventSubscriptionSource<ParsedEvent> eventSource)
     {
-        private readonly IEventSubscription eventSubscription;
-        private readonly Channel<object> taskQueue;
-        private readonly Channel<object> batchQueue;
-        private readonly Task handleTask;
-        private readonly CancellationTokenSource completed = new CancellationTokenSource();
+        var batchSize = Math.Max(1, eventConsumer.BatchSize);
+        var batchDelay = Math.Max(100, eventConsumer.BatchDelay);
 
-        public BatchSubscription(
-            IEventConsumer eventConsumer,
-            IEventSubscriber<ParsedEvents> eventSubscriber,
-            EventSubscriptionSource<ParsedEvent> eventSource)
+        taskQueue = Channel.CreateBounded<object>(new BoundedChannelOptions(2)
         {
-            var batchSize = Math.Max(1, eventConsumer.BatchSize);
-            var batchDelay = Math.Max(100, eventConsumer.BatchDelay);
+            SingleReader = true,
+            SingleWriter = true
+        });
 
-            taskQueue = Channel.CreateBounded<object>(new BoundedChannelOptions(2)
-            {
-                SingleReader = true,
-                SingleWriter = true
-            });
-
-            batchQueue = Channel.CreateBounded<object>(new BoundedChannelOptions(batchSize)
-            {
-                AllowSynchronousContinuations = true,
-                SingleReader = true,
-                SingleWriter = true
-            });
-
-            batchQueue.Batch<ParsedEvent>(taskQueue, batchSize, batchDelay, completed.Token);
-
-            handleTask = Run(eventSubscriber);
-
-            // Run last to subscribe after everything is configured.
-            eventSubscription = eventSource(this);
-        }
-
-        private async Task Run(IEventSubscriber<ParsedEvents> eventSink)
+        batchQueue = Channel.CreateBounded<object>(new BoundedChannelOptions(batchSize)
         {
-            try
-            {
-                var isStopped = false;
+            AllowSynchronousContinuations = true,
+            SingleReader = true,
+            SingleWriter = true
+        });
 
-                await foreach (var task in taskQueue.Reader.ReadAllAsync(completed.Token))
+        batchQueue.Batch<ParsedEvent>(taskQueue, batchSize, batchDelay, completed.Token);
+
+        handleTask = Run(eventSubscriber);
+
+        // Run last to subscribe after everything is configured.
+        eventSubscription = eventSource(this);
+    }
+
+    private async Task Run(IEventSubscriber<ParsedEvents> eventSink)
+    {
+        try
+        {
+            var isStopped = false;
+
+            await foreach (var task in taskQueue.Reader.ReadAllAsync(completed.Token))
+            {
+                switch (task)
                 {
-                    switch (task)
-                    {
-                        case Exception exception when exception is not OperationCanceledException:
+                    case Exception exception when exception is not OperationCanceledException:
+                        {
+                            if (!completed.IsCancellationRequested)
                             {
-                                if (!completed.IsCancellationRequested)
-                                {
-                                    await eventSink.OnErrorAsync(this, exception);
-                                }
-
-                                isStopped = true;
-                                break;
+                                await eventSink.OnErrorAsync(this, exception);
                             }
 
-                        case List<ParsedEvent> batch:
+                            isStopped = true;
+                            break;
+                        }
+
+                    case List<ParsedEvent> batch:
+                        {
+                            if (!completed.IsCancellationRequested)
                             {
-                                if (!completed.IsCancellationRequested)
-                                {
-                                    // Events can be null if the event consumer is not interested in the stored event.
-                                    var eventList = batch.Select(x => x.Event).NotNull().ToList();
-                                    var eventPosition = batch[^1].Position;
+                                // Events can be null if the event consumer is not interested in the stored event.
+                                var eventList = batch.Select(x => x.Event).NotNull().ToList();
+                                var eventPosition = batch[^1].Position;
 
-                                    // Use a struct here to save a few allocations.
-                                    await eventSink.OnNextAsync(this, new ParsedEvents(eventList, eventPosition));
-                                }
-
-                                break;
+                                // Use a struct here to save a few allocations.
+                                await eventSink.OnNextAsync(this, new ParsedEvents(eventList, eventPosition));
                             }
-                    }
 
-                    if (isStopped)
-                    {
-                        break;
-                    }
+                            break;
+                        }
                 }
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-            catch (Exception ex)
-            {
-                if (!completed.IsCancellationRequested)
+
+                if (isStopped)
                 {
-                    await eventSink.OnErrorAsync(this, ex);
+                    break;
                 }
             }
         }
-
-        public void Dispose()
+        catch (OperationCanceledException)
         {
-            if (completed.IsCancellationRequested)
-            {
-                return;
-            }
-
-            // It is not necessary to dispose the cancellation token source.
-            completed.Cancel();
-
-            // We do not lock here, it is the responsibility of the source subscription to be thread safe.
-            eventSubscription.Dispose();
+            return;
         }
-
-        public async ValueTask CompleteAsync()
+        catch (Exception ex)
         {
-            await eventSubscription.CompleteAsync();
-
-            batchQueue.Writer.TryComplete();
-
-            await handleTask;
-        }
-
-        public void WakeUp()
-        {
-            eventSubscription.WakeUp();
-        }
-
-        async ValueTask IEventSubscriber<ParsedEvent>.OnErrorAsync(IEventSubscription subscription, Exception exception)
-        {
-            try
+            if (!completed.IsCancellationRequested)
             {
-                // Forward the exception from one task only, but bypass the batch.
-                await taskQueue.Writer.WriteAsync(exception, completed.Token);
-            }
-            catch (OperationCanceledException)
-            {
-                // These exception are acceptable and happens when an exception has been thrown before.
-            }
-            catch (ChannelClosedException)
-            {
+                await eventSink.OnErrorAsync(this, ex);
             }
         }
+    }
 
-        async ValueTask IEventSubscriber<ParsedEvent>.OnNextAsync(IEventSubscription subscription, ParsedEvent @event)
+    public void Dispose()
+    {
+        if (completed.IsCancellationRequested)
         {
-            try
-            {
-                await batchQueue.Writer.WriteAsync(@event, completed.Token);
-            }
-            catch (OperationCanceledException)
-            {
-                // These exception are acceptable and happens when an exception has been thrown before.
-            }
-            catch (ChannelClosedException)
-            {
-            }
+            return;
+        }
+
+        // It is not necessary to dispose the cancellation token source.
+        completed.Cancel();
+
+        // We do not lock here, it is the responsibility of the source subscription to be thread safe.
+        eventSubscription.Dispose();
+    }
+
+    public async ValueTask CompleteAsync()
+    {
+        await eventSubscription.CompleteAsync();
+
+        batchQueue.Writer.TryComplete();
+
+        await handleTask;
+    }
+
+    public void WakeUp()
+    {
+        eventSubscription.WakeUp();
+    }
+
+    async ValueTask IEventSubscriber<ParsedEvent>.OnErrorAsync(IEventSubscription subscription, Exception exception)
+    {
+        try
+        {
+            // Forward the exception from one task only, but bypass the batch.
+            await taskQueue.Writer.WriteAsync(exception, completed.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // These exception are acceptable and happens when an exception has been thrown before.
+        }
+        catch (ChannelClosedException)
+        {
+        }
+    }
+
+    async ValueTask IEventSubscriber<ParsedEvent>.OnNextAsync(IEventSubscription subscription, ParsedEvent @event)
+    {
+        try
+        {
+            await batchQueue.Writer.WriteAsync(@event, completed.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // These exception are acceptable and happens when an exception has been thrown before.
+        }
+        catch (ChannelClosedException)
+        {
         }
     }
 }

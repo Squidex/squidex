@@ -5,57 +5,54 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FluentAssertions;
 using Squidex.Infrastructure.Validation;
-using Xunit;
 using Xunit.Sdk;
 
-namespace Squidex.Domain.Apps.Entities.TestHelpers
+namespace Squidex.Domain.Apps.Entities.TestHelpers;
+
+public static class ValidationAssert
 {
-    public static class ValidationAssert
+    public static void Throws(Action action, params ValidationError[] errors)
     {
-        public static void Throws(Action action, params ValidationError[] errors)
+        try
         {
-            try
-            {
-                action();
+            action();
 
-                Assert.True(false, $"Expected {typeof(ValidationException)} but succeeded");
-            }
-            catch (ValidationException ex)
-            {
-                ex.Errors.ToArray().Should().BeEquivalentTo(errors);
-            }
-            catch (XunitException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Assert.True(false, $"Excepted {typeof(ValidationException)}, but got {ex.GetType()}");
-            }
+            Assert.True(false, $"Expected {typeof(ValidationException)} but succeeded");
         }
-
-        public static async Task ThrowsAsync(Func<Task> action, params ValidationError[] errors)
+        catch (ValidationException ex)
         {
-            try
-            {
-                await action();
+            ex.Errors.ToArray().Should().BeEquivalentTo(errors);
+        }
+        catch (XunitException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Assert.True(false, $"Excepted {typeof(ValidationException)}, but got {ex.GetType()}");
+        }
+    }
 
-                Assert.True(false, $"Expected {typeof(ValidationException)} but succeeded");
-            }
-            catch (ValidationException ex)
-            {
-                ex.Errors.ToArray().Should().BeEquivalentTo(errors);
-            }
-            catch (XunitException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Assert.True(false, $"Excepted {typeof(ValidationException)}, but got {ex.GetType()}");
-            }
+    public static async Task ThrowsAsync(Func<Task> action, params ValidationError[] errors)
+    {
+        try
+        {
+            await action();
+
+            Assert.True(false, $"Expected {typeof(ValidationException)} but succeeded");
+        }
+        catch (ValidationException ex)
+        {
+            ex.Errors.ToArray().Should().BeEquivalentTo(errors);
+        }
+        catch (XunitException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Assert.True(false, $"Excepted {typeof(ValidationException)}, but got {ex.GetType()}");
         }
     }
 }

@@ -11,151 +11,150 @@ using TestSuite.Fixtures;
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
-namespace TestSuite.ApiTests
+namespace TestSuite.ApiTests;
+
+[UsesVerify]
+public class AppCreationTests : IClassFixture<ClientFixture>
 {
-    [UsesVerify]
-    public class AppCreationTests : IClassFixture<ClientFixture>
+    private readonly string appName = Guid.NewGuid().ToString();
+
+    public ClientFixture _ { get; }
+
+    public AppCreationTests(ClientFixture fixture)
     {
-        private readonly string appName = Guid.NewGuid().ToString();
+        _ = fixture;
+    }
 
-        public ClientFixture _ { get; }
-
-        public AppCreationTests(ClientFixture fixture)
+    [Fact]
+    public async Task Should_create_app()
+    {
+        // STEP 1: Create app
+        var createRequest = new CreateAppDto
         {
-            _ = fixture;
-        }
+            Name = appName
+        };
 
-        [Fact]
-        public async Task Should_create_app()
+        var app = await _.Apps.PostAppAsync(createRequest);
+
+        // Should return created app with correct name.
+        Assert.Equal(appName, app.Name);
+
+
+        // STEP 2: Get all apps
+        var apps = await _.Apps.GetAppsAsync();
+
+        // Should provide new app when apps are queried.
+        Assert.Contains(apps, x => x.Name == appName);
+
+
+        // STEP 3: Check contributors
+        var contributors = await _.Apps.GetContributorsAsync(appName);
+
+        // Should not add client itself as a contributor.
+        Assert.Empty(contributors.Items);
+
+
+        // STEP 4: Check clients
+        var clients = await _.Apps.GetClientsAsync(appName);
+
+        // Should create default client.
+        Assert.Contains(clients.Items, x => x.Id == "default");
+
+        await Verify(app);
+    }
+
+    [Fact]
+    public async Task Should_not_allow_creation_if_name_used()
+    {
+        // STEP 1: Create app
+        await CreateAppAsync();
+
+
+        // STEP 2: Create again and fail
+        var createRequest = new CreateAppDto
         {
-            // STEP 1: Create app
-            var createRequest = new CreateAppDto
-            {
-                Name = appName
-            };
+            Name = appName
+        };
 
-            var app = await _.Apps.PostAppAsync(createRequest);
-
-            // Should return created app with correct name.
-            Assert.Equal(appName, app.Name);
-
-
-            // STEP 2: Get all apps
-            var apps = await _.Apps.GetAppsAsync();
-
-            // Should provide new app when apps are queried.
-            Assert.Contains(apps, x => x.Name == appName);
-
-
-            // STEP 3: Check contributors
-            var contributors = await _.Apps.GetContributorsAsync(appName);
-
-            // Should not add client itself as a contributor.
-            Assert.Empty(contributors.Items);
-
-
-            // STEP 4: Check clients
-            var clients = await _.Apps.GetClientsAsync(appName);
-
-            // Should create default client.
-            Assert.Contains(clients.Items, x => x.Id == "default");
-
-            await Verify(app);
-        }
-
-        [Fact]
-        public async Task Should_not_allow_creation_if_name_used()
+        var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
         {
-            // STEP 1: Create app
-            await CreateAppAsync();
+            return _.Apps.PostAppAsync(createRequest);
+        });
+
+        Assert.Equal(400, ex.StatusCode);
+    }
+
+    [Fact]
+    public async Task Should_archive_app()
+    {
+        // STEP 1: Create app
+        await CreateAppAsync();
 
 
-            // STEP 2: Create again and fail
-            var createRequest = new CreateAppDto
-            {
-                Name = appName
-            };
+        // STEP 2: Archive app
+        await _.Apps.DeleteAppAsync(appName);
 
-            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
-            {
-                return _.Apps.PostAppAsync(createRequest);
-            });
+        var apps = await _.Apps.GetAppsAsync();
 
-            Assert.Equal(400, ex.StatusCode);
-        }
+        // Should not provide deleted app when apps are queried.
+        Assert.DoesNotContain(apps, x => x.Name == appName);
+    }
 
-        [Fact]
-        public async Task Should_archive_app()
+    [Fact]
+    public async Task Should_recreate_after_archived()
+    {
+        // STEP 1: Create app
+        await CreateAppAsync();
+
+
+        // STEP 2: Archive app
+        await _.Apps.DeleteAppAsync(appName);
+
+
+        // STEP 3: Create app again
+        var createRequest = new CreateAppDto
         {
-            // STEP 1: Create app
-            await CreateAppAsync();
+            Name = appName
+        };
+
+        await _.Apps.PostAppAsync(createRequest);
+    }
+
+    [Fact]
+    public async Task Should_create_app_from_templates()
+    {
+        // STEP 1: Get template.
+        var templates = await _.Templates.GetTemplatesAsync();
+
+        var template = templates.Items.First(x => x.IsStarter);
 
 
-            // STEP 2: Archive app
-            await _.Apps.DeleteAppAsync(appName);
-
-            var apps = await _.Apps.GetAppsAsync();
-
-            // Should not provide deleted app when apps are queried.
-            Assert.DoesNotContain(apps, x => x.Name == appName);
-        }
-
-        [Fact]
-        public async Task Should_recreate_after_archived()
+        // STEP 2: Create app.
+        var createRequest = new CreateAppDto
         {
-            // STEP 1: Create app
-            await CreateAppAsync();
+            Name = appName,
+            // The template is just referenced by the name.
+            Template = template.Name
+        };
+
+        await _.Apps.PostAppAsync(createRequest);
 
 
-            // STEP 2: Archive app
-            await _.Apps.DeleteAppAsync(appName);
+        // STEP 3: Get schemas
+        var schemas = await _.Schemas.GetSchemasAsync(appName);
 
+        Assert.NotEmpty(schemas.Items);
 
-            // STEP 3: Create app again
-            var createRequest = new CreateAppDto
-            {
-                Name = appName
-            };
+        await Verify(schemas);
+    }
 
-            await _.Apps.PostAppAsync(createRequest);
-        }
-
-        [Fact]
-        public async Task Should_create_app_from_templates()
+    private async Task CreateAppAsync()
+    {
+        var createRequest = new CreateAppDto
         {
-            // STEP 1: Get template.
-            var templates = await _.Templates.GetTemplatesAsync();
+            Name = appName
+        };
 
-            var template = templates.Items.First(x => x.IsStarter);
-
-
-            // STEP 2: Create app.
-            var createRequest = new CreateAppDto
-            {
-                Name = appName,
-                // The template is just referenced by the name.
-                Template = template.Name
-            };
-
-            await _.Apps.PostAppAsync(createRequest);
-
-
-            // STEP 3: Get schemas
-            var schemas = await _.Schemas.GetSchemasAsync(appName);
-
-            Assert.NotEmpty(schemas.Items);
-
-            await Verify(schemas);
-        }
-
-        private async Task CreateAppAsync()
-        {
-            var createRequest = new CreateAppDto
-            {
-                Name = appName
-            };
-
-            await _.Apps.PostAppAsync(createRequest);
-        }
+        await _.Apps.PostAppAsync(createRequest);
     }
 }

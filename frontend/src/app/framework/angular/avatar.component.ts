@@ -27,14 +27,30 @@ export class AvatarComponent implements OnChanges {
     public imageSource?: string | null;
     public imageSize = '50px';
 
+    public actualImage: string | undefined | null;
+
     public ngOnChanges(changes: SimpleChanges) {
+        if (changes['image']) {
+            this.actualImage = this.image;
+        }
+
         if (changes['image'] || changes['identifier']) {
-            this.imageSource = this.image || this.createSvg();
+            this.updateSource();
         }
 
         if (changes['size']) {
             this.imageSize = `${this.size}px`;
         }
+    }
+
+    private updateSource() {
+        this.imageSource = this.actualImage || this.createSvg();
+    }
+
+    public unsetImage() {
+        this.actualImage = null;
+
+        this.updateSource();
     }
 
     private createSvg() {

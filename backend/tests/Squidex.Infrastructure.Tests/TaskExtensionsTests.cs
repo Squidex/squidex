@@ -6,20 +6,18 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.Tasks;
-using Xunit;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure;
+
+public class TaskExtensionsTests
 {
-    public class TaskExtensionsTests
+    [Fact]
+    public void Should_do_nothing_on_forget()
     {
-        [Fact]
-        public void Should_do_nothing_on_forget()
-        {
-            var task = Task.FromResult(123);
+        var task = Task.FromResult(123);
 
-            task.Forget();
+        task.Forget();
 
-            Assert.Equal(123, task.Result);
-        }
+        Assert.Equal(123, task.Result);
     }
 }

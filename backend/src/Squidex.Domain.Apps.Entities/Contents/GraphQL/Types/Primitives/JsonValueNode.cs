@@ -8,17 +8,16 @@
 using GraphQLParser.AST;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
+
+internal sealed class JsonValueNode : GraphQLValue
 {
-    internal sealed class JsonValueNode : GraphQLValue
+    public override ASTNodeKind Kind => ASTNodeKind.ObjectValue;
+
+    public JsonValue Value { get; }
+
+    public JsonValueNode(JsonValue value)
     {
-        public override ASTNodeKind Kind => ASTNodeKind.ObjectValue;
-
-        public JsonValue Value { get; }
-
-        public JsonValueNode(JsonValue value)
-        {
-            Value = value;
-        }
+        Value = value;
     }
 }

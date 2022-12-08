@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
@@ -17,156 +16,154 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Schemas
+namespace Squidex.Domain.Apps.Entities.Schemas;
+
+public class SchemaChangedTriggerHandlerTests
 {
-    public class SchemaChangedTriggerHandlerTests
+    private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
+    private readonly IRuleTriggerHandler sut;
+
+    public SchemaChangedTriggerHandlerTests()
     {
-        private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
-        private readonly IRuleTriggerHandler sut;
+        A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
+            .Returns(true);
 
-        public SchemaChangedTriggerHandlerTests()
+        A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default))
+            .Returns(false);
+
+        sut = new SchemaChangedTriggerHandler(scriptEngine);
+    }
+
+    public static IEnumerable<object[]> TestEvents()
+    {
+        yield return new object[] { TestUtils.CreateEvent<SchemaCreated>(), EnrichedSchemaEventType.Created };
+        yield return new object[] { TestUtils.CreateEvent<SchemaUpdated>(), EnrichedSchemaEventType.Updated };
+        yield return new object[] { TestUtils.CreateEvent<SchemaDeleted>(), EnrichedSchemaEventType.Deleted };
+        yield return new object[] { TestUtils.CreateEvent<SchemaPublished>(), EnrichedSchemaEventType.Published };
+        yield return new object[] { TestUtils.CreateEvent<SchemaUnpublished>(), EnrichedSchemaEventType.Unpublished };
+    }
+
+    [Fact]
+    public void Should_return_false_if_asking_for_snapshot_support()
+    {
+        Assert.False(sut.CanCreateSnapshotEvents);
+    }
+
+    [Fact]
+    public void Should_handle_schema_event()
+    {
+        Assert.True(sut.Handles(new SchemaCreated()));
+    }
+
+    [Fact]
+    public void Should_not_handle_other_event()
+    {
+        Assert.False(sut.Handles(new AppCreated()));
+    }
+
+    [Theory]
+    [MemberData(nameof(TestEvents))]
+    public async Task Should_create_enriched_events(SchemaEvent @event, EnrichedSchemaEventType type)
+    {
+        var ctx = Context(appId: @event.AppId);
+
+        var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
+
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+
+        var enrichedEvent = actual.Single() as EnrichedSchemaEvent;
+
+        Assert.Equal(type, enrichedEvent!.Type);
+        Assert.Equal(@event.Actor, enrichedEvent.Actor);
+        Assert.Equal(@event.AppId, enrichedEvent.AppId);
+        Assert.Equal(@event.AppId.Id, enrichedEvent.AppId.Id);
+        Assert.Equal(@event.SchemaId, enrichedEvent.SchemaId);
+        Assert.Equal(@event.SchemaId.Id, enrichedEvent.SchemaId.Id);
+    }
+
+    [Fact]
+    public void Should_trigger_precheck_if_event_type_correct()
+    {
+        TestForCondition(string.Empty, ctx =>
         {
-            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
-                .Returns(true);
+            var @event = new SchemaCreated();
 
-            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default))
-                .Returns(false);
+            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
-            sut = new SchemaChangedTriggerHandler(scriptEngine);
-        }
+            Assert.True(actual);
+        });
+    }
 
-        public static IEnumerable<object[]> TestEvents()
+    [Fact]
+    public void Should_trigger_check_if_condition_is_empty()
+    {
+        TestForCondition(string.Empty, ctx =>
         {
-            yield return new object[] { TestUtils.CreateEvent<SchemaCreated>(), EnrichedSchemaEventType.Created };
-            yield return new object[] { TestUtils.CreateEvent<SchemaUpdated>(), EnrichedSchemaEventType.Updated };
-            yield return new object[] { TestUtils.CreateEvent<SchemaDeleted>(), EnrichedSchemaEventType.Deleted };
-            yield return new object[] { TestUtils.CreateEvent<SchemaPublished>(), EnrichedSchemaEventType.Published };
-            yield return new object[] { TestUtils.CreateEvent<SchemaUnpublished>(), EnrichedSchemaEventType.Unpublished };
-        }
+            var @event = new EnrichedSchemaEvent();
 
-        [Fact]
-        public void Should_return_false_if_asking_for_snapshot_support()
+            var actual = sut.Trigger(@event, ctx);
+
+            Assert.True(actual);
+        });
+    }
+
+    [Fact]
+    public void Should_trigger_check_if_condition_matchs()
+    {
+        TestForCondition("true", ctx =>
         {
-            Assert.False(sut.CanCreateSnapshotEvents);
-        }
+            var @event = new EnrichedSchemaEvent();
 
-        [Fact]
-        public void Should_handle_schema_event()
+            var actual = sut.Trigger(@event, ctx);
+
+            Assert.True(actual);
+        });
+    }
+
+    [Fact]
+    public void Should_not_trigger_check_if_condition_does_not_match()
+    {
+        TestForCondition("false", ctx =>
         {
-            Assert.True(sut.Handles(new SchemaCreated()));
-        }
+            var @event = new EnrichedSchemaEvent();
 
-        [Fact]
-        public void Should_not_handle_other_event()
+            var actual = sut.Trigger(@event, ctx);
+
+            Assert.False(actual);
+        });
+    }
+
+    private void TestForCondition(string condition, Action<RuleContext> action)
+    {
+        var trigger = new SchemaChangedTrigger
         {
-            Assert.False(sut.Handles(new AppCreated()));
-        }
+            Condition = condition
+        };
 
-        [Theory]
-        [MemberData(nameof(TestEvents))]
-        public async Task Should_create_enriched_events(SchemaEvent @event, EnrichedSchemaEventType type)
+        action(Context(trigger));
+
+        if (string.IsNullOrWhiteSpace(condition))
         {
-            var ctx = Context(appId: @event.AppId);
-
-            var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
-
-            var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
-
-            var enrichedEvent = actual.Single() as EnrichedSchemaEvent;
-
-            Assert.Equal(type, enrichedEvent!.Type);
-            Assert.Equal(@event.Actor, enrichedEvent.Actor);
-            Assert.Equal(@event.AppId, enrichedEvent.AppId);
-            Assert.Equal(@event.AppId.Id, enrichedEvent.AppId.Id);
-            Assert.Equal(@event.SchemaId, enrichedEvent.SchemaId);
-            Assert.Equal(@event.SchemaId.Id, enrichedEvent.SchemaId.Id);
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
+                .MustNotHaveHappened();
         }
-
-        [Fact]
-        public void Should_trigger_precheck_if_event_type_correct()
+        else
         {
-            TestForCondition(string.Empty, ctx =>
-            {
-                var @event = new SchemaCreated();
-
-                var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
-
-                Assert.True(actual);
-            });
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
+                .MustHaveHappened();
         }
+    }
 
-        [Fact]
-        public void Should_trigger_check_if_condition_is_empty()
+    private static RuleContext Context(RuleTrigger? trigger = null, NamedId<DomainId>? appId = null)
+    {
+        trigger ??= new SchemaChangedTrigger();
+
+        return new RuleContext
         {
-            TestForCondition(string.Empty, ctx =>
-            {
-                var @event = new EnrichedSchemaEvent();
-
-                var actual = sut.Trigger(@event, ctx);
-
-                Assert.True(actual);
-            });
-        }
-
-        [Fact]
-        public void Should_trigger_check_if_condition_matchs()
-        {
-            TestForCondition("true", ctx =>
-            {
-                var @event = new EnrichedSchemaEvent();
-
-                var actual = sut.Trigger(@event, ctx);
-
-                Assert.True(actual);
-            });
-        }
-
-        [Fact]
-        public void Should_not_trigger_check_if_condition_does_not_match()
-        {
-            TestForCondition("false", ctx =>
-            {
-                var @event = new EnrichedSchemaEvent();
-
-                var actual = sut.Trigger(@event, ctx);
-
-                Assert.False(actual);
-            });
-        }
-
-        private void TestForCondition(string condition, Action<RuleContext> action)
-        {
-            var trigger = new SchemaChangedTrigger
-            {
-                Condition = condition
-            };
-
-            action(Context(trigger));
-
-            if (string.IsNullOrWhiteSpace(condition))
-            {
-                A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
-                    .MustNotHaveHappened();
-            }
-            else
-            {
-                A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
-                    .MustHaveHappened();
-            }
-        }
-
-        private static RuleContext Context(RuleTrigger? trigger = null, NamedId<DomainId>? appId = null)
-        {
-            trigger ??= new SchemaChangedTrigger();
-
-            return new RuleContext
-            {
-                AppId = appId ?? NamedId.Of(DomainId.NewGuid(), "my-app"),
-                Rule = new Rule(trigger, A.Fake<RuleAction>()),
-                RuleId = DomainId.NewGuid()
-            };
-        }
+            AppId = appId ?? NamedId.Of(DomainId.NewGuid(), "my-app"),
+            Rule = new Rule(trigger, A.Fake<RuleAction>()),
+            RuleId = DomainId.NewGuid()
+        };
     }
 }

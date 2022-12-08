@@ -7,82 +7,43 @@
 
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
-using Squidex.ClientLibrary.Management;
 using TestSuite.Model;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
-namespace TestSuite.ApiTests
+namespace TestSuite.ApiTests;
+
+public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
 {
-    public sealed class GraphQLTests : IClassFixture<ContentFixture>
+    public GraphQLFixture _ { get; }
+
+    public GraphQLTests(GraphQLFixture fixture)
     {
-        public ContentFixture _ { get; }
+        _ = fixture;
+    }
 
-        public GraphQLTests(ContentFixture fixture)
+    [Fact]
+    public async Task Should_query_json()
+    {
+        // STEP 1: Create a content with JSON.
+        var content_0 = await _.Contents.CreateAsync(new TestEntityData
         {
-            _ = fixture;
-        }
-
-        public sealed class DynamicEntity : Content<object>
-        {
-        }
-
-        public sealed class Country
-        {
-            public CountryData Data { get; set; }
-        }
-
-        public sealed class CountryData
-        {
-            public string Name { get; set; }
-
-            public List<State> States { get; set; }
-        }
-
-        public sealed class State
-        {
-            public StateData Data { get; set; }
-        }
-
-        public sealed class StateData
-        {
-            public string Name { get; set; }
-
-            public List<City> Cities { get; set; }
-        }
-
-        public sealed class City
-        {
-            public CityData Data { get; set; }
-        }
-
-        public sealed class CityData
-        {
-            public string Name { get; set; }
-        }
-
-        [Fact]
-        public async Task Should_query_json()
-        {
-            // STEP 1: Create a content with JSON.
-            var content_0 = await _.Contents.CreateAsync(new TestEntityData
+            Json = JToken.FromObject(new
             {
-                Json = JToken.FromObject(new
+                value = 1,
+                obj = new
                 {
-                    value = 1,
-                    obj = new
-                    {
-                        value = 2
-                    }
-                })
-            }, ContentCreateOptions.AsPublish);
+                    value = 2
+                }
+            })
+        }, ContentCreateOptions.AsPublish);
 
 
-            // STEP 2: Query this content.
-            var query = new
-            {
-                query = @"
+        // STEP 2: Query this content.
+        var query = new
+        {
+            query = @"
                 {
                     findMyWritesContent(id: ""<ID>"") {
                         flatData {
@@ -90,42 +51,22 @@ namespace TestSuite.ApiTests
                         }   
                     }
                 }".Replace("<ID>", content_0.Id, StringComparison.Ordinal)
-            };
+        };
 
-            var result1 = await _.Contents.GraphQlAsync<JToken>(query);
+        var result = await _.SharedContents.GraphQlAsync<JToken>(query);
 
-            Assert.Equal(1, result1["findMyWritesContent"]["flatData"]["json"]["value"].Value<int>());
-            Assert.Equal(2, result1["findMyWritesContent"]["flatData"]["json"]["obj"]["value"].Value<int>());
-        }
+        Assert.Equal(1, result["findMyWritesContent"]["flatData"]["json"]["value"].Value<int>());
+        Assert.Equal(2, result["findMyWritesContent"]["flatData"]["json"]["obj"]["value"].Value<int>());
+    }
 
-        [Fact]
-        public async Task Should_create_and_query_with_graphql()
+    [Fact]
+    public async Task Should_query_graphql_reference_selectors()
+    {
+        var query = new
         {
-            try
-            {
-                await CreateSchemasAsync();
-            }
-            catch
-            {
-                // Do nothing
-            }
-
-            try
-            {
-                await CreateContentsAsync();
-            }
-            catch
-            {
-                // Do nothing
-            }
-
-            var countriesClient = _.ClientManager.CreateContentsClient<DynamicEntity, object>("countries");
-
-            var query = new
-            {
-                query = @"
+            query = @"
                 {
-                    queryCountriesContents {
+                    countries: queryCountriesContents {
                         data: flatData {
                             name,
                             states {
@@ -141,137 +82,146 @@ namespace TestSuite.ApiTests
                         }
                     }
                 }"
-            };
+        };
 
-            var result1 = await countriesClient.GraphQlAsync<JToken>(query);
+        var result = await _.SharedContents.GraphQlAsync<JToken>(query);
 
-            var typed = result1["queryCountriesContents"].ToObject<List<Country>>();
+        var cityNames =
+            result["countries"].ToObject<List<Country>>()[0].Data.States
+                .SelectMany(x => x.Data.Cities)
+                .Select(x => x.Data.Name)
+                .Order();
 
-            Assert.Equal("Leipzig", typed[0].Data.States[0].Data.Cities[0].Data.Name);
-        }
+        Assert.Equal(new[] { "Leipzig", "Stuttgart" }, cityNames);
+    }
 
-        private async Task CreateSchemasAsync()
+    [Fact]
+    public async Task Should_query_graphql_reference_operator()
+    {
+        var query = new
         {
-            // STEP 1: Create cities schema.
-            var createCitiesRequest = new CreateSchemaDto
-            {
-                Name = "cities",
-                Fields = new List<UpsertSchemaFieldDto>
+            query = @"
                 {
-                    new UpsertSchemaFieldDto
-                    {
-                        Name = "name",
-                        Properties = new StringFieldPropertiesDto()
-                    }
-                },
-                IsPublished = true
-            };
-
-            var cities = await _.Schemas.PostSchemaAsync(_.AppName, createCitiesRequest);
-
-
-            // STEP 2: Create states schema.
-            var createStatesRequest = new CreateSchemaDto
-            {
-                Name = "states",
-                Fields = new List<UpsertSchemaFieldDto>
-                {
-                    new UpsertSchemaFieldDto
-                    {
-                        Name = "name",
-                        Properties = new StringFieldPropertiesDto()
-                    },
-                    new UpsertSchemaFieldDto
-                    {
-                        Name = "cities",
-                        Properties = new ReferencesFieldPropertiesDto
-                        {
-                            SchemaIds = new List<string> { cities.Id }
+                    countries: queryCountriesContents {
+                        data: flatData {
+                            name,
+                            states {
+                                data: flatData {
+                                    name
+                                },
+                                cities: referencesCitiesContents {
+                                    data: flatData {
+                                        name
+                                    }
+                                }
+                            }
                         }
                     }
-                },
-                IsPublished = true
-            };
+                }"
+        };
 
-            var states = await _.Schemas.PostSchemaAsync(_.AppName, createStatesRequest);
+        var result = await _.SharedContents.GraphQlAsync<JToken>(query);
 
+        var cityNames =
+            result["countries"]
+                .SelectMany(x => x["data"]["states"])
+                .SelectMany(x => x["cities"])
+                .Select(x => x["data"]["name"].Value<string>())
+                .Order();
 
-            // STEP 3: Create countries schema.
-            var createCountriesRequest = new CreateSchemaDto
-            {
-                Name = "countries",
-                Fields = new List<UpsertSchemaFieldDto>
+        Assert.Equal(new[] { "Leipzig", "Stuttgart" }, cityNames);
+    }
+
+    [Fact]
+    public async Task Should_query_graphql_reference_operator_with_filter()
+    {
+        var query = new
+        {
+            query = @"
                 {
-                    new UpsertSchemaFieldDto
-                    {
-                        Name = "name",
-                        Properties = new StringFieldPropertiesDto()
-                    },
-                    new UpsertSchemaFieldDto
-                    {
-                        Name = "states",
-                        Properties = new ReferencesFieldPropertiesDto
-                        {
-                            SchemaIds = new List<string> { states.Id }
+                    countries: queryCountriesContents {
+                        data: flatData {
+                            name,
+                            states {
+                                data: flatData {
+                                    name
+                                },
+                                cities: referencesCitiesContents(filter: ""data/name/iv eq 'Leipzig'"") {
+                                    data: flatData {
+                                        name
+                                    }
+                                }
+                            }
                         }
                     }
-                },
-                IsPublished = true
-            };
+                }"
+        };
 
-            await _.Schemas.PostSchemaAsync(_.AppName, createCountriesRequest);
-        }
+        var result = await _.SharedContents.GraphQlAsync<JToken>(query);
 
-        private async Task CreateContentsAsync()
+        var cityNames =
+            result["countries"]
+                .SelectMany(x => x["data"]["states"])
+                .SelectMany(x => x["cities"])
+                .Select(x => x["data"]["name"].Value<string>())
+                .Order();
+
+        Assert.Equal(new[] { "Leipzig" }, cityNames);
+    }
+
+    [Fact]
+    public async Task Should_query_graphql_referencing_operator()
+    {
+        var query = new
         {
-            // STEP 1: Create city
-            var cityData = new
-            {
-                name = new
+            query = @"
                 {
-                    iv = "Leipzig"
-                }
-            };
+                    cities: queryCitiesContents {
+                        states: referencingStatesContents {
+                            data: flatData {
+                                name
+                            }
+                        }
+                    }
+                }"
+        };
 
-            var citiesClient = _.ClientManager.CreateContentsClient<DynamicEntity, object>("cities");
+        var result = await _.SharedContents.GraphQlAsync<JToken>(query);
 
-            var city = await citiesClient.CreateAsync(cityData, ContentCreateOptions.AsPublish);
+        var stateNames =
+            result["cities"]
+                .SelectMany(x => x["states"])
+                .Select(x => x["data"]["name"].Value<string>())
+                .Order();
 
+        Assert.Equal(new[] { "Baden Württemberg", "Sachsen" }, stateNames);
+    }
 
-            // STEP 2: Create city
-            var stateData = new
-            {
-                name = new
+    [Fact]
+    public async Task Should_query_graphql_referencing_operator_with_filter()
+    {
+        var query = new
+        {
+            query = @"
                 {
-                    iv = "Saxony"
-                },
-                cities = new
-                {
-                    iv = new[] { city.Id }
-                }
-            };
+                    cities: queryCitiesContents {
+                        states: referencingStatesContents(filter: ""data/name/iv eq 'Sachsen'"") {
+                            data: flatData {
+                                name
+                            }
+                        }
+                    }
+                }"
+        };
 
-            var statesClient = _.ClientManager.CreateContentsClient<DynamicEntity, object>("states");
+        var result = await _.SharedContents.GraphQlAsync<JToken>(query);
 
-            var state = await statesClient.CreateAsync(stateData, ContentCreateOptions.AsPublish);
+        var stateNames =
+            result["cities"]
+                .SelectMany(x => x["states"])
+                .Select(x => x["data"]["name"].Value<string>())
+                .Order();
 
-
-            // STEP 3: Create country
-            var countryData = new
-            {
-                name = new
-                {
-                    iv = "Germany"
-                },
-                states = new
-                {
-                    iv = new[] { state.Id }
-                }
-            };
-
-            var countriesClient = _.ClientManager.CreateContentsClient<DynamicEntity, object>("countries");
-
-            await countriesClient.CreateAsync(countryData, ContentCreateOptions.AsPublish);
-        }
+        Assert.Equal(new[] { "Sachsen" }, stateNames);
     }
 }
