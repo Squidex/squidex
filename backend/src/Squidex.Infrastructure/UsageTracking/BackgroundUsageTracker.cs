@@ -16,10 +16,10 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
     private const int Intervall = 60 * 1000;
     private readonly IUsageRepository usageRepository;
     private readonly ILogger<BackgroundUsageTracker> log;
-    private readonly CompletionTimer timer;
+    private readonly CompletionTimer usageTimer;
     private ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters> jobs = new ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters>();
 
-    public bool ForceWrite { get; set; }
+    public int PendingJobs => jobs.Count;
 
     public string FallbackCategory => "*";
 
@@ -27,17 +27,16 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
         ILogger<BackgroundUsageTracker> log)
     {
         this.usageRepository = usageRepository;
+        this.usageTimer = new CompletionTimer(Intervall, TrackAsync, Intervall);
 
         this.log = log;
-
-        timer = new CompletionTimer(Intervall, TrackAsync, Intervall);
     }
 
     protected override void DisposeObject(bool disposing)
     {
         if (disposing)
         {
-            timer.StopAsync().Wait();
+            usageTimer.StopAsync().Wait();
         }
     }
 
@@ -45,7 +44,7 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
     {
         ThrowIfDisposed();
 
-        timer.SkipCurrentDelay();
+        usageTimer.SkipCurrentDelay();
     }
 
     private async Task TrackAsync(
@@ -73,11 +72,6 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
                     updates[updateIndex].Date = key.Date;
 
                     updateIndex++;
-                }
-
-                if (ForceWrite)
-                {
-                    ct = default;
                 }
 
                 await usageRepository.TrackUsagesAsync(updates, ct);

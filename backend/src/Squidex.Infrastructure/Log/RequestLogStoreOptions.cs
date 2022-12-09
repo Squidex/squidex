@@ -9,7 +9,7 @@ namespace Squidex.Infrastructure.Log;
 
 public sealed class RequestLogStoreOptions
 {
-    public bool StoreEnabled { get; set; }
+    public bool StoreEnabled { get; set; } = true;
 
     public int StoreRetentionInDays { get; set; } = 90;
 

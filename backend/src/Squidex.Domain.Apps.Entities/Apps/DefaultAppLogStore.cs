@@ -59,8 +59,7 @@ public sealed class DefaultAppLogStore : IAppLogStore, IDeleter
 
         var storedRequest = new Request
         {
-            Key = appId.ToString(),
-            Timestamp = request.Timestamp
+            Key = appId.ToString()
         };
 
         Append(storedRequest, FieldAuthClientId, request.UserClientId);
@@ -75,6 +74,8 @@ public sealed class DefaultAppLogStore : IAppLogStore, IDeleter
         Append(storedRequest, FieldRequestMethod, request.RequestMethod);
         Append(storedRequest, FieldRequestPath, request.RequestPath);
         Append(storedRequest, FieldStatusCode, request.StatusCode);
+
+        storedRequest.Timestamp = request.Timestamp;
 
         return requestLogStore.LogAsync(storedRequest, ct);
     }
@@ -154,23 +155,31 @@ public sealed class DefaultAppLogStore : IAppLogStore, IDeleter
 
     private static double? GetDouble(Request request, string key)
     {
-        if (request.Properties.TryGetValue(key, out var value) &&
-            double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+        if (!request.Properties.TryGetValue(key, out var value))
         {
-            return result;
+            return null;
         }
 
-        return null;
+        if (!double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+        {
+            return null;
+        }
+
+        return result;
     }
 
     private static long? GetLong(Request request, string key)
     {
-        if (request.Properties.TryGetValue(key, out var value) &&
-            long.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+        if (!request.Properties.TryGetValue(key, out var value))
         {
-            return result;
+            return null;
         }
 
-        return null;
+        if (!long.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+        {
+            return null;
+        }
+
+        return result;
     }
 }
