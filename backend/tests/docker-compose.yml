@@ -8,7 +8,7 @@ services:
       - internal
 
   squidex1:
-    image: squidex
+    image: squidex-local
     environment:
       - URLS__BASEURL=http://localhost:8080
       - ASSETS__RESIZERURL=http://resizer
@@ -33,7 +33,7 @@ services:
       - mongo
 
   squidex2:
-    image: squidex
+    image: squidex-local
     environment:
       - URLS__BASEURL=http://localhost:8081/squidex/
       - URLS__BASEPATH=squidex/
@@ -59,7 +59,7 @@ services:
       - mongo
 
   squidex3:
-    image: squidex
+    image: squidex-local
     environment:
       - URLS__BASEURL=http://localhost:8082
       - ASSETS__RESIZERURL=http://resizer

@@ -22,12 +22,7 @@ public class BackgroundUsageTrackerTests
     {
         ct = cts.Token;
 
-        var log = A.Fake<ILogger<BackgroundUsageTracker>>();
-
-        sut = new BackgroundUsageTracker(usageStore, log)
-        {
-            ForceWrite = true
-        };
+        sut = new BackgroundUsageTracker(usageStore, A.Fake<ILogger<BackgroundUsageTracker>>());
     }
 
     [Fact]
@@ -233,11 +228,8 @@ public class BackgroundUsageTrackerTests
                 updates = args.GetArgument<UsageUpdate[]>(0)!;
             });
 
-        sut.Next();
-        sut.Dispose();
-
         // Wait for the timer to trigger.
-        await Task.Delay(500, ct);
+        await WaitForCompletion();
 
         updates.Should().BeEquivalentTo(new[]
         {
@@ -249,6 +241,20 @@ public class BackgroundUsageTrackerTests
 
         A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>._, A<CancellationToken>._))
             .MustHaveHappened();
+    }
+
+    private async Task WaitForCompletion()
+    {
+        sut.Next();
+
+        using var tcs = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+        while (sut.PendingJobs > 0)
+        {
+            tcs.Token.ThrowIfCancellationRequested();
+
+            await Task.Delay(20, tcs.Token);
+        }
     }
 
     private static Counters Counters(double? a = null, double? b = null)

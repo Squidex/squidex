@@ -16,11 +16,11 @@ public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLo
 {
     private readonly IRequestLogRepository logRepository;
     private readonly ILogger<BackgroundRequestLogStore> log;
-    private readonly CompletionTimer timer;
+    private readonly CompletionTimer logTimer;
     private readonly RequestLogStoreOptions options;
-    private ConcurrentQueue<Request> jobs = new ConcurrentQueue<Request>();
+    private readonly ConcurrentQueue<Request> jobs = new ConcurrentQueue<Request>();
 
-    public bool ForceWrite { get; set; }
+    public int PendingJobs => jobs.Count;
 
     public bool IsEnabled => options.StoreEnabled;
 
@@ -30,8 +30,7 @@ public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLo
         this.options = options.Value;
 
         this.logRepository = logRepository;
-
-        timer = new CompletionTimer(options.Value.WriteIntervall, TrackAsync, options.Value.WriteIntervall);
+        this.logTimer = new CompletionTimer(options.Value.WriteIntervall, TrackAsync, options.Value.WriteIntervall);
 
         this.log = log;
     }
@@ -40,7 +39,7 @@ public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLo
     {
         if (disposing)
         {
-            timer.StopAsync().Wait();
+            logTimer.StopAsync().Wait();
         }
     }
 
@@ -48,7 +47,7 @@ public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLo
     {
         ThrowIfDisposed();
 
-        timer.SkipCurrentDelay();
+        logTimer.SkipCurrentDelay();
     }
 
     private async Task TrackAsync(
@@ -59,27 +58,29 @@ public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLo
             return;
         }
 
+        if (jobs.IsEmpty)
+        {
+            return;
+        }
+
         try
         {
-            var batchSize = options.BatchSize;
+            var batch = new List<Request>(options.BatchSize);
 
-            var localJobs = Interlocked.Exchange(ref jobs, new ConcurrentQueue<Request>());
-
-            if (!localJobs.IsEmpty)
+            while (jobs.TryDequeue(out var dequeued))
             {
-                var pages = (int)Math.Ceiling((double)localJobs.Count / batchSize);
+                batch.Add(dequeued);
 
-                for (var i = 0; i < pages; i++)
+                if (batch.Count >= options.BatchSize)
                 {
-                    var batch = localJobs.Skip(i * batchSize).Take(batchSize);
-
-                    if (ForceWrite)
-                    {
-                        ct = default;
-                    }
-
-                    await logRepository.InsertManyAsync(batch, ct);
+                    await logRepository.InsertManyAsync(batch.ToList(), ct);
+                    batch.Clear();
                 }
+            }
+
+            if (batch.Count > 0)
+            {
+                await logRepository.InsertManyAsync(batch, ct);
             }
         }
         catch (Exception ex)

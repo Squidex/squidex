@@ -16,21 +16,14 @@ public class BackgroundRequestLogStoreTests
     private readonly CancellationTokenSource cts = new CancellationTokenSource();
     private readonly CancellationToken ct;
     private readonly IRequestLogRepository requestLogRepository = A.Fake<IRequestLogRepository>();
-    private readonly RequestLogStoreOptions options = new RequestLogStoreOptions();
+    private readonly RequestLogStoreOptions options = new RequestLogStoreOptions { StoreEnabled = true };
     private readonly BackgroundRequestLogStore sut;
 
     public BackgroundRequestLogStoreTests()
     {
         ct = cts.Token;
 
-        options.StoreEnabled = true;
-
-        var log = A.Fake<ILogger<BackgroundRequestLogStore>>();
-
-        sut = new BackgroundRequestLogStore(Options.Create(options), requestLogRepository, log)
-        {
-            ForceWrite = true
-        };
+        sut = new BackgroundRequestLogStore(Options.Create(options), requestLogRepository, A.Fake<ILogger<BackgroundRequestLogStore>>());
     }
 
     [Theory]
@@ -62,11 +55,7 @@ public class BackgroundRequestLogStoreTests
             await sut.LogAsync(new Request { Key = i.ToString(CultureInfo.InvariantCulture) }, ct);
         }
 
-        sut.Next();
-        sut.Dispose();
-
-        // Wait for the timer to not trigger.
-        await Task.Delay(500, ct);
+        await WaitForCompletion();
 
         A.CallTo(() => requestLogRepository.InsertManyAsync(A<IEnumerable<Request>>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -114,11 +103,7 @@ public class BackgroundRequestLogStoreTests
             await sut.LogAsync(new Request { Key = i.ToString(CultureInfo.InvariantCulture) }, ct);
         }
 
-        sut.Next();
-        sut.Dispose();
-
-        // Wait for the timer to trigger.
-        await Task.Delay(500, ct);
+        await WaitForCompletion();
 
         A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("0", "999"), A<CancellationToken>._))
             .MustHaveHappened();
@@ -128,6 +113,20 @@ public class BackgroundRequestLogStoreTests
 
         A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("2000", "2499"), A<CancellationToken>._))
             .MustHaveHappened();
+    }
+
+    private async Task WaitForCompletion()
+    {
+        sut.Next();
+
+        using var tcs = new CancellationTokenSource(TimeSpan.FromSeconds(5000));
+
+        while (sut.PendingJobs > 0)
+        {
+            tcs.Token.ThrowIfCancellationRequested();
+
+            await Task.Delay(20, tcs.Token);
+        }
     }
 
     private static IEnumerable<Request> Batch(string from, string to)
