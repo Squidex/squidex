@@ -38,7 +38,7 @@ jobs:
 
       - name: Test - Start Compose
         run: docker-compose up -d
-        working-directory: backend/tests
+        working-directory: tools/TestSuite
 
       - name: Test - RUN
         uses: kohlerdominik/docker-run-action@v1.1.0
@@ -52,7 +52,7 @@ jobs:
           default_network: host
           options: --name test1
           volumes: ${{ github.workspace }}:/src
-          run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
       - name: Test - RUN on path
         uses: kohlerdominik/docker-run-action@v1.1.0
@@ -66,7 +66,7 @@ jobs:
           default_network: host
           options: --name test2
           volumes: ${{ github.workspace }}:/src
-          run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
       - name: Test - RUN with dedicated collections
         uses: kohlerdominik/docker-run-action@v1.1.0
@@ -80,7 +80,7 @@ jobs:
           default_network: host
           options: --name test3
           volumes: ${{ github.workspace }}:/src
-          run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
        
       - name: Test - Dump docker logs on failure
         if: failure()
@@ -92,7 +92,7 @@ jobs:
       - name: Test - Cleanup
         if: always()
         run: docker-compose down
-        working-directory: backend/tests
+        working-directory: tools/TestSuite
 
       - name: Publish - Calculate Version
         if: github.event_name != 'pull_request'

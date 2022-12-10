@@ -1,0 +1,175 @@
+﻿# NOTE: Requires **VS2019 16.3** or later
+
+# Squidex Rules
+# Description: Squidex Rules
+
+[*.json]
+indent_style = space
+indent_size = 4
+
+[*.cs]
+charset = utf-8-bom
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+
+csharp_style_namespace_declarations = file_scoped
+
+# FAILING ANALYZERS
+dotnet_diagnostic.RECS0002.severity = none
+dotnet_diagnostic.RECS0117.severity = none
+dotnet_diagnostic.SA0001.severity = none
+dotnet_diagnostic.SA1649.severity = none
+
+# CA1707: Identifiers should not contain underscores
+dotnet_diagnostic.CA1707.severity = none
+
+# CA2016: Forward the 'CancellationToken' parameter to methods
+dotnet_diagnostic.CA2016.severity = none
+
+# CS8618: Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+dotnet_diagnostic.CS8618.severity = none
+
+# IDE0063: Use simple 'using' statement
+dotnet_diagnostic.IDE0063.severity = none
+
+# IDE0066: Convert switch statement to expression
+dotnet_diagnostic.IDE0066.severity = none
+
+# IDE0090: Use 'new(...)'
+dotnet_diagnostic.IDE0090.severity = none
+
+# MA0002: IEqualityComparer<string> or IComparer<string> is missing
+dotnet_diagnostic.MA0002.severity = none
+
+# MA0003: Add argument name to improve readability
+dotnet_diagnostic.MA0003.severity = none
+
+# MA0004: Use Task.ConfigureAwait(false)
+dotnet_diagnostic.MA0004.severity = none
+
+# MA0006: Use String.Equals instead of equality operator
+dotnet_diagnostic.MA0006.severity = none
+
+# MA0007: Add a comma after the last value
+dotnet_diagnostic.MA0007.severity = none
+
+# MA0008: Add StructLayoutAttribute
+dotnet_diagnostic.MA0008.severity = none    
+
+# MA0009: Add regex evaluation timeout
+dotnet_diagnostic.MA0009.severity = none
+
+# MA0016: Prefer return collection abstraction instead of implementation
+dotnet_diagnostic.MA0016.severity = none
+
+# MA0018: Do not declare static members on generic types
+dotnet_diagnostic.MA0018.severity = none
+
+# MA0025: Implement the functionality instead of throwing NotImplementedException
+dotnet_diagnostic.MA0025.severity = none    
+
+# MA0028: Optimize StringBuilder usage
+dotnet_diagnostic.MA0028.severity = none
+
+# MA0029: Combine LINQ methods
+dotnet_diagnostic.MA0029.severity = none 
+
+# MA0031: Optimize Enumerable.Count() usage
+dotnet_diagnostic.MA0031.severity = none
+
+# MA0036: Make class static
+dotnet_diagnostic.MA0036.severity = none
+
+# MA0038: Make method static
+dotnet_diagnostic.MA0038.severity = none 
+
+# MA0039: Do not write your own certificate validation method
+dotnet_diagnostic.MA0039.severity = none
+  
+# MA0049: Type name should not match containing namespace
+dotnet_diagnostic.MA0049.severity = none
+
+# MA0051: Method is too long
+dotnet_diagnostic.MA0051.severity = none
+
+# MA0069: Non-constant static fields should not be visible
+dotnet_diagnostic.MA0069.severity = none    
+
+# MA0071: Avoid using redundant else
+dotnet_diagnostic.MA0071.severity = none
+
+# MA0076: Do not use implicit culture-sensitive ToString in interpolated strings
+dotnet_diagnostic.MA0076.severity = none
+
+# MA0097: A class that implements IComparable<T> or IComparable should override comparison operators
+dotnet_diagnostic.MA0097.severity = none    
+
+# RECS0129: Removes 'internal' modifiers that are not required
+dotnet_diagnostic.RECS0129.severity = none
+
+# RECS0145: Removes 'private' modifiers that are not required
+dotnet_diagnostic.RECS0145.severity = none
+
+# RECS0154: Parameter is never used
+dotnet_diagnostic.RECS0154.severity = none
+
+# SA1009: Closing parenthesis should be spaced correctly
+dotnet_diagnostic.SA1009.severity = none
+
+# SA1011: Closing square brackets should be spaced correctly
+dotnet_diagnostic.SA1011.severity = none
+
+# SA1101: Prefix local calls with this
+dotnet_diagnostic.SA1101.severity = none
+
+# SA1111: Closing parenthesis should be on line of last parameter
+dotnet_diagnostic.SA1111.severity = none
+
+# SA1116: Split parameters should start on line after declaration
+dotnet_diagnostic.SA1116.severity = none
+
+# SA1117: Parameters should be on same line or separate lines
+dotnet_diagnostic.SA1117.severity = none
+
+# SA1118: Parameter should not span multiple lines
+dotnet_diagnostic.SA1118.severity = none
+
+# SA1127: Generic type constraints should be on their own line
+dotnet_diagnostic.SA1127.severity = none
+
+# SA1201: Elements should appear in the correct order
+dotnet_diagnostic.SA1201.severity = none
+
+# SA1202: Elements should be ordered by access
+dotnet_diagnostic.SA1202.severity = none
+
+# SA1204: Static elements should appear before instance elements
+dotnet_diagnostic.SA1204.severity = none
+
+# SA1402: File may only contain a single type
+dotnet_diagnostic.SA1402.severity = none
+
+# SA1413: Use trailing comma in multi-line initializers
+dotnet_diagnostic.SA1413.severity = none
+
+# SA1515: Single-line comment should be preceded by blank line
+dotnet_diagnostic.SA1515.severity = none
+
+# SA1516: Elements should be separated by blank line
+dotnet_diagnostic.SA1516.severity = none
+
+# SA1600: Elements should be documented
+dotnet_diagnostic.SA1600.severity = none
+
+# SA1601: Partial elements should be documented
+dotnet_diagnostic.SA1601.severity = none
+
+# SA1602: Enumeration items should be documented
+dotnet_diagnostic.SA1602.severity = none
+
+# SA1615: Element return value should be documented
+dotnet_diagnostic.SA1615.severity = none
+
+# SA1623: Property summary documentation should match accessors
+dotnet_diagnostic.SA1623.severity = none
