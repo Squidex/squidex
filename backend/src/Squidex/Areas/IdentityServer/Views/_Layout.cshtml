@@ -8,12 +8,12 @@
 
     <title>@ViewBag.Title - @T.Get("common.product")</title>
 
-    <link rel="stylesheet" asp-append-version="true" href="styles.css" />
+    <link rel="stylesheet" href="styles.css" asp-append-version="true" />
     
     @if (IsSectionDefined("header"))
-{
-    @await RenderSectionAsync("header")
-}
+    {
+        @await RenderSectionAsync("header")
+    }
 
     <environment include="Development">
         <script type="text/javascript" src="runtime.js"></script>

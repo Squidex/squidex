@@ -5,10 +5,10 @@
 }
 
 @functions {
-public string ErrorClass(string error)
-{
-return ViewData.ModelState[error]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid ? "border-danger" : "";
-}
+    public string ErrorClass(string error)
+    {
+        return ViewData.ModelState[error]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid ? "border-danger" : "";
+    }
 }
 
 <form asp-controller="Account" asp-action="Consent" asp-route-returnurl="@Model!.ReturnUrl" method="post">

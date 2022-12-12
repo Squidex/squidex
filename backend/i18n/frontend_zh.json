@@ -282,6 +282,8 @@
   "common.errorBack": "返回上一页。",
   "common.errorNoPermission": "您无权执行此操作。",
   "common.errorNotFound": "未找到",
+  "common.errors.chunkLoadingText": "Failed to load necessary javascript files. Very likely a new very version has been deployed. Do you want to reload?",
+  "common.errors.chunkLoadingTitle": "Failed to load chunk",
   "common.event": "事件",
   "common.events": "事件",
   "common.executed": "已执行",

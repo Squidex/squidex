@@ -282,6 +282,8 @@
   "common.errorBack": "Back to previous page.",
   "common.errorNoPermission": "You do not have the permissions to do this.",
   "common.errorNotFound": "Not Found",
+  "common.errors.chunkLoadingText": "Failed to load necessary javascript files. Very likely a new very version has been deployed. Do you want to reload?",
+  "common.errors.chunkLoadingTitle": "Failed to load chunk",
   "common.event": "Event",
   "common.events": "Events",
   "common.executed": "Executed",

@@ -3,15 +3,15 @@
 @{
     ViewBag.Title = T.Get("users.profile.title");
 
-void RenderValidation(string field)
-{
-    @if (ViewContext.ViewData.ModelState[field]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
-{
-    <div class="errors-container">
+    void RenderValidation(string field)
+    {
+        @if (ViewContext.ViewData.ModelState[field]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+        {
+            <div class="errors-container">
                 <span class="errors">@Html.ValidationMessage(field)</span>
             </div>
-}
-}
+        }
+    }
 }
 
 <h1>@T.Get("users.profile.headline")</h1>
@@ -89,8 +89,8 @@ void RenderValidation(string field)
                 <col style="width: 100px;" />
             </colgroup>
             @foreach (var login in Model!.ExternalLogins)
-    {
-        <tr>
+            {
+                <tr>
                     <td>
                         <span>@login.LoginProvider</span>
                     </td>
@@ -99,8 +99,8 @@ void RenderValidation(string field)
                     </td>
                     <td class="text-right">
                         @if (Model!.ExternalLogins.Count > 1 || Model!.HasPassword)
-                {
-                    <form asp-controller="Profile" asp-action="RemoveLogin" method="post">
+                        {
+                            <form asp-controller="Profile" asp-action="RemoveLogin" method="post">
                                 <input type="hidden" value="@login.LoginProvider" name="LoginProvider" />
                                 <input type="hidden" value="@login.ProviderKey" name="ProviderKey" />
 
@@ -108,21 +108,21 @@ void RenderValidation(string field)
                                     @T.Get("common.remove")
                                 </button>
                             </form>
-                }
+                        }
                     </td>
                 </tr>
-    }
+            }
         </table>
 
         <form asp-controller="Profile" asp-action="AddLogin" method="post">
             @foreach (var provider in Model!.ExternalProviders.Where(x => Model!.ExternalLogins.All(y => x.AuthenticationScheme != y.LoginProvider)))
-    {
-        var schema = provider.AuthenticationScheme.ToLowerInvariant();
+            {
+                var schema = provider.AuthenticationScheme.ToLowerInvariant();
 
-        <button class="btn external-button-small btn-@schema" type="submit" name="provider" value="@provider.AuthenticationScheme">
+                <button class="btn external-button-small btn-@schema" type="submit" name="provider" value="@provider.AuthenticationScheme">
                     <i class="icon-@schema external-icon"></i>
                 </button>
-    }
+            }
         </form>
     </div>
 }
@@ -134,9 +134,9 @@ void RenderValidation(string field)
     <div class="profile-section">
         <h2>@T.Get("users.profile.passwordTitle")</h2>
 
-        @if (Model!.HasPassword)
-{
-    <form class="profile-form" asp-controller="Profile" asp-action="ChangePassword" method="post">
+       @if (Model!.HasPassword)
+        {
+            <form class="profile-form" asp-controller="Profile" asp-action="ChangePassword" method="post">
                 <div class="form-group">
                     <label for="oldPassword">@T.Get("common.oldPassword")</label>
 
@@ -165,10 +165,10 @@ void RenderValidation(string field)
                     <button type="submit" class="btn btn-primary">@T.Get("users.profile.changePassword")</button>
                 </div>
             </form>
-}
-else
-{
-    <form class="profile-form" asp-controller="Profile" asp-action="SetPassword" method="post">
+        }
+        else
+        {
+            <form class="profile-form" asp-controller="Profile" asp-action="SetPassword" method="post">
                 <div class="form-group">
                     <label for="password">@T.Get("common.password")</label>
 
@@ -189,7 +189,7 @@ else
                     <button type="submit" class="btn btn-primary">@T.Get("users.profile.setPassword")</button>
                 </div>
             </form>
-}
+        }
     </div>
 }
 
@@ -233,8 +233,8 @@ else
     <form class="profile-form" asp-controller="Profile" asp-action="UpdateProperties" method="post">
         <div class="mb-2" id="properties">
             @for (var i = 0; i < Model!.Properties.Count; i++)
-    {
-        <div class="row g-2 form-group">
+            {
+                <div class="row g-2 form-group">
                     <div class="col-5 pr-2">
 
                         @{ RenderValidation($"Properties[{i}].Name"); }
@@ -253,7 +253,7 @@ else
                         </button>
                     </div>
                 </div>
-    }
+            }
         </div>
 
         <div class="form-group">

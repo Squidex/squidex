@@ -12,12 +12,12 @@ namespace Squidex.Infrastructure.Tasks;
 public class SchedulerTests
 {
     private readonly ConcurrentBag<int> actuals = new ConcurrentBag<int>();
-    private readonly Scheduler sut = new Scheduler();
+    private Scheduler sut = new Scheduler();
 
     [Fact]
     public async Task Should_schedule_single_task()
     {
-        Schedule(1);
+        ScheduleAsync(1, sut);
 
         await sut.CompleteAsync();
 
@@ -31,7 +31,7 @@ public class SchedulerTests
 
         for (var i = 1; i <= 10; i++)
         {
-            Schedule(i, limited);
+            ScheduleAsync(i, limited);
         }
 
         await limited.CompleteAsync();
@@ -42,8 +42,19 @@ public class SchedulerTests
     [Fact]
     public async Task Should_schedule_multiple_tasks()
     {
-        Schedule(1);
-        Schedule(2);
+        ScheduleAsync(1, sut);
+        ScheduleAsync(2, sut);
+
+        await sut.CompleteAsync();
+
+        Assert.Equal(new[] { 1, 2 }, actuals.OrderBy(x => x).ToArray());
+    }
+
+    [Fact]
+    public async Task Should_schedule_multiple_synchronous_tasks()
+    {
+        Schedule(1, sut);
+        Schedule(2, sut);
 
         await sut.CompleteAsync();
 
@@ -65,7 +76,7 @@ public class SchedulerTests
 
                 actuals.Add(2);
 
-                Schedule(3);
+                ScheduleAsync(3, sut);
             });
         });
 
@@ -77,20 +88,18 @@ public class SchedulerTests
     [Fact]
     public async Task Should_ignore_schedule_after_completion()
     {
-        Schedule(1);
+        ScheduleAsync(1, sut);
 
         await sut.CompleteAsync();
 
-        Schedule(3);
-
-        await Task.Delay(50);
+        ScheduleAsync(3, sut);
 
         Assert.Equal(new[] { 1 }, actuals.OrderBy(x => x).ToArray());
     }
 
-    private void Schedule(int value)
+    private void ScheduleAsync(int value, Scheduler target)
     {
-        sut.Schedule(async _ =>
+        target.Schedule(async _ =>
         {
             await Task.Delay(1);
 
@@ -100,11 +109,11 @@ public class SchedulerTests
 
     private void Schedule(int value, Scheduler target)
     {
-        target.Schedule(async _ =>
+        target.Schedule(_ =>
         {
-            await Task.Delay(1);
-
             actuals.Add(value);
+
+            return Task.CompletedTask;
         });
     }
 }

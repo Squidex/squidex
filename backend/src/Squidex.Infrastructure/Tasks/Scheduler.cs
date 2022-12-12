@@ -13,6 +13,8 @@ public delegate Task SchedulerTask(CancellationToken ct);
 
 public sealed class Scheduler
 {
+    private const int SpecialStateStartedOrDone = 1;
+    private const int SpecialStateCompleted = -1;
     private readonly TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
     private readonly SemaphoreSlim semaphore;
     private List<SchedulerTask>? tasks;
@@ -30,7 +32,7 @@ public sealed class Scheduler
 
     public void Schedule(SchedulerTask task)
     {
-        if (pendingTasks < 0)
+        if (pendingTasks <= SpecialStateCompleted)
         {
             // Already completed.
             return;
@@ -39,7 +41,7 @@ public sealed class Scheduler
         if (pendingTasks >= 1)
         {
             // If we already in a tasks we just queue it with the semaphore.
-            ScheduleTask(task, default).Forget();
+            ScheduleTasks(new[] { task }, default);
             return;
         }
 
@@ -50,50 +52,35 @@ public sealed class Scheduler
     public async ValueTask CompleteAsync(
         CancellationToken ct = default)
     {
-        if (tasks == null || tasks.Count == 0)
+        // Do not allow another completion call.
+        if (tasks == null || pendingTasks <= SpecialStateCompleted)
         {
             return;
         }
 
         // Use the value to indicate that the task have been started.
-        pendingTasks = 1;
+        pendingTasks = SpecialStateStartedOrDone;
         try
         {
-            RunTasks(ct).AsTask().Forget();
-
+            ScheduleTasks(tasks, ct);
             await tcs.Task;
         }
         finally
         {
-            pendingTasks = -1;
+            pendingTasks = SpecialStateCompleted;
         }
     }
 
-    private async ValueTask RunTasks(
+    private void ScheduleTasks(IReadOnlyCollection<SchedulerTask> taskToSchedule,
         CancellationToken ct)
     {
-        // If nothing needs to be done, we can just stop here.
-        if (tasks == null || tasks.Count == 0)
+        // Increment the pending tasks once, so we avoid issues when the tasks are executed sequentially.
+        Interlocked.Add(ref pendingTasks, taskToSchedule.Count);
+
+        foreach (var task in taskToSchedule)
         {
-            tcs.TrySetResult(true);
-            return;
+            ScheduleTask(task, ct).Forget();
         }
-
-        // Quick check to avoid the allocation of the list.
-        if (tasks.Count == 1)
-        {
-            await ScheduleTask(tasks[0], ct);
-            return;
-        }
-
-        var runningTasks = new List<Task>();
-
-        foreach (var validationTask in tasks)
-        {
-            runningTasks.Add(ScheduleTask(validationTask, ct));
-        }
-
-        await Task.WhenAll(runningTasks);
     }
 
     private async Task ScheduleTask(SchedulerTask task,
@@ -101,9 +88,7 @@ public sealed class Scheduler
     {
         try
         {
-            // Use the interlock to reduce degree of parallelization.
-            Interlocked.Increment(ref pendingTasks);
-
+            // Use the semaphore to reduce degree of parallelization.
             await semaphore.WaitAsync(ct);
             await task(ct);
         }
@@ -115,7 +100,7 @@ public sealed class Scheduler
         {
             semaphore.Release();
 
-            if (Interlocked.Decrement(ref pendingTasks) <= 1)
+            if (Interlocked.Decrement(ref pendingTasks) <= SpecialStateStartedOrDone)
             {
                 tcs.TrySetResult(true);
             }

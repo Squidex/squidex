@@ -10,6 +10,7 @@ using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Frontend.Middlewares;
 using Squidex.Hosting.Web;
 using Squidex.Pipeline.Squid;
+using Squidex.Web;
 using Squidex.Web.Pipeline;
 
 namespace Squidex.Areas.Frontend;
@@ -26,8 +27,10 @@ public static class Startup
 
         if (!environment.IsDevelopment())
         {
-            fileProvider = new CompositeFileProvider(fileProvider,
-                new PhysicalFileProvider(Path.Combine(environment.WebRootPath, "build")));
+            var buildFolder = new PhysicalFileProvider(Path.Combine(environment.WebRootPath, "build"));
+            var buildProvider = new IgnoreHashFileProvider(buildFolder);
+
+            fileProvider = new CompositeFileProvider(fileProvider, buildFolder, buildProvider);
         }
 
         app.Map("/squid.svg", builder =>
