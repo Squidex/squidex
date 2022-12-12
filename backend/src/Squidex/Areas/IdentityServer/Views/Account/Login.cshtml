@@ -3,7 +3,7 @@
 @{
     var action = Model!.IsLogin ? T.Get("common.login") : T.Get("common.signup");
 
-ViewBag.Title = action;
+    ViewBag.Title = action;
 }
 
 <div class="login-container">
@@ -11,55 +11,55 @@ ViewBag.Title = action;
         <div class="row text-center">
             <div class="btn-group profile-headline">
                 @if (Model!.IsLogin)
-        {
-            <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model!.ReturnUrl">@T.Get("common.login")</a>
-        }
-        else
-        {
-            <a class="btn btn-toggle" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model!.ReturnUrl">@T.Get("common.login")</a>
-        }
-                @if (!Model!.IsLogin)
-        {
-            <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model!.ReturnUrl">@T.Get("common.signup")</a>
-        }
-        else
-        {
-            <a class="btn btn-toggle" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model!.ReturnUrl">@T.Get("common.signup")</a>
-        }
+                {
+                    <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model!.ReturnUrl">@T.Get("common.login")</a>
+                }
+                else
+                {
+                    <a class="btn btn-toggle" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model!.ReturnUrl">@T.Get("common.login")</a>
+                }
+                        @if (!Model!.IsLogin)
+                {
+                    <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model!.ReturnUrl">@T.Get("common.signup")</a>
+                }
+                else
+                {
+                    <a class="btn btn-toggle" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model!.ReturnUrl">@T.Get("common.signup")</a>
+                }
             </div>
         </div>
     </div>
 
     <form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model!.ReturnUrl" method="post">
         @foreach (var provider in Model!.ExternalProviders)
-{
-    var schema = provider.AuthenticationScheme.ToLowerInvariant();
+        {
+            var schema = provider.AuthenticationScheme.ToLowerInvariant();
 
-    <div class="form-group">
+            <div class="form-group">
                 <button class="btn external-button btn-block btn btn-@schema" type="submit" name="provider" value="@provider.AuthenticationScheme">
                     <i class="icon-@schema external-icon"></i> @Html.Raw(T.Get("users.login.loginWith", new { action, provider = provider.DisplayName }))
                 </button>
             </div>
-}
+        }
     </form>
 
     @if (Model!.HasExternalLogin && Model!.HasPasswordAuth)
-{
-    <div class="profile-separator">
+    {
+        <div class="profile-separator">
             <div class="profile-separator-text">@T.Get("users.login.separator")</div>
         </div>
-}
-
-    @if (Model!.HasPasswordAuth)
-{
-if (Model!.IsLogin)
-{
-    if (Model!.IsFailed)
-    {
-        <div class="form-alert form-alert-error">@T.Get("users.login.error")</div>
     }
 
-    <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model!.ReturnUrl" method="post">
+    @if (Model!.HasPasswordAuth)
+    {
+        if (Model!.IsLogin)
+        {
+            if (Model!.IsFailed)
+            {
+                <div class="form-alert form-alert-error">@T.Get("users.login.error")</div>
+            }
+
+            <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model!.ReturnUrl" method="post">
                 <div class="form-group">
                     <input type="email" class="form-control" name="email" id="email" placeholder="@T.Get("users.login.emailPlaceholder")" />
                 </div>
@@ -70,31 +70,31 @@ if (Model!.IsLogin)
 
                 <button type="submit" class="btn btn-block btn-primary">@action</button>
             </form>
-}
-else
-{
-    <div class="profile-password-signup text-center">@T.Get("users.login.askAdmin")</div>
-}
-}
+        }
+        else
+        {
+            <div class="profile-password-signup text-center">@T.Get("users.login.askAdmin")</div>
+        }
+    }
 
     @if (Model!.IsLogin)
-{
-    <p class="profile-footer">
+    {
+        <p class="profile-footer">
             @T.Get("users.login.noAccountSignupQuestion")
 
             <a asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model!.ReturnUrl">
                 @T.Get("users.login.noAccountSignupAction")
             </a>
         </p>
-}
-else
-{
-    <p class="profile-footer">
+    }
+    else
+    {
+        <p class="profile-footer">
             @T.Get("users.login.noAccountLoginQuestion")
 
             <a asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model!.ReturnUrl">
                 @T.Get("users.login.noAccountLoginAction")
             </a>
         </p>
-}
+    }
 </div>

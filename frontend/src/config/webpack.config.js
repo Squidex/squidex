@@ -69,34 +69,5 @@ module.exports = (config, _, options) => {
         );
     }
 
-    const index = config.plugins.findIndex(x => x instanceof plugins.MiniCssExtractPlugin);
-
-    if (index >= 0) {
-        config.plugins.splice(index, 1);
-    }
-
-    config.plugins.push(new plugins.MiniCssExtractPlugin({
-        filename: '[name].css',
-    }));
-
-    /*
-     * Specifies the name of each output file on disk.
-     *
-     * See: https://webpack.js.org/configuration/output/#output-filename
-     */
-    config.output.filename = '[name].js';
-
-    /*
-     * The filename of non-entry chunks as relative path inside the output.path directory.
-     *
-     * See: https://webpack.js.org/configuration/output/#output-chunkfilename
-     */
-    config.output.chunkFilename = '[id].[fullhash].chunk.js';
-
-    /*
-     * The filename for assets.
-     */
-    config.output.assetModuleFilename = 'assets/[hash][ext][query]';
-
     return config;
 };

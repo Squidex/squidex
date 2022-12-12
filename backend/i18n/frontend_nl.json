@@ -282,6 +282,8 @@
   "common.errorBack": "Terug naar de vorige pagina.",
   "common.errorNoPermission": "Je hebt niet de permissies om dit te doen.",
   "common.errorNotFound": "Niet gevonden",
+  "common.errors.chunkLoadingText": "Failed to load necessary javascript files. Very likely a new very version has been deployed. Do you want to reload?",
+  "common.errors.chunkLoadingTitle": "Failed to load chunk",
   "common.event": "Evenement",
   "common.events": "Evenementen",
   "common.executed": "Uitgevoerd",
