@@ -36,7 +36,7 @@ public sealed class AssetsFluidExtension : IFluidExtension
         AddAssetFilter(options);
         AddAssetTextFilter(options);
 
-        parser.RegisterParserTag("asset", 
+        parser.RegisterParserTag("asset",
             parser.PrimaryParser.AndSkip(ZeroOrOne(parser.CommaParser)).And(parser.PrimaryParser),
             ResolveAsset);
     }

@@ -201,7 +201,7 @@ public class IgnoreHashFileProviderTests
             .MustHaveHappened();
     }
 
-    private IFileProvider CreateSut(params (string Path, IFileInfo[] Files)[] directories)
+    private IgnoreHashFileProvider CreateSut(params (string Path, IFileInfo[] Files)[] directories)
     {
         foreach (var directory in directories)
         {

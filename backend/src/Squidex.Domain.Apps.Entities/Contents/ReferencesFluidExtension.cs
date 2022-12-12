@@ -34,7 +34,7 @@ public sealed class ReferencesFluidExtension : IFluidExtension
         AddReferenceFilter(options);
 
         parser.RegisterParserTag("reference",
-            parser.PrimaryParser.AndSkip(ZeroOrOne(parser.CommaParser)).And(parser.PrimaryParser), 
+            parser.PrimaryParser.AndSkip(ZeroOrOne(parser.CommaParser)).And(parser.PrimaryParser),
             ResolveReference);
     }
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
@@ -14,7 +13,7 @@ namespace Squidex.Web;
 
 public sealed class IgnoreHashFileProvider : IFileProvider
 {
-    private readonly char[] pathSeparators = { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
+    private readonly char[] pathSeparators = { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, '\\' };
     private readonly Dictionary<string, string> map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     private readonly IFileProvider inner;
 
