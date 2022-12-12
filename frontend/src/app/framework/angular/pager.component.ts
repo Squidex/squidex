@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { PagingInfo } from '../state';
+import { PagingInfo } from './../state';
 
 export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
 

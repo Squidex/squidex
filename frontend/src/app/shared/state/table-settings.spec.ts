@@ -9,7 +9,7 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DateTime, Version } from '@app/framework';
 import { createProperties, FieldSizes, META_FIELDS, RootFieldDto, SchemaDto, TableSettings, UIState } from '@app/shared/internal';
-import { FieldWrappings } from '..';
+import { FieldWrappings } from './..';
 
 describe('TableSettings', () => {
     let uiState: IMock<UIState>;

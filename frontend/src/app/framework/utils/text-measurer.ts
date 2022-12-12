@@ -6,7 +6,7 @@
  */
 
 import { ElementRef } from '@angular/core';
-import { Types } from '../internal';
+import { Types } from './../internal';
 
 let CANVAS: HTMLCanvasElement | null = null;
 

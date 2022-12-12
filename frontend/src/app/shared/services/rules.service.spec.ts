@@ -8,7 +8,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, DateTime, Resource, ResourceLinks, RuleDto, RuleElementDto, RuleElementPropertyDto, RuleEventDto, RuleEventsDto, RulesDto, RulesService, Version } from '@app/shared/internal';
-import { RuleCompletions } from '..';
+import { RuleCompletions } from './..';
 import { SimulatedRuleEventDto, SimulatedRuleEventsDto } from './rules.service';
 
 describe('RulesService', () => {

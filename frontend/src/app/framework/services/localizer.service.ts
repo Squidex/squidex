@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { compareStrings } from '../utils/array-helper';
+import { compareStrings } from './../utils/array-helper';
 
 @Injectable()
 export class LocalizerService {

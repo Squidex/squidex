@@ -10,7 +10,7 @@ import { AbstractControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { debounceTime, Subscription } from 'rxjs';
 import { ActionForm, ALL_TRIGGERS, MessageBus, ResourceOwner, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, TriggerForm, value$ } from '@app/shared';
-import { RuleConfigured } from '../messages';
+import { RuleConfigured } from './../messages';
 
 @Component({
     selector: 'sqx-rule-page',
