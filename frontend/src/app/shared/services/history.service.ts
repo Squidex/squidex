@@ -9,7 +9,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, DateTime, escape, pretifyError, Version } from '@app/framework';
+import { ApiUrlConfig, DateTime, escapeHTML, pretifyError, Version } from '@app/framework';
 import { UsersProviderService } from './users-provider.service';
 
 export class HistoryEventDto {
@@ -57,11 +57,11 @@ export function formatHistoryMessage(message: string, users: UsersProviderServic
         }
 
         message = message.replace(/{([^\s:]*):([^}]*)}/, () => {
-            return `<span class="user-ref">${escape(placeholderValues.shift() || '')}</span>`;
+            return `<span class="user-ref">${escapeHTML(placeholderValues.shift() || '')}</span>`;
         });
 
         message = message.replace(/{([^}]*)}/g, (match: string, marker: string) => {
-            return `<span class="marker-ref">${escape(marker)}</span>`;
+            return `<span class="marker-ref">${escapeHTML(marker)}</span>`;
         });
 
         return message;

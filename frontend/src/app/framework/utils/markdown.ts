@@ -31,7 +31,7 @@ export function renderMarkdown(input: string | undefined | null, inline: boolean
         return '';
     }
 
-    input = escape(input);
+    input = escapeHTML(input);
 
     if (inline) {
         return marked(input, { renderer: RENDERER_INLINE });
@@ -52,7 +52,7 @@ const escapeReplacements = {
 
 const getEscapeReplacement = (ch: string) => escapeReplacements[ch];
 
-export function escape(html: string) {
+export function escapeHTML(html: string) {
     if (escapeTestNoEncode.test(html)) {
         return html.replace(escapeReplaceNoEncode, getEscapeReplacement);
     }
