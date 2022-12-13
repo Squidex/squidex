@@ -7,7 +7,71 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, DateTime, HistoryEventDto, HistoryService, Version } from '@app/shared/internal';
+import { firstValueFrom, of } from 'rxjs';
+import { IMock, Mock } from 'typemoq';
+import { ApiUrlConfig, DateTime, formatHistoryMessage, HistoryEventDto, HistoryService, UsersProviderService, Version } from '@app/shared/internal';
+
+describe('formatHistoryMessage', () => {
+    let userProvider: IMock<UsersProviderService>;
+
+    beforeEach(() => {
+        userProvider = Mock.ofType<UsersProviderService>();
+    });
+
+    it('should provide simple message', async () => {
+        const message = await firstValueFrom(formatHistoryMessage('message', userProvider.object));
+
+        expect(message).toEqual('message');
+    });
+
+    it('should embed marker', async () => {
+        const message = await firstValueFrom(formatHistoryMessage('{Name}', userProvider.object));
+
+        expect(message).toEqual('<span class="marker-ref">Name</span>');
+    });
+
+    it('should embed marker ref and escape HTML', async () => {
+        const message = await firstValueFrom(formatHistoryMessage('{<h1>HTML</h1>}', userProvider.object));
+
+        expect(message).toEqual('<span class="marker-ref">&lt;h1&gt;HTML&lt;/h1&gt;</span>');
+    });
+
+    it('should embed user ref with unknown type', async () => {
+        const message = await firstValueFrom(formatHistoryMessage('{unknown:User1}', userProvider.object));
+
+        expect(message).toEqual('<span class="user-ref">User1</span>');
+    });
+
+    it('should embed user ref with client', async () => {
+        const message = await firstValueFrom(formatHistoryMessage('{user:unknown:Client1}', userProvider.object));
+
+        expect(message).toEqual('<span class="user-ref">Client1-client</span>');
+    });
+
+    it('should embed user ref with client ending with client', async () => {
+        const message = await firstValueFrom(formatHistoryMessage('{user:client:Sample-Client}', userProvider.object));
+
+        expect(message).toEqual('<span class="user-ref">Sample-Client</span>');
+    });
+
+    it('should embed user ref with subject', async () => {
+        userProvider.setup(x => x.getUser('1', null))
+            .returns(() => of({ id: '1', displayName: 'User1' }));
+
+        const message = await firstValueFrom(formatHistoryMessage('{user:subject:1}', userProvider.object));
+
+        expect(message).toEqual('<span class="user-ref">User1</span>');
+    });
+
+    it('should embed user ref with id', async () => {
+        userProvider.setup(x => x.getUser('1', null))
+            .returns(() => of({ id: '1', displayName: 'User1' }));
+
+        const message = await firstValueFrom(formatHistoryMessage('{user:1}', userProvider.object));
+
+        expect(message).toEqual('<span class="user-ref">User1</span>');
+    });
+});
 
 describe('HistoryService', () => {
     beforeEach(() => {
