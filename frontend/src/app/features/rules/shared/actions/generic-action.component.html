@@ -47,7 +47,7 @@
             </ng-container>
 
             <sqx-form-hint>
-                <span [sqxMarkdown]="property.description" [inline]="true" [html]="true"></span>
+                <span [sqxMarkdown]="property.description" [inline]="true"></span>
 
                 <div *ngIf="property.isFormattable">
                     {{ 'rules.advancedFormattingHint' | sqxTranslate }}: <a tabindex="-1" href="https://docs.squidex.io/concepts/rules#3-formatting" sqxExternalLink>{{ 'common.documentation' | sqxTranslate }}</a>

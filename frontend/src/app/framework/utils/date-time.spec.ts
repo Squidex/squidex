@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DateHelper } from '..';
+import { DateHelper } from './..';
 import { DateTime } from './date-time';
 
 describe('DateTime', () => {

@@ -18,3 +18,7 @@ declare module 'sortablejs' {
 
     export function create(element: any, options: any): Ref;
 }
+
+declare namespace marked {
+    export function escape(input: string): string;
+}

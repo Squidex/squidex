@@ -7,9 +7,9 @@
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { firstValueFrom, from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, DateTime, pretifyError, Version } from '@app/framework';
+import { ApiUrlConfig, DateTime, escapeHTML, pretifyError, Version } from '@app/framework';
 import { UsersProviderService } from './users-provider.service';
 
 export class HistoryEventDto {
@@ -24,43 +24,50 @@ export class HistoryEventDto {
     }
 }
 
-const REPLACEMENT_TEMP = '$TEMP$';
-
 export function formatHistoryMessage(message: string, users: UsersProviderService): Observable<string> {
-    const userName = (userId: string) => {
-        const parts = userId.split(':');
+    async function getUserName(id: string): Promise<string> {
+        const user = await firstValueFrom(users.getUser(id, null));
 
-        if (parts.length === 1) {
-            return users.getUser(parts[0], null).pipe(map(u => u.displayName));
-        } else if (parts[0] === 'subject') {
-            return users.getUser(parts[1], null).pipe(map(u => u.displayName));
-        } else if (parts[1].endsWith('client')) {
-            return of(parts[1]);
-        } else {
-            return of(`${parts[1]}-client`);
-        }
-    };
-
-    let foundUserId: string | null = null;
-
-    message = message.replace(/{([^\s:]*):([^}]*)}/, (match: string, type: string, id: string) => {
-        if (type === 'user') {
-            foundUserId = id;
-            return REPLACEMENT_TEMP;
-        } else {
-            return id;
-        }
-    });
-
-    message = message.replace(/{([^}]*)}/g, (match: string, marker: string) => {
-        return `<span class="marker-ref">${marker}</span>`;
-    });
-
-    if (foundUserId) {
-        return userName(foundUserId).pipe(map(t => message.replace(REPLACEMENT_TEMP, `<span class="user-ref">${t}</span>`)));
+        return user.displayName;
     }
 
-    return of(message);
+    async function format(message: string): Promise<string> {
+        const placeholderMatches = message.matchAll(/{(?<type>[^\s:]*):(?<id>[^}]*)}/g) || [];
+        const placeholderValues: string[] = [];
+
+        for (const match of placeholderMatches) {
+            const { id, type } = match.groups!;
+
+            if (type !== 'user') {
+                placeholderValues.push(id);
+                continue;
+            }
+
+            const parts = id.split(':');
+
+            if (parts.length === 1) {
+                placeholderValues.push(await getUserName(parts[0]));
+            } else if (parts[0] === 'subject') {
+                placeholderValues.push(await getUserName(parts[1]));
+            } else if (parts[1].toLowerCase().endsWith('client')) {
+                placeholderValues.push(parts[1]);
+            } else {
+                placeholderValues.push(`${parts[1]}-client`);
+            }
+        }
+
+        message = message.replace(/{([^\s:]*):([^}]*)}/, () => {
+            return `<span class="user-ref">${escapeHTML(placeholderValues.shift() || '')}</span>`;
+        });
+
+        message = message.replace(/{([^}]*)}/g, (match: string, marker: string) => {
+            return `<span class="marker-ref">${escapeHTML(marker)}</span>`;
+        });
+
+        return message;
+    }
+
+    return from(format(message));
 }
 
 @Injectable()

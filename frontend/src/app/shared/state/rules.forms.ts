@@ -7,7 +7,7 @@
 
 import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, ValidatorsEx } from '@app/framework';
-import { RuleElementDto } from '../services/rules.service';
+import { RuleElementDto } from './../services/rules.service';
 
 export class ActionForm extends Form<any, UntypedFormGroup> {
     constructor(public readonly definition: RuleElementDto,

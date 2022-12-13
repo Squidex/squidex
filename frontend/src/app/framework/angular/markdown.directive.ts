@@ -6,24 +6,7 @@
  */
 
 import { Directive, ElementRef, Input, OnChanges, Renderer2 } from '@angular/core';
-import { marked } from 'marked';
-
-const RENDERER_DEFAULT = new marked.Renderer();
-const RENDERER_INLINE = new marked.Renderer();
-
-RENDERER_DEFAULT.link = (href, _, text) => {
-    if (href && href.startsWith('mailto')) {
-        return text;
-    } else {
-        return `<a href="${href}" target="_blank", rel="noopener">${text} <i class="icon-external-link"></i></a>`;
-    }
-};
-
-RENDERER_INLINE.paragraph = (text) => {
-    return text;
-};
-
-RENDERER_INLINE.link = RENDERER_DEFAULT.link;
+import { renderMarkdown } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxMarkdown]',
@@ -34,9 +17,6 @@ export class MarkdownDirective implements OnChanges {
 
     @Input()
     public inline = true;
-
-    @Input()
-    public html = false;
 
     @Input()
     public optional = false;
@@ -50,22 +30,28 @@ export class MarkdownDirective implements OnChanges {
     public ngOnChanges() {
         let html = '';
 
-        const markdown = this.markdown;
+        let markdown = this.markdown;
+
+        const hasExclamation = markdown.indexOf('!') === 0;
+
+        if (hasExclamation) {
+            markdown = markdown.substring(1);
+        }
 
         if (!markdown) {
             html = markdown;
-        } else if (this.optional && markdown.indexOf('!') !== 0) {
+        } else if (this.optional && !hasExclamation) {
             html = markdown;
         } else if (this.markdown) {
-            const renderer = this.inline ? RENDERER_INLINE : RENDERER_DEFAULT;
-
-            html = marked(this.markdown, { renderer });
+            html = renderMarkdown(markdown, this.inline);
         }
 
-        if (!this.html && (!html || html === this.markdown || html.indexOf('<') < 0)) {
-            this.renderer.setProperty(this.element.nativeElement, 'textContent', html);
-        } else {
+        const hasHtml = html.indexOf('<') >= 0;
+
+        if (hasHtml) {
             this.renderer.setProperty(this.element.nativeElement, 'innerHTML', html);
+        } else {
+            this.renderer.setProperty(this.element.nativeElement, 'textContent', html);
         }
     }
 }

@@ -8,7 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessageBus, ResourceOwner, RuleSimulatorState, SimulatedRuleEventDto } from '@app/shared';
-import { RuleConfigured } from '../messages';
+import { RuleConfigured } from './../messages';
 
 @Component({
     selector: 'sqx-simulator-events-page',

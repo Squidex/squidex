@@ -6,25 +6,7 @@
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
-import { marked } from 'marked';
-
-const renderer = new marked.Renderer();
-
-renderer.link = (href, _, text) => {
-    if (href && href.startsWith('mailto')) {
-        return text;
-    } else {
-        return `<a href="${href}" target="_blank", rel="noopener">${text} <i class="icon-external-link"></i></a>`;
-    }
-};
-
-const inlinerRenderer = new marked.Renderer();
-
-inlinerRenderer.paragraph = (text) => {
-    return text;
-};
-
-inlinerRenderer.link = renderer.link;
+import { renderMarkdown } from '@app/framework/internal';
 
 @Pipe({
     name: 'sqxMarkdown',
@@ -32,11 +14,7 @@ inlinerRenderer.link = renderer.link;
 })
 export class MarkdownPipe implements PipeTransform {
     public transform(text: string | undefined | null): string {
-        if (text) {
-            return marked(text, { renderer });
-        } else {
-            return '';
-        }
+        return renderMarkdown(text, false);
     }
 }
 
@@ -46,10 +24,6 @@ export class MarkdownPipe implements PipeTransform {
 })
 export class MarkdownInlinePipe implements PipeTransform {
     public transform(text: string | undefined | null): string {
-        if (text) {
-            return marked(text, { renderer: inlinerRenderer });
-        } else {
-            return '';
-        }
+        return renderMarkdown(text, true);
     }
 }
