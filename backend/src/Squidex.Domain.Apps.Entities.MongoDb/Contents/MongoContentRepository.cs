@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Clusters;
@@ -41,18 +42,18 @@ public partial class MongoContentRepository : MongoBase<MongoContentEntity>, ICo
     }
 
     public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider,
-        IOptions<ContentOptions> options)
+        IOptions<ContentOptions> options, ILogger<MongoContentRepository> log)
     {
         this.appProvider = appProvider;
         this.database = database;
         this.options = options.Value;
 
         collectionComplete =
-            new MongoContentCollection("States_Contents_All3", database,
+            new MongoContentCollection("States_Contents_All3", database, log,
                 ReadPreference.Primary, options.Value.OptimizeForSelfHosting);
 
         collectionPublished =
-            new MongoContentCollection("States_Contents_Published3", database,
+            new MongoContentCollection("States_Contents_Published3", database, log,
                 ReadPreference.Secondary, options.Value.OptimizeForSelfHosting);
     }
 

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -21,10 +22,10 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
 {
     private readonly MongoCountCollection countCollection;
 
-    public MongoAssetRepository(IMongoDatabase database)
+    public MongoAssetRepository(IMongoDatabase database, ILogger<MongoAssetRepository> log)
         : base(database)
     {
-        countCollection = new MongoCountCollection(database, CollectionName());
+        countCollection = new MongoCountCollection(database, log, CollectionName());
     }
 
     public IMongoCollection<MongoAssetEntity> GetInternalCollection()
