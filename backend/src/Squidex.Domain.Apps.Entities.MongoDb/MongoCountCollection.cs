@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Infrastructure.MongoDb;
@@ -14,17 +15,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb;
 
 internal sealed class MongoCountCollection : MongoRepositoryBase<MongoCountEntity>
 {
-    private readonly string name;
+    private readonly string collectionName;
+    private readonly ILogger log;
 
-    public MongoCountCollection(IMongoDatabase database, string name)
+    public MongoCountCollection(IMongoDatabase database, ILogger log, string name)
         : base(database)
     {
-        this.name = $"{name}_Count";
+        this.log = log;
+
+        collectionName = $"{name}_Count";
     }
 
     protected override string CollectionName()
     {
-        return name;
+        return collectionName;
     }
 
     public async Task<long> GetOrAddAsync(string key, Func<CancellationToken, Task<long>> provider,
@@ -41,11 +45,23 @@ internal sealed class MongoCountCollection : MongoRepositoryBase<MongoCountEntit
 
         if (isOutdated)
         {
-            // If we have a loot of items, the query might be slow and therefore we execute it in the background.
-            RefreshTotalAsync(key, cachedTotal, provider, ct).Forget();
+            // If we have a lot of items, the query might be slow and therefore we execute it in the background.
+            RefreshSilentAsync(key, cachedTotal, provider).Forget();
         }
 
         return cachedTotal;
+    }
+
+    private async Task RefreshSilentAsync(string key, long cachedCount, Func<CancellationToken, Task<long>> provider)
+    {
+        try
+        {
+            await RefreshTotalAsync(key, cachedCount, provider, default);
+        }
+        catch (Exception ex)
+        {
+            log.LogError(ex, "Failed to update count for collection {collection}.", collectionName);
+        }
     }
 
     private async Task<long> RefreshTotalAsync(string key, long cachedCount, Func<CancellationToken, Task<long>> provider,
@@ -53,17 +69,19 @@ internal sealed class MongoCountCollection : MongoRepositoryBase<MongoCountEntit
     {
         var actualCount = await provider(ct);
 
-        if (actualCount != cachedCount)
+        if (actualCount == cachedCount)
         {
-            var now = SystemClock.Instance.GetCurrentInstant();
-
-            await Collection.UpdateOneAsync(x => x.Key == key,
-                Update
-                    .Set(x => x.Key, key)
-                    .SetOnInsert(x => x.Count, actualCount)
-                    .SetOnInsert(x => x.Created, now),
-                Upsert, ct);
+            return actualCount;
         }
+
+        var now = SystemClock.Instance.GetCurrentInstant();
+
+        await Collection.UpdateOneAsync(x => x.Key == key,
+            Update
+                .Set(x => x.Key, key)
+                .SetOnInsert(x => x.Count, actualCount)
+                .SetOnInsert(x => x.Created, now),
+            Upsert, ct);
 
         return actualCount;
     }

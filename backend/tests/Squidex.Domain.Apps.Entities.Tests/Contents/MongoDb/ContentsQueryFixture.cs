@@ -7,6 +7,7 @@
 
 using System.Globalization;
 using LoremNET;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -82,11 +83,7 @@ public abstract class ContentsQueryFixtureBase : IAsyncLifetime
             OptimizeForSelfHosting = dedicatedCollections
         });
 
-        ContentRepository =
-            new MongoContentRepository(
-                mongoDatabase,
-                appProvider,
-                options);
+        ContentRepository = new MongoContentRepository(mongoDatabase, appProvider, options, A.Fake<ILogger<MongoContentRepository>>());
     }
 
     public Task DisposeAsync()

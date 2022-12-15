@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -35,7 +36,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
     private readonly ReadPreference readPreference;
     private readonly string name;
 
-    public MongoContentCollection(string name, IMongoDatabase database, ReadPreference readPreference,
+    public MongoContentCollection(string name, IMongoDatabase database, ILogger log, ReadPreference readPreference,
         bool dedicatedCollections)
         : base(database)
     {
@@ -47,7 +48,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         queryReferences = new QueryReferences(queryByIds);
         queryReferrers = new QueryReferrers();
         queryScheduled = new QueryScheduled();
-        queryByQuery = new QueryByQuery(new MongoCountCollection(database, name));
+        queryByQuery = new QueryByQuery(new MongoCountCollection(database, log, name));
 
         if (dedicatedCollections)
         {
