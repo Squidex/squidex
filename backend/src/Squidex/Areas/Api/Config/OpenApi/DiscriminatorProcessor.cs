@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using GraphQL.Utilities;
 using NJsonSchema;
 using NJsonSchema.Generation;
 using Squidex.Infrastructure.Reflection;
@@ -28,7 +29,7 @@ public sealed class DiscriminatorProcessor : ISchemaProcessor
         }
 
         if (!typeRegistry.TryGetConfig(context.ContextualType.Type, out var config) ||
-            config.DerivedTypes.Count <= 0 ||
+            config.IsEmpty ||
             config.DiscriminatorProperty == null)
         {
             return;
@@ -42,7 +43,7 @@ public sealed class DiscriminatorProcessor : ISchemaProcessor
 
         var schema = context.Schema;
 
-        foreach (var (derivedType, typeName) in config.DerivedTypes)
+        foreach (var (derivedType, typeName) in config.DerivedTypes().OrderBy(x => x.TypeName))
         {
             var derivedSchema = context.Generator.Generate(derivedType, context.Resolver);
 

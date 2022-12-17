@@ -35,7 +35,7 @@
 <body>
     <div id="redoc-container"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/redoc@2.0.0-rc.57/bundles/redoc.standalone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/redoc@2.0.0/bundles/redoc.standalone.js"></script>
     <script>
         Redoc.init('@Url.Content(Model!.Specification)', {
             theme: {
@@ -45,6 +45,9 @@
                     }
                 }
             },
+            sortOperationsAlphabetically: true,
+            sortEnumValuesAlphabetically: true,
+            sortTagsAlphabetically: true,
             nativeScrollbars: true
         }, document.getElementById('redoc-container'))
     </script>

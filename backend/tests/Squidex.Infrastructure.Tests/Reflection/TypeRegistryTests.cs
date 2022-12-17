@@ -113,6 +113,18 @@ public class TypeRegistryTests
     }
 
     [Fact]
+    public void Should_provide_last_registration_for_list()
+    {
+        sut.Add<Base>(typeof(DerivedCustom), "Custom1");
+        sut.Add<Base>(typeof(DerivedCustom), "Custom2");
+        sut.Add<Base>(typeof(DerivedBase), "Base");
+
+        sut.TryGetConfig<Base>(out var config);
+
+        Assert.Equal(new[] { (typeof(DerivedCustom), "Custom2"), (typeof(DerivedBase), "Base") }, config?.DerivedTypes().ToArray());
+    }
+
+    [Fact]
     public void Should_throw_exception_if_type_name_not_found()
     {
         Assert.Throws<ArgumentException>(() => sut.GetName<Base>(typeof(DerivedCustom)));

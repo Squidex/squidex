@@ -17,9 +17,9 @@ public sealed class TypeConfig
 
     public string? DiscriminatorProperty { get; set; }
 
-    public IReadOnlyList<(Type DerivedType, string TypeName)> DerivedTypes
+    public bool IsEmpty
     {
-        get => derivedTypes;
+        get => derivedTypes.Count == 0;
     }
 
     internal void Add(Type derivedType, string typeName)
@@ -43,6 +43,14 @@ public sealed class TypeConfig
         mapByType = null;
     }
 
+    public IEnumerable<(Type DerivedType, string TypeName)> DerivedTypes()
+    {
+        var map = mapByType ??= BuildMapByType();
+
+        // The mapping can have multiple names per type, but the last is the default.
+        return map.Select(x => (x.Key, x.Value));
+    }
+
     public bool TryGetType(string typeName, [MaybeNullWhen(false)] out Type derivedType)
     {
         var map = mapByName ??= BuildMapByName();
@@ -61,6 +69,7 @@ public sealed class TypeConfig
     {
         var result = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 
+        // Ensure that the last registration wins and becomes the default.
         foreach (var (derivedType, typeName) in derivedTypes)
         {
             result[typeName] = derivedType;
@@ -73,6 +82,7 @@ public sealed class TypeConfig
     {
         var result = new Dictionary<Type, string>();
 
+        // Ensure that the last registration wins and becomes the default.
         foreach (var (derivedType, typeName) in derivedTypes)
         {
             result[derivedType] = typeName;
