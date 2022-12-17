@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -46,11 +47,13 @@ public class RuleTests
         }
     }
 
+    [RuleAction]
     public sealed record TestAction1 : RuleAction
     {
         public string Property { get; set; }
     }
 
+    [RuleAction]
     public sealed record TestAction2 : RuleAction
     {
         public string Property { get; set; }

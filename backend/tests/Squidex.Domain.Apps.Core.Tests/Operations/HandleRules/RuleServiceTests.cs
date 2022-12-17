@@ -40,10 +40,12 @@ public class RuleServiceTests
     {
     }
 
+    [RuleAction]
     public sealed record InvalidAction : RuleAction
     {
     }
 
+    [RuleAction]
     public sealed record ValidAction : RuleAction
     {
     }

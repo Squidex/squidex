@@ -38,18 +38,18 @@ public sealed class RuleTypeProvider : ITypeProvider
         }
     }
 
-    public void Add<T>() where T : RuleAction
+    public RuleTypeProvider Add<T>() where T : RuleAction
     {
-        Add(typeof(T));
+        return Add(typeof(T));
     }
 
-    private void Add(Type actionType)
+    private RuleTypeProvider Add(Type actionType)
     {
         var metadata = actionType.GetCustomAttribute<RuleActionAttribute>();
 
         if (metadata == null)
         {
-            return;
+            return this;
         }
 
         var name = GetActionName(actionType);
@@ -136,6 +136,8 @@ public sealed class RuleTypeProvider : ITypeProvider
         }
 
         actionTypes[name] = definition;
+
+        return this;
     }
 
     private static T? GetDataAttribute<T>(PropertyInfo property) where T : ValidationAttribute

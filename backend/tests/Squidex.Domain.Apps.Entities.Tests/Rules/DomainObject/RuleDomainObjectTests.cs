@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
@@ -29,6 +30,7 @@ public class RuleDomainObjectTests : HandlerTestBase<RuleDomainObject.State>
         get => DomainId.Combine(AppId, ruleId);
     }
 
+    [RuleAction]
     public sealed record TestAction : RuleAction
     {
         public int Value { get; set; }

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -23,6 +24,7 @@ public class GuardRuleTests : IClassFixture<TranslationsFixture>
     private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
     private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
 
+    [RuleAction]
     public sealed record TestAction : RuleAction
     {
         public Uri Url { get; set; }
