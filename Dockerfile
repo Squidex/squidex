@@ -53,7 +53,7 @@ COPY frontend/package*.json /tmp/
 COPY frontend/patches /tmp/patches
 
 # Install Node packages 
-RUN npm i
+RUN cd /tmp && npm install --loglevel=error
 
 COPY frontend .
 
