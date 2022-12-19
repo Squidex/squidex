@@ -50,6 +50,9 @@ public sealed record MyUIOptions
     [JsonPropertyName("onlyAdminsCanCreateTeams")]
     public bool OnlyAdminsCanCreateTeams { get; set; }
 
+    [JsonPropertyName("markerProject")]
+    public string MarkerProject { get; set; }
+
     public sealed class MapOptions
     {
         [JsonPropertyName("type")]

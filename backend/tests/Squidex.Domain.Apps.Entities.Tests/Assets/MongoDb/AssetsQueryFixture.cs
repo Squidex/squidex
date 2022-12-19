@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Globalization;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NodaTime;
@@ -43,7 +43,14 @@ public sealed class AssetsQueryFixture : IAsyncLifetime
         mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
         mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
-        AssetRepository = new MongoAssetRepository(mongoDatabase, A.Fake<ILogger<MongoAssetRepository>>());
+        var services =
+            new ServiceCollection()
+                .AddSingleton(mongoClient)
+                .AddSingleton(mongoDatabase)
+                .AddLogging()
+                .BuildServiceProvider();
+
+        AssetRepository = services.GetRequiredService<MongoAssetRepository>();
     }
 
     public Task DisposeAsync()

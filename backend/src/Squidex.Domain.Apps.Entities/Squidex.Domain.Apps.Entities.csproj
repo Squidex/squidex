@@ -20,8 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="30.0.1" />
-    <PackageReference Include="GraphQL" Version="7.2.0" />
-    <PackageReference Include="GraphQL.DataLoader" Version="7.2.0" />
+    <PackageReference Include="GraphQL" Version="7.2.1" />
+    <PackageReference Include="GraphQL.DataLoader" Version="7.2.1" />
     <PackageReference Include="Meziantou.Analyzer" Version="1.0.756">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

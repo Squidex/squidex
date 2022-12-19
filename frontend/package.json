@@ -30,6 +30,7 @@
     "@babel/runtime": "^7.19.4",
     "@egjs/hammerjs": "2.0.17",
     "@graphiql/toolkit": "^0.8.0",
+    "@marker.io/browser": "^0.16.0",
     "ace-builds": "1.12.0",
     "angular-gridster2": "14.1.1",
     "angular-mentions": "1.5.0",

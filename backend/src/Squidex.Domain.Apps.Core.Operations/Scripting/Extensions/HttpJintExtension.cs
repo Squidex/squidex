@@ -91,20 +91,16 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
                 throw new JavaScriptException("URL is not valid.");
             }
 
-            using (var httpClient = httpClientFactory.CreateClient())
-            {
-                using (var request = CreateRequest(context, method, uri, body, headers))
-                {
-                    using (var response = await httpClient.SendAsync(request, ct))
-                    {
-                        response.EnsureSuccessStatusCode();
+            var httpClient = httpClientFactory.CreateClient("Jint");
 
-                        var responseObject = await ParseResponseasync(context, response, ct);
+            var request = CreateRequest(context, method, uri, body, headers);
+            var response = await httpClient.SendAsync(request, ct);
 
-                        scheduler.Run(callback, responseObject);
-                    }
-                }
-            }
+            response.EnsureSuccessStatusCode();
+
+            var responseObject = await ParseResponseasync(context, response, ct);
+
+            scheduler.Run(callback, responseObject);
         });
     }
 

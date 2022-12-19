@@ -50,6 +50,8 @@ public static class InfrastructureServices
         services.Configure<DiagnoserOptions>(config,
             "diagnostics");
 
+        services.AddHttpClient("Jint");
+
         services.AddReplicatedCache();
         services.AddAsyncLocalCache();
         services.AddBackgroundCache();

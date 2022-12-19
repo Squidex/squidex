@@ -27,7 +27,6 @@ public sealed class UIController : ApiController
         : base(commandBus)
     {
         this.uiOptions = uiOptions.Value;
-
         this.appUISettings = appUISettings;
     }
 

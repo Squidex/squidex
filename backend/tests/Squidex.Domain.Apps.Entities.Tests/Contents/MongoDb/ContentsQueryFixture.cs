@@ -7,6 +7,7 @@
 
 using System.Globalization;
 using LoremNET;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -17,7 +18,9 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
+using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -76,14 +79,16 @@ public abstract class ContentsQueryFixtureBase : IAsyncLifetime
         mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
         mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
-        var appProvider = CreateAppProvider();
+        var services =
+            new ServiceCollection()
+                .AddSingleton(Options.Create(new ContentOptions { OptimizeForSelfHosting = dedicatedCollections }))
+                .AddSingleton(CreateAppProvider())
+                .AddSingleton(mongoClient)
+                .AddSingleton(mongoDatabase)
+                .AddLogging()
+                .BuildServiceProvider();
 
-        var options = Options.Create(new ContentOptions
-        {
-            OptimizeForSelfHosting = dedicatedCollections
-        });
-
-        ContentRepository = new MongoContentRepository(mongoDatabase, appProvider, options, A.Fake<ILogger<MongoContentRepository>>());
+        ContentRepository = services.GetRequiredService<MongoContentRepository>();
     }
 
     public Task DisposeAsync()

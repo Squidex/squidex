@@ -47,19 +47,14 @@ public sealed class FastlyActionHandler : RuleActionHandler<FastlyAction, Fastly
     protected override async Task<Result> ExecuteJobAsync(FastlyJob job,
         CancellationToken ct = default)
     {
-        using (var httpClient = httpClientFactory.CreateClient())
-        {
-            httpClient.Timeout = TimeSpan.FromSeconds(2);
+        var httpClient = httpClientFactory.CreateClient("FastlyAction");
 
-            var requestUrl = $"https://api.fastly.com/service/{job.FastlyServiceID}/purge/{job.Key}";
+        var requestUrl = $"/service/{job.FastlyServiceID}/purge/{job.Key}";
+        var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
 
-            using (var request = new HttpRequestMessage(HttpMethod.Post, requestUrl))
-            {
-                request.Headers.Add("Fastly-Key", job.FastlyApiKey);
+        request.Headers.Add("Fastly-Key", job.FastlyApiKey);
 
-                return await httpClient.OneWayRequestAsync(request, ct: ct);
-            }
-        }
+        return await httpClient.OneWayRequestAsync(request, ct: ct);
     }
 }
 

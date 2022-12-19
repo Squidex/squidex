@@ -26,11 +26,13 @@ public sealed class AtlasTextIndex : MongoTextIndexBase<Dictionary<string, strin
         new LuceneQueryAnalyzer(LuceneVersion.LUCENE_48, "*",
             new StandardAnalyzer(LuceneVersion.LUCENE_48, CharArraySet.EMPTY_SET));
     private readonly AtlasOptions options;
+    private readonly IHttpClientFactory httpClientFactory;
     private string index;
 
-    public AtlasTextIndex(IMongoDatabase database, IOptions<AtlasOptions> options)
+    public AtlasTextIndex(IMongoDatabase database, IHttpClientFactory httpClientFactory, IOptions<AtlasOptions> options)
         : base(database)
     {
+        this.httpClientFactory = httpClientFactory;
         this.options = options.Value;
     }
 
@@ -39,7 +41,7 @@ public sealed class AtlasTextIndex : MongoTextIndexBase<Dictionary<string, strin
     {
         await base.SetupCollectionAsync(collection, ct);
 
-        index = await AtlasIndexDefinition.CreateIndexAsync(options,
+        index = await AtlasIndexDefinition.CreateIndexAsync(options, httpClientFactory,
             Database.DatabaseNamespace.DatabaseName, CollectionName(), ct);
     }
 

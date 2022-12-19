@@ -20,65 +20,62 @@ public sealed class TemplatesClient
     public TemplatesClient(IHttpClientFactory httpClientFactory, IOptions<TemplatesOptions> options)
     {
         this.httpClientFactory = httpClientFactory;
-
         this.options = options.Value;
     }
 
     public async Task<string?> GetRepositoryUrl(string name,
         CancellationToken ct = default)
     {
-        using (var httpClient = httpClientFactory.CreateClient())
+        var httpClient = httpClientFactory.CreateClient();
+
+        var result = new List<Template>();
+
+        foreach (var repository in options.Repositories.OrEmpty())
         {
-            var result = new List<Template>();
+            var url = $"{repository.ContentUrl}/README.md";
 
-            foreach (var repository in options.Repositories.OrEmpty())
+            var text = await httpClient.GetStringAsync(url, ct);
+
+            foreach (Match match in Regex.Matches(text).OfType<Match>())
             {
-                var url = $"{repository.ContentUrl}/README.md";
+                var currentName = match.Groups["Name"].Value;
 
-                var text = await httpClient.GetStringAsync(url, ct);
-
-                foreach (Match match in Regex.Matches(text).OfType<Match>())
+                if (currentName == name)
                 {
-                    var currentName = match.Groups["Name"].Value;
-
-                    if (currentName == name)
-                    {
-                        return $"{repository.GitUrl ?? repository.ContentUrl}?folder={name}";
-                    }
+                    return $"{repository.GitUrl ?? repository.ContentUrl}?folder={name}";
                 }
             }
-
-            return null;
         }
+
+        return null;
     }
 
     public async Task<List<Template>> GetTemplatesAsync(
         CancellationToken ct = default)
     {
-        using (var httpClient = httpClientFactory.CreateClient())
+        var httpClient = httpClientFactory.CreateClient();
+
+        var result = new List<Template>();
+
+        foreach (var repository in options.Repositories.OrEmpty())
         {
-            var result = new List<Template>();
+            var url = $"{repository.ContentUrl}/README.md";
 
-            foreach (var repository in options.Repositories.OrEmpty())
+            var text = await httpClient.GetStringAsync(url, ct);
+
+            foreach (Match match in Regex.Matches(text).OfType<Match>())
             {
-                var url = $"{repository.ContentUrl}/README.md";
+                var title = match.Groups["Title"].Value;
 
-                var text = await httpClient.GetStringAsync(url, ct);
-
-                foreach (Match match in Regex.Matches(text).OfType<Match>())
-                {
-                    var title = match.Groups["Title"].Value;
-
-                    result.Add(new Template(
-                        match.Groups["Name"].Value,
-                        title,
-                        match.Groups["Description"].Value,
-                        title.StartsWith("Starter ", StringComparison.OrdinalIgnoreCase)));
-                }
+                result.Add(new Template(
+                    match.Groups["Name"].Value,
+                    title,
+                    match.Groups["Description"].Value,
+                    title.StartsWith("Starter ", StringComparison.OrdinalIgnoreCase)));
             }
-
-            return result;
         }
+
+        return result;
     }
 
     public async Task<string?> GetDetailAsync(string name,
@@ -86,18 +83,17 @@ public sealed class TemplatesClient
     {
         Guard.NotNullOrEmpty(name);
 
-        using (var httpClient = httpClientFactory.CreateClient())
+        var httpClient = httpClientFactory.CreateClient();
+
+        foreach (var repository in options.Repositories.OrEmpty())
         {
-            foreach (var repository in options.Repositories.OrEmpty())
+            var url = $"{repository.ContentUrl}/{name}/README.md";
+
+            var response = await httpClient.GetAsync(url, ct);
+
+            if (response.IsSuccessStatusCode)
             {
-                var url = $"{repository.ContentUrl}/{name}/README.md";
-
-                var response = await httpClient.GetAsync(url, ct);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsStringAsync(ct);
-                }
+                return await response.Content.ReadAsStringAsync(ct);
             }
         }
 

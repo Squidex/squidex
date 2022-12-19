@@ -105,35 +105,31 @@ public static class AtlasIndexDefinition
         return "t.iv";
     }
 
-    public static async Task<string> CreateIndexAsync(AtlasOptions options,
+    public static async Task<string> CreateIndexAsync(AtlasOptions options, IHttpClientFactory httpClientFactory,
         string database,
         string collectionName,
         CancellationToken ct)
     {
         var (index, name) = Create(database, collectionName);
 
-        using (var httpClient = new HttpClient(new HttpClientHandler
+        var httpClient = httpClientFactory.CreateClient("Atlas");
+
+        var url = $"/api/atlas/v1.0/groups/{options.GroupId}/clusters/{options.ClusterName}/fts/indexes";
+
+        var result = await httpClient.PostAsJsonAsync(url, index, ct);
+
+        if (result.IsSuccessStatusCode)
         {
-            Credentials = new NetworkCredential(options.PublicKey, options.PrivateKey, "cloud.mongodb.com")
-        }))
+            return name;
+        }
+
+        var error = await result.Content.ReadFromJsonAsync<ErrorResponse>(cancellationToken: ct);
+
+        if (error?.ErrorCode == "ATLAS_FTS_DUPLICATE_INDEX")
         {
-            var url = $"https://cloud.mongodb.com/api/atlas/v1.0/groups/{options.GroupId}/clusters/{options.ClusterName}/fts/indexes";
+            var message = new ConfigurationError($"Creating index failed with {result.StatusCode}: {error?.Detail}");
 
-            var result = await httpClient.PostAsJsonAsync(url, index, ct);
-
-            if (result.IsSuccessStatusCode)
-            {
-                return name;
-            }
-
-            var error = await result.Content.ReadFromJsonAsync<ErrorResponse>(cancellationToken: ct);
-
-            if (error?.ErrorCode != "ATLAS_FTS_DUPLICATE_INDEX")
-            {
-                var message = new ConfigurationError($"Creating index failed with {result.StatusCode}: {error?.Detail}");
-
-                throw new ConfigurationException(message);
-            }
+            throw new ConfigurationException(message);
         }
 
         return name;
