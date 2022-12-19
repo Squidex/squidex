@@ -53,7 +53,7 @@ COPY frontend/package*.json /tmp/
 COPY frontend/patches /tmp/patches
 
 # Install Node packages 
-RUN cd /tmp && npm set unsafe-perm true && npm install --loglevel=error
+RUN npm i
 
 COPY frontend .
 
