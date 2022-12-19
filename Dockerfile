@@ -42,7 +42,7 @@ RUN dotnet tool install --tool-path /tools dotnet-counters \
 #
 # Stage 2, Build Frontend
 #
-FROM buildkite/puppeteer:10.0.0 as frontend
+FROM browserless/chrome as frontend
 
 WORKDIR /src
 
