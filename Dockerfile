@@ -49,17 +49,15 @@ WORKDIR /src
 ENV CONTINUOUS_INTEGRATION=1
 
 # Copy Node project files and patches
-COPY frontend/package*.json /tmp/
-COPY frontend/patches /tmp/patches
+COPY frontend/package*.json ./
 
 # Install Node packages 
-RUN cd /tmp && npm install --loglevel=error
+RUN npm install --loglevel=error
 
 COPY frontend .
 
 # Build Frontend
-RUN cp -a /tmp/node_modules . \
- && npm run test:coverage \
+RUN npm run test:coverage \
  && npm run build
 
 RUN cp -a build /build/

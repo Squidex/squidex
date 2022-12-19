@@ -31,7 +31,7 @@ public sealed class AssemblyTypeProvider<T> : ITypeProvider where T : class
 
     public void Map(TypeRegistry typeRegistry)
     {
-       var baseType = typeof(T);
+        var baseType = typeof(T);
 
         foreach (var derivedType in assembly.GetTypes())
         {

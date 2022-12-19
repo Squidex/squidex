@@ -6,7 +6,6 @@
  */
 
 import { Injectable, OnDestroy } from '@angular/core';
-import ResizeObserver from 'resize-observer-polyfill';
 
 export interface ResizeListener {
     onResize(rect: DOMRect, element: Element): void;
