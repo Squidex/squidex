@@ -44,6 +44,11 @@ RUN dotnet tool install --tool-path /tools dotnet-counters \
 #
 FROM browserless/chrome as frontend
 
+RUN addgroup src && adduser -S -G src src
+
+# Somehow there seems to be a permission issue
+USER src
+
 WORKDIR /src
 
 ENV CONTINUOUS_INTEGRATION=1
