@@ -15,10 +15,12 @@ namespace Squidex.Domain.Apps.Entities.Backup;
 public sealed class TempFolderBackupArchiveLocation : IBackupArchiveLocation
 {
     private readonly IJsonSerializer serializer;
+    private readonly IHttpClientFactory httpClientFactory;
 
-    public TempFolderBackupArchiveLocation(IJsonSerializer serializer)
+    public TempFolderBackupArchiveLocation(IJsonSerializer serializer, IHttpClientFactory httpClientFactory)
     {
         this.serializer = serializer;
+        this.httpClientFactory = httpClientFactory;
     }
 
     public async Task<IBackupReader> OpenReaderAsync(Uri url, DomainId id,
@@ -37,17 +39,14 @@ public sealed class TempFolderBackupArchiveLocation : IBackupArchiveLocation
             HttpResponseMessage? response = null;
             try
             {
-                using (var client = new HttpClient())
+                var httpClient = httpClientFactory.CreateClient("Backup");
+
+                response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);
+                response.EnsureSuccessStatusCode();
+
+                await using (var sourceStream = await response.Content.ReadAsStreamAsync(ct))
                 {
-                    client.Timeout = TimeSpan.FromHours(1);
-
-                    response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);
-                    response.EnsureSuccessStatusCode();
-
-                    await using (var sourceStream = await response.Content.ReadAsStreamAsync(ct))
-                    {
-                        await sourceStream.CopyToAsync(stream, ct);
-                    }
+                    await sourceStream.CopyToAsync(stream, ct);
                 }
             }
             catch (HttpRequestException ex)

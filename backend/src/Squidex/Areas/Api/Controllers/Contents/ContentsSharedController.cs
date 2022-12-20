@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using GraphQL.Server.Transports.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -21,17 +23,14 @@ public sealed class ContentsSharedController : ApiController
 {
     private readonly IContentQueryService contentQuery;
     private readonly IContentWorkflow contentWorkflow;
-    private readonly GraphQLRunner graphQLRunner;
 
     public ContentsSharedController(ICommandBus commandBus,
         IContentQueryService contentQuery,
-        IContentWorkflow contentWorkflow,
-        GraphQLRunner graphQLRunner)
+        IContentWorkflow contentWorkflow)
         : base(commandBus)
     {
         this.contentQuery = contentQuery;
         this.contentWorkflow = contentWorkflow;
-        this.graphQLRunner = graphQLRunner;
     }
 
     /// <summary>
@@ -47,9 +46,14 @@ public sealed class ContentsSharedController : ApiController
     [Route("content/{app}/graphql/batch")]
     [ApiPermissionOrAnonymous]
     [ApiCosts(2)]
-    public Task GetGraphQL(string app)
+    public IActionResult GetGraphQL(string app)
     {
-        return graphQLRunner.InvokeAsync(HttpContext);
+        var options = new GraphQLHttpMiddlewareOptions
+        {
+            DefaultResponseContentType = new MediaTypeHeaderValue("application/json")
+        };
+
+        return new GraphQLExecutionActionResult<DummySchema>(options);
     }
 
     /// <summary>

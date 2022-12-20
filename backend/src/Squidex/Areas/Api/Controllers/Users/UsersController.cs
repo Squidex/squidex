@@ -166,30 +166,29 @@ public sealed class UsersController : ApiController
                     return new FileCallbackResult("image/png", callback);
                 }
 
-                using (var client = httpClientFactory.CreateClient())
+                var httpClient = httpClientFactory.CreateClient("Users");
+
+                var url = entity.Claims.PictureNormalizedUrl();
+
+                if (!string.IsNullOrWhiteSpace(url))
                 {
-                    var url = entity.Claims.PictureNormalizedUrl();
+                    var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, HttpContext.RequestAborted);
 
-                    if (!string.IsNullOrWhiteSpace(url))
+                    if (response.IsSuccessStatusCode)
                     {
-                        var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, HttpContext.RequestAborted);
+                        var contentType = response.Content.Headers.ContentType?.ToString()!;
+                        var contentStream = await response.Content.ReadAsStreamAsync(HttpContext.RequestAborted);
 
-                        if (response.IsSuccessStatusCode)
+                        var etag = response.Headers.ETag;
+
+                        var result = new FileStreamResult(contentStream, contentType);
+
+                        if (!string.IsNullOrWhiteSpace(etag?.Tag))
                         {
-                            var contentType = response.Content.Headers.ContentType?.ToString()!;
-                            var contentStream = await response.Content.ReadAsStreamAsync(HttpContext.RequestAborted);
-
-                            var etag = response.Headers.ETag;
-
-                            var result = new FileStreamResult(contentStream, contentType);
-
-                            if (!string.IsNullOrWhiteSpace(etag?.Tag))
-                            {
-                                result.EntityTag = new EntityTagHeaderValue(etag.Tag, etag.IsWeak);
-                            }
-
-                            return result;
+                            result.EntityTag = new EntityTagHeaderValue(etag.Tag, etag.IsWeak);
                         }
+
+                        return result;
                     }
                 }
             }

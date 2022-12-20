@@ -17,6 +17,8 @@ public static class IdentityServices
         services.Configure<MyIdentityOptions>(config,
             "identity");
 
+        services.AddHttpClient("USers");
+
         services.AddSingletonAs<DefaultUserResolver>()
             .AsOptional<IUserResolver>();
 

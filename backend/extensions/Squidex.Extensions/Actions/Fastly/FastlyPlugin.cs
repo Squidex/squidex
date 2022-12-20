@@ -15,6 +15,12 @@ public sealed class FastlyPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
+        services.AddHttpClient("Fastly", options =>
+        {
+            options.BaseAddress = new Uri("https://api.fastly.com");
+            options.Timeout = TimeSpan.FromSeconds(2);
+        });
+
         services.AddRuleAction<FastlyAction, FastlyActionHandler>();
     }
 }

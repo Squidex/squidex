@@ -36,15 +36,14 @@ public sealed class PrerenderActionHandler : RuleActionHandler<PrerenderAction, 
     protected override async Task<Result> ExecuteJobAsync(PrerenderJob job,
         CancellationToken ct = default)
     {
-        using (var httpClient = httpClientFactory.CreateClient())
-        {
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://api.prerender.io/recache")
-            {
-                Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
-            };
+        var httpClient = httpClientFactory.CreateClient("Prerender");
 
-            return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
-        }
+        var request = new HttpRequestMessage(HttpMethod.Post, "/recache")
+        {
+            Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
+        };
+
+        return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
     }
 }
 

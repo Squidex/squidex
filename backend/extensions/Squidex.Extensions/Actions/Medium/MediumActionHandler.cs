@@ -80,50 +80,44 @@ public sealed class MediumActionHandler : RuleActionHandler<MediumAction, Medium
     protected override async Task<Result> ExecuteJobAsync(MediumJob job,
         CancellationToken ct = default)
     {
-        using (var httpClient = httpClientFactory.CreateClient())
+        var httpClient = httpClientFactory.CreateClient("MediumAction");
+
+        string path;
+
+        if (!string.IsNullOrWhiteSpace(job.PublicationId))
         {
-            httpClient.Timeout = TimeSpan.FromSeconds(4);
-            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
-            httpClient.DefaultRequestHeaders.Add("Accept-Charset", "utf-8");
-            httpClient.DefaultRequestHeaders.Add("User-Agent", "Squidex Headless CMS");
-
-            string path;
-
-            if (!string.IsNullOrWhiteSpace(job.PublicationId))
-            {
-                path = $"v1/publications/{job.PublicationId}/posts";
-            }
-            else
-            {
-                HttpResponseMessage response = null;
-
-                var meRequest = BuildMeRequest(job);
-                try
-                {
-                    response = await httpClient.SendAsync(meRequest, ct);
-
-                    var responseString = await response.Content.ReadAsStringAsync(ct);
-                    var responseJson = serializer.Deserialize<UserResponse>(responseString);
-
-                    var id = responseJson.Data?.Id;
-
-                    path = $"v1/users/{id}/posts";
-                }
-                catch (Exception ex)
-                {
-                    var requestDump = DumpFormatter.BuildDump(meRequest, response, ex.ToString());
-
-                    return Result.Failed(ex, requestDump);
-                }
-            }
-
-            return await httpClient.OneWayRequestAsync(BuildPostRequest(job, path), job.RequestBody, ct);
+            path = $"/v1/publications/{job.PublicationId}/posts";
         }
+        else
+        {
+            HttpResponseMessage response = null;
+
+            var meRequest = BuildGetRequest(job, "/v1/me");
+            try
+            {
+                response = await httpClient.SendAsync(meRequest, ct);
+
+                var responseString = await response.Content.ReadAsStringAsync(ct);
+                var responseJson = serializer.Deserialize<UserResponse>(responseString);
+
+                var id = responseJson.Data?.Id;
+
+                path = $"/v1/users/{id}/posts";
+            }
+            catch (Exception ex)
+            {
+                var requestDump = DumpFormatter.BuildDump(meRequest, response, ex.ToString());
+
+                return Result.Failed(ex, requestDump);
+            }
+        }
+
+        return await httpClient.OneWayRequestAsync(BuildPostRequest(job, path), job.RequestBody, ct);
     }
 
     private static HttpRequestMessage BuildPostRequest(MediumJob job, string path)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"https://api.medium.com/{path}")
+        var request = new HttpRequestMessage(HttpMethod.Post, path)
         {
             Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
         };
@@ -133,9 +127,9 @@ public sealed class MediumActionHandler : RuleActionHandler<MediumAction, Medium
         return request;
     }
 
-    private static HttpRequestMessage BuildMeRequest(MediumJob job)
+    private static HttpRequestMessage BuildGetRequest(MediumJob job, string path)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, "https://api.medium.com/v1/me");
+        var request = new HttpRequestMessage(HttpMethod.Get, path);
 
         request.Headers.Add("Authorization", $"Bearer {job.AccessToken}");
 

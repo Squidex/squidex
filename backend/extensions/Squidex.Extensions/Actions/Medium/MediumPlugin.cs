@@ -15,6 +15,15 @@ public sealed class MediumPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
+        services.AddHttpClient("MediumAction", options =>
+        {
+            options.BaseAddress = new Uri("https://api.medium.com/");
+            options.Timeout = TimeSpan.FromSeconds(4);
+            options.DefaultRequestHeaders.Add("Accept", "application/json");
+            options.DefaultRequestHeaders.Add("Accept-Charset", "utf-8");
+            options.DefaultRequestHeaders.Add("User-Agent", "Squidex Headless CMS");
+        });
+
         services.AddRuleAction<MediumAction, MediumActionHandler>();
     }
 }
