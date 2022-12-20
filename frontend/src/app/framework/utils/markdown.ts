@@ -43,11 +43,11 @@ export function renderMarkdown(input: string | undefined | null, inline: boolean
 const escapeTestNoEncode = /[<>"']|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/;
 const escapeReplaceNoEncode = new RegExp(escapeTestNoEncode.source, 'g');
 const escapeReplacements = {
-  '&' : '&amp;',
-  '<' : '&lt;',
-  '>' : '&gt;',
-  '"' : '&quot;',
-  '\'': '&#39;',
+    '&' : '&amp;',
+    '<' : '&lt;',
+    '>' : '&gt;',
+    '"' : '&quot;',
+    '\'': '&#39;',
 };
 
 const getEscapeReplacement = (ch: string) => escapeReplacements[ch];
