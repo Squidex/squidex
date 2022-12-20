@@ -55,7 +55,8 @@ ENV CONTINUOUS_INTEGRATION=1
 COPY frontend/package*.json ./
 
 # Install Node packages 
-RUN npm install --loglevel=error --force
+RUN npm install -g @angular/cli@latest 
+ && npm install --loglevel=error --force
 
 COPY frontend .
 
