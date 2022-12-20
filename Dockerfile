@@ -1,6 +1,7 @@
 #
 # Stage 1, Build Backend
 #
+
 FROM mcr.microsoft.com/dotnet/sdk:7.0 as backend
 
 ARG SQUIDEX__BUILD__VERSION=7.0.0
@@ -42,21 +43,17 @@ RUN dotnet tool install --tool-path /tools dotnet-counters \
 #
 # Stage 2, Build Frontend
 #
-FROM browserless/chrome as frontend
-
-# Somehow there seems to be a permission issue
-USER root
+FROM squidex/frontend-build:18.10 as frontend
 
 WORKDIR /src
 
 ENV CONTINUOUS_INTEGRATION=1
 
-# Copy Node project files and patches
+# Copy Node project files
 COPY frontend/package*.json ./
 
 # Install Node packages 
-RUN npm install -g @angular/cli@latest \
- && npm install --loglevel=error --force
+RUN npm install --loglevel=error --force
 
 COPY frontend .
 
@@ -66,7 +63,7 @@ RUN npm run test:coverage \
 
 RUN cp -a build /build/
 
-
+ 
 #
 # Stage 3, Build runtime
 #

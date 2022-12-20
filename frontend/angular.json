@@ -23,12 +23,13 @@
             "outputPath": "build",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": [
+              "zone.js"
+            ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "allowedCommonJsDependencies": [
               "@tweenjs/tween.js",
-              "angular2-chartjs",
               "cropperjs",
               "mousetrap",
               "mersenne-twister",
@@ -75,11 +76,11 @@
             },
             "development": {
               "buildOptimizer": false,
-              "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
+              "namedChunks": true,
+              "optimization": false,
               "sourceMap": true,
-              "namedChunks": true
+              "vendorChunk": true
             }
           },
           "defaultConfiguration": "production"
@@ -105,12 +106,14 @@
         "test": {
           "builder": "@angular-builders/custom-webpack:karma",
           "options": {
-            "main": "src/test.ts",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
             "karmaConfig": "karma.conf.js",
-            "inlineStyleLanguage": "scss",
+            "tsConfig": "tsconfig.spec.json",
             "assets": [
+              "src/favicon.ico",
               "src/assets"
             ],
             "styles": [

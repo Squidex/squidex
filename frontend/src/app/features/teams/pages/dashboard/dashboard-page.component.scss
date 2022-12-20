@@ -57,12 +57,6 @@ gridster-item {
 }
 
 :host ::ng-deep {
-    /* stylelint-disable */
-    chart {
-        @include absolute(0, 1rem, 1rem, 1rem);
-    }
-    /* stylelint-enable */
-
     .subtext {
         margin-bottom: 2rem;
     }
@@ -94,6 +88,12 @@ gridster-item {
 
         &-body {
             position: relative;
+        }
+
+        &-chart {
+            .card-body {
+                padding: .25rem;
+            }
         }
 
         &-title {

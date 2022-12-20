@@ -108,7 +108,7 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
         }
     }
 
-    public submitCompleted(options?: { newValue?: TOut; noReset?: boolean }) {
+    public submitCompleted(options?: { newValue?: TIn; noReset?: boolean }) {
         this.updateSubmitState(null, false);
 
         this.enable();
