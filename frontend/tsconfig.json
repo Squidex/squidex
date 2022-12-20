@@ -22,16 +22,17 @@
     "strict": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "target": "es2020",
+    "target": "ES2022",
     "lib": [
       "es2020",
       "dom"
     ],
     "paths": {
-        "@app*": [
-            "src/app*"
-        ]
+      "@app*": [
+        "src/app*"
+      ]
     },
+    "useDefineForClassFields": false
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

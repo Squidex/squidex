@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { ChartOptions as IChartOptions } from 'chart.js';
 import { DateTime } from '@app/shared';
 
 const ColorSchema: ReadonlyArray<string> = [
@@ -44,37 +45,33 @@ export module ChartHelpers {
 }
 
 export module ChartOptions {
-    export const Default = {
+    export const Default: IChartOptions = {
         responsive: true,
         scales: {
-            xAxes: [{
+            x: {
                 display: true,
                 stacked: false,
-            }],
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true,
-                },
+            },
+            y: {
+                beginAtZero: true,
                 stacked: false,
-            }],
+            },
         },
         maintainAspectRatio: false,
-    };
+    } as any;
 
-    export const Stacked = {
+    export const Stacked: IChartOptions = {
         responsive: true,
         scales: {
-            xAxes: [{
+            x: {
                 display: true,
                 stacked: true,
-            }],
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true,
-                },
+            },
+            y: {
+                beginAtZero: true,
                 stacked: true,
-            }],
+            },
         },
         maintainAspectRatio: false,
-    };
+    } as any;
 }

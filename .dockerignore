@@ -5,8 +5,12 @@
 *.log
 *.received.txt
 
+**/.angular
 .vs
 .git
+.github
+.idea
+.vscode
 
 # Build results
 **/bin
@@ -21,14 +25,11 @@
 # NodeJS 
 **/node_modules
 
-backend/src/Squidex/Assets/*.*
+**/backend/src/Squidex/Assets
 
 **/appsettings.Development.json
 **/appsettings.Production.json
 **/launchSettings.json
-
-# Build
-.drone.yml
 
 build.ps1
 build.sh

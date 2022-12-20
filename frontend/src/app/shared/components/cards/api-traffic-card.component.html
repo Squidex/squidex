@@ -1,4 +1,4 @@
-<div class="card card-lg">
+<div class="card card-lg card-chart">
     <div class="card-header">
         {{ 'dashboard.trafficHeader' | sqxTranslate }}: {{chartSummary | sqxFileSize}}
 
@@ -13,6 +13,6 @@
         </div>
     </div>
     <div class="card-body">
-        <chart type="bar" [data]="chartData" [options]="chartOptions"></chart>
+        <canvas baseChart type="bar" [data]="chartData" [options]="chartOptions"></canvas>
     </div>
 </div>

@@ -15,6 +15,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRouteSnapshot, BaseRouteReuseStrategy, RouteReuseStrategy, RouterModule } from '@angular/router';
+import { NgChartsModule } from 'ng2-charts';
 import { environment } from './../environments/environment';
 import { AppComponent } from './app.component';
 import { routing } from './app.routes';
@@ -96,6 +97,7 @@ export class AppRouteReuseStrategy extends BaseRouteReuseStrategy {
         CommonModule,
         FormsModule,
         HttpClientModule,
+        NgChartsModule.forRoot(),
         ReactiveFormsModule,
         RouterModule,
         SqxFrameworkModule.forRoot(),

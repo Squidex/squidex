@@ -1,6 +1,7 @@
 #
 # Stage 1, Build Backend
 #
+
 FROM mcr.microsoft.com/dotnet/sdk:7.0 as backend
 
 ARG SQUIDEX__BUILD__VERSION=7.0.0
@@ -42,29 +43,27 @@ RUN dotnet tool install --tool-path /tools dotnet-counters \
 #
 # Stage 2, Build Frontend
 #
-FROM buildkite/puppeteer:10.0.0 as frontend
+FROM squidex/frontend-build:18.10 as frontend
 
 WORKDIR /src
 
 ENV CONTINUOUS_INTEGRATION=1
 
-# Copy Node project files and patches
-COPY frontend/package*.json /tmp/
-COPY frontend/patches /tmp/patches
+# Copy Node project files
+COPY frontend/package*.json ./
 
 # Install Node packages 
-RUN cd /tmp && npm set unsafe-perm true && npm install --loglevel=error
+RUN npm install --loglevel=error --force
 
 COPY frontend .
 
 # Build Frontend
-RUN cp -a /tmp/node_modules . \
- && npm run test:coverage \
+RUN npm run test:coverage \
  && npm run build
 
 RUN cp -a build /build/
 
-
+ 
 #
 # Stage 3, Build runtime
 #
