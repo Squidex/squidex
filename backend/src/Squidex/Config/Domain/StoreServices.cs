@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Distributed;
@@ -171,6 +172,18 @@ public static class StoreServices
                 if (atlasOptions.IsConfigured() && atlasOptions.FullTextEnabled)
                 {
                     services.Configure<AtlasOptions>(config.GetSection("store:mongoDb:atlas"));
+
+                    services.AddHttpClient("Atlas", options =>
+                    {
+                        options.BaseAddress = new Uri("https://cloud.mongodb.com/");
+                    })
+                    .ConfigureHttpMessageHandlerBuilder(builder =>
+                    {
+                        builder.PrimaryHandler = new HttpClientHandler
+                        {
+                            Credentials = new NetworkCredential(atlasOptions.PublicKey, atlasOptions.PrivateKey, "cloud.mongodb.com")
+                        };
+                    });
 
                     services.AddSingletonAs<AtlasTextIndex>()
                         .AsOptional<ITextIndex>().As<IDeleter>();

@@ -15,6 +15,7 @@ public sealed class TypesensePlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
+        services.AddHttpClient("TypesenseAction");
         services.AddRuleAction<TypesenseAction, TypesenseActionHandler>();
     }
 }

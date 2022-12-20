@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?krjhn9');
-  src:  url('fonts/icomoon.eot?krjhn9#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?krjhn9') format('truetype'),
-    url('fonts/icomoon.woff?krjhn9') format('woff'),
-    url('fonts/icomoon.svg?krjhn9#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?et23le');
+  src:  url('fonts/icomoon.eot?et23le#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?et23le') format('truetype'),
+    url('fonts/icomoon.woff?et23le') format('woff'),
+    url('fonts/icomoon.svg?et23le#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,6 +25,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-lightbulb_outline:before {
+  content: "\e993";
+}
 .icon-hourglass_top:before {
   content: "\e992";
 }

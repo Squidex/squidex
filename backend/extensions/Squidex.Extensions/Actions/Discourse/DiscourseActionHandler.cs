@@ -68,19 +68,17 @@ public sealed class DiscourseActionHandler : RuleActionHandler<DiscourseAction, 
     protected override async Task<Result> ExecuteJobAsync(DiscourseJob job,
         CancellationToken ct = default)
     {
-        using (var httpClient = httpClientFactory.CreateClient())
-        {
-            using (var request = new HttpRequestMessage(HttpMethod.Post, job.RequestUrl)
-            {
-                Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
-            })
-            {
-                request.Headers.TryAddWithoutValidation("Api-Key", job.ApiKey);
-                request.Headers.TryAddWithoutValidation("Api-Username", job.ApiUserName);
+        var httpClient = httpClientFactory.CreateClient("DiscourseAction");
 
-                return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
-            }
-        }
+        var request = new HttpRequestMessage(HttpMethod.Post, job.RequestUrl)
+        {
+            Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
+        };
+
+        request.Headers.TryAddWithoutValidation("Api-Key", job.ApiKey);
+        request.Headers.TryAddWithoutValidation("Api-Username", job.ApiUserName);
+
+        return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
     }
 }
 

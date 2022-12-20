@@ -15,6 +15,8 @@ public sealed class DiscoursePlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
+        services.AddHttpClient("DiscourseAction");
+
         services.AddRuleAction<DiscourseAction, DiscourseActionHandler>();
     }
 }

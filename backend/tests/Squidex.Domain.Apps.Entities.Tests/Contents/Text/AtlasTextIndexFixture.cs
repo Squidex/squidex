@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Net;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -27,7 +29,25 @@ public sealed class AtlasTextIndexFixture : IAsyncLifetime
 
         var options = TestConfig.Configuration.GetSection("atlas").Get<AtlasOptions>()!;
 
-        Index = new AtlasTextIndex(mongoDatabase, Options.Create(options));
+        var services =
+            new ServiceCollection()
+                .AddSingleton(Options.Create(options))
+                .AddSingleton(mongoClient)
+                .AddSingleton(mongoDatabase)
+                .AddHttpClient("Atlas", options =>
+                {
+                    options.BaseAddress = new Uri("https://cloud.mongodb.com/");
+                })
+                .ConfigureHttpMessageHandlerBuilder(builder =>
+                {
+                    builder.PrimaryHandler = new HttpClientHandler
+                    {
+                        Credentials = new NetworkCredential(options.PublicKey, options.PrivateKey, "cloud.mongodb.com")
+                    };
+                }).Services
+                .BuildServiceProvider();
+
+        Index = services.GetRequiredService<AtlasTextIndex>();
     }
 
     public Task InitializeAsync()

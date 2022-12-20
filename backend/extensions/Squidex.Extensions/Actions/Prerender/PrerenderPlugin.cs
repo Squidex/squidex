@@ -15,6 +15,11 @@ public sealed class PrerenderPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
+        services.AddHttpClient("PrerenderAction", options =>
+        {
+            options.BaseAddress = new Uri("https://api.prerender.io");
+        });
+
         services.AddRuleAction<PrerenderAction, PrerenderActionHandler>();
     }
 }

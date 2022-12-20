@@ -15,6 +15,11 @@ public sealed class SlackPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
+        services.AddHttpClient("SlackAction", options =>
+        {
+            options.Timeout = TimeSpan.FromSeconds(2);
+        });
+
         services.AddRuleAction<SlackAction, SlackActionHandler>();
     }
 }

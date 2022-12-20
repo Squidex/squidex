@@ -30,6 +30,8 @@ public static class ContentsServices
         services.Configure<TemplatesOptions>(config,
             "templates");
 
+        services.AddHttpClient("Templates");
+
         services.AddSingletonAs(c => new Lazy<IContentQueryService>(c.GetRequiredService<IContentQueryService>))
             .AsSelf();
 

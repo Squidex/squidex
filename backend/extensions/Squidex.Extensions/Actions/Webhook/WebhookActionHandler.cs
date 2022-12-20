@@ -90,7 +90,7 @@ public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction, Webh
     protected override async Task<Result> ExecuteJobAsync(WebhookJob job,
         CancellationToken ct = default)
     {
-        var httpClient = httpClientFactory.CreateClient();
+        var httpClient = httpClientFactory.CreateClient("WebhookAction");
 
         var method = HttpMethod.Post;
 
@@ -110,7 +110,7 @@ public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction, Webh
                 break;
         }
 
-        using var request = new HttpRequestMessage(method, job.RequestUrl);
+        var request = new HttpRequestMessage(method, job.RequestUrl);
 
         if (!string.IsNullOrEmpty(job.RequestBody) && job.Method != WebhookMethod.GET)
         {
@@ -118,8 +118,6 @@ public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction, Webh
 
             request.Content = new StringContent(job.RequestBody, Encoding.UTF8, mediaType);
         }
-
-        request.Headers.Add("User-Agent", "Squidex Webhook");
 
         if (job.Headers != null)
         {
@@ -133,8 +131,6 @@ public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction, Webh
         {
             request.Headers.Add("X-Signature", job.RequestSignature);
         }
-
-        request.Headers.Add("X-Application", "Squidex Webhook");
 
         return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
     }

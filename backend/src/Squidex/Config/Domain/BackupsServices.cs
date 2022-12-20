@@ -19,6 +19,11 @@ public static class BackupsServices
 {
     public static void AddSquidexBackups(this IServiceCollection services)
     {
+        services.AddHttpClient("Backup", options =>
+        {
+            options.Timeout = TimeSpan.FromHours(1);
+        });
+
         services.AddSingletonAs<TempFolderBackupArchiveLocation>()
             .As<IBackupArchiveLocation>();
 

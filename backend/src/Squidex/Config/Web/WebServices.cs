@@ -117,8 +117,5 @@ public static class WebServices
 
         services.AddSingletonAs<CachingGraphQLResolver>()
             .As<IConfigureExecution>();
-
-        services.AddSingletonAs<GraphQLRunner>()
-            .AsSelf();
     }
 }

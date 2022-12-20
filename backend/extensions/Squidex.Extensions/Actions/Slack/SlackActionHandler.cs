@@ -41,17 +41,14 @@ public sealed class SlackActionHandler : RuleActionHandler<SlackAction, SlackJob
     protected override async Task<Result> ExecuteJobAsync(SlackJob job,
         CancellationToken ct = default)
     {
-        using (var httpClient = httpClientFactory.CreateClient())
+        var httpClient = httpClientFactory.CreateClient("SlackAction");
+
+        var request = new HttpRequestMessage(HttpMethod.Post, job.RequestUrl)
         {
-            httpClient.Timeout = TimeSpan.FromSeconds(2);
+            Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
+        };
 
-            var request = new HttpRequestMessage(HttpMethod.Post, job.RequestUrl)
-            {
-                Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
-            };
-
-            return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
-        }
+        return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
     }
 }
 

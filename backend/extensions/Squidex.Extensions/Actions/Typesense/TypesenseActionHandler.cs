@@ -109,7 +109,7 @@ public sealed class TypesenseActionHandler : RuleActionHandler<TypesenseAction, 
             return Result.Ignored();
         }
 
-        var httpClient = httpClientFactory.CreateClient();
+        var httpClient = httpClientFactory.CreateClient("TypesenseAction");
 
         HttpRequestMessage request;
 
@@ -125,12 +125,9 @@ public sealed class TypesenseActionHandler : RuleActionHandler<TypesenseAction, 
             request = new HttpRequestMessage(HttpMethod.Delete, $"{job.ServerUrl}/{job.ContentId}");
         }
 
-        using (request)
-        {
-            request.Headers.TryAddWithoutValidation("X-Typesense-Api-Key", job.ServerKey);
+        request.Headers.TryAddWithoutValidation("X-Typesense-Api-Key", job.ServerKey);
 
-            return await httpClient.OneWayRequestAsync(request, job.Content, ct);
-        }
+        return await httpClient.OneWayRequestAsync(request, job.Content, ct);
     }
 }
 
