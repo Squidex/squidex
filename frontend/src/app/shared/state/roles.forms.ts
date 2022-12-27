@@ -6,7 +6,7 @@
  */
 
 import { UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, Form, hasNoValue$, hasValue$, TemplatedFormArray } from '@app/framework';
+import { ExtendedFormGroup, Form, hasNoValue$, TemplatedFormArray } from '@app/framework';
 import { CreateRoleDto, RoleDto, UpdateRoleDto } from './../services/roles.service';
 
 export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDto> {
@@ -32,24 +32,6 @@ class PermissionTemplate {
 
     public createControl(_: any, initialValue: string) {
         return new UntypedFormControl(initialValue, Validators.required);
-    }
-}
-
-type AddPermissionFormType = { permission: string };
-
-export class AddPermissionForm extends Form<ExtendedFormGroup, AddPermissionFormType> {
-    public get permission() {
-        return this.form.controls['permission'];
-    }
-
-    public hasPermission = hasValue$(this.permission);
-
-    constructor() {
-        super(new ExtendedFormGroup({
-            permission: new UntypedFormControl('',
-                Validators.required,
-            ),
-        }));
     }
 }
 

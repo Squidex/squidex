@@ -82,18 +82,16 @@
                     </table>
                 </ng-template>
 
-                <form class="form-group row gx-2" [formGroup]="addPermissionForm.form" (ngSubmit)="addPermission()" *ngIf="isEditable">
+                <div class="form-group row gx-2" *ngIf="isEditable">
                     <div class="col">
-                        <sqx-autocomplete formControlName="permission" [source]="allPermissions" #addInput
-                            placeholder="{{ 'roles.permissionsPlaceholder' | sqxTranslate }}">
-                        </sqx-autocomplete>
+                        <div class="form-control preview">{{ 'common.permission' | sqxTranslate }}</div>
                     </div>
                     <div class="col-auto">
-                        <button type="submit" class="btn btn-success col-action">
+                        <button type="button" class="btn btn-success col-action" (click)="addPermission()">
                             <i class="icon-plus"></i>
                         </button>
                     </div>
-                </form>
+                </div>
 
                 <div class="mt-4" *ngIf="!role.isDefaultRole">
                     <h3>{{ 'roles.properties' | sqxTranslate }}</h3>

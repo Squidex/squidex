@@ -339,6 +339,7 @@
   "common.passwordConfirm": "确认密码",
   "common.pattern": "模式",
   "common.patterns": "模式",
+  "common.permission": "Permission",
   "common.permissions": "权限",
   "common.preview": "预览",
   "common.product": "Squidex Headless CMS",

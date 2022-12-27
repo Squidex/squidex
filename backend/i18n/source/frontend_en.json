@@ -339,6 +339,7 @@
   "common.passwordConfirm": "Confirm Password",
   "common.pattern": "Pattern",
   "common.patterns": "Patterns",
+  "common.permission": "Permission",
   "common.permissions": "Permissions",
   "common.preview": "Preview",
   "common.product": "Squidex Headless CMS",

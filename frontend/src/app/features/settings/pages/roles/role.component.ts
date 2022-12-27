@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { AddPermissionForm, AutocompleteComponent, AutocompleteSource, EditRoleForm, RoleDto, RolesState, SchemaDto, Settings } from '@app/shared';
+import { AutocompleteComponent, AutocompleteSource, EditRoleForm, RoleDto, RolesState, SchemaDto, Settings } from '@app/shared';
 
 const DESCRIPTIONS = {
     Developer: 'i18n:roles.defaults.developer',
@@ -59,8 +59,6 @@ export class RoleComponent implements OnChanges {
     public isEditing = false;
     public isEditable = false;
 
-    public addPermissionForm = new AddPermissionForm();
-
     public editForm = new EditRoleForm();
 
     public get halfSchemas() {
@@ -100,14 +98,7 @@ export class RoleComponent implements OnChanges {
     }
 
     public addPermission() {
-        const value = this.addPermissionForm.submit();
-
-        if (value) {
-            this.editForm.form.add(value.permission);
-
-            this.addPermissionForm.submitCompleted();
-            this.addPermissionInput.focus();
-        }
+        this.editForm.form.add('');
     }
 
     public save() {
