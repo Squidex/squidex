@@ -20,4 +20,8 @@ public sealed record AssetScripts
     public string? Move { get; init; }
 
     public string? Delete { get; init; }
+
+    public string? Query { get; init; }
+
+    public string? QueryPre { get; init; }
 }

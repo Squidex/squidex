@@ -18,13 +18,11 @@ public class EnrichWithSchemaTests
     private readonly ISchemaEntity schema;
     private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-    private readonly ProvideSchema schemaProvider;
     private readonly EnrichWithSchema sut;
 
     public EnrichWithSchemaTests()
     {
         schema = Mocks.Schema(appId, schemaId);
-        schemaProvider = x => Task.FromResult((schema, ResolvedComponents.Empty));
 
         sut = new EnrichWithSchema();
     }
@@ -36,7 +34,7 @@ public class EnrichWithSchemaTests
 
         var content = CreateContent();
 
-        await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider, default);
+        await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), SchemaProvider(), default);
 
         Assert.NotNull(content.ReferenceFields);
     }
@@ -48,7 +46,7 @@ public class EnrichWithSchemaTests
 
         var source = CreateContent();
 
-        await sut.EnrichAsync(ctx, Enumerable.Repeat(source, 1), schemaProvider, default);
+        await sut.EnrichAsync(ctx, Enumerable.Repeat(source, 1), SchemaProvider(), default);
 
         Assert.Null(source.ReferenceFields);
     }
@@ -68,5 +66,10 @@ public class EnrichWithSchemaTests
     private ContentEntity CreateContent()
     {
         return new ContentEntity { SchemaId = schemaId };
+    }
+
+    private ProvideSchema SchemaProvider()
+    {
+        return x => Task.FromResult((schema, ResolvedComponents.Empty));
     }
 }

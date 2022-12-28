@@ -36,25 +36,27 @@ public sealed class ResolveAssets : IContentEnricherStep
     public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
-        if (ShouldEnrich(context))
+        if (!ShouldEnrich(context))
         {
-            var ids = new HashSet<DomainId>();
+            return;
+        }
 
-            foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
-            {
-                var (schema, components) = await schemas(group.Key);
+        var ids = new HashSet<DomainId>();
 
-                AddAssetIds(ids, schema, components, group);
-            }
+        foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+        {
+            var (schema, components) = await schemas(group.Key);
 
-            var assets = await GetAssetsAsync(context, ids, ct);
+            AddAssetIds(ids, schema, components, group);
+        }
 
-            foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
-            {
-                var (schema, components) = await schemas(group.Key);
+        var assets = await GetAssetsAsync(context, ids, ct);
 
-                ResolveAssetsUrls(schema, components, group, assets);
-            }
+        foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+        {
+            var (schema, components) = await schemas(group.Key);
+
+            ResolveAssetsUrls(schema, components, group, assets);
         }
     }
 

@@ -5,32 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text;
-using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Caching;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
 public sealed class AssetEnricher : IAssetEnricher
 {
-    private readonly ITagService tagService;
-    private readonly IEnumerable<IAssetMetadataSource> assetMetadataSources;
-    private readonly IRequestCache requestCache;
-    private readonly IUrlGenerator urlGenerator;
-    private readonly IJsonSerializer serializer;
+    private readonly IEnumerable<IAssetEnricherStep> steps;
 
-    public AssetEnricher(ITagService tagService, IEnumerable<IAssetMetadataSource> assetMetadataSources, IRequestCache requestCache,
-        IUrlGenerator urlGenerator, IJsonSerializer serializer)
+    public AssetEnricher(IEnumerable<IAssetEnricherStep> steps)
     {
-        this.tagService = tagService;
-        this.assetMetadataSources = assetMetadataSources;
-        this.requestCache = requestCache;
-        this.urlGenerator = urlGenerator;
-        this.serializer = serializer;
+        this.steps = steps;
     }
 
     public async Task<IEnrichedAssetEntity> EnrichAsync(IAssetEntity asset, Context context,
@@ -52,108 +38,42 @@ public sealed class AssetEnricher : IAssetEnricher
 
         using (Telemetry.Activities.StartActivity("AssetEnricher/EnrichAsync"))
         {
-            var results = assets.Select(x => SimpleMapper.Map(x, new AssetEntity())).ToList();
+            var results = new List<AssetEntity>();
 
-            foreach (var asset in results)
+            if (context.App != null)
             {
-                requestCache.AddDependency(asset.UniqueId, asset.Version);
+                foreach (var step in steps)
+                {
+                    await step.EnrichAsync(context, ct);
+                }
             }
 
-            if (!context.ShouldSkipAssetEnrichment())
+            if (!assets.Any())
             {
-                await EnrichTagsAsync(results, ct);
+                return results;
+            }
 
-                EnrichWithMetadataText(results);
-                EnrichWithEditTokens(results);
+            foreach (var asset in assets)
+            {
+                var result = SimpleMapper.Map(asset, new AssetEntity());
+
+                results.Add(result);
+            }
+
+            if (context.App != null)
+            {
+                foreach (var step in steps)
+                {
+                    ct.ThrowIfCancellationRequested();
+
+                    using (Telemetry.Activities.StartActivity(step.ToString()!))
+                    {
+                        await step.EnrichAsync(context, results, ct);
+                    }
+                }
             }
 
             return results;
         }
-    }
-
-    private void EnrichWithEditTokens(IEnumerable<IEnrichedAssetEntity> assets)
-    {
-        var url = urlGenerator.Root();
-
-        foreach (var asset in assets)
-        {
-            // We have to use these short names here because they are later read like this.
-            var token = new
-            {
-                a = asset.AppId.Name,
-                i = asset.Id.ToString(),
-                u = url
-            };
-
-            var json = serializer.Serialize(token);
-
-            asset.EditToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
-        }
-    }
-
-    private void EnrichWithMetadataText(List<AssetEntity> results)
-    {
-        var sb = new StringBuilder();
-
-        void Append(string? text)
-        {
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                sb.AppendIfNotEmpty(", ");
-                sb.Append(text);
-            }
-        }
-
-        foreach (var asset in results)
-        {
-            sb.Clear();
-
-            foreach (var source in assetMetadataSources)
-            {
-                foreach (var metadata in source.Format(asset))
-                {
-                    Append(metadata);
-                }
-            }
-
-            Append(asset.FileSize.ToReadableSize());
-
-            asset.MetadataText = sb.ToString();
-        }
-    }
-
-    private async Task EnrichTagsAsync(List<AssetEntity> assets,
-        CancellationToken ct)
-    {
-        foreach (var group in assets.GroupBy(x => x.AppId.Id))
-        {
-            ct.ThrowIfCancellationRequested();
-
-            var tagsById = await CalculateTagsAsync(group, ct);
-
-            foreach (var asset in group)
-            {
-                asset.TagNames = new HashSet<string>();
-
-                if (asset.Tags != null)
-                {
-                    foreach (var id in asset.Tags)
-                    {
-                        if (tagsById.TryGetValue(id, out var name))
-                        {
-                            asset.TagNames.Add(name);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private async Task<Dictionary<string, string>> CalculateTagsAsync(IGrouping<DomainId, IAssetEntity> group,
-        CancellationToken ct)
-    {
-        var uniqueIds = group.Where(x => x.Tags != null).SelectMany(x => x.Tags).ToHashSet();
-
-        return await tagService.GetTagNamesAsync(group.Key, TagGroups.Assets, uniqueIds, ct);
     }
 }

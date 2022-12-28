@@ -81,9 +81,11 @@ public class ScriptContentTests
 
         A.CallTo(() => scriptEngine.TransformAsync(
                 A<DataScriptVars>.That.Matches(x =>
-                    Equals(x["user"], ctx.UserPrincipal) &&
+                    Equals(x["contentId"], content.Id) &&
                     Equals(x["data"], oldData) &&
-                    Equals(x["contentId"], content.Id)),
+                    Equals(x["appId"], appId.Id) &&
+                    Equals(x["appName"], appId.Name) &&
+                    Equals(x["user"], ctx.UserPrincipal)),
                 "my-query",
                 ScriptOptions(), A<CancellationToken>._))
             .MustHaveHappened();

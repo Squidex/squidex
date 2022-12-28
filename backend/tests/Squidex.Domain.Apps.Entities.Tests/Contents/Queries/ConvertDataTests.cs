@@ -28,7 +28,6 @@ public class ConvertDataTests
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
     private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-    private readonly ProvideSchema schemaProvider;
     private readonly ConvertData sut;
 
     public ConvertDataTests()
@@ -41,7 +40,6 @@ public class ConvertDataTests
                     .AddAssets(31, "nested"));
 
         schema = Mocks.Schema(appId, schemaId, schemaDef);
-        schemaProvider = x => Task.FromResult((schema, ResolvedComponents.Empty));
 
         sut = new ConvertData(urlGenerator, TestUtils.DefaultSerializer, assetRepository, contentRepository);
     }
@@ -91,7 +89,7 @@ public class ConvertDataTests
 
         var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
-        await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider, default);
+        await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), SchemaProvider(), default);
 
         Assert.Equal(expected, content.Data);
     }
@@ -129,7 +127,7 @@ public class ConvertDataTests
 
         var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
-        await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider, default);
+        await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), SchemaProvider(), default);
 
         Assert.Equal(expected, content.Data);
     }
@@ -159,5 +157,10 @@ public class ConvertDataTests
             SchemaId = schemaId,
             Status = Status.Published
         };
+    }
+
+    private ProvideSchema SchemaProvider()
+    {
+        return x => Task.FromResult((schema, ResolvedComponents.Empty));
     }
 }
