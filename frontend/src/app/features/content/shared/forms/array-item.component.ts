@@ -72,7 +72,7 @@ export class ArrayItemComponent implements OnChanges {
     @ViewChildren(ComponentSectionComponent)
     public sections!: QueryList<ComponentSectionComponent>;
 
-    public isInvalid?: Observable<boolean>;
+    public isInvalidForm?: Observable<boolean>;
     public isInvalidComponent?: Observable<boolean>;
 
     public title?: Observable<string>;
@@ -83,7 +83,7 @@ export class ArrayItemComponent implements OnChanges {
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['formModel']) {
-            this.isInvalid = invalid$(this.formModel.form);
+            this.isInvalidForm = invalid$(this.formModel.form);
 
             if (Types.is(this.formModel, ComponentForm)) {
                 this.isInvalidComponent = this.formModel.schemaChanges.pipe(map(x => !x));
@@ -146,15 +146,8 @@ function getTitle(formModel: ObjectFormBase) {
 
     let valueLength = 0;
 
-    if (Types.is(formModel, ComponentForm) && formModel.schema) {
-        const formatted = formModel.schema.displayName;
-
-        values.push(formatted);
-        valueLength += formatted.length;
-    }
-
-    if (Types.is(formModel.field, RootFieldDto)) {
-        for (const field of formModel.field.nested) {
+    function addFields(fields: ReadonlyArray<FieldDto>) {
+        for (const field of fields) {
             const fieldValue = value[field.name];
 
             if (fieldValue) {
@@ -170,6 +163,17 @@ function getTitle(formModel: ObjectFormBase) {
                 }
             }
         }
+    }
+
+    if (Types.is(formModel, ComponentForm) && formModel.schema) {
+        const formatted = formModel.schema.displayName;
+
+        values.push(formatted);
+        valueLength += formatted.length;
+
+        addFields(formModel.schema.fields);
+    } else if (Types.is(formModel.field, RootFieldDto)) {
+       addFields(formModel.field.nested);
     }
 
     return values.join(', ');
