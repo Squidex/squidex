@@ -21,7 +21,8 @@ public static class ScriptingExtensions
         CanReject = true
     };
 
-    public static async Task ExecuteCreateScriptAsync(this AssetOperation operation, CreateAsset create)
+    public static async Task ExecuteCreateScriptAsync(this AssetOperation operation, CreateAsset create,
+        CancellationToken ct)
     {
         var script = operation.App.AssetScripts?.Create;
 
@@ -30,7 +31,7 @@ public static class ScriptingExtensions
             return;
         }
 
-        var parentPath = await GetPathAsync(operation, create.ParentId);
+        var parentPath = await GetPathAsync(operation, create.ParentId, ct);
 
         // Script vars are just wrappers over dictionaries for better performance.
         var vars = new AssetScriptVars
@@ -51,10 +52,11 @@ public static class ScriptingExtensions
             Operation = "Create"
         };
 
-        await ExecuteScriptAsync(operation, script, vars);
+        await ExecuteScriptAsync(operation, script, vars, ct);
     }
 
-    public static Task ExecuteUpdateScriptAsync(this AssetOperation operation, UpdateAsset update)
+    public static Task ExecuteUpdateScriptAsync(this AssetOperation operation, UpdateAsset update,
+        CancellationToken ct)
     {
         var script = operation.App.AssetScripts?.Update;
 
@@ -79,10 +81,11 @@ public static class ScriptingExtensions
             Operation = "Update"
         };
 
-        return ExecuteScriptAsync(operation, script, vars);
+        return ExecuteScriptAsync(operation, script, vars, ct);
     }
 
-    public static Task ExecuteAnnotateScriptAsync(this AssetOperation operation, AnnotateAsset annotate)
+    public static Task ExecuteAnnotateScriptAsync(this AssetOperation operation, AnnotateAsset annotate,
+        CancellationToken ct)
     {
         var script = operation.App.AssetScripts?.Annotate;
 
@@ -106,10 +109,11 @@ public static class ScriptingExtensions
             Operation = "Annotate"
         };
 
-        return ExecuteScriptAsync(operation, script, vars);
+        return ExecuteScriptAsync(operation, script, vars, ct);
     }
 
-    public static async Task ExecuteMoveScriptAsync(this AssetOperation operation, MoveAsset move)
+    public static async Task ExecuteMoveScriptAsync(this AssetOperation operation, MoveAsset move,
+        CancellationToken ct)
     {
         var script = operation.App.AssetScripts?.Move;
 
@@ -118,7 +122,7 @@ public static class ScriptingExtensions
             return;
         }
 
-        var parentPath = await GetPathAsync(operation, move.ParentId);
+        var parentPath = await GetPathAsync(operation, move.ParentId, ct);
 
         // Script vars are just wrappers over dictionaries for better performance.
         var vars = new AssetScriptVars
@@ -131,10 +135,11 @@ public static class ScriptingExtensions
             Operation = "Move"
         };
 
-        await ExecuteScriptAsync(operation, script, vars);
+        await ExecuteScriptAsync(operation, script, vars, ct);
     }
 
-    public static Task ExecuteDeleteScriptAsync(this AssetOperation operation, DeleteAsset delete)
+    public static Task ExecuteDeleteScriptAsync(this AssetOperation operation, DeleteAsset delete,
+        CancellationToken ct)
     {
         var script = operation.App.AssetScripts?.Delete;
 
@@ -153,14 +158,15 @@ public static class ScriptingExtensions
             Operation = "Delete"
         };
 
-        return ExecuteScriptAsync(operation, script, vars);
+        return ExecuteScriptAsync(operation, script, vars, ct);
     }
 
-    private static async Task ExecuteScriptAsync(AssetOperation operation, string script, AssetScriptVars vars)
+    private static async Task ExecuteScriptAsync(AssetOperation operation, string script, AssetScriptVars vars,
+        CancellationToken ct)
     {
         var snapshot = operation.Snapshot;
 
-        var parentPath = await GetPathAsync(operation, snapshot.ParentId);
+        var parentPath = await GetPathAsync(operation, snapshot.ParentId, ct);
 
         // Script vars are just wrappers over dictionaries for better performance.
         var asset = new AssetEntityScriptVars
@@ -186,10 +192,11 @@ public static class ScriptingExtensions
 
         var scriptEngine = operation.Resolve<IScriptEngine>();
 
-        await scriptEngine.ExecuteAsync(vars, script, Options);
+        await scriptEngine.ExecuteAsync(vars, script, Options, ct);
     }
 
-    private static async Task<Array> GetPathAsync(AssetOperation operation, DomainId parentId)
+    private static async Task<Array> GetPathAsync(AssetOperation operation, DomainId parentId,
+        CancellationToken ct)
     {
         if (parentId == default)
         {
@@ -197,7 +204,7 @@ public static class ScriptingExtensions
         }
 
         var assetQuery = operation.Resolve<IAssetQueryService>();
-        var assetPath = await assetQuery.FindAssetFolderAsync(operation.App.Id, parentId);
+        var assetPath = await assetQuery.FindAssetFolderAsync(operation.App.Id, parentId, ct);
 
         return assetPath.Select(x => new { id = x.Id, folderName = x.FolderName }).ToArray();
     }

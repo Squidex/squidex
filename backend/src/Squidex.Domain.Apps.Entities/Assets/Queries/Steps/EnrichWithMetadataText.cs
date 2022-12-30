@@ -22,7 +22,7 @@ public sealed class EnrichWithMetadataText : IAssetEnricherStep
     public Task EnrichAsync(Context context, IEnumerable<AssetEntity> assets,
         CancellationToken ct)
     {
-        if (!context.ShouldSkipAssetEnrichment())
+        if (context.ShouldSkipAssetEnrichment())
         {
             return Task.CompletedTask;
         }
@@ -30,7 +30,6 @@ public sealed class EnrichWithMetadataText : IAssetEnricherStep
         var sb = DefaultPools.StringBuilder.Get();
         try
         {
-
             void Append(string? text)
             {
                 if (!string.IsNullOrWhiteSpace(text))

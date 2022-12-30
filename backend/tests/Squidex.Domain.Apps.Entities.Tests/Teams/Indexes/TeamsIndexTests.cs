@@ -11,17 +11,13 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Teams.Indexes;
 
-public class TeamsIndexTests
+public class TeamsIndexTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly ITeamRepository teamRepository = A.Fake<ITeamRepository>();
     private readonly TeamsIndex sut;
 
     public TeamsIndexTests()
     {
-        ct = cts.Token;
-
         sut = new TeamsIndex(teamRepository);
     }
 
@@ -30,10 +26,10 @@ public class TeamsIndexTests
     {
         var team = SetupTeam(0);
 
-        A.CallTo(() => teamRepository.QueryAllAsync("user1", ct))
+        A.CallTo(() => teamRepository.QueryAllAsync("user1", CancellationToken))
             .Returns(new List<ITeamEntity> { team });
 
-        var actual = await sut.GetTeamsAsync("user1", ct);
+        var actual = await sut.GetTeamsAsync("user1", CancellationToken);
 
         Assert.Same(actual[0], team);
     }
@@ -43,10 +39,10 @@ public class TeamsIndexTests
     {
         var team = SetupTeam(-1);
 
-        A.CallTo(() => teamRepository.QueryAllAsync("user1", ct))
+        A.CallTo(() => teamRepository.QueryAllAsync("user1", CancellationToken))
             .Returns(new List<ITeamEntity> { team });
 
-        var actual = await sut.GetTeamsAsync("user1", ct);
+        var actual = await sut.GetTeamsAsync("user1", CancellationToken);
 
         Assert.Empty(actual);
     }
@@ -56,10 +52,10 @@ public class TeamsIndexTests
     {
         var team = SetupTeam(0);
 
-        A.CallTo(() => teamRepository.FindAsync(team.Id, ct))
+        A.CallTo(() => teamRepository.FindAsync(team.Id, CancellationToken))
             .Returns(team);
 
-        var actual = await sut.GetTeamAsync(team.Id, ct);
+        var actual = await sut.GetTeamAsync(team.Id, CancellationToken);
 
         Assert.Same(actual, team);
     }
@@ -69,10 +65,10 @@ public class TeamsIndexTests
     {
         var team = SetupTeam(0);
 
-        A.CallTo(() => teamRepository.FindAsync(team.Id, ct))
+        A.CallTo(() => teamRepository.FindAsync(team.Id, CancellationToken))
             .Returns(Task.FromResult<ITeamEntity?>(null));
 
-        var actual = await sut.GetTeamAsync(team.Id, ct);
+        var actual = await sut.GetTeamAsync(team.Id, CancellationToken);
 
         Assert.Null(actual);
     }
@@ -81,7 +77,8 @@ public class TeamsIndexTests
     {
         var team = Mocks.Team(DomainId.NewGuid());
 
-        A.CallTo(() => team.Version).Returns(version);
+        A.CallTo(() => team.Version)
+            .Returns(version);
 
         return team;
     }

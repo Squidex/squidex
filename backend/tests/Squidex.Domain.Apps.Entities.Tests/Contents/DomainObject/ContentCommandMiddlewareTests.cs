@@ -18,9 +18,7 @@ public sealed class ContentCommandMiddlewareTests : HandlerTestBase<ContentDomai
     private readonly IDomainObjectCache domainObjectCache = A.Fake<IDomainObjectCache>();
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
     private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
-    private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
     private readonly DomainId contentId = DomainId.NewGuid();
-    private readonly Context requestContext;
     private readonly ContentCommandMiddleware sut;
 
     public sealed class MyCommand : SquidexCommand
@@ -34,16 +32,11 @@ public sealed class ContentCommandMiddlewareTests : HandlerTestBase<ContentDomai
 
     public ContentCommandMiddlewareTests()
     {
-        requestContext = Context.Anonymous(Mocks.App(AppNamedId));
-
-        A.CallTo(() => contextProvider.Context)
-            .Returns(requestContext);
-
         sut = new ContentCommandMiddleware(
             domainObjectFactory,
             domainObjectCache,
             contentEnricher,
-            contextProvider);
+            ApiContextProvider);
     }
 
     [Fact]
@@ -51,7 +44,7 @@ public sealed class ContentCommandMiddlewareTests : HandlerTestBase<ContentDomai
     {
         await HandleAsync(new CreateContent(), 12);
 
-        A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, A<bool>._, requestContext, A<CancellationToken>._))
+        A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, A<bool>._, ApiContext, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -66,7 +59,7 @@ public sealed class ContentCommandMiddlewareTests : HandlerTestBase<ContentDomai
 
         Assert.Same(actual, context.Result<IEnrichedContentEntity>());
 
-        A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, A<bool>._, requestContext, A<CancellationToken>._))
+        A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, A<bool>._, ApiContext, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -77,7 +70,7 @@ public sealed class ContentCommandMiddlewareTests : HandlerTestBase<ContentDomai
 
         var enriched = new ContentEntity();
 
-        A.CallTo(() => contentEnricher.EnrichAsync(actual, true, requestContext, A<CancellationToken>._))
+        A.CallTo(() => contentEnricher.EnrichAsync(actual, true, ApiContext, CancellationToken))
             .Returns(enriched);
 
         var context =
@@ -95,12 +88,12 @@ public sealed class ContentCommandMiddlewareTests : HandlerTestBase<ContentDomai
 
         var domainObject = A.Fake<ContentDomainObject>();
 
-        A.CallTo(() => domainObject.ExecuteAsync(A<IAggregateCommand>._, A<CancellationToken>._))
+        A.CallTo(() => domainObject.ExecuteAsync(A<IAggregateCommand>._, CancellationToken))
             .Returns(new CommandResult(command.AggregateId, 1, 0, actual));
 
         A.CallTo(() => domainObjectFactory.Create<ContentDomainObject>(command.AggregateId))
             .Returns(domainObject);
 
-        return HandleAsync(sut, command);
+        return HandleAsync(sut, command, CancellationToken);
     }
 }

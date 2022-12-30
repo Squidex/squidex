@@ -7,16 +7,14 @@
 
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Search;
 
-public class SearchManagerTests
+public class SearchManagerTests : GivenContext
 {
     private readonly ISearchSource source1 = A.Fake<ISearchSource>();
     private readonly ISearchSource source2 = A.Fake<ISearchSource>();
     private readonly ILogger<SearchManager> log = A.Fake<ILogger<SearchManager>>();
-    private readonly Context requestContext = Context.Anonymous(Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app")));
     private readonly SearchManager sut;
 
     public SearchManagerTests()
@@ -27,7 +25,7 @@ public class SearchManagerTests
     [Fact]
     public async Task Should_not_call_sources_and_return_empty_if_query_is_empty()
     {
-        var actual = await sut.SearchAsync(string.Empty, requestContext);
+        var actual = await sut.SearchAsync(string.Empty, ApiContext, CancellationToken);
 
         Assert.Empty(actual);
 
@@ -41,7 +39,7 @@ public class SearchManagerTests
     [Fact]
     public async Task Should_not_call_sources_and_return_empty_if_is_too_short()
     {
-        var actual = await sut.SearchAsync("11", requestContext);
+        var actual = await sut.SearchAsync("11", ApiContext, CancellationToken);
 
         Assert.Empty(actual);
 
@@ -60,13 +58,13 @@ public class SearchManagerTests
 
         var query = "a query";
 
-        A.CallTo(() => source1.SearchAsync(query, requestContext, A<CancellationToken>._))
+        A.CallTo(() => source1.SearchAsync(query, ApiContext, CancellationToken))
             .Returns(actual1);
 
-        A.CallTo(() => source2.SearchAsync(query, requestContext, A<CancellationToken>._))
+        A.CallTo(() => source2.SearchAsync(query, ApiContext, CancellationToken))
             .Returns(actual2);
 
-        var actual = await sut.SearchAsync(query, requestContext);
+        var actual = await sut.SearchAsync(query, ApiContext, CancellationToken);
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
@@ -81,13 +79,13 @@ public class SearchManagerTests
 
         var query = "a query";
 
-        A.CallTo(() => source1.SearchAsync(query, requestContext, A<CancellationToken>._))
+        A.CallTo(() => source1.SearchAsync(query, ApiContext, CancellationToken))
             .Throws(new InvalidOperationException());
 
-        A.CallTo(() => source2.SearchAsync(query, requestContext, A<CancellationToken>._))
+        A.CallTo(() => source2.SearchAsync(query, ApiContext, CancellationToken))
             .Returns(actual2);
 
-        var actual = await sut.SearchAsync(query, requestContext);
+        var actual = await sut.SearchAsync(query, ApiContext, CancellationToken);
 
         actual.Should().BeEquivalentTo(actual2);
 

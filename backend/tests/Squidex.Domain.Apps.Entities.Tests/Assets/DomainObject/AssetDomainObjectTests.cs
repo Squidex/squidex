@@ -11,7 +11,6 @@ using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Tags;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
@@ -23,8 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
 public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
 {
-    private readonly IAppEntity app;
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
     private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
@@ -41,8 +38,6 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
 
     public AssetDomainObjectTests()
     {
-        app = Mocks.App(AppNamedId, Language.DE);
-
         var scripts = new AssetScripts
         {
             Annotate = "<annotate-script>",
@@ -52,23 +47,20 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
             Update = "<update-script>"
         };
 
-        A.CallTo(() => app.AssetScripts)
+        A.CallTo(() => App.AssetScripts)
             .Returns(scripts);
 
-        A.CallTo(() => appProvider.GetAppAsync(AppId, false, default))
-            .Returns(app);
-
-        A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId, A<CancellationToken>._))
+        A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, A<CancellationToken>._))
             .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
-        A.CallTo(() => tagService.GetTagIdsAsync(AppId, TagGroups.Assets, A<HashSet<string>>._, default))
+        A.CallTo(() => tagService.GetTagIdsAsync(AppId.Id, TagGroups.Assets, A<HashSet<string>>._, default))
             .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x) ?? new Dictionary<string, string>()));
 
         var log = A.Fake<ILogger<AssetDomainObject>>();
 
         var serviceProvider =
             new ServiceCollection()
-                .AddSingleton(appProvider)
+                .AddSingleton(AppProvider)
                 .AddSingleton(assetQuery)
                 .AddSingleton(contentRepository)
                 .AddSingleton(log)
@@ -117,7 +109,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
                 })
             );
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<create-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -170,7 +162,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
                 })
             );
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<create-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -200,7 +192,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
                 })
             );
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<update-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -230,7 +222,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
                 })
             );
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<update-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -252,7 +244,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
                 CreateAssetEvent(new AssetAnnotated { FileName = command.FileName })
             );
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -274,7 +266,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
                 CreateAssetEvent(new AssetAnnotated { Slug = command.Slug })
             );
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -296,7 +288,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
                 CreateAssetEvent(new AssetAnnotated { IsProtected = command.IsProtected })
             );
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -318,7 +310,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
                 CreateAssetEvent(new AssetAnnotated { Metadata = command.Metadata })
             );
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<anootate-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<anootate-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
     }
 
@@ -338,7 +330,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
                 CreateAssetEvent(new AssetAnnotated { Tags = new HashSet<string> { "tag1" } })
             );
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -360,7 +352,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
                 CreateAssetEvent(new AssetMoved { ParentId = parentId })
             );
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<move-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<move-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -383,7 +375,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
                 CreateAssetEvent(new AssetDeleted { DeletedSize = 2048, OldTags = new HashSet<string>() })
             );
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -394,7 +386,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
 
         await ExecuteCreateAsync();
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, Id, SearchScope.All, A<CancellationToken>._))
             .Returns(false);
 
         var actual = await PublishAsync(command);
@@ -404,7 +396,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
         Assert.Equal(EtagVersion.Empty, sut.Snapshot.Version);
         Assert.Empty(LastEvents);
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -415,12 +407,12 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
 
         await ExecuteCreateAsync();
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, Id, SearchScope.All, A<CancellationToken>._))
             .Returns(true);
 
         await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
     }
 
@@ -431,12 +423,12 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
 
         await ExecuteCreateAsync();
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, Id, SearchScope.All, A<CancellationToken>._))
             .Returns(true);
 
         await PublishAsync(command);
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -481,7 +473,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
 
     private async Task<object> PublishAsync(AssetCommand command)
     {
-        var actual = await sut.ExecuteAsync(CreateAssetCommand(command), default);
+        var actual = await sut.ExecuteAsync(CreateAssetCommand(command), CancellationToken);
 
         return actual.Payload;
     }

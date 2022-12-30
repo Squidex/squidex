@@ -20,12 +20,9 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Invitation;
 
-public class InvitationEventConsumerTests
+public class InvitationEventConsumerTests : GivenContext
 {
-    private readonly IAppEntity app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly ILogger<InvitationEventConsumer> log = A.Fake<ILogger<InvitationEventConsumer>>();
-    private readonly ITeamEntity team = Mocks.Team(DomainId.NewGuid());
     private readonly IUser assignee = UserMocks.User("2");
     private readonly IUser assigner = UserMocks.User("1");
     private readonly IUserNotifications userNotifications = A.Fake<IUserNotifications>();
@@ -45,13 +42,7 @@ public class InvitationEventConsumerTests
         A.CallTo(() => userResolver.FindByIdAsync(assigneeId, default))
             .Returns(assignee);
 
-        A.CallTo(() => appProvider.GetAppAsync(app.Id, true, default))
-            .Returns(app);
-
-        A.CallTo(() => appProvider.GetTeamAsync(team.Id, default))
-            .Returns(team);
-
-        sut = new InvitationEventConsumer(appProvider, userNotifications, userResolver, log);
+        sut = new InvitationEventConsumer(AppProvider, userNotifications, userResolver, log);
     }
 
     [Fact]
@@ -224,7 +215,7 @@ public class InvitationEventConsumerTests
 
         await sut.On(@event);
 
-        A.CallTo(() => userNotifications.SendInviteAsync(assigner, assignee, app, default))
+        A.CallTo(() => userNotifications.SendInviteAsync(assigner, assignee, App, default))
             .MustHaveHappened();
     }
 
@@ -235,7 +226,7 @@ public class InvitationEventConsumerTests
 
         await sut.On(@event);
 
-        A.CallTo(() => userNotifications.SendInviteAsync(assigner, assignee, team, default))
+        A.CallTo(() => userNotifications.SendInviteAsync(assigner, assignee, Team, default))
             .MustHaveHappened();
     }
 
@@ -246,7 +237,7 @@ public class InvitationEventConsumerTests
 
         await sut.On(@event);
 
-        A.CallTo(() => userNotifications.SendInviteAsync(assigner, assignee, app, default))
+        A.CallTo(() => userNotifications.SendInviteAsync(assigner, assignee, App, default))
             .MustHaveHappened();
     }
 
@@ -257,7 +248,7 @@ public class InvitationEventConsumerTests
 
         await sut.On(@event);
 
-        A.CallTo(() => userNotifications.SendInviteAsync(assigner, assignee, team, default))
+        A.CallTo(() => userNotifications.SendInviteAsync(assigner, assignee, Team, default))
             .MustHaveHappened();
     }
 
@@ -266,7 +257,7 @@ public class InvitationEventConsumerTests
     {
         var @event = CreateTeamEvent(true);
 
-        A.CallTo(() => appProvider.GetTeamAsync(A<DomainId>._, default))
+        A.CallTo(() => AppProvider.GetTeamAsync(A<DomainId>._, default))
             .Returns(Task.FromResult<ITeamEntity?>(null));
 
         await sut.On(@event);
@@ -300,7 +291,7 @@ public class InvitationEventConsumerTests
         var @event = new AppContributorAssigned
         {
             Actor = new RefToken(assignerType, assignerId),
-            AppId = app.NamedId(),
+            AppId = AppId,
             ContributorId = assigneeId,
             IsCreated = isNewUser,
             IsAdded = isNewContributor
@@ -322,7 +313,7 @@ public class InvitationEventConsumerTests
             ContributorId = assigneeId,
             IsCreated = isNewUser,
             IsAdded = isNewContributor,
-            TeamId = team.Id
+            TeamId = TeamId
         };
 
         var envelope = Envelope.Create(@event);

@@ -56,7 +56,7 @@ public sealed partial class AssetFolderDomainObject : DomainObject<AssetFolderDo
             case CreateAssetFolder create:
                 return CreateReturnAsync(create, async (c, ct) =>
                 {
-                    await CreateCore(c, c);
+                    await CreateCore(c, ct);
 
                     return Snapshot;
                 }, ct);
@@ -64,7 +64,7 @@ public sealed partial class AssetFolderDomainObject : DomainObject<AssetFolderDo
             case MoveAssetFolder move:
                 return UpdateReturnAsync(move, async (c, ct) =>
                 {
-                    await MoveCore(c);
+                    await MoveCore(c, ct);
 
                     return Snapshot;
                 }, ct);
@@ -89,7 +89,8 @@ public sealed partial class AssetFolderDomainObject : DomainObject<AssetFolderDo
         }
     }
 
-    private async Task CreateCore(CreateAssetFolder create, CreateAssetFolder c)
+    private async Task CreateCore(CreateAssetFolder c,
+        CancellationToken ct)
     {
         var operation = await AssetFolderOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -97,19 +98,20 @@ public sealed partial class AssetFolderDomainObject : DomainObject<AssetFolderDo
 
         if (!c.OptimizeValidation)
         {
-            await operation.MustMoveToValidFolder(c.ParentId);
+            await operation.MustMoveToValidFolder(c.ParentId, ct);
         }
 
-        Create(create);
+        Create(c);
     }
 
-    private async Task MoveCore(MoveAssetFolder c)
+    private async Task MoveCore(MoveAssetFolder c,
+        CancellationToken ct)
     {
         var operation = await AssetFolderOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
         if (!c.OptimizeValidation)
         {
-            await operation.MustMoveToValidFolder(c.ParentId);
+            await operation.MustMoveToValidFolder(c.ParentId, ct);
         }
 
         Move(c);

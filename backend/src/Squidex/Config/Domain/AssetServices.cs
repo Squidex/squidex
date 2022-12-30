@@ -11,6 +11,7 @@ using Squidex.Assets;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Queries;
+using Squidex.Domain.Apps.Entities.Assets.Queries.Steps;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Hosting;
@@ -71,6 +72,21 @@ public static class AssetServices
 
         services.AddSingletonAs<AssetEnricher>()
             .As<IAssetEnricher>();
+
+        services.AddSingletonAs<CalculateTokens>()
+            .As<IAssetEnricherStep>();
+
+        services.AddSingletonAs<ConvertTags>()
+            .As<IAssetEnricherStep>();
+
+        services.AddSingletonAs<EnrichForCaching>()
+            .As<IAssetEnricherStep>();
+
+        services.AddSingletonAs<EnrichWithMetadataText>()
+            .As<IAssetEnricherStep>();
+
+        services.AddSingletonAs<ScriptAsset>()
+            .As<IAssetEnricherStep>();
 
         services.AddSingletonAs<AssetQueryService>()
             .As<IAssetQueryService>();

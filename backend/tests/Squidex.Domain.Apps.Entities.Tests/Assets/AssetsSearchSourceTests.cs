@@ -5,21 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Security.Claims;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Shared;
-using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public class AssetsSearchSourceTests
+public class AssetsSearchSourceTests : GivenContext
 {
     private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly AssetsSearchSource sut;
 
     public AssetsSearchSourceTests()
@@ -30,9 +27,7 @@ public class AssetsSearchSourceTests
     [Fact]
     public async Task Should_return_empty_actuals_if_user_has_no_permission()
     {
-        var ctx = ContextWithPermission();
-
-        var actual = await sut.SearchAsync("logo", ctx, default);
+        var actual = await sut.SearchAsync("logo", ApiContext, default);
 
         Assert.Empty(actual);
 
@@ -43,23 +38,23 @@ public class AssetsSearchSourceTests
     [Fact]
     public async Task Should_return_assets_actuals_if_found()
     {
-        var permission = PermissionIds.ForApp(PermissionIds.AppAssetsRead, appId.Name);
+        var permission = PermissionIds.ForApp(PermissionIds.AppAssetsRead, AppId.Name);
 
-        var ctx = ContextWithPermission(permission.Id);
+        var requestContext = CreateContext(false, permission.Id);
 
         var asset1 = CreateAsset("logo1.png");
         var asset2 = CreateAsset("logo2.png");
 
-        A.CallTo(() => urlGenerator.AssetsUI(appId, asset1.Id.ToString()))
+        A.CallTo(() => urlGenerator.AssetsUI(AppId, asset1.Id.ToString()))
             .Returns("assets-url1");
 
-        A.CallTo(() => urlGenerator.AssetsUI(appId, asset2.Id.ToString()))
+        A.CallTo(() => urlGenerator.AssetsUI(AppId, asset2.Id.ToString()))
             .Returns("assets-url2");
 
-        A.CallTo(() => assetQuery.QueryAsync(ctx, null, A<Q>.That.HasQuery("Filter: contains(fileName, 'logo'); Take: 5"), A<CancellationToken>._))
+        A.CallTo(() => assetQuery.QueryAsync(requestContext, null, A<Q>.That.HasQuery("Filter: contains(fileName, 'logo'); Take: 5"), A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(2, asset1, asset2));
 
-        var actual = await sut.SearchAsync("logo", ctx, default);
+        var actual = await sut.SearchAsync("logo", requestContext, default);
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
@@ -70,18 +65,5 @@ public class AssetsSearchSourceTests
     private static IEnrichedAssetEntity CreateAsset(string fileName)
     {
         return new AssetEntity { FileName = fileName, Id = DomainId.NewGuid() };
-    }
-
-    private Context ContextWithPermission(string? permission = null)
-    {
-        var claimsIdentity = new ClaimsIdentity();
-        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-        if (permission != null)
-        {
-            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
-        }
-
-        return new Context(claimsPrincipal, Mocks.App(appId));
     }
 }

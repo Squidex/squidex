@@ -26,7 +26,8 @@ public static class ValidationExtensions
         operation.ThrowOnErrors();
     }
 
-    public static async Task MustMoveToValidFolder(this AssetOperation operation, DomainId parentId)
+    public static async Task MustMoveToValidFolder(this AssetOperation operation, DomainId parentId,
+        CancellationToken ct)
     {
         // If moved to root folder or not moved at all, we can just skip the validation.
         if (parentId == DomainId.Empty || parentId == operation.Snapshot.ParentId)
@@ -36,7 +37,7 @@ public static class ValidationExtensions
 
         var assetQuery = operation.Resolve<IAssetQueryService>();
 
-        var path = await assetQuery.FindAssetFolderAsync(operation.App.Id, parentId);
+        var path = await assetQuery.FindAssetFolderAsync(operation.App.Id, parentId, ct);
 
         if (path.Count == 0)
         {
@@ -46,7 +47,8 @@ public static class ValidationExtensions
         operation.ThrowOnErrors();
     }
 
-    public static async Task MustMoveToValidFolder(this AssetFolderOperation operation, DomainId parentId)
+    public static async Task MustMoveToValidFolder(this AssetFolderOperation operation, DomainId parentId,
+        CancellationToken ct)
     {
         // If moved to root folder or not moved at all, we can just skip the validation.
         if (parentId == DomainId.Empty || parentId == operation.Snapshot.ParentId)
@@ -56,7 +58,7 @@ public static class ValidationExtensions
 
         var assetQuery = operation.Resolve<IAssetQueryService>();
 
-        var path = await assetQuery.FindAssetFolderAsync(operation.App.Id, parentId);
+        var path = await assetQuery.FindAssetFolderAsync(operation.App.Id, parentId, ct);
 
         if (path.Count == 0)
         {
@@ -77,11 +79,12 @@ public static class ValidationExtensions
         operation.ThrowOnErrors();
     }
 
-    public static async Task CheckReferrersAsync(this AssetOperation operation)
+    public static async Task CheckReferrersAsync(this AssetOperation operation,
+        CancellationToken ct)
     {
         var contentRepository = operation.Resolve<IContentRepository>();
 
-        var hasReferrer = await contentRepository.HasReferrersAsync(operation.App.Id, operation.CommandId, SearchScope.All, default);
+        var hasReferrer = await contentRepository.HasReferrersAsync(operation.App.Id, operation.CommandId, SearchScope.All, ct);
 
         if (hasReferrer)
         {

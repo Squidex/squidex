@@ -8,14 +8,13 @@
 using Microsoft.Extensions.Options;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Infrastructure;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public class DefaultAppImageStoreTests
+public class DefaultAppImageStoreTests : GivenContext
 {
     private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
-    private readonly DomainId appId = DomainId.NewGuid();
     private readonly string fileNameDefault;
     private readonly string fileNameFolder;
     private readonly AssetOptions options = new AssetOptions();
@@ -23,8 +22,8 @@ public class DefaultAppImageStoreTests
 
     public DefaultAppImageStoreTests()
     {
-        fileNameDefault = appId.ToString();
-        fileNameFolder = $"{appId}/thumbnail";
+        fileNameDefault = AppId.Id.ToString();
+        fileNameFolder = $"{AppId.Id}/thumbnail";
 
         sut = new DefaultAppImageStore(assetStore, Options.Create(options));
     }
@@ -40,9 +39,9 @@ public class DefaultAppImageStoreTests
 
         var fileName = GetFileName(folderPerApp);
 
-        await sut.UploadAsync(appId, stream);
+        await sut.UploadAsync(AppId.Id, stream, CancellationToken);
 
-        A.CallTo(() => assetStore.UploadAsync(fileName, stream, true, default))
+        A.CallTo(() => assetStore.UploadAsync(fileName, stream, true, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -57,9 +56,9 @@ public class DefaultAppImageStoreTests
 
         var fileName = GetFileName(folderPerApp);
 
-        await sut.DownloadAsync(appId, stream);
+        await sut.DownloadAsync(AppId.Id, stream, CancellationToken);
 
-        A.CallTo(() => assetStore.DownloadAsync(fileName, stream, default, default))
+        A.CallTo(() => assetStore.DownloadAsync(fileName, stream, default, CancellationToken))
             .MustHaveHappened();
     }
 

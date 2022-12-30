@@ -18,10 +18,9 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards;
 
-public class GuardSchemaTests : IClassFixture<TranslationsFixture>
+public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly Schema schema_0;
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
 
     public GuardSchemaTests()
     {
@@ -663,7 +662,7 @@ public class GuardSchemaTests : IClassFixture<TranslationsFixture>
 
     private CreateSchema CreateCommand(CreateSchema command)
     {
-        command.AppId = appId;
+        command.AppId = AppId;
 
         return command;
     }

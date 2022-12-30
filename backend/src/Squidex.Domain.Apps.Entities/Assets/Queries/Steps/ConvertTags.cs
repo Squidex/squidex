@@ -22,7 +22,7 @@ public sealed class ConvertTags : IAssetEnricherStep
     public async Task EnrichAsync(Context context, IEnumerable<AssetEntity> assets,
         CancellationToken ct)
     {
-        if (!context.ShouldSkipAssetEnrichment())
+        if (context.ShouldSkipAssetEnrichment())
         {
             return;
         }

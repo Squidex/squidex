@@ -13,27 +13,19 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Web.CommandMiddlewares;
 
-public class EnrichWithAppIdCommandMiddlewareTests
+public class EnrichWithAppIdCommandMiddlewareTests : GivenContext
 {
-    private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly Context requestContext;
     private readonly EnrichWithAppIdCommandMiddleware sut;
 
     public EnrichWithAppIdCommandMiddlewareTests()
     {
-        requestContext = Context.Anonymous(Mocks.App(appId));
-
-        A.CallTo(() => contextProvider.Context)
-            .Returns(requestContext);
-
-        sut = new EnrichWithAppIdCommandMiddleware(contextProvider);
+        sut = new EnrichWithAppIdCommandMiddleware(ApiContextProvider);
     }
 
     [Fact]
     public async Task Should_throw_exception_if_app_not_found()
     {
-        A.CallTo(() => contextProvider.Context)
+        A.CallTo(() => ApiContextProvider.Context)
             .Returns(Context.Anonymous(null!));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => HandleAsync(new CreateContent()));
@@ -44,7 +36,7 @@ public class EnrichWithAppIdCommandMiddlewareTests
     {
         var context = await HandleAsync(new CreateContent());
 
-        Assert.Equal(appId, ((IAppCommand)context.Command).AppId);
+        Assert.Equal(AppId, ((IAppCommand)context.Command).AppId);
     }
 
     [Fact]

@@ -10,42 +10,30 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
-public class AssetEnricherTests
+public class AssetEnricherTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
-    private readonly Context requestContext;
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-
-    public AssetEnricherTests()
-    {
-        ct = cts.Token;
-
-        requestContext = new Context(Mocks.ApiUser(), Mocks.App(appId));
-    }
-
     [Fact]
-    public async Task Should_only_invoke_pre_enrich_for_empty_actuals()
+    public async Task Should_only_invoke_pre_enrich_for_empty_assets()
     {
-        var source = Array.Empty<IAssetEntity>();
+        var assets = Array.Empty<IAssetEntity>();
 
         var step1 = A.Fake<IAssetEnricherStep>();
         var step2 = A.Fake<IAssetEnricherStep>();
 
         var sut = new AssetEnricher(new[] { step1, step2 });
 
-        await sut.EnrichAsync(source, requestContext, ct);
+        await sut.EnrichAsync(assets, ApiContext, CancellationToken);
 
-        A.CallTo(() => step1.EnrichAsync(requestContext, ct))
+        A.CallTo(() => step1.EnrichAsync(ApiContext, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step2.EnrichAsync(requestContext, ct))
+        A.CallTo(() => step2.EnrichAsync(ApiContext, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<AssetEntity>>._, A<CancellationToken>._))
+        A.CallTo(() => step1.EnrichAsync(ApiContext, A<IEnumerable<AssetEntity>>._, A<CancellationToken>._))
             .MustNotHaveHappened();
 
-        A.CallTo(() => step2.EnrichAsync(requestContext, A<IEnumerable<AssetEntity>>._, A<CancellationToken>._))
+        A.CallTo(() => step2.EnrichAsync(ApiContext, A<IEnumerable<AssetEntity>>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -59,23 +47,23 @@ public class AssetEnricherTests
 
         var sut = new AssetEnricher(new[] { step1, step2 });
 
-        await sut.EnrichAsync(source, requestContext, ct);
+        await sut.EnrichAsync(source, ApiContext, CancellationToken);
 
-        A.CallTo(() => step1.EnrichAsync(requestContext, ct))
+        A.CallTo(() => step1.EnrichAsync(ApiContext, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step2.EnrichAsync(requestContext, ct))
+        A.CallTo(() => step2.EnrichAsync(ApiContext, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<AssetEntity>>._, ct))
+        A.CallTo(() => step1.EnrichAsync(ApiContext, A<IEnumerable<AssetEntity>>._, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step2.EnrichAsync(requestContext, A<IEnumerable<AssetEntity>>._, ct))
+        A.CallTo(() => step2.EnrichAsync(ApiContext, A<IEnumerable<AssetEntity>>._, CancellationToken))
             .MustHaveHappened();
     }
 
     private AssetEntity CreateAsset()
     {
-        return new AssetEntity { Id = DomainId.NewGuid(), AppId = appId };
+        return new AssetEntity { Id = DomainId.NewGuid(), AppId = AppId };
     }
 }

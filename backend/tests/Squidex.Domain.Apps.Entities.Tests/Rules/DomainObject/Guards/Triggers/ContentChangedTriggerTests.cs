@@ -15,12 +15,8 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards.Triggers;
 
-public class ContentChangedTriggerTests : IClassFixture<TranslationsFixture>
+public class ContentChangedTriggerTests : GivenContext, IClassFixture<TranslationsFixture>
 {
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-
     [Fact]
     public async Task Should_add_error_if_schema_id_is_not_defined()
     {
@@ -29,7 +25,7 @@ public class ContentChangedTriggerTests : IClassFixture<TranslationsFixture>
             Schemas = ReadonlyList.Create(new ContentChangedTriggerSchemaV2())
         };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(appId.Id, trigger, appProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
 
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
@@ -37,27 +33,27 @@ public class ContentChangedTriggerTests : IClassFixture<TranslationsFixture>
                 new ValidationError("Schema ID is required.", "Schemas")
             });
 
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false, default))
+        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, A<DomainId>._, false, default))
             .MustNotHaveHappened();
     }
 
     [Fact]
     public async Task Should_add_error_if_schemas_ids_are_not_valid()
     {
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, default))
+        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, SchemaId.Id, false, default))
             .Returns(Task.FromResult<ISchemaEntity?>(null));
 
         var trigger = new ContentChangedTriggerV2
         {
-            Schemas = ReadonlyList.Create(new ContentChangedTriggerSchemaV2 { SchemaId = schemaId.Id })
+            Schemas = ReadonlyList.Create(new ContentChangedTriggerSchemaV2 { SchemaId = SchemaId.Id })
         };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(appId.Id, trigger, appProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
 
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError($"Schema {schemaId.Id} does not exist.", "Schemas")
+                new ValidationError($"Schema {SchemaId.Id} does not exist.", "Schemas")
             });
     }
 
@@ -66,7 +62,7 @@ public class ContentChangedTriggerTests : IClassFixture<TranslationsFixture>
     {
         var trigger = new ContentChangedTriggerV2();
 
-        var errors = await RuleTriggerValidator.ValidateAsync(appId.Id, trigger, appProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
 
         Assert.Empty(errors);
     }
@@ -79,7 +75,7 @@ public class ContentChangedTriggerTests : IClassFixture<TranslationsFixture>
             Schemas = ReadonlyList.Empty<ContentChangedTriggerSchemaV2>()
         };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(appId.Id, trigger, appProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
 
         Assert.Empty(errors);
     }
@@ -87,15 +83,15 @@ public class ContentChangedTriggerTests : IClassFixture<TranslationsFixture>
     [Fact]
     public async Task Should_not_add_error_if_schemas_ids_are_valid()
     {
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false, default))
-            .Returns(Mocks.Schema(appId, schemaId));
+        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, A<DomainId>._, false, default))
+            .Returns(Schema);
 
         var trigger = new ContentChangedTriggerV2
         {
-            Schemas = ReadonlyList.Create(new ContentChangedTriggerSchemaV2 { SchemaId = schemaId.Id })
+            Schemas = ReadonlyList.Create(new ContentChangedTriggerSchemaV2 { SchemaId = SchemaId.Id })
         };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(appId.Id, trigger, appProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
 
         Assert.Empty(errors);
     }

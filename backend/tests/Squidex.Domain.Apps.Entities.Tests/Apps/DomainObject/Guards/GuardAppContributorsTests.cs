@@ -15,23 +15,26 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 
-#pragma warning disable SA1310 // Field names must not contain underscore
-
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
 
-public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
+public class GuardAppContributorsTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IUser user1 = UserMocks.User("1");
     private readonly IUser user2 = UserMocks.User("2");
     private readonly IUser user3 = UserMocks.User("3");
     private readonly IUserResolver users = A.Fake<IUserResolver>();
-    private readonly Contributors contributors_0 = Contributors.Empty;
     private readonly Plan planWithoutLimit = new Plan { MaxContributors = -1 };
     private readonly Plan planWithLimit = new Plan { MaxContributors = 2 };
-    private readonly Roles roles = Roles.Empty;
+    private Contributors contributors = Contributors.Empty;
 
     public GuardAppContributorsTests()
     {
+        A.CallTo(() => App.Roles)
+            .Returns(Roles.Empty);
+
+        A.CallTo(() => App.Contributors)
+            .ReturnsLazily(() => contributors);
+
         A.CallTo(() => user1.Id)
             .Returns("1");
 
@@ -59,7 +62,7 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor();
 
-        await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(command, App(contributors_0), users, planWithoutLimit),
+        await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(command, App, users, planWithoutLimit),
             new ValidationError("Contributor ID or email is required.", "ContributorId"));
     }
 
@@ -68,7 +71,7 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "1", Role = "Invalid" };
 
-        await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(command, App(contributors_0), users, planWithoutLimit),
+        await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(command, App, users, planWithoutLimit),
             new ValidationError("Role is not a valid value.", "Role"));
     }
 
@@ -77,9 +80,9 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "1", Role = Role.Owner };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Owner);
+        contributors = contributors.Assign("1", Role.Owner);
 
-        await GuardAppContributors.CanAssign(command, App(contributors_1), users, planWithoutLimit);
+        await GuardAppContributors.CanAssign(command, App, users, planWithoutLimit);
     }
 
     [Fact]
@@ -87,9 +90,9 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "1", Role = Role.Owner, IgnoreActor = true };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Owner);
+        contributors = contributors.Assign("1", Role.Owner);
 
-        await GuardAppContributors.CanAssign(command, App(contributors_1), users, planWithoutLimit);
+        await GuardAppContributors.CanAssign(command, App, users, planWithoutLimit);
     }
 
     [Fact]
@@ -97,7 +100,7 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "notfound", Role = Role.Owner };
 
-        await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => GuardAppContributors.CanAssign(command, App(contributors_0), users, planWithoutLimit));
+        await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => GuardAppContributors.CanAssign(command, App, users, planWithoutLimit));
     }
 
     [Fact]
@@ -105,7 +108,7 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "3", Role = Role.Editor, Actor = RefToken.User("3") };
 
-        await Assert.ThrowsAsync<DomainForbiddenException>(() => GuardAppContributors.CanAssign(command, App(contributors_0), users, planWithoutLimit));
+        await Assert.ThrowsAsync<DomainForbiddenException>(() => GuardAppContributors.CanAssign(command, App, users, planWithoutLimit));
     }
 
     [Fact]
@@ -113,10 +116,9 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "3" };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Owner);
-        var contributors_2 = contributors_1.Assign("2", Role.Editor);
+        contributors = contributors.Assign("1", Role.Owner).Assign("2", Role.Editor);
 
-        await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(command, App(contributors_2), users, planWithLimit),
+        await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(command, App, users, planWithLimit),
             new ValidationError("You have reached the maximum number of contributors for your plan."));
     }
 
@@ -125,10 +127,9 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "3", IgnorePlans = true };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Owner);
-        var contributors_2 = contributors_1.Assign("2", Role.Editor);
+        contributors = contributors.Assign("1", Role.Owner).Assign("2", Role.Editor);
 
-        await GuardAppContributors.CanAssign(command, App(contributors_2), users, planWithLimit);
+        await GuardAppContributors.CanAssign(command, App, users, planWithLimit);
     }
 
     [Fact]
@@ -136,7 +137,7 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "1" };
 
-        await GuardAppContributors.CanAssign(command, App(contributors_0), users, planWithoutLimit);
+        await GuardAppContributors.CanAssign(command, App, users, planWithoutLimit);
     }
 
     [Fact]
@@ -144,9 +145,9 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "1" };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Developer);
+        contributors = contributors.Assign("1", Role.Developer);
 
-        await GuardAppContributors.CanAssign(command, App(contributors_1), users, planWithoutLimit);
+        await GuardAppContributors.CanAssign(command, App, users, planWithoutLimit);
     }
 
     [Fact]
@@ -154,10 +155,9 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "1" };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Developer);
-        var contributors_2 = contributors_1.Assign("2", Role.Developer);
+        contributors = contributors.Assign("1", Role.Developer).Assign("2", Role.Developer);
 
-        await GuardAppContributors.CanAssign(command, App(contributors_2), users, planWithLimit);
+        await GuardAppContributors.CanAssign(command, App, users, planWithLimit);
     }
 
     [Fact]
@@ -165,10 +165,9 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "3", IgnorePlans = true };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Editor);
-        var contributors_2 = contributors_1.Assign("2", Role.Editor);
+        contributors = contributors.Assign("1", Role.Editor).Assign("2", Role.Editor);
 
-        await GuardAppContributors.CanAssign(command, App(contributors_2), users, planWithoutLimit);
+        await GuardAppContributors.CanAssign(command, App, users, planWithoutLimit);
     }
 
     [Fact]
@@ -176,7 +175,7 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new RemoveContributor();
 
-        ValidationAssert.Throws(() => GuardAppContributors.CanRemove(command, App(contributors_0)),
+        ValidationAssert.Throws(() => GuardAppContributors.CanRemove(command, App),
             new ValidationError("Contributor ID or email is required.", "ContributorId"));
     }
 
@@ -185,7 +184,7 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new RemoveContributor { ContributorId = "1" };
 
-        Assert.Throws<DomainObjectNotFoundException>(() => GuardAppContributors.CanRemove(command, App(contributors_0)));
+        Assert.Throws<DomainObjectNotFoundException>(() => GuardAppContributors.CanRemove(command, App));
     }
 
     [Fact]
@@ -193,10 +192,9 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new RemoveContributor { ContributorId = "1" };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Owner);
-        var contributors_2 = contributors_1.Assign("2", Role.Editor);
+        contributors = contributors.Assign("1", Role.Owner).Assign("2", Role.Editor);
 
-        ValidationAssert.Throws(() => GuardAppContributors.CanRemove(command, App(contributors_2)),
+        ValidationAssert.Throws(() => GuardAppContributors.CanRemove(command, App),
             new ValidationError("Cannot remove the only owner."));
     }
 
@@ -205,19 +203,8 @@ public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new RemoveContributor { ContributorId = "1" };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Owner);
-        var contributors_2 = contributors_1.Assign("2", Role.Owner);
+        contributors = contributors.Assign("1", Role.Owner).Assign("2", Role.Owner);
 
-        GuardAppContributors.CanRemove(command, App(contributors_2));
-    }
-
-    private IAppEntity App(Contributors contributors)
-    {
-        var app = A.Fake<IAppEntity>();
-
-        A.CallTo(() => app.Contributors).Returns(contributors);
-        A.CallTo(() => app.Roles).Returns(roles);
-
-        return app;
+        GuardAppContributors.CanRemove(command, App);
     }
 }

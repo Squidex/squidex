@@ -37,41 +37,45 @@ public sealed class ContentValidator
         this.partitionResolver = partitionResolver;
     }
 
-    public ValueTask ValidateInputPartialAsync(ContentData data)
+    public ValueTask ValidateInputPartialAsync(ContentData data,
+        CancellationToken ct = default)
     {
         Guard.NotNull(data);
 
         ValidateInputCore(data, true);
 
-        return context.Root.CompleteAsync();
+        return context.Root.CompleteAsync(ct);
     }
 
-    public ValueTask ValidateInputAsync(ContentData data)
+    public ValueTask ValidateInputAsync(ContentData data,
+        CancellationToken ct = default)
     {
         Guard.NotNull(data);
 
         ValidateInputCore(data, false);
 
-        return context.Root.CompleteAsync();
+        return context.Root.CompleteAsync(ct);
     }
 
-    public ValueTask ValidateInputAndContentAsync(ContentData data)
+    public ValueTask ValidateInputAndContentAsync(ContentData data,
+        CancellationToken ct = default)
     {
         Guard.NotNull(data);
 
         ValidateInputCore(data, false);
         ValidateContentCore(data);
 
-        return context.Root.CompleteAsync();
+        return context.Root.CompleteAsync(ct);
     }
 
-    public ValueTask ValidateContentAsync(ContentData data)
+    public ValueTask ValidateContentAsync(ContentData data,
+        CancellationToken ct = default)
     {
         Guard.NotNull(data);
 
         ValidateContentCore(data);
 
-        return context.Root.CompleteAsync();
+        return context.Root.CompleteAsync(ct);
     }
 
     private void ValidateInputCore(ContentData data, bool partial)

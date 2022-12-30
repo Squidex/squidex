@@ -17,11 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject;
 public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject.State>
 {
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
-    private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
     private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
     private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly Context requestContext;
     private readonly AppCommandMiddleware sut;
 
     public sealed class MyCommand : SquidexCommand
@@ -30,27 +27,22 @@ public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject.State>
 
     protected override DomainId Id
     {
-        get => appId.Id;
+        get => AppId.Id;
     }
 
     public AppCommandMiddlewareTests()
     {
-        requestContext = Context.Anonymous(Mocks.App(appId));
-
-        A.CallTo(() => contextProvider.Context)
-            .Returns(requestContext);
-
-        sut = new AppCommandMiddleware(domainObjectFactory, appImageStore, assetThumbnailGenerator, contextProvider);
+        sut = new AppCommandMiddleware(domainObjectFactory, appImageStore, assetThumbnailGenerator, ApiContextProvider);
     }
 
     [Fact]
     public async Task Should_replace_context_app_with_domain_object_actual()
     {
-        var actual = A.Fake<IAppEntity>();
+        var replaced = A.Fake<IAppEntity>();
 
-        await HandleAsync(new UpdateApp(), actual);
+        await HandleAsync(new UpdateApp(), replaced);
 
-        Assert.Same(actual, requestContext.App);
+        Assert.Same(replaced, ApiContext.App);
     }
 
     [Fact]
@@ -58,12 +50,12 @@ public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject.State>
     {
         var file = new NoopAssetFile();
 
-        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, default))
+        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
             .Returns(new ImageInfo(100, 100, ImageOrientation.None, ImageFormat.PNG));
 
         await HandleAsync(new UploadAppImage { File = file }, None.Value);
 
-        A.CallTo(() => appImageStore.UploadAsync(appId.Id, A<Stream>._, A<CancellationToken>._))
+        A.CallTo(() => appImageStore.UploadAsync(AppId.Id, A<Stream>._, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -74,15 +66,15 @@ public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject.State>
 
         var command = new UploadAppImage { File = file };
 
-        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, default))
+        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
             .Returns(Task.FromResult<ImageInfo?>(null));
 
-        await Assert.ThrowsAsync<ValidationException>(() => HandleAsync(sut, command));
+        await Assert.ThrowsAsync<ValidationException>(() => HandleAsync(sut, command, CancellationToken));
     }
 
     private Task<CommandContext> HandleAsync(AppCommand command, object actual)
     {
-        command.AppId = appId;
+        command.AppId = AppId;
 
         var domainObject = A.Fake<AppDomainObject>();
 
@@ -92,6 +84,6 @@ public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject.State>
         A.CallTo(() => domainObjectFactory.Create<AppDomainObject>(command.AggregateId))
             .Returns(domainObject);
 
-        return HandleAsync(sut, command);
+        return HandleAsync(sut, command, CancellationToken);
     }
 }

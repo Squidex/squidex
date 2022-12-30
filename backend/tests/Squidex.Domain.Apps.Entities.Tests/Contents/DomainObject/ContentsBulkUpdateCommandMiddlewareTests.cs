@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Security.Claims;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -16,18 +15,14 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
 using Squidex.Shared;
-using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
-public class ContentsBulkUpdateCommandMiddlewareTests
+public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
     private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
     private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
     private readonly NamedId<DomainId> schemaCustomId = NamedId.Of(DomainId.NewGuid(), "my-schema2");
     private readonly Instant time = Instant.FromDateTimeUtc(DateTime.UtcNow);
@@ -35,8 +30,6 @@ public class ContentsBulkUpdateCommandMiddlewareTests
 
     public ContentsBulkUpdateCommandMiddlewareTests()
     {
-        ct = cts.Token;
-
         var log = A.Fake<ILogger<ContentsBulkUpdateCommandMiddleware>>();
 
         sut = new ContentsBulkUpdateCommandMiddleware(contentQuery, contextProvider, log);
@@ -92,7 +85,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
                     x.ShouldSkipCleanup() &&
                     x.ShouldSkipContentEnrichment() &&
                     x.ShouldSkipTotal()),
-                schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), ct))
+                schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), CancellationToken))
             .Returns(ResultList.CreateFrom(2, CreateContent(id), CreateContent(id)));
 
         var command = BulkCommand(BulkUpdateContentType.ChangeStatus, new BulkUpdateJob { Query = query });
@@ -118,7 +111,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
                     x.ShouldSkipCleanup() &&
                     x.ShouldSkipContentEnrichment() &&
                     x.ShouldSkipTotal()),
-                schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), ct))
+                schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), CancellationToken))
             .Returns(ResultList.CreateFrom(1, CreateContent(id)));
 
         var command = BulkCommand(BulkUpdateContentType.Upsert, new BulkUpdateJob { Query = query, Data = data });
@@ -129,7 +122,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), ct))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), CancellationToken))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -148,7 +141,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
                     x.ShouldSkipCleanup() &&
                     x.ShouldSkipContentEnrichment() &&
                     x.ShouldSkipTotal()),
-                schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), ct))
+                schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), CancellationToken))
             .Returns(ResultList.CreateFrom(2,
                 CreateContent(id1),
                 CreateContent(id2)));
@@ -164,11 +157,11 @@ public class ContentsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id2 && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id1), ct))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id1), CancellationToken))
             .MustHaveHappenedOnceExactly();
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id2), ct))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id2), CancellationToken))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -187,7 +180,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default), ct))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default), CancellationToken))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -206,7 +199,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default), ct))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default), CancellationToken))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -225,7 +218,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), ct))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), CancellationToken))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -244,7 +237,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), ct))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), CancellationToken))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -263,7 +256,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<CreateContent>.That.Matches(x => x.ContentId == id && x.Data == data), ct))
+                A<CreateContent>.That.Matches(x => x.ContentId == id && x.Data == data), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -300,7 +293,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpdateContent>.That.Matches(x => x.ContentId == id && x.Data == data), ct))
+                A<UpdateContent>.That.Matches(x => x.ContentId == id && x.Data == data), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -337,7 +330,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<PatchContent>.That.Matches(x => x.ContentId == id && x.Data == data), ct))
+                A<PatchContent>.That.Matches(x => x.ContentId == id && x.Data == data), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -374,7 +367,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == null), ct))
+                A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == null), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -393,7 +386,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == time), ct))
+                A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == time), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -430,7 +423,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<ValidateContent>.That.Matches(x => x.ContentId == id), ct))
+                A<ValidateContent>.That.Matches(x => x.ContentId == id), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -467,7 +460,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<DeleteContent>.That.Matches(x => x.ContentId == id), ct))
+                A<DeleteContent>.That.Matches(x => x.ContentId == id), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -494,8 +487,8 @@ public class ContentsBulkUpdateCommandMiddlewareTests
     {
         SetupContext(PermissionIds.AppContentsDeleteOwn);
 
-        A.CallTo(() => contentQuery.GetSchemaOrThrowAsync(A<Context>._, schemaCustomId.Name, ct))
-            .Returns(Mocks.Schema(appId, schemaCustomId));
+        A.CallTo(() => contentQuery.GetSchemaOrThrowAsync(A<Context>._, schemaCustomId.Name, CancellationToken))
+            .Returns(Mocks.Schema(AppId, schemaCustomId));
 
         var (id, _, _) = CreateTestData(false);
 
@@ -507,7 +500,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<DeleteContent>.That.Matches(x => x.SchemaId == schemaCustomId), ct))
+                A<DeleteContent>.That.Matches(x => x.SchemaId == schemaCustomId), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -529,7 +522,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainObjectNotFoundException);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<DeleteContent>.That.Matches(x => x.SchemaId == schemaCustomId), ct))
+                A<DeleteContent>.That.Matches(x => x.SchemaId == schemaCustomId), CancellationToken))
             .MustNotHaveHappened();
     }
 
@@ -537,7 +530,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
     {
         var context = new CommandContext(command, commandBus);
 
-        await sut.HandleAsync(context, ct);
+        await sut.HandleAsync(context, CancellationToken);
 
         return (context.PlainResult as BulkUpdateResult)!;
     }
@@ -550,7 +543,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests
 
         return new BulkUpdateContents
         {
-            AppId = appId,
+            AppId = AppId,
             Jobs = new[]
             {
                 job
@@ -561,18 +554,9 @@ public class ContentsBulkUpdateCommandMiddlewareTests
 
     private Context SetupContext(string id)
     {
-        var claimsIdentity = new ClaimsIdentity();
-        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-        claimsIdentity.AddClaim(
-            new Claim(SquidexClaimTypes.Permissions,
-                PermissionIds.ForApp(id, appId.Name, schemaId.Name).Id));
-
-        claimsIdentity.AddClaim(
-            new Claim(SquidexClaimTypes.Permissions,
-                PermissionIds.ForApp(id, appId.Name, schemaCustomId.Name).Id));
-
-        var requestContext = new Context(claimsPrincipal, Mocks.App(appId));
+        var requestContext = CreateContext(false,
+            PermissionIds.ForApp(id, AppId.Name, schemaId.Name).Id,
+            PermissionIds.ForApp(id, AppId.Name, schemaCustomId.Name).Id);
 
         A.CallTo(() => contextProvider.Context)
             .Returns(requestContext);

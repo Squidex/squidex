@@ -5,30 +5,23 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Security.Claims;
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
-using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
-public class AssetsBulkUpdateCommandMiddlewareTests
+public class AssetsBulkUpdateCommandMiddlewareTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
     private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly AssetsBulkUpdateCommandMiddleware sut;
 
     public AssetsBulkUpdateCommandMiddlewareTests()
     {
-        ct = cts.Token;
-
         var log = A.Fake<ILogger<AssetsBulkUpdateCommandMiddleware>>();
 
         sut = new AssetsBulkUpdateCommandMiddleware(contextProvider, log);
@@ -68,7 +61,7 @@ public class AssetsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual);
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
-        A.CallTo(() => commandBus.PublishAsync(A<AnnotateAsset>.That.Matches(x => x.AssetId == id && x.FileName == "file"), ct))
+        A.CallTo(() => commandBus.PublishAsync(A<AnnotateAsset>.That.Matches(x => x.AssetId == id && x.FileName == "file"), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -104,7 +97,7 @@ public class AssetsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual);
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
-        A.CallTo(() => commandBus.PublishAsync(A<MoveAsset>.That.Matches(x => x.AssetId == id), ct))
+        A.CallTo(() => commandBus.PublishAsync(A<MoveAsset>.That.Matches(x => x.AssetId == id), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -141,7 +134,7 @@ public class AssetsBulkUpdateCommandMiddlewareTests
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<DeleteAsset>.That.Matches(x => x.AssetId == id), ct))
+                A<DeleteAsset>.That.Matches(x => x.AssetId == id), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -167,7 +160,7 @@ public class AssetsBulkUpdateCommandMiddlewareTests
     {
         var context = new CommandContext(command, commandBus);
 
-        await sut.HandleAsync(context, ct);
+        await sut.HandleAsync(context, CancellationToken);
 
         return (context.PlainResult as BulkUpdateResult)!;
     }
@@ -176,7 +169,7 @@ public class AssetsBulkUpdateCommandMiddlewareTests
     {
         return new BulkUpdateAssets
         {
-            AppId = appId,
+            AppId = AppId,
             Jobs = new[]
             {
                 new BulkUpdateJob
@@ -191,14 +184,7 @@ public class AssetsBulkUpdateCommandMiddlewareTests
 
     private Context SetupContext(string id)
     {
-        var permission = PermissionIds.ForApp(id, appId.Name).Id;
-
-        var claimsIdentity = new ClaimsIdentity();
-        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-        claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
-
-        var requestContext = new Context(claimsPrincipal, Mocks.App(appId));
+        var requestContext = CreateContext(false, PermissionIds.ForApp(id, AppId.Name).Id);
 
         A.CallTo(() => contextProvider.Context)
             .Returns(requestContext);

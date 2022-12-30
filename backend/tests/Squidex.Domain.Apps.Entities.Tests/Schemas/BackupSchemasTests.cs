@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
@@ -15,18 +16,13 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Schemas;
 
-public class BackupSchemasTests
+public class BackupSchemasTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly Rebuilder rebuilder = A.Fake<Rebuilder>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly BackupSchemas sut;
 
     public BackupSchemasTests()
     {
-        ct = cts.Token;
-
         sut = new BackupSchemas(rebuilder);
     }
 
@@ -43,46 +39,46 @@ public class BackupSchemasTests
         var schemaId2 = NamedId.Of(DomainId.NewGuid(), "my-schema2");
         var schemaId3 = NamedId.Of(DomainId.NewGuid(), "my-schema3");
 
-        var context = new RestoreContext(appId.Id, new UserMapping(RefToken.User("123")), A.Fake<IBackupReader>(), DomainId.NewGuid());
+        var context = new RestoreContext(AppId.Id, new UserMapping(User), A.Fake<IBackupReader>(), DomainId.NewGuid());
 
         await sut.RestoreEventAsync(AppEvent(new SchemaCreated
         {
             SchemaId = schemaId1
-        }), context, ct);
+        }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new SchemaCreated
         {
             SchemaId = schemaId2
-        }), context, ct);
+        }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new SchemaCreated
         {
             SchemaId = schemaId3
-        }), context, ct);
+        }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new SchemaDeleted
         {
             SchemaId = schemaId3
-        }), context, ct);
+        }), context, CancellationToken);
 
         var rebuildContents = new HashSet<DomainId>();
 
-        A.CallTo(() => rebuilder.InsertManyAsync<SchemaDomainObject, SchemaDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, ct))
+        A.CallTo(() => rebuilder.InsertManyAsync<SchemaDomainObject, SchemaDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
             .Invokes(x => rebuildContents.AddRange(x.GetArgument<IEnumerable<DomainId>>(0)!));
 
-        await sut.RestoreAsync(context, ct);
+        await sut.RestoreAsync(context, CancellationToken);
 
         Assert.Equal(new HashSet<DomainId>
         {
-            DomainId.Combine(appId, schemaId1.Id),
-            DomainId.Combine(appId, schemaId2.Id)
+            DomainId.Combine(AppId, schemaId1.Id),
+            DomainId.Combine(AppId, schemaId2.Id)
         }, rebuildContents);
     }
 
     private Envelope<SchemaEvent> AppEvent(SchemaEvent @event)
     {
-        @event.AppId = appId;
+        @event.AppId = AppId;
 
-        return Envelope.Create(@event).SetAggregateId(DomainId.Combine(appId, @event.SchemaId.Id));
+        return Envelope.Create(@event).SetAggregateId(DomainId.Combine(AppId, @event.SchemaId.Id));
     }
 }

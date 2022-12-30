@@ -7,22 +7,19 @@
 
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Infrastructure;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards.Triggers;
 
-public class UsageTriggerValidationTests : IClassFixture<TranslationsFixture>
+public class UsageTriggerValidationTests : GivenContext, IClassFixture<TranslationsFixture>
 {
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-    private readonly DomainId appId = DomainId.NewGuid();
-
     [Fact]
     public async Task Should_add_error_if_num_days_less_than_1()
     {
         var trigger = new UsageTrigger { NumDays = 0 };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(appId, trigger, appProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
 
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
@@ -36,7 +33,7 @@ public class UsageTriggerValidationTests : IClassFixture<TranslationsFixture>
     {
         var trigger = new UsageTrigger { NumDays = 32 };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(appId, trigger, appProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
 
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
@@ -50,7 +47,7 @@ public class UsageTriggerValidationTests : IClassFixture<TranslationsFixture>
     {
         var trigger = new UsageTrigger { NumDays = 20 };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(appId, trigger, appProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
 
         Assert.Empty(errors);
     }
@@ -60,7 +57,7 @@ public class UsageTriggerValidationTests : IClassFixture<TranslationsFixture>
     {
         var trigger = new UsageTrigger();
 
-        var errors = await RuleTriggerValidator.ValidateAsync(appId, trigger, appProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
 
         Assert.Empty(errors);
     }

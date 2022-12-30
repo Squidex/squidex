@@ -19,20 +19,18 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public class AssetsFluidExtensionTests
+public class AssetsFluidExtensionTests : GivenContext
 {
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
     private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly FluidTemplateEngine sut;
 
     public AssetsFluidExtensionTests()
     {
         var serviceProvider =
             new ServiceCollection()
-                .AddSingleton(appProvider)
+                .AddSingleton(AppProvider)
                 .AddSingleton(assetFileStore)
                 .AddSingleton(assetQuery)
                 .AddSingleton(assetThumbnailGenerator)
@@ -43,9 +41,6 @@ public class AssetsFluidExtensionTests
             new ContentFluidExtension(),
             new AssetsFluidExtension(serviceProvider)
         };
-
-        A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, default))
-            .Returns(Mocks.App(appId));
 
         sut = new FluidTemplateEngine(extensions);
     }
@@ -179,7 +174,7 @@ public class AssetsFluidExtensionTests
             Id = DomainId.NewGuid(),
             FileVersion = 0,
             FileSize = 100,
-            AppId = appId
+            AppId = AppId
         };
 
         SetupText(@event.ToRef(), Encode(encoding, "hello+assets"));
@@ -276,7 +271,7 @@ public class AssetsFluidExtensionTests
             AssetType = AssetType.Image,
             FileVersion = 0,
             FileSize = 100,
-            AppId = appId
+            AppId = AppId
         };
 
         SetupBlurHash(@event.ToRef(), "Hash");
@@ -307,7 +302,7 @@ public class AssetsFluidExtensionTests
 
     private void SetupText(AssetRef asset, byte[] bytes)
     {
-        A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, asset.Id, asset.FileVersion, null, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
+        A.CallTo(() => assetFileStore.DownloadAsync(AppId.Id, asset.Id, asset.FileVersion, null, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
             .Invokes(x => x.GetArgument<Stream>(4)?.Write(bytes));
     }
 
@@ -323,7 +318,7 @@ public class AssetsFluidExtensionTests
                     .AddField("assets",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(assetId))),
-            AppId = appId
+            AppId = AppId
         };
 
         A.CallTo(() => assetQuery.FindAsync(A<Context>._, assetId, EtagVersion.Any, A<CancellationToken>._))
@@ -351,7 +346,7 @@ public class AssetsFluidExtensionTests
                     .AddField("assets",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(assetId1, assetId2))),
-            AppId = appId
+            AppId = AppId
         };
 
         A.CallTo(() => assetQuery.FindAsync(A<Context>._, assetId1, EtagVersion.Any, A<CancellationToken>._))
@@ -372,7 +367,7 @@ public class AssetsFluidExtensionTests
     {
         return new AssetEntity
         {
-            AppId = appId,
+            AppId = AppId,
             Id = assetId,
             FileSize = fileSize,
             FileName = $"file{index}.jpg",

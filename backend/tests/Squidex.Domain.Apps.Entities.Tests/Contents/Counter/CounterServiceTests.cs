@@ -6,24 +6,18 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.TestHelpers;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Counter;
 
-public class CounterServiceTests
+public class CounterServiceTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly TestState<CounterService.State> state;
-    private readonly DomainId appId = DomainId.NewGuid();
     private readonly CounterService sut;
 
     public CounterServiceTests()
     {
-        ct = cts.Token;
-
-        state = new TestState<CounterService.State>(appId);
+        state = new TestState<CounterService.State>(AppId.Id);
 
         sut = new CounterService(state.PersistenceFactory);
     }
@@ -39,36 +33,36 @@ public class CounterServiceTests
     [Fact]
     public async Task Should_delete_state_when_app_deleted()
     {
-        await ((IDeleter)sut).DeleteAppAsync(Mocks.App(NamedId.Of(appId, "my-app")), ct);
+        await ((IDeleter)sut).DeleteAppAsync(App, CancellationToken);
 
-        A.CallTo(() => state.Persistence.DeleteAsync(ct))
+        A.CallTo(() => state.Persistence.DeleteAsync(CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_increment_counters()
     {
-        Assert.Equal(1, await sut.IncrementAsync(appId, "Counter1", ct));
-        Assert.Equal(2, await sut.IncrementAsync(appId, "Counter1", ct));
+        Assert.Equal(1, await sut.IncrementAsync(AppId.Id, "Counter1", CancellationToken));
+        Assert.Equal(2, await sut.IncrementAsync(AppId.Id, "Counter1", CancellationToken));
 
-        Assert.Equal(1, await sut.IncrementAsync(appId, "Counter2", ct));
-        Assert.Equal(2, await sut.IncrementAsync(appId, "Counter2", ct));
+        Assert.Equal(1, await sut.IncrementAsync(AppId.Id, "Counter2", CancellationToken));
+        Assert.Equal(2, await sut.IncrementAsync(AppId.Id, "Counter2", CancellationToken));
 
-        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<CounterService.State>._, ct))
+        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<CounterService.State>._, CancellationToken))
             .MustHaveHappened(4, Times.Exactly);
     }
 
     [Fact]
     public async Task Should_reset_counter()
     {
-        Assert.Equal(1, await sut.IncrementAsync(appId, "Counter1", ct));
-        Assert.Equal(2, await sut.IncrementAsync(appId, "Counter1", ct));
+        Assert.Equal(1, await sut.IncrementAsync(AppId.Id, "Counter1", CancellationToken));
+        Assert.Equal(2, await sut.IncrementAsync(AppId.Id, "Counter1", CancellationToken));
 
-        Assert.Equal(1, await sut.ResetAsync(appId, "Counter1", 1, ct));
+        Assert.Equal(1, await sut.ResetAsync(AppId.Id, "Counter1", 1, CancellationToken));
 
-        Assert.Equal(2, await sut.IncrementAsync(appId, "Counter1", ct));
+        Assert.Equal(2, await sut.IncrementAsync(AppId.Id, "Counter1", CancellationToken));
 
-        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<CounterService.State>._, ct))
+        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<CounterService.State>._, CancellationToken))
             .MustHaveHappened(4, Times.Exactly);
     }
 }

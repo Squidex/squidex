@@ -14,8 +14,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
@@ -24,14 +24,12 @@ using Squidex.Shared.Identity;
 
 namespace Squidex.Web.Pipeline;
 
-public class AppResolverTests
+public class AppResolverTests : GivenContext
 {
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly HttpContext httpContext = new DefaultHttpContext();
     private readonly ActionContext actionContext;
     private readonly ActionExecutingContext actionExecutingContext;
     private readonly ActionExecutionDelegate next;
-    private readonly string appName = "my-app";
     private readonly AppResolver sut;
     private bool isNextCalled;
 
@@ -44,7 +42,7 @@ public class AppResolverTests
 
         actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>(), this);
         actionExecutingContext.HttpContext = httpContext;
-        actionExecutingContext.RouteData.Values["app"] = appName;
+        actionExecutingContext.RouteData.Values["app"] = AppId.Name;
 
         next = () =>
         {
@@ -53,7 +51,7 @@ public class AppResolverTests
             return Task.FromResult<ActionExecutedContext>(null!);
         };
 
-        sut = new AppResolver(appProvider);
+        sut = new AppResolver(AppProvider);
     }
 
     [Theory]
@@ -71,7 +69,7 @@ public class AppResolverTests
         Assert.IsType<NotFoundResult>(actionExecutingContext.Result);
         Assert.False(isNextCalled);
 
-        A.CallTo(() => appProvider.GetAppAsync(A<string>._, false, httpContext.RequestAborted))
+        A.CallTo(() => AppProvider.GetAppAsync(A<string>._, false, httpContext.RequestAborted))
             .MustNotHaveHappened();
     }
 
@@ -80,7 +78,7 @@ public class AppResolverTests
     {
         SetupUser();
 
-        A.CallTo(() => appProvider.GetAppAsync(appName, false, httpContext.RequestAborted))
+        A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, false, httpContext.RequestAborted))
             .Returns(Task.FromResult<IAppEntity?>(null));
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -94,10 +92,8 @@ public class AppResolverTests
     {
         SetupUser(null);
 
-        var app = CreateApp(appName);
-
-        A.CallTo(() => appProvider.GetAppAsync(appName, false, httpContext.RequestAborted))
-            .Returns(app);
+        A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, false, httpContext.RequestAborted))
+            .Returns(App);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
@@ -110,22 +106,20 @@ public class AppResolverTests
     {
         var user = SetupUser();
 
-        var app = CreateApp(appName);
+        user.AddClaim(new Claim(OpenIdClaims.Subject, User.Identifier));
+        user.AddClaim(new Claim(SquidexClaimTypes.Permissions, $"squidex.apps.{AppId.Name}"));
 
-        user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
-        user.AddClaim(new Claim(SquidexClaimTypes.Permissions, $"squidex.apps.{appName}"));
-
-        A.CallTo(() => appProvider.GetAppAsync(appName, true, httpContext.RequestAborted))
-            .Returns(app);
+        A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, true, httpContext.RequestAborted))
+            .Returns(App);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
         var permissions = user.Claims.Where(x => x.Type == SquidexClaimTypes.Permissions).ToList();
 
-        Assert.Same(app, httpContext.Context().App);
+        Assert.Same(App, httpContext.Context().App);
         Assert.True(user.Claims.Any());
         Assert.True(permissions.Count < 3);
-        Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.apps.{appName}", StringComparison.OrdinalIgnoreCase)));
+        Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.apps.{AppId.Name}", StringComparison.OrdinalIgnoreCase)));
         Assert.True(isNextCalled);
     }
 
@@ -134,21 +128,22 @@ public class AppResolverTests
     {
         var user = SetupUser();
 
-        var app = CreateApp(appName, user: "user1");
+        user.AddClaim(new Claim(OpenIdClaims.Subject, User.Identifier));
 
-        user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
+        A.CallTo(() => App.Contributors)
+            .Returns(Contributors.Empty.Assign(User.Identifier, Role.Reader));
 
-        A.CallTo(() => appProvider.GetAppAsync(appName, true, httpContext.RequestAborted))
-            .Returns(app);
+        A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, true, httpContext.RequestAborted))
+            .Returns(App);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
         var permissions = user.Claims.Where(x => x.Type == SquidexClaimTypes.Permissions).ToList();
 
-        Assert.Same(app, httpContext.Context().App);
+        Assert.Same(App, httpContext.Context().App);
         Assert.True(user.Claims.Count() > 2);
         Assert.True(permissions.Count < 3);
-        Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.apps.{appName}", StringComparison.OrdinalIgnoreCase)));
+        Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.apps.{AppId.Name}", StringComparison.OrdinalIgnoreCase)));
         Assert.True(isNextCalled);
     }
 
@@ -157,22 +152,23 @@ public class AppResolverTests
     {
         var user = SetupUser();
 
-        var app = CreateApp(appName, user: "user1");
-
-        user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
+        user.AddClaim(new Claim(OpenIdClaims.Subject, User.Identifier));
         user.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
 
-        A.CallTo(() => appProvider.GetAppAsync(appName, false, httpContext.RequestAborted))
-            .Returns(app);
+        A.CallTo(() => App.Contributors)
+            .Returns(Contributors.Empty.Assign(User.Identifier, Role.Reader));
+
+        A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, false, httpContext.RequestAborted))
+            .Returns(App);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
         var permissions = user.Claims.Where(x => x.Type == SquidexClaimTypes.Permissions).ToList();
 
-        Assert.Same(app, httpContext.Context().App);
+        Assert.Same(App, httpContext.Context().App);
         Assert.True(user.Claims.Count() > 2);
         Assert.True(permissions.Count > 10);
-        Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.apps.{appName}", StringComparison.OrdinalIgnoreCase)));
+        Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.apps.{AppId.Name}", StringComparison.OrdinalIgnoreCase)));
         Assert.True(isNextCalled);
     }
 
@@ -181,16 +177,17 @@ public class AppResolverTests
     {
         var user = SetupUser();
 
-        user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
+        user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{AppId.Name}:{Client.Identifier}"));
 
-        var app = CreateApp(appName, client: "client1");
+        A.CallTo(() => App.Clients)
+            .Returns(AppClients.Empty.Add(Client.Identifier, Role.Reader));
 
-        A.CallTo(() => appProvider.GetAppAsync(appName, true, httpContext.RequestAborted))
-            .Returns(app);
+        A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, true, httpContext.RequestAborted))
+            .Returns(App);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-        Assert.Same(app, httpContext.Context().App);
+        Assert.Same(App, httpContext.Context().App);
         Assert.True(user.Claims.Count() > 2);
         Assert.True(isNextCalled);
     }
@@ -200,17 +197,18 @@ public class AppResolverTests
     {
         var user = SetupUser();
 
-        var app = CreateApp(appName, client: "client1", allowAnonymous: true);
+        A.CallTo(() => App.Clients)
+            .Returns(AppClients.Empty.Add(Client.Identifier, Role.Reader).Update(Client.Identifier, allowAnonymous: true));
 
-        A.CallTo(() => appProvider.GetAppAsync(appName, true, httpContext.RequestAborted))
-            .Returns(app);
+        A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, true, httpContext.RequestAborted))
+            .Returns(App);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-        Assert.Same(app, httpContext.Context().App);
+        Assert.Same(App, httpContext.Context().App);
         Assert.True(user.Claims.Count() > 2);
         Assert.True(isNextCalled);
-        Assert.Contains(user.Claims, x => x.Type == OpenIdClaims.ClientId && x.Value == "client1");
+        Assert.Contains(user.Claims, x => x.Type == OpenIdClaims.ClientId && x.Value == Client.Identifier);
     }
 
     [Fact]
@@ -218,19 +216,17 @@ public class AppResolverTests
     {
         var user = SetupUser();
 
-        user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
+        user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{AppId.Name}:{Client.Identifier}"));
         user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
-
-        var app = CreateApp(appName);
 
         actionContext.ActionDescriptor.EndpointMetadata.Add(new AllowAnonymousAttribute());
 
-        A.CallTo(() => appProvider.GetAppAsync(appName, true, httpContext.RequestAborted))
-            .Returns(app);
+        A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, true, httpContext.RequestAborted))
+            .Returns(App);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-        Assert.Same(app, httpContext.Context().App);
+        Assert.Same(App, httpContext.Context().App);
         Assert.Equal(2, user.Claims.Count());
         Assert.True(isNextCalled);
     }
@@ -240,13 +236,11 @@ public class AppResolverTests
     {
         var user = SetupUser();
 
-        user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{appName}:client1"));
+        user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{AppId.Name}:{Client.Identifier}"));
         user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 
-        var app = CreateApp(appName);
-
-        A.CallTo(() => appProvider.GetAppAsync(appName, false, httpContext.RequestAborted))
-            .Returns(app);
+        A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, false, httpContext.RequestAborted))
+            .Returns(App);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
@@ -259,12 +253,13 @@ public class AppResolverTests
     {
         var user = SetupUser();
 
-        user.AddClaim(new Claim(OpenIdClaims.ClientId, "other:client1"));
+        user.AddClaim(new Claim(OpenIdClaims.ClientId, $"other:{Client.Identifier}"));
 
-        var app = CreateApp(appName, client: "client1");
+        A.CallTo(() => App.Clients)
+            .Returns(AppClients.Empty.Add(Client.Identifier, Role.Reader));
 
-        A.CallTo(() => appProvider.GetAppAsync(appName, false, httpContext.RequestAborted))
-            .Returns(app);
+        A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, false, httpContext.RequestAborted))
+            .Returns(App);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
@@ -281,7 +276,7 @@ public class AppResolverTests
 
         Assert.True(isNextCalled);
 
-        A.CallTo(() => appProvider.GetAppAsync(A<string>._, false, httpContext.RequestAborted))
+        A.CallTo(() => AppProvider.GetAppAsync(A<string>._, false, httpContext.RequestAborted))
             .MustNotHaveHappened();
     }
 
@@ -293,31 +288,5 @@ public class AppResolverTests
         actionExecutingContext.HttpContext.User = userPrincipal;
 
         return userIdentity;
-    }
-
-    private static IAppEntity CreateApp(string name, string? user = null, string? client = null, bool? allowAnonymous = null)
-    {
-        var app = A.Fake<IAppEntity>();
-
-        var contributors = Contributors.Empty;
-
-        if (user != null)
-        {
-            contributors = contributors.Assign(user, Role.Reader);
-        }
-
-        var clients = AppClients.Empty;
-
-        if (client != null)
-        {
-            clients = clients.Add(client, "secret").Update(client, allowAnonymous: allowAnonymous);
-        }
-
-        A.CallTo(() => app.Contributors).Returns(contributors);
-        A.CallTo(() => app.Clients).Returns(clients);
-        A.CallTo(() => app.Name).Returns(name);
-        A.CallTo(() => app.Roles).Returns(Roles.Empty);
-
-        return app;
     }
 }

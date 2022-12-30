@@ -13,31 +13,26 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public class RolePermissionsProviderTests
+public class RolePermissionsProviderTests : GivenContext
 {
-    private readonly IAppEntity app;
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly RolePermissionsProvider sut;
 
     public RolePermissionsProviderTests()
     {
-        app = Mocks.App(appId);
-
-        sut = new RolePermissionsProvider(appProvider);
+        sut = new RolePermissionsProvider(AppProvider);
     }
 
     [Fact]
     public async Task Should_provide_all_permissions()
     {
-        A.CallTo(() => appProvider.GetSchemasAsync(A<DomainId>._, default))
+        A.CallTo(() => AppProvider.GetSchemasAsync(A<DomainId>._, default))
             .Returns(new List<ISchemaEntity>
             {
-                Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), "schema1")),
-                Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), "schema2"))
+                Mocks.Schema(AppId, NamedId.Of(DomainId.NewGuid(), "schema1")),
+                Mocks.Schema(AppId, NamedId.Of(DomainId.NewGuid(), "schema2"))
             });
 
-        var actual = await sut.GetPermissionsAsync(app);
+        var actual = await sut.GetPermissionsAsync(App);
 
         Assert.True(actual.Contains("*"));
         Assert.True(actual.Contains("clients.read"));

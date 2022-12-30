@@ -14,13 +14,10 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public class DefaultAssetFileStoreTests
+public class DefaultAssetFileStoreTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
     private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
-    private readonly DomainId appId = DomainId.NewGuid();
     private readonly DomainId assetId = DomainId.NewGuid();
     private readonly long assetFileVersion = 21;
     private readonly AssetOptions options = new AssetOptions();
@@ -28,8 +25,6 @@ public class DefaultAssetFileStoreTests
 
     public DefaultAssetFileStoreTests()
     {
-        ct = cts.Token;
-
         sut = new DefaultAssetFileStore(assetStore, assetRepository, Options.Create(options));
     }
 
@@ -60,7 +55,7 @@ public class DefaultAssetFileStoreTests
         A.CallTo(() => assetStore.GeneratePublicUrl(fullName))
             .Returns(url);
 
-        var actual = sut.GeneratePublicUrl(appId, assetId, assetFileVersion, suffix);
+        var actual = sut.GeneratePublicUrl(AppId.Id, assetId, assetFileVersion, suffix);
 
         Assert.Equal(url, actual);
     }
@@ -75,10 +70,10 @@ public class DefaultAssetFileStoreTests
 
         var size = 1024L;
 
-        A.CallTo(() => assetStore.GetSizeAsync(fullName, ct))
+        A.CallTo(() => assetStore.GetSizeAsync(fullName, CancellationToken))
             .Returns(size);
 
-        var actual = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion, suffix, ct);
+        var actual = await sut.GetFileSizeAsync(AppId.Id, assetId, assetFileVersion, suffix, CancellationToken);
 
         Assert.Equal(size, actual);
     }
@@ -91,13 +86,13 @@ public class DefaultAssetFileStoreTests
 
         var size = 1024L;
 
-        A.CallTo(() => assetStore.GetSizeAsync(A<string>._, ct))
+        A.CallTo(() => assetStore.GetSizeAsync(A<string>._, CancellationToken))
             .Throws(new AssetNotFoundException(assetId.ToString()));
 
-        A.CallTo(() => assetStore.GetSizeAsync(fullName, ct))
+        A.CallTo(() => assetStore.GetSizeAsync(fullName, CancellationToken))
             .Returns(size);
 
-        var actual = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion, suffix, ct);
+        var actual = await sut.GetFileSizeAsync(AppId.Id, assetId, assetFileVersion, suffix, CancellationToken);
 
         Assert.Equal(size, actual);
     }
@@ -107,9 +102,9 @@ public class DefaultAssetFileStoreTests
     {
         var stream = new MemoryStream();
 
-        await sut.UploadAsync("Temp", stream, ct);
+        await sut.UploadAsync("Temp", stream, CancellationToken);
 
-        A.CallTo(() => assetStore.UploadAsync("Temp", stream, false, ct))
+        A.CallTo(() => assetStore.UploadAsync("Temp", stream, false, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -123,9 +118,9 @@ public class DefaultAssetFileStoreTests
 
         var stream = new MemoryStream();
 
-        await sut.UploadAsync(appId, assetId, assetFileVersion, suffix, stream, true, ct);
+        await sut.UploadAsync(AppId.Id, assetId, assetFileVersion, suffix, stream, true, CancellationToken);
 
-        A.CallTo(() => assetStore.UploadAsync(fullName, stream, true, ct))
+        A.CallTo(() => assetStore.UploadAsync(fullName, stream, true, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -139,9 +134,9 @@ public class DefaultAssetFileStoreTests
 
         var stream = new MemoryStream();
 
-        await sut.DownloadAsync(appId, assetId, assetFileVersion, suffix, stream, default, ct);
+        await sut.DownloadAsync(AppId.Id, assetId, assetFileVersion, suffix, stream, default, CancellationToken);
 
-        A.CallTo(() => assetStore.DownloadAsync(fullName, stream, default, ct))
+        A.CallTo(() => assetStore.DownloadAsync(fullName, stream, default, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -152,12 +147,12 @@ public class DefaultAssetFileStoreTests
 
         var stream = new MemoryStream();
 
-        A.CallTo(() => assetStore.DownloadAsync(A<string>._, stream, default, ct))
+        A.CallTo(() => assetStore.DownloadAsync(A<string>._, stream, default, CancellationToken))
             .Throws(new AssetNotFoundException(assetId.ToString())).Once();
 
-        await Assert.ThrowsAsync<AssetNotFoundException>(() => sut.DownloadAsync(appId, assetId, assetFileVersion, null, stream, default, ct));
+        await Assert.ThrowsAsync<AssetNotFoundException>(() => sut.DownloadAsync(AppId.Id, assetId, assetFileVersion, null, stream, default, CancellationToken));
 
-        A.CallTo(() => assetStore.DownloadAsync(A<string>._, stream, default, ct))
+        A.CallTo(() => assetStore.DownloadAsync(A<string>._, stream, default, CancellationToken))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -169,12 +164,12 @@ public class DefaultAssetFileStoreTests
 
         var stream = new MemoryStream();
 
-        A.CallTo(() => assetStore.DownloadAsync(A<string>.That.Matches(x => x != fileName), stream, default, ct))
+        A.CallTo(() => assetStore.DownloadAsync(A<string>.That.Matches(x => x != fileName), stream, default, CancellationToken))
             .Throws(new AssetNotFoundException(assetId.ToString())).Once();
 
-        await sut.DownloadAsync(appId, assetId, assetFileVersion, suffix, stream, default, ct);
+        await sut.DownloadAsync(AppId.Id, assetId, assetFileVersion, suffix, stream, default, CancellationToken);
 
-        A.CallTo(() => assetStore.DownloadAsync(fullName, stream, default, ct))
+        A.CallTo(() => assetStore.DownloadAsync(fullName, stream, default, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -186,30 +181,30 @@ public class DefaultAssetFileStoreTests
 
         options.FolderPerApp = folderPerApp;
 
-        await sut.CopyAsync("Temp", appId, assetId, assetFileVersion, suffix, ct);
+        await sut.CopyAsync("Temp", AppId.Id, assetId, assetFileVersion, suffix, CancellationToken);
 
-        A.CallTo(() => assetStore.CopyAsync("Temp", fullName, ct))
+        A.CallTo(() => assetStore.CopyAsync("Temp", fullName, CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_delete_temporary_file_from_store()
     {
-        await sut.DeleteAsync("Temp", ct);
+        await sut.DeleteAsync("Temp", CancellationToken);
 
-        A.CallTo(() => assetStore.DeleteAsync("Temp", ct))
+        A.CallTo(() => assetStore.DeleteAsync("Temp", CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_delete_file_from_store()
     {
-        await sut.DeleteAsync(appId, assetId, ct);
+        await sut.DeleteAsync(AppId.Id, assetId, CancellationToken);
 
-        A.CallTo(() => assetStore.DeleteByPrefixAsync($"{appId}_{assetId}", ct))
+        A.CallTo(() => assetStore.DeleteByPrefixAsync($"{AppId.Id}_{assetId}", CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => assetStore.DeleteByPrefixAsync(assetId.ToString(), ct))
+        A.CallTo(() => assetStore.DeleteByPrefixAsync(assetId.ToString(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -218,9 +213,9 @@ public class DefaultAssetFileStoreTests
     {
         options.FolderPerApp = true;
 
-        await sut.DeleteAsync(appId, assetId, ct);
+        await sut.DeleteAsync(AppId.Id, assetId, CancellationToken);
 
-        A.CallTo(() => assetStore.DeleteByPrefixAsync($"{appId}/{assetId}", ct))
+        A.CallTo(() => assetStore.DeleteByPrefixAsync($"{AppId.Id}/{assetId}", CancellationToken))
             .MustHaveHappened();
     }
 
@@ -230,23 +225,21 @@ public class DefaultAssetFileStoreTests
         var asset1 = new AssetEntity { Id = DomainId.NewGuid() };
         var asset2 = new AssetEntity { Id = DomainId.NewGuid() };
 
-        A.CallTo(() => assetRepository.StreamAll(appId, ct))
+        A.CallTo(() => assetRepository.StreamAll(AppId.Id, CancellationToken))
             .Returns(new[] { asset1, asset2 }.ToAsyncEnumerable());
 
-        var app = Mocks.App(NamedId.Of(appId, "my-app"));
+        await ((IDeleter)sut).DeleteAppAsync(App, CancellationToken);
 
-        await ((IDeleter)sut).DeleteAppAsync(app, ct);
-
-        A.CallTo(() => assetStore.DeleteByPrefixAsync($"{appId}_{asset1.Id}", ct))
+        A.CallTo(() => assetStore.DeleteByPrefixAsync($"{AppId.Id}_{asset1.Id}", CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => assetStore.DeleteByPrefixAsync($"{appId}_{asset2.Id}", ct))
+        A.CallTo(() => assetStore.DeleteByPrefixAsync($"{AppId.Id}_{asset2.Id}", CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => assetStore.DeleteByPrefixAsync(asset1.Id.ToString(), ct))
+        A.CallTo(() => assetStore.DeleteByPrefixAsync(asset1.Id.ToString(), CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => assetStore.DeleteByPrefixAsync(asset2.Id.ToString(), ct))
+        A.CallTo(() => assetStore.DeleteByPrefixAsync(asset2.Id.ToString(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -255,18 +248,16 @@ public class DefaultAssetFileStoreTests
     {
         options.FolderPerApp = true;
 
-        var app = Mocks.App(NamedId.Of(appId, "my-app"));
+        await ((IDeleter)sut).DeleteAppAsync(App, CancellationToken);
 
-        await ((IDeleter)sut).DeleteAppAsync(app, ct);
-
-        A.CallTo(() => assetStore.DeleteByPrefixAsync($"{appId}/", ct))
+        A.CallTo(() => assetStore.DeleteByPrefixAsync($"{AppId.Id}/", CancellationToken))
             .MustHaveHappened();
     }
 
     private string GetFullName(string fileName)
     {
         return fileName
-            .Replace("{appId}", appId.ToString(), StringComparison.Ordinal)
+            .Replace("{appId}", AppId.Id.ToString(), StringComparison.Ordinal)
             .Replace("{assetId}", assetId.ToString(), StringComparison.Ordinal)
             .Replace("{assetFileVersion}", assetFileVersion.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
     }

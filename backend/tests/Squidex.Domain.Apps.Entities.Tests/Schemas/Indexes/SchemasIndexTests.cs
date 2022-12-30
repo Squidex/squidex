@@ -8,9 +8,9 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Caching;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.States;
@@ -20,22 +20,16 @@ using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes;
 
-public class SchemasIndexTests
+public class SchemasIndexTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly TestState<NameReservationState.State> state;
     private readonly ISchemaRepository schemaRepository = A.Fake<ISchemaRepository>();
     private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
     private readonly SchemasIndex sut;
 
     public SchemasIndexTests()
     {
-        state = new TestState<NameReservationState.State>($"{appId.Id}_Schemas");
-
-        ct = cts.Token;
+        state = new TestState<NameReservationState.State>($"{AppId.Id}_Schemas");
 
         var replicatedCache =
             new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), A.Fake<IMessageBus>(),
@@ -47,101 +41,92 @@ public class SchemasIndexTests
     [Fact]
     public async Task Should_resolve_schema_by_name()
     {
-        var expected = SetupSchema();
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Name, CancellationToken))
+            .Returns(Schema);
 
-        A.CallTo(() => schemaRepository.FindAsync(appId.Id, schemaId.Name, ct))
-            .Returns(expected);
+        var actual1 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Name, false, CancellationToken);
+        var actual2 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Name, false, CancellationToken);
 
-        var actual1 = await sut.GetSchemaAsync(appId.Id, schemaId.Name, false, ct);
-        var actual2 = await sut.GetSchemaAsync(appId.Id, schemaId.Name, false, ct);
+        Assert.Same(Schema, actual1);
+        Assert.Same(Schema, actual2);
 
-        Assert.Same(expected, actual1);
-        Assert.Same(expected, actual2);
-
-        A.CallTo(() => schemaRepository.FindAsync(appId.Id, schemaId.Name, ct))
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Name, CancellationToken))
             .MustHaveHappenedTwiceExactly();
     }
 
     [Fact]
     public async Task Should_resolve_schema_by_name_and_id_if_cached_before()
     {
-        var expected = SetupSchema();
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Name, CancellationToken))
+            .Returns(Schema);
 
-        A.CallTo(() => schemaRepository.FindAsync(appId.Id, schemaId.Name, ct))
-            .Returns(expected);
+        var actual1 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Name, true, CancellationToken);
+        var actual2 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Name, true, CancellationToken);
+        var actual3 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Id, true, CancellationToken);
 
-        var actual1 = await sut.GetSchemaAsync(appId.Id, schemaId.Name, true, ct);
-        var actual2 = await sut.GetSchemaAsync(appId.Id, schemaId.Name, true, ct);
-        var actual3 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, true, ct);
+        Assert.Same(Schema, actual1);
+        Assert.Same(Schema, actual2);
+        Assert.Same(Schema, actual3);
 
-        Assert.Same(expected, actual1);
-        Assert.Same(expected, actual2);
-        Assert.Same(expected, actual3);
-
-        A.CallTo(() => schemaRepository.FindAsync(appId.Id, schemaId.Name, ct))
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Name, CancellationToken))
             .MustHaveHappenedOnceExactly();
     }
 
     [Fact]
     public async Task Should_resolve_schema_by_id()
     {
-        var expected = SetupSchema();
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Id, CancellationToken))
+            .Returns(Schema);
 
-        A.CallTo(() => schemaRepository.FindAsync(appId.Id, schemaId.Id, ct))
-            .Returns(expected);
+        var actual1 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Id, false, CancellationToken);
+        var actual2 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Id, false, CancellationToken);
 
-        var actual1 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, false, ct);
-        var actual2 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, false, ct);
+        Assert.Same(Schema, actual1);
+        Assert.Same(Schema, actual2);
 
-        Assert.Same(expected, actual1);
-        Assert.Same(expected, actual2);
-
-        A.CallTo(() => schemaRepository.FindAsync(appId.Id, schemaId.Id, ct))
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Id, CancellationToken))
             .MustHaveHappenedTwiceExactly();
     }
 
     [Fact]
     public async Task Should_resolve_schema_by_id_and_name_if_cached_before()
     {
-        var expected = SetupSchema();
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Id, CancellationToken))
+            .Returns(Schema);
 
-        A.CallTo(() => schemaRepository.FindAsync(appId.Id, schemaId.Id, ct))
-            .Returns(expected);
+        var actual1 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Id, true, CancellationToken);
+        var actual2 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Id, true, CancellationToken);
+        var actual3 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Name, true, CancellationToken);
 
-        var actual1 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, true, ct);
-        var actual2 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, true, ct);
-        var actual3 = await sut.GetSchemaAsync(appId.Id, schemaId.Name, true, ct);
+        Assert.Same(Schema, actual1);
+        Assert.Same(Schema, actual2);
+        Assert.Same(Schema, actual3);
 
-        Assert.Same(expected, actual1);
-        Assert.Same(expected, actual2);
-        Assert.Same(expected, actual3);
-
-        A.CallTo(() => schemaRepository.FindAsync(appId.Id, schemaId.Id, ct))
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Id, CancellationToken))
             .MustHaveHappenedOnceExactly();
     }
 
     [Fact]
     public async Task Should_resolve_schemas()
     {
-        var expected = SetupSchema();
+        A.CallTo(() => schemaRepository.QueryAllAsync(AppId.Id, CancellationToken))
+            .Returns(new List<ISchemaEntity> { Schema });
 
-        A.CallTo(() => schemaRepository.QueryAllAsync(appId.Id, ct))
-            .Returns(new List<ISchemaEntity> { expected });
+        var actual = await sut.GetSchemasAsync(AppId.Id, CancellationToken);
 
-        var actual = await sut.GetSchemasAsync(appId.Id, ct);
-
-        Assert.Same(actual[0], expected);
+        Assert.Same(actual[0], Schema);
     }
 
     [Fact]
     public async Task Should_return_empty_schemas_if_schema_not_created()
     {
-        var expected = SetupSchema(EtagVersion.Empty);
+        A.CallTo(() => Schema.Version)
+            .Returns(EtagVersion.Empty);
 
-        A.CallTo(() => schemaRepository.QueryAllAsync(appId.Id, ct))
-            .Returns(new List<ISchemaEntity> { expected });
+        A.CallTo(() => schemaRepository.QueryAllAsync(AppId.Id, CancellationToken))
+            .Returns(new List<ISchemaEntity> { Schema });
 
-        var actual = await sut.GetSchemasAsync(appId.Id, ct);
+        var actual = await sut.GetSchemasAsync(AppId.Id, CancellationToken);
 
         Assert.Empty(actual);
     }
@@ -149,12 +134,13 @@ public class SchemasIndexTests
     [Fact]
     public async Task Should_return_empty_schemas_if_schema_deleted()
     {
-        var expected = SetupSchema(0, true);
+        A.CallTo(() => Schema.IsDeleted)
+            .Returns(true);
 
-        A.CallTo(() => schemaRepository.QueryAllAsync(appId.Id, ct))
-            .Returns(new List<ISchemaEntity> { expected });
+        A.CallTo(() => schemaRepository.QueryAllAsync(AppId.Id, CancellationToken))
+            .Returns(new List<ISchemaEntity> { Schema });
 
-        var actual = await sut.GetSchemasAsync(appId.Id, ct);
+        var actual = await sut.GetSchemasAsync(AppId.Id, CancellationToken);
 
         Assert.Empty(actual);
     }
@@ -162,10 +148,10 @@ public class SchemasIndexTests
     [Fact]
     public async Task Should_take_and_remove_reservation_if_created()
     {
-        A.CallTo(() => schemaRepository.FindAsync(appId.Id, schemaId.Name, ct))
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Name, CancellationToken))
             .Returns(Task.FromResult<ISchemaEntity?>(null));
 
-        var command = Create(schemaId.Name);
+        var command = Create(SchemaId.Name);
 
         var context =
             new CommandContext(command, commandBus)
@@ -178,21 +164,21 @@ public class SchemasIndexTests
             madeReservation = state.Snapshot.Reservations.FirstOrDefault();
 
             return Task.CompletedTask;
-        }, ct);
+        }, CancellationToken);
 
         Assert.Empty(state.Snapshot.Reservations);
 
-        Assert.Equal(schemaId.Id, madeReservation?.Id);
-        Assert.Equal(schemaId.Name, madeReservation?.Name);
+        Assert.Equal(SchemaId.Id, madeReservation?.Id);
+        Assert.Equal(SchemaId.Name, madeReservation?.Name);
     }
 
     [Fact]
     public async Task Should_clear_reservation_if_schema_creation_failed()
     {
-        A.CallTo(() => schemaRepository.FindAsync(appId.Id, schemaId.Name, ct))
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Name, CancellationToken))
             .Returns(Task.FromResult<ISchemaEntity?>(null));
 
-        var command = Create(schemaId.Name);
+        var command = Create(SchemaId.Name);
 
         var context =
             new CommandContext(command, commandBus)
@@ -205,44 +191,44 @@ public class SchemasIndexTests
             madeReservation = state.Snapshot.Reservations.FirstOrDefault();
 
             throw new InvalidOperationException();
-        }, ct));
+        }, CancellationToken));
 
         Assert.Empty(state.Snapshot.Reservations);
 
-        Assert.Equal(schemaId.Id, madeReservation?.Id);
-        Assert.Equal(schemaId.Name, madeReservation?.Name);
+        Assert.Equal(SchemaId.Id, madeReservation?.Id);
+        Assert.Equal(SchemaId.Name, madeReservation?.Name);
     }
 
     [Fact]
     public async Task Should_not_create_schema_if_name_is_reserved()
     {
-        state.Snapshot.Reservations.Add(new NameReservation(RandomHash.Simple(), schemaId.Name, DomainId.NewGuid()));
+        state.Snapshot.Reservations.Add(new NameReservation(RandomHash.Simple(), SchemaId.Name, DomainId.NewGuid()));
 
-        A.CallTo(() => schemaRepository.FindAsync(appId.Id, schemaId.Name, ct))
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Name, CancellationToken))
             .Returns(Task.FromResult<ISchemaEntity?>(null));
 
-        var command = Create(schemaId.Name);
+        var command = Create(SchemaId.Name);
 
         var context =
             new CommandContext(command, commandBus)
                 .Complete();
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context, ct));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context, CancellationToken));
     }
 
     [Fact]
     public async Task Should_not_create_schema_if_name_is_taken()
     {
-        A.CallTo(() => schemaRepository.FindAsync(appId.Id, schemaId.Name, ct))
-            .Returns(SetupSchema());
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Name, CancellationToken))
+            .Returns(Schema);
 
-        var command = Create(schemaId.Name);
+        var command = Create(SchemaId.Name);
 
         var context =
             new CommandContext(command, commandBus)
                 .Complete();
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context, ct));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context, CancellationToken));
 
         A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<NameReservationState.State>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -251,15 +237,13 @@ public class SchemasIndexTests
     [Fact]
     public async Task Should_not_make_an_update_for_other_command()
     {
-        var schema = SetupSchema();
-
-        var command = new UpdateSchema { SchemaId = schemaId, AppId = appId };
+        var command = new UpdateSchema { SchemaId = SchemaId, AppId = AppId };
 
         var context =
             new CommandContext(command, commandBus)
-                .Complete(schema);
+                .Complete(Schema);
 
-        await sut.HandleAsync(context, ct);
+        await sut.HandleAsync(context, CancellationToken);
 
         A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<NameReservationState.State>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -267,19 +251,6 @@ public class SchemasIndexTests
 
     private CreateSchema Create(string name)
     {
-        return new CreateSchema { SchemaId = schemaId.Id, Name = name, AppId = appId };
-    }
-
-    private ISchemaEntity SetupSchema(long version = 0, bool isDeleted = false)
-    {
-        var schema = A.Fake<ISchemaEntity>();
-
-        A.CallTo(() => schema.SchemaDef).Returns(new Schema(schemaId.Name));
-        A.CallTo(() => schema.Id).Returns(schemaId.Id);
-        A.CallTo(() => schema.AppId).Returns(appId);
-        A.CallTo(() => schema.Version).Returns(version);
-        A.CallTo(() => schema.IsDeleted).Returns(isDeleted);
-
-        return schema;
+        return new CreateSchema { SchemaId = SchemaId.Id, Name = name, AppId = AppId };
     }
 }

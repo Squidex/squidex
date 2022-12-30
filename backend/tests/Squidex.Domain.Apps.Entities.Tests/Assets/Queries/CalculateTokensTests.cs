@@ -8,34 +8,39 @@
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Assets.Queries.Steps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
-public class CalculateTokensTests
+public class CalculateTokensTests : GivenContext
 {
     private readonly IJsonSerializer serializer = A.Fake<IJsonSerializer>();
     private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
-    private readonly Context requestContext;
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly CalculateTokens sut;
 
     public CalculateTokensTests()
     {
-        requestContext = new Context(Mocks.ApiUser(), Mocks.App(appId));
-
         sut = new CalculateTokens(urlGenerator, serializer);
+    }
+
+    [Fact]
+    public async Task Should_not_enrich_asset_edit_tokens_if_disabled()
+    {
+        var asset = CreateAsset();
+
+        await sut.EnrichAsync(ApiContext.Clone(b => b.WithoutAssetEnrichment()), Enumerable.Repeat(asset, 1), default);
+
+        Assert.Null(asset.EditToken);
     }
 
     [Fact]
     public async Task Should_compute_ui_tokens()
     {
-        var source = CreateAsset();
+        var asset = CreateAsset();
 
-        await sut.EnrichAsync(requestContext, new[] { source }, default);
+        await sut.EnrichAsync(ApiContext, new[] { asset }, CancellationToken);
 
-        Assert.NotNull(source.EditToken);
+        Assert.NotNull(asset.EditToken);
 
         A.CallTo(() => urlGenerator.Root())
             .MustHaveHappened();
@@ -44,11 +49,11 @@ public class CalculateTokensTests
     [Fact]
     public async Task Should_also_compute_ui_tokens_for_frontend()
     {
-        var source = CreateAsset();
+        var asset = CreateAsset();
 
-        await sut.EnrichAsync(new Context(Mocks.FrontendUser(), Mocks.App(appId)), new[] { source }, default);
+        await sut.EnrichAsync(FrontendContext, new[] { asset }, CancellationToken);
 
-        Assert.NotNull(source.EditToken);
+        Assert.NotNull(asset.EditToken);
 
         A.CallTo(() => urlGenerator.Root())
             .MustHaveHappened();
@@ -56,6 +61,6 @@ public class CalculateTokensTests
 
     private AssetEntity CreateAsset()
     {
-        return new AssetEntity { AppId = appId };
+        return new AssetEntity { AppId = AppId };
     }
 }

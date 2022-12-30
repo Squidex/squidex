@@ -30,6 +30,8 @@ public sealed class EnrichForCaching : IAssetEnricherStep
     public Task EnrichAsync(Context context, IEnumerable<AssetEntity> assets,
         CancellationToken ct)
     {
+        requestCache.AddDependency(context.App.Id, context.App.Version);
+
         foreach (var asset in assets)
         {
             requestCache.AddDependency(asset.UniqueId, asset.Version);

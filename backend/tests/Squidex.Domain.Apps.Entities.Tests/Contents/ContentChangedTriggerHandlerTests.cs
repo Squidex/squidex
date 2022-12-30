@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
@@ -23,10 +24,8 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public class ContentChangedTriggerHandlerTests
+public class ContentChangedTriggerHandlerTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
     private readonly IContentLoader contentLoader = A.Fake<IContentLoader>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
@@ -36,8 +35,6 @@ public class ContentChangedTriggerHandlerTests
 
     public ContentChangedTriggerHandlerTests()
     {
-        ct = cts.Token;
-
         A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
             .Returns(true);
 
@@ -128,14 +125,14 @@ public class ContentChangedTriggerHandlerTests
     {
         var ctx = Context();
 
-        A.CallTo(() => contentRepository.StreamAll(ctx.AppId.Id, null, ct))
+        A.CallTo(() => contentRepository.StreamAll(ctx.AppId.Id, null, CancellationToken))
             .Returns(new List<ContentEntity>
             {
                 new ContentEntity { SchemaId = schemaMatch },
                 new ContentEntity { SchemaId = schemaNonMatch }
             }.ToAsyncEnumerable());
 
-        var actual = await sut.CreateSnapshotEventsAsync(ctx, ct).ToListAsync(ct);
+        var actual = await sut.CreateSnapshotEventsAsync(ctx, CancellationToken).ToListAsync(CancellationToken);
 
         var typed = actual.OfType<EnrichedContentEvent>().ToList();
 
@@ -160,14 +157,14 @@ public class ContentChangedTriggerHandlerTests
 
         var ctx = Context(trigger);
 
-        A.CallTo(() => contentRepository.StreamAll(ctx.AppId.Id, A<HashSet<DomainId>>.That.Is(schemaMatch.Id), ct))
+        A.CallTo(() => contentRepository.StreamAll(ctx.AppId.Id, A<HashSet<DomainId>>.That.Is(schemaMatch.Id), CancellationToken))
             .Returns(new List<ContentEntity>
             {
                 new ContentEntity { SchemaId = schemaMatch },
                 new ContentEntity { SchemaId = schemaMatch }
             }.ToAsyncEnumerable());
 
-        var actual = await sut.CreateSnapshotEventsAsync(ctx, ct).ToListAsync(ct);
+        var actual = await sut.CreateSnapshotEventsAsync(ctx, CancellationToken).ToListAsync(CancellationToken);
 
         var typed = actual.OfType<EnrichedContentEvent>().ToList();
 
@@ -186,10 +183,10 @@ public class ContentChangedTriggerHandlerTests
 
         var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-        A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 12, ct))
+        A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 12, CancellationToken))
             .Returns(SimpleMapper.Map(@event, new ContentEntity()));
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, ct).ToListAsync(ct);
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, CancellationToken).ToListAsync(CancellationToken);
 
         var enrichedEvent = (EnrichedContentEvent)actual.Single();
 
@@ -213,13 +210,13 @@ public class ContentChangedTriggerHandlerTests
         var dataNow = new ContentData();
         var dataOld = new ContentData();
 
-        A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 12, ct))
+        A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 12, CancellationToken))
             .Returns(new ContentEntity { AppId = ctx.AppId, SchemaId = schemaMatch, Version = 12, Data = dataNow, Id = @event.ContentId });
 
-        A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 11, ct))
+        A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 11, CancellationToken))
             .Returns(new ContentEntity { AppId = ctx.AppId, SchemaId = schemaMatch, Version = 11, Data = dataOld });
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, ct).ToListAsync(ct);
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, CancellationToken).ToListAsync(CancellationToken);
 
         var enrichedEvent = actual.Single() as EnrichedContentEvent;
 
@@ -388,13 +385,13 @@ public class ContentChangedTriggerHandlerTests
         }
     }
 
-    private static RuleContext Context(RuleTrigger? trigger = null)
+    private RuleContext Context(RuleTrigger? trigger = null)
     {
         trigger ??= new ContentChangedTriggerV2();
 
         return new RuleContext
         {
-            AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
+            AppId = AppId,
             Rule = new Rule(trigger, A.Fake<RuleAction>()),
             RuleId = DomainId.NewGuid()
         };

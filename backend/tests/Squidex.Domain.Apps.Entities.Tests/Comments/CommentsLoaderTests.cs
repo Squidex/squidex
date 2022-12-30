@@ -6,22 +6,19 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Comments.DomainObject;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Comments;
 
-public sealed class CommentsLoaderTests
+public sealed class CommentsLoaderTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
     private readonly CommentsLoader sut;
 
     public CommentsLoaderTests()
     {
-        ct = cts.Token;
-
         sut = new CommentsLoader(domainObjectFactory);
     }
 
@@ -39,11 +36,11 @@ public sealed class CommentsLoaderTests
         A.CallTo(() => domainObject.GetComments(11))
             .Returns(comments);
 
-        var actual = await sut.GetCommentsAsync(commentsId, 11, ct);
+        var actual = await sut.GetCommentsAsync(commentsId, 11, CancellationToken);
 
         Assert.Same(comments, actual);
 
-        A.CallTo(() => domainObject.LoadAsync(ct))
+        A.CallTo(() => domainObject.LoadAsync(CancellationToken))
             .MustHaveHappened();
     }
 }

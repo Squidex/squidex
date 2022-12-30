@@ -17,11 +17,8 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
 
-public sealed class ScriptingExtensionsTests
+public sealed class ScriptingExtensionsTests : GivenContext
 {
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly RefToken actor = RefToken.User("123");
-
     [Fact]
     public async Task Should_add_tag_in_script()
     {
@@ -31,7 +28,7 @@ public sealed class ScriptingExtensionsTests
 
         var operation = Operation(script, CreateAsset(), command);
 
-        await operation.ExecuteAnnotateScriptAsync(command);
+        await operation.ExecuteAnnotateScriptAsync(command, CancellationToken);
 
         Assert.Contains("tag", command.Tags);
     }
@@ -45,7 +42,7 @@ public sealed class ScriptingExtensionsTests
 
         var operation = Operation(script, CreateAsset(), command);
 
-        await operation.ExecuteAnnotateScriptAsync(command);
+        await operation.ExecuteAnnotateScriptAsync(command, CancellationToken);
 
         Assert.Equal(JsonValue.Create(42), command.Metadata["foo"]);
     }
@@ -59,7 +56,7 @@ public sealed class ScriptingExtensionsTests
 
         var operation = Operation(script, CreateAsset(), command);
 
-        await Assert.ThrowsAsync<ValidationException>(() => operation.ExecuteAnnotateScriptAsync(command));
+        await Assert.ThrowsAsync<ValidationException>(() => operation.ExecuteAnnotateScriptAsync(command, CancellationToken));
     }
 
     [Fact]
@@ -71,7 +68,7 @@ public sealed class ScriptingExtensionsTests
 
         var operation = Operation(script, CreateAsset(), command);
 
-        await Assert.ThrowsAsync<ValidationException>(() => operation.ExecuteAnnotateScriptAsync(command));
+        await Assert.ThrowsAsync<ValidationException>(() => operation.ExecuteAnnotateScriptAsync(command, CancellationToken));
     }
 
     private AssetOperation Operation(string script, AssetEntity asset, AnnotateAsset command)
@@ -81,9 +78,7 @@ public sealed class ScriptingExtensionsTests
             Annotate = script
         };
 
-        var app = Mocks.App(appId);
-
-        A.CallTo(() => app.AssetScripts)
+        A.CallTo(() => App.AssetScripts)
             .Returns(scripts);
 
         var serviceProvider =
@@ -94,12 +89,12 @@ public sealed class ScriptingExtensionsTests
                 .AddSingleton<IScriptEngine, JintScriptEngine>()
                 .BuildServiceProvider();
 
-        command.Actor = actor;
+        command.Actor = User;
         command.User = Mocks.FrontendUser();
 
         return new AssetOperation(serviceProvider, () => asset)
         {
-            App = app,
+            App = App,
             CommandId = asset.Id,
             Command = command
         };
@@ -110,9 +105,9 @@ public sealed class ScriptingExtensionsTests
         return new AssetEntity
         {
             Id = DomainId.NewGuid(),
-            AppId = appId,
+            AppId = AppId,
             Created = default,
-            CreatedBy = actor,
+            CreatedBy = User,
             Metadata = new AssetMetadata(),
             Tags = new HashSet<string>()
         };

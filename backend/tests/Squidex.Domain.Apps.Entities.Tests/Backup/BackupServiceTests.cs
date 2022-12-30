@@ -14,20 +14,18 @@ using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Backup;
 
-public class BackupServiceTests
+public class BackupServiceTests : GivenContext
 {
     private readonly TestState<BackupState> stateBackup;
     private readonly TestState<BackupRestoreState> stateRestore;
     private readonly IMessageBus messaging = A.Fake<IMessageBus>();
-    private readonly DomainId appId = DomainId.NewGuid();
     private readonly DomainId backupId = DomainId.NewGuid();
-    private readonly RefToken actor = RefToken.User("me");
     private readonly BackupService sut;
 
     public BackupServiceTests()
     {
         stateRestore = new TestState<BackupRestoreState>("Default");
-        stateBackup = new TestState<BackupState>(appId);
+        stateBackup = new TestState<BackupState>(AppId.Id);
 
         sut = new BackupService(
             stateRestore.PersistenceFactory,
@@ -40,36 +38,36 @@ public class BackupServiceTests
         var restoreUrl = new Uri("http://squidex.io");
         var restoreAppName = "New App";
 
-        await sut.StartRestoreAsync(actor, restoreUrl, restoreAppName);
+        await sut.StartRestoreAsync(User, restoreUrl, restoreAppName, CancellationToken);
 
-        A.CallTo(() => messaging.PublishAsync(new BackupRestore(actor, restoreUrl, restoreAppName), null, default))
+        A.CallTo(() => messaging.PublishAsync(new BackupRestore(User, restoreUrl, restoreAppName), null, CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_send_message_to_start_backup()
     {
-        await sut.StartBackupAsync(appId, actor);
+        await sut.StartBackupAsync(AppId.Id, User, CancellationToken);
 
-        A.CallTo(() => messaging.PublishAsync(new BackupStart(appId, actor), null, default))
+        A.CallTo(() => messaging.PublishAsync(new BackupStart(AppId.Id, User), null, CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_send_message_to_delete_backup()
     {
-        await sut.DeleteBackupAsync(appId, backupId);
+        await sut.DeleteBackupAsync(AppId.Id, backupId, CancellationToken);
 
-        A.CallTo(() => messaging.PublishAsync(new BackupDelete(appId, backupId), null, default))
+        A.CallTo(() => messaging.PublishAsync(new BackupDelete(AppId.Id, backupId), null, CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_send_message_to_clear_backups()
     {
-        await ((IDeleter)sut).DeleteAppAsync(Mocks.App(NamedId.Of(appId, "my-app")), default);
+        await ((IDeleter)sut).DeleteAppAsync(App, CancellationToken);
 
-        A.CallTo(() => messaging.PublishAsync(new BackupClear(appId), null, default))
+        A.CallTo(() => messaging.PublishAsync(new BackupClear(AppId.Id), null, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -86,7 +84,7 @@ public class BackupServiceTests
 
         var restoreUrl = new Uri("http://squidex.io");
 
-        await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartRestoreAsync(actor, restoreUrl, null));
+        await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartRestoreAsync(User, restoreUrl, null, CancellationToken));
     }
 
     [Fact]
@@ -97,7 +95,7 @@ public class BackupServiceTests
             stateBackup.Snapshot.Jobs.Add(new BackupJob());
         }
 
-        await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartBackupAsync(appId, actor));
+        await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartBackupAsync(AppId.Id, User, CancellationToken));
     }
 
     [Fact]
@@ -108,7 +106,7 @@ public class BackupServiceTests
             stateBackup.Snapshot.Jobs.Add(new BackupJob { Status = JobStatus.Started });
         }
 
-        await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartBackupAsync(appId, actor));
+        await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartBackupAsync(AppId.Id, User, CancellationToken));
     }
 
     [Fact]
@@ -122,7 +120,7 @@ public class BackupServiceTests
             }
         };
 
-        var actual = await sut.GetRestoreAsync();
+        var actual = await sut.GetRestoreAsync(CancellationToken);
 
         actual.Should().BeEquivalentTo(stateRestore.Snapshot.Job);
     }
@@ -139,7 +137,7 @@ public class BackupServiceTests
 
         stateBackup.Snapshot.Jobs.Add(job);
 
-        var actual = await sut.GetBackupsAsync(appId);
+        var actual = await sut.GetBackupsAsync(AppId.Id, CancellationToken);
 
         actual.Should().BeEquivalentTo(stateBackup.Snapshot.Jobs);
     }
@@ -156,7 +154,7 @@ public class BackupServiceTests
 
         stateBackup.Snapshot.Jobs.Add(job);
 
-        var actual = await sut.GetBackupAsync(appId, backupId);
+        var actual = await sut.GetBackupAsync(AppId.Id, backupId, CancellationToken);
 
         actual.Should().BeEquivalentTo(job);
     }

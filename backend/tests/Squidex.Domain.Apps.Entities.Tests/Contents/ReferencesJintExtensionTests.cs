@@ -18,18 +18,16 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public class ReferencesJintExtensionTests : IClassFixture<TranslationsFixture>
+public class ReferencesJintExtensionTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly JintScriptEngine sut;
 
     public ReferencesJintExtensionTests()
     {
         var serviceProvider =
             new ServiceCollection()
-                .AddSingleton(appProvider)
+                .AddSingleton(AppProvider)
                 .AddSingleton(contentQuery)
                 .BuildServiceProvider();
 
@@ -37,9 +35,6 @@ public class ReferencesJintExtensionTests : IClassFixture<TranslationsFixture>
         {
             new ReferencesJintExtension(serviceProvider)
         };
-
-        A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, default))
-            .Returns(Mocks.App(appId));
 
         sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
             Options.Create(new JintScriptOptions
@@ -66,7 +61,7 @@ public class ReferencesJintExtensionTests : IClassFixture<TranslationsFixture>
                     complete(`${actual1}`);
                 })";
 
-        var actual = (await sut.ExecuteAsync(vars, script)).ToString();
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
 
         Assert.Equal(Cleanup(expected), Cleanup(actual));
     }
@@ -89,7 +84,7 @@ public class ReferencesJintExtensionTests : IClassFixture<TranslationsFixture>
                     complete(`${actual1}\n${actual2}`);
                 })";
 
-        var actual = (await sut.ExecuteAsync(vars, script)).ToString();
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
 
         Assert.Equal(Cleanup(expected), Cleanup(actual));
     }
@@ -108,12 +103,13 @@ public class ReferencesJintExtensionTests : IClassFixture<TranslationsFixture>
                         .AddInvariant(JsonValue.Array(referenceIds)));
 
         A.CallTo(() => contentQuery.QueryAsync(
-                A<Context>.That.Matches(x => x.App.Id == appId.Id && x.UserPrincipal == user), A<Q>.That.HasIds(referenceIds), A<CancellationToken>._))
+                A<Context>.That.Matches(x => x.App == App && x.UserPrincipal == user), A<Q>.That.HasIds(referenceIds), A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(2, references));
 
         var vars = new ScriptVars
         {
-            ["appId"] = appId.Id,
+            ["appId"] = AppId.Id,
+            ["appName"] = AppId.Name,
             ["data"] = data,
             ["dataOld"] = null,
             ["user"] = user

@@ -7,21 +7,16 @@
 
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public class AssetTagsDeleterTests
+public class AssetTagsDeleterTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly ITagService tagService = A.Fake<ITagService>();
     private readonly AssetTagsDeleter sut;
 
     public AssetTagsDeleterTests()
     {
-        ct = cts.Token;
-
         sut = new AssetTagsDeleter(tagService);
     }
 
@@ -36,11 +31,9 @@ public class AssetTagsDeleterTests
     [Fact]
     public async Task Should_remove_events_from_streams()
     {
-        var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
+        await sut.DeleteAppAsync(App, CancellationToken);
 
-        await sut.DeleteAppAsync(app, ct);
-
-        A.CallTo(() => tagService.ClearAsync(app.Id, TagGroups.Assets, ct))
+        A.CallTo(() => tagService.ClearAsync(AppId.Id, TagGroups.Assets, CancellationToken))
             .MustHaveHappened();
     }
 }

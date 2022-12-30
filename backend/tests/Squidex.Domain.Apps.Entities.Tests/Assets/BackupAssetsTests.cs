@@ -9,6 +9,7 @@ using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
@@ -17,21 +18,16 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public class BackupAssetsTests
+public class BackupAssetsTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly Rebuilder rebuilder = A.Fake<Rebuilder>();
     private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
     private readonly ITagService tagService = A.Fake<ITagService>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly RefToken actor = RefToken.User("123");
     private readonly BackupAssets sut;
 
     public BackupAssetsTests()
     {
-        ct = cts.Token;
-
         sut = new BackupAssets(rebuilder, assetFileStore, tagService);
     }
 
@@ -51,12 +47,12 @@ public class BackupAssetsTests
 
         var context = CreateBackupContext();
 
-        A.CallTo(() => tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets, ct))
+        A.CallTo(() => tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets, CancellationToken))
             .Returns(tags);
 
-        await sut.BackupAsync(context, ct);
+        await sut.BackupAsync(context, CancellationToken);
 
-        A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Tags, ct))
+        A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Tags, CancellationToken))
             .MustHaveHappened();
 
         A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Alias!, A<CancellationToken>._))
@@ -77,15 +73,15 @@ public class BackupAssetsTests
 
         var context = CreateBackupContext();
 
-        A.CallTo(() => tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets, ct))
+        A.CallTo(() => tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets, CancellationToken))
             .Returns(tags);
 
-        await sut.BackupAsync(context, ct);
+        await sut.BackupAsync(context, CancellationToken);
 
-        A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Tags, ct))
+        A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Tags, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Alias, ct))
+        A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Alias, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -99,18 +95,18 @@ public class BackupAssetsTests
         var envelope =
             new Envelope<IEvent>(new AppCreated
             {
-                AppId = appId
+                AppId = AppId
             });
 
-        A.CallTo(() => context.Reader.HasFileAsync(A<string>._, ct))
+        A.CallTo(() => context.Reader.HasFileAsync(A<string>._, CancellationToken))
             .Returns(true);
 
-        A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(A<string>._, ct))
+        A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(A<string>._, CancellationToken))
             .Returns(tags);
 
-        await sut.RestoreEventAsync(envelope, context, ct);
+        await sut.RestoreEventAsync(envelope, context, CancellationToken);
 
-        A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Tags == tags), ct))
+        A.CallTo(() => tagService.RebuildTagsAsync(AppId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Tags == tags), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -124,18 +120,18 @@ public class BackupAssetsTests
         var envelope =
             new Envelope<IEvent>(new AppCreated
             {
-                AppId = appId
+                AppId = AppId
             });
 
-        A.CallTo(() => context.Reader.HasFileAsync(A<string>._, ct))
+        A.CallTo(() => context.Reader.HasFileAsync(A<string>._, CancellationToken))
             .Returns(false).Once().Then.Returns(true);
 
-        A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, ct))
+        A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, CancellationToken))
             .Returns(alias);
 
-        await sut.RestoreEventAsync(envelope, context, ct);
+        await sut.RestoreEventAsync(envelope, context, CancellationToken);
 
-        A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Alias == alias), ct))
+        A.CallTo(() => tagService.RebuildTagsAsync(AppId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Alias == alias), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -149,16 +145,16 @@ public class BackupAssetsTests
         var envelope =
             new Envelope<IEvent>(new AppCreated
             {
-                AppId = appId
+                AppId = AppId
             });
 
-        A.CallTo(() => context.Reader.HasFileAsync(A<string>._, ct))
+        A.CallTo(() => context.Reader.HasFileAsync(A<string>._, CancellationToken))
             .Returns(false);
 
-        A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, ct))
+        A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, CancellationToken))
             .Returns(alias);
 
-        await sut.RestoreEventAsync(envelope, context, ct);
+        await sut.RestoreEventAsync(envelope, context, CancellationToken);
 
         A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -166,7 +162,7 @@ public class BackupAssetsTests
         A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(A<string>._, A<CancellationToken>._))
             .MustNotHaveHappened();
 
-        A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Alias == alias), A<CancellationToken>._))
+        A.CallTo(() => tagService.RebuildTagsAsync(AppId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Alias == alias), A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -209,12 +205,12 @@ public class BackupAssetsTests
 
         var context = CreateBackupContext();
 
-        A.CallTo(() => context.Writer.OpenBlobAsync($"{assetId}_{version}.asset", ct))
+        A.CallTo(() => context.Writer.OpenBlobAsync($"{assetId}_{version}.asset", CancellationToken))
             .Returns(assetStream);
 
-        await sut.BackupEventAsync(AppEvent(@event), context, ct);
+        await sut.BackupEventAsync(AppEvent(@event), context, CancellationToken);
 
-        A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, assetId, version, null, assetStream, default, ct))
+        A.CallTo(() => assetFileStore.DownloadAsync(AppId.Id, assetId, version, null, assetStream, default, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -225,13 +221,13 @@ public class BackupAssetsTests
 
         var context = CreateBackupContext();
 
-        A.CallTo(() => context.Writer.OpenBlobAsync($"{assetId}_{version}.asset", ct))
+        A.CallTo(() => context.Writer.OpenBlobAsync($"{assetId}_{version}.asset", CancellationToken))
             .Returns(assetStream);
 
-        A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, assetId, version, null, assetStream, default, ct))
+        A.CallTo(() => assetFileStore.DownloadAsync(AppId.Id, assetId, version, null, assetStream, default, CancellationToken))
             .Throws(new AssetNotFoundException(assetId.ToString()));
 
-        await sut.BackupEventAsync(AppEvent(@event), context, ct);
+        await sut.BackupEventAsync(AppEvent(@event), context, CancellationToken);
     }
 
     [Fact]
@@ -253,7 +249,7 @@ public class BackupAssetsTests
     [Fact]
     public async Task Should_restore_updated_asset()
     {
-        var @event = new AssetUpdated { AppId = appId, AssetId = DomainId.NewGuid(), FileVersion = 3 };
+        var @event = new AssetUpdated { AppId = AppId, AssetId = DomainId.NewGuid(), FileVersion = 3 };
 
         await TestRestoreAsync(@event, @event.FileVersion);
     }
@@ -261,7 +257,7 @@ public class BackupAssetsTests
     [Fact]
     public async Task Should_restore_updated_asset_with_missing_file()
     {
-        var @event = new AssetUpdated { AppId = appId, AssetId = DomainId.NewGuid(), FileVersion = 3 };
+        var @event = new AssetUpdated { AppId = AppId, AssetId = DomainId.NewGuid(), FileVersion = 3 };
 
         await TestRestoreFailedAsync(@event, @event.FileVersion);
     }
@@ -273,12 +269,12 @@ public class BackupAssetsTests
 
         var context = CreateRestoreContext();
 
-        A.CallTo(() => context.Reader.OpenBlobAsync($"{assetId}_{version}.asset", ct))
+        A.CallTo(() => context.Reader.OpenBlobAsync($"{assetId}_{version}.asset", CancellationToken))
             .Returns(assetStream);
 
-        await sut.RestoreEventAsync(AppEvent(@event), context, ct);
+        await sut.RestoreEventAsync(AppEvent(@event), context, CancellationToken);
 
-        A.CallTo(() => assetFileStore.UploadAsync(appId.Id, assetId, version, null, assetStream, true, ct))
+        A.CallTo(() => assetFileStore.UploadAsync(AppId.Id, assetId, version, null, assetStream, true, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -289,12 +285,12 @@ public class BackupAssetsTests
 
         var context = CreateRestoreContext();
 
-        A.CallTo(() => context.Reader.OpenBlobAsync($"{assetId}_{version}.asset", ct))
+        A.CallTo(() => context.Reader.OpenBlobAsync($"{assetId}_{version}.asset", CancellationToken))
             .Throws(new FileNotFoundException());
 
-        await sut.RestoreEventAsync(AppEvent(@event), context, ct);
+        await sut.RestoreEventAsync(AppEvent(@event), context, CancellationToken);
 
-        A.CallTo(() => assetFileStore.UploadAsync(appId.Id, assetId, version, null, assetStream, true, A<CancellationToken>._))
+        A.CallTo(() => assetFileStore.UploadAsync(AppId.Id, assetId, version, null, assetStream, true, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -309,29 +305,29 @@ public class BackupAssetsTests
         await sut.RestoreEventAsync(AppEvent(new AssetCreated
         {
             AssetId = assetId1
-        }), context, ct);
+        }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new AssetCreated
         {
             AssetId = assetId2
-        }), context, ct);
+        }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new AssetDeleted
         {
             AssetId = assetId2
-        }), context, ct);
+        }), context, CancellationToken);
 
         var rebuildAssets = new HashSet<DomainId>();
 
-        A.CallTo(() => rebuilder.InsertManyAsync<AssetDomainObject, AssetDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, ct))
+        A.CallTo(() => rebuilder.InsertManyAsync<AssetDomainObject, AssetDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
             .Invokes(x => rebuildAssets.AddRange(x.GetArgument<IEnumerable<DomainId>>(0)!));
 
-        await sut.RestoreAsync(context, ct);
+        await sut.RestoreAsync(context, CancellationToken);
 
         Assert.Equal(new HashSet<DomainId>
         {
-            DomainId.Combine(appId, assetId1),
-            DomainId.Combine(appId, assetId2)
+            DomainId.Combine(AppId, assetId1),
+            DomainId.Combine(AppId, assetId2)
         }, rebuildAssets);
     }
 
@@ -346,54 +342,54 @@ public class BackupAssetsTests
         await sut.RestoreEventAsync(AppEvent(new AssetFolderCreated
         {
             AssetFolderId = assetFolderId1
-        }), context, ct);
+        }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new AssetFolderCreated
         {
             AssetFolderId = assetFolderId2
-        }), context, ct);
+        }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new AssetFolderDeleted
         {
             AssetFolderId = assetFolderId2
-        }), context, ct);
+        }), context, CancellationToken);
 
         var rebuildAssetFolders = new HashSet<DomainId>();
 
-        A.CallTo(() => rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, ct))
+        A.CallTo(() => rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
             .Invokes(x => rebuildAssetFolders.AddRange(x.GetArgument<IEnumerable<DomainId>>(0)!));
 
-        await sut.RestoreAsync(context, ct);
+        await sut.RestoreAsync(context, CancellationToken);
 
         Assert.Equal(new HashSet<DomainId>
         {
-            DomainId.Combine(appId, assetFolderId1),
-            DomainId.Combine(appId, assetFolderId2)
+            DomainId.Combine(AppId, assetFolderId1),
+            DomainId.Combine(AppId, assetFolderId2)
         }, rebuildAssetFolders);
     }
 
     private BackupContext CreateBackupContext()
     {
-        return new BackupContext(appId.Id, CreateUserMapping(), A.Fake<IBackupWriter>());
+        return new BackupContext(AppId.Id, CreateUserMapping(), A.Fake<IBackupWriter>());
     }
 
     private RestoreContext CreateRestoreContext()
     {
-        return new RestoreContext(appId.Id, CreateUserMapping(), A.Fake<IBackupReader>(), DomainId.NewGuid());
+        return new RestoreContext(AppId.Id, CreateUserMapping(), A.Fake<IBackupReader>(), DomainId.NewGuid());
     }
 
     private Envelope<AssetEvent> AppEvent(AssetEvent @event)
     {
-        @event.AppId = appId;
+        @event.AppId = AppId;
 
-        return Envelope.Create(@event).SetAggregateId(DomainId.Combine(appId, @event.AssetId));
+        return Envelope.Create(@event).SetAggregateId(DomainId.Combine(AppId, @event.AssetId));
     }
 
     private Envelope<AssetFolderEvent> AppEvent(AssetFolderEvent @event)
     {
-        @event.AppId = appId;
+        @event.AppId = AppId;
 
-        return Envelope.Create(@event).SetAggregateId(DomainId.Combine(appId, @event.AssetFolderId));
+        return Envelope.Create(@event).SetAggregateId(DomainId.Combine(AppId, @event.AssetFolderId));
     }
 
     private IUserMapping CreateUserMapping()

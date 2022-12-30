@@ -14,21 +14,20 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Rules;
 
-public class RuleEnqueuerTests
+public class RuleEnqueuerTests : GivenContext
 {
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
     private readonly ILocalCache localCache = A.Fake<ILocalCache>();
     private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
     private readonly IRuleService ruleService = A.Fake<IRuleService>();
     private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly RuleEnqueuer sut;
 
     [RuleAction]
@@ -42,7 +41,7 @@ public class RuleEnqueuerTests
         var options = Options.Create(new RuleOptions());
 
         sut = new RuleEnqueuer(cache, localCache,
-            appProvider,
+            AppProvider,
             ruleEventRepository,
             ruleService,
             options,
@@ -76,7 +75,7 @@ public class RuleEnqueuerTests
     [Fact]
     public async Task Should_not_insert_job_if_null()
     {
-        var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
+        var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
         var rule = CreateRule();
 
@@ -97,7 +96,7 @@ public class RuleEnqueuerTests
     [Fact]
     public async Task Should_not_insert_job_if_job_has_a_skip_reason()
     {
-        var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
+        var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
         var rule = CreateRule();
 
@@ -118,7 +117,7 @@ public class RuleEnqueuerTests
     [Fact]
     public async Task Should_update_repository_if_enqueing()
     {
-        var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
+        var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
         var rule = CreateRule();
 
@@ -139,7 +138,7 @@ public class RuleEnqueuerTests
     [Fact]
     public async Task Should_update_repository_if_enqueing_broken_job()
     {
-        var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
+        var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
         var rule = CreateRule();
 
@@ -160,7 +159,7 @@ public class RuleEnqueuerTests
     [Fact]
     public async Task Should_update_repository_with_jobs_from_service()
     {
-        var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
+        var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
         var job1 = new RuleJob
         {
@@ -178,7 +177,7 @@ public class RuleEnqueuerTests
     [Fact]
     public async Task Should_not_eqneue_if_event_restored()
     {
-        var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
+        var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
         var job1 = new RuleJob { Created = now };
 
@@ -195,7 +194,7 @@ public class RuleEnqueuerTests
         var rule1 = CreateRule();
         var rule2 = CreateRule();
 
-        A.CallTo(() => appProvider.GetRulesAsync(appId.Id, A<CancellationToken>._))
+        A.CallTo(() => AppProvider.GetRulesAsync(AppId.Id, A<CancellationToken>._))
             .Returns(new List<IRuleEntity> { rule1, rule2 });
 
         A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule1), default))

@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
@@ -19,14 +18,10 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public abstract class TextIndexerTestsBase
+public abstract class TextIndexerTestsBase : GivenContext
 {
     protected readonly List<DomainId> ids1 = new List<DomainId> { DomainId.NewGuid() };
     protected readonly List<DomainId> ids2 = new List<DomainId> { DomainId.NewGuid() };
-
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-    private readonly IAppEntity app;
     private readonly Lazy<TextIndexingProcess> sut;
 
     protected TextIndexingProcess Sut
@@ -42,11 +37,6 @@ public abstract class TextIndexerTestsBase
 
     protected TextIndexerTestsBase()
     {
-        app =
-            Mocks.App(appId,
-                Language.DE,
-                Language.EN);
-
         sut = new Lazy<TextIndexingProcess>(CreateSut);
     }
 
@@ -400,12 +390,12 @@ public abstract class TextIndexerTestsBase
     private async Task UpdateAsync(DomainId id, ContentEvent contentEvent)
     {
         contentEvent.ContentId = id;
-        contentEvent.AppId = appId;
-        contentEvent.SchemaId = schemaId;
+        contentEvent.AppId = AppId;
+        contentEvent.SchemaId = SchemaId;
 
         await Sut.On(Enumerable.Repeat(Envelope.Create<IEvent>(contentEvent), 1));
 
-        await Task.Delay(WaitAfterUpdate);
+        await Task.Delay(WaitAfterUpdate, default);
     }
 
     private static ContentData TextData(string language, string text)
@@ -439,9 +429,9 @@ public abstract class TextIndexerTestsBase
 
     protected async Task SearchGeo(List<DomainId>? expected, string field, double latitude, double longitude, SearchScope target = SearchScope.All)
     {
-        var query = new GeoQuery(schemaId.Id, field, latitude, longitude, 1000, 1000);
+        var query = new GeoQuery(SchemaId.Id, field, latitude, longitude, 1000, 1000);
 
-        var actual = await Sut.TextIndex.SearchAsync(app, query, target);
+        var actual = await Sut.TextIndex.SearchAsync(App, query, target, default);
 
         if (expected != null)
         {
@@ -457,10 +447,10 @@ public abstract class TextIndexerTestsBase
     {
         var query = new TextQuery(text, 1000)
         {
-            RequiredSchemaIds = new List<DomainId> { schemaId.Id }
+            RequiredSchemaIds = new List<DomainId> { SchemaId.Id }
         };
 
-        var actual = await Sut.TextIndex.SearchAsync(app, query, target);
+        var actual = await Sut.TextIndex.SearchAsync(App, query, target, default);
 
         if (expected != null)
         {

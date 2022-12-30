@@ -75,20 +75,20 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
 
                     if (Version <= EtagVersion.Empty || IsDeleted(Snapshot))
                     {
-                        await CreateCore(c.AsCreate(), operation);
+                        await CreateCore(c.AsCreate(), operation, ct);
                     }
                     else if (c.Patch)
                     {
-                        await PatchCore(c.AsUpdate(), operation);
+                        await PatchCore(c.AsUpdate(), operation, ct);
                     }
                     else
                     {
-                        await UpdateCore(c.AsUpdate(), operation);
+                        await UpdateCore(c.AsUpdate(), operation, ct);
                     }
 
                     if (Is.OptionalChange(operation.Snapshot.EditingStatus(), c.Status))
                     {
-                        await ChangeCore(c.AsChange(c.Status.Value), operation);
+                        await ChangeCore(c.AsChange(c.Status.Value), operation, ct);
                     }
 
                     return Snapshot;
@@ -99,7 +99,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                    await CreateCore(c, operation);
+                    await CreateCore(c, operation, ct);
 
                     if (operation.Schema.SchemaDef.Type == SchemaType.Singleton)
                     {
@@ -107,7 +107,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                     }
                     else if (Is.OptionalChange(Snapshot.Status, c.Status))
                     {
-                        await ChangeCore(c.AsChange(c.Status.Value), operation);
+                        await ChangeCore(c.AsChange(c.Status.Value), operation, ct);
                     }
 
                     return Snapshot;
@@ -118,7 +118,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                    await ValidateCore(operation);
+                    await ValidateCore(operation, ct);
 
                     return true;
                 }, ct);
@@ -148,7 +148,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                    await PatchCore(c, operation);
+                    await PatchCore(c, operation, ct);
 
                     return Snapshot;
                 }, ct);
@@ -158,7 +158,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                    await UpdateCore(c, operation);
+                    await UpdateCore(c, operation, ct);
 
                     return Snapshot;
                 }, ct);
@@ -186,7 +186,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                         {
                             var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                            await ChangeCore(c, operation);
+                            await ChangeCore(c, operation, ct);
                         }
                     }
                     catch (Exception)
@@ -209,7 +209,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                    await DeleteCore(c, operation);
+                    await DeleteCore(c, operation, ct);
                 }, ct);
 
             case DeleteContent deleteContent:
@@ -217,7 +217,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                    await DeleteCore(c, operation);
+                    await DeleteCore(c, operation, ct);
                 }, ct);
 
             default:
@@ -226,7 +226,8 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
         }
     }
 
-    private async Task CreateCore(CreateContent c, ContentOperation operation)
+    private async Task CreateCore(CreateContent c, ContentOperation operation,
+        CancellationToken ct)
     {
         operation.MustNotCreateComponent();
         operation.MustNotCreateSingleton();
@@ -235,27 +236,28 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
 
         if (!c.DoNotValidate)
         {
-            await operation.ValidateInputAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished());
+            await operation.ValidateInputAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished(), ct);
         }
 
         var status = await operation.GetInitialStatusAsync();
 
         if (!c.DoNotScript)
         {
-            c.Data = await operation.ExecuteCreateScriptAsync(c.Data, status);
+            c.Data = await operation.ExecuteCreateScriptAsync(c.Data, status, ct);
         }
 
         operation.GenerateDefaultValues(c.Data);
 
         if (!c.DoNotValidate)
         {
-            await operation.ValidateContentAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished());
+            await operation.ValidateContentAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished(), ct);
         }
 
         Create(c, status);
     }
 
-    private async Task ChangeCore(ChangeContentStatus c, ContentOperation operation)
+    private async Task ChangeCore(ChangeContentStatus c, ContentOperation operation,
+        CancellationToken ct)
     {
         operation.MustHavePermission(PermissionIds.AppContentsChangeStatus);
         operation.MustNotChangeSingleton(c.Status);
@@ -276,7 +278,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
 
         if (!c.DoNotScript)
         {
-            var newData = await operation.ExecuteChangeScriptAsync(c.Status, GetChange(c.Status));
+            var newData = await operation.ExecuteChangeScriptAsync(c.Status, GetChange(c.Status), ct);
 
             if (!newData.Equals(Snapshot.Data))
             {
@@ -297,25 +299,26 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
 
         if (c.CheckReferrers && Snapshot.IsPublished())
         {
-            await operation.CheckReferrersAsync();
+            await operation.CheckReferrersAsync(ct);
         }
 
         if (!c.DoNotValidate && await operation.ShouldValidateAsync(c.Status))
         {
-            await operation.ValidateContentAndInputAsync(Snapshot.Data, c.OptimizeValidation, true);
+            await operation.ValidateContentAndInputAsync(Snapshot.Data, c.OptimizeValidation, true, ct);
         }
 
         ChangeStatus(c);
     }
 
-    private async Task UpdateCore(UpdateContent c, ContentOperation operation)
+    private async Task UpdateCore(UpdateContent c, ContentOperation operation,
+        CancellationToken ct)
     {
         operation.MustHavePermission(PermissionIds.AppContentsUpdate);
         operation.MustHaveData(c.Data);
 
         if (!c.DoNotValidate)
         {
-            await operation.ValidateInputAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished());
+            await operation.ValidateInputAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished(), ct);
         }
 
         if (!c.DoNotValidateWorkflow)
@@ -332,25 +335,26 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
 
         if (!c.DoNotScript)
         {
-            newData = await operation.ExecuteUpdateScriptAsync(newData);
+            newData = await operation.ExecuteUpdateScriptAsync(newData, ct);
         }
 
         if (!c.DoNotValidate)
         {
-            await operation.ValidateContentAsync(newData, c.OptimizeValidation, Snapshot.IsPublished());
+            await operation.ValidateContentAsync(newData, c.OptimizeValidation, Snapshot.IsPublished(), ct);
         }
 
         Update(c, newData);
     }
 
-    private async Task PatchCore(UpdateContent c, ContentOperation operation)
+    private async Task PatchCore(UpdateContent c, ContentOperation operation,
+        CancellationToken ct)
     {
         operation.MustHavePermission(PermissionIds.AppContentsUpdate);
         operation.MustHaveData(c.Data);
 
         if (!c.DoNotValidate)
         {
-            await operation.ValidateInputPartialAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished());
+            await operation.ValidateInputPartialAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished(), ct);
         }
 
         if (!c.DoNotValidateWorkflow)
@@ -367,12 +371,12 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
 
         if (!c.DoNotScript)
         {
-            newData = await operation.ExecuteUpdateScriptAsync(newData);
+            newData = await operation.ExecuteUpdateScriptAsync(newData, ct);
         }
 
         if (!c.DoNotValidate)
         {
-            await operation.ValidateContentAsync(newData, c.OptimizeValidation, Snapshot.IsPublished());
+            await operation.ValidateContentAsync(newData, c.OptimizeValidation, Snapshot.IsPublished(), ct);
         }
 
         Update(c, newData);
@@ -388,11 +392,12 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
         }
     }
 
-    private async Task ValidateCore(ContentOperation operation)
+    private async Task ValidateCore(ContentOperation operation,
+        CancellationToken ct)
     {
         operation.MustHavePermission(PermissionIds.AppContentsRead);
 
-        await operation.ValidateContentAndInputAsync(Snapshot.Data, false, Snapshot.IsPublished());
+        await operation.ValidateContentAndInputAsync(Snapshot.Data, false, Snapshot.IsPublished(), ct);
     }
 
     private async Task CreateDraftCore(CreateContentDraft c, ContentOperation operation)
@@ -413,19 +418,20 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
         DeleteDraft(c);
     }
 
-    private async Task DeleteCore(DeleteContent c, ContentOperation operation)
+    private async Task DeleteCore(DeleteContent c, ContentOperation operation,
+        CancellationToken ct)
     {
         operation.MustHavePermission(PermissionIds.AppContentsDelete);
         operation.MustNotDeleteSingleton();
 
         if (!c.DoNotScript)
         {
-            await operation.ExecuteDeleteScriptAsync(c.Permanent);
+            await operation.ExecuteDeleteScriptAsync(c.Permanent, ct);
         }
 
         if (c.CheckReferrers)
         {
-            await operation.CheckReferrersAsync();
+            await operation.CheckReferrersAsync(ct);
         }
 
         Delete(c);

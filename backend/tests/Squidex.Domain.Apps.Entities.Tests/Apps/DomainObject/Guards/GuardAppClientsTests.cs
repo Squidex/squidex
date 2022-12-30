@@ -12,21 +12,27 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 
-#pragma warning disable SA1310 // Field names must not contain underscore
-
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
 
-public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
+public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixture>
 {
-    private readonly AppClients clients_0 = AppClients.Empty;
-    private readonly Roles roles = Roles.Empty;
+    private AppClients clients = AppClients.Empty;
+
+    public GuardAppClientsTests()
+    {
+        A.CallTo(() => App.Roles)
+            .Returns(Roles.Empty);
+
+        A.CallTo(() => App.Clients)
+            .ReturnsLazily(() => clients);
+    }
 
     [Fact]
     public void CanAttach_should_throw_execption_if_client_id_is_null()
     {
         var command = new AttachClient();
 
-        ValidationAssert.Throws(() => GuardAppClients.CanAttach(command, App(clients_0)),
+        ValidationAssert.Throws(() => GuardAppClients.CanAttach(command, App),
             new ValidationError("Client ID is required.", "Id"));
     }
 
@@ -35,9 +41,9 @@ public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AttachClient { Id = "android" };
 
-        var clients_1 = clients_0.Add("android", "secret");
+        clients = clients.Add("android", "secret");
 
-        ValidationAssert.Throws(() => GuardAppClients.CanAttach(command, App(clients_1)),
+        ValidationAssert.Throws(() => GuardAppClients.CanAttach(command, App),
             new ValidationError("A client with the same id already exists."));
     }
 
@@ -46,9 +52,9 @@ public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AttachClient { Id = "ios" };
 
-        var clients_1 = clients_0.Add("android", "secret");
+        clients = clients.Add("android", "secret");
 
-        GuardAppClients.CanAttach(command, App(clients_1));
+        GuardAppClients.CanAttach(command, App);
     }
 
     [Fact]
@@ -56,7 +62,7 @@ public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
     {
         var command = new RevokeClient();
 
-        ValidationAssert.Throws(() => GuardAppClients.CanRevoke(command, App(clients_0)),
+        ValidationAssert.Throws(() => GuardAppClients.CanRevoke(command, App),
             new ValidationError("Client ID is required.", "Id"));
     }
 
@@ -65,7 +71,7 @@ public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
     {
         var command = new RevokeClient { Id = "ios" };
 
-        Assert.Throws<DomainObjectNotFoundException>(() => GuardAppClients.CanRevoke(command, App(clients_0)));
+        Assert.Throws<DomainObjectNotFoundException>(() => GuardAppClients.CanRevoke(command, App));
     }
 
     [Fact]
@@ -73,9 +79,9 @@ public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
     {
         var command = new RevokeClient { Id = "ios" };
 
-        var clients_1 = clients_0.Add("ios", "secret");
+        clients = clients.Add("ios", "secret");
 
-        GuardAppClients.CanRevoke(command, App(clients_1));
+        GuardAppClients.CanRevoke(command, App);
     }
 
     [Fact]
@@ -83,7 +89,7 @@ public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateClient { Name = "iOS" };
 
-        ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App(clients_0)),
+        ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App),
             new ValidationError("Client ID is required.", "Id"));
     }
 
@@ -92,7 +98,7 @@ public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateClient { Id = "ios", Name = "iOS" };
 
-        Assert.Throws<DomainObjectNotFoundException>(() => GuardAppClients.CanUpdate(command, App(clients_0)));
+        Assert.Throws<DomainObjectNotFoundException>(() => GuardAppClients.CanUpdate(command, App));
     }
 
     [Fact]
@@ -100,9 +106,9 @@ public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateClient { Id = "ios", Role = "Invalid" };
 
-        var clients_1 = clients_0.Add("ios", "secret");
+        clients = clients.Add("ios", "secret");
 
-        ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App(clients_1)),
+        ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App),
             new ValidationError("Role is not a valid value.", "Role"));
     }
 
@@ -111,9 +117,9 @@ public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateClient { Id = "ios", ApiCallsLimit = -10 };
 
-        var clients_1 = clients_0.Add("ios", "secret");
+        clients = clients.Add("ios", "secret");
 
-        ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App(clients_1)),
+        ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App),
             new ValidationError("ApiCallsLimit must be greater or equal to 0.", "ApiCallsLimit"));
     }
 
@@ -122,9 +128,9 @@ public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateClient { Id = "ios", ApiTrafficLimit = -10 };
 
-        var clients_1 = clients_0.Add("ios", "secret");
+        clients = clients.Add("ios", "secret");
 
-        ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App(clients_1)),
+        ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App),
             new ValidationError("ApiTrafficLimit must be greater or equal to 0.", "ApiTrafficLimit"));
     }
 
@@ -133,9 +139,9 @@ public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateClient { Id = "ios", Name = "ios" };
 
-        var clients_1 = clients_0.Add("ios", "secret");
+        clients = clients.Add("ios", "secret");
 
-        GuardAppClients.CanUpdate(command, App(clients_1));
+        GuardAppClients.CanUpdate(command, App);
     }
 
     [Fact]
@@ -143,9 +149,9 @@ public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateClient { Id = "ios", Role = Role.Editor };
 
-        var clients_1 = clients_0.Add("ios", "secret");
+        clients = clients.Add("ios", "secret");
 
-        GuardAppClients.CanUpdate(command, App(clients_1));
+        GuardAppClients.CanUpdate(command, App);
     }
 
     [Fact]
@@ -153,18 +159,8 @@ public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateClient { Id = "ios", Name = "iOS", Role = Role.Reader };
 
-        var clients_1 = clients_0.Add("ios", "secret");
+        clients = clients.Add("ios", "secret");
 
-        GuardAppClients.CanUpdate(command, App(clients_1));
-    }
-
-    private IAppEntity App(AppClients clients)
-    {
-        var app = A.Fake<IAppEntity>();
-
-        A.CallTo(() => app.Clients).Returns(clients);
-        A.CallTo(() => app.Roles).Returns(roles);
-
-        return app;
+        GuardAppClients.CanUpdate(command, App);
     }
 }

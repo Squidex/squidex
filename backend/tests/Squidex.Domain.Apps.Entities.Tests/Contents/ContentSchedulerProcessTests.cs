@@ -10,17 +10,17 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public class ContentSchedulerProcessTests
+public class ContentSchedulerProcessTests : GivenContext
 {
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
     private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
     private readonly IClock clock = A.Fake<IClock>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly ContentSchedulerProcess sut;
 
     public ContentSchedulerProcessTests()
@@ -38,14 +38,14 @@ public class ContentSchedulerProcessTests
 
         var content1 = new ContentEntity
         {
-            AppId = appId,
+            AppId = AppId,
             Id = DomainId.NewGuid(),
             ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Archived, null!, now)
         };
 
         var content2 = new ContentEntity
         {
-            AppId = appId,
+            AppId = AppId,
             Id = DomainId.NewGuid(),
             ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Draft, null!, now)
         };
@@ -53,10 +53,10 @@ public class ContentSchedulerProcessTests
         A.CallTo(() => clock.GetCurrentInstant())
             .Returns(now);
 
-        A.CallTo(() => contentRepository.QueryScheduledWithoutDataAsync(now, default))
+        A.CallTo(() => contentRepository.QueryScheduledWithoutDataAsync(now, CancellationToken))
             .Returns(new[] { content1, content2 }.ToAsyncEnumerable());
 
-        await sut.PublishAsync();
+        await sut.PublishAsync(CancellationToken);
 
         A.CallTo(() => commandBus.PublishAsync(
                 A<ChangeContentStatus>.That.Matches(x =>
@@ -82,7 +82,7 @@ public class ContentSchedulerProcessTests
 
         var content1 = new ContentEntity
         {
-            AppId = appId,
+            AppId = AppId,
             Id = DomainId.NewGuid(),
             ScheduleJob = null
         };
@@ -90,10 +90,10 @@ public class ContentSchedulerProcessTests
         A.CallTo(() => clock.GetCurrentInstant())
             .Returns(now);
 
-        A.CallTo(() => contentRepository.QueryScheduledWithoutDataAsync(now, default))
+        A.CallTo(() => contentRepository.QueryScheduledWithoutDataAsync(now, CancellationToken))
             .Returns(new[] { content1 }.ToAsyncEnumerable());
 
-        await sut.PublishAsync();
+        await sut.PublishAsync(CancellationToken);
 
         A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -106,7 +106,7 @@ public class ContentSchedulerProcessTests
 
         var content1 = new ContentEntity
         {
-            AppId = appId,
+            AppId = AppId,
             Id = DomainId.NewGuid(),
             ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Archived, null!, now)
         };
@@ -114,13 +114,13 @@ public class ContentSchedulerProcessTests
         A.CallTo(() => clock.GetCurrentInstant())
             .Returns(now);
 
-        A.CallTo(() => contentRepository.QueryScheduledWithoutDataAsync(now, default))
+        A.CallTo(() => contentRepository.QueryScheduledWithoutDataAsync(now, CancellationToken))
             .Returns(new[] { content1 }.ToAsyncEnumerable());
 
         A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, default))
             .Throws(new DomainObjectNotFoundException(content1.Id.ToString()));
 
-        await sut.PublishAsync();
+        await sut.PublishAsync(CancellationToken);
 
         A.CallTo(() => contentRepository.ResetScheduledAsync(content1.UniqueId, default))
             .MustHaveHappened();

@@ -13,17 +13,13 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
-public class ConvertTagsTests
+public class ConvertTagsTests : GivenContext
 {
     private readonly ITagService tagService = A.Fake<ITagService>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly Context requestContext;
     private readonly ConvertTags sut;
 
     public ConvertTagsTests()
     {
-        requestContext = Context.Anonymous(Mocks.App(appId));
-
         sut = new ConvertTags(tagService);
     }
 
@@ -32,7 +28,7 @@ public class ConvertTagsTests
     {
         var asset = new AssetEntity();
 
-        await sut.EnrichAsync(requestContext, Enumerable.Repeat(asset, 1), default);
+        await sut.EnrichAsync(ApiContext, Enumerable.Repeat(asset, 1), CancellationToken);
 
         Assert.Empty(asset.TagNames);
     }
@@ -42,7 +38,7 @@ public class ConvertTagsTests
     {
         var asset = new AssetEntity();
 
-        await sut.EnrichAsync(requestContext.Clone(b => b.WithoutAssetEnrichment()), Enumerable.Repeat(asset, 1), default);
+        await sut.EnrichAsync(ApiContext.Clone(b => b.WithoutAssetEnrichment()), Enumerable.Repeat(asset, 1), CancellationToken);
 
         Assert.Null(asset.TagNames);
     }
@@ -57,17 +53,17 @@ public class ConvertTagsTests
                 "id1",
                 "id2"
             },
-            AppId = appId
+            AppId = AppId
         };
 
-        A.CallTo(() => tagService.GetTagNamesAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Is("id1", "id2"), default))
+        A.CallTo(() => tagService.GetTagNamesAsync(AppId.Id, TagGroups.Assets, A<HashSet<string>>.That.Is("id1", "id2"), CancellationToken))
             .Returns(new Dictionary<string, string>
             {
                 ["id1"] = "name1",
                 ["id2"] = "name2"
             });
 
-        await sut.EnrichAsync(requestContext, Enumerable.Repeat(asset, 1), default);
+        await sut.EnrichAsync(ApiContext, Enumerable.Repeat(asset, 1), CancellationToken);
 
         Assert.Equal(new HashSet<string> { "name1", "name2" }, asset.TagNames);
     }
@@ -82,7 +78,7 @@ public class ConvertTagsTests
                 "id1",
                 "id2"
             },
-            AppId = appId
+            AppId = AppId
         };
 
         var asset2 = new AssetEntity
@@ -92,10 +88,10 @@ public class ConvertTagsTests
                 "id2",
                 "id3"
             },
-            AppId = appId
+            AppId = AppId
         };
 
-        A.CallTo(() => tagService.GetTagNamesAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Is("id1", "id2", "id3"), default))
+        A.CallTo(() => tagService.GetTagNamesAsync(AppId.Id, TagGroups.Assets, A<HashSet<string>>.That.Is("id1", "id2", "id3"), CancellationToken))
             .Returns(new Dictionary<string, string>
             {
                 ["id1"] = "name1",
@@ -103,7 +99,7 @@ public class ConvertTagsTests
                 ["id3"] = "name3"
             });
 
-        await sut.EnrichAsync(requestContext, new[] { asset1, asset2 }, default);
+        await sut.EnrichAsync(ApiContext, new[] { asset1, asset2 }, CancellationToken);
 
         Assert.Equal(new HashSet<string> { "name1", "name2" }, asset1.TagNames);
         Assert.Equal(new HashSet<string> { "name2", "name3" }, asset2.TagNames);

@@ -28,12 +28,11 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
     private readonly Plan planFree = new Plan { Id = "free" };
     private readonly string contributorId = DomainId.NewGuid().ToString();
     private readonly string name = "My Team";
-    private readonly DomainId teamId = DomainId.NewGuid();
     private readonly TeamDomainObject sut;
 
     protected override DomainId Id
     {
-        get => teamId;
+        get => TeamId;
     }
 
     public TeamDomainObjectTests()
@@ -52,7 +51,7 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
         A.CallTo(() => billingPlans.GetPlan(planPaid.Id))
             .Returns(planPaid);
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<ITeamEntity>._, A<string>._, default))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<ITeamEntity>._, A<string>._, CancellationToken))
             .Returns(Task.FromResult<Uri?>(null));
 
         var serviceProvider =
@@ -72,7 +71,7 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
     [Fact]
     public async Task Create_should_create_events_and_set_intitial_state()
     {
-        var command = new CreateTeam { Name = name };
+        var command = new CreateTeam { Name = name, TeamId = TeamId };
 
         var actual = await PublishAsync(command);
 
@@ -82,15 +81,15 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateTeamEvent(new TeamCreated { Name = name }),
-                CreateTeamEvent(new TeamContributorAssigned { ContributorId = Actor.Identifier, Role = Role.Owner })
+                CreateEvent(new TeamCreated { Name = name }),
+                CreateEvent(new TeamContributorAssigned { ContributorId = User.Identifier, Role = Role.Owner })
             );
     }
 
     [Fact]
     public async Task Create_should_not_assign_client_as_contributor()
     {
-        var command = new CreateTeam { Name = name, Actor = ActorClient };
+        var command = new CreateTeam { Name = name, Actor = Client, TeamId = TeamId };
 
         var actual = await PublishAsync(command);
 
@@ -100,7 +99,7 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateTeamEvent(new TeamCreated { Name = name }, true) // Must be with client actor.
+                CreateEvent(new TeamCreated { Name = name }, true) // Must be with client User.
             );
     }
 
@@ -119,7 +118,7 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateTeamEvent(new TeamUpdated { Name = command.Name })
+                CreateEvent(new TeamUpdated { Name = command.Name })
             );
     }
 
@@ -128,7 +127,7 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
     {
         var command = new ChangePlan { PlanId = planPaid.Id };
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<ITeamEntity>._, planPaid.Id, default))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<ITeamEntity>._, planPaid.Id, CancellationToken))
             .Returns(Task.FromResult<Uri?>(null));
 
         await ExecuteCreateAsync();
@@ -141,13 +140,13 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateTeamEvent(new TeamPlanChanged { PlanId = planPaid.Id })
+                CreateEvent(new TeamPlanChanged { PlanId = planPaid.Id })
             );
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<ITeamEntity>._, planPaid.Id, default))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<ITeamEntity>._, planPaid.Id, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => billingManager.SubscribeAsync(Actor.Identifier, A<ITeamEntity>._, planPaid.Id, default))
+        A.CallTo(() => billingManager.SubscribeAsync(User.Identifier, A<ITeamEntity>._, planPaid.Id, default))
             .MustHaveHappened();
     }
 
@@ -166,7 +165,7 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateTeamEvent(new TeamPlanChanged { PlanId = planPaid.Id })
+                CreateEvent(new TeamPlanChanged { PlanId = planPaid.Id })
             );
 
         A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<ITeamEntity>._, A<string?>._, A<CancellationToken>._))
@@ -192,10 +191,10 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateTeamEvent(new TeamPlanReset())
+                CreateEvent(new TeamPlanReset())
             );
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<ITeamEntity>._, A<string?>._, A<CancellationToken>._))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<ITeamEntity>._, A<string?>._, CancellationToken))
             .MustHaveHappenedOnceExactly();
 
         A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, A<ITeamEntity>._, A<CancellationToken>._))
@@ -218,10 +217,10 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateTeamEvent(new TeamPlanReset())
+                CreateEvent(new TeamPlanReset())
             );
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<ITeamEntity>._, planPaid.Id, default))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<ITeamEntity>._, planPaid.Id, CancellationToken))
             .MustHaveHappenedOnceExactly();
 
         A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, A<ITeamEntity>._, A<CancellationToken>._))
@@ -233,7 +232,7 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
     {
         var command = new ChangePlan { PlanId = planPaid.Id };
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<ITeamEntity>._, planPaid.Id, default))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<ITeamEntity>._, planPaid.Id, CancellationToken))
             .Returns(new Uri("http://squidex.io"));
 
         await ExecuteCreateAsync();
@@ -258,10 +257,10 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
 
         Assert.Equal(planPaid.Id, sut.Snapshot.Plan?.PlanId);
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<ITeamEntity>._, planPaid.Id, A<CancellationToken>._))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<ITeamEntity>._, planPaid.Id, A<CancellationToken>._))
             .MustNotHaveHappened();
 
-        A.CallTo(() => billingManager.SubscribeAsync(Actor.Identifier, A<ITeamEntity>._, planPaid.Id, A<CancellationToken>._))
+        A.CallTo(() => billingManager.SubscribeAsync(User.Identifier, A<ITeamEntity>._, planPaid.Id, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -280,7 +279,7 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateTeamEvent(new TeamContributorAssigned { ContributorId = contributorId, Role = command.Role, IsAdded = true })
+                CreateEvent(new TeamContributorAssigned { ContributorId = contributorId, Role = command.Role, IsAdded = true })
             );
     }
 
@@ -300,13 +299,13 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateTeamEvent(new TeamContributorRemoved { ContributorId = contributorId })
+                CreateEvent(new TeamContributorRemoved { ContributorId = contributorId })
             );
     }
 
     private Task ExecuteCreateAsync()
     {
-        return PublishAsync(new CreateTeam { Name = name });
+        return PublishAsync(new CreateTeam { Name = name, TeamId = TeamId });
     }
 
     private Task ExecuteAssignContributorAsync()
@@ -319,28 +318,14 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
         return PublishAsync(new ChangePlan { PlanId = planPaid.Id });
     }
 
-    private T CreateTeamEvent<T>(T @event, bool fromClient = false) where T : TeamEvent
-    {
-        @event.TeamId = teamId;
-
-        return CreateEvent(@event, fromClient);
-    }
-
-    private T CreateTeamCommand<T>(T command) where T : TeamCommand
-    {
-        command.TeamId = teamId;
-
-        return CreateCommand(command);
-    }
-
     private Task<object> PublishIdempotentAsync(TeamCommand command)
     {
-        return PublishIdempotentAsync(sut, CreateTeamCommand(command));
+        return PublishIdempotentAsync(sut, CreateCommand(command));
     }
 
     private async Task<object> PublishAsync(TeamCommand command)
     {
-        var actual = await sut.ExecuteAsync(CreateTeamCommand(command), default);
+        var actual = await sut.ExecuteAsync(CreateCommand(command), CancellationToken);
 
         return actual.Payload;
     }

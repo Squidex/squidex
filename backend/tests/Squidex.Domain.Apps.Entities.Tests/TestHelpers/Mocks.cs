@@ -44,7 +44,7 @@ public static class Mocks
     {
         var schema = A.Fake<ISchemaEntity>();
 
-        schemaDef ??= new Schema(schemaId.Name);
+        schemaDef ??= new Schema(schemaId.Name).Publish();
 
         A.CallTo(() => schema.Id).Returns(schemaId.Id);
         A.CallTo(() => schema.AppId).Returns(appId);

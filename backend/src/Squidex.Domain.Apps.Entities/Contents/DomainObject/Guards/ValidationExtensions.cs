@@ -47,38 +47,42 @@ public static class ValidationExtensions
         operation.ThrowOnErrors();
     }
 
-    public static async Task ValidateInputAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
+    public static async Task ValidateInputAsync(this ContentOperation operation, ContentData data, bool optimize, bool published,
+        CancellationToken ct)
     {
         var validator = GetValidator(operation, optimize, published);
 
-        await validator.ValidateInputAsync(data);
+        await validator.ValidateInputAsync(data, ct);
 
         operation.AddErrors(validator.Errors).ThrowOnErrors();
     }
 
-    public static async Task ValidateInputPartialAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
+    public static async Task ValidateInputPartialAsync(this ContentOperation operation, ContentData data, bool optimize, bool published,
+        CancellationToken ct)
     {
         var validator = GetValidator(operation, optimize, published);
 
-        await validator.ValidateInputPartialAsync(data);
+        await validator.ValidateInputPartialAsync(data, ct);
 
         operation.AddErrors(validator.Errors).ThrowOnErrors();
     }
 
-    public static async Task ValidateContentAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
+    public static async Task ValidateContentAsync(this ContentOperation operation, ContentData data, bool optimize, bool published,
+        CancellationToken ct)
     {
         var validator = GetValidator(operation, optimize, published);
 
-        await validator.ValidateContentAsync(data);
+        await validator.ValidateContentAsync(data, ct);
 
         operation.AddErrors(validator.Errors).ThrowOnErrors();
     }
 
-    public static async Task ValidateContentAndInputAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
+    public static async Task ValidateContentAndInputAsync(this ContentOperation operation, ContentData data, bool optimize, bool published,
+        CancellationToken ct)
     {
         var validator = GetValidator(operation, optimize, published);
 
-        await validator.ValidateInputAndContentAsync(data);
+        await validator.ValidateInputAndContentAsync(data, ct);
 
         operation.AddErrors(validator.Errors).ThrowOnErrors();
     }
@@ -88,11 +92,12 @@ public static class ValidationExtensions
         data.GenerateDefaultValues(operation.Schema.SchemaDef, operation.Partition());
     }
 
-    public static async Task CheckReferrersAsync(this ContentOperation operation)
+    public static async Task CheckReferrersAsync(this ContentOperation operation,
+        CancellationToken ct)
     {
         var contentRepository = operation.Resolve<IContentRepository>();
 
-        var hasReferrer = await contentRepository.HasReferrersAsync(operation.App.Id, operation.CommandId, SearchScope.All, default);
+        var hasReferrer = await contentRepository.HasReferrersAsync(operation.App.Id, operation.CommandId, SearchScope.All, ct);
 
         if (hasReferrer)
         {

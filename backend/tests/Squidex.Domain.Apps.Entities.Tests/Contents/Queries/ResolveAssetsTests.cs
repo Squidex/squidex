@@ -18,23 +18,18 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
-public class ResolveAssetsTests
+public class ResolveAssetsTests : GivenContext
 {
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
     private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
     private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
     private readonly ProvideSchema schemaProvider;
-    private readonly Context requestContext;
     private readonly ResolveAssets sut;
 
     public ResolveAssetsTests()
     {
-        requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId, Language.DE));
-
         var schemaDef =
-            new Schema(schemaId.Name)
+            new Schema(SchemaId.Name)
                 .AddAssets(1, "asset1", Partitioning.Invariant, new AssetsFieldProperties
                 {
                     ResolveFirst = true,
@@ -49,14 +44,17 @@ public class ResolveAssetsTests
                 })
                 .SetFieldsInLists("asset1", "asset2");
 
-        A.CallTo(() => urlGenerator.AssetContent(appId, A<string>._))
+        A.CallTo(() => Schema.SchemaDef)
+            .Returns(schemaDef);
+
+        A.CallTo(() => urlGenerator.AssetContent(AppId, A<string>._))
             .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<string>(1)}");
 
         schemaProvider = x =>
         {
-            if (x == schemaId.Id)
+            if (x == SchemaId.Id)
             {
-                return Task.FromResult((Mocks.Schema(appId, schemaId, schemaDef), ResolvedComponents.Empty));
+                return Task.FromResult((Schema, ResolvedComponents.Empty));
             }
             else
             {
@@ -84,10 +82,10 @@ public class ResolveAssetsTests
         };
 
         A.CallTo(() => assetQuery.QueryAsync(
-                A<Context>.That.Matches(x => x.ShouldSkipAssetEnrichment() && x.ShouldSkipTotal()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id), A<CancellationToken>._))
+                A<Context>.That.Matches(x => x.ShouldSkipAssetEnrichment() && x.ShouldSkipTotal()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id), CancellationToken))
             .Returns(ResultList.CreateFrom(4, doc1, doc2));
 
-        await sut.EnrichAsync(requestContext, contents, schemaProvider, default);
+        await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);
 
         A.CallTo(() => requestCache.AddDependency(doc1.UniqueId, doc1.Version))
             .MustHaveHappened();
@@ -116,10 +114,10 @@ public class ResolveAssetsTests
         };
 
         A.CallTo(() => assetQuery.QueryAsync(
-                A<Context>.That.Matches(x => x.ShouldSkipAssetEnrichment() && x.ShouldSkipTotal()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id, img1.Id, img2.Id), A<CancellationToken>._))
+                A<Context>.That.Matches(x => x.ShouldSkipAssetEnrichment() && x.ShouldSkipTotal()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id, img1.Id, img2.Id), CancellationToken))
             .Returns(ResultList.CreateFrom(4, img1, img2, doc1, doc2));
 
-        await sut.EnrichAsync(requestContext, contents, schemaProvider, default);
+        await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);
 
         Assert.Equal(
             new ContentData()
@@ -143,16 +141,14 @@ public class ResolveAssetsTests
     }
 
     [Fact]
-    public async Task Should_not_enrich_references_if_not_api_user()
+    public async Task Should_not_enrich_references_if_not_frontend_user()
     {
         var contents = new[]
         {
             CreateContent(new[] { DomainId.NewGuid() }, Array.Empty<DomainId>())
         };
 
-        var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId));
-
-        await sut.EnrichAsync(ctx, contents, schemaProvider, default);
+        await sut.EnrichAsync(ApiContext, contents, schemaProvider, CancellationToken);
 
         Assert.Null(contents[0].ReferenceData);
 
@@ -168,9 +164,7 @@ public class ResolveAssetsTests
             CreateContent(new[] { DomainId.NewGuid() }, Array.Empty<DomainId>())
         };
 
-        var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId)).Clone(b => b.WithoutContentEnrichment(true));
-
-        await sut.EnrichAsync(ctx, contents, schemaProvider, default);
+        await sut.EnrichAsync(FrontendContext.Clone(b => b.WithoutContentEnrichment(true)), contents, schemaProvider, CancellationToken);
 
         Assert.Null(contents[0].ReferenceData);
 
@@ -186,7 +180,7 @@ public class ResolveAssetsTests
             CreateContent(Array.Empty<DomainId>(), Array.Empty<DomainId>())
         };
 
-        await sut.EnrichAsync(requestContext, contents, schemaProvider, default);
+        await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);
 
         Assert.NotNull(contents[0].ReferenceData);
 
@@ -205,7 +199,7 @@ public class ResolveAssetsTests
             CreateContent(new[] { id1, id2 }, Array.Empty<DomainId>())
         };
 
-        await sut.EnrichAsync(requestContext, contents, schemaProvider, default);
+        await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);
 
         Assert.NotNull(contents[0].ReferenceData);
 
@@ -226,7 +220,7 @@ public class ResolveAssetsTests
                     .AddField("asset2",
                         new ContentFieldData()
                             .AddLocalized("en", JsonValue.Array(assets2.Select(x => x.ToString())))),
-            SchemaId = schemaId
+            SchemaId = SchemaId
         };
     }
 
@@ -234,7 +228,7 @@ public class ResolveAssetsTests
     {
         return new AssetEntity
         {
-            AppId = appId,
+            AppId = AppId,
             Id = id,
             Type = type,
             FileName = fileName,

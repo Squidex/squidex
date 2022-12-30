@@ -7,7 +7,6 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -18,8 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
 public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolderDomainObject.State>
 {
-    private readonly IAppEntity app;
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
     private readonly DomainId parentId = DomainId.NewGuid();
@@ -33,19 +30,14 @@ public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolderDomainObj
 
     public AssetFolderDomainObjectTests()
     {
-        app = Mocks.App(AppNamedId, Language.DE);
-
-        A.CallTo(() => appProvider.GetAppAsync(AppId, false, default))
-            .Returns(app);
-
-        A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId, A<CancellationToken>._))
+        A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, A<CancellationToken>._))
             .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
         var log = A.Fake<ILogger<AssetFolderDomainObject>>();
 
         var serviceProvider =
             new ServiceCollection()
-                .AddSingleton(appProvider)
+                .AddSingleton(AppProvider)
                 .AddSingleton(assetQuery)
                 .AddSingleton(contentRepository)
                 .AddSingleton(log)
@@ -175,7 +167,7 @@ public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolderDomainObj
 
     private async Task<object> PublishAsync(AssetFolderCommand command)
     {
-        var actual = await sut.ExecuteAsync(CreateAssetFolderCommand(command), default);
+        var actual = await sut.ExecuteAsync(CreateAssetFolderCommand(command), CancellationToken);
 
         return actual.Payload;
     }

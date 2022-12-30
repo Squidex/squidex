@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Security.Claims;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -15,19 +14,14 @@ using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Shared;
-using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public class ContentsSearchSourceTests
+public class ContentsSearchSourceTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
     private readonly ITextIndex contentIndex = A.Fake<ITextIndex>();
     private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly NamedId<DomainId> schemaId1 = NamedId.Of(DomainId.NewGuid(), "my-schema1");
     private readonly NamedId<DomainId> schemaId2 = NamedId.Of(DomainId.NewGuid(), "my-schema2");
     private readonly NamedId<DomainId> schemaId3 = NamedId.Of(DomainId.NewGuid(), "my-schema3");
@@ -35,17 +29,15 @@ public class ContentsSearchSourceTests
 
     public ContentsSearchSourceTests()
     {
-        ct = cts.Token;
-
-        A.CallTo(() => appProvider.GetSchemasAsync(appId.Id, ct))
+        A.CallTo(() => AppProvider.GetSchemasAsync(AppId.Id, CancellationToken))
             .Returns(new List<ISchemaEntity>
             {
-                Mocks.Schema(appId, schemaId1),
-                Mocks.Schema(appId, schemaId2),
-                Mocks.Schema(appId, schemaId3)
+                Mocks.Schema(AppId, schemaId1),
+                Mocks.Schema(AppId, schemaId2),
+                Mocks.Schema(AppId, schemaId3)
             });
 
-        sut = new ContentsSearchSource(appProvider, contentQuery, contentIndex, urlGenerator);
+        sut = new ContentsSearchSource(AppProvider, contentQuery, contentIndex, urlGenerator);
     }
 
     [Fact]
@@ -152,50 +144,50 @@ public class ContentsSearchSourceTests
     [Fact]
     public async Task Should_not_invoke_content_index_if_user_has_no_permission()
     {
-        var ctx = ContextWithPermissions();
+        var requestContext = ContextWithPermissions();
 
-        var actual = await sut.SearchAsync("query", ctx, ct);
+        var actual = await sut.SearchAsync("query", requestContext, CancellationToken);
 
         Assert.Empty(actual);
 
-        A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>._, A<SearchScope>._, A<CancellationToken>._))
+        A.CallTo(() => contentIndex.SearchAsync(App, A<TextQuery>._, A<SearchScope>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
     [Fact]
     public async Task Should_not_invoke_context_query_if_no_id_found()
     {
-        var ctx = ContextWithPermissions(schemaId1, schemaId2);
+        var requestContext = ContextWithPermissions(schemaId1, schemaId2);
 
-        A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>.That.Matches(x => x.Text == "query~"), ctx.Scope(), ct))
+        A.CallTo(() => contentIndex.SearchAsync(App, A<TextQuery>.That.Matches(x => x.Text == "query~"), ApiContext.Scope(), CancellationToken))
             .Returns(new List<DomainId>());
 
-        var actual = await sut.SearchAsync("query", ctx, ct);
+        var actual = await sut.SearchAsync("query", requestContext, CancellationToken);
 
         Assert.Empty(actual);
 
-        A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>._, A<CancellationToken>._))
+        A.CallTo(() => contentQuery.QueryAsync(requestContext, A<Q>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
     private async Task TestContentAsync(ContentEntity content, string expectedName)
     {
-        content.AppId = appId;
+        content.AppId = AppId;
 
-        var ctx = ContextWithPermissions(schemaId1, schemaId2);
+        var requestContext = ContextWithPermissions(schemaId1, schemaId2);
 
         var ids = new List<DomainId> { content.Id };
 
-        A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>.That.Matches(x => x.Text == "query~"), ctx.Scope(), ct))
+        A.CallTo(() => contentIndex.SearchAsync(App, A<TextQuery>.That.Matches(x => x.Text == "query~"), ApiContext.Scope(), CancellationToken))
             .Returns(ids);
 
-        A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>.That.HasIds(ids), ct))
+        A.CallTo(() => contentQuery.QueryAsync(requestContext, A<Q>.That.HasIds(ids), CancellationToken))
             .Returns(ResultList.CreateFrom<IEnrichedContentEntity>(1, content));
 
-        A.CallTo(() => urlGenerator.ContentUI(appId, schemaId1, content.Id))
+        A.CallTo(() => urlGenerator.ContentUI(AppId, schemaId1, content.Id))
             .Returns("content-url");
 
-        var actual = await sut.SearchAsync("query", ctx, ct);
+        var actual = await sut.SearchAsync("query", requestContext, CancellationToken);
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
@@ -204,16 +196,13 @@ public class ContentsSearchSourceTests
 
     private Context ContextWithPermissions(params NamedId<DomainId>[] allowedSchemas)
     {
-        var claimsIdentity = new ClaimsIdentity();
-        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+        var permissions = new List<string>();
 
         foreach (var schemaId in allowedSchemas)
         {
-            var permission = PermissionIds.ForApp(PermissionIds.AppContentsReadOwn, appId.Name, schemaId.Name).Id;
-
-            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
+            permissions.Add(PermissionIds.ForApp(PermissionIds.AppContentsReadOwn, AppId.Name, schemaId.Name).Id);
         }
 
-        return new Context(claimsPrincipal, Mocks.App(appId));
+        return CreateContext(false, permissions.ToArray());
     }
 }

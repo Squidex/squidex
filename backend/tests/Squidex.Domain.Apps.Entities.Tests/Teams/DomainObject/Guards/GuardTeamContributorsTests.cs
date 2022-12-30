@@ -14,20 +14,21 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 
-#pragma warning disable SA1310 // Field names must not contain underscore
-
 namespace Squidex.Domain.Apps.Entities.Teams.DomainObject.Guards;
 
-public class GuardTeamContributorsTests : IClassFixture<TranslationsFixture>
+public class GuardTeamContributorsTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IUser user1 = UserMocks.User("1");
     private readonly IUser user2 = UserMocks.User("2");
     private readonly IUser user3 = UserMocks.User("3");
     private readonly IUserResolver users = A.Fake<IUserResolver>();
-    private readonly Contributors contributors_0 = Contributors.Empty;
+    private Contributors contributors = Contributors.Empty;
 
     public GuardTeamContributorsTests()
     {
+        A.CallTo(() => Team.Contributors)
+            .ReturnsLazily(() => contributors);
+
         A.CallTo(() => user1.Id)
             .Returns("1");
 
@@ -55,7 +56,7 @@ public class GuardTeamContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor();
 
-        await ValidationAssert.ThrowsAsync(() => GuardTeamContributors.CanAssign(command, Team(contributors_0), users),
+        await ValidationAssert.ThrowsAsync(() => GuardTeamContributors.CanAssign(command, Team, users),
             new ValidationError("Contributor ID or email is required.", "ContributorId"));
     }
 
@@ -64,7 +65,7 @@ public class GuardTeamContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "1", Role = "Invalid" };
 
-        await ValidationAssert.ThrowsAsync(() => GuardTeamContributors.CanAssign(command, Team(contributors_0), users),
+        await ValidationAssert.ThrowsAsync(() => GuardTeamContributors.CanAssign(command, Team, users),
             new ValidationError("Role is not a valid value.", "Role"));
     }
 
@@ -73,9 +74,9 @@ public class GuardTeamContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "1", Role = Role.Owner };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Owner);
+        contributors = contributors.Assign("1", Role.Owner);
 
-        await GuardTeamContributors.CanAssign(command, Team(contributors_1), users);
+        await GuardTeamContributors.CanAssign(command, Team, users);
     }
 
     [Fact]
@@ -83,9 +84,9 @@ public class GuardTeamContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "1", Role = Role.Owner, IgnoreActor = true };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Owner);
+        contributors = contributors.Assign("1", Role.Owner);
 
-        await GuardTeamContributors.CanAssign(command, Team(contributors_1), users);
+        await GuardTeamContributors.CanAssign(command, Team, users);
     }
 
     [Fact]
@@ -93,7 +94,7 @@ public class GuardTeamContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "notfound", Role = Role.Owner };
 
-        await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => GuardTeamContributors.CanAssign(command, Team(contributors_0), users));
+        await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => GuardTeamContributors.CanAssign(command, Team, users));
     }
 
     [Fact]
@@ -101,7 +102,7 @@ public class GuardTeamContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "3", Role = Role.Editor, Actor = RefToken.User("3") };
 
-        await Assert.ThrowsAsync<DomainForbiddenException>(() => GuardTeamContributors.CanAssign(command, Team(contributors_0), users));
+        await Assert.ThrowsAsync<DomainForbiddenException>(() => GuardTeamContributors.CanAssign(command, Team, users));
     }
 
     [Fact]
@@ -109,7 +110,7 @@ public class GuardTeamContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "1" };
 
-        await GuardTeamContributors.CanAssign(command, Team(contributors_0), users);
+        await GuardTeamContributors.CanAssign(command, Team, users);
     }
 
     [Fact]
@@ -117,9 +118,9 @@ public class GuardTeamContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "1" };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Owner);
+        contributors = contributors.Assign("1", Role.Owner);
 
-        await GuardTeamContributors.CanAssign(command, Team(contributors_1), users);
+        await GuardTeamContributors.CanAssign(command, Team, users);
     }
 
     [Fact]
@@ -127,10 +128,9 @@ public class GuardTeamContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "1" };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Owner);
-        var contributors_2 = contributors_1.Assign("2", Role.Owner);
+        contributors = contributors.Assign("1", Role.Owner).Assign("2", Role.Owner);
 
-        await GuardTeamContributors.CanAssign(command, Team(contributors_2), users);
+        await GuardTeamContributors.CanAssign(command, Team, users);
     }
 
     [Fact]
@@ -138,10 +138,9 @@ public class GuardTeamContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new AssignContributor { ContributorId = "3", IgnorePlans = true };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Editor);
-        var contributors_2 = contributors_1.Assign("2", Role.Editor);
+        contributors = contributors.Assign("1", Role.Editor).Assign("2", Role.Editor);
 
-        await GuardTeamContributors.CanAssign(command, Team(contributors_2), users);
+        await GuardTeamContributors.CanAssign(command, Team, users);
     }
 
     [Fact]
@@ -149,7 +148,7 @@ public class GuardTeamContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new RemoveContributor();
 
-        ValidationAssert.Throws(() => GuardTeamContributors.CanRemove(command, Team(contributors_0)),
+        ValidationAssert.Throws(() => GuardTeamContributors.CanRemove(command, Team),
             new ValidationError("Contributor ID or email is required.", "ContributorId"));
     }
 
@@ -158,7 +157,7 @@ public class GuardTeamContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new RemoveContributor { ContributorId = "1" };
 
-        Assert.Throws<DomainObjectNotFoundException>(() => GuardTeamContributors.CanRemove(command, Team(contributors_0)));
+        Assert.Throws<DomainObjectNotFoundException>(() => GuardTeamContributors.CanRemove(command, Team));
     }
 
     [Fact]
@@ -166,10 +165,9 @@ public class GuardTeamContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new RemoveContributor { ContributorId = "1" };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Owner);
-        var contributors_2 = contributors_1.Assign("2", Role.Editor);
+        contributors = contributors.Assign("1", Role.Owner).Assign("2", Role.Editor);
 
-        ValidationAssert.Throws(() => GuardTeamContributors.CanRemove(command, Team(contributors_2)),
+        ValidationAssert.Throws(() => GuardTeamContributors.CanRemove(command, Team),
             new ValidationError("Cannot remove the only owner."));
     }
 
@@ -178,18 +176,8 @@ public class GuardTeamContributorsTests : IClassFixture<TranslationsFixture>
     {
         var command = new RemoveContributor { ContributorId = "1" };
 
-        var contributors_1 = contributors_0.Assign("1", Role.Owner);
-        var contributors_2 = contributors_1.Assign("2", Role.Owner);
+        contributors = contributors.Assign("1", Role.Owner).Assign("2", Role.Owner);
 
-        GuardTeamContributors.CanRemove(command, Team(contributors_2));
-    }
-
-    private static ITeamEntity Team(Contributors contributors)
-    {
-        var team = A.Fake<ITeamEntity>();
-
-        A.CallTo(() => team.Contributors).Returns(contributors);
-
-        return team;
+        GuardTeamContributors.CanRemove(command, Team);
     }
 }

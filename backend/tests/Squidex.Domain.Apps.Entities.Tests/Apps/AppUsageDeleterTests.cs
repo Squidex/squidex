@@ -6,22 +6,17 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public class AppUsageDeleterTests
+public class AppUsageDeleterTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IApiUsageTracker usageTracker = A.Fake<IApiUsageTracker>();
     private readonly AppUsageDeleter sut;
 
     public AppUsageDeleterTests()
     {
-        ct = cts.Token;
-
         sut = new AppUsageDeleter(usageTracker);
     }
 
@@ -36,11 +31,9 @@ public class AppUsageDeleterTests
     [Fact]
     public async Task Should_remove_events_from_streams()
     {
-        var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
+        await sut.DeleteAppAsync(App, CancellationToken);
 
-        await sut.DeleteAppAsync(app, ct);
-
-        A.CallTo(() => usageTracker.DeleteAsync(app.Id.ToString(), ct))
+        A.CallTo(() => usageTracker.DeleteAsync(AppId.Id.ToString(), CancellationToken))
             .MustHaveHappened();
     }
 }

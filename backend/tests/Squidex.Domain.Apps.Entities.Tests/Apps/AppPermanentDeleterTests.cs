@@ -9,13 +9,12 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public class AppPermanentDeleterTests
+public class AppPermanentDeleterTests : GivenContext
 {
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
     private readonly IDeleter deleter1 = A.Fake<IDeleter>();
@@ -90,24 +89,22 @@ public class AppPermanentDeleterTests
     [Fact]
     public async Task Should_call_deleters_when_contributor_removed()
     {
-        var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
-
         await sut.On(Envelope.Create(new AppContributorRemoved
         {
-            AppId = app.NamedId(), ContributorId = "user1"
+            AppId = AppId, ContributorId = "user1"
         }));
 
-        A.CallTo(() => deleter1.DeleteContributorAsync(app.Id, "user1", default))
+        A.CallTo(() => deleter1.DeleteContributorAsync(AppId.Id, "user1", default))
             .MustHaveHappened();
 
-        A.CallTo(() => deleter2.DeleteContributorAsync(app.Id, "user1", default))
+        A.CallTo(() => deleter2.DeleteContributorAsync(AppId.Id, "user1", default))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_call_deleters_when_app_deleted()
     {
-        var app = new AppDomainObject.State { Id = DomainId.NewGuid(), Name = "my-app" };
+        var app = new AppDomainObject.State { Id = AppId.Id, Name = AppId.Name };
 
         var domainObject = A.Fake<AppDomainObject>();
 
@@ -119,7 +116,7 @@ public class AppPermanentDeleterTests
 
         await sut.On(Envelope.Create(new AppDeleted
         {
-            AppId = app.NamedId()
+            AppId = AppId
         }));
 
         A.CallTo(() => deleter1.DeleteAppAsync(app, default))

@@ -23,7 +23,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject;
 
 public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
 {
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
     private readonly IBillingManager billingManager = A.Fake<IBillingManager>();
     private readonly IUser user;
@@ -36,36 +35,32 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     private readonly string planIdPaid = "premium";
     private readonly string planIdFree = "free";
     private readonly InitialSettings initialSettings;
-    private readonly DomainId teamId = DomainId.NewGuid();
     private readonly DomainId workflowId = DomainId.NewGuid();
     private readonly AppDomainObject sut;
 
     protected override DomainId Id
     {
-        get => AppId;
+        get => AppId.Id;
     }
 
     public AppDomainObjectTests()
     {
         user = UserMocks.User(contributorId);
 
-        A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId, default))
+        A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId, CancellationToken))
             .Returns(user);
 
-        A.CallTo(() => usageGate.GetPlanForAppAsync(A<IAppEntity>.That.Matches(x => x.Plan != null && x.Plan.PlanId == planIdFree), false, default))
+        A.CallTo(() => usageGate.GetPlanForAppAsync(A<IAppEntity>.That.Matches(x => x.Plan != null && x.Plan.PlanId == planIdFree), false, CancellationToken))
             .Returns((new Plan { Id = planIdFree, MaxContributors = 10 }, planIdFree, null));
 
-        A.CallTo(() => usageGate.GetPlanForAppAsync(A<IAppEntity>.That.Matches(x => x.Plan != null && x.Plan.PlanId == planIdPaid), false, default))
+        A.CallTo(() => usageGate.GetPlanForAppAsync(A<IAppEntity>.That.Matches(x => x.Plan != null && x.Plan.PlanId == planIdPaid), false, CancellationToken))
             .Returns((new Plan { Id = planIdPaid, MaxContributors = 30 }, planIdPaid, null));
 
         A.CallTo(() => billingPlans.GetFreePlan())
             .Returns(new Plan { Id = planIdFree, MaxContributors = 10 });
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<IAppEntity>._, A<string>._, default))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<IAppEntity>._, A<string>._, CancellationToken))
             .Returns(Task.FromResult<Uri?>(null));
-
-        A.CallTo(() => appProvider.GetTeamAsync(teamId, default))
-            .Returns(Mocks.Team(teamId, contributor: Actor.Identifier));
 
         // Create a non-empty setting, otherwise the event is not raised as it does not change the domain object.
         initialSettings = new InitialSettings
@@ -78,7 +73,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
 
         var serviceProvider =
             new ServiceCollection()
-                .AddSingleton(appProvider)
+                .AddSingleton(AppProvider)
                 .AddSingleton(billingManager)
                 .AddSingleton(billingPlans)
                 .AddSingleton(initialSettings)
@@ -105,18 +100,18 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     [Fact]
     public async Task Create_should_create_events_and_set_intitial_state()
     {
-        var command = new CreateApp { Name = AppName, AppId = AppId };
+        var command = new CreateApp { Name = AppId.Name, AppId = AppId.Id };
 
         var actual = await PublishAsync(command);
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.Equal(AppName, sut.Snapshot.Name);
+        Assert.Equal(AppId.Name, sut.Snapshot.Name);
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateEvent(new AppCreated { Name = AppName }),
-                CreateEvent(new AppContributorAssigned { ContributorId = Actor.Identifier, Role = Role.Owner }),
+                CreateEvent(new AppCreated { Name = AppId.Name }),
+                CreateEvent(new AppContributorAssigned { ContributorId = User.Identifier, Role = Role.Owner }),
                 CreateEvent(new AppSettingsUpdated { Settings = initialSettings.Settings })
             );
     }
@@ -124,17 +119,17 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     [Fact]
     public async Task Create_should_not_assign_client_as_contributor()
     {
-        var command = new CreateApp { Name = AppName, Actor = ActorClient, AppId = AppId };
+        var command = new CreateApp { Name = AppId.Name, Actor = Client, AppId = AppId.Id };
 
         var actual = await PublishAsync(command);
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.Equal(AppName, sut.Snapshot.Name);
+        Assert.Equal(AppId.Name, sut.Snapshot.Name);
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateEvent(new AppCreated { Name = AppName }, true), // Must be with client actor.
+                CreateEvent(new AppCreated { Name = AppId.Name }, true), // Must be with client actor.
                 CreateEvent(new AppSettingsUpdated { Settings = initialSettings.Settings }, true)
             );
     }
@@ -227,7 +222,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     {
         var command = new ChangePlan { PlanId = planIdPaid };
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<IAppEntity>._, planIdPaid, default))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<IAppEntity>._, planIdPaid, default))
             .Returns(Task.FromResult<Uri?>(null));
 
         await ExecuteCreateAsync();
@@ -243,10 +238,10 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
                 CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
             );
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<IAppEntity>._, planIdPaid, default))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<IAppEntity>._, planIdPaid, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => billingManager.SubscribeAsync(Actor.Identifier, A<IAppEntity>._, planIdPaid, default))
+        A.CallTo(() => billingManager.SubscribeAsync(User.Identifier, A<IAppEntity>._, planIdPaid, default))
             .MustHaveHappened();
     }
 
@@ -320,7 +315,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
                 CreateEvent(new AppPlanReset())
             );
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<IAppEntity>._, planIdPaid, default))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<IAppEntity>._, planIdPaid, CancellationToken))
             .MustHaveHappenedOnceExactly();
 
         A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._,  A<IAppEntity>._, A<CancellationToken>._))
@@ -332,7 +327,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     {
         var command = new ChangePlan { PlanId = planIdPaid };
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<IAppEntity>._, planIdPaid, default))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<IAppEntity>._, planIdPaid, CancellationToken))
             .Returns(new Uri("http://squidex.io"));
 
         await ExecuteCreateAsync();
@@ -357,10 +352,10 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
 
         Assert.Equal(planIdPaid, sut.Snapshot.Plan?.PlanId);
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(Actor.Identifier, A<IAppEntity>._, planIdPaid, A<CancellationToken>._))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<IAppEntity>._, planIdPaid, A<CancellationToken>._))
             .MustNotHaveHappened();
 
-        A.CallTo(() => billingManager.SubscribeAsync(Actor.Identifier, A<IAppEntity>._, planIdPaid, A<CancellationToken>._))
+        A.CallTo(() => billingManager.SubscribeAsync(User.Identifier, A<IAppEntity>._, planIdPaid, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -426,7 +421,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     [Fact]
     public async Task Transfer_should_create_events_and_set_team()
     {
-        var command = new TransferToTeam { TeamId = teamId };
+        var command = new TransferToTeam { TeamId = TeamId };
 
         await ExecuteCreateAsync();
 
@@ -434,11 +429,11 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.Equal(teamId, sut.Snapshot.TeamId);
+        Assert.Equal(TeamId, sut.Snapshot.TeamId);
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateEvent(new AppTransfered { TeamId = teamId })
+                CreateEvent(new AppTransfered { TeamId = TeamId })
             );
     }
 
@@ -720,7 +715,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
 
     private Task ExecuteCreateAsync()
     {
-        return PublishAsync(new CreateApp { Name = AppName, AppId = AppId });
+        return PublishAsync(new CreateApp { Name = AppId.Name, AppId = AppId.Id });
     }
 
     private Task ExecuteUploadImage()
@@ -760,7 +755,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
 
     private Task ExecuteTransferAsync()
     {
-        return PublishAsync(new TransferToTeam { TeamId = teamId });
+        return PublishAsync(new TransferToTeam { TeamId = TeamId });
     }
 
     private Task ExecuteArchiveAsync()
@@ -775,7 +770,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
 
     private async Task<object> PublishAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
     {
-        var actual = await sut.ExecuteAsync(CreateCommand(command), default);
+        var actual = await sut.ExecuteAsync(CreateCommand(command), CancellationToken);
 
         return actual.Payload;
     }

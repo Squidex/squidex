@@ -7,16 +7,16 @@
 
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public class AssetPermanentDeleterTests
+public class AssetPermanentDeleterTests : GivenContext
 {
     private readonly IAssetFileStore assetFiletore = A.Fake<IAssetFileStore>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly AssetPermanentDeleter sut;
 
     public AssetPermanentDeleterTests()
@@ -75,31 +75,31 @@ public class AssetPermanentDeleterTests
     [Fact]
     public async Task Should_not_delete_assets_if_event_restored()
     {
-        var @event = new AssetDeleted { AppId = appId, AssetId = DomainId.NewGuid() };
+        var @event = new AssetDeleted { AppId = AppId, AssetId = DomainId.NewGuid() };
 
         await sut.On(Envelope.Create(@event).SetRestored());
 
-        A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, A<CancellationToken>._))
+        A.CallTo(() => assetFiletore.DeleteAsync(AppId.Id, @event.AssetId, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
     [Fact]
     public async Task Should_delete_asset()
     {
-        var @event = new AssetDeleted { AppId = appId, AssetId = DomainId.NewGuid() };
+        var @event = new AssetDeleted { AppId = AppId, AssetId = DomainId.NewGuid() };
 
         await sut.On(Envelope.Create(@event));
 
-        A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, A<CancellationToken>._))
+        A.CallTo(() => assetFiletore.DeleteAsync(AppId.Id, @event.AssetId, A<CancellationToken>._))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_ignore_not_found_assets()
     {
-        var @event = new AssetDeleted { AppId = appId, AssetId = DomainId.NewGuid() };
+        var @event = new AssetDeleted { AppId = AppId, AssetId = DomainId.NewGuid() };
 
-        A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, default))
+        A.CallTo(() => assetFiletore.DeleteAsync(AppId.Id, @event.AssetId, default))
             .Throws(new AssetNotFoundException("fileName"));
 
         await sut.On(Envelope.Create(@event));
@@ -108,9 +108,9 @@ public class AssetPermanentDeleterTests
     [Fact]
     public async Task Should_not_ignore_exceptions()
     {
-        var @event = new AssetDeleted { AppId = appId, AssetId = DomainId.NewGuid() };
+        var @event = new AssetDeleted { AppId = AppId, AssetId = DomainId.NewGuid() };
 
-        A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, default))
+        A.CallTo(() => assetFiletore.DeleteAsync(AppId.Id, @event.AssetId, default))
             .Throws(new InvalidOperationException());
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => sut.On(Envelope.Create(@event)));

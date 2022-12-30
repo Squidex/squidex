@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Web.Pipeline;
@@ -22,14 +21,12 @@ using Squidex.Web.Pipeline;
 
 namespace Squidex.Web;
 
-public class ApiPermissionAttributeTests
+public class ApiPermissionAttributeTests : GivenContext
 {
     private readonly HttpContext httpContext = new DefaultHttpContext();
     private readonly ActionExecutingContext actionExecutingContext;
     private readonly ActionExecutionDelegate next;
     private readonly ClaimsIdentity user = new ClaimsIdentity();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
     private bool isNextCalled;
 
     public ApiPermissionAttributeTests()
@@ -62,7 +59,7 @@ public class ApiPermissionAttributeTests
     [Fact]
     public async Task Should_make_permission_check_with_app_feature()
     {
-        actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
+        actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(App));
 
         user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
 
@@ -79,8 +76,8 @@ public class ApiPermissionAttributeTests
     [Fact]
     public async Task Should_make_permission_check_with_schema_feature()
     {
-        actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
-        actionExecutingContext.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Mocks.Schema(appId, schemaId)));
+        actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(App));
+        actionExecutingContext.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Schema));
 
         user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app.schemas.my-schema"));
 
@@ -97,7 +94,7 @@ public class ApiPermissionAttributeTests
     [Fact]
     public async Task Should_return_forbidden_if_user_has_wrong_permission()
     {
-        actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
+        actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(App));
 
         user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 

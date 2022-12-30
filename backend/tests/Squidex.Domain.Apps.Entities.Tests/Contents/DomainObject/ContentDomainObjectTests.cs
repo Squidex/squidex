@@ -14,10 +14,8 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
@@ -29,11 +27,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.State>
 {
     private readonly DomainId contentId = DomainId.NewGuid();
-    private readonly IAppEntity app;
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>(x => x.Wrapping(new DefaultContentWorkflow()));
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
-    private readonly ISchemaEntity schema;
     private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
 
     private readonly ContentData invalidData =
@@ -72,8 +67,6 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
 
     public ContentDomainObjectTests()
     {
-        app = Mocks.App(AppNamedId, Language.DE);
-
         var scripts = new SchemaScripts
         {
             Change = "<change-script>",
@@ -90,15 +83,10 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                      new NumberFieldProperties { IsRequired = false })
                 .SetScripts(scripts);
 
-        schema = Mocks.Schema(AppNamedId, SchemaNamedId, schemaDef);
+        A.CallTo(() => Schema.SchemaDef)
+            .Returns(schemaDef);
 
-        A.CallTo(() => appProvider.GetAppAsync(AppName, false, default))
-            .Returns(app);
-
-        A.CallTo(() => appProvider.GetAppWithSchemaAsync(AppId, SchemaId, false, default))
-            .Returns((app, schema));
-
-        A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), CancellationToken))
             .ReturnsLazily(x => Task.FromResult(x.GetArgument<DataScriptVars>(0)!.Data!));
 
         patched = patch.MergeInto(data);
@@ -107,7 +95,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
 
         var serviceProvider =
             new ServiceCollection()
-                .AddSingleton(appProvider)
+                .AddSingleton(AppProvider)
                 .AddSingleton(A.Fake<ILogger<ContentValidator>>())
                 .AddSingleton(log)
                 .AddSingleton(contentWorkflow)
@@ -148,9 +136,9 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
     }
 
@@ -171,9 +159,9 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
     }
 
@@ -195,9 +183,9 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -248,9 +236,9 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
     }
 
@@ -271,9 +259,9 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
     }
 
@@ -295,9 +283,9 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -319,7 +307,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentUpdated { Data = otherData })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -341,7 +329,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentUpdated { Data = patched })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(patched, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(patched, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -363,7 +351,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentUpdated { Data = otherData })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -387,9 +375,9 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -443,7 +431,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentUpdated { Data = otherData })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -467,7 +455,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentUpdated { Data = otherData })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -484,7 +472,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
 
         Assert.Single(LastEvents);
 
-        A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "<update-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "<update-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
     }
 
@@ -516,7 +504,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentUpdated { Data = patched })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(patched, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(patched, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -540,7 +528,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentUpdated { Data = patched })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(patched, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(patched, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -557,7 +545,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
 
         Assert.Single(LastEvents);
 
-        A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "<update-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "<update-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
     }
 
@@ -579,7 +567,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -601,7 +589,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -624,7 +612,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentStatusChanged { Status = Status.Draft, Change = StatusChange.Unpublished })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -633,7 +621,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
     {
         var command = new ChangeContentStatus { Status = Status.Draft };
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions(), CancellationToken))
             .Returns(otherData);
 
         await ExecuteCreateAsync();
@@ -652,7 +640,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentStatusChanged { Status = Status.Draft, Change = StatusChange.Unpublished })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -676,7 +664,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentStatusChanged { Change = StatusChange.Change, Status = Status.Archived })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -700,7 +688,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentStatusChanged { Change = StatusChange.Published, Status = Status.Published })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Published, Status.Draft), "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Published, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -727,7 +715,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentStatusScheduled { Status = Status.Published, DueTime = dueTime })
             );
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
     }
 
@@ -741,7 +729,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
 
         var command = new ChangeContentStatus { Status = Status.Archived, StatusJobId = sut.Snapshot.ScheduleJob!.Id };
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>._, Status.Draft, Status.Archived, User))
+        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>._, Status.Draft, Status.Archived, ApiContext.UserPrincipal))
             .Returns(true);
 
         var actual = await PublishAsync(command);
@@ -755,7 +743,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
             );
 
-        A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -769,7 +757,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
 
         var command = new ChangeContentStatus { Status = Status.Published, StatusJobId = sut.Snapshot.ScheduleJob!.Id };
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>._, Status.Draft, Status.Published, User))
+        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>._, Status.Draft, Status.Published, ApiContext.UserPrincipal))
             .Returns(false);
 
         var actual = await PublishAsync(command);
@@ -783,7 +771,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentSchedulingCancelled())
             );
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
     }
 
@@ -795,7 +783,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
         await ExecuteCreateAsync();
         await ExecuteChangeStatusAsync(Status.Published);
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId, contentId, SearchScope.All, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, contentId, SearchScope.All, A<CancellationToken>._))
             .Returns(true);
 
         await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));
@@ -809,7 +797,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
         await ExecuteCreateAsync();
         await ExecuteChangeStatusAsync(Status.Published);
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId, contentId, SearchScope.Published, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, contentId, SearchScope.Published, A<CancellationToken>._))
             .Returns(true);
 
         await PublishAsync(command);
@@ -865,7 +853,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
                 CreateContentEvent(new ContentDeleted())
             );
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(DataScriptVars(data, null, Status.Draft), "<delete-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(DataScriptVars(data, null, Status.Draft), "<delete-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -883,7 +871,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
         Assert.Equal(EtagVersion.Empty, sut.Snapshot.Version);
         Assert.Empty(LastEvents);
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(DataScriptVars(data, null, Status.Draft), "<delete-script>", ScriptOptions(), default))
+        A.CallTo(() => scriptEngine.ExecuteAsync(DataScriptVars(data, null, Status.Draft), "<delete-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -894,7 +882,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
 
         var command = new DeleteContent { CheckReferrers = true };
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId, contentId, SearchScope.All, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, contentId, SearchScope.All, A<CancellationToken>._))
             .Returns(true);
 
         await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));
@@ -907,7 +895,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
 
         await ExecuteCreateAsync();
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId, contentId, SearchScope.All, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, contentId, SearchScope.All, A<CancellationToken>._))
             .Returns(true);
 
         await PublishAsync(command);
@@ -1007,7 +995,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
             Equals(x["dataOld"], oldData) &&
             Equals(x["status"], newStatus) &&
             Equals(x["statusOld"], oldStatus) &&
-            Equals(x["user"], User);
+            Equals(x["user"], ApiContext.UserPrincipal);
     }
 
     private T CreateContentEvent<T>(T @event) where T : ContentEvent
@@ -1026,7 +1014,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
 
     private async Task<object> PublishAsync(ContentCommand command)
     {
-        var actual = await sut.ExecuteAsync(CreateContentCommand(command), default);
+        var actual = await sut.ExecuteAsync(CreateContentCommand(command), CancellationToken);
 
         return actual.Payload;
     }

@@ -6,14 +6,13 @@
 // ==========================================================================
 
 using Squidex.Assets;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup;
 
-public class DefaultBackupArchiveStoreTests
+public class DefaultBackupArchiveStoreTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
     private readonly DomainId backupId = DomainId.NewGuid();
     private readonly string fileName;
@@ -21,8 +20,6 @@ public class DefaultBackupArchiveStoreTests
 
     public DefaultBackupArchiveStoreTests()
     {
-        ct = cts.Token;
-
         fileName = $"{backupId}_0";
 
         sut = new DefaultBackupArchiveStore(assetStore);
@@ -33,9 +30,9 @@ public class DefaultBackupArchiveStoreTests
     {
         var stream = new MemoryStream();
 
-        await sut.UploadAsync(backupId, stream, ct);
+        await sut.UploadAsync(backupId, stream, CancellationToken);
 
-        A.CallTo(() => assetStore.UploadAsync(fileName, stream, true, ct))
+        A.CallTo(() => assetStore.UploadAsync(fileName, stream, true, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -44,18 +41,18 @@ public class DefaultBackupArchiveStoreTests
     {
         var stream = new MemoryStream();
 
-        await sut.DownloadAsync(backupId, stream, ct);
+        await sut.DownloadAsync(backupId, stream, CancellationToken);
 
-        A.CallTo(() => assetStore.DownloadAsync(fileName, stream, default, ct))
+        A.CallTo(() => assetStore.DownloadAsync(fileName, stream, default, CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_invoke_asset_store_to_delete_archive_using_suffix_for_compatibility()
     {
-        await sut.DeleteAsync(backupId, ct);
+        await sut.DeleteAsync(backupId, CancellationToken);
 
-        A.CallTo(() => assetStore.DeleteAsync(fileName, ct))
+        A.CallTo(() => assetStore.DeleteAsync(fileName, CancellationToken))
             .MustHaveHappened();
     }
 }
