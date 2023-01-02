@@ -89,7 +89,9 @@ public sealed class ScriptContent : IContentEnricherStep
 
         var options = new ScriptOptions
         {
-            AsContext = true
+            AsContext = true,
+            CanDisallow = true,
+            CanReject = true
         };
 
         content.Data = await scriptEngine.TransformAsync(vars, script, options, ct);

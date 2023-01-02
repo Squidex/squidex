@@ -15,7 +15,7 @@ import { AppsState, AssetCompletions, AssetScriptsState, AssetsService, EditAsse
     templateUrl: './asset-scripts-page.component.html',
 })
 export class AssetScriptsPageComponent extends ResourceOwner implements OnInit {
-    public assetScript = 'annotate';
+    public assetScript = 'query';
     public assetCompletions: Observable<AssetCompletions> = EMPTY;
 
     public editForm = new EditAssetScriptsForm();

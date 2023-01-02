@@ -92,7 +92,9 @@ public sealed class ScriptAsset : IAssetEnricherStep
 
         var options = new ScriptOptions
         {
-            AsContext = true
+            AsContext = true,
+            CanDisallow = true,
+            CanReject = true
         };
 
         await scriptEngine.ExecuteAsync(vars, script, options, ct);

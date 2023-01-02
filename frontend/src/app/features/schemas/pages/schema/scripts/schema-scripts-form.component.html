@@ -3,7 +3,7 @@
         <ul class="nav nav-tabs2">
             <li class="nav-item" *ngFor="let script of editForm.form.controls | sqxKeys">
                 <a class="nav-link" [class.active]="schemaScript === script" (click)="selectField(script)">
-                    {{script | sqxSchemaScriptName}}
+                    {{script | sqxScriptName}}
                 </a>
             </li>
         </ul>

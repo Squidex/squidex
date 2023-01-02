@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { SchemaScriptNamePipe } from './schema-scripts.pipes';
+import { ScriptNamePipe } from './pipes';
 
-describe('SchemaScriptsPipe', () => {
-    const pipe = new SchemaScriptNamePipe();
+describe('ScriptNamePipe', () => {
+    const pipe = new ScriptNamePipe();
 
     it('should return titlecase for schema name', () => {
         const actual = pipe.transform('create');

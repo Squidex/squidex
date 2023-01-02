@@ -44,7 +44,6 @@ export * from './pages/schema/preview/schema-preview-urls-form.component';
 export * from './pages/schema/rules/schema-field-rules-form.component';
 export * from './pages/schema/schema-page.component';
 export * from './pages/schema/scripts/schema-scripts-form.component';
-export * from './pages/schema/scripts/schema-scripts.pipes';
 export * from './pages/schema/ui/field-list.component';
 export * from './pages/schema/ui/schema-ui-form.component';
 export * from './pages/schemas/schema-form.component';

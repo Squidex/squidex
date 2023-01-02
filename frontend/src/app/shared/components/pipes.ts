@@ -10,6 +10,20 @@ import { Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, UserDto, UsersProviderService } from '@app/shared/internal';
 
+@Pipe({
+    name: 'sqxScriptName',
+    pure: true,
+})
+export class ScriptNamePipe implements PipeTransform {
+    public transform(value: string) {
+        if (value === 'queryPre') {
+            return 'Prepare Query';
+        } else {
+            return value.substring(0, 1).toUpperCase() + value.substring(1);
+        }
+    }
+}
+
 class UserAsyncPipe {
     private lastUserId?: string;
     private lastValue: string | undefined = undefined;
