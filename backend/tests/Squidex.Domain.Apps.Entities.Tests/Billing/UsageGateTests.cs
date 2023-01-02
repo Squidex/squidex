@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -17,20 +16,14 @@ using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Billing;
 
-public class UsageGateTests
+public class UsageGateTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IMessageBus messaging = A.Fake<IMessageBus>();
     private readonly IApiUsageTracker apiUsageTracker = A.Fake<IApiUsageTracker>();
-    private readonly IAppEntity appWithoutTeam;
-    private readonly IAppEntity appWithTeam;
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
     private readonly IUsageTracker usageTracker = A.Fake<IUsageTracker>();
     private readonly string clientId = Guid.NewGuid().ToString();
     private readonly DomainId teamId = DomainId.NewGuid();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly DateTime today = new DateTime(2020, 10, 3);
     private readonly Plan planFree = new Plan { Id = "free" };
     private readonly Plan planPaid = new Plan { Id = "paid" };
@@ -38,14 +31,6 @@ public class UsageGateTests
 
     public UsageGateTests()
     {
-        appWithoutTeam = Mocks.App(appId);
-        appWithTeam = Mocks.App(appId);
-
-        ct = cts.Token;
-
-        A.CallTo(() => appWithTeam.TeamId)
-            .Returns(teamId);
-
         A.CallTo(() => billingPlans.GetActualPlan(A<string>._))
             .ReturnsLazily(x => (planFree, planFree.Id));
 
@@ -55,31 +40,31 @@ public class UsageGateTests
         A.CallTo(() => usageTracker.FallbackCategory)
             .Returns("*");
 
-        sut = new UsageGate(appProvider, apiUsageTracker, billingPlans, messaging, usageTracker);
+        sut = new UsageGate(AppProvider, apiUsageTracker, billingPlans, messaging, usageTracker);
     }
 
     [Fact]
     public async Task Should_delete_app_asset_usage()
     {
-        await sut.DeleteAssetUsageAsync(appId.Id, ct);
+        await sut.DeleteAssetUsageAsync(AppId.Id, CancellationToken);
 
-        A.CallTo(() => usageTracker.DeleteAsync($"{appId.Id}_Assets", ct))
+        A.CallTo(() => usageTracker.DeleteAsync($"{AppId.Id}_Assets", CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_delete_assets_usage()
     {
-        await sut.DeleteAssetsUsageAsync(ct);
+        await sut.DeleteAssetsUsageAsync(CancellationToken);
 
-        A.CallTo(() => usageTracker.DeleteByKeyPatternAsync("^([a-zA-Z0-9]+)_Assets", ct))
+        A.CallTo(() => usageTracker.DeleteByKeyPatternAsync("^([a-zA-Z0-9]+)_Assets", CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_get_free_plan_for_app()
     {
-        var plan = await sut.GetPlanForAppAsync(appWithoutTeam, false, ct);
+        var plan = await sut.GetPlanForAppAsync(App, false, CancellationToken);
 
         Assert.Equal((planFree, planFree.Id, null), plan);
     }
@@ -89,13 +74,16 @@ public class UsageGateTests
     {
         var team = A.Fake<ITeamEntity>();
 
-        A.CallTo(() => appProvider.GetTeamAsync(teamId, ct))
+        A.CallTo(() => AppProvider.GetTeamAsync(teamId, CancellationToken))
             .Returns(team);
 
         A.CallTo(() => team.Id)
             .Returns(teamId);
 
-        var plan = await sut.GetPlanForAppAsync(appWithTeam, false, ct);
+        A.CallTo(() => App.TeamId)
+            .Returns(teamId);
+
+        var plan = await sut.GetPlanForAppAsync(App, false, CancellationToken);
 
         Assert.Equal((planFree, planFree.Id, teamId), plan);
     }
@@ -103,10 +91,10 @@ public class UsageGateTests
     [Fact]
     public async Task Should_get_paid_plan_for_app()
     {
-        A.CallTo(() => appWithoutTeam.Plan)
+        A.CallTo(() => App.Plan)
             .Returns(new AssignedPlan(RefToken.User("1"), planPaid.Id));
 
-        var plan = await sut.GetPlanForAppAsync(appWithoutTeam, false, ct);
+        var plan = await sut.GetPlanForAppAsync(App, false, CancellationToken);
 
         Assert.Equal((planPaid, planPaid.Id, null), plan);
     }
@@ -114,13 +102,10 @@ public class UsageGateTests
     [Fact]
     public async Task Should_get_paid_plan_for_app_id()
     {
-        A.CallTo(() => appProvider.GetAppAsync(appWithoutTeam.Id, true, ct))
-            .Returns(appWithoutTeam);
-
-        A.CallTo(() => appWithoutTeam.Plan)
+        A.CallTo(() => App.Plan)
             .Returns(new AssignedPlan(RefToken.User("1"), planPaid.Id));
 
-        var plan = await sut.GetPlanForAppAsync(appWithoutTeam.Id, false, ct);
+        var plan = await sut.GetPlanForAppAsync(AppId.Id, false, CancellationToken);
 
         Assert.Equal((planPaid, planPaid.Id, null), plan);
     }
@@ -130,7 +115,7 @@ public class UsageGateTests
     {
         var team = A.Fake<ITeamEntity>();
 
-        A.CallTo(() => appProvider.GetTeamAsync(teamId, ct))
+        A.CallTo(() => AppProvider.GetTeamAsync(teamId, CancellationToken))
             .Returns(team);
 
         A.CallTo(() => team.Id)
@@ -139,7 +124,10 @@ public class UsageGateTests
         A.CallTo(() => team.Plan)
             .Returns(new AssignedPlan(RefToken.User("1"), planPaid.Id));
 
-        var plan = await sut.GetPlanForAppAsync(appWithTeam, false, ct);
+        A.CallTo(() => App.TeamId)
+            .Returns(teamId);
+
+        var plan = await sut.GetPlanForAppAsync(App, false, CancellationToken);
 
         Assert.Equal((planPaid, planPaid.Id, teamId), plan);
     }
@@ -152,17 +140,17 @@ public class UsageGateTests
         A.CallTo(() => billingPlans.GetActualPlan(A<string>._))
             .ReturnsLazily(x => (plan, plan.Id));
 
-        A.CallTo(() => appWithoutTeam.Clients)
+        A.CallTo(() => App.Clients)
             .Returns(AppClients.Empty.Add(clientId, clientId).Update(clientId, apiCallsLimit: 1000));
 
-        A.CallTo(() => apiUsageTracker.GetMonthCallsAsync(appId.Id.ToString(), today, A<string>._, ct))
+        A.CallTo(() => apiUsageTracker.GetMonthCallsAsync(AppId.Id.ToString(), today, A<string>._, CancellationToken))
             .Returns(1000);
 
-        var isBlocked = await sut.IsBlockedAsync(appWithoutTeam, clientId, today, ct);
+        var isBlocked = await sut.IsBlockedAsync(App, clientId, today, CancellationToken);
 
         Assert.True(isBlocked);
 
-        A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, ct))
+        A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -174,14 +162,14 @@ public class UsageGateTests
         A.CallTo(() => billingPlans.GetActualPlan(A<string>._))
             .ReturnsLazily(x => (plan, plan.Id));
 
-        A.CallTo(() => apiUsageTracker.GetMonthCallsAsync(appId.Id.ToString(), today, A<string>._, ct))
+        A.CallTo(() => apiUsageTracker.GetMonthCallsAsync(AppId.Id.ToString(), today, A<string>._, CancellationToken))
             .Returns(1000);
 
-        var isBlocked = await sut.IsBlockedAsync(appWithoutTeam, clientId, today, ct);
+        var isBlocked = await sut.IsBlockedAsync(App, clientId, today, CancellationToken);
 
         Assert.True(isBlocked);
 
-        A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, ct))
+        A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -193,10 +181,10 @@ public class UsageGateTests
         A.CallTo(() => billingPlans.GetActualPlan(A<string>._))
             .ReturnsLazily(x => (plan, plan.Id));
 
-        A.CallTo(() => apiUsageTracker.GetMonthCallsAsync(appId.Id.ToString(), today, A<string>._, ct))
+        A.CallTo(() => apiUsageTracker.GetMonthCallsAsync(AppId.Id.ToString(), today, A<string>._, CancellationToken))
             .Returns(100);
 
-        var isBlocked = await sut.IsBlockedAsync(appWithoutTeam, clientId, today, ct);
+        var isBlocked = await sut.IsBlockedAsync(App, clientId, today, CancellationToken);
 
         Assert.False(isBlocked);
 
@@ -212,14 +200,14 @@ public class UsageGateTests
         A.CallTo(() => billingPlans.GetActualPlan(A<string>._))
             .ReturnsLazily(x => (plan, plan.Id));
 
-        A.CallTo(() => apiUsageTracker.GetMonthCallsAsync(appId.Id.ToString(), today, A<string>._, ct))
+        A.CallTo(() => apiUsageTracker.GetMonthCallsAsync(AppId.Id.ToString(), today, A<string>._, CancellationToken))
             .Returns(1200); // in 10 days = 4000 / month
 
-        var isBlocked = await sut.IsBlockedAsync(appWithoutTeam, clientId, today, ct);
+        var isBlocked = await sut.IsBlockedAsync(App, clientId, today, CancellationToken);
 
         Assert.False(isBlocked);
 
-        A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, ct))
+        A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -231,14 +219,14 @@ public class UsageGateTests
         A.CallTo(() => billingPlans.GetActualPlan(A<string>._))
             .ReturnsLazily(x => (plan, plan.Id));
 
-        A.CallTo(() => apiUsageTracker.GetMonthCallsAsync(appId.Id.ToString(), today, A<string>._, ct))
+        A.CallTo(() => apiUsageTracker.GetMonthCallsAsync(AppId.Id.ToString(), today, A<string>._, CancellationToken))
             .Returns(1200); // in 10 days = 4000 / month
 
-        var isBlocked = await sut.IsBlockedAsync(appWithoutTeam, clientId, today, ct);
+        var isBlocked = await sut.IsBlockedAsync(App, clientId, today, CancellationToken);
 
         Assert.False(isBlocked);
 
-        A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, ct))
+        A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -250,13 +238,13 @@ public class UsageGateTests
         A.CallTo(() => billingPlans.GetActualPlan(A<string>._))
             .ReturnsLazily(x => (plan, plan.Id));
 
-        A.CallTo(() => apiUsageTracker.GetMonthCallsAsync(appId.Id.ToString(), today, A<string>._, ct))
+        A.CallTo(() => apiUsageTracker.GetMonthCallsAsync(AppId.Id.ToString(), today, A<string>._, CancellationToken))
             .Returns(1200); // in 10 days = 4000 / month
 
-        await sut.IsBlockedAsync(appWithoutTeam, clientId, today, ct);
-        await sut.IsBlockedAsync(appWithoutTeam, clientId, today, ct);
+        await sut.IsBlockedAsync(App, clientId, today, CancellationToken);
+        await sut.IsBlockedAsync(App, clientId, today, CancellationToken);
 
-        A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, ct))
+        A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, CancellationToken))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -270,11 +258,11 @@ public class UsageGateTests
         A.CallTo(() => billingPlans.GetActualPlan(A<string>._))
             .ReturnsLazily(x => (plan, plan.Id));
 
-        A.CallTo(() => apiUsageTracker.GetMonthCallsAsync(appId.Id.ToString(), now, A<string>._, ct))
+        A.CallTo(() => apiUsageTracker.GetMonthCallsAsync(AppId.Id.ToString(), now, A<string>._, CancellationToken))
             .Returns(220); // in 3 days = 3300 / month
 
-        await sut.IsBlockedAsync(appWithoutTeam, clientId, now, ct);
-        await sut.IsBlockedAsync(appWithoutTeam, clientId, now, ct);
+        await sut.IsBlockedAsync(App, clientId, now, CancellationToken);
+        await sut.IsBlockedAsync(App, clientId, now, CancellationToken);
 
         A.CallTo(() => messaging.PublishAsync(A<UsageTrackingCheck>._, null, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -283,10 +271,10 @@ public class UsageGateTests
     [Fact]
     public async Task Should_get_app_asset_total_size_from_summary_date()
     {
-        A.CallTo(() => usageTracker.GetAsync($"{appId.Id}_Assets", default, default, null, ct))
+        A.CallTo(() => usageTracker.GetAsync($"{AppId.Id}_Assets", default, default, null, CancellationToken))
             .Returns(new Counters { ["TotalSize"] = 2048 });
 
-        var size = await sut.GetTotalSizeByAppAsync(appId.Id, ct);
+        var size = await sut.GetTotalSizeByAppAsync(AppId.Id, CancellationToken);
 
         Assert.Equal(2048, size);
     }
@@ -294,10 +282,10 @@ public class UsageGateTests
     [Fact]
     public async Task Should_get_team_asset_total_size_from_summary_date()
     {
-        A.CallTo(() => usageTracker.GetAsync($"{appId.Id}_TeamAssets", default, default, null, ct))
+        A.CallTo(() => usageTracker.GetAsync($"{AppId.Id}_TeamAssets", default, default, null, CancellationToken))
             .Returns(new Counters { ["TotalSize"] = 2048 });
 
-        var size = await sut.GetTotalSizeByTeamAsync(appId.Id, ct);
+        var size = await sut.GetTotalSizeByTeamAsync(AppId.Id, CancellationToken);
 
         Assert.Equal(2048, size);
     }
@@ -305,27 +293,30 @@ public class UsageGateTests
     [Fact]
     public async Task Should_track_request_async()
     {
-        await sut.TrackRequestAsync(appWithoutTeam, "client", today, 42, 50, 512, ct);
+        await sut.TrackRequestAsync(App, "client", today, 42, 50, 512, CancellationToken);
 
-        A.CallTo(() => apiUsageTracker.TrackAsync(today, appWithoutTeam.Id.ToString(), "client", 42, 50, 512, ct))
+        A.CallTo(() => apiUsageTracker.TrackAsync(today, AppId.Id.ToString(), "client", 42, 50, 512, CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_track_request_for_team_async()
     {
-        await sut.TrackRequestAsync(appWithTeam, "client", today, 42, 50, 512, ct);
+        A.CallTo(() => App.TeamId)
+            .Returns(teamId);
 
-        A.CallTo(() => apiUsageTracker.TrackAsync(today, appWithTeam.TeamId!.ToString()!, appWithTeam.Name, 42, 50, 512, ct))
+        await sut.TrackRequestAsync(App, "client", today, 42, 50, 512, CancellationToken);
+
+        A.CallTo(() => apiUsageTracker.TrackAsync(today, App.TeamId!.ToString()!, AppId.Name, 42, 50, 512, CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_get_app_asset_counters_from_categories()
     {
-        SetupAssetQuery($"{appId.Id}_Assets");
+        SetupAssetQuery($"{AppId.Id}_Assets");
 
-        var actual = await sut.QueryByAppAsync(appId.Id, today, today.AddDays(3), ct);
+        var actual = await sut.QueryByAppAsync(AppId.Id, today, today.AddDays(3), CancellationToken);
 
         actual.Should().BeEquivalentTo(new List<AssetStats>
         {
@@ -338,9 +329,9 @@ public class UsageGateTests
     [Fact]
     public async Task Should_get_team_asset_counters_from_categories()
     {
-        SetupAssetQuery($"{appId.Id}_TeamAssets");
+        SetupAssetQuery($"{AppId.Id}_TeamAssets");
 
-        var actual = await sut.QueryByTeamAsync(appId.Id, today, today.AddDays(3), ct);
+        var actual = await sut.QueryByTeamAsync(AppId.Id, today, today.AddDays(3), CancellationToken);
 
         actual.Should().BeEquivalentTo(new List<AssetStats>
         {
@@ -352,7 +343,7 @@ public class UsageGateTests
 
     private void SetupAssetQuery(string key)
     {
-        A.CallTo(() => usageTracker.QueryAsync(key, today, today.AddDays(3), ct))
+        A.CallTo(() => usageTracker.QueryAsync(key, today, today.AddDays(3), CancellationToken))
             .Returns(new Dictionary<string, List<(DateTime, Counters)>>
             {
                 [usageTracker.FallbackCategory] = new List<(DateTime, Counters)>
@@ -382,13 +373,13 @@ public class UsageGateTests
         Counters? countersSummary = null;
         Counters? countersDate = null;
 
-        A.CallTo(() => usageTracker.TrackAsync(default, $"{appId.Id}_Assets", null, A<Counters>._, ct))
+        A.CallTo(() => usageTracker.TrackAsync(default, $"{AppId.Id}_Assets", null, A<Counters>._, CancellationToken))
             .Invokes(x => countersSummary = x.GetArgument<Counters>(3));
 
-        A.CallTo(() => usageTracker.TrackAsync(today, $"{appId.Id}_Assets", null, A<Counters>._, ct))
+        A.CallTo(() => usageTracker.TrackAsync(today, $"{AppId.Id}_Assets", null, A<Counters>._, CancellationToken))
             .Invokes(x => countersDate = x.GetArgument<Counters>(3));
 
-        await sut.TrackAssetAsync(appWithoutTeam.Id, today, 512, 3, ct);
+        await sut.TrackAssetAsync(AppId.Id, today, 512, 3, CancellationToken);
 
         var expected = new Counters
         {
@@ -411,19 +402,19 @@ public class UsageGateTests
         A.CallTo(() => team.Id)
             .Returns(teamId);
 
-        A.CallTo(() => appProvider.GetAppAsync(appWithTeam.Id, true, ct))
-            .Returns(appWithTeam);
+        A.CallTo(() => App.TeamId)
+            .Returns(teamId);
 
-        A.CallTo(() => appProvider.GetTeamAsync(teamId, ct))
+        A.CallTo(() => AppProvider.GetTeamAsync(teamId, CancellationToken))
             .Returns(team);
 
-        A.CallTo(() => usageTracker.TrackAsync(default, $"{teamId}_TeamAssets", null, A<Counters>._, ct))
+        A.CallTo(() => usageTracker.TrackAsync(default, $"{teamId}_TeamAssets", null, A<Counters>._, CancellationToken))
             .Invokes(x => countersSummary = x.GetArgument<Counters>(3));
 
-        A.CallTo(() => usageTracker.TrackAsync(today, $"{teamId}_TeamAssets", null, A<Counters>._, ct))
+        A.CallTo(() => usageTracker.TrackAsync(today, $"{teamId}_TeamAssets", null, A<Counters>._, CancellationToken))
             .Invokes(x => countersDate = x.GetArgument<Counters>(3));
 
-        await sut.TrackAssetAsync(appWithTeam.Id, today, 512, 3, ct);
+        await sut.TrackAssetAsync(AppId.Id, today, 512, 3, CancellationToken);
 
         var expected = new Counters
         {

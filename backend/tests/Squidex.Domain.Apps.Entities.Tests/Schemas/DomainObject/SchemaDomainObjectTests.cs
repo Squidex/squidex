@@ -28,7 +28,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
 
     protected override DomainId Id
     {
-        get => DomainId.Combine(AppId, SchemaId);
+        get => DomainId.Combine(AppId.Id, SchemaId.Id);
     }
 
     public SchemaDomainObjectTests()
@@ -54,15 +54,15 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     {
         var properties = new SchemaProperties();
 
-        var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, Type = SchemaType.Singleton };
+        var command = new CreateSchema { Name = SchemaId.Name, SchemaId = SchemaId.Id, Properties = properties, Type = SchemaType.Singleton };
 
         var actual = await PublishAsync(command);
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.Equal(AppId, sut.Snapshot.AppId.Id);
+        Assert.Equal(AppId, sut.Snapshot.AppId);
 
-        Assert.Equal(SchemaName, sut.Snapshot.SchemaDef.Name);
+        Assert.Equal(SchemaId.Name, sut.Snapshot.SchemaDef.Name);
         Assert.Equal(SchemaType.Singleton, sut.Snapshot.SchemaDef.Type);
 
         LastEvents
@@ -93,7 +93,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
             }
         };
 
-        var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, Fields = fields };
+        var command = new CreateSchema { Name = SchemaId.Name, SchemaId = SchemaId.Id, Properties = properties, Fields = fields };
 
         var actual = await PublishAsync(command);
 
@@ -101,9 +101,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
 
         var @event = (SchemaCreated)LastEvents.Single().Payload;
 
-        Assert.Equal(AppId, sut.Snapshot.AppId.Id);
-        Assert.Equal(SchemaName, sut.Snapshot.SchemaDef.Name);
-        Assert.Equal(SchemaName, sut.Snapshot.SchemaDef.Name);
+        Assert.Equal(AppId, sut.Snapshot.AppId);
+        Assert.Equal(SchemaId.Name, sut.Snapshot.SchemaDef.Name);
+        Assert.Equal(SchemaType.Default, sut.Snapshot.SchemaDef.Type);
 
         Assert.Equal(3, @event.Schema.Fields.Count);
     }
@@ -718,7 +718,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
 
     private Task ExecuteCreateAsync()
     {
-        return PublishAsync(new CreateSchema { Name = SchemaName, SchemaId = SchemaId });
+        return PublishAsync(new CreateSchema { Name = SchemaId.Name, SchemaId = SchemaId.Id });
     }
 
     private Task ExecuteAddArrayFieldAsync()
@@ -766,24 +766,14 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
         return new StringFieldProperties { MinLength = 10, MaxLength = 20 };
     }
 
-    private async Task<object?> PublishIdempotentAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
+    private Task<object> PublishIdempotentAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
     {
-        var actual = await PublishAsync(command);
-
-        var previousSnapshot = sut.Snapshot;
-        var previousVersion = sut.Snapshot.Version;
-
-        await PublishAsync(command);
-
-        Assert.Same(previousSnapshot, sut.Snapshot);
-        Assert.Equal(previousVersion, sut.Snapshot.Version);
-
-        return actual;
+        return PublishIdempotentAsync(sut, CreateCommand(command));
     }
 
     private async Task<object> PublishAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
     {
-        var actual = await sut.ExecuteAsync(CreateCommand(command), default);
+        var actual = await sut.ExecuteAsync(CreateCommand(command), CancellationToken);
 
         return actual.Payload;
     }

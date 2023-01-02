@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -16,13 +17,12 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public class RecursiveDeleterTests
+public class RecursiveDeleterTests : GivenContext
 {
     private readonly ILogger<RecursiveDeleter> log = A.Fake<ILogger<RecursiveDeleter>>();
     private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
     private readonly IAssetFolderRepository assetFolderRepository = A.Fake<IAssetFolderRepository>();
     private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly RecursiveDeleter sut;
 
     public RecursiveDeleterTests()
@@ -57,7 +57,7 @@ public class RecursiveDeleterTests
     [Fact]
     public async Task Should_Not_invoke_delete_commands_if_event_restored()
     {
-        var @event = new AssetFolderDeleted { AppId = appId, AssetFolderId = DomainId.NewGuid() };
+        var @event = new AssetFolderDeleted { AppId = AppId, AssetFolderId = DomainId.NewGuid() };
 
         await sut.On(Envelope.Create(@event).SetRestored());
 
@@ -68,12 +68,12 @@ public class RecursiveDeleterTests
     [Fact]
     public async Task Should_invoke_delete_commands_for_all_subfolders()
     {
-        var @event = new AssetFolderDeleted { AppId = appId, AssetFolderId = DomainId.NewGuid() };
+        var @event = new AssetFolderDeleted { AppId = AppId, AssetFolderId = DomainId.NewGuid() };
 
         var childFolderId1 = DomainId.NewGuid();
         var childFolderId2 = DomainId.NewGuid();
 
-        A.CallTo(() => assetFolderRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId, default))
+        A.CallTo(() => assetFolderRepository.QueryChildIdsAsync(AppId.Id, @event.AssetFolderId, default))
             .Returns(new List<DomainId> { childFolderId1, childFolderId2 });
 
         await sut.On(Envelope.Create(@event));
@@ -88,12 +88,12 @@ public class RecursiveDeleterTests
     [Fact]
     public async Task Should_invoke_delete_commands_for_all_assets()
     {
-        var @event = new AssetFolderDeleted { AppId = appId, AssetFolderId = DomainId.NewGuid() };
+        var @event = new AssetFolderDeleted { AppId = AppId, AssetFolderId = DomainId.NewGuid() };
 
         var childId1 = DomainId.NewGuid();
         var childId2 = DomainId.NewGuid();
 
-        A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId, default))
+        A.CallTo(() => assetRepository.QueryChildIdsAsync(AppId.Id, @event.AssetFolderId, default))
             .Returns(new List<DomainId> { childId1, childId2 });
 
         await sut.On(Envelope.Create(@event));
@@ -108,7 +108,7 @@ public class RecursiveDeleterTests
     [Fact]
     public async Task Should_ignore_exceptions()
     {
-        var @event = new AssetFolderDeleted { AppId = appId, AssetFolderId = DomainId.NewGuid() };
+        var @event = new AssetFolderDeleted { AppId = AppId, AssetFolderId = DomainId.NewGuid() };
 
         var childId1 = DomainId.NewGuid();
         var childId2 = DomainId.NewGuid();
@@ -116,7 +116,7 @@ public class RecursiveDeleterTests
         A.CallTo(() => commandBus.PublishAsync(A<DeleteAsset>.That.Matches(x => x.AssetId == childId1), default))
             .Throws(new InvalidOperationException());
 
-        A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId, default))
+        A.CallTo(() => assetRepository.QueryChildIdsAsync(AppId.Id, @event.AssetFolderId, default))
             .Returns(new List<DomainId> { childId1, childId2 });
 
         await sut.On(Envelope.Create(@event));

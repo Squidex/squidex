@@ -37,6 +37,7 @@ public sealed class ScriptContent : IContentEnricherStep
                 continue;
             }
 
+            // Script vars are just wrappers over dictionaries for better performance.
             var vars = new ContentScriptVars
             {
                 AppId = schema.AppId.Id,
@@ -68,6 +69,7 @@ public sealed class ScriptContent : IContentEnricherStep
     private async Task TransformAsync(ContentScriptVars sharedVars, string script, ContentEntity content,
         CancellationToken ct)
     {
+        // Script vars are just wrappers over dictionaries for better performance.
         var vars = new ContentScriptVars
         {
             ContentId = content.Id,
@@ -87,7 +89,9 @@ public sealed class ScriptContent : IContentEnricherStep
 
         var options = new ScriptOptions
         {
-            AsContext = true
+            AsContext = true,
+            CanDisallow = true,
+            CanReject = true
         };
 
         content.Data = await scriptEngine.TransformAsync(vars, script, options, ct);

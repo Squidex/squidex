@@ -8,11 +8,11 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Infrastructure;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Counter;
 
-public class CounterJintExtensionTests
+public class CounterJintExtensionTests : GivenContext
 {
     private readonly ICounterService counterService = A.Fake<ICounterService>();
     private readonly JintScriptEngine sut;
@@ -35,9 +35,7 @@ public class CounterJintExtensionTests
     [Fact]
     public void Should_reset_counter()
     {
-        var appId = DomainId.NewGuid();
-
-        A.CallTo(() => counterService.ResetAsync(appId, "my", 4, default))
+        A.CallTo(() => counterService.ResetAsync(AppId.Id, "my", 4, default))
             .Returns(3);
 
         const string script = @"
@@ -46,7 +44,7 @@ public class CounterJintExtensionTests
 
         var vars = new ScriptVars
         {
-            ["appId"] = appId
+            ["appId"] = AppId.Id
         };
 
         var actual = sut.Execute(vars, script).ToString();
@@ -57,9 +55,7 @@ public class CounterJintExtensionTests
     [Fact]
     public async Task Should_reset_counter_with_callback()
     {
-        var appId = DomainId.NewGuid();
-
-        A.CallTo(() => counterService.ResetAsync(appId, "my", 4, A<CancellationToken>._))
+        A.CallTo(() => counterService.ResetAsync(AppId.Id, "my", 4, A<CancellationToken>._))
             .Returns(3);
 
         const string script = @"
@@ -70,7 +66,7 @@ public class CounterJintExtensionTests
 
         var vars = new ScriptVars
         {
-            ["appId"] = appId
+            ["appId"] = AppId.Id
         };
 
         var actual = (await sut.ExecuteAsync(vars, script)).ToString();
@@ -81,9 +77,7 @@ public class CounterJintExtensionTests
     [Fact]
     public void Should_increment_counter()
     {
-        var appId = DomainId.NewGuid();
-
-        A.CallTo(() => counterService.IncrementAsync(appId, "my", A<CancellationToken>._))
+        A.CallTo(() => counterService.IncrementAsync(AppId.Id, "my", A<CancellationToken>._))
             .Returns(3);
 
         const string script = @"
@@ -92,7 +86,7 @@ public class CounterJintExtensionTests
 
         var vars = new ScriptVars
         {
-            ["appId"] = appId
+            ["appId"] = AppId.Id
         };
 
         var actual = sut.Execute(vars, script).ToString();
@@ -103,9 +97,7 @@ public class CounterJintExtensionTests
     [Fact]
     public async Task Should_increment_counter_with_callback()
     {
-        var appId = DomainId.NewGuid();
-
-        A.CallTo(() => counterService.IncrementAsync(appId, "my", A<CancellationToken>._))
+        A.CallTo(() => counterService.IncrementAsync(AppId.Id, "my", A<CancellationToken>._))
             .Returns(3);
 
         const string script = @"
@@ -116,7 +108,7 @@ public class CounterJintExtensionTests
 
         var vars = new ScriptVars
         {
-            ["appId"] = appId
+            ["appId"] = AppId.Id
         };
 
         var actual = (await sut.ExecuteAsync(vars, script)).ToString();

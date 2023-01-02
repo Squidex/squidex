@@ -8,20 +8,11 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
-public class ContentEnricherTests
+public class ContentEnricherTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-    private readonly ISchemaEntity schema;
-    private readonly Context requestContext;
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-
     private sealed class ResolveSchema : IContentEnricherStep
     {
         public ISchemaEntity Schema { get; private set; }
@@ -36,40 +27,28 @@ public class ContentEnricherTests
         }
     }
 
-    public ContentEnricherTests()
-    {
-        ct = cts.Token;
-
-        requestContext = new Context(Mocks.ApiUser(), Mocks.App(appId));
-
-        schema = Mocks.Schema(appId, schemaId);
-
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, ct))
-            .Returns(schema);
-    }
-
     [Fact]
-    public async Task Should_only_invoke_pre_enrich_for_empty_actuals()
+    public async Task Should_only_invoke_pre_enrich_for_empty_contents()
     {
         var source = Array.Empty<IContentEntity>();
 
         var step1 = A.Fake<IContentEnricherStep>();
         var step2 = A.Fake<IContentEnricherStep>();
 
-        var sut = new ContentEnricher(new[] { step1, step2 }, appProvider);
+        var sut = new ContentEnricher(new[] { step1, step2 }, AppProvider);
 
-        await sut.EnrichAsync(source, requestContext, ct);
+        await sut.EnrichAsync(source, ApiContext, CancellationToken);
 
-        A.CallTo(() => step1.EnrichAsync(requestContext, ct))
+        A.CallTo(() => step1.EnrichAsync(ApiContext, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step2.EnrichAsync(requestContext, ct))
+        A.CallTo(() => step2.EnrichAsync(ApiContext, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, A<CancellationToken>._))
+        A.CallTo(() => step1.EnrichAsync(ApiContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, A<CancellationToken>._))
             .MustNotHaveHappened();
 
-        A.CallTo(() => step2.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, A<CancellationToken>._))
+        A.CallTo(() => step2.EnrichAsync(ApiContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -81,20 +60,20 @@ public class ContentEnricherTests
         var step1 = A.Fake<IContentEnricherStep>();
         var step2 = A.Fake<IContentEnricherStep>();
 
-        var sut = new ContentEnricher(new[] { step1, step2 }, appProvider);
+        var sut = new ContentEnricher(new[] { step1, step2 }, AppProvider);
 
-        await sut.EnrichAsync(source, false, requestContext, ct);
+        await sut.EnrichAsync(source, false, ApiContext, CancellationToken);
 
-        A.CallTo(() => step1.EnrichAsync(requestContext, ct))
+        A.CallTo(() => step1.EnrichAsync(ApiContext, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step2.EnrichAsync(requestContext, ct))
+        A.CallTo(() => step2.EnrichAsync(ApiContext, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, ct))
+        A.CallTo(() => step1.EnrichAsync(ApiContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step2.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, ct))
+        A.CallTo(() => step2.EnrichAsync(ApiContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -106,14 +85,14 @@ public class ContentEnricherTests
         var step1 = new ResolveSchema();
         var step2 = new ResolveSchema();
 
-        var sut = new ContentEnricher(new[] { step1, step2 }, appProvider);
+        var sut = new ContentEnricher(new[] { step1, step2 }, AppProvider);
 
-        await sut.EnrichAsync(source, false, requestContext, ct);
+        await sut.EnrichAsync(source, false, ApiContext, CancellationToken);
 
-        Assert.Same(schema, step1.Schema);
-        Assert.Same(schema, step1.Schema);
+        Assert.Same(Schema, step1.Schema);
+        Assert.Same(Schema, step1.Schema);
 
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, ct))
+        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, SchemaId.Id, false, CancellationToken))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -122,9 +101,9 @@ public class ContentEnricherTests
     {
         var source = CreateContent(new ContentData());
 
-        var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), appProvider);
+        var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), AppProvider);
 
-        var actual = await sut.EnrichAsync(source, true, requestContext, ct);
+        var actual = await sut.EnrichAsync(source, true, ApiContext, CancellationToken);
 
         Assert.NotSame(source.Data, actual.Data);
     }
@@ -134,15 +113,15 @@ public class ContentEnricherTests
     {
         var source = CreateContent(new ContentData());
 
-        var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), appProvider);
+        var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), AppProvider);
 
-        var actual = await sut.EnrichAsync(source, false, requestContext, ct);
+        var actual = await sut.EnrichAsync(source, false, ApiContext, CancellationToken);
 
         Assert.Same(source.Data, actual.Data);
     }
 
     private ContentEntity CreateContent(ContentData? data = null)
     {
-        return new ContentEntity { SchemaId = schemaId, Data = data! };
+        return new ContentEntity { SchemaId = SchemaId, Data = data! };
     }
 }

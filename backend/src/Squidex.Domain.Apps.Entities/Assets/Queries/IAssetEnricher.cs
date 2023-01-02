@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Assets;
+namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
 public interface IAssetEnricher
 {

@@ -6,30 +6,26 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
-public class AssetLoaderTests
+public class AssetLoaderTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
     private readonly IDomainObjectCache domainObjectCache = A.Fake<IDomainObjectCache>();
     private readonly AssetDomainObject domainObject = A.Fake<AssetDomainObject>();
-    private readonly DomainId appId = DomainId.NewGuid();
     private readonly DomainId id = DomainId.NewGuid();
     private readonly DomainId uniqueId;
     private readonly AssetLoader sut;
 
     public AssetLoaderTests()
     {
-        ct = cts.Token;
+        uniqueId = DomainId.Combine(AppId.Id, id);
 
-        uniqueId = DomainId.Combine(appId, id);
-
-        A.CallTo(() => domainObjectCache.GetAsync<AssetDomainObject.State>(A<DomainId>._, A<long>._, ct))
+        A.CallTo(() => domainObjectCache.GetAsync<AssetDomainObject.State>(A<DomainId>._, A<long>._, CancellationToken))
             .Returns(Task.FromResult<AssetDomainObject.State>(null!));
 
         A.CallTo(() => domainObjectFactory.Create<AssetDomainObject>(uniqueId))
@@ -43,10 +39,10 @@ public class AssetLoaderTests
     {
         var asset = (AssetDomainObject.State)null!;
 
-        A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+        A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(asset);
 
-        Assert.Null(await sut.GetAsync(appId, id, 10, ct));
+        Assert.Null(await sut.GetAsync(AppId.Id, id, 10, CancellationToken));
     }
 
     [Fact]
@@ -54,10 +50,10 @@ public class AssetLoaderTests
     {
         var asset = new AssetDomainObject.State { Version = EtagVersion.Empty };
 
-        A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+        A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(asset);
 
-        Assert.Null(await sut.GetAsync(appId, id, 10, ct));
+        Assert.Null(await sut.GetAsync(AppId.Id, id, 10, CancellationToken));
     }
 
     [Fact]
@@ -65,10 +61,10 @@ public class AssetLoaderTests
     {
         var asset = new AssetDomainObject.State { Version = 5 };
 
-        A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+        A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(asset);
 
-        Assert.Null(await sut.GetAsync(appId, id, 10, ct));
+        Assert.Null(await sut.GetAsync(AppId.Id, id, 10, CancellationToken));
     }
 
     [Fact]
@@ -76,10 +72,10 @@ public class AssetLoaderTests
     {
         var asset = new AssetDomainObject.State { Version = 5 };
 
-        A.CallTo(() => domainObject.GetSnapshotAsync(EtagVersion.Any, ct))
+        A.CallTo(() => domainObject.GetSnapshotAsync(EtagVersion.Any, CancellationToken))
             .Returns(asset);
 
-        var actual = await sut.GetAsync(appId, id, EtagVersion.Any, ct);
+        var actual = await sut.GetAsync(AppId.Id, id, EtagVersion.Any, CancellationToken);
 
         Assert.Same(asset, actual);
     }
@@ -89,10 +85,10 @@ public class AssetLoaderTests
     {
         var asset = new AssetDomainObject.State { Version = 10 };
 
-        A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+        A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(asset);
 
-        var actual = await sut.GetAsync(appId, id, 10, ct);
+        var actual = await sut.GetAsync(AppId.Id, id, 10, CancellationToken);
 
         Assert.Same(asset, actual);
     }
@@ -102,10 +98,10 @@ public class AssetLoaderTests
     {
         var content = new AssetDomainObject.State { Version = 10 };
 
-        A.CallTo(() => domainObjectCache.GetAsync<AssetDomainObject.State>(DomainId.Combine(appId, id), 10, ct))
+        A.CallTo(() => domainObjectCache.GetAsync<AssetDomainObject.State>(DomainId.Combine(AppId.Id, id), 10, CancellationToken))
             .Returns(content);
 
-        var actual = await sut.GetAsync(appId, id, 10, ct);
+        var actual = await sut.GetAsync(AppId.Id, id, 10, CancellationToken);
 
         Assert.Same(content, actual);
 

@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -20,28 +19,24 @@ using TestUtils = Squidex.Domain.Apps.Core.TestHelpers.TestUtils;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
-public class ConvertDataTests
+public class ConvertDataTests : GivenContext
 {
-    private readonly ISchemaEntity schema;
     private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
     private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-    private readonly ProvideSchema schemaProvider;
     private readonly ConvertData sut;
 
     public ConvertDataTests()
     {
         var schemaDef =
-            new Schema("my-schema")
+            new Schema(SchemaId.Name)
                 .AddReferences(1, "references", Partitioning.Invariant)
                 .AddAssets(2, "assets", Partitioning.Invariant)
                 .AddArray(3, "array", Partitioning.Invariant, a => a
                     .AddAssets(31, "nested"));
 
-        schema = Mocks.Schema(appId, schemaId, schemaDef);
-        schemaProvider = x => Task.FromResult((schema, ResolvedComponents.Empty));
+        A.CallTo(() => Schema.SchemaDef)
+            .Returns(schemaDef);
 
         sut = new ConvertData(urlGenerator, TestUtils.DefaultSerializer, assetRepository, contentRepository);
     }
@@ -51,9 +46,7 @@ public class ConvertDataTests
     {
         var content = CreateContent(new ContentData());
 
-        var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
-
-        await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider, default);
+        await sut.EnrichAsync(FrontendContext, new[] { content }, SchemaProvider(), CancellationToken);
 
         Assert.NotNull(content.Data);
     }
@@ -83,15 +76,13 @@ public class ConvertDataTests
                                 new JsonObject()
                                     .Add("nested", JsonValue.Array(id2)))));
 
-        A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), A<CancellationToken>._))
+        A.CallTo(() => assetRepository.QueryIdsAsync(AppId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), CancellationToken))
             .Returns(new List<DomainId> { id2 });
 
-        A.CallTo(() => contentRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.QueryIdsAsync(AppId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All, CancellationToken))
             .Returns(new List<ContentIdStatus> { new ContentIdStatus(id2, id2, Status.Published) });
 
-        var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
-
-        await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider, default);
+        await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
 
         Assert.Equal(expected, content.Data);
     }
@@ -121,15 +112,13 @@ public class ConvertDataTests
                                 new JsonObject()
                                     .Add("nested", JsonValue.Array()))));
 
-        A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), A<CancellationToken>._))
+        A.CallTo(() => assetRepository.QueryIdsAsync(AppId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), CancellationToken))
             .Returns(new List<DomainId>());
 
-        A.CallTo(() => contentRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.QueryIdsAsync(AppId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All, CancellationToken))
             .Returns(new List<ContentIdStatus>());
 
-        var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
-
-        await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider, default);
+        await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
 
         Assert.Equal(expected, content.Data);
     }
@@ -155,9 +144,17 @@ public class ConvertDataTests
     {
         return new ContentEntity
         {
+            AppId = AppId,
+            Created = default,
+            CreatedBy = User,
             Data = data,
-            SchemaId = schemaId,
+            SchemaId = SchemaId,
             Status = Status.Published
         };
+    }
+
+    private ProvideSchema SchemaProvider()
+    {
+        return x => Task.FromResult((Schema, ResolvedComponents.Empty));
     }
 }

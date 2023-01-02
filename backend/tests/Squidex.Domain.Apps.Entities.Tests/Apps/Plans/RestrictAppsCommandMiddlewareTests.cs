@@ -8,6 +8,7 @@
 using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Validation;
@@ -16,10 +17,8 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Plans;
 
-public sealed class RestrictAppsCommandMiddlewareTests
+public sealed class RestrictAppsCommandMiddlewareTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
     private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
     private readonly RestrictAppsOptions options = new RestrictAppsOptions();
@@ -27,8 +26,6 @@ public sealed class RestrictAppsCommandMiddlewareTests
 
     public RestrictAppsCommandMiddlewareTests()
     {
-        ct = cts.Token;
-
         sut = new RestrictAppsCommandMiddleware(Options.Create(options), userResolver);
     }
 
@@ -54,7 +51,7 @@ public sealed class RestrictAppsCommandMiddlewareTests
         A.CallTo(() => user.Claims)
             .Returns(Enumerable.Repeat(new Claim(SquidexClaimTypes.TotalApps, "5"), 1).ToList());
 
-        A.CallTo(() => userResolver.FindByIdAsync(userId, ct))
+        A.CallTo(() => userResolver.FindByIdAsync(userId, CancellationToken))
             .Returns(user);
 
         var isNextCalled = false;
@@ -64,7 +61,7 @@ public sealed class RestrictAppsCommandMiddlewareTests
             isNextCalled = true;
 
             return Task.CompletedTask;
-        }, ct));
+        }, CancellationToken));
 
         Assert.False(isNextCalled);
     }
@@ -91,7 +88,7 @@ public sealed class RestrictAppsCommandMiddlewareTests
         A.CallTo(() => user.Claims)
             .Returns(Enumerable.Repeat(new Claim(SquidexClaimTypes.TotalApps, "5"), 1).ToList());
 
-        A.CallTo(() => userResolver.FindByIdAsync(userId, ct))
+        A.CallTo(() => userResolver.FindByIdAsync(userId, CancellationToken))
             .Returns(user);
 
         await sut.HandleAsync(commandContext, (c, ct) =>
@@ -99,7 +96,7 @@ public sealed class RestrictAppsCommandMiddlewareTests
             c.Complete(true);
 
             return Task.CompletedTask;
-        }, ct);
+        }, CancellationToken);
 
         A.CallTo(() => userResolver.SetClaimAsync(userId, SquidexClaimTypes.TotalApps, "6", true, default))
             .MustHaveHappened();
@@ -122,7 +119,7 @@ public sealed class RestrictAppsCommandMiddlewareTests
             c.Complete(true);
 
             return Task.CompletedTask;
-        }, ct);
+        }, CancellationToken);
 
         A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -145,7 +142,7 @@ public sealed class RestrictAppsCommandMiddlewareTests
             c.Complete(true);
 
             return Task.CompletedTask;
-        }, ct);
+        }, CancellationToken);
 
         A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -168,7 +165,7 @@ public sealed class RestrictAppsCommandMiddlewareTests
             c.Complete(true);
 
             return Task.CompletedTask;
-        }, ct);
+        }, CancellationToken);
 
         A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
             .MustNotHaveHappened();

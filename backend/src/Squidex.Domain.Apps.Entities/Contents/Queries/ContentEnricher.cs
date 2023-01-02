@@ -58,52 +58,54 @@ public sealed class ContentEnricher : IContentEnricher
                 }
             }
 
-            if (contents.Any())
+            if (!contents.Any())
             {
-                foreach (var content in contents)
+                return results;
+            }
+
+            foreach (var content in contents)
+            {
+                var result = SimpleMapper.Map(content, new ContentEntity());
+
+                if (cloneData)
                 {
-                    var result = SimpleMapper.Map(content, new ContentEntity());
-
-                    if (cloneData)
+                    using (Telemetry.Activities.StartActivity("ContentEnricher/CloneData"))
                     {
-                        using (Telemetry.Activities.StartActivity("ContentEnricher/CloneData"))
-                        {
-                            result.Data = result.Data.Clone();
-                        }
+                        result.Data = result.Data.Clone();
                     }
-
-                    results.Add(result);
                 }
 
-                if (context.App != null)
+                results.Add(result);
+            }
+
+            if (context.App != null)
+            {
+                var schemaCache = new Dictionary<DomainId, Task<(ISchemaEntity, ResolvedComponents)>>();
+
+                Task<(ISchemaEntity, ResolvedComponents)> GetSchema(DomainId id)
                 {
-                    var schemaCache = new Dictionary<DomainId, Task<(ISchemaEntity, ResolvedComponents)>>();
-
-                    Task<(ISchemaEntity, ResolvedComponents)> GetSchema(DomainId id)
+                    return schemaCache.GetOrAdd(id, async x =>
                     {
-                        return schemaCache.GetOrAdd(id, async x =>
+                        var schema = await appProvider.GetSchemaAsync(context.App.Id, x, false, ct);
+
+                        if (schema == null)
                         {
-                            var schema = await appProvider.GetSchemaAsync(context.App.Id, x, false, ct);
-
-                            if (schema == null)
-                            {
-                                throw new DomainObjectNotFoundException(x.ToString());
-                            }
-
-                            var components = await appProvider.GetComponentsAsync(schema, ct);
-
-                            return (schema, components);
-                        });
-                    }
-
-                    foreach (var step in steps)
-                    {
-                        ct.ThrowIfCancellationRequested();
-
-                        using (Telemetry.Activities.StartActivity(step.ToString()!))
-                        {
-                            await step.EnrichAsync(context, results, GetSchema, ct);
+                            throw new DomainObjectNotFoundException(x.ToString());
                         }
+
+                        var components = await appProvider.GetComponentsAsync(schema, ct);
+
+                        return (schema, components);
+                    });
+                }
+
+                foreach (var step in steps)
+                {
+                    ct.ThrowIfCancellationRequested();
+
+                    using (Telemetry.Activities.StartActivity(step.ToString()!))
+                    {
+                        await step.EnrichAsync(context, results, GetSchema, ct);
                     }
                 }
             }

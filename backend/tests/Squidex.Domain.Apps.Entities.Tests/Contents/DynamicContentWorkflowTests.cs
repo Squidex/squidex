@@ -10,7 +10,6 @@ using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -18,12 +17,8 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public class DynamicContentWorkflowTests
+public class DynamicContentWorkflowTests : GivenContext
 {
-    private readonly IAppEntity app;
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
     private readonly NamedId<DomainId> simpleSchemaId = NamedId.Of(DomainId.NewGuid(), "my-simple-schema");
     private readonly DynamicContentWorkflow sut;
 
@@ -58,8 +53,6 @@ public class DynamicContentWorkflowTests
 
     public DynamicContentWorkflowTests()
     {
-        app = Mocks.App(appId);
-
         var simpleWorkflow = new Workflow(
             Status.Draft,
             new Dictionary<Status, WorkflowStep>
@@ -83,10 +76,7 @@ public class DynamicContentWorkflowTests
 
         var workflows = Workflows.Empty.Set(workflow).Set(DomainId.NewGuid(), simpleWorkflow);
 
-        A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, default))
-            .Returns(app);
-
-        A.CallTo(() => app.Workflows)
+        A.CallTo(() => App.Workflows)
             .Returns(workflows);
 
         var scriptEngine = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
@@ -96,7 +86,7 @@ public class DynamicContentWorkflowTests
                 TimeoutExecution = TimeSpan.FromSeconds(10)
             }));
 
-        sut = new DynamicContentWorkflow(scriptEngine, appProvider);
+        sut = new DynamicContentWorkflow(scriptEngine, AppProvider);
     }
 
     [Fact]
@@ -122,7 +112,7 @@ public class DynamicContentWorkflowTests
     [Fact]
     public async Task Should_return_draft_as_initial_status()
     {
-        var actual = await sut.GetInitialStatusAsync(Mocks.Schema(appId, schemaId));
+        var actual = await sut.GetInitialStatusAsync(Schema);
 
         Assert.Equal(Status.Draft, actual);
     }
@@ -130,7 +120,7 @@ public class DynamicContentWorkflowTests
     [Fact]
     public async Task Should_allow_publish_on_create()
     {
-        var actual = await sut.CanPublishInitialAsync(Mocks.Schema(appId, schemaId), Mocks.FrontendUser("Editor"));
+        var actual = await sut.CanPublishInitialAsync(Schema, Mocks.FrontendUser("Editor"));
 
         Assert.True(actual);
     }
@@ -138,7 +128,7 @@ public class DynamicContentWorkflowTests
     [Fact]
     public async Task Should_not_allow_publish_on_create_if_role_not_allowed()
     {
-        var actual = await sut.CanPublishInitialAsync(Mocks.Schema(appId, schemaId), Mocks.FrontendUser("Developer"));
+        var actual = await sut.CanPublishInitialAsync(Schema, Mocks.FrontendUser("Developer"));
 
         Assert.False(actual);
     }
@@ -148,7 +138,7 @@ public class DynamicContentWorkflowTests
     {
         var content = CreateContent(Status.Draft, 2);
 
-        var actual = await sut.CanMoveToAsync(Mocks.Schema(appId, schemaId), content.Status, Status.Published, content.Data, Mocks.FrontendUser("Editor"));
+        var actual = await sut.CanMoveToAsync(Schema, content.Status, Status.Published, content.Data, Mocks.FrontendUser("Editor"));
 
         Assert.True(actual);
     }
@@ -350,7 +340,7 @@ public class DynamicContentWorkflowTests
             new StatusInfo(Status.Published, StatusColors.Published)
         };
 
-        var actual = await sut.GetAllAsync(Mocks.Schema(appId, schemaId));
+        var actual = await sut.GetAllAsync(Schema);
 
         actual.Should().BeEquivalentTo(expected);
     }
@@ -364,7 +354,7 @@ public class DynamicContentWorkflowTests
             new StatusInfo(Status.Published, StatusColors.Published)
         };
 
-        var actual = await sut.GetAllAsync(Mocks.Schema(appId, simpleSchemaId));
+        var actual = await sut.GetAllAsync(Mocks.Schema(AppId, simpleSchemaId));
 
         actual.Should().BeEquivalentTo(expected);
     }
@@ -372,7 +362,8 @@ public class DynamicContentWorkflowTests
     [Fact]
     public async Task Should_return_all_statuses_for_default_workflow_if_no_workflow_configured()
     {
-        A.CallTo(() => app.Workflows).Returns(Workflows.Empty);
+        A.CallTo(() => App.Workflows)
+            .Returns(Workflows.Empty);
 
         var expected = new[]
         {
@@ -381,7 +372,7 @@ public class DynamicContentWorkflowTests
             new StatusInfo(Status.Published, StatusColors.Published)
         };
 
-        var actual = await sut.GetAllAsync(Mocks.Schema(appId, simpleSchemaId));
+        var actual = await sut.GetAllAsync(Mocks.Schema(AppId, simpleSchemaId));
 
         actual.Should().BeEquivalentTo(expected);
     }
@@ -389,7 +380,7 @@ public class DynamicContentWorkflowTests
     [Fact]
     public async Task Should_not_validate_when_not_publishing()
     {
-        var actual = await sut.ShouldValidateAsync(Mocks.Schema(appId, schemaId), Status.Draft);
+        var actual = await sut.ShouldValidateAsync(Schema, Status.Draft);
 
         Assert.False(actual);
     }
@@ -413,7 +404,7 @@ public class DynamicContentWorkflowTests
     [Fact]
     public async Task Should_validate_when_enabled_in_step()
     {
-        var actual = await sut.ShouldValidateAsync(Mocks.Schema(appId, schemaId), Status.Archived);
+        var actual = await sut.ShouldValidateAsync(Schema, Status.Archived);
 
         Assert.True(actual);
     }
@@ -425,12 +416,12 @@ public class DynamicContentWorkflowTests
             ValidateOnPublish = validateOnPublish
         });
 
-        return Mocks.Schema(appId, simpleSchemaId, schema);
+        return Mocks.Schema(AppId, simpleSchemaId, schema);
     }
 
     private ContentEntity CreateContent(Status status, int value, bool simple = false)
     {
-        var content = new ContentEntity { AppId = appId, Status = status };
+        var content = new ContentEntity { AppId = AppId, Status = status };
 
         if (simple)
         {
@@ -438,7 +429,7 @@ public class DynamicContentWorkflowTests
         }
         else
         {
-            content.SchemaId = schemaId;
+            content.SchemaId = SchemaId;
         }
 
         content.Data =

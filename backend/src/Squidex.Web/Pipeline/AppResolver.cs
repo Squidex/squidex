@@ -44,7 +44,7 @@ public sealed class AppResolver : IAsyncActionFilter
 
             var isFrontend = user.IsInClient(DefaultClients.Frontend);
 
-            var app = await appProvider.GetAppAsync(appName, !isFrontend, default);
+            var app = await appProvider.GetAppAsync(appName, !isFrontend, context.HttpContext.RequestAborted);
 
             if (app == null)
             {

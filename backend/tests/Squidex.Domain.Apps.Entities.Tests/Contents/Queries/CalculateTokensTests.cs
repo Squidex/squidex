@@ -8,42 +8,30 @@
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
-public class CalculateTokensTests
+public class CalculateTokensTests : GivenContext
 {
-    private readonly ISchemaEntity schema;
     private readonly IJsonSerializer serializer = A.Fake<IJsonSerializer>();
     private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
-    private readonly Context requestContext;
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-    private readonly ProvideSchema schemaProvider;
     private readonly CalculateTokens sut;
 
     public CalculateTokensTests()
     {
-        requestContext = new Context(Mocks.ApiUser(), Mocks.App(appId));
-
-        schema = Mocks.Schema(appId, schemaId);
-        schemaProvider = x => Task.FromResult((schema, ResolvedComponents.Empty));
-
         sut = new CalculateTokens(urlGenerator, serializer);
     }
 
     [Fact]
     public async Task Should_compute_ui_tokens()
     {
-        var source = CreateContent();
+        var content = CreateContent();
 
-        await sut.EnrichAsync(requestContext, new[] { source }, schemaProvider, default);
+        await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
 
-        Assert.NotNull(source.EditToken);
+        Assert.NotNull(content.EditToken);
 
         A.CallTo(() => urlGenerator.Root())
             .MustHaveHappened();
@@ -52,11 +40,11 @@ public class CalculateTokensTests
     [Fact]
     public async Task Should_also_compute_ui_tokens_for_frontend()
     {
-        var source = CreateContent();
+        var content = CreateContent();
 
-        await sut.EnrichAsync(new Context(Mocks.FrontendUser(), Mocks.App(appId)), new[] { source }, schemaProvider, default);
+        await sut.EnrichAsync(FrontendContext, new[] { content }, SchemaProvider(), CancellationToken);
 
-        Assert.NotNull(source.EditToken);
+        Assert.NotNull(content.EditToken);
 
         A.CallTo(() => urlGenerator.Root())
             .MustHaveHappened();
@@ -64,6 +52,11 @@ public class CalculateTokensTests
 
     private ContentEntity CreateContent()
     {
-        return new ContentEntity { AppId = appId, SchemaId = schemaId };
+        return new ContentEntity { AppId = AppId, SchemaId = SchemaId };
+    }
+
+    private ProvideSchema SchemaProvider()
+    {
+        return x => Task.FromResult((Schema, ResolvedComponents.Empty));
     }
 }

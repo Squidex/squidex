@@ -15,10 +15,9 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
 
-public class GuardAssetFolderTests : IClassFixture<TranslationsFixture>
+public class GuardAssetFolderTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly RefToken actor = RefToken.User("123");
 
     [Fact]
@@ -45,10 +44,10 @@ public class GuardAssetFolderTests : IClassFixture<TranslationsFixture>
 
         var operation = Operation(CreateAssetFolder());
 
-        A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, A<CancellationToken>._))
+        A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
             .Returns(new List<IAssetFolderEntity>());
 
-        await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId),
+        await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId, CancellationToken),
             new ValidationError("Asset folder does not exist.", "ParentId"));
     }
 
@@ -59,10 +58,10 @@ public class GuardAssetFolderTests : IClassFixture<TranslationsFixture>
 
         var operation = Operation(CreateAssetFolder());
 
-        A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, A<CancellationToken>._))
+        A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
             .Returns(new List<IAssetFolderEntity> { CreateAssetFolder() });
 
-        await operation.MustMoveToValidFolder(parentId);
+        await operation.MustMoveToValidFolder(parentId, CancellationToken);
     }
 
     [Fact]
@@ -72,9 +71,9 @@ public class GuardAssetFolderTests : IClassFixture<TranslationsFixture>
 
         var operation = Operation(CreateAssetFolder(default, parentId));
 
-        await operation.MustMoveToValidFolder(parentId);
+        await operation.MustMoveToValidFolder(parentId, CancellationToken);
 
-        A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, A<CancellationToken>._))
+        A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
             .MustNotHaveHappened();
     }
 
@@ -85,9 +84,9 @@ public class GuardAssetFolderTests : IClassFixture<TranslationsFixture>
 
         var operation = Operation(CreateAssetFolder());
 
-        await operation.MustMoveToValidFolder(parentId);
+        await operation.MustMoveToValidFolder(parentId, CancellationToken);
 
-        A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, A<DomainId>._, A<CancellationToken>._))
+        A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, A<DomainId>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -98,14 +97,14 @@ public class GuardAssetFolderTests : IClassFixture<TranslationsFixture>
 
         var operation = Operation(CreateAssetFolder());
 
-        A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, A<CancellationToken>._))
+        A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
             .Returns(new List<IAssetFolderEntity>
             {
                 CreateAssetFolder(operation.CommandId),
                 CreateAssetFolder(parentId, operation.CommandId)
             });
 
-        await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId),
+        await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId, CancellationToken),
             new ValidationError("Cannot add folder to its own child.", "ParentId"));
     }
 
@@ -123,7 +122,7 @@ public class GuardAssetFolderTests : IClassFixture<TranslationsFixture>
 
         return new AssetFolderOperation(serviceProvider, () => assetFolder)
         {
-            App = Mocks.App(appId),
+            App = App,
             CommandId = assetFolder.Id,
             Command = new CreateAssetFolder { User = currentUser, Actor = actor }
         };
@@ -136,7 +135,7 @@ public class GuardAssetFolderTests : IClassFixture<TranslationsFixture>
         A.CallTo(() => assetFolder.Id)
             .Returns(OrNew(id));
         A.CallTo(() => assetFolder.AppId)
-            .Returns(appId);
+            .Returns(AppId);
         A.CallTo(() => assetFolder.ParentId)
             .Returns(OrNew(parentId));
 

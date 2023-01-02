@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
 
-public class GuardAppWorkflowTests : IClassFixture<TranslationsFixture>
+public class GuardAppWorkflowTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly DomainId workflowId = DomainId.NewGuid();
     private readonly Workflows workflows;
@@ -23,6 +23,9 @@ public class GuardAppWorkflowTests : IClassFixture<TranslationsFixture>
     public GuardAppWorkflowTests()
     {
         workflows = Workflows.Empty.Add(workflowId, "name");
+
+        A.CallTo(() => App.Workflows)
+            .Returns(workflows);
     }
 
     [Fact]
@@ -51,7 +54,7 @@ public class GuardAppWorkflowTests : IClassFixture<TranslationsFixture>
             WorkflowId = DomainId.NewGuid()
         };
 
-        Assert.Throws<DomainObjectNotFoundException>(() => GuardAppWorkflows.CanUpdate(command, App()));
+        Assert.Throws<DomainObjectNotFoundException>(() => GuardAppWorkflows.CanUpdate(command, App));
     }
 
     [Fact]
@@ -59,7 +62,7 @@ public class GuardAppWorkflowTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateWorkflow { WorkflowId = workflowId };
 
-        ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App()),
+        ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App),
             new ValidationError("Workflow is required.", "Workflow"));
     }
 
@@ -77,7 +80,7 @@ public class GuardAppWorkflowTests : IClassFixture<TranslationsFixture>
             WorkflowId = workflowId
         };
 
-        ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App()),
+        ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App),
             new ValidationError("Initial step is required.", "Workflow.Initial"));
     }
 
@@ -95,7 +98,7 @@ public class GuardAppWorkflowTests : IClassFixture<TranslationsFixture>
             WorkflowId = workflowId
         };
 
-        ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App()),
+        ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App),
             new ValidationError("Initial step cannot be published step.", "Workflow.Initial"));
     }
 
@@ -113,7 +116,7 @@ public class GuardAppWorkflowTests : IClassFixture<TranslationsFixture>
             WorkflowId = workflowId
         };
 
-        ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App()),
+        ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App),
             new ValidationError("Workflow must have a published step.", "Workflow.Steps"));
     }
 
@@ -132,7 +135,7 @@ public class GuardAppWorkflowTests : IClassFixture<TranslationsFixture>
             WorkflowId = workflowId
         };
 
-        ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App()),
+        ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App),
             new ValidationError("Step is required.", "Workflow.Steps.Published"));
     }
 
@@ -156,7 +159,7 @@ public class GuardAppWorkflowTests : IClassFixture<TranslationsFixture>
             WorkflowId = workflowId
         };
 
-        ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App()),
+        ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App),
             new ValidationError("Transition has an invalid target.", "Workflow.Steps.Published.Transitions.Archived"));
     }
 
@@ -181,7 +184,7 @@ public class GuardAppWorkflowTests : IClassFixture<TranslationsFixture>
             WorkflowId = workflowId
         };
 
-        ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App()),
+        ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App),
             new ValidationError("Transition is required.", "Workflow.Steps.Published.Transitions.Draft"));
     }
 
@@ -190,7 +193,7 @@ public class GuardAppWorkflowTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateWorkflow { Workflow = Workflow.Default, WorkflowId = workflowId };
 
-        GuardAppWorkflows.CanUpdate(command, App());
+        GuardAppWorkflows.CanUpdate(command, App);
     }
 
     [Fact]
@@ -198,7 +201,7 @@ public class GuardAppWorkflowTests : IClassFixture<TranslationsFixture>
     {
         var command = new DeleteWorkflow { WorkflowId = DomainId.NewGuid() };
 
-        Assert.Throws<DomainObjectNotFoundException>(() => GuardAppWorkflows.CanDelete(command, App()));
+        Assert.Throws<DomainObjectNotFoundException>(() => GuardAppWorkflows.CanDelete(command, App));
     }
 
     [Fact]
@@ -206,15 +209,6 @@ public class GuardAppWorkflowTests : IClassFixture<TranslationsFixture>
     {
         var command = new DeleteWorkflow { WorkflowId = workflowId };
 
-        GuardAppWorkflows.CanDelete(command, App());
-    }
-
-    private IAppEntity App()
-    {
-        var app = A.Fake<IAppEntity>();
-
-        A.CallTo(() => app.Workflows).Returns(workflows);
-
-        return app;
+        GuardAppWorkflows.CanDelete(command, App);
     }
 }

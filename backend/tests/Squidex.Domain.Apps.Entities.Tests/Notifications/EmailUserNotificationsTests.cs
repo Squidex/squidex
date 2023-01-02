@@ -9,24 +9,19 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Email;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Notifications;
 
-public class EmailUserNotificationsTests
+public class EmailUserNotificationsTests : GivenContext
 {
     private readonly IEmailSender emailSender = A.Fake<IEmailSender>();
     private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
     private readonly IUser assigner = UserMocks.User("1", "1@email.com", "user1");
     private readonly IUser assigned = UserMocks.User("2", "2@email.com", "user2");
     private readonly ILogger<EmailUserNotifications> log = A.Fake<ILogger<EmailUserNotifications>>();
-    private readonly IAppEntity app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
-    private readonly ITeamEntity team = Mocks.Team(DomainId.NewGuid());
     private readonly EmailUserNotificationOptions texts = new EmailUserNotificationOptions();
     private readonly EmailUserNotifications sut;
 
@@ -89,7 +84,7 @@ public class EmailUserNotificationsTests
     [Fact]
     public async Task Should_not_send_app_invitation_email_if_texts_for_new_user_are_empty()
     {
-        await sut.SendInviteAsync(assigner, assigned, app);
+        await sut.SendInviteAsync(assigner, assigned, App);
 
         A.CallTo(() => emailSender.SendAsync(assigned.Email, A<string>._, A<string>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -100,7 +95,7 @@ public class EmailUserNotificationsTests
     [Fact]
     public async Task Should_not_send_text_invitation_email_if_texts_for_new_user_are_empty()
     {
-        await sut.SendInviteAsync(assigner, assigned, team);
+        await sut.SendInviteAsync(assigner, assigned, Team);
 
         A.CallTo(() => emailSender.SendAsync(assigned.Email, A<string>._, A<string>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -111,7 +106,7 @@ public class EmailUserNotificationsTests
     [Fact]
     public async Task Should_not_send_app_invitation_email_if_texts_for_existing_user_are_empty()
     {
-        await sut.SendInviteAsync(assigner, assigned, app);
+        await sut.SendInviteAsync(assigner, assigned, App);
 
         A.CallTo(() => emailSender.SendAsync(assigned.Email, A<string>._, A<string>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -122,7 +117,7 @@ public class EmailUserNotificationsTests
     [Fact]
     public async Task Should_not_send_text_invitation_email_if_texts_for_existing_user_are_empty()
     {
-        await sut.SendInviteAsync(assigner, assigned, team);
+        await sut.SendInviteAsync(assigner, assigned, Team);
 
         A.CallTo(() => emailSender.SendAsync(assigned.Email, A<string>._, A<string>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -133,7 +128,7 @@ public class EmailUserNotificationsTests
     [Fact]
     public async Task Should_not_send_usage_email_if_texts_empty()
     {
-        await sut.SendUsageAsync(assigned, app, 100, 120);
+        await sut.SendUsageAsync(assigned, App, 100, 120);
 
         A.CallTo(() => emailSender.SendAsync(assigned.Email, A<string>._, A<string>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -149,7 +144,7 @@ public class EmailUserNotificationsTests
         texts.ExistingUserSubject = "email-subject";
         texts.ExistingUserBody = "email-body";
 
-        await sut.SendInviteAsync(assigner, withoutConsent, app);
+        await sut.SendInviteAsync(assigner, withoutConsent, App);
 
         A.CallTo(() => emailSender.SendAsync(withoutConsent.Email, "email-subject", "email-body", A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -163,7 +158,7 @@ public class EmailUserNotificationsTests
         texts.ExistingTeamUserSubject = "email-subject";
         texts.ExistingTeamUserBody = "email-body";
 
-        await sut.SendInviteAsync(assigner, withoutConsent, team);
+        await sut.SendInviteAsync(assigner, withoutConsent, Team);
 
         A.CallTo(() => emailSender.SendAsync(withoutConsent.Email, "email-subject", "email-body", A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -177,7 +172,7 @@ public class EmailUserNotificationsTests
         texts.ExistingUserSubject = "email-subject";
         texts.ExistingUserBody = "email-body";
 
-        await sut.SendInviteAsync(assigner, withConsent, app);
+        await sut.SendInviteAsync(assigner, withConsent, App);
 
         A.CallTo(() => emailSender.SendAsync(withConsent.Email, "email-subject", "email-body", A<CancellationToken>._))
             .MustHaveHappened();
@@ -191,7 +186,7 @@ public class EmailUserNotificationsTests
         texts.ExistingTeamUserSubject = "email-subject";
         texts.ExistingTeamUserBody = "email-body";
 
-        await sut.SendInviteAsync(assigner, withConsent, team);
+        await sut.SendInviteAsync(assigner, withConsent, Team);
 
         A.CallTo(() => emailSender.SendAsync(withConsent.Email, "email-subject", "email-body", A<CancellationToken>._))
             .MustHaveHappened();
@@ -202,7 +197,7 @@ public class EmailUserNotificationsTests
         texts.UsageSubject = pattern;
         texts.UsageBody = pattern;
 
-        await sut.SendUsageAsync(assigned, app, 100, 120);
+        await sut.SendUsageAsync(assigned, App, 100, 120);
 
         A.CallTo(() => emailSender.SendAsync(assigned.Email, actual, actual, A<CancellationToken>._))
             .MustHaveHappened();
@@ -213,7 +208,7 @@ public class EmailUserNotificationsTests
         texts.NewUserSubject = pattern;
         texts.NewUserBody = pattern;
 
-        await sut.SendInviteAsync(assigner, assigned, app);
+        await sut.SendInviteAsync(assigner, assigned, App);
 
         A.CallTo(() => emailSender.SendAsync(assigned.Email, actual, actual, A<CancellationToken>._))
             .MustHaveHappened();

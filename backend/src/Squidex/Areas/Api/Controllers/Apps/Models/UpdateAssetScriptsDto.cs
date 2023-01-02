@@ -14,6 +14,16 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models;
 public sealed class UpdateAssetScriptsDto
 {
     /// <summary>
+    /// The script that is executed for each asset when querying assets.
+    /// </summary>
+    public string? Query { get; set; }
+
+    /// <summary>
+    /// The script that is executed for all assets when querying assets.
+    /// </summary>
+    public string? QueryPre { get; set; }
+
+    /// <summary>
     /// The script that is executed when creating an asset.
     /// </summary>
     public string? Create { get; init; }

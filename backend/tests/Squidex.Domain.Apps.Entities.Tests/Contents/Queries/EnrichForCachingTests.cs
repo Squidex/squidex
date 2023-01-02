@@ -7,30 +7,19 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
-public class EnrichForCachingTests
+public class EnrichForCachingTests : GivenContext
 {
-    private readonly ISchemaEntity schema;
     private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
-    private readonly Context requestContext;
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-    private readonly ProvideSchema schemaProvider;
     private readonly EnrichForCaching sut;
 
     public EnrichForCachingTests()
     {
-        requestContext = new Context(Mocks.ApiUser(), Mocks.App(appId));
-
-        schema = Mocks.Schema(appId, schemaId);
-        schemaProvider = x => Task.FromResult((schema, ResolvedComponents.Empty));
-
         sut = new EnrichForCaching(requestCache);
     }
 
@@ -42,7 +31,7 @@ public class EnrichForCachingTests
         A.CallTo(() => requestCache.AddHeader(A<string>._))
             .Invokes(new Action<string>(header => headers.Add(header)));
 
-        await sut.EnrichAsync(requestContext, default);
+        await sut.EnrichAsync(ApiContext, CancellationToken);
 
         Assert.Equal(new List<string>
         {
@@ -62,20 +51,25 @@ public class EnrichForCachingTests
     {
         var content = CreateContent();
 
-        await sut.EnrichAsync(requestContext, Enumerable.Repeat(content, 1), schemaProvider, default);
+        await sut.EnrichAsync(ApiContext, Enumerable.Repeat(content, 1), SchemaProvider(), CancellationToken);
 
         A.CallTo(() => requestCache.AddDependency(content.UniqueId, content.Version))
             .MustHaveHappened();
 
-        A.CallTo(() => requestCache.AddDependency(schema.UniqueId, schema.Version))
+        A.CallTo(() => requestCache.AddDependency(Schema.UniqueId, Schema.Version))
             .MustHaveHappened();
 
-        A.CallTo(() => requestCache.AddDependency(requestContext.App.UniqueId, requestContext.App.Version))
+        A.CallTo(() => requestCache.AddDependency(App.UniqueId, App.Version))
             .MustHaveHappened();
     }
 
     private ContentEntity CreateContent()
     {
-        return new ContentEntity { AppId = appId, Id = DomainId.NewGuid(), SchemaId = schemaId, Version = 13 };
+        return new ContentEntity { AppId = AppId, Id = DomainId.NewGuid(), SchemaId = SchemaId, Version = 13 };
+    }
+
+    private ProvideSchema SchemaProvider()
+    {
+        return x => Task.FromResult((Schema, ResolvedComponents.Empty));
     }
 }

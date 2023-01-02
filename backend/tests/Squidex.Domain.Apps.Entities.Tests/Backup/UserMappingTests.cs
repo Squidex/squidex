@@ -6,22 +6,19 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup;
 
-public class UserMappingTests
+public class UserMappingTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
-    private readonly RefToken initiator = Subject("me");
+    private readonly RefToken initiator = RefToken.User("me");
     private readonly UserMapping sut;
 
     public UserMappingTests()
     {
-        ct = cts.Token;
-
         sut = new UserMapping(initiator);
     }
 
@@ -29,9 +26,9 @@ public class UserMappingTests
     public async Task Should_backup_users_but_no_clients()
     {
         sut.Backup("1");
-        sut.Backup(Subject("2"));
+        sut.Backup(RefToken.User("2"));
 
-        sut.Backup(Client("client"));
+        sut.Backup(RefToken.Client("client"));
 
         var user1 = UserMocks.User("1", "1@email.com");
         var user2 = UserMocks.User("2", "1@email.com");
@@ -44,17 +41,17 @@ public class UserMappingTests
 
         var userResolver = A.Fake<IUserResolver>();
 
-        A.CallTo(() => userResolver.QueryManyAsync(A<string[]>.That.Is(user1.Id, user2.Id), ct))
+        A.CallTo(() => userResolver.QueryManyAsync(A<string[]>.That.Is(user1.Id, user2.Id), CancellationToken))
             .Returns(users);
 
         var writer = A.Fake<IBackupWriter>();
 
         Dictionary<string, string>? storedUsers = null;
 
-        A.CallTo(() => writer.WriteJsonAsync(A<string>._, A<object>._, ct))
+        A.CallTo(() => writer.WriteJsonAsync(A<string>._, A<object>._, CancellationToken))
             .Invokes(x => storedUsers = x.GetArgument<Dictionary<string, string>>(1));
 
-        await sut.StoreAsync(writer, userResolver, ct);
+        await sut.StoreAsync(writer, userResolver, CancellationToken);
 
         Assert.Equal(new Dictionary<string, string>
         {
@@ -73,25 +70,25 @@ public class UserMappingTests
 
         var userResolver = A.Fake<IUserResolver>();
 
-        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user1.Email, false, ct))
+        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user1.Email, false, CancellationToken))
             .Returns((user1, false));
 
-        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user2.Email, false, ct))
+        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user2.Email, false, CancellationToken))
             .Returns((user2, true));
 
-        await sut.RestoreAsync(reader, userResolver, ct);
+        await sut.RestoreAsync(reader, userResolver, CancellationToken);
 
         Assert.True(sut.TryMap("1_old", out var mapped1));
-        Assert.True(sut.TryMap(Subject("2_old"), out var mapped2));
+        Assert.True(sut.TryMap(RefToken.User("2_old"), out var mapped2));
 
-        Assert.Equal(Subject("1"), mapped1);
-        Assert.Equal(Subject("2"), mapped2);
+        Assert.Equal(RefToken.User("1"), mapped1);
+        Assert.Equal(RefToken.User("2"), mapped2);
     }
 
     [Fact]
     public void Should_return_initiator_if_user_not_found()
     {
-        var user = Subject("user1");
+        var user = RefToken.User("user1");
 
         Assert.False(sut.TryMap(user, out var mapped));
         Assert.Same(initiator, mapped);
@@ -100,7 +97,7 @@ public class UserMappingTests
     [Fact]
     public void Should_create_same_token_if_mapping_client()
     {
-        var client = Client("client1");
+        var client = RefToken.Client("client1");
 
         Assert.True(sut.TryMap(client, out var mapped));
         Assert.Same(client, mapped);
@@ -112,19 +109,9 @@ public class UserMappingTests
 
         var reader = A.Fake<IBackupReader>();
 
-        A.CallTo(() => reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, ct))
+        A.CallTo(() => reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, CancellationToken))
             .Returns(storedUsers);
 
         return reader;
-    }
-
-    private static RefToken Client(string identifier)
-    {
-        return RefToken.Client(identifier);
-    }
-
-    private static RefToken Subject(string identifier)
-    {
-        return RefToken.User(identifier);
     }
 }

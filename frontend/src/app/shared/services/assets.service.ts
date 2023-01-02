@@ -87,7 +87,7 @@ export class AssetDto {
     public fullUrl(apiUrl: ApiUrlConfig, authService?: AuthService) {
         let url = apiUrl.buildUrl(this.contentUrl);
 
-        if (this.isProtected && authService && authService.user) {
+        if (authService && authService.user) {
             url = StringHelper.appendToUrl(url, 'access_token', authService.user.accessToken);
         }
 

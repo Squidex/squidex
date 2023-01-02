@@ -393,8 +393,6 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_protect_asset()
     {
-        var fileName = $"{Guid.NewGuid()}.png";
-
         // STEP 1: Create asset
         var asset_1 = await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-squared.png", "image/png");
 
@@ -459,6 +457,70 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         }
 
         await Verify(asset_2);
+    }
+
+    [Fact]
+    public async Task Should_protect_asset_with_script()
+    {
+        var appName = Guid.NewGuid().ToString();
+
+        // STEP 0: Create app.
+        var appRequest = new CreateAppDto
+        {
+            Name = appName
+        };
+
+        await _.Apps.PostAppAsync(appRequest);
+
+
+        // STEP 1: Create folder.
+        var folderRequest = new CreateAssetFolderDto
+        {
+            FolderName = "folder"
+        };
+
+        var folder = await _.Assets.PostAssetFolderAsync(appName, folderRequest);
+
+
+        // STEP 2: Create asset
+        var asset_1 = await _.Assets.UploadFileAsync(appName, "Assets/logo-squared.png", "image/png", parentId: folder.Id);
+
+
+        // STEP 3: Download asset
+        await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+        {
+            var downloaded = await _.DownloadAsync(asset_1);
+
+            // Should dowload with correct size.
+            Assert.Equal(stream.Length, downloaded.Length);
+        }
+
+
+        // STEP 4: Protect asset using a script
+        var scriptsRequest = new UpdateAssetScriptsDto
+        {
+            Query = $@"
+                if (ctx.assetId === '{asset_1.Id}') {{
+                    disallow();
+                }}"
+        };
+
+        await _.Apps.PutAssetScriptsAsync(appName, scriptsRequest);
+
+
+        // STEP 5: Download asset.
+        await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+        {
+            var ex = await Assert.ThrowsAnyAsync<HttpRequestException>(() =>
+            {
+                return _.DownloadAsync(asset_1);
+            });
+
+            // Should return 403 from the script.
+            Assert.Equal(HttpStatusCode.Forbidden, ex.StatusCode);
+        }
+
+        await Verify(asset_1);
     }
 
     [Fact]

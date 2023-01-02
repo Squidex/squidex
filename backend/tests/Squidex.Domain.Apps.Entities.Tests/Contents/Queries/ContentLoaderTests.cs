@@ -6,30 +6,26 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
-public class ContentLoaderTests
+public class ContentLoaderTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
     private readonly IDomainObjectCache domainObjectCache = A.Fake<IDomainObjectCache>();
     private readonly ContentDomainObject domainObject = A.Fake<ContentDomainObject>();
-    private readonly DomainId appId = DomainId.NewGuid();
     private readonly DomainId id = DomainId.NewGuid();
     private readonly DomainId unqiueId;
     private readonly ContentLoader sut;
 
     public ContentLoaderTests()
     {
-        ct = cts.Token;
+        unqiueId = DomainId.Combine(AppId.Id, id);
 
-        unqiueId = DomainId.Combine(appId, id);
-
-        A.CallTo(() => domainObjectCache.GetAsync<ContentDomainObject.State>(A<DomainId>._, A<long>._, ct))
+        A.CallTo(() => domainObjectCache.GetAsync<ContentDomainObject.State>(A<DomainId>._, A<long>._, CancellationToken))
             .Returns(Task.FromResult<ContentDomainObject.State>(null!));
 
         A.CallTo(() => domainObjectFactory.Create<ContentDomainObject>(unqiueId))
@@ -43,10 +39,10 @@ public class ContentLoaderTests
     {
         var content = (ContentDomainObject.State)null!;
 
-        A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+        A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(content);
 
-        Assert.Null(await sut.GetAsync(appId, id, 10, ct));
+        Assert.Null(await sut.GetAsync(AppId.Id, id, 10, CancellationToken));
     }
 
     [Fact]
@@ -54,10 +50,10 @@ public class ContentLoaderTests
     {
         var content = new ContentDomainObject.State { Version = EtagVersion.Empty };
 
-        A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+        A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(content);
 
-        Assert.Null(await sut.GetAsync(appId, id, 10, ct));
+        Assert.Null(await sut.GetAsync(AppId.Id, id, 10, CancellationToken));
     }
 
     [Fact]
@@ -65,10 +61,10 @@ public class ContentLoaderTests
     {
         var content = new ContentDomainObject.State { Version = 5 };
 
-        A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+        A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(content);
 
-        Assert.Null(await sut.GetAsync(appId, id, 10, ct));
+        Assert.Null(await sut.GetAsync(AppId.Id, id, 10, CancellationToken));
     }
 
     [Fact]
@@ -76,10 +72,10 @@ public class ContentLoaderTests
     {
         var content = new ContentDomainObject.State { Version = 5 };
 
-        A.CallTo(() => domainObject.GetSnapshotAsync(EtagVersion.Any, ct))
+        A.CallTo(() => domainObject.GetSnapshotAsync(EtagVersion.Any, CancellationToken))
             .Returns(content);
 
-        var actual = await sut.GetAsync(appId, id, EtagVersion.Any, ct);
+        var actual = await sut.GetAsync(AppId.Id, id, EtagVersion.Any, CancellationToken);
 
         Assert.Same(content, actual);
     }
@@ -89,10 +85,10 @@ public class ContentLoaderTests
     {
         var content = new ContentDomainObject.State { Version = 10 };
 
-        A.CallTo(() => domainObject.GetSnapshotAsync(10, ct))
+        A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(content);
 
-        var actual = await sut.GetAsync(appId, id, 10, ct);
+        var actual = await sut.GetAsync(AppId.Id, id, 10, CancellationToken);
 
         Assert.Same(content, actual);
     }
@@ -102,10 +98,10 @@ public class ContentLoaderTests
     {
         var content = new ContentDomainObject.State { Version = 10 };
 
-        A.CallTo(() => domainObjectCache.GetAsync<ContentDomainObject.State>(DomainId.Combine(appId, id), 10, ct))
+        A.CallTo(() => domainObjectCache.GetAsync<ContentDomainObject.State>(DomainId.Combine(AppId.Id, id), 10, CancellationToken))
             .Returns(content);
 
-        var actual = await sut.GetAsync(appId, id, 10, ct);
+        var actual = await sut.GetAsync(AppId.Id, id, 10, CancellationToken);
 
         Assert.Same(content, actual);
 

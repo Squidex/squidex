@@ -6,22 +6,17 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
-using Squidex.Infrastructure;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Indexes;
 
-public class RulesIndexTests
+public class RulesIndexTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IRuleRepository ruleRepository = A.Fake<IRuleRepository>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly RulesIndex sut;
 
     public RulesIndexTests()
     {
-        ct = cts.Token;
-
         sut = new RulesIndex(ruleRepository);
     }
 
@@ -30,10 +25,10 @@ public class RulesIndexTests
     {
         var rule = SetupRule(0);
 
-        A.CallTo(() => ruleRepository.QueryAllAsync(appId.Id, ct))
+        A.CallTo(() => ruleRepository.QueryAllAsync(AppId.Id, CancellationToken))
             .Returns(new List<IRuleEntity> { rule });
 
-        var actual = await sut.GetRulesAsync(appId.Id, ct);
+        var actual = await sut.GetRulesAsync(AppId.Id, CancellationToken);
 
         Assert.Same(actual[0], rule);
     }
@@ -43,10 +38,10 @@ public class RulesIndexTests
     {
         var rule = SetupRule(-1);
 
-        A.CallTo(() => ruleRepository.QueryAllAsync(appId.Id, ct))
+        A.CallTo(() => ruleRepository.QueryAllAsync(AppId.Id, CancellationToken))
             .Returns(new List<IRuleEntity> { rule });
 
-        var actual = await sut.GetRulesAsync(appId.Id, ct);
+        var actual = await sut.GetRulesAsync(AppId.Id, CancellationToken);
 
         Assert.Empty(actual);
     }
@@ -56,16 +51,16 @@ public class RulesIndexTests
     {
         var rule = SetupRule(0, true);
 
-        A.CallTo(() => ruleRepository.QueryAllAsync(appId.Id, ct))
+        A.CallTo(() => ruleRepository.QueryAllAsync(AppId.Id, CancellationToken))
             .Returns(new List<IRuleEntity> { rule });
 
-        var actual = await sut.GetRulesAsync(appId.Id, ct);
+        var actual = await sut.GetRulesAsync(AppId.Id, CancellationToken);
 
         Assert.Empty(actual);
     }
 
     private IRuleEntity SetupRule(long version, bool isDeleted = false)
     {
-        return new RuleEntity { AppId = appId, Version = version, IsDeleted = isDeleted };
+        return new RuleEntity { AppId = AppId, Version = version, IsDeleted = isDeleted };
     }
 }

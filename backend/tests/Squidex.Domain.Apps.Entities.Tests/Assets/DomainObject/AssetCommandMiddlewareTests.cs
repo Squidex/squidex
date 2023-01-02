@@ -7,6 +7,7 @@
 
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Assets.Queries;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -15,18 +16,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
 public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.State>
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IDomainObjectCache domainObjectCache = A.Fake<IDomainObjectCache>();
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
     private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
     private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
     private readonly IAssetMetadataSource assetMetadataSource = A.Fake<IAssetMetadataSource>();
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
-    private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
     private readonly DomainId assetId = DomainId.NewGuid();
     private readonly AssetFile file = new NoopAssetFile();
-    private readonly Context requestContext;
     private readonly AssetCommandMiddleware sut;
 
     public sealed class MyCommand : SquidexCommand
@@ -35,21 +32,14 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
 
     protected override DomainId Id
     {
-        get => DomainId.Combine(AppId, assetId);
+        get => DomainId.Combine(AppId.Id, assetId);
     }
 
     public AssetCommandMiddlewareTests()
     {
-        ct = cts.Token;
-
         file = new NoopAssetFile();
 
-        requestContext = Context.Anonymous(Mocks.App(AppNamedId));
-
-        A.CallTo(() => contextProvider.Context)
-            .Returns(requestContext);
-
-        A.CallTo(() => assetQuery.FindByHashAsync(A<Context>._, A<string>._, A<string>._, A<long>._, ct))
+        A.CallTo(() => assetQuery.FindByHashAsync(A<Context>._, A<string>._, A<string>._, A<long>._, CancellationToken))
             .Returns(Task.FromResult<IEnrichedAssetEntity?>(null));
 
         sut = new AssetCommandMiddleware(
@@ -58,7 +48,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
             assetEnricher,
             assetFileStore,
             assetQuery,
-            contextProvider, new[] { assetMetadataSource });
+            ApiContextProvider, new[] { assetMetadataSource });
     }
 
     [Fact]
@@ -66,7 +56,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
     {
         await HandleAsync(new AnnotateAsset(), 12);
 
-        A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>._, requestContext, A<CancellationToken>._))
+        A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>._, ApiContext, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -79,7 +69,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
             await HandleAsync(new AnnotateAsset(),
                 actual);
 
-        A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>._, requestContext, A<CancellationToken>._))
+        A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>._, ApiContext, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -90,7 +80,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
 
         var enriched = new AssetEntity();
 
-        A.CallTo(() => assetEnricher.EnrichAsync(actual, requestContext, ct))
+        A.CallTo(() => assetEnricher.EnrichAsync(actual, ApiContext, CancellationToken))
             .Returns(enriched);
 
         var context =
@@ -130,7 +120,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
     {
         var actual = CreateAsset();
 
-        SetupSameHashAsset(file.FileName, file.FileSize, out _);
+        SetupSameHashAsset(file.FileName, file.FileSize, out var unused);
 
         var context =
             await HandleAsync(new CreateAsset { File = file, Duplicate = true },
@@ -184,7 +174,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
     {
         var actual = CreateAsset();
 
-        SetupSameHashAsset(file.FileName, file.FileSize, out _);
+        SetupSameHashAsset(file.FileName, file.FileSize, out var unused);
 
         var context =
             await HandleAsync(new UpsertAsset { File = file },
@@ -217,13 +207,13 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
 
     private void AssertAssetHasBeenUploaded(long fileVersion)
     {
-        A.CallTo(() => assetFileStore.UploadAsync(A<string>._, A<HasherStream>._, ct))
+        A.CallTo(() => assetFileStore.UploadAsync(A<string>._, A<HasherStream>._, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => assetFileStore.CopyAsync(A<string>._, AppId, assetId, fileVersion, null, ct))
+        A.CallTo(() => assetFileStore.CopyAsync(A<string>._, AppId.Id, assetId, fileVersion, null, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => assetFileStore.DeleteAsync(A<string>._, ct))
+        A.CallTo(() => assetFileStore.DeleteAsync(A<string>._, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -235,13 +225,13 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
             FileSize = fileSize
         };
 
-        A.CallTo(() => assetQuery.FindByHashAsync(requestContext, A<string>._, fileName, fileSize, ct))
+        A.CallTo(() => assetQuery.FindByHashAsync(ApiContext, A<string>._, fileName, fileSize, CancellationToken))
             .Returns(duplicate);
     }
 
     private void AssertMetadataEnriched()
     {
-        A.CallTo(() => assetMetadataSource.EnhanceAsync(A<UploadAssetCommand>._, ct))
+        A.CallTo(() => assetMetadataSource.EnhanceAsync(A<UploadAssetCommand>._, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -253,17 +243,17 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
 
         var domainObject = A.Fake<AssetDomainObject>();
 
-        A.CallTo(() => domainObject.ExecuteAsync(A<IAggregateCommand>._, ct))
+        A.CallTo(() => domainObject.ExecuteAsync(A<IAggregateCommand>._, CancellationToken))
             .Returns(new CommandResult(command.AggregateId, 1, 0, actual));
 
         A.CallTo(() => domainObjectFactory.Create<AssetDomainObject>(command.AggregateId))
             .Returns(domainObject);
 
-        return HandleAsync(sut, command, ct);
+        return HandleAsync(sut, command, CancellationToken);
     }
 
     private IAssetEntity CreateAsset(long fileVersion = 0)
     {
-        return new AssetEntity { AppId = AppNamedId, Id = assetId, FileVersion = fileVersion };
+        return new AssetEntity { AppId = AppId, Id = assetId, FileVersion = fileVersion };
     }
 }

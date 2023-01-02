@@ -15,16 +15,15 @@ using Squidex.Web.Pipeline;
 
 namespace Squidex.Web.CommandMiddlewares;
 
-public class EnrichWithTeamIdCommandMiddlewareTests
+public class EnrichWithTeamIdCommandMiddlewareTests : GivenContext
 {
     private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
-    private readonly DomainId teamId = DomainId.NewGuid();
     private readonly HttpContext httpContext = new DefaultHttpContext();
     private readonly EnrichWithTeamIdCommandMiddleware sut;
 
     public EnrichWithTeamIdCommandMiddlewareTests()
     {
-        httpContext.Features.Set<ITeamFeature>(new TeamFeature(Mocks.Team(teamId)));
+        httpContext.Features.Set<ITeamFeature>(new TeamFeature(Team));
 
         A.CallTo(() => httpContextAccessor.HttpContext)
             .Returns(httpContext);
@@ -45,7 +44,7 @@ public class EnrichWithTeamIdCommandMiddlewareTests
     {
         var context = await HandleAsync(new UpdateTeam());
 
-        Assert.Equal(teamId, ((ITeamCommand)context.Command).TeamId);
+        Assert.Equal(TeamId, ((ITeamCommand)context.Command).TeamId);
     }
 
     [Fact]

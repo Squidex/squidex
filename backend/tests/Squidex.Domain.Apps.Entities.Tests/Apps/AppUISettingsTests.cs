@@ -8,27 +8,21 @@
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.TestHelpers;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public sealed class AppUISettingsTests
+public sealed class AppUISettingsTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly TestState<AppUISettings.State> state;
-    private readonly DomainId appId = DomainId.NewGuid();
     private readonly string userId = Guid.NewGuid().ToString();
     private readonly string stateId;
     private readonly AppUISettings sut;
 
     public AppUISettingsTests()
     {
-        ct = cts.Token;
-
-        stateId = $"{appId}_{userId}";
+        stateId = $"{AppId.Id}_{userId}";
         state = new TestState<AppUISettings.State>(stateId);
 
         sut = new AppUISettings(state.PersistenceFactory);
@@ -45,87 +39,85 @@ public sealed class AppUISettingsTests
     [Fact]
     public async Task Should_delete_contributor_state()
     {
-        await ((IDeleter)sut).DeleteContributorAsync(appId, userId, ct);
+        await ((IDeleter)sut).DeleteContributorAsync(AppId.Id, userId, CancellationToken);
 
-        A.CallTo(() => state.Persistence.DeleteAsync(ct))
+        A.CallTo(() => state.Persistence.DeleteAsync(CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_delete_app_and_contributors()
     {
-        var app = Mocks.App(NamedId.Of(appId, "my-app"));
-
-        A.CallTo(() => app.Contributors)
+        A.CallTo(() => App.Contributors)
             .Returns(Contributors.Empty.Assign(userId, Role.Owner));
 
-        var rootState = new TestState<AppUISettings.State>(appId, state.PersistenceFactory);
+        var rootState = new TestState<AppUISettings.State>(AppId.Id, state.PersistenceFactory);
 
-        await ((IDeleter)sut).DeleteAppAsync(app, ct);
+        await ((IDeleter)sut).DeleteAppAsync(App, CancellationToken);
 
-        A.CallTo(() => state.Persistence.DeleteAsync(ct))
+        A.CallTo(() => state.Persistence.DeleteAsync(CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => rootState.Persistence.DeleteAsync(ct))
+        A.CallTo(() => rootState.Persistence.DeleteAsync(CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_set_setting()
     {
-        await sut.SetAsync(appId, userId, new JsonObject().Add("key", 42), ct);
+        await sut.SetAsync(AppId.Id, userId, new JsonObject().Add("key", 42), CancellationToken);
 
-        var actual = await sut.GetAsync(appId, userId, ct);
+        var actual = await sut.GetAsync(AppId.Id, userId, CancellationToken);
 
         var expected =
             new JsonObject().Add("key", 42);
 
         Assert.Equal(expected.ToString(), actual.ToString());
 
-        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, ct))
+        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_set_root_value()
     {
-        await sut.SetAsync(appId, userId, "key", 42, ct);
+        await sut.SetAsync(AppId.Id, userId, "key", 42, CancellationToken);
 
-        var actual = await sut.GetAsync(appId, userId, ct);
+        var actual = await sut.GetAsync(AppId.Id, userId, CancellationToken);
 
         var expected =
             new JsonObject().Add("key", 42);
 
         Assert.Equal(expected.ToString(), actual.ToString());
 
-        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, ct))
+        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_remove_root_value()
     {
-        await sut.SetAsync(appId, userId, "key", 42, ct);
+        await sut.SetAsync(AppId.Id, userId, "key", 42, CancellationToken);
 
-        await sut.RemoveAsync(appId, userId, "key", ct);
-        await sut.RemoveAsync(appId, userId, "key", ct);
+        await sut.RemoveAsync(AppId.Id, userId, "key", CancellationToken);
+        await sut.RemoveAsync(AppId.Id, userId, "key", CancellationToken);
 
-        var actual = await sut.GetAsync(appId, userId, ct);
+        var actual = await sut.GetAsync(AppId.Id, userId, CancellationToken);
 
         var expected = new JsonObject();
 
         Assert.Equal(expected.ToString(), actual.ToString());
 
-        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, ct))
+        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, CancellationToken))
             .MustHaveHappenedTwiceExactly();
     }
 
     [Fact]
     public async Task Should_set_nested_value()
     {
-        await sut.SetAsync(appId, userId, "root.nested", 42, ct);
+        await sut.SetAsync(AppId.Id, userId, "root.nested", 42, CancellationToken);
 
-        var actual = await sut.GetAsync(appId, userId, ct);
+        var actual = await sut.GetAsync(AppId.Id, userId, CancellationToken);
 
         var expected =
             new JsonObject().Add("root",
@@ -133,17 +125,17 @@ public sealed class AppUISettingsTests
 
         Assert.Equal(expected.ToString(), actual.ToString());
 
-        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, ct))
+        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_not_write_state_if_value_not_changed()
     {
-        await sut.SetAsync(appId, userId, "root.nested", 42, ct);
-        await sut.SetAsync(appId, userId, "root.nested", 42, ct);
+        await sut.SetAsync(AppId.Id, userId, "root.nested", 42, CancellationToken);
+        await sut.SetAsync(AppId.Id, userId, "root.nested", 42, CancellationToken);
 
-        var actual = await sut.GetAsync(appId, userId, ct);
+        var actual = await sut.GetAsync(AppId.Id, userId, CancellationToken);
 
         var expected =
             new JsonObject().Add("root",
@@ -151,19 +143,19 @@ public sealed class AppUISettingsTests
 
         Assert.Equal(expected.ToString(), actual.ToString());
 
-        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, ct))
+        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, CancellationToken))
             .MustHaveHappenedOnceExactly();
     }
 
     [Fact]
     public async Task Should_remove_nested_value()
     {
-        await sut.SetAsync(appId, userId, "root.nested", 42, ct);
+        await sut.SetAsync(AppId.Id, userId, "root.nested", 42, CancellationToken);
 
-        await sut.RemoveAsync(appId, userId, "root.nested", ct);
-        await sut.RemoveAsync(appId, userId, "key", ct);
+        await sut.RemoveAsync(AppId.Id, userId, "root.nested", CancellationToken);
+        await sut.RemoveAsync(AppId.Id, userId, "key", CancellationToken);
 
-        var actual = await sut.GetAsync(appId, userId, ct);
+        var actual = await sut.GetAsync(AppId.Id, userId, CancellationToken);
 
         var expected =
             new JsonObject().Add("root",
@@ -171,22 +163,22 @@ public sealed class AppUISettingsTests
 
         Assert.Equal(expected.ToString(), actual.ToString());
 
-        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, ct))
+        A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, CancellationToken))
             .MustHaveHappenedTwiceExactly();
     }
 
     [Fact]
     public async Task Should_throw_exception_if_nested_not_an_object()
     {
-        await sut.SetAsync(appId, userId, "root.nested", 42, ct);
+        await sut.SetAsync(AppId.Id, userId, "root.nested", 42, CancellationToken);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => sut.SetAsync(appId, userId, "root.nested.value", 42, ct));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => sut.SetAsync(AppId.Id, userId, "root.nested.value", 42, CancellationToken));
     }
 
     [Fact]
     public async Task Should_do_nothing_if_deleting_and_nested_not_found()
     {
-        await sut.RemoveAsync(appId, userId, "root.nested", ct);
+        await sut.RemoveAsync(AppId.Id, userId, "root.nested", CancellationToken);
 
         A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -195,7 +187,7 @@ public sealed class AppUISettingsTests
     [Fact]
     public async Task Should_do_nothing_if_deleting_and_key_not_found()
     {
-        await sut.RemoveAsync(appId, userId, "root", ct);
+        await sut.RemoveAsync(AppId.Id, userId, "root", CancellationToken);
 
         A.CallTo(() => state.Persistence.WriteSnapshotAsync(A<AppUISettings.State>._, A<CancellationToken>._))
             .MustNotHaveHappened();

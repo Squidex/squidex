@@ -20,7 +20,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
 
 public class RuleDomainObjectTests : HandlerTestBase<RuleDomainObject.State>
 {
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly IRuleEnqueuer ruleEnqueuer = A.Fake<IRuleEnqueuer>();
     private readonly DomainId ruleId = DomainId.NewGuid();
     private readonly RuleDomainObject sut;
@@ -42,7 +41,7 @@ public class RuleDomainObjectTests : HandlerTestBase<RuleDomainObject.State>
 
         var serviceProvider =
             new ServiceCollection()
-                .AddSingleton(appProvider)
+                .AddSingleton(AppProvider)
                 .AddSingleton(ruleEnqueuer)
                 .BuildServiceProvider();
 
@@ -69,7 +68,7 @@ public class RuleDomainObjectTests : HandlerTestBase<RuleDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.Equal(AppId, sut.Snapshot.AppId.Id);
+        Assert.Equal(AppId, sut.Snapshot.AppId);
 
         Assert.Same(command.Trigger, sut.Snapshot.RuleDef.Trigger);
         Assert.Same(command.Action, sut.Snapshot.RuleDef.Action);
@@ -290,7 +289,7 @@ public class RuleDomainObjectTests : HandlerTestBase<RuleDomainObject.State>
 
     private async Task<object?> PublishAsync(RuleCommand command)
     {
-        var actual = await sut.ExecuteAsync(CreateRuleCommand(command), default);
+        var actual = await sut.ExecuteAsync(CreateRuleCommand(command), CancellationToken);
 
         return actual.Payload;
     }

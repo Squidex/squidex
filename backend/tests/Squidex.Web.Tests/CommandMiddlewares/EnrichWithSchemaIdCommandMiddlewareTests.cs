@@ -15,18 +15,16 @@ using Squidex.Web.Pipeline;
 
 namespace Squidex.Web.CommandMiddlewares;
 
-public class EnrichWithSchemaIdCommandMiddlewareTests
+public class EnrichWithSchemaIdCommandMiddlewareTests : GivenContext
 {
     private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
     private readonly HttpContext httpContext = new DefaultHttpContext();
     private readonly EnrichWithSchemaIdCommandMiddleware sut;
 
     public EnrichWithSchemaIdCommandMiddlewareTests()
     {
-        httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
-        httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Mocks.Schema(appId, schemaId)));
+        httpContext.Features.Set<IAppFeature>(new AppFeature(App));
+        httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Schema));
 
         A.CallTo(() => httpContextAccessor.HttpContext)
             .Returns(httpContext);
@@ -47,7 +45,7 @@ public class EnrichWithSchemaIdCommandMiddlewareTests
     {
         var context = await HandleAsync(new CreateContent());
 
-        Assert.Equal(schemaId, ((ISchemaCommand)context.Command).SchemaId);
+        Assert.Equal(SchemaId, ((ISchemaCommand)context.Command).SchemaId);
     }
 
     [Fact]
@@ -62,7 +60,7 @@ public class EnrichWithSchemaIdCommandMiddlewareTests
 
     private async Task<CommandContext> HandleAsync(IAppCommand command)
     {
-        command.AppId = appId;
+        command.AppId = AppId;
 
         var commandContext = new CommandContext(command, A.Fake<ICommandBus>());
 

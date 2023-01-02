@@ -8,6 +8,7 @@
 using NodaTime;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Billing;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -15,20 +16,19 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public class AssetUsageTrackerTests
+public class AssetUsageTrackerTests : GivenContext
 {
     private readonly IAssetLoader assetLoader = A.Fake<IAssetLoader>();
     private readonly ISnapshotStore<AssetUsageTracker.State> store = A.Fake<ISnapshotStore<AssetUsageTracker.State>>();
     private readonly ITagService tagService = A.Fake<ITagService>();
     private readonly IUsageGate usageGate = A.Fake<IUsageGate>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly DomainId assetId = DomainId.NewGuid();
     private readonly DomainId assetKey;
     private readonly AssetUsageTracker sut;
 
     public AssetUsageTrackerTests()
     {
-        assetKey = DomainId.Combine(appId, assetId);
+        assetKey = DomainId.Combine(AppId, assetId);
 
         sut = new AssetUsageTracker(usageGate, assetLoader, tagService, store);
     }
@@ -81,7 +81,7 @@ public class AssetUsageTrackerTests
     {
         var date = DateTime.UtcNow.Date.AddDays(13);
 
-        @event.AppId = appId;
+        @event.AppId = AppId;
 
         var envelope =
             Envelope.Create<IEvent>(@event)
@@ -89,7 +89,7 @@ public class AssetUsageTrackerTests
 
         await sut.On(new[] { envelope });
 
-        A.CallTo(() => usageGate.TrackAssetAsync(appId.Id, date, sizeDiff, countDiff, default))
+        A.CallTo(() => usageGate.TrackAssetAsync(AppId.Id, date, sizeDiff, countDiff, default))
             .MustHaveHappened();
     }
 
@@ -98,7 +98,7 @@ public class AssetUsageTrackerTests
     {
         var @event = new AssetCreated
         {
-            AppId = appId,
+            AppId = AppId,
             Tags = new HashSet<string>
             {
                 "tag1",
@@ -113,7 +113,7 @@ public class AssetUsageTrackerTests
 
         Dictionary<string, int>? update = null;
 
-        A.CallTo(() => tagService.UpdateAsync(appId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
+        A.CallTo(() => tagService.UpdateAsync(AppId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
             .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
 
         await sut.On(new[] { envelope });
@@ -130,7 +130,7 @@ public class AssetUsageTrackerTests
     {
         var @event1 = new AssetCreated
         {
-            AppId = appId,
+            AppId = AppId,
             Tags = new HashSet<string>
             {
                 "tag1",
@@ -141,7 +141,7 @@ public class AssetUsageTrackerTests
 
         var @event2 = new AssetCreated
         {
-            AppId = appId,
+            AppId = AppId,
             Tags = new HashSet<string>
             {
                 "tag2",
@@ -160,7 +160,7 @@ public class AssetUsageTrackerTests
 
         Dictionary<string, int>? update = null;
 
-        A.CallTo(() => tagService.UpdateAsync(appId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
+        A.CallTo(() => tagService.UpdateAsync(AppId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
             .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
 
         await sut.On(new[] { envelope1, envelope2 });
@@ -181,7 +181,7 @@ public class AssetUsageTrackerTests
     {
         var @event1 = new AssetCreated
         {
-            AppId = appId,
+            AppId = AppId,
             Tags = new HashSet<string>
             {
                 "tag1",
@@ -192,7 +192,7 @@ public class AssetUsageTrackerTests
 
         var @event2 = new AssetAnnotated
         {
-            AppId = appId,
+            AppId = AppId,
             Tags = new HashSet<string>
             {
                 "tag2",
@@ -211,7 +211,7 @@ public class AssetUsageTrackerTests
 
         Dictionary<string, int>? update = null;
 
-        A.CallTo(() => tagService.UpdateAsync(appId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
+        A.CallTo(() => tagService.UpdateAsync(AppId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
             .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
 
         await sut.On(new[] { envelope1, envelope2 });
@@ -229,7 +229,7 @@ public class AssetUsageTrackerTests
     {
         var @event1 = new AssetCreated
         {
-            AppId = appId,
+            AppId = AppId,
             Tags = new HashSet<string>
             {
                 "tag1",
@@ -240,7 +240,7 @@ public class AssetUsageTrackerTests
 
         var @event2 = new AssetAnnotated
         {
-            AppId = appId,
+            AppId = AppId,
             Tags = new HashSet<string>
             {
                 "tag2",
@@ -259,7 +259,7 @@ public class AssetUsageTrackerTests
 
         Dictionary<string, int>? update = null;
 
-        A.CallTo(() => tagService.UpdateAsync(appId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
+        A.CallTo(() => tagService.UpdateAsync(AppId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
             .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
 
         await sut.On(new[] { envelope1 });
@@ -278,7 +278,7 @@ public class AssetUsageTrackerTests
     {
         var @event1 = new AssetCreated
         {
-            AppId = appId,
+            AppId = AppId,
             Tags = new HashSet<string>
             {
                 "tag1",
@@ -287,7 +287,7 @@ public class AssetUsageTrackerTests
             AssetId = assetId
         };
 
-        var @event2 = new AssetDeleted { AppId = appId, AssetId = assetId };
+        var @event2 = new AssetDeleted { AppId = AppId, AssetId = assetId };
 
         var envelope1 =
             Envelope.Create<IEvent>(@event1)
@@ -299,7 +299,7 @@ public class AssetUsageTrackerTests
 
         Dictionary<string, int>? update = null;
 
-        A.CallTo(() => tagService.UpdateAsync(appId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
+        A.CallTo(() => tagService.UpdateAsync(AppId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
             .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
 
         await sut.On(new[] { Envelope.Create<IEvent>(@event1), Envelope.Create<IEvent>(@event2) });
@@ -326,7 +326,7 @@ public class AssetUsageTrackerTests
         A.CallTo(() => store.ReadAsync(assetKey, default))
             .Returns(new SnapshotResult<AssetUsageTracker.State>(assetKey, state, 0));
 
-        var @event = new AssetDeleted { AppId = appId, AssetId = assetId };
+        var @event = new AssetDeleted { AppId = AppId, AssetId = assetId };
 
         var envelope =
             Envelope.Create<IEvent>(@event)
@@ -334,7 +334,7 @@ public class AssetUsageTrackerTests
 
         Dictionary<string, int>? update = null;
 
-        A.CallTo(() => tagService.UpdateAsync(appId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
+        A.CallTo(() => tagService.UpdateAsync(AppId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
             .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
 
         await sut.On(new[] { envelope });
@@ -358,10 +358,10 @@ public class AssetUsageTrackerTests
             }
         };
 
-        A.CallTo(() => assetLoader.GetAsync(appId.Id, assetId, 41, default))
+        A.CallTo(() => assetLoader.GetAsync(AppId.Id, assetId, 41, default))
             .Returns(asset);
 
-        var @event = new AssetDeleted { AppId = appId, AssetId = assetId };
+        var @event = new AssetDeleted { AppId = AppId, AssetId = assetId };
 
         var envelope =
             Envelope.Create<IEvent>(@event)
@@ -370,7 +370,7 @@ public class AssetUsageTrackerTests
 
         Dictionary<string, int>? update = null;
 
-        A.CallTo(() => tagService.UpdateAsync(appId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
+        A.CallTo(() => tagService.UpdateAsync(AppId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
             .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
 
         await sut.On(new[] { envelope });

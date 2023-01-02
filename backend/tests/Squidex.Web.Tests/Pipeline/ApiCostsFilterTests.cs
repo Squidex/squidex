@@ -11,14 +11,13 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Billing;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 
 namespace Squidex.Web.Pipeline;
 
-public class ApiCostsFilterTests
+public class ApiCostsFilterTests : GivenContext
 {
-    private readonly IAppEntity appEntity = A.Fake<IAppEntity>();
     private readonly IUsageGate usageGate = A.Fake<IUsageGate>();
     private readonly ActionExecutingContext actionContext;
     private readonly ActionExecutionDelegate next;
@@ -51,7 +50,7 @@ public class ApiCostsFilterTests
 
         SetupApp();
 
-        A.CallTo(() => usageGate.IsBlockedAsync(appEntity, A<string>._, DateTime.Today, default))
+        A.CallTo(() => usageGate.IsBlockedAsync(App, A<string>._, DateTime.Today, default))
             .Returns(true);
 
         await sut.OnActionExecutionAsync(actionContext, next);
@@ -67,7 +66,7 @@ public class ApiCostsFilterTests
 
         SetupApp();
 
-        A.CallTo(() => usageGate.IsBlockedAsync(appEntity, A<string>._, DateTime.Today, default))
+        A.CallTo(() => usageGate.IsBlockedAsync(App, A<string>._, DateTime.Today, default))
             .Returns(false);
 
         await sut.OnActionExecutionAsync(actionContext, next);
@@ -86,7 +85,7 @@ public class ApiCostsFilterTests
 
         Assert.True(isNextCalled);
 
-        A.CallTo(() => usageGate.IsBlockedAsync(appEntity, A<string>._, DateTime.Today, default))
+        A.CallTo(() => usageGate.IsBlockedAsync(App, A<string>._, DateTime.Today, default))
             .MustNotHaveHappened();
     }
 
@@ -99,12 +98,12 @@ public class ApiCostsFilterTests
 
         Assert.True(isNextCalled);
 
-        A.CallTo(() => usageGate.IsBlockedAsync(appEntity, A<string>._, DateTime.Today, default))
+        A.CallTo(() => usageGate.IsBlockedAsync(App, A<string>._, DateTime.Today, default))
             .MustNotHaveHappened();
     }
 
     private void SetupApp()
     {
-        httpContext.Features.Set(Context.Anonymous(appEntity));
+        httpContext.Features.Set(Context.Anonymous(App));
     }
 }

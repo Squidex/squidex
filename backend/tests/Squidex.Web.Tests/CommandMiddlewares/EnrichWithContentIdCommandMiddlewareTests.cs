@@ -6,15 +6,14 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Web.CommandMiddlewares;
 
-public class EnrichWithContentIdCommandMiddlewareTests
+public class EnrichWithContentIdCommandMiddlewareTests : GivenContext
 {
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
     private readonly EnrichWithContentIdCommandMiddleware sut;
 
     public EnrichWithContentIdCommandMiddlewareTests()
@@ -32,7 +31,7 @@ public class EnrichWithContentIdCommandMiddlewareTests
 
         await HandleAsync(command);
 
-        Assert.Equal(schemaId.Id, command.ContentId);
+        Assert.Equal(SchemaId.Id, command.ContentId);
     }
 
     [Fact]
@@ -40,12 +39,12 @@ public class EnrichWithContentIdCommandMiddlewareTests
     {
         var command = new CreateContent
         {
-            ContentId = DomainId.Create("_schemaId_")
+            ContentId = DomainId.Create("_SchemaId_")
         };
 
         await HandleAsync(command);
 
-        Assert.NotEqual(schemaId.Id, command.ContentId);
+        Assert.NotEqual(SchemaId.Id, command.ContentId);
     }
 
     [Fact]
@@ -58,13 +57,13 @@ public class EnrichWithContentIdCommandMiddlewareTests
 
         await HandleAsync(command);
 
-        Assert.NotEqual(schemaId.Id, command.ContentId);
+        Assert.NotEqual(SchemaId.Id, command.ContentId);
     }
 
     private async Task<CommandContext> HandleAsync(ContentCommand command)
     {
-        command.AppId = appId;
-        command.SchemaId = schemaId;
+        command.AppId = AppId;
+        command.SchemaId = SchemaId;
 
         var commandContext = new CommandContext(command, A.Fake<ICommandBus>());
 

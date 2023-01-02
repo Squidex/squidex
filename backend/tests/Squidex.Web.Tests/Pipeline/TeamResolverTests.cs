@@ -14,8 +14,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Teams;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared.Identity;
@@ -24,14 +24,12 @@ using Squidex.Shared.Identity;
 
 namespace Squidex.Web.Pipeline;
 
-public class TeamResolverTests
+public class TeamResolverTests : GivenContext
 {
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly HttpContext httpContext = new DefaultHttpContext();
     private readonly ActionContext actionContext;
     private readonly ActionExecutingContext actionExecutingContext;
     private readonly ActionExecutionDelegate next;
-    private readonly DomainId teamId = DomainId.NewGuid();
     private readonly TeamResolver sut;
     private bool isNextCalled;
 
@@ -44,7 +42,7 @@ public class TeamResolverTests
 
         actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>(), this);
         actionExecutingContext.HttpContext = httpContext;
-        actionExecutingContext.RouteData.Values["team"] = teamId.ToString();
+        actionExecutingContext.RouteData.Values["team"] = TeamId.ToString();
 
         next = () =>
         {
@@ -53,7 +51,7 @@ public class TeamResolverTests
             return Task.FromResult<ActionExecutedContext>(null!);
         };
 
-        sut = new TeamResolver(appProvider);
+        sut = new TeamResolver(AppProvider);
     }
 
     [Theory]
@@ -71,7 +69,7 @@ public class TeamResolverTests
         Assert.IsType<NotFoundResult>(actionExecutingContext.Result);
         Assert.False(isNextCalled);
 
-        A.CallTo(() => appProvider.GetTeamAsync(A<DomainId>._, httpContext.RequestAborted))
+        A.CallTo(() => AppProvider.GetTeamAsync(A<DomainId>._, httpContext.RequestAborted))
             .MustNotHaveHappened();
     }
 
@@ -80,7 +78,7 @@ public class TeamResolverTests
     {
         SetupUser();
 
-        A.CallTo(() => appProvider.GetTeamAsync(teamId, httpContext.RequestAborted))
+        A.CallTo(() => AppProvider.GetTeamAsync(TeamId, httpContext.RequestAborted))
             .Returns(Task.FromResult<ITeamEntity?>(null));
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -94,10 +92,8 @@ public class TeamResolverTests
     {
         SetupUser(null);
 
-        var team = CreateTeam(teamId);
-
-        A.CallTo(() => appProvider.GetTeamAsync(teamId, httpContext.RequestAborted))
-            .Returns(team);
+        A.CallTo(() => AppProvider.GetTeamAsync(TeamId, httpContext.RequestAborted))
+            .Returns(Team);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
@@ -110,22 +106,20 @@ public class TeamResolverTests
     {
         var user = SetupUser();
 
-        var team = CreateTeam(teamId);
+        user.AddClaim(new Claim(OpenIdClaims.Subject, User.Identifier));
+        user.AddClaim(new Claim(SquidexClaimTypes.Permissions, $"squidex.teams.{TeamId}"));
 
-        user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
-        user.AddClaim(new Claim(SquidexClaimTypes.Permissions, $"squidex.teams.{teamId}"));
-
-        A.CallTo(() => appProvider.GetTeamAsync(teamId, httpContext.RequestAborted))
-            .Returns(team);
+        A.CallTo(() => AppProvider.GetTeamAsync(TeamId, httpContext.RequestAborted))
+            .Returns(Team);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
         var permissions = user.Claims.Where(x => x.Type == SquidexClaimTypes.Permissions).ToList();
 
-        Assert.Same(team, httpContext.Features.Get<ITeamFeature>()!.Team);
+        Assert.Same(Team, httpContext.Features.Get<ITeamFeature>()!.Team);
         Assert.True(user.Claims.Any());
         Assert.True(permissions.Count < 3);
-        Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.teams.{teamId}", StringComparison.OrdinalIgnoreCase)));
+        Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.teams.{TeamId}", StringComparison.OrdinalIgnoreCase)));
         Assert.True(isNextCalled);
     }
 
@@ -134,21 +128,22 @@ public class TeamResolverTests
     {
         var user = SetupUser();
 
-        var team = CreateTeam(teamId, user: "user1");
+        user.AddClaim(new Claim(OpenIdClaims.Subject, User.Identifier));
 
-        user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
+        A.CallTo(() => Team.Contributors)
+            .Returns(Contributors.Empty.Assign(User.Identifier, Role.Owner));
 
-        A.CallTo(() => appProvider.GetTeamAsync(teamId, httpContext.RequestAborted))
-            .Returns(team);
+        A.CallTo(() => AppProvider.GetTeamAsync(TeamId, httpContext.RequestAborted))
+            .Returns(Team);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
         var permissions = user.Claims.Where(x => x.Type == SquidexClaimTypes.Permissions).ToList();
 
-        Assert.Same(team, httpContext.Features.Get<ITeamFeature>()!.Team);
+        Assert.Same(Team, httpContext.Features.Get<ITeamFeature>()!.Team);
         Assert.True(user.Claims.Count() > 2);
         Assert.True(permissions.Count < 3);
-        Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.teams.{teamId}", StringComparison.OrdinalIgnoreCase)));
+        Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.teams.{TeamId}", StringComparison.OrdinalIgnoreCase)));
         Assert.True(isNextCalled);
     }
 
@@ -157,19 +152,17 @@ public class TeamResolverTests
     {
         var user = SetupUser();
 
-        user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{teamId}:client1"));
+        user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{TeamId}:client1"));
         user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.teams.other-team"));
-
-        var team = CreateTeam(teamId);
 
         actionContext.ActionDescriptor.EndpointMetadata.Add(new AllowAnonymousAttribute());
 
-        A.CallTo(() => appProvider.GetTeamAsync(teamId, httpContext.RequestAborted))
-            .Returns(team);
+        A.CallTo(() => AppProvider.GetTeamAsync(TeamId, httpContext.RequestAborted))
+            .Returns(Team);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-        Assert.Same(team, httpContext.Features.Get<ITeamFeature>()!.Team);
+        Assert.Same(Team, httpContext.Features.Get<ITeamFeature>()!.Team);
         Assert.Equal(2, user.Claims.Count());
         Assert.True(isNextCalled);
     }
@@ -179,13 +172,11 @@ public class TeamResolverTests
     {
         var user = SetupUser();
 
-        user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{teamId}:client1"));
+        user.AddClaim(new Claim(OpenIdClaims.ClientId, $"{TeamId}:client1"));
         user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.teams.other-team"));
 
-        var team = CreateTeam(teamId);
-
-        A.CallTo(() => appProvider.GetTeamAsync(teamId, httpContext.RequestAborted))
-            .Returns(team);
+        A.CallTo(() => AppProvider.GetTeamAsync(TeamId, httpContext.RequestAborted))
+            .Returns(Team);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
@@ -202,7 +193,7 @@ public class TeamResolverTests
 
         Assert.True(isNextCalled);
 
-        A.CallTo(() => appProvider.GetTeamAsync(A<DomainId>._, httpContext.RequestAborted))
+        A.CallTo(() => AppProvider.GetTeamAsync(A<DomainId>._, httpContext.RequestAborted))
             .MustNotHaveHappened();
     }
 
@@ -214,22 +205,5 @@ public class TeamResolverTests
         actionExecutingContext.HttpContext.User = userPrincipal;
 
         return userIdentity;
-    }
-
-    private static ITeamEntity CreateTeam(DomainId id, string? user = null)
-    {
-        var team = A.Fake<ITeamEntity>();
-
-        var contributors = Contributors.Empty;
-
-        if (user != null)
-        {
-            contributors = contributors.Assign(user, Role.Owner);
-        }
-
-        A.CallTo(() => team.Id).Returns(id);
-        A.CallTo(() => team.Contributors).Returns(contributors);
-
-        return team;
     }
 }

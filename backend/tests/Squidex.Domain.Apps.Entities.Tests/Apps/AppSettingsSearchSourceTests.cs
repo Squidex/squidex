@@ -5,20 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Security.Claims;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Shared;
-using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public sealed class AppSettingsSearchSourceTests
+public sealed class AppSettingsSearchSourceTests : GivenContext
 {
     private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly AppSettingsSearchSource sut;
 
     public AppSettingsSearchSourceTests()
@@ -29,24 +25,20 @@ public sealed class AppSettingsSearchSourceTests
     [Fact]
     public async Task Should_return_empty_if_nothing_matching()
     {
-        var ctx = ContextWithPermission();
-
-        var actual = await sut.SearchAsync("xyz", ctx, default);
+        var actual = await sut.SearchAsync("xyz", ApiContext, CancellationToken);
 
         Assert.Empty(actual);
     }
 
     [Fact]
-    public async Task Should_return_dashboard_actual_if_matching_and_permission_given()
+    public async Task Should_return_dashboard_result_if_matching_and_permission_given()
     {
-        var permission = PermissionIds.ForApp(PermissionIds.AppUsage, appId.Name);
+        var requestContext = SetupContext(PermissionIds.AppUsage);
 
-        var ctx = ContextWithPermission(permission.Id);
-
-        A.CallTo(() => urlGenerator.DashboardUI(appId))
+        A.CallTo(() => urlGenerator.DashboardUI(AppId))
             .Returns("dashboard-url");
 
-        var actual = await sut.SearchAsync("dashboard", ctx, default);
+        var actual = await sut.SearchAsync("dashboard", requestContext, CancellationToken);
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
@@ -54,26 +46,22 @@ public sealed class AppSettingsSearchSourceTests
     }
 
     [Fact]
-    public async Task Should_not_return_dashboard_actual_if_user_has_no_permission()
+    public async Task Should_not_return_dashboard_result_if_user_has_no_permission()
     {
-        var ctx = ContextWithPermission();
-
-        var actual = await sut.SearchAsync("assets", ctx, default);
+        var actual = await sut.SearchAsync("assets", ApiContext, CancellationToken);
 
         Assert.Empty(actual);
     }
 
     [Fact]
-    public async Task Should_return_languages_actual_if_matching_and_permission_given()
+    public async Task Should_return_languages_result_if_matching_and_permission_given()
     {
-        var permission = PermissionIds.ForApp(PermissionIds.AppLanguagesRead, appId.Name);
+        var requestContext = SetupContext(PermissionIds.AppLanguagesRead);
 
-        var ctx = ContextWithPermission(permission.Id);
-
-        A.CallTo(() => urlGenerator.LanguagesUI(appId))
+        A.CallTo(() => urlGenerator.LanguagesUI(AppId))
             .Returns("languages-url");
 
-        var actual = await sut.SearchAsync("languages", ctx, default);
+        var actual = await sut.SearchAsync("languages", requestContext, CancellationToken);
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
@@ -81,36 +69,22 @@ public sealed class AppSettingsSearchSourceTests
     }
 
     [Fact]
-    public async Task Should_not_return_languages_actual_if_user_has_no_permission()
+    public async Task Should_not_return_languages_result_if_user_has_no_permission()
     {
-        var ctx = ContextWithPermission();
-
-        var actual = await sut.SearchAsync("assets", ctx, default);
+        var actual = await sut.SearchAsync("assets", ApiContext, CancellationToken);
 
         Assert.Empty(actual);
     }
 
     [Fact]
-    public async Task Should_not_return_patterns_actual_if_user_has_no_permission()
+    public async Task Should_return_schemas_result_if_matching_and_permission_given()
     {
-        var ctx = ContextWithPermission();
+        var requestContext = SetupContext(PermissionIds.AppSchemasRead);
 
-        var actual = await sut.SearchAsync("patterns", ctx, default);
-
-        Assert.Empty(actual);
-    }
-
-    [Fact]
-    public async Task Should_return_schemas_actual_if_matching_and_permission_given()
-    {
-        var permission = PermissionIds.ForApp(PermissionIds.AppSchemasRead, appId.Name);
-
-        var ctx = ContextWithPermission(permission.Id);
-
-        A.CallTo(() => urlGenerator.SchemasUI(appId))
+        A.CallTo(() => urlGenerator.SchemasUI(AppId))
             .Returns("schemas-url");
 
-        var actual = await sut.SearchAsync("schemas", ctx, default);
+        var actual = await sut.SearchAsync("schemas", requestContext, CancellationToken);
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
@@ -118,26 +92,22 @@ public sealed class AppSettingsSearchSourceTests
     }
 
     [Fact]
-    public async Task Should_not_return_schemas_actual_if_user_has_no_permission()
+    public async Task Should_not_return_schemas_result_if_user_has_no_permission()
     {
-        var ctx = ContextWithPermission();
-
-        var actual = await sut.SearchAsync("schemas", ctx, default);
+        var actual = await sut.SearchAsync("schemas", ApiContext, CancellationToken);
 
         Assert.Empty(actual);
     }
 
     [Fact]
-    public async Task Should_return_assets_actual_if_matching_and_permission_given()
+    public async Task Should_return_assets_result_if_matching_and_permission_given()
     {
-        var permission = PermissionIds.ForApp(PermissionIds.AppAssetsRead, appId.Name);
+        var requestContext = SetupContext(PermissionIds.AppAssetsRead);
 
-        var ctx = ContextWithPermission(permission.Id);
-
-        A.CallTo(() => urlGenerator.AssetsUI(appId, A<string?>._))
+        A.CallTo(() => urlGenerator.AssetsUI(AppId, A<string?>._))
             .Returns("assets-url");
 
-        var actual = await sut.SearchAsync("assets", ctx, default);
+        var actual = await sut.SearchAsync("assets", requestContext, CancellationToken);
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
@@ -145,26 +115,22 @@ public sealed class AppSettingsSearchSourceTests
     }
 
     [Fact]
-    public async Task Should_not_return_assets_actual_if_user_has_no_permission()
+    public async Task Should_not_return_assets_result_if_user_has_no_permission()
     {
-        var ctx = ContextWithPermission();
-
-        var actual = await sut.SearchAsync("assets", ctx, default);
+        var actual = await sut.SearchAsync("assets", ApiContext, CancellationToken);
 
         Assert.Empty(actual);
     }
 
     [Fact]
-    public async Task Should_return_backups_actual_if_matching_and_permission_given()
+    public async Task Should_return_backups_result_if_matching_and_permission_given()
     {
-        var permission = PermissionIds.ForApp(PermissionIds.AppBackupsRead, appId.Name);
+        var requestContext = SetupContext(PermissionIds.AppBackupsRead);
 
-        var ctx = ContextWithPermission(permission.Id);
-
-        A.CallTo(() => urlGenerator.BackupsUI(appId))
+        A.CallTo(() => urlGenerator.BackupsUI(AppId))
             .Returns("backups-url");
 
-        var actual = await sut.SearchAsync("backups", ctx, default);
+        var actual = await sut.SearchAsync("backups", requestContext, CancellationToken);
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
@@ -172,26 +138,22 @@ public sealed class AppSettingsSearchSourceTests
     }
 
     [Fact]
-    public async Task Should_not_return_backups_actual_if_user_has_no_permission()
+    public async Task Should_not_return_backups_result_if_user_has_no_permission()
     {
-        var ctx = ContextWithPermission();
-
-        var actual = await sut.SearchAsync("backups", ctx, default);
+        var actual = await sut.SearchAsync("backups", ApiContext, CancellationToken);
 
         Assert.Empty(actual);
     }
 
     [Fact]
-    public async Task Should_return_clients_actual_if_matching_and_permission_given()
+    public async Task Should_return_clients_result_if_matching_and_permission_given()
     {
-        var permission = PermissionIds.ForApp(PermissionIds.AppClientsRead, appId.Name);
+        var requestContext = SetupContext(PermissionIds.AppClientsRead);
 
-        var ctx = ContextWithPermission(permission.Id);
-
-        A.CallTo(() => urlGenerator.ClientsUI(appId))
+        A.CallTo(() => urlGenerator.ClientsUI(AppId))
             .Returns("clients-url");
 
-        var actual = await sut.SearchAsync("clients", ctx, default);
+        var actual = await sut.SearchAsync("clients", requestContext, CancellationToken);
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
@@ -199,26 +161,22 @@ public sealed class AppSettingsSearchSourceTests
     }
 
     [Fact]
-    public async Task Should_not_return_clients_actual_if_user_has_no_permission()
+    public async Task Should_not_return_clients_result_if_user_has_no_permission()
     {
-        var ctx = ContextWithPermission();
-
-        var actual = await sut.SearchAsync("clients", ctx, default);
+        var actual = await sut.SearchAsync("clients", ApiContext, CancellationToken);
 
         Assert.Empty(actual);
     }
 
     [Fact]
-    public async Task Should_return_contributors_actual_if_matching_and_permission_given()
+    public async Task Should_return_contributors_result_if_matching_and_permission_given()
     {
-        var permission = PermissionIds.ForApp(PermissionIds.AppContributorsRead, appId.Name);
+        var requestContext = SetupContext(PermissionIds.AppContributorsRead);
 
-        var ctx = ContextWithPermission(permission.Id);
-
-        A.CallTo(() => urlGenerator.ContributorsUI(appId))
+        A.CallTo(() => urlGenerator.ContributorsUI(AppId))
             .Returns("contributors-url");
 
-        var actual = await sut.SearchAsync("contributors", ctx, default);
+        var actual = await sut.SearchAsync("contributors", requestContext, CancellationToken);
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
@@ -226,26 +184,22 @@ public sealed class AppSettingsSearchSourceTests
     }
 
     [Fact]
-    public async Task Should_not_contributors_clients_actual_if_user_has_no_permission()
+    public async Task Should_not_contributors_clients_result_if_user_has_no_permission()
     {
-        var ctx = ContextWithPermission();
-
-        var actual = await sut.SearchAsync("contributors", ctx, default);
+        var actual = await sut.SearchAsync("contributors", ApiContext, CancellationToken);
 
         Assert.Empty(actual);
     }
 
     [Fact]
-    public async Task Should_return_subscription_actual_if_matching_and_permission_given()
+    public async Task Should_return_subscription_result_if_matching_and_permission_given()
     {
-        var permission = PermissionIds.ForApp(PermissionIds.AppPlansRead, appId.Name);
+        var requestContext = SetupContext(PermissionIds.AppPlansRead);
 
-        var ctx = ContextWithPermission(permission.Id);
-
-        A.CallTo(() => urlGenerator.PlansUI(appId))
+        A.CallTo(() => urlGenerator.PlansUI(AppId))
             .Returns("subscription-url");
 
-        var actual = await sut.SearchAsync("subscription", ctx, default);
+        var actual = await sut.SearchAsync("subscription", requestContext, CancellationToken);
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
@@ -253,26 +207,22 @@ public sealed class AppSettingsSearchSourceTests
     }
 
     [Fact]
-    public async Task Should_not_subscription_clients_actual_if_user_has_no_permission()
+    public async Task Should_not_subscription_clients_result_if_user_has_no_permission()
     {
-        var ctx = ContextWithPermission();
-
-        var actual = await sut.SearchAsync("subscription", ctx, default);
+        var actual = await sut.SearchAsync("subscription", ApiContext, CancellationToken);
 
         Assert.Empty(actual);
     }
 
     [Fact]
-    public async Task Should_return_roles_actual_if_matching_and_permission_given()
+    public async Task Should_return_roles_result_if_matching_and_permission_given()
     {
-        var permission = PermissionIds.ForApp(PermissionIds.AppRolesRead, appId.Name);
+        var requestContext = SetupContext(PermissionIds.AppRolesRead);
 
-        var ctx = ContextWithPermission(permission.Id);
-
-        A.CallTo(() => urlGenerator.RolesUI(appId))
+        A.CallTo(() => urlGenerator.RolesUI(AppId))
             .Returns("roles-url");
 
-        var actual = await sut.SearchAsync("roles", ctx, default);
+        var actual = await sut.SearchAsync("roles", requestContext, CancellationToken);
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
@@ -280,26 +230,22 @@ public sealed class AppSettingsSearchSourceTests
     }
 
     [Fact]
-    public async Task Should_not_roles_clients_actual_if_user_has_no_permission()
+    public async Task Should_not_roles_clients_result_if_user_has_no_permission()
     {
-        var ctx = ContextWithPermission();
-
-        var actual = await sut.SearchAsync("roles", ctx, default);
+        var actual = await sut.SearchAsync("roles", ApiContext, CancellationToken);
 
         Assert.Empty(actual);
     }
 
     [Fact]
-    public async Task Should_return_rules_actual_if_matching_and_permission_given()
+    public async Task Should_return_rules_result_if_matching_and_permission_given()
     {
-        var permission = PermissionIds.ForApp(PermissionIds.AppRulesRead, appId.Name);
+        var requestContext = SetupContext(PermissionIds.AppRulesRead);
 
-        var ctx = ContextWithPermission(permission.Id);
-
-        A.CallTo(() => urlGenerator.RulesUI(appId))
+        A.CallTo(() => urlGenerator.RulesUI(AppId))
             .Returns("rules-url");
 
-        var actual = await sut.SearchAsync("rules", ctx, default);
+        var actual = await sut.SearchAsync("rules", requestContext, CancellationToken);
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
@@ -307,26 +253,22 @@ public sealed class AppSettingsSearchSourceTests
     }
 
     [Fact]
-    public async Task Should_not_return_rules_actual_if_user_has_no_permission()
+    public async Task Should_not_return_rules_result_if_user_has_no_permission()
     {
-        var ctx = ContextWithPermission();
-
-        var actual = await sut.SearchAsync("assets", ctx, default);
+        var actual = await sut.SearchAsync("assets", ApiContext, CancellationToken);
 
         Assert.Empty(actual);
     }
 
     [Fact]
-    public async Task Should_return_workflows_actual_if_matching_and_permission_given()
+    public async Task Should_return_workflows_result_if_matching_and_permission_given()
     {
-        var permission = PermissionIds.ForApp(PermissionIds.AppWorkflowsRead, appId.Name);
+        var requestContext = SetupContext(PermissionIds.AppWorkflowsRead);
 
-        var ctx = ContextWithPermission(permission.Id);
-
-        A.CallTo(() => urlGenerator.WorkflowsUI(appId))
+        A.CallTo(() => urlGenerator.WorkflowsUI(AppId))
             .Returns("workflows-url");
 
-        var actual = await sut.SearchAsync("workflows", ctx, default);
+        var actual = await sut.SearchAsync("workflows", requestContext, CancellationToken);
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
@@ -334,25 +276,15 @@ public sealed class AppSettingsSearchSourceTests
     }
 
     [Fact]
-    public async Task Should_not_return_workflows_actual_if_user_has_no_permission()
+    public async Task Should_not_return_workflows_result_if_user_has_no_permission()
     {
-        var ctx = ContextWithPermission();
-
-        var actual = await sut.SearchAsync("workflows", ctx, default);
+        var actual = await sut.SearchAsync("workflows", ApiContext, CancellationToken);
 
         Assert.Empty(actual);
     }
 
-    private Context ContextWithPermission(string? permission = null)
+    private Context SetupContext(string permission)
     {
-        var claimsIdentity = new ClaimsIdentity();
-        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-        if (permission != null)
-        {
-            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
-        }
-
-        return new Context(claimsPrincipal, Mocks.App(appId));
+        return CreateContext(false, PermissionIds.ForApp(permission, AppId.Name).Id);
     }
 }

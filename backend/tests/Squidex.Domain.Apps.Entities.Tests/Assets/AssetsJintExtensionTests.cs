@@ -22,20 +22,18 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
+public class AssetsJintExtensionTests : GivenContext, IClassFixture<TranslationsFixture>
 {
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
     private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly JintScriptEngine sut;
 
     public AssetsJintExtensionTests()
     {
         var serviceProvider =
             new ServiceCollection()
-                .AddSingleton(appProvider)
+                .AddSingleton(AppProvider)
                 .AddSingleton(assetFileStore)
                 .AddSingleton(assetQuery)
                 .AddSingleton(assetThumbnailGenerator)
@@ -45,9 +43,6 @@ public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
         {
             new AssetsJintExtension(serviceProvider)
         };
-
-        A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, A<CancellationToken>._))
-            .Returns(Mocks.App(appId));
 
         sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
             Options.Create(new JintScriptOptions
@@ -97,7 +92,7 @@ public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
                     complete(`${actual1}`);
                 });";
 
-        var actual = (await sut.ExecuteAsync(vars, script)).ToString();
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
 
         Assert.Equal(Cleanup(expected), Cleanup(actual));
     }
@@ -120,7 +115,7 @@ public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
                     complete(`${actual1}\n${actual2}`);
                 });";
 
-        var actual = (await sut.ExecuteAsync(vars, script)).ToString();
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
 
         Assert.Equal(Cleanup(expected), Cleanup(actual));
     }
@@ -146,7 +141,7 @@ public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
                     }}, '{encoding}');
                 }});";
 
-        var actual = (await sut.ExecuteAsync(vars, script)).ToString();
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
 
         Assert.Equal(Cleanup(expected), Cleanup(actual));
     }
@@ -169,7 +164,7 @@ public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
                     });
                 });";
 
-        var actual = (await sut.ExecuteAsync(vars, script)).ToString();
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
 
         Assert.Equal(Cleanup(expected), Cleanup(actual));
 
@@ -186,7 +181,7 @@ public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
             Id = DomainId.NewGuid(),
             FileVersion = 0,
             FileSize = 100,
-            AppId = appId
+            AppId = AppId
         };
 
         SetupText(@event.ToRef(), Encode(encoding, "hello+assets"));
@@ -207,7 +202,7 @@ public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
                     complete(actual);
                 }}, '{encoding}');";
 
-        var actual = (await sut.ExecuteAsync(vars, script)).ToString();
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
 
         Assert.Equal(Cleanup(expected), Cleanup(actual));
     }
@@ -232,7 +227,7 @@ public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
                     });
                 });";
 
-        var actual = (await sut.ExecuteAsync(vars, script)).ToString();
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
 
         Assert.Equal(Cleanup(expected), Cleanup(actual));
     }
@@ -257,7 +252,7 @@ public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
                     });
                 });";
 
-        var actual = (await sut.ExecuteAsync(vars, script)).ToString();
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
 
         Assert.Equal(Cleanup(expected), Cleanup(actual));
     }
@@ -282,7 +277,7 @@ public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
                     });
                 });";
 
-        var actual = (await sut.ExecuteAsync(vars, script)).ToString();
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
 
         Assert.Equal(Cleanup(expected), Cleanup(actual));
     }
@@ -296,7 +291,7 @@ public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
             AssetType = AssetType.Image,
             FileVersion = 0,
             FileSize = 100,
-            AppId = appId
+            AppId = AppId
         };
 
         SetupBlurHash(@event.ToRef(), "Hash");
@@ -317,7 +312,7 @@ public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
                     complete(actual);
                 });";
 
-        var actual = (await sut.ExecuteAsync(vars, script)).ToString();
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
 
         Assert.Equal(Cleanup(expected), Cleanup(actual));
     }
@@ -330,7 +325,7 @@ public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
 
     private void SetupText(AssetRef asset, byte[] bytes)
     {
-        A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, asset.Id, asset.FileVersion, null, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
+        A.CallTo(() => assetFileStore.DownloadAsync(AppId.Id, asset.Id, asset.FileVersion, null, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
             .Invokes(x => x.GetArgument<Stream>(4)?.Write(bytes));
     }
 
@@ -348,14 +343,14 @@ public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
                         .AddInvariant(JsonValue.Array(assetIds)));
 
         A.CallTo(() => assetQuery.QueryAsync(
-                A<Context>.That.Matches(x => x.App.Id == appId.Id && x.UserPrincipal == user), null, A<Q>.That.HasIds(assetIds), A<CancellationToken>._))
+                A<Context>.That.Matches(x => x.App == App && x.UserPrincipal == user), null, A<Q>.That.HasIds(assetIds), A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(2, assets));
 
         var vars = new ScriptVars
         {
             ["data"] = data,
-            ["appId"] = appId.Id,
-            ["appName"] = appId.Name,
+            ["appId"] = AppId.Id,
+            ["appName"] = AppId.Name,
             ["user"] = user
         };
 
@@ -366,7 +361,7 @@ public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
     {
         return new AssetEntity
         {
-            AppId = appId,
+            AppId = AppId,
             Id = DomainId.NewGuid(),
             FileSize = fileSize,
             FileName = $"file{index}.jpg",

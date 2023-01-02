@@ -11,29 +11,19 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 
-public class GuardRuleTests : IClassFixture<TranslationsFixture>
+public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly Uri validUrl = new Uri("https://squidex.io");
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
 
     [RuleAction]
     public sealed record TestAction : RuleAction
     {
         public Uri Url { get; set; }
-    }
-
-    public GuardRuleTests()
-    {
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, default))
-            .Returns(Mocks.Schema(appId, schemaId));
     }
 
     [Fact]
@@ -48,7 +38,7 @@ public class GuardRuleTests : IClassFixture<TranslationsFixture>
             Trigger = null!
         });
 
-        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, appProvider),
+        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, AppProvider),
             new ValidationError("Trigger is required.", "Trigger"));
     }
 
@@ -64,7 +54,7 @@ public class GuardRuleTests : IClassFixture<TranslationsFixture>
             Action = null!
         });
 
-        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, appProvider),
+        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, AppProvider),
             new ValidationError("Action is required.", "Action"));
     }
 
@@ -83,7 +73,7 @@ public class GuardRuleTests : IClassFixture<TranslationsFixture>
             }
         });
 
-        await GuardRule.CanCreate(command, appProvider);
+        await GuardRule.CanCreate(command, AppProvider);
     }
 
     [Fact]
@@ -91,7 +81,7 @@ public class GuardRuleTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateRule();
 
-        await GuardRule.CanUpdate(command, Rule(), appProvider);
+        await GuardRule.CanUpdate(command, Rule(), AppProvider);
     }
 
     [Fact]
@@ -99,7 +89,7 @@ public class GuardRuleTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateRule { Name = "MyName" };
 
-        await GuardRule.CanUpdate(command, Rule(), appProvider);
+        await GuardRule.CanUpdate(command, Rule(), AppProvider);
     }
 
     [Fact]
@@ -118,12 +108,12 @@ public class GuardRuleTests : IClassFixture<TranslationsFixture>
             Name = "NewName"
         };
 
-        await GuardRule.CanUpdate(command, Rule(), appProvider);
+        await GuardRule.CanUpdate(command, Rule(), AppProvider);
     }
 
     private CreateRule CreateCommand(CreateRule command)
     {
-        command.AppId = appId;
+        command.AppId = AppId;
 
         return command;
     }
@@ -132,7 +122,7 @@ public class GuardRuleTests : IClassFixture<TranslationsFixture>
     {
         var rule = A.Fake<IRuleEntity>();
 
-        A.CallTo(() => rule.AppId).Returns(appId);
+        A.CallTo(() => rule.AppId).Returns(AppId);
 
         return rule;
     }

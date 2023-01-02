@@ -7,29 +7,24 @@
 
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Comments.DomainObject;
 
-public class CommentsCommandMiddlewareTests
+public class CommentsCommandMiddlewareTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
     private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
     private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-    private readonly RefToken actor = RefToken.User("me");
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly DomainId commentsId = DomainId.NewGuid();
     private readonly DomainId commentId = DomainId.NewGuid();
     private readonly CommentsCommandMiddleware sut;
 
     public CommentsCommandMiddlewareTests()
     {
-        ct = cts.Token;
-
         A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, default))
             .Returns(Task.FromResult<IUser?>(null));
 
@@ -44,7 +39,7 @@ public class CommentsCommandMiddlewareTests
 
         var domainObject = A.Fake<CommentsStream>();
 
-        A.CallTo(() => domainObject.ExecuteAsync(command, ct))
+        A.CallTo(() => domainObject.ExecuteAsync(command, CancellationToken))
             .Returns(CommandResult.Empty(commentsId, 0, 0));
 
         A.CallTo(() => domainObjectFactory.Create<CommentsStream>(commentsId))
@@ -57,7 +52,7 @@ public class CommentsCommandMiddlewareTests
             isNextCalled = true;
 
             return Task.CompletedTask;
-        }, ct);
+        }, CancellationToken);
 
         Assert.True(isNextCalled);
     }
@@ -76,7 +71,7 @@ public class CommentsCommandMiddlewareTests
 
         var context = CrateCommandContext(command);
 
-        await sut.HandleAsync(context, ct);
+        await sut.HandleAsync(context, CancellationToken);
 
         Assert.Equal(command.Mentions, new[] { "id1", "id2" });
     }
@@ -95,7 +90,7 @@ public class CommentsCommandMiddlewareTests
 
         var context = CrateCommandContext(command);
 
-        await sut.HandleAsync(context, ct);
+        await sut.HandleAsync(context, CancellationToken);
 
         A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -112,7 +107,7 @@ public class CommentsCommandMiddlewareTests
 
         var context = CrateCommandContext(command);
 
-        await sut.HandleAsync(context, ct);
+        await sut.HandleAsync(context, CancellationToken);
 
         A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -129,7 +124,7 @@ public class CommentsCommandMiddlewareTests
 
         var context = CrateCommandContext(command);
 
-        await sut.HandleAsync(context, ct);
+        await sut.HandleAsync(context, CancellationToken);
 
         A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -150,10 +145,10 @@ public class CommentsCommandMiddlewareTests
 
     private T CreateCommentsCommand<T>(T command) where T : CommentCommand
     {
-        command.Actor = actor;
-        command.AppId = appId;
+        command.AppId = AppId;
         command.CommentsId = commentsId;
         command.CommentId = commentId;
+        command.Actor = User;
 
         return command;
     }

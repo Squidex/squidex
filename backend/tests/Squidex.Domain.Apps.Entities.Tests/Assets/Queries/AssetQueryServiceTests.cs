@@ -13,28 +13,20 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
-public class AssetQueryServiceTests
+public class AssetQueryServiceTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
     private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
     private readonly IAssetLoader assetLoader = A.Fake<IAssetLoader>();
     private readonly IAssetFolderRepository assetFolderRepository = A.Fake<IAssetFolderRepository>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly Context requestContext;
     private readonly AssetQueryParser queryParser = A.Fake<AssetQueryParser>();
     private readonly AssetQueryService sut;
 
     public AssetQueryServiceTests()
     {
-        ct = cts.Token;
-
-        requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId));
-
         SetupEnricher();
 
-        A.CallTo(() => queryParser.ParseAsync(requestContext, A<Q>._, ct))
+        A.CallTo(() => queryParser.ParseAsync(ApiContext, A<Q>._, CancellationToken))
             .ReturnsLazily(c => Task.FromResult(c.GetArgument<Q>(1)!));
 
         var options = Options.Create(new AssetOptions());
@@ -53,10 +45,10 @@ public class AssetQueryServiceTests
     {
         var asset = CreateAsset(DomainId.NewGuid());
 
-        A.CallTo(() => assetRepository.FindAssetBySlugAsync(appId.Id, "slug", A<CancellationToken>._))
+        A.CallTo(() => assetRepository.FindAssetBySlugAsync(AppId.Id, "slug", A<CancellationToken>._))
             .Returns(asset);
 
-        var actual = await sut.FindBySlugAsync(requestContext, "slug", ct);
+        var actual = await sut.FindBySlugAsync(ApiContext, "slug", CancellationToken);
 
         AssertAsset(asset, actual);
     }
@@ -66,10 +58,10 @@ public class AssetQueryServiceTests
     {
         var asset = CreateAsset(DomainId.NewGuid());
 
-        A.CallTo(() => assetRepository.FindAssetBySlugAsync(appId.Id, "slug", A<CancellationToken>._))
+        A.CallTo(() => assetRepository.FindAssetBySlugAsync(AppId.Id, "slug", A<CancellationToken>._))
             .Returns(Task.FromResult<IAssetEntity?>(null));
 
-        var actual = await sut.FindBySlugAsync(requestContext, "slug", ct);
+        var actual = await sut.FindBySlugAsync(ApiContext, "slug", CancellationToken);
 
         Assert.Null(actual);
     }
@@ -79,10 +71,10 @@ public class AssetQueryServiceTests
     {
         var asset = CreateAsset(DomainId.NewGuid());
 
-        A.CallTo(() => assetRepository.FindAssetAsync(appId.Id, asset.Id, A<CancellationToken>._))
+        A.CallTo(() => assetRepository.FindAssetAsync(AppId.Id, asset.Id, A<CancellationToken>._))
             .Returns(asset);
 
-        var actual = await sut.FindAsync(requestContext, asset.Id, ct: ct);
+        var actual = await sut.FindAsync(ApiContext, asset.Id, ct: CancellationToken);
 
         AssertAsset(asset, actual);
     }
@@ -92,10 +84,10 @@ public class AssetQueryServiceTests
     {
         var asset = CreateAsset(DomainId.NewGuid());
 
-        A.CallTo(() => assetRepository.FindAssetAsync(appId.Id, asset.Id, A<CancellationToken>._))
+        A.CallTo(() => assetRepository.FindAssetAsync(AppId.Id, asset.Id, A<CancellationToken>._))
             .Returns(Task.FromResult<IAssetEntity?>(null));
 
-        var actual = await sut.FindAsync(requestContext, asset.Id, ct: ct);
+        var actual = await sut.FindAsync(ApiContext, asset.Id, ct: CancellationToken);
 
         Assert.Null(actual);
     }
@@ -105,10 +97,10 @@ public class AssetQueryServiceTests
     {
         var asset = CreateAsset(DomainId.NewGuid());
 
-        A.CallTo(() => assetLoader.GetAsync(appId.Id, asset.Id, 2, A<CancellationToken>._))
+        A.CallTo(() => assetLoader.GetAsync(AppId.Id, asset.Id, 2, A<CancellationToken>._))
             .Returns(asset);
 
-        var actual = await sut.FindAsync(requestContext, asset.Id, 2, ct);
+        var actual = await sut.FindAsync(ApiContext, asset.Id, 2, CancellationToken);
 
         AssertAsset(asset, actual);
     }
@@ -118,10 +110,10 @@ public class AssetQueryServiceTests
     {
         var asset = CreateAsset(DomainId.NewGuid());
 
-        A.CallTo(() => assetLoader.GetAsync(appId.Id, asset.Id, 2, A<CancellationToken>._))
+        A.CallTo(() => assetLoader.GetAsync(AppId.Id, asset.Id, 2, A<CancellationToken>._))
             .Returns(Task.FromResult<IAssetEntity?>(null));
 
-        var actual = await sut.FindAsync(requestContext, asset.Id, 2, ct);
+        var actual = await sut.FindAsync(ApiContext, asset.Id, 2, CancellationToken);
 
         Assert.Null(actual);
     }
@@ -134,7 +126,7 @@ public class AssetQueryServiceTests
         A.CallTo(() => assetRepository.FindAssetAsync(asset.Id, A<CancellationToken>._))
             .Returns(asset);
 
-        var actual = await sut.FindGlobalAsync(requestContext, asset.Id, ct);
+        var actual = await sut.FindGlobalAsync(ApiContext, asset.Id, CancellationToken);
 
         AssertAsset(asset, actual);
     }
@@ -147,7 +139,7 @@ public class AssetQueryServiceTests
         A.CallTo(() => assetRepository.FindAssetAsync(asset.Id, A<CancellationToken>._))
             .Returns(Task.FromResult<IAssetEntity?>(null));
 
-        var actual = await sut.FindGlobalAsync(requestContext, asset.Id, ct);
+        var actual = await sut.FindGlobalAsync(ApiContext, asset.Id, CancellationToken);
 
         Assert.Null(actual);
     }
@@ -157,10 +149,10 @@ public class AssetQueryServiceTests
     {
         var asset = CreateAsset(DomainId.NewGuid());
 
-        A.CallTo(() => assetRepository.FindAssetByHashAsync(appId.Id, "hash", "name", 123, A<CancellationToken>._))
+        A.CallTo(() => assetRepository.FindAssetByHashAsync(AppId.Id, "hash", "name", 123, A<CancellationToken>._))
             .Returns(asset);
 
-        var actual = await sut.FindByHashAsync(requestContext, "hash", "name", 123, ct);
+        var actual = await sut.FindByHashAsync(ApiContext, "hash", "name", 123, CancellationToken);
 
         AssertAsset(asset, actual);
     }
@@ -170,10 +162,10 @@ public class AssetQueryServiceTests
     {
         var asset = CreateAsset(DomainId.NewGuid());
 
-        A.CallTo(() => assetRepository.FindAssetByHashAsync(appId.Id, "hash", "name", 123, A<CancellationToken>._))
+        A.CallTo(() => assetRepository.FindAssetByHashAsync(AppId.Id, "hash", "name", 123, A<CancellationToken>._))
             .Returns(Task.FromResult<IAssetEntity?>(null));
 
-        var actual = await sut.FindByHashAsync(requestContext, "hash", "name", 123, ct);
+        var actual = await sut.FindByHashAsync(ApiContext, "hash", "name", 123, CancellationToken);
 
         Assert.Null(actual);
     }
@@ -188,10 +180,10 @@ public class AssetQueryServiceTests
 
         var q = Q.Empty.WithODataQuery("fileName eq 'Name'");
 
-        A.CallTo(() => assetRepository.QueryAsync(appId.Id, parentId, q, A<CancellationToken>._))
+        A.CallTo(() => assetRepository.QueryAsync(AppId.Id, parentId, q, A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(8, asset1, asset2));
 
-        var actual = await sut.QueryAsync(requestContext, parentId, q, ct);
+        var actual = await sut.QueryAsync(ApiContext, parentId, q, CancellationToken);
 
         Assert.Equal(8, actual.Total);
 
@@ -206,10 +198,10 @@ public class AssetQueryServiceTests
 
         var assetFolders = ResultList.CreateFrom<IAssetFolderEntity>(10);
 
-        A.CallTo(() => assetFolderRepository.QueryAsync(appId.Id, parentId, A<CancellationToken>._))
+        A.CallTo(() => assetFolderRepository.QueryAsync(AppId.Id, parentId, A<CancellationToken>._))
             .Returns(assetFolders);
 
-        var actual = await sut.QueryAssetFoldersAsync(requestContext, parentId, ct);
+        var actual = await sut.QueryAssetFoldersAsync(ApiContext, parentId, CancellationToken);
 
         Assert.Same(assetFolders, actual);
     }
@@ -221,10 +213,10 @@ public class AssetQueryServiceTests
 
         var assetFolders = ResultList.CreateFrom<IAssetFolderEntity>(10);
 
-        A.CallTo(() => assetFolderRepository.QueryAsync(appId.Id, parentId, A<CancellationToken>._))
+        A.CallTo(() => assetFolderRepository.QueryAsync(AppId.Id, parentId, A<CancellationToken>._))
             .Returns(assetFolders);
 
-        var actual = await sut.QueryAssetFoldersAsync(appId.Id, parentId, ct);
+        var actual = await sut.QueryAssetFoldersAsync(AppId.Id, parentId, CancellationToken);
 
         Assert.Same(assetFolders, actual);
     }
@@ -235,10 +227,10 @@ public class AssetQueryServiceTests
         var folderId1 = DomainId.NewGuid();
         var folder1 = CreateFolder(folderId1);
 
-        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId1, A<CancellationToken>._))
+        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(AppId.Id, folderId1, A<CancellationToken>._))
             .Returns(folder1);
 
-        var actual = await sut.FindAssetFolderAsync(appId.Id, folderId1, ct);
+        var actual = await sut.FindAssetFolderAsync(AppId.Id, folderId1, CancellationToken);
 
         Assert.Equal(actual, new[] { folder1 });
     }
@@ -254,16 +246,16 @@ public class AssetQueryServiceTests
         var folder2 = CreateFolder(folderId2, folderId1);
         var folder3 = CreateFolder(folderId3, folderId2);
 
-        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId1, A<CancellationToken>._))
+        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(AppId.Id, folderId1, A<CancellationToken>._))
             .Returns(folder1);
 
-        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId2, A<CancellationToken>._))
+        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(AppId.Id, folderId2, A<CancellationToken>._))
             .Returns(folder2);
 
-        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId3, A<CancellationToken>._))
+        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(AppId.Id, folderId3, A<CancellationToken>._))
             .Returns(folder3);
 
-        var actual = await sut.FindAssetFolderAsync(appId.Id, folderId3, ct);
+        var actual = await sut.FindAssetFolderAsync(AppId.Id, folderId3, CancellationToken);
 
         Assert.Equal(actual, new[] { folder1, folder2, folder3 });
     }
@@ -273,10 +265,10 @@ public class AssetQueryServiceTests
     {
         var folderId1 = DomainId.NewGuid();
 
-        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId1, A<CancellationToken>._))
+        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(AppId.Id, folderId1, A<CancellationToken>._))
             .Returns(Task.FromResult<IAssetFolderEntity?>(null));
 
-        var actual = await sut.FindAssetFolderAsync(appId.Id, folderId1, ct);
+        var actual = await sut.FindAssetFolderAsync(AppId.Id, folderId1, CancellationToken);
 
         Assert.Empty(actual);
     }
@@ -290,13 +282,13 @@ public class AssetQueryServiceTests
         var folder1 = CreateFolder(folderId1);
         var folder2 = CreateFolder(folderId2, folderId1);
 
-        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId1, A<CancellationToken>._))
+        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(AppId.Id, folderId1, A<CancellationToken>._))
             .Returns(Task.FromResult<IAssetFolderEntity?>(null));
 
-        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId2, A<CancellationToken>._))
+        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(AppId.Id, folderId2, A<CancellationToken>._))
             .Returns(folder2);
 
-        var actual = await sut.FindAssetFolderAsync(appId.Id, folderId2, ct);
+        var actual = await sut.FindAssetFolderAsync(AppId.Id, folderId2, CancellationToken);
 
         Assert.Empty(actual);
     }
@@ -310,13 +302,13 @@ public class AssetQueryServiceTests
         var folder1 = CreateFolder(folderId1, folderId2);
         var folder2 = CreateFolder(folderId2, folderId1);
 
-        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId1, A<CancellationToken>._))
+        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(AppId.Id, folderId1, A<CancellationToken>._))
             .Returns(Task.FromResult<IAssetFolderEntity?>(null));
 
-        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(appId.Id, folderId2, A<CancellationToken>._))
+        A.CallTo(() => assetFolderRepository.FindAssetFolderAsync(AppId.Id, folderId2, A<CancellationToken>._))
             .Returns(folder2);
 
-        var actual = await sut.FindAssetFolderAsync(appId.Id, folderId2, ct);
+        var actual = await sut.FindAssetFolderAsync(AppId.Id, folderId2, CancellationToken);
 
         Assert.Empty(actual);
     }
@@ -345,7 +337,7 @@ public class AssetQueryServiceTests
 
     private void SetupEnricher()
     {
-        A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>._, A<Context>._, ct))
+        A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>._, A<Context>._, CancellationToken))
             .ReturnsLazily(x =>
             {
                 var input = x.GetArgument<IEnumerable<IAssetEntity>>(0)!;

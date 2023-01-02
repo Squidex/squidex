@@ -17,22 +17,17 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
-public class ResolveReferencesTests : IClassFixture<TranslationsFixture>
+public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
     private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly NamedId<DomainId> refSchemaId1 = NamedId.Of(DomainId.NewGuid(), "my-ref1");
     private readonly NamedId<DomainId> refSchemaId2 = NamedId.Of(DomainId.NewGuid(), "my-ref2");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
     private readonly ProvideSchema schemaProvider;
-    private readonly Context requestContext;
     private readonly ResolveReferences sut;
 
     public ResolveReferencesTests()
     {
-        requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId, Language.DE));
-
         var refSchemaDef =
             new Schema("my-ref")
                 .AddString(1, "name", Partitioning.Invariant,
@@ -42,7 +37,7 @@ public class ResolveReferencesTests : IClassFixture<TranslationsFixture>
                 .SetFieldsInReferences("name", "number");
 
         var schemaDef =
-            new Schema(schemaId.Name)
+            new Schema(SchemaId.Name)
                 .AddReferences(1, "ref1", Partitioning.Invariant, new ReferencesFieldProperties
                 {
                     ResolveReference = true,
@@ -59,19 +54,22 @@ public class ResolveReferencesTests : IClassFixture<TranslationsFixture>
                 })
                 .SetFieldsInLists("ref1", "ref2");
 
+        A.CallTo(() => Schema.SchemaDef)
+            .Returns(schemaDef);
+
         schemaProvider = x =>
         {
-            if (x == schemaId.Id)
+            if (x == SchemaId.Id)
             {
-                return Task.FromResult((Mocks.Schema(appId, schemaId, schemaDef), ResolvedComponents.Empty));
+                return Task.FromResult((Schema, ResolvedComponents.Empty));
             }
             else if (x == refSchemaId1.Id)
             {
-                return Task.FromResult((Mocks.Schema(appId, refSchemaId1, refSchemaDef), ResolvedComponents.Empty));
+                return Task.FromResult((Mocks.Schema(AppId, refSchemaId1, refSchemaDef), ResolvedComponents.Empty));
             }
             else if (x == refSchemaId2.Id)
             {
-                return Task.FromResult((Mocks.Schema(appId, refSchemaId2, refSchemaDef), ResolvedComponents.Empty));
+                return Task.FromResult((Mocks.Schema(AppId, refSchemaId2, refSchemaDef), ResolvedComponents.Empty));
             }
             else
             {
@@ -100,12 +98,12 @@ public class ResolveReferencesTests : IClassFixture<TranslationsFixture>
                 A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id), A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
-        await sut.EnrichAsync(requestContext, contents, schemaProvider, default);
+        await sut.EnrichAsync(FrontendContext, contents, schemaProvider, default);
 
-        A.CallTo(() => requestCache.AddDependency(DomainId.Combine(appId, refSchemaId1.Id), 0))
+        A.CallTo(() => requestCache.AddDependency(DomainId.Combine(AppId, refSchemaId1.Id), 0))
             .MustHaveHappened();
 
-        A.CallTo(() => requestCache.AddDependency(DomainId.Combine(appId, refSchemaId2.Id), 0))
+        A.CallTo(() => requestCache.AddDependency(DomainId.Combine(AppId, refSchemaId2.Id), 0))
             .MustHaveHappened();
 
         A.CallTo(() => requestCache.AddDependency(ref1_1.UniqueId, ref1_1.Version))
@@ -136,10 +134,10 @@ public class ResolveReferencesTests : IClassFixture<TranslationsFixture>
         };
 
         A.CallTo(() => contentQuery.QueryAsync(
-                A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id), A<CancellationToken>._))
+                A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id), CancellationToken))
             .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
-        await sut.EnrichAsync(requestContext, contents, schemaProvider, default);
+        await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);
 
         Assert.Equal(
             new ContentData()
@@ -189,10 +187,10 @@ public class ResolveReferencesTests : IClassFixture<TranslationsFixture>
         };
 
         A.CallTo(() => contentQuery.QueryAsync(
-                A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id), A<CancellationToken>._))
+                A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id), CancellationToken))
             .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
-        await sut.EnrichAsync(requestContext, contents, schemaProvider, default);
+        await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);
 
         Assert.Equal(
             new ContentData()
@@ -228,16 +226,14 @@ public class ResolveReferencesTests : IClassFixture<TranslationsFixture>
     }
 
     [Fact]
-    public async Task Should_not_enrich_references_if_not_api_user()
+    public async Task Should_not_enrich_references_if_not_frontend_user()
     {
         var contents = new[]
         {
             CreateContent(new[] { DomainId.NewGuid() }, Array.Empty<DomainId>())
         };
 
-        var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId));
-
-        await sut.EnrichAsync(ctx, contents, schemaProvider, default);
+        await sut.EnrichAsync(ApiContext, contents, schemaProvider, CancellationToken);
 
         Assert.Null(contents[0].ReferenceData);
 
@@ -253,9 +249,7 @@ public class ResolveReferencesTests : IClassFixture<TranslationsFixture>
             CreateContent(new[] { DomainId.NewGuid() }, Array.Empty<DomainId>())
         };
 
-        var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId)).Clone(b => b.WithoutContentEnrichment(true));
-
-        await sut.EnrichAsync(ctx, contents, schemaProvider, default);
+        await sut.EnrichAsync(FrontendContext.Clone(b => b.WithoutContentEnrichment(true)), contents, schemaProvider, CancellationToken);
 
         Assert.Null(contents[0].ReferenceData);
 
@@ -271,7 +265,7 @@ public class ResolveReferencesTests : IClassFixture<TranslationsFixture>
             CreateContent(Array.Empty<DomainId>(), Array.Empty<DomainId>())
         };
 
-        await sut.EnrichAsync(requestContext, contents, schemaProvider, default);
+        await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);
 
         Assert.NotNull(contents[0].ReferenceData);
 
@@ -292,8 +286,8 @@ public class ResolveReferencesTests : IClassFixture<TranslationsFixture>
                     .AddField("ref2",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(ref2.Select(x => x.ToString())))),
-            SchemaId = schemaId,
-            AppId = appId,
+            SchemaId = SchemaId,
+            AppId = AppId,
             Version = 0
         };
     }
@@ -312,7 +306,7 @@ public class ResolveReferencesTests : IClassFixture<TranslationsFixture>
                         new ContentFieldData()
                             .AddInvariant(number)),
             SchemaId = refSchemaId,
-            AppId = appId,
+            AppId = AppId,
             Version = version
         };
     }

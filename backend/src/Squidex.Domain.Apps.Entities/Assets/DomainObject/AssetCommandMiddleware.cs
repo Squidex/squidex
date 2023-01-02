@@ -8,6 +8,7 @@
 using System.Security.Cryptography;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Assets.Queries;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 

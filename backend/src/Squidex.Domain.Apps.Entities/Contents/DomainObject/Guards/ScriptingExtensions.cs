@@ -19,7 +19,8 @@ public static class ScriptingExtensions
         CanReject = true
     };
 
-    public static Task<ContentData> ExecuteCreateScriptAsync(this ContentOperation operation, ContentData data, Status status)
+    public static Task<ContentData> ExecuteCreateScriptAsync(this ContentOperation operation, ContentData data, Status status,
+        CancellationToken ct)
     {
         var script = operation.SchemaDef.Scripts.Create;
 
@@ -40,10 +41,11 @@ public static class ScriptingExtensions
             StatusOld = default
         });
 
-        return TransformAsync(operation, script, vars);
+        return TransformAsync(operation, script, vars, ct);
     }
 
-    public static Task<ContentData> ExecuteUpdateScriptAsync(this ContentOperation operation, ContentData data)
+    public static Task<ContentData> ExecuteUpdateScriptAsync(this ContentOperation operation, ContentData data,
+        CancellationToken ct)
     {
         var script = operation.SchemaDef.Scripts.Update;
 
@@ -64,10 +66,11 @@ public static class ScriptingExtensions
             StatusOld = default
         });
 
-        return TransformAsync(operation, script, vars);
+        return TransformAsync(operation, script, vars, ct);
     }
 
-    public static Task<ContentData> ExecuteChangeScriptAsync(this ContentOperation operation, Status status, StatusChange change)
+    public static Task<ContentData> ExecuteChangeScriptAsync(this ContentOperation operation, Status status, StatusChange change,
+        CancellationToken ct)
     {
         var script = operation.SchemaDef.Scripts.Change;
 
@@ -89,10 +92,11 @@ public static class ScriptingExtensions
             Validate = Validate(operation, status)
         });
 
-        return TransformAsync(operation, script, vars);
+        return TransformAsync(operation, script, vars, ct);
     }
 
-    public static Task ExecuteDeleteScriptAsync(this ContentOperation operation, bool permanent)
+    public static Task ExecuteDeleteScriptAsync(this ContentOperation operation, bool permanent,
+        CancellationToken ct)
     {
         var script = operation.SchemaDef.Scripts.Delete;
 
@@ -114,17 +118,19 @@ public static class ScriptingExtensions
             StatusOld = default
         });
 
-        return ExecuteAsync(operation, script, vars);
+        return ExecuteAsync(operation, script, vars, ct);
     }
 
-    private static async Task<ContentData> TransformAsync(ContentOperation operation, string script, ContentScriptVars vars)
+    private static async Task<ContentData> TransformAsync(ContentOperation operation, string script, ContentScriptVars vars,
+        CancellationToken ct)
     {
-        return await operation.Resolve<IScriptEngine>().TransformAsync(vars, script, Options);
+        return await operation.Resolve<IScriptEngine>().TransformAsync(vars, script, Options, ct);
     }
 
-    private static async Task ExecuteAsync(ContentOperation operation, string script, ContentScriptVars vars)
+    private static async Task ExecuteAsync(ContentOperation operation, string script, ContentScriptVars vars,
+        CancellationToken ct)
     {
-        await operation.Resolve<IScriptEngine>().ExecuteAsync(vars, script, Options);
+        await operation.Resolve<IScriptEngine>().ExecuteAsync(vars, script, Options, ct);
     }
 
     private static Action Validate(ContentOperation operation, Status status)
@@ -135,7 +141,7 @@ public static class ScriptingExtensions
             {
                 var snapshot = operation.Snapshot;
 
-                operation.ValidateContentAndInputAsync(snapshot.Data, false, snapshot.IsPublished() || status == Status.Published).Wait();
+                operation.ValidateContentAndInputAsync(snapshot.Data, false, snapshot.IsPublished() || status == Status.Published, default).Wait();
             }
             catch (AggregateException ex) when (ex.InnerException != null)
             {

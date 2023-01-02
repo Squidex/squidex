@@ -17,10 +17,9 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
-public class ScriptContentTests
+public class ScriptContentTests : GivenContext
 {
     private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly ScriptContent sut;
 
     public ScriptContentTests()
@@ -31,14 +30,12 @@ public class ScriptContentTests
     [Fact]
     public async Task Should_not_call_script_engine_if_no_script_configured()
     {
-        var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId));
-
         var (provider, schemaId) = CreateSchema(
             queryPre: "my-pre-query");
 
         var content = new ContentEntity { Data = new ContentData(), SchemaId = schemaId };
 
-        await sut.EnrichAsync(ctx, new[] { content }, provider, default);
+        await sut.EnrichAsync(ApiContext, new[] { content }, provider, default);
 
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -47,14 +44,12 @@ public class ScriptContentTests
     [Fact]
     public async Task Should_not_call_script_engine_for_frontend_user()
     {
-        var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
-
         var (provider, schemaId) = CreateSchema(
             query: "my-query");
 
         var content = new ContentEntity { Data = new ContentData(), SchemaId = schemaId };
 
-        await sut.EnrichAsync(ctx, new[] { content }, provider, default);
+        await sut.EnrichAsync(FrontendContext, new[] { content }, provider, default);
 
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -63,8 +58,6 @@ public class ScriptContentTests
     [Fact]
     public async Task Should_call_script_engine_with_data()
     {
-        var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId));
-
         var oldData = new ContentData();
 
         var (provider, schemaId) = CreateSchema(
@@ -75,15 +68,17 @@ public class ScriptContentTests
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "my-query", ScriptOptions(), A<CancellationToken>._))
             .Returns(new ContentData());
 
-        await sut.EnrichAsync(ctx, new[] { content }, provider, default);
+        await sut.EnrichAsync(ApiContext, new[] { content }, provider, default);
 
         Assert.NotSame(oldData, content.Data);
 
         A.CallTo(() => scriptEngine.TransformAsync(
                 A<DataScriptVars>.That.Matches(x =>
-                    Equals(x["user"], ctx.UserPrincipal) &&
+                    Equals(x["contentId"], content.Id) &&
                     Equals(x["data"], oldData) &&
-                    Equals(x["contentId"], content.Id)),
+                    Equals(x["AppId"], AppId.Id) &&
+                    Equals(x["appName"], AppId.Name) &&
+                    Equals(x["user"], ApiContext.UserPrincipal)),
                 "my-query",
                 ScriptOptions(), A<CancellationToken>._))
             .MustHaveHappened();
@@ -92,8 +87,6 @@ public class ScriptContentTests
     [Fact]
     public async Task Should_make_test_with_pre_query_script()
     {
-        var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId));
-
         var (provider, id) = CreateSchema(
             query: @"
                     ctx.data.test = { iv: ctx.custom };
@@ -112,7 +105,7 @@ public class ScriptContentTests
 
         var sut2 = new ScriptContent(realScriptEngine);
 
-        await sut2.EnrichAsync(ctx, new[] { content }, provider, default);
+        await sut2.EnrichAsync(ApiContext, new[] { content }, provider, default);
 
         Assert.Equal(JsonValue.Create(123), content.Data["test"]!["iv"]);
     }
@@ -121,7 +114,7 @@ public class ScriptContentTests
     {
         var id = NamedId.Of(DomainId.NewGuid(), "my-schema");
 
-        return (_ =>
+        return (__ =>
         {
             var schemaDef =
                 new Schema(id.Name)
@@ -131,7 +124,7 @@ public class ScriptContentTests
                         QueryPre = queryPre
                     });
 
-            return Task.FromResult((Mocks.Schema(appId, id, schemaDef), ResolvedComponents.Empty));
+            return Task.FromResult((Mocks.Schema(AppId, id, schemaDef), ResolvedComponents.Empty));
         }, id);
     }
 

@@ -17,12 +17,10 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
 
-public class GuardAssetTests : IClassFixture<TranslationsFixture>
+public class GuardAssetTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly RefToken actor = RefToken.User("123");
 
     [Fact]
     public async Task Should_throw_exception_if_moving_to_invalid_folder()
@@ -31,10 +29,10 @@ public class GuardAssetTests : IClassFixture<TranslationsFixture>
 
         var operation = Operation(CreateAsset());
 
-        A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, default))
+        A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
             .Returns(new List<IAssetFolderEntity>());
 
-        await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId),
+        await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId, CancellationToken),
             new ValidationError("Asset folder does not exist.", "ParentId"));
     }
 
@@ -45,10 +43,10 @@ public class GuardAssetTests : IClassFixture<TranslationsFixture>
 
         var operation = Operation(CreateAsset());
 
-        A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, default))
+        A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
             .Returns(new List<IAssetFolderEntity> { CreateAssetFolder() });
 
-        await operation.MustMoveToValidFolder(parentId);
+        await operation.MustMoveToValidFolder(parentId, CancellationToken);
     }
 
     [Fact]
@@ -58,9 +56,9 @@ public class GuardAssetTests : IClassFixture<TranslationsFixture>
 
         var operation = Operation(CreateAsset(default, parentId));
 
-        await operation.MustMoveToValidFolder(parentId);
+        await operation.MustMoveToValidFolder(parentId, CancellationToken);
 
-        A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, A<CancellationToken>._))
+        A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -71,9 +69,9 @@ public class GuardAssetTests : IClassFixture<TranslationsFixture>
 
         var operation = Operation(CreateAsset(parentId));
 
-        await operation.MustMoveToValidFolder(parentId);
+        await operation.MustMoveToValidFolder(parentId, CancellationToken);
 
-        A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, A<CancellationToken>._))
+        A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -82,10 +80,10 @@ public class GuardAssetTests : IClassFixture<TranslationsFixture>
     {
         var operation = Operation(CreateAsset());
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, operation.CommandId, SearchScope.All, default))
+        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, operation.CommandId, SearchScope.All, CancellationToken))
             .Returns(true);
 
-        await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync());
+        await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync(CancellationToken));
     }
 
     [Fact]
@@ -93,10 +91,10 @@ public class GuardAssetTests : IClassFixture<TranslationsFixture>
     {
         var operation = Operation(CreateAsset());
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, operation.CommandId, SearchScope.All, default))
+        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, operation.CommandId, SearchScope.All, CancellationToken))
             .Returns(true);
 
-        await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync());
+        await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync(CancellationToken));
     }
 
     private AssetOperation Operation(AssetEntity asset)
@@ -114,9 +112,9 @@ public class GuardAssetTests : IClassFixture<TranslationsFixture>
 
         return new AssetOperation(serviceProvider, () => asset)
         {
-            App = Mocks.App(appId),
+            App = App,
             CommandId = asset.Id,
-            Command = new CreateAsset { User = currentUser, Actor = actor }
+            Command = new CreateAsset { User = currentUser, Actor = User }
         };
     }
 
@@ -125,9 +123,9 @@ public class GuardAssetTests : IClassFixture<TranslationsFixture>
         return new AssetEntity
         {
             Id = OrNew(id),
-            AppId = appId,
+            AppId = AppId,
             Created = default,
-            CreatedBy = actor,
+            CreatedBy = User,
             ParentId = OrNew(parentId)
         };
     }
@@ -139,7 +137,7 @@ public class GuardAssetTests : IClassFixture<TranslationsFixture>
         A.CallTo(() => assetFolder.Id)
             .Returns(OrNew(id));
         A.CallTo(() => assetFolder.AppId)
-            .Returns(appId);
+            .Returns(AppId);
         A.CallTo(() => assetFolder.ParentId)
             .Returns(OrNew(parentId));
 

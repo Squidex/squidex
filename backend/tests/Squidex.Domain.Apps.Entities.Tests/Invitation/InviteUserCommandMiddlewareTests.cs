@@ -9,7 +9,6 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
 using AssignAppContributor = Squidex.Domain.Apps.Entities.Apps.Commands.AssignContributor;
@@ -17,20 +16,14 @@ using AssignTeamContributor = Squidex.Domain.Apps.Entities.Teams.Commands.Assign
 
 namespace Squidex.Domain.Apps.Entities.Invitation;
 
-public class InviteUserCommandMiddlewareTests
+public class InviteUserCommandMiddlewareTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-    private readonly IAppEntity app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
-    private readonly ITeamEntity team = Mocks.Team(DomainId.NewGuid());
     private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
     private readonly InviteUserCommandMiddleware sut;
 
     public InviteUserCommandMiddlewareTests()
     {
-        ct = cts.Token;
-
         sut = new InviteUserCommandMiddleware(userResolver);
     }
 
@@ -41,19 +34,19 @@ public class InviteUserCommandMiddlewareTests
 
         var context =
             new CommandContext(command, commandBus)
-                .Complete(app);
+                .Complete(App);
 
         var user = UserMocks.User("123", command.ContributorId);
 
-        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, ct))
+        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, CancellationToken))
             .Returns((user, true));
 
-        await sut.HandleAsync(context, ct);
+        await sut.HandleAsync(context, CancellationToken);
 
-        Assert.Same(context.Result<InvitedResult<IAppEntity>>().Entity, app);
+        Assert.Same(context.Result<InvitedResult<IAppEntity>>().Entity, App);
         Assert.Equal(user.Id, command.ContributorId);
 
-        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, ct))
+        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -64,19 +57,19 @@ public class InviteUserCommandMiddlewareTests
 
         var context =
             new CommandContext(command, commandBus)
-                .Complete(team);
+                .Complete(Team);
 
         var user = UserMocks.User("123", command.ContributorId);
 
-        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, ct))
+        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, CancellationToken))
             .Returns((user, true));
 
-        await sut.HandleAsync(context, ct);
+        await sut.HandleAsync(context, CancellationToken);
 
-        Assert.Same(context.Result<InvitedResult<ITeamEntity>>().Entity, team);
+        Assert.Same(context.Result<InvitedResult<ITeamEntity>>().Entity, Team);
         Assert.Equal(user.Id, command.ContributorId);
 
-        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, ct))
+        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -87,19 +80,19 @@ public class InviteUserCommandMiddlewareTests
 
         var context =
             new CommandContext(command, commandBus)
-                .Complete(app);
+                .Complete(App);
 
         var user = UserMocks.User("123", command.ContributorId);
 
-        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, ct))
+        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, CancellationToken))
             .Returns((user, false));
 
-        await sut.HandleAsync(context, ct);
+        await sut.HandleAsync(context, CancellationToken);
 
-        Assert.Same(context.Result<IAppEntity>(), app);
+        Assert.Same(context.Result<IAppEntity>(), App);
         Assert.Equal(user.Id, command.ContributorId);
 
-        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, ct))
+        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -110,19 +103,19 @@ public class InviteUserCommandMiddlewareTests
 
         var context =
             new CommandContext(command, commandBus)
-                .Complete(team);
+                .Complete(Team);
 
         var user = UserMocks.User("123", command.ContributorId);
 
-        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, ct))
+        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, CancellationToken))
             .Returns((user, false));
 
-        await sut.HandleAsync(context, ct);
+        await sut.HandleAsync(context, CancellationToken);
 
-        Assert.Same(context.Result<ITeamEntity>(), team);
+        Assert.Same(context.Result<ITeamEntity>(), Team);
         Assert.Equal(user.Id, command.ContributorId);
 
-        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, ct))
+        A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -133,9 +126,9 @@ public class InviteUserCommandMiddlewareTests
 
         var context =
             new CommandContext(command, commandBus)
-                .Complete(app);
+                .Complete(App);
 
-        await sut.HandleAsync(context, ct);
+        await sut.HandleAsync(context, CancellationToken);
 
         A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(A<string>._, A<bool>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -148,9 +141,9 @@ public class InviteUserCommandMiddlewareTests
 
         var context =
             new CommandContext(command, commandBus)
-                .Complete(app);
+                .Complete(App);
 
-        await sut.HandleAsync(context, ct);
+        await sut.HandleAsync(context, CancellationToken);
 
         A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(A<string>._, A<bool>._, A<CancellationToken>._))
             .MustNotHaveHappened();

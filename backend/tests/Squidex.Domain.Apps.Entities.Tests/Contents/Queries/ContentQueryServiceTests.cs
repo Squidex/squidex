@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -16,51 +15,40 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
-using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
-public class ContentQueryServiceTests
+public class ContentQueryServiceTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
     private readonly IContentLoader contentVersionLoader = A.Fake<IContentLoader>();
-    private readonly ISchemaEntity schema;
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
     private readonly ContentData contentData = new ContentData();
     private readonly ContentQueryParser queryParser = A.Fake<ContentQueryParser>();
     private readonly ContentQueryService sut;
 
     public ContentQueryServiceTests()
     {
-        ct = cts.Token;
-
         var schemaDef =
-            new Schema(schemaId.Name)
+            new Schema(SchemaId.Name)
                 .Publish()
                 .SetScripts(new SchemaScripts { Query = "<query-script>" });
 
-        schema = Mocks.Schema(appId, schemaId, schemaDef);
+        A.CallTo(() => Schema.SchemaDef)
+            .Returns(schemaDef);
 
         SetupEnricher();
 
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, A<bool>._, ct))
-            .Returns(schema);
+        A.CallTo(() => AppProvider.GetSchemasAsync(AppId.Id, CancellationToken))
+            .Returns(new List<ISchemaEntity> { Schema });
 
-        A.CallTo(() => appProvider.GetSchemasAsync(appId.Id, ct))
-            .Returns(new List<ISchemaEntity> { schema });
-
-        A.CallTo(() => queryParser.ParseAsync(A<Context>._, A<Q>._, A<ISchemaEntity?>._, ct))
+        A.CallTo(() => queryParser.ParseAsync(A<Context>._, A<Q>._, A<ISchemaEntity?>._, CancellationToken))
             .ReturnsLazily(c => Task.FromResult(c.GetArgument<Q>(1)!));
 
         var options = Options.Create(new ContentOptions());
 
         sut = new ContentQueryService(
-            appProvider,
+            AppProvider,
             contentEnricher,
             contentRepository,
             contentVersionLoader,
@@ -71,68 +59,61 @@ public class ContentQueryServiceTests
     [Fact]
     public async Task Should_get_schema_from_guid_string()
     {
-        var input = schemaId.Id.ToString();
+        var input = SchemaId.Id.ToString();
 
-        var requestContext = CreateContext();
+        var requestContext = SetupContext();
 
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, true, ct))
-            .Returns(schema);
+        var actual = await sut.GetSchemaOrThrowAsync(requestContext, input, CancellationToken);
 
-        var actual = await sut.GetSchemaOrThrowAsync(requestContext, input, ct);
-
-        Assert.Equal(schema, actual);
+        Assert.Equal(Schema, actual);
     }
 
     [Fact]
     public async Task Should_get_schema_from_name()
     {
-        var input = schemaId.Name;
+        var input = SchemaId.Name;
 
-        var requestContext = CreateContext();
+        var requestContext = SetupContext();
 
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, true, ct))
-            .Returns(schema);
+        var actual = await sut.GetSchemaOrThrowAsync(requestContext, input, CancellationToken);
 
-        var actual = await sut.GetSchemaOrThrowAsync(requestContext, input, ct);
-
-        Assert.Equal(schema, actual);
+        Assert.Equal(Schema, actual);
     }
 
     [Fact]
     public async Task Should_throw_notfound_exception_if_schema_to_get_not_found()
     {
-        var requestContext = CreateContext();
+        var requestContext = SetupContext();
 
-        A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<string>._, true, ct))
-            .Returns((ISchemaEntity?)null);
+        Schema = null!;
 
-        await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(requestContext, schemaId.Name, ct));
+        await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(requestContext, SchemaId.Name, CancellationToken));
     }
 
     [Fact]
     public async Task Should_throw_permission_exception_if_content_to_find_is_restricted()
     {
-        var requestContext = CreateContext(allowSchema: false);
+        var requestContext = SetupContext(allowSchema: false);
 
         var content = CreateContent(DomainId.NewGuid());
 
-        A.CallTo(() => contentRepository.FindContentAsync(requestContext.App, schema, content.Id, A<SearchScope>._, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, A<SearchScope>._, A<CancellationToken>._))
             .Returns(CreateContent(DomainId.NewGuid()));
 
-        await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.FindAsync(requestContext, schemaId.Name, content.Id, ct: ct));
+        await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.FindAsync(requestContext, SchemaId.Name, content.Id, ct: CancellationToken));
     }
 
     [Fact]
     public async Task Should_return_null_if_content_by_id_dannot_be_found()
     {
-        var requestContext = CreateContext();
+        var requestContext = SetupContext();
 
         var content = CreateContent(DomainId.NewGuid());
 
-        A.CallTo(() => contentRepository.FindContentAsync(requestContext.App, schema, content.Id, A<SearchScope>._, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, A<SearchScope>._, A<CancellationToken>._))
             .Returns<IContentEntity?>(null);
 
-        var actual = await sut.FindAsync(requestContext, schemaId.Name, content.Id, ct: ct);
+        var actual = await sut.FindAsync(requestContext, SchemaId.Name, content.Id, ct: CancellationToken);
 
         Assert.Null(actual);
     }
@@ -140,14 +121,14 @@ public class ContentQueryServiceTests
     [Fact]
     public async Task Should_return_content_by_special_id()
     {
-        var requestContext = CreateContext();
+        var requestContext = SetupContext();
 
         var content = CreateContent(DomainId.NewGuid());
 
-        A.CallTo(() => contentRepository.FindContentAsync(requestContext.App, schema, schema.Id, SearchScope.Published, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, SchemaId.Id, SearchScope.Published, A<CancellationToken>._))
             .Returns(content);
 
-        var actual = await sut.FindAsync(requestContext, schemaId.Name, DomainId.Create("_schemaId_"), ct: ct);
+        var actual = await sut.FindAsync(requestContext, SchemaId.Name, DomainId.Create("_schemaId_"), ct: CancellationToken);
 
         AssertContent(content, actual);
     }
@@ -159,14 +140,14 @@ public class ContentQueryServiceTests
     [InlineData(0, 0, SearchScope.Published)]
     public async Task Should_return_content_by_id(int isFrontend, int unpublished, SearchScope scope)
     {
-        var requestContext = CreateContext(isFrontend, isUnpublished: unpublished);
+        var requestContext = SetupContext(isFrontend, isUnpublished: unpublished);
 
         var content = CreateContent(DomainId.NewGuid());
 
-        A.CallTo(() => contentRepository.FindContentAsync(requestContext.App, schema, content.Id, scope, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, scope, A<CancellationToken>._))
             .Returns(content);
 
-        var actual = await sut.FindAsync(requestContext, schemaId.Name, content.Id, ct: ct);
+        var actual = await sut.FindAsync(requestContext, SchemaId.Name, content.Id, ct: CancellationToken);
 
         AssertContent(content, actual);
     }
@@ -174,14 +155,14 @@ public class ContentQueryServiceTests
     [Fact]
     public async Task Should_return_content_by_id_and_version()
     {
-        var requestContext = CreateContext();
+        var requestContext = SetupContext();
 
         var content = CreateContent(DomainId.NewGuid());
 
-        A.CallTo(() => contentVersionLoader.GetAsync(appId.Id, content.Id, 13, A<CancellationToken>._))
+        A.CallTo(() => contentVersionLoader.GetAsync(AppId.Id, content.Id, 13, A<CancellationToken>._))
             .Returns(content);
 
-        var actual = await sut.FindAsync(requestContext, schemaId.Name, content.Id, 13, ct);
+        var actual = await sut.FindAsync(requestContext, SchemaId.Name, content.Id, 13, CancellationToken);
 
         AssertContent(content, actual);
     }
@@ -189,9 +170,9 @@ public class ContentQueryServiceTests
     [Fact]
     public async Task Should_throw_exception_if_user_has_no_permission_to_query_content()
     {
-        var requestContext = CreateContext(allowSchema: false);
+        var requestContext = SetupContext(allowSchema: false);
 
-        await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.QueryAsync(requestContext, schemaId.Name, Q.Empty, ct));
+        await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.QueryAsync(requestContext, SchemaId.Name, Q.Empty, CancellationToken));
     }
 
     [Theory]
@@ -201,17 +182,17 @@ public class ContentQueryServiceTests
     [InlineData(0, 0, SearchScope.Published)]
     public async Task Should_query_contents(int isFrontend, int unpublished, SearchScope scope)
     {
-        var requestContext = CreateContext(isFrontend, isUnpublished: unpublished);
+        var requestContext = SetupContext(isFrontend, isUnpublished: unpublished);
 
         var content1 = CreateContent(DomainId.NewGuid());
         var content2 = CreateContent(DomainId.NewGuid());
 
         var q = Q.Empty.WithReference(DomainId.NewGuid());
 
-        A.CallTo(() => contentRepository.QueryAsync(requestContext.App, schema, q, scope, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.QueryAsync(App, Schema, q, scope, A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(5, content1, content2));
 
-        var actual = await sut.QueryAsync(requestContext, schemaId.Name, q, ct);
+        var actual = await sut.QueryAsync(requestContext, SchemaId.Name, q, CancellationToken);
 
         Assert.Equal(5, actual.Total);
 
@@ -226,20 +207,19 @@ public class ContentQueryServiceTests
     [InlineData(0, 0, SearchScope.Published)]
     public async Task Should_query_contents_by_ids(int isFrontend, int unpublished, SearchScope scope)
     {
-        var requestContext = CreateContext(isFrontend, isUnpublished: unpublished);
+        var requestContext = SetupContext(isFrontend, isUnpublished: unpublished);
 
-        var ids = Enumerable.Range(0, 5).Select(x => DomainId.NewGuid()).ToList();
+        var contentIds = Enumerable.Range(0, 5).Select(x => DomainId.NewGuid()).ToList();
+        var contents = contentIds.Select(CreateContent).ToList();
 
-        var contents = ids.Select(CreateContent).ToList();
+        var q = Q.Empty.WithIds(contentIds);
 
-        var q = Q.Empty.WithIds(ids);
-
-        A.CallTo(() => contentRepository.QueryAsync(requestContext.App,
+        A.CallTo(() => contentRepository.QueryAsync(App,
                 A<List<ISchemaEntity>>.That.Matches(x => x.Count == 1), q, scope,
                 A<CancellationToken>._))
             .Returns(ResultList.Create(5, contents));
 
-        var actual = await sut.QueryAsync(requestContext, q, ct);
+        var actual = await sut.QueryAsync(requestContext, q, CancellationToken);
 
         Assert.Equal(5, actual.Total);
 
@@ -252,18 +232,19 @@ public class ContentQueryServiceTests
     [Fact]
     public async Task Should_query_contents_with_matching_permissions()
     {
-        var requestContext = CreateContext(allowSchema: false);
+        var requestContext = SetupContext(allowSchema: false);
 
-        var ids = Enumerable.Range(0, 5).Select(x => DomainId.NewGuid()).ToList();
+        var contentIds = Enumerable.Range(0, 5).Select(x => DomainId.NewGuid()).ToList();
+        var contents = contentIds.Select(CreateContent).ToList();
 
-        var q = Q.Empty.WithIds(ids);
+        var q = Q.Empty.WithIds(contentIds);
 
-        A.CallTo(() => contentRepository.QueryAsync(requestContext.App,
+        A.CallTo(() => contentRepository.QueryAsync(App,
                 A<List<ISchemaEntity>>.That.Matches(x => x.Count == 0), q, SearchScope.All,
                 A<CancellationToken>._))
-            .Returns(ResultList.Create(0, ids.Select(CreateContent)));
+            .Returns(ResultList.Create(0, contents));
 
-        var actual = await sut.QueryAsync(requestContext, q, ct);
+        var actual = await sut.QueryAsync(requestContext, q, CancellationToken);
 
         Assert.Empty(actual);
     }
@@ -271,11 +252,11 @@ public class ContentQueryServiceTests
     [Fact]
     public async Task Should_query_contents_from_user_if_user_has_only_own_permission()
     {
-        var requestContext = CreateContext(permissionId: PermissionIds.AppContentsReadOwn);
+        var requestContext = SetupContext(permissionId: PermissionIds.AppContentsReadOwn);
 
-        await sut.QueryAsync(requestContext, schemaId.Name, Q.Empty, ct);
+        await sut.QueryAsync(requestContext, SchemaId.Name, Q.Empty, CancellationToken);
 
-        A.CallTo(() => contentRepository.QueryAsync(requestContext.App, schema,
+        A.CallTo(() => contentRepository.QueryAsync(App, Schema,
                 A<Q>.That.Matches(x => Equals(x.CreatedBy, requestContext.UserPrincipal.Token())), SearchScope.Published, A
                 <CancellationToken>._))
             .MustHaveHappened();
@@ -284,11 +265,11 @@ public class ContentQueryServiceTests
     [Fact]
     public async Task Should_query_all_contents_if_user_has_read_permission()
     {
-        var requestContext = CreateContext(permissionId: PermissionIds.AppContentsRead);
+        var requestContext = SetupContext(permissionId: PermissionIds.AppContentsRead);
 
-        await sut.QueryAsync(requestContext, schemaId.Name, Q.Empty, ct);
+        await sut.QueryAsync(requestContext, SchemaId.Name, Q.Empty, CancellationToken);
 
-        A.CallTo(() => contentRepository.QueryAsync(requestContext.App, schema,
+        A.CallTo(() => contentRepository.QueryAsync(App, Schema,
                 A<Q>.That.Matches(x => x.CreatedBy == null), SearchScope.Published,
                 A<CancellationToken>._))
             .MustHaveHappened();
@@ -296,7 +277,7 @@ public class ContentQueryServiceTests
 
     private void SetupEnricher()
     {
-        A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<IContentEntity>>._, A<Context>._, ct))
+        A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<IContentEntity>>._, A<Context>._, CancellationToken))
             .ReturnsLazily(x =>
             {
                 var input = x.GetArgument<IEnumerable<IContentEntity>>(0)!;
@@ -305,30 +286,22 @@ public class ContentQueryServiceTests
             });
     }
 
-    private Context CreateContext(
+    private Context SetupContext(
         int isFrontend = 0,
         int isUnpublished = 0,
         bool allowSchema = true,
         string permissionId = PermissionIds.AppContentsRead)
     {
-        var claimsIdentity = new ClaimsIdentity();
-        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-        claimsIdentity.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
-
-        if (isFrontend == 1)
-        {
-            claimsIdentity.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
-        }
+        var permissions = new List<string>();
 
         if (allowSchema)
         {
-            var concretePermission = PermissionIds.ForApp(permissionId, appId.Name, schemaId.Name).Id;
+            var concretePermission = PermissionIds.ForApp(permissionId, AppId.Name, SchemaId.Name).Id;
 
-            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, concretePermission));
+            permissions.Add(concretePermission);
         }
 
-        return new Context(claimsPrincipal, Mocks.App(appId)).Clone(b => b.WithUnpublished(isUnpublished == 1));
+        return CreateContext(isFrontend == 1, permissions.ToArray()).Clone(b => b.WithUnpublished(isUnpublished == 1));
     }
 
     private static void AssertContent(IContentEntity source, IEnrichedContentEntity? actual)
@@ -345,7 +318,7 @@ public class ContentQueryServiceTests
         {
             Id = id,
             Data = contentData,
-            SchemaId = schemaId,
+            SchemaId = SchemaId,
             Status = Status.Published
         };
 

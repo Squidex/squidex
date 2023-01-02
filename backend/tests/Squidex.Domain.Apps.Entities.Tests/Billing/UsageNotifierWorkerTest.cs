@@ -16,29 +16,24 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Billing;
 
-public class UsageNotifierWorkerTest
+public class UsageNotifierWorkerTest : GivenContext
 {
     private readonly TestState<UsageNotifierWorker.State> state = new TestState<UsageNotifierWorker.State>("Default");
     private readonly IClock clock = A.Fake<IClock>();
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly IUserNotifications notificationSender = A.Fake<IUserNotifications>();
     private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-    private readonly IAppEntity app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
     private readonly UsageNotifierWorker sut;
     private Instant time = SystemClock.Instance.GetCurrentInstant();
 
     public UsageNotifierWorkerTest()
     {
-        A.CallTo(() => appProvider.GetAppAsync(app.Id, true, default))
-            .Returns(app);
-
         A.CallTo(() => clock.GetCurrentInstant())
             .ReturnsLazily(() => time);
 
         A.CallTo(() => notificationSender.IsActive)
             .Returns(true);
 
-        sut = new UsageNotifierWorker(state.PersistenceFactory, appProvider, notificationSender, userResolver)
+        sut = new UsageNotifierWorker(state.PersistenceFactory, AppProvider, notificationSender, userResolver)
         {
             Clock = clock
         };
@@ -61,7 +56,7 @@ public class UsageNotifierWorkerTest
 
         var message = new UsageTrackingCheck
         {
-            AppId = app.Id,
+            AppId = AppId.Id,
             Usage = 1000,
             UsageLimit = 3000,
             Users = new[] { "1", "2" }
@@ -82,7 +77,7 @@ public class UsageNotifierWorkerTest
 
         var message = new UsageTrackingCheck
         {
-            AppId = app.Id,
+            AppId = AppId.Id,
             Usage = 1000,
             UsageLimit = 3000,
             Users = new[] { "1", "2", "3" }
@@ -90,13 +85,13 @@ public class UsageNotifierWorkerTest
 
         await sut.HandleAsync(message, default);
 
-        A.CallTo(() => notificationSender.SendUsageAsync(user1!, app, 1000, 3000, default))
+        A.CallTo(() => notificationSender.SendUsageAsync(user1!, App, 1000, 3000, default))
             .MustHaveHappened();
 
-        A.CallTo(() => notificationSender.SendUsageAsync(user2!, app, 1000, 3000, default))
+        A.CallTo(() => notificationSender.SendUsageAsync(user2!, App, 1000, 3000, default))
             .MustHaveHappened();
 
-        A.CallTo(() => notificationSender.SendUsageAsync(user3!, app, 1000, 3000, default))
+        A.CallTo(() => notificationSender.SendUsageAsync(user3!, App, 1000, 3000, default))
             .MustNotHaveHappened();
     }
 
@@ -107,7 +102,7 @@ public class UsageNotifierWorkerTest
 
         var message = new UsageTrackingCheck
         {
-            AppId = app.Id,
+            AppId = AppId.Id,
             Usage = 1000,
             UsageLimit = 3000,
             Users = new[] { "1" }
@@ -116,7 +111,7 @@ public class UsageNotifierWorkerTest
         await sut.HandleAsync(message, default);
         await sut.HandleAsync(message, default);
 
-        A.CallTo(() => notificationSender.SendUsageAsync(user!, app, 1000, 3000, default))
+        A.CallTo(() => notificationSender.SendUsageAsync(user!, App, 1000, 3000, default))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -127,7 +122,7 @@ public class UsageNotifierWorkerTest
 
         var message = new UsageTrackingCheck
         {
-            AppId = app.Id,
+            AppId = AppId.Id,
             Usage = 1000,
             UsageLimit = 3000,
             Users = new[] { "1" }
@@ -139,7 +134,7 @@ public class UsageNotifierWorkerTest
 
         await sut.HandleAsync(message, default);
 
-        A.CallTo(() => notificationSender.SendUsageAsync(user!, app, 1000, 3000, default))
+        A.CallTo(() => notificationSender.SendUsageAsync(user!, App, 1000, 3000, default))
             .MustHaveHappenedTwiceExactly();
     }
 
@@ -155,7 +150,7 @@ public class UsageNotifierWorkerTest
 
         var message = new UsageTrackingCheck
         {
-            AppId = app.Id,
+            AppId = AppId.Id,
             Usage = 1000,
             UsageLimit = 3000,
             Users = new[] { "1" }
@@ -167,7 +162,7 @@ public class UsageNotifierWorkerTest
 
         await sut.HandleAsync(message, default);
 
-        A.CallTo(() => notificationSender.SendUsageAsync(user!, app, 1000, 3000, default))
+        A.CallTo(() => notificationSender.SendUsageAsync(user!, App, 1000, 3000, default))
             .MustHaveHappenedOnceExactly();
     }
 

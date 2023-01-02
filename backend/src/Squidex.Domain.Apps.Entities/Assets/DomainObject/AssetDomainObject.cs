@@ -70,16 +70,16 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
 
                     if (Version > EtagVersion.Empty && !IsDeleted(Snapshot))
                     {
-                        await UpdateCore(c.AsUpdate(), operation);
+                        await UpdateCore(c.AsUpdate(), operation, ct);
                     }
                     else
                     {
-                        await CreateCore(c.AsCreate(), operation);
+                        await CreateCore(c.AsCreate(), operation, ct);
                     }
 
                     if (Is.OptionalChange(Snapshot.ParentId, c.ParentId))
                     {
-                        await MoveCore(c.AsMove(c.ParentId.Value), operation);
+                        await MoveCore(c.AsMove(c.ParentId.Value), operation, ct);
                     }
 
                     return Snapshot;
@@ -90,11 +90,11 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
                 {
                     var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                    await CreateCore(c, operation);
+                    await CreateCore(c, operation, ct);
 
                     if (Is.Change(Snapshot.ParentId, c.ParentId))
                     {
-                        await MoveCore(c.AsMove(), operation);
+                        await MoveCore(c.AsMove(), operation, ct);
                     }
 
                     return Snapshot;
@@ -105,7 +105,7 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
                 {
                     var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                    await AnnotateCore(c, operation);
+                    await AnnotateCore(c, operation, ct);
 
                     return Snapshot;
                 }, ct);
@@ -115,7 +115,7 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
                 {
                     var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                    await UpdateCore(c, operation);
+                    await UpdateCore(c, operation, ct);
 
                     return Snapshot;
                 }, ct);
@@ -125,7 +125,7 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
                 {
                     var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                    await MoveCore(c, operation);
+                    await MoveCore(c, operation, ct);
 
                     return Snapshot;
                 }, ct);
@@ -135,7 +135,7 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
                 {
                     var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                    await DeleteCore(c, operation);
+                    await DeleteCore(c, operation, ct);
                 }, ct);
 
             case DeleteAsset delete:
@@ -143,7 +143,7 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
                 {
                     var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                    await DeleteCore(c, operation);
+                    await DeleteCore(c, operation, ct);
                 }, ct);
 
             default:
@@ -152,16 +152,17 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
         }
     }
 
-    private async Task CreateCore(CreateAsset create, AssetOperation operation)
+    private async Task CreateCore(CreateAsset create, AssetOperation operation,
+        CancellationToken ct)
     {
         if (!create.OptimizeValidation)
         {
-            await operation.MustMoveToValidFolder(create.ParentId);
+            await operation.MustMoveToValidFolder(create.ParentId, ct);
         }
 
         if (!create.DoNotScript)
         {
-            await operation.ExecuteCreateScriptAsync(create);
+            await operation.ExecuteCreateScriptAsync(create, ct);
         }
 
         if (create.Tags != null)
@@ -172,11 +173,12 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
         Create(create);
     }
 
-    private async Task AnnotateCore(AnnotateAsset annotate, AssetOperation operation)
+    private async Task AnnotateCore(AnnotateAsset annotate, AssetOperation operation,
+        CancellationToken ct)
     {
         if (!annotate.DoNotScript)
         {
-            await operation.ExecuteAnnotateScriptAsync(annotate);
+            await operation.ExecuteAnnotateScriptAsync(annotate, ct);
         }
 
         if (annotate.Tags != null)
@@ -187,41 +189,44 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
         Annotate(annotate);
     }
 
-    private async Task UpdateCore(UpdateAsset update, AssetOperation operation)
+    private async Task UpdateCore(UpdateAsset update, AssetOperation operation,
+        CancellationToken ct)
     {
         if (!update.DoNotScript)
         {
-            await operation.ExecuteUpdateScriptAsync(update);
+            await operation.ExecuteUpdateScriptAsync(update, ct);
         }
 
         Update(update);
     }
 
-    private async Task MoveCore(MoveAsset move, AssetOperation operation)
+    private async Task MoveCore(MoveAsset move, AssetOperation operation,
+        CancellationToken ct)
     {
         if (!move.OptimizeValidation)
         {
-            await operation.MustMoveToValidFolder(move.ParentId);
+            await operation.MustMoveToValidFolder(move.ParentId, ct);
         }
 
         if (!move.DoNotScript)
         {
-            await operation.ExecuteMoveScriptAsync(move);
+            await operation.ExecuteMoveScriptAsync(move, ct);
         }
 
         Move(move);
     }
 
-    private async Task DeleteCore(DeleteAsset delete, AssetOperation operation)
+    private async Task DeleteCore(DeleteAsset delete, AssetOperation operation,
+        CancellationToken ct)
     {
         if (delete.CheckReferrers)
         {
-            await operation.CheckReferrersAsync();
+            await operation.CheckReferrersAsync(ct);
         }
 
         if (!delete.DoNotScript)
         {
-            await operation.ExecuteDeleteScriptAsync(delete);
+            await operation.ExecuteDeleteScriptAsync(delete, ct);
         }
 
         Delete(delete);

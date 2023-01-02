@@ -10,13 +10,12 @@ using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Domain.Apps.Entities.Teams.DomainObject.Guards;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Teams.Apps.Teams.DomainObject.Guards;
 
-public class GuardTeamTests : IClassFixture<TranslationsFixture>
+public class GuardTeamTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IUserResolver users = A.Fake<IUserResolver>();
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
@@ -58,7 +57,7 @@ public class GuardTeamTests : IClassFixture<TranslationsFixture>
     [Fact]
     public void CanChangePlan_should_throw_exception_if_plan_id_is_null()
     {
-        var command = new ChangePlan { Actor = RefToken.User("me") };
+        var command = new ChangePlan { Actor = User };
 
         ValidationAssert.Throws(() => GuardTeam.CanChangePlan(command, billingPlans),
             new ValidationError("Plan ID is required.", "PlanId"));
@@ -67,7 +66,7 @@ public class GuardTeamTests : IClassFixture<TranslationsFixture>
     [Fact]
     public void CanChangePlan_should_throw_exception_if_plan_not_found()
     {
-        var command = new ChangePlan { PlanId = "notfound", Actor = RefToken.User("me") };
+        var command = new ChangePlan { PlanId = "notfound", Actor = User };
 
         ValidationAssert.Throws(() => GuardTeam.CanChangePlan(command, billingPlans),
             new ValidationError("A plan with this id does not exist.", "PlanId"));
@@ -76,7 +75,7 @@ public class GuardTeamTests : IClassFixture<TranslationsFixture>
     [Fact]
     public void CanChangePlan_should_not_throw_exception_if_plan_is_found()
     {
-        var command = new ChangePlan { PlanId = "basic", Actor = RefToken.User("me") };
+        var command = new ChangePlan { PlanId = "basic", Actor = User };
 
         GuardTeam.CanChangePlan(command, billingPlans);
     }

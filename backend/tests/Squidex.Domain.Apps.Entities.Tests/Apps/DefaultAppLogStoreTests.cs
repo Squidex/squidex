@@ -7,23 +7,17 @@
 
 using System.Globalization;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public class DefaultAppLogStoreTests
+public class DefaultAppLogStoreTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IRequestLogStore requestLogStore = A.Fake<IRequestLogStore>();
-    private readonly DomainId appId = DomainId.NewGuid();
     private readonly DefaultAppLogStore sut;
 
     public DefaultAppLogStoreTests()
     {
-        ct = cts.Token;
-
         sut = new DefaultAppLogStore(requestLogStore);
     }
 
@@ -38,11 +32,9 @@ public class DefaultAppLogStoreTests
     [Fact]
     public async Task Should_remove_events_from_streams()
     {
-        var app = Mocks.App(NamedId.Of(appId, "my-app"));
+        await ((IDeleter)sut).DeleteAppAsync(App, CancellationToken);
 
-        await ((IDeleter)sut).DeleteAppAsync(app, ct);
-
-        A.CallTo(() => requestLogStore.DeleteAsync($"^[a-z]-{app.Id}", A<CancellationToken>._))
+        A.CallTo(() => requestLogStore.DeleteAsync($"^[a-z]-{AppId.Id}", A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -52,7 +44,7 @@ public class DefaultAppLogStoreTests
         A.CallTo(() => requestLogStore.IsEnabled)
             .Returns(false);
 
-        await sut.LogAsync(appId, default, ct);
+        await sut.LogAsync(AppId.Id, default, CancellationToken);
 
         A.CallTo(() => requestLogStore.LogAsync(A<Request>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -66,7 +58,7 @@ public class DefaultAppLogStoreTests
         A.CallTo(() => requestLogStore.IsEnabled)
             .Returns(true);
 
-        A.CallTo(() => requestLogStore.LogAsync(A<Request>._, ct))
+        A.CallTo(() => requestLogStore.LogAsync(A<Request>._, CancellationToken))
             .Invokes(x => recordedRequest = x.GetArgument<Request>(0)!);
 
         var request = default(RequestLog);
@@ -84,7 +76,7 @@ public class DefaultAppLogStoreTests
         request.UserClientId = "frontend";
         request.UserId = "user1";
 
-        await sut.LogAsync(appId, request, ct);
+        await sut.LogAsync(AppId.Id, request, CancellationToken);
 
         Assert.NotNull(recordedRequest);
 
@@ -100,7 +92,7 @@ public class DefaultAppLogStoreTests
         Contains(request.UserClientId, recordedRequest);
         Contains(request.UserId, recordedRequest);
 
-        Assert.Equal(appId.ToString(), recordedRequest?.Key);
+        Assert.Equal(AppId.Id.ToString(), recordedRequest?.Key);
     }
 
     [Fact]
@@ -109,7 +101,7 @@ public class DefaultAppLogStoreTests
         var dateFrom = DateTime.UtcNow.Date.AddDays(-30);
         var dateTo = DateTime.UtcNow.Date;
 
-        A.CallTo(() => requestLogStore.QueryAllAsync(appId.ToString(), dateFrom, dateTo, ct))
+        A.CallTo(() => requestLogStore.QueryAllAsync(AppId.Id.ToString(), dateFrom, dateTo, CancellationToken))
             .Returns(new[]
             {
                 CreateRecord(),
@@ -120,7 +112,7 @@ public class DefaultAppLogStoreTests
 
         var stream = new MemoryStream();
 
-        await sut.ReadLogAsync(appId, dateFrom, dateTo, stream, ct);
+        await sut.ReadLogAsync(AppId.Id, dateFrom, dateTo, stream, CancellationToken);
 
         stream.Position = 0;
 

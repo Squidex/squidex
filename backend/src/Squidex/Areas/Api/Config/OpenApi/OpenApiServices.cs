@@ -107,6 +107,7 @@ public static class OpenApiServices
         };
 
         settings.AllowReferencesWithProperties = true;
+        settings.DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull;
         settings.FlattenInheritanceHierarchy = flatten;
         settings.SchemaNameGenerator = new SchemaNameGenerator();
         settings.SchemaProcessors.Add(new DiscriminatorProcessor(typeRegistry));

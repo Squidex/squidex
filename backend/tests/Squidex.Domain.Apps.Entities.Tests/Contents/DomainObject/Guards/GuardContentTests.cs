@@ -22,35 +22,32 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards;
 
-public class GuardContentTests : IClassFixture<TranslationsFixture>
+public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
     private readonly ISchemaEntity normalSchema;
     private readonly ISchemaEntity normalUnpublishedSchema;
     private readonly ISchemaEntity singletonSchema;
     private readonly ISchemaEntity singletonUnpublishedSchema;
     private readonly ISchemaEntity componentSchema;
-    private readonly RefToken actor = RefToken.User("123");
 
     public GuardContentTests()
     {
         normalUnpublishedSchema =
-            Mocks.Schema(appId, schemaId, new Schema(schemaId.Name));
+            Mocks.Schema(AppId, SchemaId, new Schema(SchemaId.Name));
 
         normalSchema =
-            Mocks.Schema(appId, schemaId, new Schema(schemaId.Name).Publish());
+            Mocks.Schema(AppId, SchemaId, new Schema(SchemaId.Name).Publish());
 
         singletonUnpublishedSchema =
-            Mocks.Schema(appId, schemaId, new Schema(schemaId.Name, type: SchemaType.Singleton));
+            Mocks.Schema(AppId, SchemaId, new Schema(SchemaId.Name, type: SchemaType.Singleton));
 
         singletonSchema =
-            Mocks.Schema(appId, schemaId, new Schema(schemaId.Name, type: SchemaType.Singleton).Publish());
+            Mocks.Schema(AppId, SchemaId, new Schema(SchemaId.Name, type: SchemaType.Singleton).Publish());
 
         componentSchema =
-            Mocks.Schema(appId, schemaId, new Schema(schemaId.Name, type: SchemaType.Component).Publish());
+            Mocks.Schema(AppId, SchemaId, new Schema(SchemaId.Name, type: SchemaType.Component).Publish());
     }
 
     [Fact]
@@ -315,7 +312,7 @@ public class GuardContentTests : IClassFixture<TranslationsFixture>
     [Fact]
     public void Should_not_throw_exception_if_content_is_from_another_user_but_user_has_permission()
     {
-        var userPermission = PermissionIds.ForApp(PermissionIds.AppContentsDelete, appId.Name, schemaId.Name).Id;
+        var userPermission = PermissionIds.ForApp(PermissionIds.AppContentsDelete, AppId.Name, SchemaId.Name).Id;
         var userObject = Mocks.FrontendUser(permission: userPermission);
 
         var operation = Operation(CreateContent(Status.Draft), normalSchema, userObject);
@@ -330,7 +327,7 @@ public class GuardContentTests : IClassFixture<TranslationsFixture>
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        ((ContentEntity)operation.Snapshot).CreatedBy = actor;
+        ((ContentEntity)operation.Snapshot).CreatedBy = User;
 
         operation.MustHavePermission(PermissionIds.AppContentsDelete);
     }
@@ -360,10 +357,10 @@ public class GuardContentTests : IClassFixture<TranslationsFixture>
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, operation.CommandId, SearchScope.All, default))
+        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, operation.CommandId, SearchScope.All, CancellationToken))
             .Returns(true);
 
-        await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync());
+        await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync(CancellationToken));
     }
 
     [Fact]
@@ -371,10 +368,10 @@ public class GuardContentTests : IClassFixture<TranslationsFixture>
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, operation.CommandId, SearchScope.All, default))
+        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, operation.CommandId, SearchScope.All, CancellationToken))
             .Returns(true);
 
-        await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync());
+        await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync(CancellationToken));
     }
 
     private ContentOperation Operation(ContentEntity content, ISchemaEntity operationSchema)
@@ -392,8 +389,8 @@ public class GuardContentTests : IClassFixture<TranslationsFixture>
 
         return new ContentOperation(serviceProvider, () => content)
         {
-            App = Mocks.App(appId),
-            Command = new CreateContent { User = currentUser, Actor = actor },
+            App = App,
+            Command = new CreateContent { User = currentUser, Actor = User },
             CommandId = content.Id,
             Schema = operationSchema
         };
@@ -412,10 +409,10 @@ public class GuardContentTests : IClassFixture<TranslationsFixture>
     private ContentEntity CreateContentCore(ContentEntity content, DomainId? id = null)
     {
         content.Id = id ?? DomainId.NewGuid();
-        content.AppId = appId;
+        content.AppId = AppId;
         content.Created = default;
-        content.CreatedBy = actor;
-        content.SchemaId = schemaId;
+        content.CreatedBy = User;
+        content.SchemaId = SchemaId;
 
         return content;
     }

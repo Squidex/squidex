@@ -16,18 +16,16 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public class ReferencesFluidExtensionTests
+public class ReferencesFluidExtensionTests : GivenContext
 {
     private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly FluidTemplateEngine sut;
 
     public ReferencesFluidExtensionTests()
     {
         var serviceProvider =
             new ServiceCollection()
-                .AddSingleton(appProvider)
+                .AddSingleton(AppProvider)
                 .AddSingleton(contentQuery)
                 .BuildServiceProvider();
 
@@ -36,9 +34,6 @@ public class ReferencesFluidExtensionTests
             new ContentFluidExtension(),
             new ReferencesFluidExtension(serviceProvider)
         };
-
-        A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, default))
-            .Returns(Mocks.App(appId));
 
         sut = new FluidTemplateEngine(extensions);
     }
@@ -96,7 +91,7 @@ public class ReferencesFluidExtensionTests
                     .AddField("references",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(referenceId1, referenceId2))),
-            AppId = appId
+            AppId = AppId
         };
 
         A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId1), A<CancellationToken>._))

@@ -11,8 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
-using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -23,16 +21,13 @@ using Squidex.Shared;
 
 namespace Squidex.Web.Pipeline;
 
-public class SchemaResolverTests
+public class SchemaResolverTests : GivenContext
 {
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly HttpContext httpContext = new DefaultHttpContext();
     private readonly ActionContext actionContext;
     private readonly ActionExecutingContext actionExecutingContext;
     private readonly ActionExecutionDelegate next;
     private readonly ClaimsIdentity user = new ClaimsIdentity();
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly SchemaResolver sut;
     private bool isNextCalled;
 
@@ -46,7 +41,7 @@ public class SchemaResolverTests
         actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>(), this);
         actionExecutingContext.HttpContext = httpContext;
         actionExecutingContext.HttpContext.User = new ClaimsPrincipal(user);
-        actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
+        actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(App));
 
         next = () =>
         {
@@ -55,7 +50,7 @@ public class SchemaResolverTests
             return Task.FromResult<ActionExecutedContext>(null!);
         };
 
-        sut = new SchemaResolver(appProvider);
+        sut = new SchemaResolver(AppProvider);
     }
 
     [Theory]
@@ -70,7 +65,7 @@ public class SchemaResolverTests
 
         AssertNotFound();
 
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true, httpContext.RequestAborted))
+        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, A<DomainId>._, true, httpContext.RequestAborted))
             .MustNotHaveHappened();
     }
 
@@ -78,12 +73,13 @@ public class SchemaResolverTests
     public async Task Should_return_404_if_schema_not_published_when_attribute_applied()
     {
         actionContext.ActionDescriptor.EndpointMetadata.Add(new SchemaMustBePublishedAttribute());
-        actionContext.RouteData.Values["schema"] = schemaId.Id.ToString();
+        actionContext.RouteData.Values["schema"] = SchemaId.Id.ToString();
 
-        var schema = CreateSchema(false);
+        A.CallTo(() => Schema.SchemaDef)
+            .Returns(Schema.SchemaDef.Unpublish());
 
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true, httpContext.RequestAborted))
-            .Returns(schema);
+        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, A<DomainId>._, true, httpContext.RequestAborted))
+            .Returns(Schema);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
@@ -93,24 +89,25 @@ public class SchemaResolverTests
     [Fact]
     public async Task Should_resolve_schema_if_schema_not_published()
     {
-        actionContext.RouteData.Values["schema"] = schemaId.Id.ToString();
+        actionContext.RouteData.Values["schema"] = SchemaId.Id.ToString();
 
-        var schema = CreateSchema(false);
+        A.CallTo(() => Schema.SchemaDef)
+            .Returns(Schema.SchemaDef.Unpublish());
 
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true, httpContext.RequestAborted))
-            .Returns(schema);
+        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, A<DomainId>._, true, httpContext.RequestAborted))
+            .Returns(Schema);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-        AssertSchema(schema);
+        AssertSchema(Schema);
     }
 
     [Fact]
     public async Task Should_return_404_if_schema_not_found()
     {
-        actionContext.RouteData.Values["schema"] = schemaId.Id.ToString();
+        actionContext.RouteData.Values["schema"] = SchemaId.Id.ToString();
 
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true, httpContext.RequestAborted))
+        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, A<DomainId>._, true, httpContext.RequestAborted))
             .Returns(Task.FromResult<ISchemaEntity?>(null));
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -121,16 +118,14 @@ public class SchemaResolverTests
     [Fact]
     public async Task Should_resolve_schema_from_id()
     {
-        actionContext.RouteData.Values["schema"] = schemaId.Id.ToString();
+        actionContext.RouteData.Values["schema"] = SchemaId.Id.ToString();
 
-        var schema = CreateSchema(true);
-
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, true, httpContext.RequestAborted))
-            .Returns(schema);
+        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, SchemaId.Id, true, httpContext.RequestAborted))
+            .Returns(Schema);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-        AssertSchema(schema);
+        AssertSchema(Schema);
     }
 
     [Fact]
@@ -138,31 +133,27 @@ public class SchemaResolverTests
     {
         user.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
 
-        actionContext.RouteData.Values["schema"] = schemaId.Id.ToString();
+        actionContext.RouteData.Values["schema"] = SchemaId.Id.ToString();
 
-        var schema = CreateSchema(true);
-
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, httpContext.RequestAborted))
-            .Returns(schema);
+        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, SchemaId.Id, false, httpContext.RequestAborted))
+            .Returns(Schema);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-        AssertSchema(schema);
+        AssertSchema(Schema);
     }
 
     [Fact]
     public async Task Should_resolve_schema_from_name()
     {
-        actionContext.RouteData.Values["schema"] = schemaId.Name;
+        actionContext.RouteData.Values["schema"] = SchemaId.Name;
 
-        var schema = CreateSchema(true);
-
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, true, httpContext.RequestAborted))
-            .Returns(schema);
+        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, SchemaId.Name, true, httpContext.RequestAborted))
+            .Returns(Schema);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-        AssertSchema(schema);
+        AssertSchema(Schema);
     }
 
     [Fact]
@@ -170,29 +161,27 @@ public class SchemaResolverTests
     {
         user.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
 
-        actionContext.RouteData.Values["schema"] = schemaId.Name;
+        actionContext.RouteData.Values["schema"] = SchemaId.Name;
 
-        var schema = CreateSchema(true);
-
-        A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, false, httpContext.RequestAborted))
-            .Returns(schema);
+        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, SchemaId.Name, false, httpContext.RequestAborted))
+            .Returns(Schema);
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-        AssertSchema(schema);
+        AssertSchema(Schema);
     }
 
     [Fact]
     public async Task Should_do_nothing_if_app_feature_not_set()
     {
         actionExecutingContext.HttpContext.Features.Set<IAppFeature>(null!);
-        actionExecutingContext.RouteData.Values["schema"] = schemaId.Name;
+        actionExecutingContext.RouteData.Values["schema"] = SchemaId.Name;
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
         Assert.True(isNextCalled);
 
-        A.CallTo(() => appProvider.GetAppAsync(A<string>._, false, httpContext.RequestAborted))
+        A.CallTo(() => AppProvider.GetAppAsync(A<string>._, false, httpContext.RequestAborted))
             .MustNotHaveHappened();
     }
 
@@ -203,7 +192,7 @@ public class SchemaResolverTests
 
         Assert.True(isNextCalled);
 
-        A.CallTo(() => appProvider.GetAppAsync(A<string>._, false, httpContext.RequestAborted))
+        A.CallTo(() => AppProvider.GetAppAsync(A<string>._, false, httpContext.RequestAborted))
             .MustNotHaveHappened();
     }
 
@@ -215,24 +204,7 @@ public class SchemaResolverTests
 
     private void AssertSchema(ISchemaEntity schema)
     {
-        Assert.Equal(schema, actionContext.HttpContext.Features.Get<ISchemaFeature>()!.Schema);
+        Assert.Equal(Schema, actionContext.HttpContext.Features.Get<ISchemaFeature>()!.Schema);
         Assert.True(isNextCalled);
-    }
-
-    private ISchemaEntity CreateSchema(bool published)
-    {
-        var schema = new Schema(schemaId.Name);
-
-        if (published)
-        {
-            schema = schema.Publish();
-        }
-
-        var schemaEntity = A.Fake<ISchemaEntity>();
-
-        A.CallTo(() => schemaEntity.Id).Returns(schemaId.Id);
-        A.CallTo(() => schemaEntity.SchemaDef).Returns(schema);
-
-        return schemaEntity;
     }
 }

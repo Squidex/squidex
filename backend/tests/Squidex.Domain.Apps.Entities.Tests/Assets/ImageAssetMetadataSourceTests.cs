@@ -8,14 +8,13 @@
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public class ImageAssetMetadataSourceTests
+public class ImageAssetMetadataSourceTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
     private readonly MemoryStream stream = new MemoryStream();
     private readonly AssetFile file;
@@ -23,8 +22,6 @@ public class ImageAssetMetadataSourceTests
 
     public ImageAssetMetadataSourceTests()
     {
-        ct = cts.Token;
-
         file = new DelegateAssetFile("MyImage.png", "image/png", 1024, () => stream);
 
         sut = new ImageAssetMetadataSource(assetThumbnailGenerator);
@@ -35,9 +32,9 @@ public class ImageAssetMetadataSourceTests
     {
         var command = new CreateAsset { File = file, Type = AssetType.Image };
 
-        await sut.EnhanceAsync(command, ct);
+        await sut.EnhanceAsync(command, CancellationToken);
 
-        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, ct))
+        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -46,7 +43,7 @@ public class ImageAssetMetadataSourceTests
     {
         var command = new CreateAsset { File = file };
 
-        await sut.EnhanceAsync(command, ct);
+        await sut.EnhanceAsync(command, CancellationToken);
 
         Assert.Empty(command.Tags);
     }
@@ -56,10 +53,10 @@ public class ImageAssetMetadataSourceTests
     {
         var command = new CreateAsset { File = file };
 
-        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, ct))
+        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, CancellationToken))
             .Returns(new ImageInfo(800, 600, ImageOrientation.None, ImageFormat.PNG));
 
-        await sut.EnhanceAsync(command, ct);
+        await sut.EnhanceAsync(command, CancellationToken);
 
         Assert.Equal(800, command.Metadata.GetPixelWidth());
         Assert.Equal(600, command.Metadata.GetPixelHeight());
@@ -74,19 +71,19 @@ public class ImageAssetMetadataSourceTests
     {
         var command = new CreateAsset { File = file };
 
-        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, ct))
+        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
             .Returns(new ImageInfo(800, 600, ImageOrientation.None, ImageFormat.PNG));
 
-        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, ct))
+        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, CancellationToken))
             .Returns(new ImageInfo(600, 800, ImageOrientation.BottomRight, ImageFormat.PNG)).Once();
 
-        await sut.EnhanceAsync(command, ct);
+        await sut.EnhanceAsync(command, CancellationToken);
 
         Assert.Equal(800, command.Metadata.GetPixelWidth());
         Assert.Equal(600, command.Metadata.GetPixelHeight());
         Assert.Equal(AssetType.Image, command.Type);
 
-        A.CallTo(() => assetThumbnailGenerator.FixOrientationAsync(stream, file.MimeType, A<Stream>._, ct))
+        A.CallTo(() => assetThumbnailGenerator.FixOrientationAsync(stream, file.MimeType, A<Stream>._, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -98,7 +95,7 @@ public class ImageAssetMetadataSourceTests
         command.Metadata.SetPixelWidth(100);
         command.Metadata.SetPixelWidth(100);
 
-        await sut.EnhanceAsync(command, ct);
+        await sut.EnhanceAsync(command, CancellationToken);
 
         Assert.Contains("image", command.Tags);
         Assert.Contains("image/small", command.Tags);
@@ -112,7 +109,7 @@ public class ImageAssetMetadataSourceTests
         command.Metadata.SetPixelWidth(800);
         command.Metadata.SetPixelWidth(600);
 
-        await sut.EnhanceAsync(command, ct);
+        await sut.EnhanceAsync(command, CancellationToken);
 
         Assert.Contains("image", command.Tags);
         Assert.Contains("image/medium", command.Tags);
@@ -126,7 +123,7 @@ public class ImageAssetMetadataSourceTests
         command.Metadata.SetPixelWidth(1200);
         command.Metadata.SetPixelWidth(1400);
 
-        await sut.EnhanceAsync(command, ct);
+        await sut.EnhanceAsync(command, CancellationToken);
 
         Assert.Contains("image", command.Tags);
         Assert.Contains("image/large", command.Tags);

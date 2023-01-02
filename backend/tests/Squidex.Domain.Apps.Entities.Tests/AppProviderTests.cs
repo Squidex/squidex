@@ -20,55 +20,42 @@ using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Entities;
 
-public class AppProviderTests
+public class AppProviderTests : GivenContext
 {
-    private readonly CancellationTokenSource cts = new CancellationTokenSource();
-    private readonly CancellationToken ct;
     private readonly IAppsIndex indexForApps = A.Fake<IAppsIndex>();
     private readonly IRulesIndex indexForRules = A.Fake<IRulesIndex>();
     private readonly ISchemasIndex indexForSchemas = A.Fake<ISchemasIndex>();
     private readonly ITeamsIndex indexForTeams = A.Fake<ITeamsIndex>();
-    private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-    private readonly IAppEntity app;
     private readonly AppProvider sut;
 
     public AppProviderTests()
     {
-        ct = cts.Token;
-
-        app = Mocks.App(appId);
-
         sut = new AppProvider(indexForApps, indexForRules, indexForSchemas, indexForTeams, new AsyncLocalCache());
     }
 
     [Fact]
     public async Task Should_get_app_with_schema_from_index()
     {
-        var schema = Mocks.Schema(app.NamedId(), schemaId);
+        A.CallTo(() => indexForApps.GetAppAsync(AppId.Id, false, CancellationToken))
+            .Returns(App);
 
-        A.CallTo(() => indexForApps.GetAppAsync(app.Id, false, ct))
-            .Returns(app);
+        A.CallTo(() => indexForSchemas.GetSchemaAsync(AppId.Id, SchemaId.Id, false, CancellationToken))
+            .Returns(Schema);
 
-        A.CallTo(() => indexForSchemas.GetSchemaAsync(app.Id, schema.Id, false, ct))
-            .Returns(schema);
+        var actual = await sut.GetAppWithSchemaAsync(AppId.Id, SchemaId.Id, false, CancellationToken);
 
-        var actual = await sut.GetAppWithSchemaAsync(app.Id, schemaId.Id, false, ct);
-
-        Assert.Equal(schema, actual.Item2);
+        Assert.Equal(Schema, actual.Item2);
     }
 
     [Fact]
     public async Task Should_get_team_apps_from_index()
     {
-        var team = Mocks.Team(DomainId.NewGuid());
+        A.CallTo(() => indexForApps.GetAppsForTeamAsync(TeamId, CancellationToken))
+            .Returns(new List<IAppEntity> { App });
 
-        A.CallTo(() => indexForApps.GetAppsForTeamAsync(team.Id, ct))
-            .Returns(new List<IAppEntity> { app });
+        var actual = await sut.GetTeamAppsAsync(TeamId, CancellationToken);
 
-        var actual = await sut.GetTeamAppsAsync(team.Id, ct);
-
-        Assert.Equal(app, actual.Single());
+        Assert.Equal(App, actual.Single());
     }
 
     [Fact]
@@ -76,99 +63,89 @@ public class AppProviderTests
     {
         var permissions = new PermissionSet("*");
 
-        A.CallTo(() => indexForApps.GetAppsForUserAsync("user1", permissions, ct))
-            .Returns(new List<IAppEntity> { app });
+        A.CallTo(() => indexForApps.GetAppsForUserAsync("user1", permissions, CancellationToken))
+            .Returns(new List<IAppEntity> { App });
 
-        var actual = await sut.GetUserAppsAsync("user1", permissions, ct);
+        var actual = await sut.GetUserAppsAsync("user1", permissions, CancellationToken);
 
-        Assert.Equal(app, actual.Single());
+        Assert.Equal(App, actual.Single());
     }
 
     [Fact]
     public async Task Should_get_app_from_index()
     {
-        A.CallTo(() => indexForApps.GetAppAsync(app.Id, false, ct))
-            .Returns(app);
+        A.CallTo(() => indexForApps.GetAppAsync(AppId.Id, false, CancellationToken))
+            .Returns(App);
 
-        var actual = await sut.GetAppAsync(app.Id, false, ct);
+        var actual = await sut.GetAppAsync(AppId.Id, false, CancellationToken);
 
-        Assert.Equal(app, actual);
+        Assert.Equal(App, actual);
     }
 
     [Fact]
     public async Task Should_get_app_by_name_from_index()
     {
-        A.CallTo(() => indexForApps.GetAppAsync(app.Name, false, ct))
-            .Returns(app);
+        A.CallTo(() => indexForApps.GetAppAsync(AppId.Name, false, CancellationToken))
+            .Returns(App);
 
-        var actual = await sut.GetAppAsync(app.Name, false, ct);
+        var actual = await sut.GetAppAsync(AppId.Name, false, CancellationToken);
 
-        Assert.Equal(app, actual);
+        Assert.Equal(App, actual);
     }
 
     [Fact]
     public async Task Should_get_team_from_index()
     {
-        var team = Mocks.Team(DomainId.NewGuid());
+        A.CallTo(() => indexForTeams.GetTeamAsync(TeamId, CancellationToken))
+            .Returns(Team);
 
-        A.CallTo(() => indexForTeams.GetTeamAsync(team.Id, ct))
-            .Returns(team);
+        var actual = await sut.GetTeamAsync(TeamId, CancellationToken);
 
-        var actual = await sut.GetTeamAsync(team.Id, ct);
-
-        Assert.Equal(team, actual);
+        Assert.Equal(Team, actual);
     }
 
     [Fact]
     public async Task Should_get_teams_from_index()
     {
-        var team = Mocks.Team(DomainId.NewGuid());
+        A.CallTo(() => indexForTeams.GetTeamsAsync("user1", CancellationToken))
+            .Returns(new List<ITeamEntity> { Team });
 
-        A.CallTo(() => indexForTeams.GetTeamsAsync("user1", ct))
-            .Returns(new List<ITeamEntity> { team });
+        var actual = await sut.GetUserTeamsAsync("user1", CancellationToken);
 
-        var actual = await sut.GetUserTeamsAsync("user1", ct);
-
-        Assert.Equal(team, actual.Single());
+        Assert.Equal(Team, actual.Single());
     }
 
     [Fact]
     public async Task Should_get_schema_from_index()
     {
-        var schema = Mocks.Schema(app.NamedId(), schemaId);
+        A.CallTo(() => indexForSchemas.GetSchemaAsync(AppId.Id, SchemaId.Id, false, CancellationToken))
+            .Returns(Schema);
 
-        A.CallTo(() => indexForSchemas.GetSchemaAsync(app.Id, schema.Id, false, ct))
-            .Returns(schema);
+        var actual = await sut.GetSchemaAsync(AppId.Id, SchemaId.Id, false, CancellationToken);
 
-        var actual = await sut.GetSchemaAsync(app.Id, schema.Id, false, ct);
-
-        Assert.Equal(schema, actual);
+        Assert.Equal(Schema, actual);
     }
 
     [Fact]
     public async Task Should_get_schema_by_name_from_index()
     {
-        var schema = Mocks.Schema(app.NamedId(), schemaId);
+        A.CallTo(() => indexForSchemas.GetSchemaAsync(AppId.Id, SchemaId.Name, false, CancellationToken))
+            .Returns(Schema);
 
-        A.CallTo(() => indexForSchemas.GetSchemaAsync(app.Id, schemaId.Name, false, ct))
-            .Returns(schema);
+        var actual = await sut.GetSchemaAsync(AppId.Id, SchemaId.Name, false, CancellationToken);
 
-        var actual = await sut.GetSchemaAsync(app.Id, schemaId.Name, false, ct);
-
-        Assert.Equal(schema, actual);
+        Assert.Equal(Schema, actual);
     }
 
     [Fact]
     public async Task Should_get_schemas_from_index()
     {
-        var schema = Mocks.Schema(app.NamedId(), schemaId);
+        A.CallTo(() => indexForSchemas.GetSchemasAsync(AppId.Id, CancellationToken))
+            .Returns(new List<ISchemaEntity> { Schema });
 
-        A.CallTo(() => indexForSchemas.GetSchemasAsync(app.Id, ct))
-            .Returns(new List<ISchemaEntity> { schema });
+        var actual = await sut.GetSchemasAsync(AppId.Id, CancellationToken);
 
-        var actual = await sut.GetSchemasAsync(app.Id, ct);
-
-        Assert.Equal(schema, actual.Single());
+        Assert.Equal(Schema, actual.Single());
     }
 
     [Fact]
@@ -176,10 +153,10 @@ public class AppProviderTests
     {
         var rule = new RuleEntity();
 
-        A.CallTo(() => indexForRules.GetRulesAsync(app.Id, ct))
+        A.CallTo(() => indexForRules.GetRulesAsync(AppId.Id, CancellationToken))
             .Returns(new List<IRuleEntity> { rule });
 
-        var actual = await sut.GetRulesAsync(app.Id, ct);
+        var actual = await sut.GetRulesAsync(AppId.Id, CancellationToken);
 
         Assert.Equal(rule, actual.Single());
     }
@@ -189,10 +166,10 @@ public class AppProviderTests
     {
         var rule = new RuleEntity { Id = DomainId.NewGuid() };
 
-        A.CallTo(() => indexForRules.GetRulesAsync(app.Id, ct))
+        A.CallTo(() => indexForRules.GetRulesAsync(AppId.Id, CancellationToken))
             .Returns(new List<IRuleEntity> { rule });
 
-        var actual = await sut.GetRuleAsync(app.Id, rule.Id, ct);
+        var actual = await sut.GetRuleAsync(AppId.Id, rule.Id, CancellationToken);
 
         Assert.Equal(rule, actual);
     }

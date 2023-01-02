@@ -175,6 +175,12 @@ class MetadataTemplate {
 export class EditAssetScriptsForm extends Form<ExtendedFormGroup, {}, object> {
     constructor() {
         super(new ExtendedFormGroup({
+            query: new UntypedFormControl('',
+                Validators.nullValidator,
+            ),
+            queryPre: new UntypedFormControl('',
+                Validators.nullValidator,
+            ),
             annotate: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
