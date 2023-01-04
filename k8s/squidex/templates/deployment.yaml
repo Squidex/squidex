@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: squidex
-          image: {{ .Values.squidexImage}}:{{ .Values.squidexTag}}
+          image: squidex/squidex:{{ .Values.squidexTag}}
           imagePullPolicy: Always
           resources:
             requests:
@@ -52,8 +52,8 @@ spec:
               value: "true"
             - name: IDENTITY__ADMINEMAIL
               valueFrom:
-                secretKeyRef:
-                  name: squidex-params
+                configMapKeyRef:
+                  name: squidex
                   key: ADMIN_EMAIL
             - name: IDENTITY__ADMINPASSWORD
               valueFrom:
@@ -62,8 +62,8 @@ spec:
                   key: squidex_admin_password
             - name: URLS__BASEURL
               valueFrom:
-                secretKeyRef:
-                  name: squidex-params
+                configMapKeyRef:
+                  name: squidex
                   key: DOMAIN
             - name: URLS__ENFORCEHTTPS
               value: "false"
@@ -78,14 +78,14 @@ spec:
             - name: EVENTSTORE__MONGODB__CONFIGURATION
               valueFrom:
                 configMapKeyRef:
-                  name: squidex-{{ .Values.version }}
+                  name: squidex
                   key: MONGODB__CONFIGURATION
             - name: EVENTSTORE__MONGODB__DATABASE
               value: "Squidex"
             - name: STORE__MONGODB__CONFIGURATION
               valueFrom:
                 configMapKeyRef:
-                  name: squidex-{{ .Values.version }}
+                  name: squidex
                   key: MONGODB__CONFIGURATION
             - name: STORE__MONGODB__DATABASE
               value: "Squidex"
@@ -95,8 +95,8 @@ spec:
               value: "AmazonS3"
             - name: ASSETSTORE__AMAZONS3__BUCKET
               valueFrom:
-                secretKeyRef:
-                  name: squidex-params
+                configMapKeyRef:
+                  name: squidex
                   key: S3_BUCKET
             - name: ASSETSTORE__AMAZONS3__REGIONNAME
               value: "us-east-1"
@@ -151,7 +151,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: squidex
-                  key: email_smtp_password
+                  key: squidex_admin_password
             - name: EMAIL__SMTP__ENABLESSL
               value: "true"
             - name: EMAIL__SMTP__PORT

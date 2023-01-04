@@ -1,4 +1,4 @@
-contentVersion: v2
-secretsEnvironment: production
-ingressHost: squidex-production-v2.learnwithhomer.com
-squidexImage: squidex/squidex
+ingressHost: squidex-staging-v2.learnwithhomer.com
+domain: https://squidex-staging-v2.learnwithhomer.com
+adminEmail: squidex-staging@homerlearning.com
+S3Bucket: homer-squidex-staging

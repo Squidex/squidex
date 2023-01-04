@@ -1,0 +1,171 @@
+name: Deploy to Dev/Staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      choice:
+        type: choice
+        description: Select an Environment
+        options:
+        - content-v1
+        - content-v2
+      tag:
+        description: The tag of Squidex to pull
+
+jobs:
+  build_and_deploy:
+    name: Deploy
+    runs-on: ubuntu-latest # Using a linux runner
+
+    # Setting environment variables
+    env:
+      IMAGE_TAG: ${{ github.event.inputs.tag }}
+      HELM_PATH: ${{ github.workspace }}/k8s/helm-chart/squidex
+      NAMESPACE: ${{ github.event.inputs.choice }}
+
+    steps:
+    - name: set-env-vars
+      uses: FranzDiebold/github-env-vars-action@v2
+
+    # Checks out the current repository
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    # Helm is required to generate the manifests
+    - name: Install Helm
+      run: |
+        wget https://get.helm.sh/helm-v3.9.1-linux-amd64.tar.gz
+        tar xvf helm-v3.9.1-linux-amd64.tar.gz
+        sudo mv linux-amd64/helm /usr/local/bin
+        echo "Installed helm"
+
+    # Install yq - yaml processor
+    - name: Install yq
+      run: |
+        sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+        sudo chmod a+x /usr/local/bin/yq
+        yq --version
+        echo "Installed yq"
+
+    # # Confuguring AWS on the runner
+    # - name: Configure AWS credentials
+    #   uses: aws-actions/configure-aws-credentials@v1
+    #   with:
+    #     aws-access-key-id: ${{ secrets.HOMER_AWS_ACCESS_KEY_ID }}
+    #     aws-secret-access-key: ${{ secrets.HOMER_AWS_SECRET_ACCESS_KEY }}
+    #     aws-region: us-east-1
+
+    # # Logs into ECR, and fetches the container registries
+    # - name: Login to Amazon ECR
+    #   id: login-ecr
+    #   uses: aws-actions/amazon-ecr-login@v1
+
+    # # Build and tag images
+    # - name: Build, tag, and push image to Amazon ECR
+    #   env:
+    #     # Container resgistries are gotten from the previous step
+    #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+    #   run: |
+    #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$CI_ACTION_REF_NAME_SLUG-$CI_SHA_SHORT .
+    #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$CI_ACTION_REF_NAME_SLUG-$CI_SHA_SHORT
+
+    # Set kubeconfig context for Staging cluster
+    - name: Staging :- Set Kubeconfig
+      if: ${{ github.event.inputs.choice != 'devopsTest' }}
+      uses: azure/k8s-set-context@v2
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.HOMER_KUBECONFIG_STAGING }}
+
+    # This generates the deployment manifests for specified environment
+    - name: Generate manifest for '${{ env.APP_ENVIRONMENT }}'
+      run: |
+        export DEPLOY_NAME=$(yq e '.name' $HELM_PATH/values.yaml)
+
+        echo "APP_ENVIRONMENT: $APP_ENVIRONMENT"
+        export NAMESPACE=$APP_ENVIRONMENT
+        export REPLICAS=$(kubectl get deployment $DEPLOY_NAME -n $NAMESPACE -o=jsonpath={.spec.replicas})
+        [ -z $REPLICAS ] && export REPLICAS=$(yq e '.replicas' $HELM_PATH/values.yaml)
+
+        echo "Number of replicas: $REPLICAS"
+        echo "Namespace: $NAMESPACE"
+        echo "NAMESPACE=$NAMESPACE" >> $GITHUB_ENV
+
+
+        helm template $HELM_PATH  -f $HELM_PATH/values-staging.yaml --set imageTag=$IMAGE_TAG --set replicas=$REPLICAS --set version=$NAMESPACE  > manifest.yaml
+
+        echo "Generated manifest"
+
+    # This deploys to staging/test cluster, for the specified env
+    - name: Deploy to '${{ env.APP_ENVIRONMENT }}'
+      uses: Azure/k8s-deploy@v4.4
+      with:
+        namespace: ${{ env.NAMESPACE }}
+        manifests: |
+            ./manifest.yaml
+            ./Dockerfile
+        
+
+################################ NOTIFY SLACK #######################################################
+#############################NEEDS HOMER TOKENS ADDED##################################################################
+
+    # - name: Notify Slack Staging Success
+    #   if: ${{ success() }}
+    #   uses: wearerequired/slack-messaging-action@v1
+    #   with:
+    #     bot_token: ${{ secrets.HOMER_SLACK_BOT_TOKEN }}
+    #     channel: codespark-staging-status # <--- Enter the right channel name here
+    #     payload: >-
+    #       {
+    #           "icon_emoji": ":rocket:",
+    #           "username": "Deployer",
+    #           "attachments": [
+    #               {
+    #                   "author_name": "${{ github.event.sender.login }}",
+    #                   "author_link": "${{ github.event.sender.html_url }}",
+    #                   "author_icon": "${{ github.event.sender.avatar_url }}",
+    #                   "color": "good",
+    #                   "fallback": "Deployment Finished",
+    #                   "pretext": "SUCCESS: ${{ github.ref_name }} to ${{ env.APP_ENVIRONMENT }} for ${{ github.event.repository.name }}.",
+    #                   "fields": [
+    #                       {
+    #                         "title": "Revision",
+    #                         "value": "<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}@${{ github.ref }}>",
+    #                         "short": true
+    #                       }
+    #                     ],
+    #                   "footer": "<https://github.com/${{ github.repository }}|${{ github.repository }}>"
+    #               }
+    #           ]
+    #       }
+
+    # - name: Notify Slack Staging Failure
+    #   if: ${{ failure() }}
+    #   uses: wearerequired/slack-messaging-action@v1
+    #   with:
+    #     bot_token: ${{ secrets.HOMER_SLACK_BOT_TOKEN }}
+    #     channel: codespark-staging-status # <--- Enter the right channel name here
+    #     payload: >-
+    #       {
+    #           "icon_emoji": ":boom:",
+    #           "username": "Deployer",
+    #           "attachments": [
+    #               {
+    #                   "author_name": "${{ github.event.sender.login }}",
+    #                   "author_link": "${{ github.event.sender.html_url }}",
+    #                   "author_icon": "${{ github.event.sender.avatar_url }}",
+    #                   "color": "danger",
+    #                   "fallback": "Failed",
+    #                   "pretext": "FAILURE: ${{ github.ref_name }} to ${{ env.APP_ENVIRONMENT }} for ${{ github.event.repository.name }}.",
+    #                   "fields": [
+    #                       {
+    #                         "title": "Revision",
+    #                         "value": "<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}@${{ github.ref }}>",
+    #                         "short": true
+    #                       }
+    #                     ],
+    #                   "footer": "<https://github.com/${{ github.repository }}|${{ github.repository }}>"
+    #               }
+    #           ]
+    #       }
+
