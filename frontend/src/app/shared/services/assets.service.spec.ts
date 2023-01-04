@@ -28,6 +28,58 @@ describe('AssetsService', () => {
         httpMock.verify();
     }));
 
+    const tests = [
+        {
+            name: 'basic query',
+            query: { take: 17, skip: 13 },
+            requestBody: { q: sanitize({ take: 17, skip: 13 }), parentId: undefined },
+            noSlowTotal: null,
+            noTotal: null,
+        },
+        {
+            name: 'basic query without total',
+            query: { take: 17, skip: 13, noTotal: true, noSlowTotal: true },
+            requestBody: { q: sanitize({ take: 17, skip: 13 }), parentId: undefined },
+            noSlowTotal: '1',
+            noTotal: '1',
+        },
+        {
+            name: 'query by parent',
+            query: { take: 17, skip: 13, parentId: '1' },
+            requestBody: { q: sanitize({ take: 17, skip: 13 }), parentId: '1' },
+            noSlowTotal: null,
+            noTotal: null,
+        },
+        {
+            name: 'query by name',
+            query: { take: 17, skip: 13, query: { fullText: 'my-query' } },
+            requestBody: { q: sanitize({ filter: { and: [{ path: 'fileName', op: 'contains', value: 'my-query' }] }, take: 17, skip: 13 }), parentId: undefined },
+            noSlowTotal: null,
+            noTotal: null,
+        },
+        {
+            name: 'query by tag',
+            query: { take: 17, skip: 13, tags: ['tag1']  },
+            requestBody: { q: sanitize({ filter: { and: [{ path: 'tags', op: 'eq', value: 'tag1' }] }, take: 17, skip: 13 }), parentId: undefined },
+            noSlowTotal: null,
+            noTotal: null,
+        },
+        {
+            name: 'query by ids',
+            query: { ids: ['1', '2']  },
+            requestBody: { ids: ['1', '2'] },
+            noSlowTotal: null,
+            noTotal: null,
+        },
+        {
+            name: 'query by ref',
+            query: { ref: '1' },
+            requestBody: { q: sanitize({ filter: { or: [{ path: 'id', op: 'eq', value: '1' }, { path: 'slug', op: 'eq', value: '1' }] }, take: 1 }) },
+            noSlowTotal: null,
+            noTotal: '1',
+        },
+    ];
+
     it('should make get request to get asset tags',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
             let tags: any;
@@ -79,46 +131,46 @@ describe('AssetsService', () => {
             });
         }));
 
-    it('should make post request to get assets',
-        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            let assets: AssetsDto;
+    tests.forEach(x => {
+        it(`should make post request to get assets with ${x.name}`,
+            inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+                let assets: AssetsDto;
 
-            assetsService.getAssets('my-app', { take: 17, skip: 13 }).subscribe(result => {
-                assets = result;
-            });
+                assetsService.getAssets('my-app', x.query).subscribe(result => {
+                    assets = result;
+                });
 
-            const expectedQuery = { take: 17, skip: 13 };
+                const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/query');
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/query');
+                expect(req.request.method).toEqual('POST');
+                expect(req.request.headers.get('If-Match')).toBeNull();
+                expect(req.request.headers.get('X-NoSlowTotal')).toEqual(x.noSlowTotal);
+                expect(req.request.headers.get('X-NoTotal')).toEqual(x.noTotal);
+                expect(req.request.body).toEqual(x.requestBody);
 
-            expect(req.request.method).toEqual('POST');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.headers.get('X-NoSlowTotal')).toBeNull();
-            expect(req.request.headers.get('X-NoTotal')).toBeNull();
-            expect(req.request.body).toEqual({ q: sanitize(expectedQuery) });
+                req.flush({
+                    total: 10,
+                    items: [
+                        assetResponse(12),
+                        assetResponse(13),
+                    ],
+                    folders: [
+                        assetFolderResponse(22),
+                        assetFolderResponse(23),
+                    ],
+                });
 
-            req.flush({
-                total: 10,
-                items: [
-                    assetResponse(12),
-                    assetResponse(13),
-                ],
-                folders: [
-                    assetFolderResponse(22),
-                    assetFolderResponse(23),
-                ],
-            });
-
-            expect(assets!).toEqual({
-                items: [
-                    createAsset(12),
-                    createAsset(13),
-                ],
-                total: 10,
-                canCreate: false,
-                canRenameTag: false,
-            });
-        }));
+                expect(assets!).toEqual({
+                    items: [
+                        createAsset(12),
+                        createAsset(13),
+                    ],
+                    total: 10,
+                    canCreate: false,
+                    canRenameTag: false,
+                });
+            }));
+    });
 
     it('should make get request to get asset folders',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
@@ -172,92 +224,6 @@ describe('AssetsService', () => {
             req.flush(assetResponse(12));
 
             expect(asset!).toEqual(createAsset(12));
-        }));
-
-    it('should make post request to get assets by name',
-        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            const query = { fullText: 'my-query' };
-
-            assetsService.getAssets('my-app', { take: 17, skip: 13, query }).subscribe();
-
-            const expectedQuery = { filter: { and: [{ path: 'fileName', op: 'contains', value: 'my-query' }] }, take: 17, skip: 13 };
-
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/query');
-
-            expect(req.request.method).toEqual('POST');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.headers.get('X-NoSlowTotal')).toBeNull();
-            expect(req.request.headers.get('X-NoTotal')).toBeNull();
-            expect(req.request.body).toEqual({ q: sanitize(expectedQuery) });
-
-            req.flush({ total: 10, items: [] });
-        }));
-
-    it('should make post request to get assets by tag',
-        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            assetsService.getAssets('my-app', { take: 17, skip: 13, tags: ['tag1'] }).subscribe();
-
-            const expectedQuery = { filter: { and: [{ path: 'tags', op: 'eq', value: 'tag1' }] }, take: 17, skip: 13 };
-
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/query');
-
-            expect(req.request.method).toEqual('POST');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.headers.get('X-NoSlowTotal')).toBeNull();
-            expect(req.request.headers.get('X-NoTotal')).toBeNull();
-            expect(req.request.body).toEqual({ q: sanitize(expectedQuery) });
-
-            req.flush({ total: 10, items: [] });
-        }));
-
-    it('should make post request to get assets by ids',
-        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            const ids = ['1', '2'];
-
-            assetsService.getAssets('my-app', { ids }).subscribe();
-
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/query');
-
-            expect(req.request.method).toEqual('POST');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.headers.get('X-NoSlowTotal')).toBeNull();
-            expect(req.request.headers.get('X-NoTotal')).toBeNull();
-            expect(req.request.body).toEqual({ ids });
-
-            req.flush({ total: 10, items: [] });
-        }));
-
-    it('should make post request to get assets by ref',
-        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            const value = '1', op = 'eq';
-
-            assetsService.getAssets('my-app', { ref: value }).subscribe();
-
-            const expectedQuery = { filter: { or: [{ path: 'id', op, value }, { path: 'slug', op, value }] }, take: 1 };
-
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/query');
-
-            expect(req.request.method).toEqual('POST');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.headers.get('X-NoTotal')).toEqual('1');
-            expect(req.request.headers.get('X-NoSlowTotal')).toBeNull();
-            expect(req.request.body).toEqual({ q: sanitize(expectedQuery) });
-
-            req.flush({ total: 10, items: [] });
-        }));
-
-    it('should make post request to get assets without total',
-        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            assetsService.getAssets('my-app', { take: 17, skip: 13, noSlowTotal: true, noTotal: true }).subscribe();
-
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/query');
-
-            expect(req.request.method).toEqual('POST');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.headers.get('X-NoTotal')).toBe('1');
-            expect(req.request.headers.get('X-NoSlowTotal')).toBe('1');
-
-            req.flush({ total: 10, items: [] });
         }));
 
     it('should make post request to create asset',

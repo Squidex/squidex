@@ -418,12 +418,6 @@ function buildHeaders(q: AssetsQuery | undefined, noTotal: boolean) {
 function buildQuery(q?: AssetsQuery & AssetsByQuery & AssetsByIds & AssetsByRef) {
     const { ids, parentId, query, ref, skip, tags, take } = q || {};
 
-    const body: any = {};
-
-    if (parentId) {
-        body.parentId = parentId;
-    }
-
     if (ref) {
         const queryObj: Query = {
             filter: {
@@ -440,28 +434,27 @@ function buildQuery(q?: AssetsQuery & AssetsByQuery & AssetsByIds & AssetsByRef)
             take: 1,
         };
 
-        body.q = sanitize(queryObj);
+        return { q: sanitize(queryObj) };
     } else if (Types.isArray(ids)) {
-        body.ids = ids;
+        return { ids };
     } else {
         const queryObj: Query = {};
-
-        const filters: any[] = [];
+        const queryFilters: any[] = [];
 
         if (query && query.fullText && query.fullText.length > 0) {
-            filters.push({ path: 'fileName', op: 'contains', value: query.fullText });
+            queryFilters.push({ path: 'fileName', op: 'contains', value: query.fullText });
         }
 
         if (tags) {
             for (const tag of tags) {
                 if (tag && tag.length > 0) {
-                    filters.push({ path: 'tags', op: 'eq', value: tag });
+                    queryFilters.push({ path: 'tags', op: 'eq', value: tag });
                 }
             }
         }
 
-        if (filters.length > 0) {
-            queryObj.filter = { and: filters };
+        if (queryFilters.length > 0) {
+            queryObj.filter = { and: queryFilters };
         }
 
         if (take && take > 0) {
@@ -472,10 +465,8 @@ function buildQuery(q?: AssetsQuery & AssetsByQuery & AssetsByIds & AssetsByRef)
             queryObj.skip = skip;
         }
 
-        body.q = sanitize(queryObj);
+        return { q: sanitize(queryObj), parentId };
     }
-
-    return body;
 }
 
 function parseAssets(response: { items: any[]; total: number } & Resource): AssetsDto {
