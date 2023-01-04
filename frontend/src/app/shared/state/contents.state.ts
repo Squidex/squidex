@@ -28,7 +28,7 @@ interface Snapshot extends ListState<Query> {
     referencing?: string;
 
     // The reference content id.
-    reference?: string;
+    references?: string;
 
     // The statuses.
     statuses?: ReadonlyArray<StatusInfo>;
@@ -129,14 +129,14 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 }));
     }
 
-    public loadReference(contentId: string, update: Partial<Snapshot> = {}) {
-        this.resetState({ reference: contentId, referencing: undefined, ...update });
+    public loadReferences(contentId: string, update: Partial<Snapshot> = {}) {
+        this.resetState({ references: contentId, referencing: undefined, ...update });
 
         return this.loadInternal(false, true);
     }
 
     public loadReferencing(contentId: string, update: Partial<Snapshot> = {}) {
-        this.resetState({ referencing: contentId, reference: undefined, ...update });
+        this.resetState({ referencing: contentId, references: undefined, ...update });
 
         return this.loadInternal(false, true);
     }
@@ -162,32 +162,29 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     private loadInternalCore(isReload: boolean, noSlowTotal: boolean) {
-        if (!this.appName || !this.schemaName) {
+        if (!this.appName) {
             return EMPTY;
         }
 
         this.next({ isLoading: true }, 'Loading Started');
 
-        const { page, pageSize, query, reference, referencing, total } = this.snapshot;
-
-        const q: any = { take: pageSize, skip: pageSize * page, noSlowTotal };
-
-        if (query) {
-            q.query = query;
-        }
-
-        if (page > 0 && total > 0) {
-            q.noTotal = true;
-        }
+        const { references, referencing } = this.snapshot;
+        const query = createQuery(this.snapshot, noSlowTotal);
 
         let content$: Observable<ContentsDto>;
 
-        if (referencing) {
-            content$ = this.contentsService.getContentReferencing(this.appName, this.schemaName, referencing, q);
-        } else if (reference) {
-            content$ = this.contentsService.getContentReferences(this.appName, this.schemaName, reference, q);
+        if (referencing && this.schemaName) {
+            content$ = this.contentsService.getContentReferencing(this.appName, this.schemaName, referencing, query);
+        } else if (referencing) {
+            content$ = this.contentsService.getAllContents(this.appName, { referencing }, query);
+        } else if (references && this.schemaName) {
+            content$ = this.contentsService.getContentReferences(this.appName, this.schemaName, references, query);
+        } else if (references) {
+            content$ = this.contentsService.getAllContents(this.appName, { references }, query);
+        } else if (this.schemaName) {
+            content$ = this.contentsService.getContents(this.appName, this.schemaName, query);
         } else {
-            content$ = this.contentsService.getContents(this.appName, this.schemaName, q);
+            return EMPTY;
         }
 
         return content$.pipe(
@@ -479,6 +476,27 @@ export class ComponentContentsState extends ContentsStateBase {
 
 function getStatusQueries(statuses: ReadonlyArray<StatusInfo> | undefined): ReadonlyArray<SavedQuery> {
     return statuses?.map(buildStatusQuery) || [];
+}
+
+function createQuery(snapshot: Snapshot, noSlowTotal: boolean) {
+    const {
+        page,
+        pageSize,
+        query,
+        total,
+    } = snapshot;
+
+    const result: any = { take: pageSize, skip: pageSize * page, noSlowTotal };
+
+    if (query) {
+        result.query = query;
+    }
+
+    if (page > 0 && total > 0) {
+        result.noTotal = true;
+    }
+
+    return result;
 }
 
 function buildStatusQuery(s: StatusInfo) {

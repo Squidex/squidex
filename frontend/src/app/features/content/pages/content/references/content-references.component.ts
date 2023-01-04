@@ -67,7 +67,7 @@ export class ContentReferencesComponent implements OnChanges, OnInit, OnDestroy 
                     .getInitial();
 
             if (this.mode === 'references') {
-                this.contentsState.loadReference(this.content.id, initial);
+                this.contentsState.loadReferences(this.content.id, initial);
             } else {
                 this.contentsState.loadReferencing(this.content.id, initial);
             }

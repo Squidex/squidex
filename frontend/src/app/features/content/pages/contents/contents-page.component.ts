@@ -96,8 +96,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
                     this.schema = schema;
 
-                    this.tableSettings = new TableSettings(this.uiState, schema);
-
                     const initial =
                         this.contentsRoute.mapTo(this.contentsState)
                             .withPaging('contents', 10)
@@ -106,6 +104,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
                     this.contentsState.load(false, true, initial);
                     this.contentsRoute.listen();
+
+                    this.tableSettings = new TableSettings(this.uiState, schema);
 
                     const languageKey = this.localStore.get(this.languageKey());
                     const language = this.languages.find(x => x.iso2Code === languageKey);
