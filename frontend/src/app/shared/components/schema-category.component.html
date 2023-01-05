@@ -6,13 +6,13 @@
         (cdkDropListDropped)="changeCategory($event)">
 
         <li class="nav-item nav-heading">
-            <div class="row g-1 align-items-center">
+            <div class="row g-1 align-items-center overflow-hidden">
                 <div class="col-auto">
                     <button type="button" class="btn btn-sm btn-decent btn-text-secondary btn-toggle" (click)="toggle()">
                         <i [class.icon-caret-right]="isCollapsed" [class.icon-caret-down]="!isCollapsed"></i> 
                     </button>
                 </div>
-                <div class="col pe-1">
+                <div class="col overflow-hidden pe-1">
                     <sqx-editable-title 
                         size="sm"
                         [closeButton]="false"

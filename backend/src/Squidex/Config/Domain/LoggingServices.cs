@@ -52,16 +52,7 @@ public static class LoggingServices
             {
                 return true;
             }
-
-            if (category.StartsWith("IdentityServer4.", StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
 #endif
-            if (level < LogLevel.Information)
-            {
-                return false;
-            }
 
             if (category == null)
             {

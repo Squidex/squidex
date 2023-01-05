@@ -27,6 +27,9 @@ export class ContentEditorComponent {
     public isNew = false;
 
     @Input()
+    public isDeleted?: boolean;
+
+    @Input()
     public showIdInput = false;
 
     @Input()

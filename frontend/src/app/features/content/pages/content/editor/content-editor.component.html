@@ -2,12 +2,29 @@
 
 <sqx-list-view>
     <ng-container topHeader>
+        
+        <div *ngIf="isNew && showIdInput">
+            <input class="form-control" placeholder="{{ 'contents.idPlaceholder' | sqxTranslate }}" 
+                [ngModel]="contentId"    
+                (ngModelChange)="contentIdChange.emit($event)" />
+        </div>
+        
+        <div class="alert alert-danger" *ngIf="!contentVersion && isDeleted">
+            {{ 'contents.deleted' | sqxTranslate }}
+        </div>
+
         <div class="alert alert-danger" *ngIf="contentVersion">
             <div class="float-end">
                 <a (click)="loadLatest.emit()">{{ 'contents.viewLatest' | sqxTranslate }}</a>
             </div>
 
-            <div [innerHTML]="'contents.versionViewing' | sqxTranslate: { version: contentVersion } | sqxMarkdownInline | sqxSafeHtml"></div>
+            <div *ngIf="isDeleted"
+                [innerHTML]="'contents.versionViewingDeleted' | sqxTranslate: { version: contentVersion } | sqxMarkdownInline | sqxSafeHtml">
+            </div>
+            
+            <div *ngIf="!isDeleted"
+                [innerHTML]="'contents.versionViewing' | sqxTranslate: { version: contentVersion } | sqxMarkdownInline | sqxSafeHtml">
+            </div>
         </div>
         
         <div *ngIf="isNew && showIdInput">

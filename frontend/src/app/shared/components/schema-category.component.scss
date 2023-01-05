@@ -44,6 +44,10 @@ $drag-margin: -8px;
     }
 }
 
+.overflow-hidden {
+    overflow: hidden;
+}
+
 .cdk-drag-placeholder {
     display: none;
 }
