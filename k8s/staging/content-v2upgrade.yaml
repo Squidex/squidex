@@ -1,4 +1,0 @@
-contentVersion: v2upgrade
-secretsEnvironment: staging
-ingressHost: squidex-staging-v2upgrade.learnwithhomer.com
-squidexImage: squidex/squidex

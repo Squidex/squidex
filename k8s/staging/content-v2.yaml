@@ -1,4 +1,4 @@
-contentVersion: v2
-secretsEnvironment: staging
 ingressHost: squidex-staging-v2.learnwithhomer.com
-squidexImage: squidex/squidex
+domain: https://squidex-staging-v2.learnwithhomer.com
+adminEmail: squidex-staging@homerlearning.com
+S3Bucket: homer-squidex-staging
