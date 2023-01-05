@@ -44,16 +44,11 @@ public sealed class QueryDto
             result = result.WithIds(Ids);
         }
 
-        if (OData != null)
-        {
-            result = result.WithODataQuery(OData);
-        }
-
         if (JsonQuery != null)
         {
             result = result.WithJsonQuery(JsonQuery.RootElement.ToString());
         }
 
-        return result;
+        return result.WithODataQuery(OData);
     }
 }

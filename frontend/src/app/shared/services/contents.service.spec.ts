@@ -31,112 +31,126 @@ describe('ContentsService', () => {
         httpMock.verify();
     }));
 
-    it('should make post request to get contents with json query',
-        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-            const query = { fullText: 'my-query' };
+    const tests = [
+        {
+            name: 'json query',
+            query: { take: 17, skip: 13, query: { fullText: 'my-query' } },
+            requestBody: { q: sanitize({ fullText: 'my-query', take: 17, skip: 13 }) },
+            requestString: `q=${JSON.stringify(sanitize({ fullText: 'my-query', take: 17, skip: 13 }))}`,
+            noSlowTotal: null,
+            noTotal: null,
+        },
+        {
+            name: 'odata filter',
+            query: { take: 17, skip: 13, query: { fullText: '$filter=my-filter' } },
+            requestBody: { odata: '$filter=my-filter&$top=17&$skip=13' },
+            requestString: '$filter=my-filter&$top=17&$skip=13',
+            noSlowTotal: null,
+            noTotal: null,
+        },
+        {
+            name: 'json query without total',
+            query: { take: 17, skip: 13, query: { fullText: 'my-query' }, noTotal: true, noSlowTotal: true },
+            requestBody: { q: sanitize({ fullText: 'my-query', take: 17, skip: 13 }) },
+            requestString: `q=${JSON.stringify(sanitize({ fullText: 'my-query', take: 17, skip: 13 }))}`,
+            noSlowTotal: '1',
+            noTotal: '1',
+        },
+    ];
 
-            let contents: ContentsDto;
+    tests.forEach(x => {
+        it(`should make post request to get contents using ${x.name}`,
+            inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+                let contents: ContentsDto;
 
-            contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, query }).subscribe(result => {
-                contents = result;
-            });
+                contentsService.getContents('my-app', 'my-schema', x.query).subscribe(result => {
+                    contents = result;
+                });
 
-            const expectedQuery = { ...query, take: 17, skip: 13 };
+                const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/query');
 
-            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/query');
+                expect(req.request.method).toEqual('POST');
+                expect(req.request.headers.get('If-Match')).toBeNull();
+                expect(req.request.headers.get('X-NoSlowTotal')).toEqual(x.noSlowTotal);
+                expect(req.request.headers.get('X-NoTotal')).toEqual(x.noTotal);
+                expect(req.request.body).toEqual({ ...x.requestBody });
 
-            expect(req.request.method).toEqual('POST');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.headers.get('X-NoSlowTotal')).toBeNull();
-            expect(req.request.headers.get('X-NoTotal')).toBeNull();
-            expect(req.request.body).toEqual({ q: sanitize(expectedQuery) });
+                req.flush({
+                    total: 10,
+                    items: [
+                        contentResponse(12),
+                        contentResponse(13),
+                    ],
+                    statuses: [{
+                        status: 'Draft', color: 'Gray',
+                    }],
+                });
 
-            req.flush({
-                total: 10,
-                items: [
-                    contentResponse(12),
-                    contentResponse(13),
-                ],
-                statuses: [{
-                    status: 'Draft', color: 'Gray',
-                }],
-            });
+                expect(contents!).toEqual({
+                    items: [
+                        createContent(12),
+                        createContent(13),
+                    ],
+                    total: 10,
+                    statuses: [
+                        { status: 'Draft', color: 'Gray' },
+                    ],
+                    canCreate: false,
+                    canCreateAndPublish: false,
+                });
+            }));
+    });
 
-            expect(contents!).toEqual({
-                items: [
-                    createContent(12),
-                    createContent(13),
-                ],
-                total: 10,
-                statuses: [
-                    { status: 'Draft', color: 'Gray' },
-                ],
-                canCreate: false,
-                canCreateAndPublish: false,
-            });
-        }));
+    tests.forEach(x => {
+        it(`should make post request to get all contents using ${x.name}`,
+            inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+                const ids = ['1', '2', '3'];
 
-    it('should make post request to get contents with odata filter',
-        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-            const query = { fullText: '$filter=my-filter' };
+                contentsService.getAllContents('my-app', { ids }, x.query).subscribe();
 
-            contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, query }).subscribe();
+                const req = httpMock.expectOne('http://service/p/api/content/my-app');
 
-            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/query');
+                expect(req.request.method).toEqual('POST');
+                expect(req.request.headers.get('If-Match')).toBeNull();
+                expect(req.request.headers.get('X-NoSlowTotal')).toEqual(x.noSlowTotal);
+                expect(req.request.headers.get('X-NoTotal')).toEqual(x.noTotal);
+                expect(req.request.body).toEqual({ ids, ...x.requestBody });
 
-            expect(req.request.method).toEqual('POST');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.headers.get('X-NoSlowTotal')).toBeNull();
-            expect(req.request.headers.get('X-NoTotal')).toBeNull();
-            expect(req.request.body).toEqual({ odata: '$filter=my-filter&$top=17&$skip=13' });
+                req.flush({ total: 10, items: [] });
+            }));
+        });
 
-            req.flush({ total: 10, items: [] });
-        }));
+    tests.forEach(x => {
+        it(`should make get request to get references with using ${x.name}`,
+            inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+                contentsService.getContentReferences('my-app', 'my-schema', '42', x.query).subscribe();
 
-    it('should make post request to get all contents by ids',
-        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-            const ids = ['1', '2', '3'];
+                const req = httpMock.expectOne(`http://service/p/api/content/my-app/my-schema/42/references?${x.requestString}`);
 
-            contentsService.getAllContents('my-app', { ids }).subscribe();
+                expect(req.request.method).toEqual('GET');
+                expect(req.request.headers.get('If-Match')).toBeNull();
+                expect(req.request.headers.get('X-NoSlowTotal')).toEqual(x.noSlowTotal);
+                expect(req.request.headers.get('X-NoTotal')).toEqual(x.noTotal);
 
-            const req = httpMock.expectOne('http://service/p/api/content/my-app');
+                req.flush({ total: 10, items: [] });
+            }));
+    });
 
-            expect(req.request.method).toEqual('POST');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.headers.get('X-NoSlowTotal')).toBeNull();
-            expect(req.request.headers.get('X-NoTotal')).toBeNull();
-            expect(req.request.body).toEqual({ ids });
+    tests.forEach(x => {
+        it(`should make get request to get referencing with using ${x.name}`,
+            inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+                contentsService.getContentReferencing('my-app', 'my-schema', '42', x.query).subscribe();
 
-            req.flush({ total: 10, items: [] });
-        }));
+                const req = httpMock.expectOne(`http://service/p/api/content/my-app/my-schema/42/referencing?${x.requestString}`);
 
-    it('should make post request to get contents without total',
-        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-            contentsService.getContents('my-app', 'my-schema', { noTotal: true, noSlowTotal: true }).subscribe();
+                expect(req.request.method).toEqual('GET');
+                expect(req.request.headers.get('If-Match')).toBeNull();
+                expect(req.request.headers.get('X-NoSlowTotal')).toEqual(x.noSlowTotal);
+                expect(req.request.headers.get('X-NoTotal')).toEqual(x.noTotal);
 
-            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/query');
-
-            expect(req.request.method).toEqual('POST');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.headers.get('X-NoSlowTotal')).toBe('1');
-            expect(req.request.headers.get('X-NoTotal')).toBe('1');
-
-            req.flush({ total: 10, items: [] });
-        }));
-
-    it('should make post request to get all contents without total',
-        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-            contentsService.getAllContents('my-app', { ids: [], noTotal: true, noSlowTotal: true }).subscribe();
-
-            const req = httpMock.expectOne('http://service/p/api/content/my-app');
-
-            expect(req.request.method).toEqual('POST');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.headers.get('X-NoSlowTotal')).toBe('1');
-            expect(req.request.headers.get('X-NoTotal')).toBe('1');
-
-            req.flush({ total: 10, items: [] });
-        }));
+                req.flush({ total: 10, items: [] });
+            }));
+    });
 
     it('should make get request to get content',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {

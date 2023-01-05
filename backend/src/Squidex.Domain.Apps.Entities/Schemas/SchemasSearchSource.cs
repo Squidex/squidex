@@ -23,7 +23,6 @@ public sealed class SchemasSearchSource : ISearchSource
     public SchemasSearchSource(IAppProvider appProvider, IUrlGenerator urlGenerator)
     {
         this.appProvider = appProvider;
-
         this.urlGenerator = urlGenerator;
     }
 
@@ -34,24 +33,26 @@ public sealed class SchemasSearchSource : ISearchSource
 
         var schemas = await appProvider.GetSchemasAsync(context.App.Id, ct);
 
-        if (schemas.Count > 0)
+        if (schemas.Count <= 0)
         {
-            var appId = context.App.NamedId();
+            return result;
+        }
 
-            foreach (var schema in schemas)
+        var appId = context.App.NamedId();
+
+        foreach (var schema in schemas)
+        {
+            var schemaId = schema.NamedId();
+
+            var name = schema.SchemaDef.DisplayNameUnchanged();
+
+            if (name.Contains(query, StringComparison.OrdinalIgnoreCase))
             {
-                var schemaId = schema.NamedId();
+                AddSchemaUrl(result, appId, schemaId, name);
 
-                var name = schema.SchemaDef.DisplayNameUnchanged();
-
-                if (name.Contains(query, StringComparison.OrdinalIgnoreCase))
+                if (schema.SchemaDef.Type != SchemaType.Component && HasPermission(context, schemaId))
                 {
-                    AddSchemaUrl(result, appId, schemaId, name);
-
-                    if (schema.SchemaDef.Type != SchemaType.Component && HasPermission(context, schemaId))
-                    {
-                        AddContentsUrl(result, appId, schema, schemaId, name);
-                    }
+                    AddContentsUrl(result, appId, schema, schemaId, name);
                 }
             }
         }

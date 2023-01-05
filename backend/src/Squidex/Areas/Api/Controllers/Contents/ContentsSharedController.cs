@@ -60,7 +60,7 @@ public sealed class ContentsSharedController : ApiController
     /// Queries contents.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <param name="query">The required query object.</param>
+    /// <param name="query">The query object.</param>
     /// <response code="200">Contents returned.</response>.
     /// <response code="404">App not found.</response>.
     /// <remarks>
@@ -73,7 +73,7 @@ public sealed class ContentsSharedController : ApiController
     [ApiCosts(1)]
     public async Task<IActionResult> GetAllContents(string app, AllContentsByGetDto query)
     {
-        var contents = await contentQuery.QueryAsync(Context, query?.ToQuery() ?? Q.Empty, HttpContext.RequestAborted);
+        var contents = await contentQuery.QueryAsync(Context, (query ?? new AllContentsByGetDto()).ToQuery(Request), HttpContext.RequestAborted);
 
         var response = Deferred.AsyncResponse(() =>
         {

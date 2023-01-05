@@ -176,6 +176,12 @@
                                 {{ 'assets.protectedHint' | sqxTranslate }}
                             </sqx-form-hint>
                         </div>
+
+                        <hr />
+
+                        <div class="form-group">
+                            <a [routerLink]="['../content/__references', asset.id]" target="_blank">{{ 'assets.viewReferences' | sqxTranslate }}</a>
+                        </div>
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="1">

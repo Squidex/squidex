@@ -1,0 +1,52 @@
+<sqx-title message="i18n:common.references"></sqx-title>
+
+<sqx-layout layout="main" titleText="i18n:common.references" titleIcon="contents">
+    <ng-container menu>
+        <div class="row flex-nowrap flex-grow-1 gx-2">
+            <div class="col-auto ms-8">
+                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:contents.refreshTooltip" shortcut="CTRL + B">
+                    <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+                </button>
+            </div>
+            <div class="col-auto" *ngIf="languages.length > 1">
+                <sqx-language-selector class="languages-buttons" 
+                    (languageChange)="changeLanguage($event)"
+                    [language]="language"
+                    [languages]="languages">
+                </sqx-language-selector>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container>
+        <sqx-list-view [isLoading]="contentsState.isLoading | async" [table]="true">
+            <ng-container>
+                <table class="table table-items table-fixed" *ngIf="contentsState.contents | async; let contents">
+                    <tbody *ngFor="let content of contents; trackBy: trackByContent"
+                        [sqxReferenceItem]="content"
+                        [canRemove]="false"
+                        [columns]="contents | sqxContentsColumns"
+                        [isCompact]="false"
+                        [isDisabled]="false"
+                        [language]="language"
+                        [languages]="languages"
+                        [validations]="(contentsState.validationResults | async)!"
+                        [validityVisible]="true">
+                    </tbody>
+        
+                    <tbody *ngIf="(contentsState.isLoaded | async) && contents.length === 0">
+                        <tr>
+                            <td class="table-items-row-empty">
+                                {{ 'contents.noReferencing' | sqxTranslate }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </ng-container>
+        
+            <ng-container footer>
+                <sqx-pager [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)"></sqx-pager>
+            </ng-container>
+        </sqx-list-view>
+    </ng-container>
+</sqx-layout>

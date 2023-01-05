@@ -16,7 +16,8 @@ using Squidex.Shared;
 namespace Squidex.Domain.Apps.Entities.Schemas;
 
 public class SchemasSearchSourceTests : GivenContext, IClassFixture<TranslationsFixture>
-{    private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
+{
+    private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
     private readonly SchemasSearchSource sut;
 
     public SchemasSearchSourceTests()
