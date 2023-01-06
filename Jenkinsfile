@@ -14,8 +14,8 @@ def namespace = null
 def helm_data_file = null
 def mongo_url = null
 def squidex_version = null //Sanitized version of tag without . in the number
-def env = ["hmr-staging": "staging",
-           "hmr_production": "production"]
+def env = ["staging": "hmr-kops-staging",
+           "production": "hmr-kops-production"]
 def environment = null
 
 pipeline {
@@ -27,14 +27,14 @@ pipeline {
     booleanParam(name: 'create_db', defaultValue: true, description: 'Create New MongoDB Environment')
     string(name: 'tag', description: 'The tag to deploy: ex. 6.7.0', defaultValue: 'latest')
     string(name: 'dbname', description: 'The current mongodb to use (like: homer-squidex-staging or homer-squidex-staging-v2upgrade)', defaultValue: 'none')
-    choice(name: 'cluster', choices: ['hmr-staging', 'hmr-production'], description: 'The Kubernetes Cluster to deploy to')
+    choice(name: 'cluster', choices: ['staging', 'production'], description: 'The Kubernetes Cluster to deploy to') //The names don't quite match but we handle it in a map
     choice(name: 'namespace', choices: ['content-v2', 'content-v1'], description: 'The environment to deploy squidex to')
    }
   stages {
     stage('Checkout') {
       steps {
           script {
-            cluster = params.cluster
+            environment = params.cluster
             origin = params.dbname
             tag = params.tag
             /* in production the 'content-v1' namespace is named 'squidex',
@@ -43,7 +43,7 @@ pipeline {
             helm_data_file = "${cluster}/${namespace}.yaml"
             squidex_version = tag.replaceAll("\\.","") //We need a DNS friendly value so need to remove dots
             println("The sanitized squidex tag is ${squidex_version}")
-            environment = env[cluster]
+            cluster = env[environment]
             if(!params.create_db) {
               dbname = params.dbname
             }
