@@ -39,8 +39,8 @@ pipeline {
             tag = params.tag
             /* in production the 'content-v1' namespace is named 'squidex',
                so we are overriding it here                                 */
-            namespace = params.namespace //Everything on the 2.0 clusters 
-            helm_data_file = "${cluster}/${namespace}.yaml"
+            namespace = params.namespace //Everything on the 2.0 clusters runs this way
+            helm_data_file = "${environment}/${namespace}.yaml"
             squidex_version = tag.replaceAll("\\.","") //We need a DNS friendly value so need to remove dots
             println("The sanitized squidex tag is ${squidex_version}")
             cluster = env[environment]
