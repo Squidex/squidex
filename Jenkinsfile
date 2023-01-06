@@ -90,7 +90,10 @@ pipeline {
     stage('Deploy'){
       steps {
         script {
-          homerKubernetes.deploy(namespace, cluster, 'output.yaml')
+          def kubectlDockerArgs = " -v ${WORKSPACE}/output.yaml:/deployment.yaml"
+          def kubectlArgs = "apply -f deployment.yaml -n ${namespace}"
+
+          homerKubernetes.runKubectl(cluster, kubectlDockerArgs, kubectlArgs, "", "${cluster}.kops.learnwithhomer.com")
         }
       }
     }
