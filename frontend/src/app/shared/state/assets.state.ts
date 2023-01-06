@@ -66,7 +66,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
         this.project(x => x.tagsSelected);
 
     public tags =
-        this.projectFrom(this.tagsUnsorted, getSortedTags);
+        this.projectFrom(this.tagsUnsorted, getTagsSorted);
 
     public tagsNames =
         this.projectFrom(this.tagsUnsorted, getTagNames);
@@ -97,9 +97,6 @@ export abstract class AssetsStateBase extends State<Snapshot> {
 
     public path =
         this.project(x => x.path);
-
-    public pathAvailable =
-        this.project(x => x.path.length > 0);
 
     public parentFolder =
         this.project(x => getParent(x.path));
@@ -432,6 +429,10 @@ function getTagNames(tags: object): ReadonlyArray<string> {
     return Object.keys(tags);
 }
 
+function getTagsSorted(tags: { [name: string]: number }) {
+    return Object.keys(tags).sort(compareStrings).map(name => ({ name, count: tags[name] }));
+}
+
 function isReferrerError(error?: ErrorDto) {
     return error?.errorCode === 'OBJECT_REFERENCED';
 }
@@ -480,20 +481,24 @@ function createQuery(snapshot: Snapshot, noSlowTotal: boolean) {
 
     const result: any = { take: pageSize, skip: pageSize * page, noSlowTotal };
 
-    const tags = Object.keys(tagsSelected);
-
     if (Types.isString(ref)) {
         result.ref = ref;
-    } else if (Types.isString(query?.fullText) || tags.length > 0) {
-        if (query) {
-            result.query = query;
-        }
-
-        if (tags.length > 0) {
-            result.tags = tags;
-        }
     } else {
-        result.parentId = snapshot.parentId;
+        const tags = getTagNames(tagsSelected);
+        const hasTags = tags.length > 0;
+        const hasQuery = Types.isString(query?.fullText) && query?.fullText;
+
+        if (hasQuery || hasTags) {
+            if (hasQuery) {
+                result.query = query;
+            }
+
+            if (hasTags) {
+                result.tags = tags;
+            }
+        } else {
+            result.parentId = snapshot.parentId;
+        }
     }
 
     if (page > 0 && total > 0) {
@@ -509,10 +514,6 @@ function getParent(path: ReadonlyArray<AssetPathItem>) {
     } else {
         return undefined;
     }
-}
-
-function getSortedTags(tags: { [name: string]: number }) {
-    return Object.keys(tags).sort(compareStrings).map(name => ({ name, count: tags[name] }));
 }
 
 @Injectable()

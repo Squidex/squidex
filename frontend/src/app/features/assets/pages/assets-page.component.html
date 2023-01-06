@@ -54,8 +54,13 @@
                 <sqx-asset-path [path]="assetsState.path | async" (navigate)="assetsState.navigate($event.id)"></sqx-asset-path>
             </ng-container>
 
-            <div>
-                <sqx-assets-list [assetsState]="assetsState" [showPager]="false" [isListView]="isListView"></sqx-assets-list>
+            <div *ngIf="assetsState.path | async; let path">
+                <sqx-assets-list
+                    [assetsState]="assetsState"
+                    [showPager]="false"
+                    [showFolderIcon]="path.length === 0"
+                    [isListView]="isListView">
+                </sqx-assets-list>
             </div>
 
             <ng-container footer>

@@ -16,8 +16,8 @@
 
 <sqx-list-view [isLoading]="(assetsState.isLoading | async) && indicateLoading" [overflow]="true">
     <ng-container topHeader>
-        <div cdkDropListGroup>
-            <div class="folders" *ngIf="assetsState.pathAvailable | async">
+        <div cdkDropListGroup *ngIf="assetsState.path | async; let path">
+            <div class="folders" *ngIf="path.length > 0">
                 <ng-container *ngIf="(assetsState.hasFolders | async) || (assetsState.parentFolder | async)">
                     <h5>{{ 'common.folders' | sqxTranslate }}</h5>
                 </ng-container>
@@ -72,13 +72,14 @@
                         cdkDrag
                         [cdkDragData]="asset"
                         [cdkDragDisabled]="isDisabled || !asset.canMove"
+                        [allTags]="tags" 
                         [asset]="asset"
                         [assetsState]="assetsState"
                         [isListView]="isListView"
                         [isDisabled]="isDisabled"
                         [isSelectable]="!!selectedIds"
                         [isSelected]="isSelected(asset)"
-                        [allTags]="tags" 
+                        [folderIcon]="showFolderIcon && path.length === 0"
                         (select)="select.emit(asset)" (delete)="deleteAsset(asset)"
                         (selectFolder)="selectFolder(asset)">
                     </sqx-asset>

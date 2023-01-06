@@ -51,6 +51,9 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     public folderId?: string;
 
     @Input()
+    public folderIcon?: boolean | null | undefined;
+
+    @Input()
     public removeMode?: boolean | null;
 
     @Input()

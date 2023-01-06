@@ -40,6 +40,9 @@ export class AssetsListComponent extends StatefulComponent<State> {
     public selectedIds?: {};
 
     @Input()
+    public showFolderIcon?: boolean | null = true;
+
+    @Input()
     public showPager?: boolean | null = true;
 
     constructor(changeDetector: ChangeDetectorRef) {
