@@ -2,4 +2,4 @@ ingressHost: squidex-staging.learnwithhomer.com
 domain: https://squidex-staging.learnwithhomer.com
 adminEmail: squidex-staging-45@homerlearning.com
 S3Bucket: homer-squidex-staging-45
-
+secretName: staging-v1-squidex
