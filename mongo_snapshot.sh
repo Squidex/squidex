@@ -5,7 +5,7 @@ set -e # Fails script if any command fails
 # staging or production
 export environment=$1
 # cluster we want to use as the source
-export cluster=$2
+export origin=$2
 # version we are migrating to
 export version=$3
 # getting the secrets for atlas
@@ -31,10 +31,10 @@ fi
 export cluster_version=`atlas clusters describe $cluster --projectId ${project} | grep $2 | awk '{print $3}' | grep -o '^[^.]*\.[0-9]*'`
 
 #creating snapshot of current cluster to use to build the new cluster
-export snapshot=`atlas backups snapshots create $cluster --desc test-upgrade-backup --projectId ${project} | awk -F\' '{print $2}'`
+export snapshot=`atlas backups snapshots create $origin --desc test-upgrade-backup --projectId ${project} | awk -F\' '{print $2}'`
 
 #watching the cluster snapshot so when it is done, we can create our new database
-atlas backups snapshots watch ${snapshot} --clusterName $cluster --projectId ${project} 
+atlas backups snapshots watch ${snapshot} --clusterName $origin --projectId ${project} 
 
 #create new cluster
 atlas cluster create squidex-${environment}-${version} --projectId ${project} --provider AWS --region US_EAST_1 --members 3 --tier M10 --mdbVersion ${cluster_version} --diskSizeGB 100
@@ -43,7 +43,7 @@ atlas cluster create squidex-${environment}-${version} --projectId ${project} --
 atlas cluster watch squidex-${environment}-${version} --projectId ${project}
 
 #with the snapshot done, time to create the new database
-atlas backup restore start automated --clusterName ${cluster} --snapshotId ${snapshot} --targetClusterName squidex-${environment}-${version} --targetProjectId ${project} --projectId ${project}
+atlas backup restore start automated --clusterName ${origin} --snapshotId ${snapshot} --targetClusterName squidex-${environment}-${version} --targetProjectId ${project} --projectId ${project}
 
 #wait for cluster restore to be done
 atlas cluster watch squidex-${environment}-${version} --projectId ${project}

@@ -8,11 +8,15 @@ def create_db = true
 def full_image_name = null
 def cluster = null
 def dbname = null
+def origin = null
 def tag = null
 def namespace = null
 def helm_data_file = null
 def mongo_url = null
 def squidex_version = null //Sanitized version of tag without . in the number
+def env = ["hmr-staging": "staging",
+           "hmr_production": "production"]
+def environment = null
 
 pipeline {
   agent any
@@ -31,7 +35,7 @@ pipeline {
       steps {
           script {
             cluster = params.cluster
-            dbname = params.dbname
+            origin = params.dbname
             tag = params.tag
             /* in production the 'content-v1' namespace is named 'squidex',
                so we are overriding it here                                 */
@@ -39,6 +43,10 @@ pipeline {
             helm_data_file = "${cluster}/${namespace}.yaml"
             squidex_version = tag.replaceAll("\\.","") //We need a DNS friendly value so need to remove dots
             println("The sanitized squidex tag is ${squidex_version}")
+            environment = env[cluster]
+            if(!params.create_db) {
+              dbname = params.dbname
+            }
           }
       }
     }
@@ -50,11 +58,19 @@ pipeline {
       steps {
         script{
           timeout(time: 40, unit:'MINUTES') {
-            sh "./mongo_snapshot.sh ${cluster} ${dbname} ${squidex_version}"
-            url = sh(returnStdout:true, script: "./mongo_url.sh ${cluster} ${dbname} ${squidex_version}").trim()
+            sh "./mongo_snapshot.sh ${environment} ${origin} ${squidex_version}"
+            dbname = "squidex-${environment}-${squidex_version}"
+          }
+        }
+      }
+    }
+
+    stage('Get Mongo URL') {
+      steps {
+        script {
+            url = sh(returnStdout:true, script: "./mongo_url.sh ${dbname} ${environment}").trim()
             prefix="mongodb+srv://"
             mongo_url=url.substring(prefix.size())
-          }
         }
       }
     }
@@ -63,7 +79,7 @@ pipeline {
       steps {
         script {
           replicas = 1 //Initially the deployment should just be a single pod
-          mongoLogin = sh(returnStdout: true, script:"aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text --region=us-east-1 | jq -r '.\"${cluster}_${namespace}_login\"'").trim()
+          mongoLogin = sh(returnStdout: true, script:"aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text --region=us-east-1 | jq -r '.\"${environment}_${namespace}_login\"'").trim()
           helmArgs = "--set replicaCount=${replicas} --set imageTag=${tag} --set version=${squidex_version} --set mongoconnectionstring=${mongoLogin} --set mongourl=${mongo_url}"
           homerKubernetes.processConfigData(helm_data_file, namespace, cluster, helmArgs, "./squidex")
         }

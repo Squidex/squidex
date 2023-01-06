@@ -2,12 +2,9 @@
 
 #setting up some vars for the version especially as a '.' is not allowed in an Atlas DB name
 # staging or production
-export environment=$1
-# cluster we want to use as the source
-export cluster=$2
-# version we are migrating to
-export version=$3
-# getting the secrets for atlas
+export dbname=$1
+export environment=$2
+
 export MONGODB_ATLAS_PUBLIC_API_KEY=$(aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text --region us-east-1 | jq -r .squidex_atlas_api_key)
 export MONGODB_ATLAS_PRIVATE_API_KEY=$(aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text --region us-east-1 | jq -r .squidex_atlas_private_api_key)
 
@@ -27,4 +24,4 @@ then
 fi
 docker pull imega/jq > /dev/null 2>&1 #We don't want any docker output
 
-atlas cluster describe squidex-${environment}-${version} --projectId ${project} -o json |  docker run --rm -i imega/jq -r '.connectionStrings.standardSrv'
+atlas cluster describe ${dbname} --projectId ${project} -o json |  docker run --rm -i imega/jq -r '.connectionStrings.standardSrv'
