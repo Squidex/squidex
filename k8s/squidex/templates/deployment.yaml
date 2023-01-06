@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: squidex
-          image: squidex/squidex:{{ .Values.squidexTag}}
+          image: squidex/squidex:{{ .Values.imageTag }}
           imagePullPolicy: Always
           resources:
             requests:
