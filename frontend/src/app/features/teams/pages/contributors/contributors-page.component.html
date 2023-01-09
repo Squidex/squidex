@@ -2,7 +2,7 @@
 
 <sqx-layout layout="main" titleText="i18n:common.contributors" titleIcon="contributors" [innerWidth]="55">
     <ng-container menu>
-        <div class="d-flex justify-content-end">
+        <div class="d-flex justify-content-end align-items-center">
             <sqx-notifo topic="apps/{{contributorsState.teamId}}/settings/contributors"></sqx-notifo>
 
             <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:contributors.refreshTooltip" shortcut="CTRL + B">
@@ -11,7 +11,7 @@
 
             <div class="form-inline">
                 <input class="form-control" placeholder="{{ 'contributors.search' | sqxTranslate }}" 
-                    [ngModel]="contributorsState.query | async" 
+                    [ngModel]="contributorsState.query | async"
                     (ngModelChange)="search($event)"
                     shortcut="CTRL + I"
                     shortcutAction="focus">

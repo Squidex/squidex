@@ -206,13 +206,6 @@ public static class SimpleMapper
         }
     }
 
-    public static TTarget Map<TSource, TTarget>(TSource source)
-        where TSource : class
-        where TTarget : class, new()
-    {
-        return Map(source, new TTarget(), CultureInfo.CurrentCulture);
-    }
-
     public static TTarget Map<TSource, TTarget>(TSource source, TTarget target)
         where TSource : class
         where TTarget : class
