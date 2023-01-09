@@ -240,6 +240,21 @@ public sealed class AccountController : IdentityServerController
         if (isLoggedIn)
         {
             user = await userService.FindByLoginAsync(login.LoginProvider, login.ProviderKey, HttpContext.RequestAborted);
+
+            if (user != null)
+            {
+                var squidexClaimsFromLoginPrincipal = login.Principal.Claims.GetSquidexClaims();
+
+                if (user.Claims.GetSquidexClaims().Equals(squidexClaimsFromLoginPrincipal))
+                {
+                    var values = new UserValues
+                    {
+                        CustomClaims = squidexClaimsFromLoginPrincipal.ToList()
+                    };
+
+                    user = await userService.UpdateAsync(user.Id, values, false, HttpContext.RequestAborted);
+                }
+            }
         }
         else
         {
