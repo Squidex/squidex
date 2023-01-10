@@ -66,20 +66,14 @@ public class NotifoService : IUserEvents
         }
     }
 
-    public async Task OnUserCreatedAsync(IUser user)
+    public Task OnUserCreatedAsync(IUser user)
     {
-        if (!string.IsNullOrWhiteSpace(user.Email))
-        {
-            await UpsertUserAsync(user);
-        }
+        return UpsertUserAsync(user);
     }
 
-    public async Task OnUserUpdatedAsync(IUser user, IUser previous)
+    public Task OnUserUpdatedAsync(IUser user, IUser previous)
     {
-        if (!string.Equals(user.Email, previous?.Email, StringComparison.OrdinalIgnoreCase))
-        {
-            await UpsertUserAsync(user);
-        }
+        return UpsertUserAsync(user);
     }
 
     private async Task UpsertUserAsync(IUser user)

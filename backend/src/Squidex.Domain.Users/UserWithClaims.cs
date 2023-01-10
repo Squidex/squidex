@@ -7,27 +7,30 @@
 
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Users;
 
 internal sealed class UserWithClaims : IUser
 {
+    private readonly IdentityUser snapshot;
+
     public IdentityUser Identity { get; }
 
     public string Id
     {
-        get => Identity.Id;
+        get => snapshot.Id;
     }
 
     public string Email
     {
-        get => Identity.Email!;
+        get => snapshot.Email!;
     }
 
     public bool IsLocked
     {
-        get => Identity.LockoutEnd > DateTime.UtcNow;
+        get => snapshot.LockoutEnd > DateTime.UtcNow;
     }
 
     public IReadOnlyList<Claim> Claims { get; }
@@ -38,6 +41,10 @@ internal sealed class UserWithClaims : IUser
     {
         Identity = user;
 
+        // Clone the user so that we capture the previous values, even when the user is updated.
+        snapshot = SimpleMapper.Map(user, new IdentityUser());
+
+        // Claims are immutable so we do not need a copy of them.
         Claims = claims;
     }
 }
