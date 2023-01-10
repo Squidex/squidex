@@ -22,6 +22,9 @@ interface State {
 })
 export class AssetsListComponent extends StatefulComponent<State> {
     @Output()
+    public edit = new EventEmitter<AssetDto>();
+
+    @Output()
     public select = new EventEmitter<AssetDto>();
 
     @Input()
@@ -34,16 +37,10 @@ export class AssetsListComponent extends StatefulComponent<State> {
     public isListView?: boolean | null;
 
     @Input()
-    public indicateLoading?: boolean | null;
-
-    @Input()
     public selectedIds?: {};
 
     @Input()
     public showFolderIcon?: boolean | null = true;
-
-    @Input()
-    public showPager?: boolean | null = true;
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
@@ -75,8 +72,8 @@ export class AssetsListComponent extends StatefulComponent<State> {
         }
     }
 
-    public reloadTotal() {
-        this.assetsState.load(true, false);
+    public replaceAsset(asset: AssetDto) {
+        this.assetsState.replaceAsset(asset);
     }
 
     public selectFolder(asset: AssetDto) {

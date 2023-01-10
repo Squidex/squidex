@@ -213,6 +213,20 @@ export abstract class AssetsStateBase extends State<Snapshot> {
         }, 'Asset Created');
     }
 
+    public replaceAsset(asset: AssetDto) {
+        if (asset.parentId !== this.snapshot.parentId || this.snapshot.assets.find(x => x.id === asset.id)) {
+            return;
+        }
+
+        this.next(s => {
+            const assets = s.assets.replacedBy('id', asset);
+
+            const tags = updateTags(s, asset);
+
+            return { ...s, assets, total: s.total + 1, ...tags };
+        }, 'Asset Replaced');
+    }
+
     public createAssetFolder(folderName: string) {
         return this.assetsService.postAssetFolder(this.appName, { folderName, parentId: this.snapshot.parentId }).pipe(
             tap(folder => {
@@ -266,7 +280,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
             return { ...s, assets };
         }, 'Asset Moving Started');
 
-        return this.assetsService.putAssetItemParent(this.appName, asset, { parentId }, asset.version).pipe(
+        return this.assetsService.putAssetParent(this.appName, asset, { parentId }, asset.version).pipe(
             catchError(error => {
                 this.next(s => {
                     const assets = [asset, ...s.assets];
@@ -290,7 +304,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
             return { ...s, folders };
         }, 'Folder Moving Started');
 
-        return this.assetsService.putAssetItemParent(this.appName, folder, { parentId }, folder.version).pipe(
+        return this.assetsService.putAssetFolderParent(this.appName, folder, { parentId }, folder.version).pipe(
             catchError(error => {
                 this.next(s => {
                     const folders = [...s.folders, folder].sortByString(x => x.folderName);

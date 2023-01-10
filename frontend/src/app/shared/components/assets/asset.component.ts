@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
-import { AssetDto, AssetsState, AssetUploaderState, DialogModel, DialogService, StatefulComponent, Types, UploadCanceled } from '@app/shared/internal';
+import { AssetDto, AssetUploaderState, DialogService, StatefulComponent, Types, UploadCanceled } from '@app/shared/internal';
 
 interface State {
     // The download progress.
@@ -21,7 +21,7 @@ interface State {
 })
 export class AssetComponent extends StatefulComponent<State> implements OnInit {
     @Output()
-    public load = new EventEmitter<AssetDto>();
+    public loadDone = new EventEmitter<AssetDto>();
 
     @Output()
     public loadError = new EventEmitter();
@@ -31,6 +31,9 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
 
     @Output()
     public delete = new EventEmitter();
+
+    @Output()
+    public edit = new EventEmitter<AssetDto>();
 
     @Output()
     public select = new EventEmitter();
@@ -43,9 +46,6 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
 
     @Input()
     public asset?: AssetDto;
-
-    @Input()
-    public assetsState!: AssetsState;
 
     @Input()
     public folderId?: string;
@@ -71,11 +71,6 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     @Input() @HostBinding('class.isListView')
     public isListView?: boolean | null;
 
-    @Input()
-    public allTags!: ReadonlyArray<string>;
-
-    public editDialog = new DialogModel();
-
     constructor(changeDetector: ChangeDetectorRef,
         private readonly assetUploader: AssetUploaderState,
         private readonly dialogs: DialogService,
@@ -91,13 +86,13 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
         if (assetFile) {
             this.setProgress(1);
 
-            this.assetUploader.uploadFile(assetFile, this.assetsState, this.folderId)
+            this.assetUploader.uploadFile(assetFile, this.folderId)
                 .subscribe({
-                    next: dto => {
-                        if (Types.isNumber(dto)) {
-                            this.setProgress(dto);
+                    next: assetOrProgress => {
+                        if (Types.isNumber(assetOrProgress)) {
+                            this.setProgress(assetOrProgress);
                         } else {
-                            this.emitLoad(dto);
+                            this.emitLoad(assetOrProgress);
                         }
                     },
                     error: error => {
@@ -122,12 +117,11 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
 
                         this.assetUploader.uploadAsset(asset, files[0])
                             .subscribe({
-                                next: asset => {
-                                    if (Types.isNumber(asset)) {
-                                        this.setProgress(asset);
+                                next: assetOrProgress => {
+                                    if (Types.isNumber(assetOrProgress)) {
+                                        this.setProgress(assetOrProgress);
                                     } else {
-                                        this.setProgress(0);
-                                        this.setAsset(asset);
+                                        this.emitLoad(assetOrProgress);
                                     }
                                 },
                                 error: error => {
@@ -144,14 +138,14 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
         }
     }
 
-    public edit() {
+    public emitEdit() {
         if (!this.isDisabled) {
-            this.editDialog.show();
+            this.edit.emit(this.asset);
         }
     }
 
     public emitLoad(asset: AssetDto) {
-        this.load.emit(asset);
+        this.loadDone.emit(asset);
     }
 
     public emitLoadError(error: any) {

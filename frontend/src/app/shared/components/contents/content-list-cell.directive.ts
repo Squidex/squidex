@@ -169,7 +169,7 @@ export class ContentListCellDirective extends ResourceOwner implements OnChanges
 }
 
 @Directive({
-    selector: '[sqxContentListCellResize]',
+    selector: '[sqxContentListCellResize][field][fields]',
 })
 export class ContentListCellResizeDirective implements OnInit, OnDestroy {
     private mouseMove?: Function;
@@ -179,13 +179,10 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
     private windowBlur?: Function;
     private startOffset = 0;
     private startWidth = 0;
-    private fieldName?: string;
     private resizer: any;
 
     @Input()
-    public set field(value: TableField) {
-        this.fieldName = value.rootField?.name;
-    }
+    public field!: TableField;
 
     @Input('fields')
     public tableFields?: TableSettings;
@@ -209,7 +206,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
     }
 
     public ngOnInit() {
-        if (!this.tableFields || !this.fieldName) {
+        if (!this.tableFields || !this.field) {
             return;
         }
 
@@ -223,7 +220,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
     }
 
     private onMouseDown = (event: MouseEvent) => {
-        if (!this.tableFields || !this.fieldName) {
+        if (!this.tableFields || !this.field) {
             return;
         }
 
@@ -238,7 +235,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
     };
 
     private onMouseMove = (event: MouseEvent) => {
-        if (!this.mouseMove || !this.tableFields || !this.fieldName) {
+        if (!this.mouseMove || !this.tableFields || !this.field) {
             return;
         }
 
@@ -250,7 +247,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
     };
 
     private onMouseUp = (event: MouseEvent) => {
-        if (!this.mouseMove || !this.tableFields || !this.fieldName) {
+        if (!this.mouseMove || !this.tableFields || !this.field) {
             return;
         }
 
@@ -272,7 +269,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
             width = this.minimumWidth;
         }
 
-        this.tableFields!.updateSize(this.fieldName!, width, save);
+        this.tableFields!.updateSize(this.field.name!, width, save);
     }
 
     private resetMovement() {

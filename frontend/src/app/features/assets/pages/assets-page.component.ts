@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { AssetsState, DialogModel, LocalStoreService, MathHelper, Queries, Query, QueryFullTextSynchronizer, ResourceOwner, Router2State, UIState } from '@app/shared';
+import { AssetDto, AssetsState, DialogModel, LocalStoreService, MathHelper, Queries, Query, QueryFullTextSynchronizer, ResourceOwner, Router2State, UIState } from '@app/shared';
 import { Settings } from '@app/shared/state/settings';
 
 @Component({
@@ -19,6 +19,8 @@ import { Settings } from '@app/shared/state/settings';
 })
 export class AssetsPageComponent extends ResourceOwner implements OnInit {
     public queries = new Queries(this.uiState, 'assets');
+
+    public editAsset?: AssetDto;
 
     public addAssetFolderDialog = new DialogModel();
 
@@ -57,8 +59,20 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
         this.assetsState.load(true, false);
     }
 
+    public editStart(asset: AssetDto) {
+        this.editAsset = asset;
+    }
+
+    public editDone() {
+        this.editAsset = undefined;
+    }
+
     public search(query: Query) {
         this.assetsState.search(query);
+    }
+
+    public replaceAsset(asset: AssetDto) {
+        this.assetsState.replaceAsset(asset);
     }
 
     public selectTags(tags: ReadonlyArray<string>) {

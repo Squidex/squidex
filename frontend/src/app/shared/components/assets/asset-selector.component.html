@@ -43,14 +43,21 @@
     </ng-container>
 
     <ng-container content>
-        <sqx-assets-list 
-            [assetsState]="assetsState"
-            [indicateLoading]="true"
-            [isDisabled]="true"
-            [isListView]="snapshot.isListView" 
-            (select)="selectAsset($event)" 
-            [selectedIds]="snapshot.selectedAssets">
-        </sqx-assets-list>
+        <sqx-list-view [isLoading]="assetsState.isLoading | async" [overflow]="true">
+            <ng-container content>
+                <sqx-assets-list 
+                    [assetsState]="assetsState"
+                    [isDisabled]="true"
+                    [isListView]="snapshot.isListView" 
+                    (select)="selectAsset($event)" 
+                    [selectedIds]="snapshot.selectedAssets">
+                </sqx-assets-list>
+            </ng-container>
+    
+            <ng-container footer>
+                <sqx-pager (loadTotal)="reloadTotal()" [paging]="assetsState.paging | async" (pagingChange)="assetsState.page($event)"></sqx-pager>
+            </ng-container>
+        </sqx-list-view>
     </ng-container>
 
     <ng-container footer>

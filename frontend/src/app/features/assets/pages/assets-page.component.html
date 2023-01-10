@@ -57,9 +57,10 @@
             <div *ngIf="assetsState.path | async; let path">
                 <sqx-assets-list
                     [assetsState]="assetsState"
-                    [showPager]="false"
-                    [showFolderIcon]="path.length === 0"
-                    [isListView]="isListView">
+                    (edit)="editStart($event)"
+                    [isDisabled]="false"
+                    [isListView]="isListView"
+                    [showFolderIcon]="path.length === 0">
                 </sqx-assets-list>
             </div>
 
@@ -83,3 +84,10 @@
 <ng-container *sqxModal="addAssetFolderDialog">
     <sqx-asset-folder-dialog (complete)="addAssetFolderDialog.hide()"></sqx-asset-folder-dialog>
 </ng-container>
+
+<sqx-asset-dialog *sqxModal="editAsset;isDialog:true"
+    [asset]="editAsset!" 
+    (assetUpdated)="replaceAsset($event)"
+    (assetReplaced)="replaceAsset($event)"
+    (complete)="editDone()">
+</sqx-asset-dialog>

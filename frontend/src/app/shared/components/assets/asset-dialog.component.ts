@@ -5,33 +5,35 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetsState, AssetUploaderState, AuthService, DialogService, Types, UploadCanceled } from '@app/shared/internal';
-import { AssetsService } from '@app/shared/services/assets.service';
+import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetsState, AssetUploaderState, AuthService, DialogService, MoveAssetForm, Types, UploadCanceled } from '@app/shared/internal';
+import { AssetsService, MoveAssetItemDto } from '@app/shared/services/assets.service';
 import { AssetPathItem, ROOT_ITEM } from '@app/shared/state/assets.state';
 import { AssetTextEditorComponent } from './asset-text-editor.component';
 import { ImageCropperComponent } from './image-cropper.component';
 import { ImageFocusPointComponent } from './image-focus-point.component';
 
 @Component({
-    selector: 'sqx-asset-dialog[allTags][asset]',
+    selector: 'sqx-asset-dialog[asset]',
     styleUrls: ['./asset-dialog.component.scss'],
     templateUrl: './asset-dialog.component.html',
 })
-export class AssetDialogComponent implements OnChanges {
+export class AssetDialogComponent implements OnInit {
+    private readonly pathCache: { [parentId: string]: ReadonlyArray<AssetPathItem> } = {};
+
     @Output()
     public complete = new EventEmitter();
 
     @Output()
-    public changed = new EventEmitter<AssetDto>();
+    public assetReplaced = new EventEmitter<AssetDto>();
+
+    @Output()
+    public assetUpdated = new EventEmitter<AssetDto>();
 
     @Input()
     public asset!: AssetDto;
-
-    @Input()
-    public allTags!: ReadonlyArray<string>;
 
     @ViewChildren(ImageCropperComponent)
     public imageCropper!: QueryList<ImageCropperComponent>;
@@ -42,15 +44,20 @@ export class AssetDialogComponent implements OnChanges {
     @ViewChildren(AssetTextEditorComponent)
     public textEditor!: QueryList<AssetTextEditorComponent>;
 
-    public path!: Observable<ReadonlyArray<AssetPathItem>>;
+    public path: ReadonlyArray<AssetPathItem> = [];
+
+    public progress = 0;
 
     public selectedTab = 0;
     public isEditable = false;
     public isEditableAny = false;
     public isUploadable = false;
+    public isMoving = false;
+    public isMoveable = false;
 
-    public progress = 0;
+    public moveForm = new MoveAssetForm();
 
+    public annotateTag: ReadonlyArray<string> = [];
     public annotateForm = new AnnotateAssetForm();
 
     public get isImage() {
@@ -76,30 +83,50 @@ export class AssetDialogComponent implements OnChanges {
     ) {
     }
 
-    public ngOnChanges() {
+    public ngOnInit() {
+        this.annotateTags =
+            this.assetsService.getTags(this.appsState.appName).pipe(
+                map(tags => Object.keys(tags)));
+
         this.selectTab(0);
 
-        this.isEditable = this.asset.canUpdate;
-        this.isUploadable = this.asset.canUpload;
-
-        this.annotateForm.load(this.asset);
-        this.annotateForm.setEnabled(this.isEditable);
-
-        this.path =
-            this.assetsService.getAssetFolders(this.appsState.appName, this.asset.parentId, 'Path').pipe(
-                map(folders => [ROOT_ITEM, ...folders.path]));
+        this.assetchanged(this.asset);
     }
 
-    public navigate(id: string) {
-        this.assetsState.navigate(id);
+    private assetchanged(asset: AssetDto) {
+        const cachedPath = 
+        this.path =
+            this.assetsService.getAssetFolders(this.appsState.appName, asset.parentId, 'Path').pipe(
+                map(folders => [ROOT_ITEM, ...folders.path]));
+
+        this.isEditable = asset.canUpdate;
+        this.isUploadable = asset.canUpload;
+        this.isMoveable = asset.canMove;
+
+        this.annotateForm.load(asset);
+        this.annotateForm.setEnabled(this.isEditable);
+
+        this.moveForm.load(asset);
+        this.moveForm.setEnabled(this.isMoveable);
+
+        this.asset = asset;
+
     }
 
     public selectTab(tab: number) {
         this.selectedTab = tab;
     }
 
+    public navigate(id: string) {
+        this.assetsState.navigate(id);
+    }
+
     public generateSlug() {
         this.annotateForm.generateSlug(this.asset);
+    }
+
+    public startMoving() {
+        this.isMoving = true;
     }
 
     public emitComplete() {
@@ -133,7 +160,8 @@ export class AssetDialogComponent implements OnChanges {
                             if (Types.isNumber(dto)) {
                                 this.setProgress(dto);
                             } else {
-                                this.changed.emit(dto);
+                                this.assetReplaced.emit(dto);
+                                this.assetchanged(dto);
 
                                 this.dialogs.notifyInfo('i18n:assets.updated');
                             }
@@ -144,7 +172,7 @@ export class AssetDialogComponent implements OnChanges {
                             }
                         },
                         complete: () => {
-                        this.setProgress(0);
+                            this.setProgress(0);
                         },
                     });
             } else {
@@ -158,7 +186,7 @@ export class AssetDialogComponent implements OnChanges {
             return;
         }
 
-        this.annoateAssetInternal(this.imageFocus.first.submit(this.asset));
+        this.annotateInternal(this.imageFocus.first.submit(this.asset));
     }
 
     public annotateAsset() {
@@ -166,25 +194,59 @@ export class AssetDialogComponent implements OnChanges {
             return;
         }
 
-        this.annoateAssetInternal(this.annotateForm.submit(this.asset));
+        this.annotateInternal(this.annotateForm.submit(this.asset));
     }
 
-    private annoateAssetInternal(value: AnnotateAssetDto | null) {
-        if (value) {
-            this.assetsState.updateAsset(this.asset, value)
-                .subscribe({
-                    next: () => {
-                        this.annotateForm.submitCompleted({ noReset: true });
-
-                        this.dialogs.notifyInfo('i18n:assets.updated');
-                    },
-                    error: error => {
-                        this.annotateForm.submitFailed(error);
-                    },
-                });
-        } else {
-            this.dialogs.notifyInfo('i18n:common.nothingChanged');
+    public moveAsset() {
+        if (!this.isMoveable) {
+            return;
         }
+
+        this.moveInternal(this.moveForm.submit());
+    }
+
+    private annotateInternal(value: AnnotateAssetDto | null) {
+        if (!value) {
+            this.dialogs.notifyInfo('i18n:common.nothingChanged');
+            return;
+        }
+
+        this.assetsState.updateAsset(this.asset, value)
+            .subscribe({
+                next: dto => {
+                    this.assetUpdated.emit(dto);
+                    this.assetchanged(dto);
+
+                    this.annotateForm.submitCompleted({ noReset: true });
+
+                    this.dialogs.notifyInfo('i18n:assets.updated');
+                },
+                error: error => {
+                    this.annotateForm.submitFailed(error);
+                },
+            });
+    }
+
+    private moveInternal(values: MoveAssetItemDto | null) {
+        if (!values) {
+            this.isMoving = false;
+            return;
+        }
+
+        this.assetsState.moveAsset(this.asset, values.parentId)
+            .subscribe({
+                next: (dto) => {
+                    this.assetUpdated.emit(dto);
+                    this.assetchanged(dto);
+
+                    this.annotateForm.submitCompleted({ noReset: true });
+
+                    this.dialogs.notifyInfo('i18n:assets.moved');
+                },
+                complete: () => {
+                    this.isMoving = false;
+                },
+            });
     }
 
     public setProgress(progress: number) {

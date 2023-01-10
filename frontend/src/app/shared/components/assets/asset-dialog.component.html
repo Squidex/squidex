@@ -77,7 +77,35 @@
                             <label for="id">{{ 'common.folder' | sqxTranslate }}</label>
 
                             <div class="path">
-                                <sqx-asset-path [path]="path | async" [all]="true" (navigate)="navigate($event.id)"></sqx-asset-path>
+                                <ng-container *ngIf="isMoving; else pathTemplate">
+                                    <form [formGroup]="moveForm.form" (ngSubmit)="moveAsset()">
+                                        <div class="row align-items-center g-2">
+                                            <div class="col">
+                                                <sqx-asset-folder-dropdown formControlName="parentId"></sqx-asset-folder-dropdown>
+                                            </div>
+
+                                            <div class="col-auto">
+                                                <button type="submit" class="btn btn-primary">
+                                                    {{ 'asset.move' | sqxTranslate }}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </ng-container>
+
+                                <ng-template #pathTemplate>
+                                    <div class="row align-items-center g-2">
+                                        <div class="col">
+                                            <sqx-asset-path [path]="path | async" [all]="true" (navigate)="navigate($event.id)"></sqx-asset-path>
+                                        </div>
+
+                                        <div class="col-auto" *ngIf="isMoveable">
+                                            <button type="button" class="btn btn-outline-secondary" (click)="startMoving()">
+                                                {{ 'asset.move' | sqxTranslate }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </ng-template>
                             </div>
                         </div>
 
@@ -125,12 +153,12 @@
                             </button>
                         </div>
                     
-                        <div class="form-group">
+                        <div class="form-group" *ngIf="annotateTags | async; let tags">
                             <label>{{ 'common.tags' | sqxTranslate }}</label>
                             
                             <sqx-control-errors for="tags"></sqx-control-errors>
             
-                            <sqx-tag-editor [suggestions]="allTags" [allowDuplicates]="false" [undefinedWhenEmpty]="false" formControlName="tags"></sqx-tag-editor>
+                            <sqx-tag-editor [suggestions]="annotateTags" [allowDuplicates]="false" [undefinedWhenEmpty]="false" formControlName="tags"></sqx-tag-editor>
                         </div>
             
                         <div class="form-group">

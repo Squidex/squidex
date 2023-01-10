@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AssetsService } from '@app/shared/internal';
 import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
 
 @Component({
-    selector: 'sqx-asset-folder-dropdown-item[appName][node]',
+    selector: 'sqx-asset-folder-dropdown-item[appName][nodeModel]',
     styleUrls: ['./asset-folder-dropdown-item.component.scss'],
     templateUrl: './asset-folder-dropdown-item.component.html',
 })
@@ -19,7 +19,7 @@ export class AssetFolderDropdownItemComponent {
     public appName!: string;
 
     @Input()
-    public node!: AssetFolderDropdowNode;
+    public nodeModel!: AssetFolderDropdowNode;
 
     @Input()
     public nodeLevel = 0;
@@ -33,11 +33,12 @@ export class AssetFolderDropdownItemComponent {
 
     constructor(
         private readonly assetsService: AssetsService,
+        private readonly changeDetector: ChangeDetectorRef,
     ) {
     }
 
     public toggle() {
-        if (this.node.isExpanded && this.node.isLoaded) {
+        if (this.nodeModel.isExpanded && this.nodeModel.isLoaded) {
             this.collapse();
         } else {
             this.expand();
@@ -45,27 +46,27 @@ export class AssetFolderDropdownItemComponent {
     }
 
     public collapse() {
-        this.node.isExpanded = false;
+        this.nodeModel.isExpanded = false;
     }
 
     public expand() {
-        this.node.isExpanded = true;
+        this.nodeModel.isExpanded = true;
 
         this.loadChildren();
     }
 
     public loadChildren() {
-        if (this.node.isLoading || this.node.isLoaded) {
+        if (this.nodeModel.isLoading || this.nodeModel.isLoaded) {
             return;
         }
 
-        this.node.isLoading = true;
+        this.nodeModel.isLoading = true;
 
-        this.assetsService.getAssetFolders(this.appName, this.node.item.id, 'Items')
+        this.assetsService.getAssetFolders(this.appName, this.nodeModel.item.id, 'Items')
             .subscribe({
                 next: dto => {
                     if (dto.items.length > 0) {
-                        const parent = this.node;
+                        const parent = this.nodeModel;
 
                         for (const item of dto.items) {
                             if (!parent.children.find(x => x.item.id === item.id)) {
@@ -76,11 +77,13 @@ export class AssetFolderDropdownItemComponent {
                         parent.children.sortByString(x => x.item.folderName);
                     }
 
-                    this.node.isLoaded = true;
+                    this.nodeModel.isLoaded = true;
+                    this.changeDetector.detectChanges();
                 },
                 complete: () => {
                     setTimeout(() => {
-                        this.node.isLoading = false;
+                        this.nodeModel.isLoading = false;
+                        this.changeDetector.detectChanges();
                     }, 250);
                 },
             });

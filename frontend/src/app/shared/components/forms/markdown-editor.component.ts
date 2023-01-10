@@ -292,7 +292,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
             }
         };
 
-        this.assetUploader.uploadFile(file, undefined, this.folderId)
+        this.assetUploader.uploadFile(file, this.folderId)
             .subscribe({
                 next: asset => {
                     if (Types.is(asset, AssetDto)) {
