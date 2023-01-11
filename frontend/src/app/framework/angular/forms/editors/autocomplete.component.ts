@@ -52,9 +52,6 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public itemsSource!: AutocompleteSource;
 
     @Input()
-    public inputName = 'autocompletion';
-
-    @Input()
     public inputStyle?: 'underlined' | 'empty';
 
     @Input()

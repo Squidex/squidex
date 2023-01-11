@@ -1,15 +1,15 @@
 <div class="control-container">
-    <input class="form-control" (blur)="blur()" (keydown)="onKeyDown($event)" #input
+    <input class="form-control" #input
+        (blur)="blur()" (keydown)="onKeyDown($event)"
         [sqxFocusOnInit]="autoFocus"
-        [name]="inputName" 
-        [placeholder]="placeholder"
+        autocapitalize="off"
         autocomplete="off" 
         autocorrect="off"
-        autocapitalize="off"
         [class.form-empty]="inputStyle === 'empty'"
-        [class.form-underlined]="inputStyle === 'underlined'"
         [class.form-icon]="!!icon"
-        [formControl]="queryInput">
+        [class.form-underlined]="inputStyle === 'underlined'"
+        [formControl]="queryInput"
+        [placeholder]="placeholder">
 
     <div class="icon" *ngIf="icon">
         <ng-container *ngIf="snapshot.isLoading; else notLoading">

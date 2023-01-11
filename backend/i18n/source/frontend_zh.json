@@ -453,7 +453,7 @@
   "contributors.import.run": "添加贡献者",
   "contributors.import.run2": "导入",
   "contributors.importButton": "一次添加多个贡献者",
-  "contributors.importHintg": "大团队？",
+  "contributors.importHint": "大团队？",
   "contributors.importTitle": "导入贡献者",
   "contributors.loadFailed": "加载贡献者失败。请重新加载。",
   "contributors.planHint": "您的计划允许最多 {maxContributors} 个贡献者。",

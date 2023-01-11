@@ -88,9 +88,6 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public placeholder = 'i18n:common.tagAdd';
 
     @Input()
-    public inputName = 'tag-editor';
-
-    @Input()
     public dropdownWidth = '18rem';
 
     @Input()

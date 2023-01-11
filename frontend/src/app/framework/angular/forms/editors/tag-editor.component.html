@@ -1,24 +1,22 @@
 <div class="form-container">
     <div class="form-control tags" tabindex="0" #form 
-        (mousedown)="focusInput($event)"
-        (focus)="focusInput($event)"
+        (focus)="focusInput($event)" (mousedown)="focusInput($event)"
         [class.blank]="styleBlank" 
-        [class.singleline]="styleScrollable"
-        [class.readonly]="readonly"
-        [class.suggested]="itemsSorted.length > 0"
-        [class.multiline]="!styleScrollable"
-        [class.focus]="snapshot.hasFocus" 
+        [class.dashed]="styleDashed && !(snapshot.tags.length > 0)"
         [class.disabled]="snapshot.isDisabled"
-        [class.dashed]="styleDashed && !(snapshot.tags.length > 0)">
+        [class.focus]="snapshot.hasFocus" 
+        [class.multiline]="!styleScrollable"
+        [class.readonly]="readonly"
+        [class.singleline]="styleScrollable"
+        [class.suggested]="itemsSorted.length > 0">
         <span class="item" *ngFor="let tag of snapshot.tags; let i = index" [class.disabled]="addInput.disabled">
             {{tag}} <i class="icon-close" (click)="remove(i)"></i>
         </span>
 
         <input class="blank text-input" #input
             (blur)="markTouched()" (copy)="onCopy($event)" (cut)="onCut($event)" (focus)="focus()" (keydown)="onKeyDown($event)" (paste)="onPaste($event)"
-            [name]="inputName"
             [placeholder]="placeholder | sqxTranslate"
-            autocomplete="off" 
+            autocomplete="off"
             autocorrect="off"
             autocapitalize="off"
             spellcheck="false"
@@ -54,7 +52,7 @@
             [sqxAnchoredTo]="form"
             [adjustWidth]="false"
             [adjustHeight]="false"
-            [scrollY]="true" 
+            [scrollY]="true"
             position="bottom-left">
             <div class="row">
                 <div class=" col-6" *ngFor="let item of itemsSorted; let i = index">

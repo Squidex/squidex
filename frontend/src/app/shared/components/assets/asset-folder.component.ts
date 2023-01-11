@@ -49,7 +49,7 @@ export class AssetFolderComponent {
     }
 
     public emitDelete() {
-        if (!this.isDisabled) {
+        if (this.isDisabled) {
             return;
         }
 
@@ -57,7 +57,7 @@ export class AssetFolderComponent {
     }
 
     public emitNavigate() {
-        if (!this.isDisabled) {
+        if (this.isDisabled) {
             return;
         }
 
