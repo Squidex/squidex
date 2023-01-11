@@ -20,7 +20,7 @@ jobs:
     # Setting environment variables
     env:
       IMAGE_TAG: ${{ github.event.inputs.tag }}
-      HELM_PATH: ${{ github.workspace }}/k8s/helm-chart/squidex
+      HELM_PATH: ${{ github.workspace }}/k8s/helm-chart
       NAMESPACE: ${{ github.event.inputs.choice }}
 
     steps:
@@ -57,19 +57,12 @@ jobs:
     # This generates the deployment manifests for specified environment
     - name: Generate manifest for '${{ env.APP_ENVIRONMENT }}'
       run: |
-        export DEPLOY_NAME=$(yq e '.name' $HELM_PATH/values.yaml)
-
-        echo "APP_ENVIRONMENT: $APP_ENVIRONMENT"
-        export NAMESPACE=$APP_ENVIRONMENT
-        export REPLICAS=$(kubectl get deployment $DEPLOY_NAME -n $NAMESPACE -o=jsonpath={.spec.replicas})
-        [ -z $REPLICAS ] && export REPLICAS=$(yq e '.replicas' $HELM_PATH/values.yaml)
-
         echo "Number of replicas: $REPLICAS"
         echo "Namespace: $NAMESPACE"
         echo "NAMESPACE=$NAMESPACE" >> $GITHUB_ENV
 
 
-        helm template $HELM_PATH  -f $HELM_PATH/production/$NAMESPACE.yaml --set imageTag=$IMAGE_TAG --set replicas=$REPLICAS --set version=$NAMESPACE  > manifest.yaml
+        helm template $HELM_PATH/squidex  -f $HELM_PATH/production/$NAMESPACE.yaml --set imageTag=$IMAGE_TAG --set replicas=1 --set version=$NAMESPACE  > manifest.yaml
 
         echo "Generated manifest"
 
