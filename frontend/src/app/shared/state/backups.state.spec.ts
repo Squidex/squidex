@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { BackupsService, BackupsState, DialogService } from '@app/shared/internal';
 import { createBackup } from './../services/backups.service.spec';
@@ -54,7 +53,7 @@ describe('BackupsState', () => {
             backupsService.setup(x => x.getBackups(app))
                 .returns(() => throwError(() => 'Service Error'));
 
-            backupsState.load().pipe(onErrorResumeNext()).subscribe();
+            backupsState.load().pipe(onErrorResumeNextWith()).subscribe();
 
             expect(backupsState.snapshot.isLoading).toBeFalsy();
         });
@@ -74,7 +73,7 @@ describe('BackupsState', () => {
             backupsService.setup(x => x.getBackups(app))
                 .returns(() => throwError(() => 'Service Error'));
 
-            backupsState.load(true, false).pipe(onErrorResumeNext()).subscribe();
+            backupsState.load(true, false).pipe(onErrorResumeNextWith()).subscribe();
 
             expect().nothing();
 
@@ -85,7 +84,7 @@ describe('BackupsState', () => {
             backupsService.setup(x => x.getBackups(app))
                 .returns(() => throwError(() => 'Service Error'));
 
-            backupsState.load(true, true).pipe(onErrorResumeNext()).subscribe();
+            backupsState.load(true, true).pipe(onErrorResumeNextWith()).subscribe();
 
             expect().nothing();
 

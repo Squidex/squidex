@@ -11,10 +11,11 @@
             <div class="col" style="width: 300px;">
                 <div class="row g-0 search">
                     <div class="col-6">
-                        <sqx-tag-editor class="tags" [singleLine]="true" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
-                            [suggestions]="assetsState.tagsNames | async"
+                        <sqx-tag-editor class="tags" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
+                            [itemsSource]="assetsState.tagsNames | async"
                             [ngModel]="assetsState.selectedTagNames | async"
                             (ngModelChange)="selectTags($event)"
+                            [styleScrollable]="true"
                             [undefinedWhenEmpty]="false">
                         </sqx-tag-editor>
                     </div>

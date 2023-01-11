@@ -110,9 +110,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
         this.own(
             this.messageBus.of(AssetUpdated)
                 .subscribe(event => {
-                    if (event.source !== this) {
-                        this.setAssets(this.snapshot.assets.replacedBy('id', event.asset));
-                    }
+                    this.setAssets(this.snapshot.assets.replacedBy('id', event.asset));
                 }));
     }
 

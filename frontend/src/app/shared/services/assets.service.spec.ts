@@ -358,24 +358,52 @@ describe('AssetsService', () => {
             expect(asset!).toEqual(createAsset(123));
         }));
 
-    it('should make delete request to move asset item',
+    it('should make put request to move asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
-                    move: { method: 'DELETE', href: 'api/apps/my-app/assets/123/parent' },
+                    move: { method: 'PUT', href: 'api/apps/my-app/assets/123/parent' },
                 },
             };
 
-            const dto = { parentId: 'parent1' };
+            let asset: AssetDto;
 
-            assetsService.putAssetItemParent('my-app', resource, dto, version).subscribe();
+            assetsService.putAssetParent('my-app', resource, { parentId: 'parent1' }, version).subscribe(result => {
+                asset = result;
+            });
 
             const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123/parent');
 
-            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.method).toEqual('PUT');
             expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-            req.flush({});
+            req.flush(assetResponse(123));
+
+            expect(asset!).toEqual(createAsset(123));
+        }));
+
+    it('should make put request to move asset folder',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    move: { method: 'PUT', href: 'api/apps/my-app/assets/folders/123/parent' },
+                },
+            };
+
+            let assetFolder: AssetFolderDto;
+
+            assetsService.putAssetFolderParent('my-app', resource, { parentId: 'parent1' }, version).subscribe(result => {
+                assetFolder = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/folders/123/parent');
+
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
+
+            req.flush(assetFolderResponse(123));
+
+            expect(assetFolder!).toEqual(createAssetFolder(123));
         }));
 
     it('should make delete request to delete asset item',

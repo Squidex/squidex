@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { EventConsumersService } from '@app/features/administration/internal';
 import { DialogService } from '@app/framework';
@@ -50,7 +49,7 @@ describe('EventConsumersState', () => {
             eventConsumersService.setup(x => x.getEventConsumers())
                 .returns(() => throwError(() => 'Service Error'));
 
-            eventConsumersState.load().pipe(onErrorResumeNext()).subscribe();
+            eventConsumersState.load().pipe(onErrorResumeNextWith()).subscribe();
 
             expect(eventConsumersState.snapshot.isLoading).toBeFalsy();
         });
@@ -70,7 +69,7 @@ describe('EventConsumersState', () => {
             eventConsumersService.setup(x => x.getEventConsumers())
                 .returns(() => throwError(() => 'Service Error')).verifiable();
 
-            eventConsumersState.load(true, false).pipe(onErrorResumeNext()).subscribe();
+            eventConsumersState.load(true, false).pipe(onErrorResumeNextWith()).subscribe();
 
             expect().nothing();
 

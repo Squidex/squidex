@@ -1,4 +1,4 @@
-<sqx-modal-dialog (close)="emitComplete()" size="lg" [fullHeight]="true" [hasTabs]="false">
+<sqx-modal-dialog (close)="emitComplete()" size="lg" [fullHeight]="true" [flexBody]="true" [hasTabs]="false">
     <ng-container title>
         {{ 'assets.selectMany' | sqxTranslate }}
     </ng-container>
@@ -13,10 +13,11 @@
             <div class="col">
                 <div class="row g-0 search">
                     <div class="col-6">
-                        <sqx-tag-editor class="tags" [singleLine]="true" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}" 
+                        <sqx-tag-editor class="tags" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
+                            [itemsSource]="assetsState.tagsNames | async"
                             (ngModelChange)="selectTags($event)" [undefinedWhenEmpty]="false"
                             [ngModel]="assetsState.selectedTagNames | async"
-                            [suggestions]="assetsState.tagsNames | async">
+                            [styleScrollable]="true">
                         </sqx-tag-editor>
                     </div>
                     <div class="col-6">

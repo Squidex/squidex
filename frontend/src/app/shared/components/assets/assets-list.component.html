@@ -44,6 +44,7 @@
                     cdkDrag
                     [cdkDragData]="assetFolder"
                     [cdkDragDisabled]="isDisabled || !assetFolder.canMove"
+                    [isDisabled]="isDisabled"
                     (navigate)="assetsState.navigate($event.id)" (delete)="deleteAssetFolder($event)">
                 </sqx-asset-folder>
             </div>
@@ -60,6 +61,7 @@
             cdkDropListSortingDisabled>
             <sqx-asset *ngFor="let file of snapshot.newFiles" 
                 [assetFile]="file"
+                [isDisabled]="isDisabled"
                 [isListView]="isListView"
                 (loadDone)="add(file, $event)"
                 (loadError)="remove(file)">
@@ -70,15 +72,16 @@
                 [asset]="asset"
                 [cdkDragData]="asset"
                 [cdkDragDisabled]="isDisabled || !asset.canMove"
+                (delete)="deleteAsset(asset)"
+                (edit)="edit.emit($event)"
                 [folderIcon]="showFolderIcon && path.length === 0"
+                [isDisabled]="isDisabled"
                 [isListView]="isListView"
                 [isSelectable]="!!selectedIds"
                 [isSelected]="isSelected(asset)"
-                (delete)="deleteAsset(asset)"
-                (edit)="edit.emit($event)"
+                (loadDone)="replaceAsset($event)"
                 (select)="select.emit(asset)" 
-                (selectFolder)="selectFolder(asset)"
-                (loadDone)="replaceAsset($event)">
+                (selectFolder)="selectFolder(asset)">
             </sqx-asset>
         </div>
     </ng-container>

@@ -22,10 +22,12 @@ export class AssetFolderComponent {
     public delete = new EventEmitter<AssetFolderDto>();
 
     @Input()
+    public isDisabled?: boolean | null;
+
+    @Input()
     public assetPathItem!: AssetPathItem;
 
-    public dropdown = new ModalModel();
-
+    public editDropdown = new ModalModel();
     public editDialog = new DialogModel();
 
     public get assetFolder(): AssetFolderDto {
@@ -47,10 +49,18 @@ export class AssetFolderComponent {
     }
 
     public emitDelete() {
+        if (!this.isDisabled) {
+            return;
+        }
+
         this.delete.emit(this.assetFolder);
     }
 
     public emitNavigate() {
+        if (!this.isDisabled) {
+            return;
+        }
+
         this.navigate.emit(this.assetPathItem);
     }
 }

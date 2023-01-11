@@ -50,7 +50,7 @@ const Template: Story<AutocompleteComponent & { model: any }> = (args: Autocompl
                 [disabled]="disabled"
                 [icon]="icon"
                 [inputStyle]="inputStyle"
-                [source]="source">
+                [itemsSource]="itemsSource">
             </sqx-autocomplete>
         </sqx-root-view>
     `,
@@ -71,7 +71,7 @@ class Source implements AutocompleteSource {
 export const Default = Template.bind({});
 
 Default.args = {
-    source: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing']),
+    itemsSource: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing']),
 };
 
 export const Disabled = Template.bind({});
@@ -101,6 +101,6 @@ StyleUnderlined.args = {
 export const IconLoading = Template.bind({});
 
 IconLoading.args = {
-    source: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing'], 4000),
+    itemsSource: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing'], 4000),
     icon: 'user',
 };

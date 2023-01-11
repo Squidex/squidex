@@ -12,8 +12,7 @@ import { HTTP_INTERCEPTORS, HttpClient, HttpHeaders } from '@angular/common/http
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { of, onErrorResumeNextWith } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { ApiUrlConfig, AuthService } from '@app/shared/internal';
 import { AuthInterceptor } from './auth.interceptor';
@@ -101,7 +100,7 @@ describe('AuthInterceptor', () => {
             authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
             authService.setup(x => x.loginSilent()).returns(() => of(<any>{ authToken: 'letmereallyin' }));
 
-            http.get('http://service/p/apps').pipe(onErrorResumeNext()).subscribe();
+            http.get('http://service/p/apps').pipe(onErrorResumeNextWith()).subscribe();
 
             httpMock.expectOne('http://service/p/apps').error(<any>{}, { status: 401 });
             httpMock.expectOne('http://service/p/apps').error(<any>{}, { status: 401 });
@@ -118,7 +117,7 @@ describe('AuthInterceptor', () => {
             inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
                 authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
 
-                http.get('http://service/p/apps').pipe(onErrorResumeNext()).subscribe();
+                http.get('http://service/p/apps').pipe(onErrorResumeNextWith()).subscribe();
 
                 const req = httpMock.expectOne('http://service/p/apps');
 
@@ -137,7 +136,7 @@ describe('AuthInterceptor', () => {
             inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
                 authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
 
-                http.get('http://service/p/apps').pipe(onErrorResumeNext()).subscribe();
+                http.get('http://service/p/apps').pipe(onErrorResumeNextWith()).subscribe();
 
                 const req = httpMock.expectOne('http://service/p/apps');
 

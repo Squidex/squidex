@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService, versioned, WorkflowsPayload, WorkflowsService, WorkflowsState } from '@app/shared/internal';
 import { createWorkflows } from './../services/workflows.service.spec';
@@ -56,7 +55,7 @@ describe('WorkflowsState', () => {
             workflowsService.setup(x => x.getWorkflows(app))
                 .returns(() => throwError(() => 'Service Error'));
 
-            workflowsState.load().pipe(onErrorResumeNext()).subscribe();
+            workflowsState.load().pipe(onErrorResumeNextWith()).subscribe();
 
             expect(workflowsState.snapshot.isLoading).toBeFalsy();
         });

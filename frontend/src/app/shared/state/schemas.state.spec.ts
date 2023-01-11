@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { firstValueFrom, of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService, SchemaDto, SchemasService, UpdateSchemaCategoryDto, versioned } from '@app/shared/internal';
 import { createSchema } from './../services/schemas.service.spec';
@@ -79,7 +78,7 @@ describe('SchemasState', () => {
             schemasService.setup(x => x.getSchemas(app))
                 .returns(() => throwError(() => 'Service Error'));
 
-            schemasState.load().pipe(onErrorResumeNext()).subscribe();
+            schemasState.load().pipe(onErrorResumeNextWith()).subscribe();
 
             expect(schemasState.snapshot.isLoading).toBeFalsy();
         });

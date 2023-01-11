@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { EMPTY, of, throwError } from 'rxjs';
-import { catchError, onErrorResumeNext } from 'rxjs/operators';
+import { EMPTY, of, onErrorResumeNextWith, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { TeamContributorsService, TeamContributorsState } from '@app/features/teams/internal';
 import { ContributorDto, ContributorsPayload, DialogService, ErrorDto, versioned } from '@app/shared';
@@ -65,7 +65,7 @@ describe('TeamContributorsState', () => {
             contributorsService.setup(x => x.getContributors(team))
                 .returns(() => throwError(() => 'Service Error'));
 
-            contributorsState.load().pipe(onErrorResumeNext()).subscribe();
+            contributorsState.load().pipe(onErrorResumeNextWith()).subscribe();
 
             expect(contributorsState.snapshot.isLoading).toBeFalsy();
         });

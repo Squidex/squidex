@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService, RolesPayload, RolesService, RolesState, versioned } from '@app/shared/internal';
 import { createRoles } from './../services/roles.service.spec';
@@ -52,7 +51,7 @@ describe('RolesState', () => {
             rolesService.setup(x => x.getRoles(app))
                 .returns(() => throwError(() => 'Service Error'));
 
-            rolesState.load().pipe(onErrorResumeNext()).subscribe();
+            rolesState.load().pipe(onErrorResumeNextWith()).subscribe();
 
             expect(rolesState.snapshot.isLoading).toBeFalsy();
         });

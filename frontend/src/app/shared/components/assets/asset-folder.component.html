@@ -8,12 +8,12 @@
                 {{assetFolder.folderName | sqxTranslate}}
             </div>
             <div class="col-auto">
-                <ng-container *ngIf="canDelete || canUpdate">
-                    <button type="button" class="btn btn-sm btn-text-secondary" (click)="dropdown.toggle()" #buttonOptions>
+                <ng-container *ngIf="(canDelete || canUpdate) && !isDisabled">
+                    <button type="button" class="btn btn-sm btn-text-secondary" (click)="editDropdown.toggle()" #buttonOptions>
                         <i class="icon-dots"></i>
                     </button>
     
-                    <ng-container *sqxModal="dropdown;closeAlways:true">
+                    <ng-container *sqxModal="editDropdown;closeAlways:true">
                         <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true">  
                             <ng-container *ngIf="canUpdate">
                                 <a class="dropdown-item" (click)="editDialog.show()">

@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { of, onErrorResumeNextWith, throwError } from 'rxjs'
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService, versioned } from '@app/shared/internal';
 import { AppsService, AssetScriptsPayload } from './../services/apps.service';
@@ -58,7 +57,7 @@ describe('AssetScriptsState', () => {
             appsService.setup(x => x.getAssetScripts(app))
                 .returns(() => throwError(() => 'Service Error'));
 
-            assetScriptsState.load().pipe(onErrorResumeNext()).subscribe();
+            assetScriptsState.load().pipe(onErrorResumeNextWith()).subscribe();
 
             expect(assetScriptsState.snapshot.isLoading).toBeFalsy();
         });

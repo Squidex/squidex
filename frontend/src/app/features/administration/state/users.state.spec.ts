@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { firstValueFrom, of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { UpsertUserDto, UsersService } from '@app/features/administration/internal';
 import { DialogService } from '@app/shared';
@@ -53,7 +52,7 @@ describe('UsersState', () => {
             usersService.setup(x => x.getUsers(10, 0, undefined))
                 .returns(() => throwError(() => 'Service Error'));
 
-            usersState.load().pipe(onErrorResumeNext()).subscribe();
+            usersState.load().pipe(onErrorResumeNextWith()).subscribe();
 
             expect(usersState.snapshot.isLoading).toBeFalsy();
         });

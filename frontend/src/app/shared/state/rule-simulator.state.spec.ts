@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService, RulesService } from '@app/shared/internal';
 import { createSimulatedRuleEvent } from './../services/rules.service.spec';
@@ -71,7 +70,7 @@ describe('RuleSimulatorState', () => {
             .returns(() => throwError(() => 'Service Error'));
 
         ruleSimulatorState.selectRule('12');
-        ruleSimulatorState.load().pipe(onErrorResumeNext()).subscribe();
+        ruleSimulatorState.load().pipe(onErrorResumeNextWith()).subscribe();
 
         expect(ruleSimulatorState.snapshot.isLoading).toBeFalsy();
     });

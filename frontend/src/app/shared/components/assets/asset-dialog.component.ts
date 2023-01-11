@@ -6,9 +6,9 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetsState, AssetUploaderState, AuthService, DialogService, MoveAssetForm, Types, UploadCanceled } from '@app/shared/internal';
+import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetsState, AssetUploaderState, AuthService, DialogService, MoveAssetForm, switchMapCached, Types, UploadCanceled } from '@app/shared/internal';
 import { AssetsService, MoveAssetItemDto } from '@app/shared/services/assets.service';
 import { AssetPathItem, ROOT_ITEM } from '@app/shared/state/assets.state';
 import { AssetTextEditorComponent } from './asset-text-editor.component';
@@ -21,8 +21,6 @@ import { ImageFocusPointComponent } from './image-focus-point.component';
     templateUrl: './asset-dialog.component.html',
 })
 export class AssetDialogComponent implements OnInit {
-    private readonly pathCache: { [parentId: string]: ReadonlyArray<AssetPathItem> } = {};
-
     @Output()
     public complete = new EventEmitter();
 
@@ -44,7 +42,8 @@ export class AssetDialogComponent implements OnInit {
     @ViewChildren(AssetTextEditorComponent)
     public textEditor!: QueryList<AssetTextEditorComponent>;
 
-    public path: ReadonlyArray<AssetPathItem> = [];
+    public pathSource = new BehaviorSubject<string>('');
+    public pathItems!: Observable<ReadonlyArray<AssetPathItem>>;
 
     public progress = 0;
 
@@ -57,7 +56,7 @@ export class AssetDialogComponent implements OnInit {
 
     public moveForm = new MoveAssetForm();
 
-    public annotateTag: ReadonlyArray<string> = [];
+    public annotateTags!: Observable<string[]>;
     public annotateForm = new AnnotateAssetForm();
 
     public get isImage() {
@@ -88,16 +87,17 @@ export class AssetDialogComponent implements OnInit {
             this.assetsService.getTags(this.appsState.appName).pipe(
                 map(tags => Object.keys(tags)));
 
+        this.pathItems =
+            this.pathSource.pipe(
+                switchMapCached(x => this.assetsService.getAssetFolders(this.appsState.appName, x, 'Path')), map(({ path }) => [ROOT_ITEM, ...path]));
+
         this.selectTab(0);
 
         this.assetchanged(this.asset);
     }
 
     private assetchanged(asset: AssetDto) {
-        const cachedPath = 
-        this.path =
-            this.assetsService.getAssetFolders(this.appsState.appName, asset.parentId, 'Path').pipe(
-                map(folders => [ROOT_ITEM, ...folders.path]));
+        this.pathSource.next(asset.parentId);
 
         this.isEditable = asset.canUpdate;
         this.isUploadable = asset.canUpload;
@@ -110,7 +110,6 @@ export class AssetDialogComponent implements OnInit {
         this.moveForm.setEnabled(this.isMoveable);
 
         this.asset = asset;
-
     }
 
     public selectTab(tab: number) {

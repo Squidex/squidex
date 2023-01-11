@@ -4,7 +4,8 @@
 
         <div class="col-9">
             <sqx-tag-editor placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" formControlName="schemaIds" 
-                [converter]="(schemasSource.normalConverter | async)!" [suggestions]="(schemasSource.normalConverter | async)?.suggestions">
+                [itemConverter]="(schemasSource.normalConverter | async)!"
+                [itemsSource]="(schemasSource.normalConverter | async)?.suggestions">
             </sqx-tag-editor>
         </div>
     </div>

@@ -4,7 +4,7 @@
     <form [formGroup]="assignContributorForm.form" (ngSubmit)="assignContributor()">
         <div class="row gx-2">
             <div class="col">
-                <sqx-autocomplete [source]="usersDataSource" formControlName="user" icon="search" inputName="contributor" placeholder="{{ 'contributors.emailPlaceholder' | sqxTranslate }}" displayProperty="displayName">
+                <sqx-autocomplete [itemsSource]="usersDataSource" formControlName="user" icon="search" inputName="contributor" placeholder="{{ 'contributors.emailPlaceholder' | sqxTranslate }}" displayProperty="displayName">
                     <ng-template let-user="$implicit">
                         <span class="autocomplete-user">
                             <img class="user-picture" [src]="user | sqxUserDtoPicture">

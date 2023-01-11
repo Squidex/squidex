@@ -23,24 +23,24 @@ const TRANSLATIONS = {
         <sqx-root-view>
             <sqx-tag-editor 
                 [allowOpen]="true" 
-                [suggestions]="suggestions"
-                [suggestionsLoading]="suggestionsLoading"
+                [itemsSource]="itemsSource"
+                [itemsSourceLoading]="itemsSourceLoading"
                 (open)="load()">
             </sqx-tag-editor>
         </sqx-root-view>
     `,
 })
 class TestComponent {
-    public suggestions: string[] = [];
-    public suggestionsLoading = false;
+    public itemsSource: string[] = [];
+    public itemsSourceLoading = false;
 
     public load() {
-        this.suggestions = [];
-        this.suggestionsLoading = true;
+        this.itemsSource = [];
+        this.itemsSourceLoading = true;
 
         setTimeout(() => {
-            this.suggestions = ['A', 'B'];
-            this.suggestionsLoading = false;
+            this.itemsSource = ['A', 'B'];
+            this.itemsSourceLoading = false;
         }, 1000);
     }
 }
@@ -80,12 +80,12 @@ const Template: Story<TagEditorComponent & { ngModel: any }> = (args: TagEditorC
             <sqx-tag-editor
                 [allowOpen]="allowOpen"
                 [disabled]="disabled"
+                [itemsSource]="itemsSource"
+                [itemsSourceLoading]="itemsSourceLoading"
                 [ngModel]="ngModel"
-                [singleLine]="singleLine"
+                [styleScrollable]="styleScrollable"
                 [styleBlank]="styleBlank"
-                [styleDashed]="styleDashed"
-                [suggestions]="suggestions"
-                [suggestionsLoading]="suggestionsLoading">
+                [styleDashed]="styleDashed">
             </sqx-tag-editor>
         </sqx-root-view>
     `,
@@ -103,28 +103,28 @@ export const Default = Template.bind({});
 export const Suggestions = Template.bind({});
 
 Suggestions.args = {
-    suggestions: ['A', 'B', 'C'],
+    itemsSource: ['A', 'B', 'C'],
     allowOpen: true,
 };
 
 export const SuggestionsEmpty = Template.bind({});
 
 SuggestionsEmpty.args = {
-    suggestions: [],
+    itemsSource: [],
     allowOpen: true,
 };
 
 export const SuggestionsLoading = Template.bind({});
 
 SuggestionsLoading.args = {
-    suggestionsLoading: true,
+    itemsSourceLoading: true,
     allowOpen: true,
 };
 
 export const Values = Template.bind({});
 
 Values.args = {
-    suggestions: [],
+    itemsSource: [],
     ngModel: ['A', 'A', 'B'],
 };
 
@@ -159,14 +159,14 @@ StyleBlankValues.args = {
 export const Multiline = Template.bind({});
 
 Multiline.args = {
-    singleLine: false,
+    styleScrollable: false,
     ngModel: ['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua'],
 };
 
 export const SingleLine = Template.bind({});
 
 SingleLine.args = {
-    singleLine: true,
+    styleScrollable: true,
     ngModel: ['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua'],
 };
 
