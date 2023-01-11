@@ -20,7 +20,7 @@ jobs:
     # Setting environment variables
     env:
       IMAGE_TAG: ${{ github.event.inputs.tag }}
-      HELM_PATH: ${{ github.workspace }}/k8s/helm-chart
+      HELM_PATH: ${{ github.workspace }}/k8s
       NAMESPACE: ${{ github.event.inputs.choice }}
 
     steps:
