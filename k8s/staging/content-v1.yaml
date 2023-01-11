@@ -3,3 +3,5 @@ domain: https://squidex-staging.learnwithhomer.com
 adminEmail: squidex-staging-45@homerlearning.com
 S3Bucket: homer-squidex-staging-45
 secretName: staging-v1-squidex
+mongoconnectionstring: squidex-staging45:CZpyxADhi2PQqHNU
+mongourl: homer-squidex-staging-4.0aiuw.mongodb.net
