@@ -42,10 +42,10 @@ export class TemplatedFormArray extends UndefinableFormArray {
         super.reset(value, options);
     }
 
-    public add(initialValue?: any) {
+    public add(initialValue?: any, options?: { emitEvent: false }) {
         const control = this.template.createControl({}, initialValue);
 
-        this.push(control);
+        this.push(control, options);
 
         return control;
     }
@@ -71,7 +71,7 @@ export class TemplatedFormArray extends UndefinableFormArray {
             let index = this.controls.length;
 
             while (this.controls.length < value.length) {
-                this.add(value[index]);
+                this.add(value[index], { emitEvent: false });
 
                 index++;
             }

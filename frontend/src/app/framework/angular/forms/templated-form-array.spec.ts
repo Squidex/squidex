@@ -150,4 +150,42 @@ describe('TemplatedFormArray', () => {
 
         expect(formTemplate.removeCalled).toEqual([]);
     });
+
+    it('should propagate value only once when multiple items are added', () => {
+        let changes: any[] = [];
+
+        formArray.valueChanges.subscribe(value => {
+            changes.push(value);
+        });
+
+        formArray.setValue([{ value: 1 }, { value: 2 }, { value: 3 }]);
+
+        expect(changes).toEqual([
+            [
+                { value: 1 },
+                { value: 2 },
+                { value: 3 },
+            ],
+        ]);
+    });
+
+    it('should propagate value only once when multiple items are removed', () => {
+        formArray.setValue([{ value: 1 }, { value: 2 }, { value: 3 }, { value: 4 }, { value: 5 }]);
+
+        let changes: any[] = [];
+
+        formArray.valueChanges.subscribe(value => {
+            changes.push(value);
+        });
+
+        formArray.setValue([{ value: 1 }, { value: 2 }, { value: 3 }]);
+
+        expect(changes).toEqual([
+            [
+                { value: 1 },
+                { value: 2 },
+                { value: 3 },
+            ],
+        ]);
+    });
 });

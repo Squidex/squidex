@@ -47,16 +47,16 @@ export class UndefinableFormArray extends ExtendedFormArray {
         }
     }
 
-    public push(control: AbstractControl) {
+    public push(control: AbstractControl, options?: { emitEvent: false }) {
         this.isUndefined = false;
 
-        super.push(control);
+        super.push(control, options);
     }
 
-    public insert(index: number, control: AbstractControl) {
+    public insert(index: number, control: AbstractControl, options?: { emitEvent: false }) {
         this.isUndefined = false;
 
-        super.insert(index, control);
+        super.insert(index, control, options);
     }
 
     public setValue(value?: any[], options?: { onlySelf?: boolean; emitEvent?: boolean }) {
