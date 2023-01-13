@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Text;
+using System.Web;
 using Squidex.Infrastructure;
 
 namespace Squidex.Pipeline.Squid;
@@ -87,11 +88,16 @@ public sealed class SquidMiddleware
 
         var (line1, line2, line3) = SplitText(requestedText);
 
-        svg = svg.Replace("{{TITLE}}", requestedTitle.ToUpperInvariant(), StringComparison.Ordinal);
-        svg = svg.Replace("{{TEXT1}}", line1, StringComparison.Ordinal);
-        svg = svg.Replace("{{TEXT2}}", line2, StringComparison.Ordinal);
-        svg = svg.Replace("{{TEXT3}}", line3, StringComparison.Ordinal);
-        svg = svg.Replace("[COLOR]", requestedBackground, StringComparison.Ordinal);
+        void Replace(string source, string value)
+        {
+            svg = svg.Replace(source, HttpUtility.HtmlEncode(value), StringComparison.Ordinal);
+        }
+
+        Replace("{{TITLE}}", requestedTitle.ToUpperInvariant());
+        Replace("{{TEXT1}}", line1);
+        Replace("{{TEXT2}}", line2);
+        Replace("{{TEXT3}}", line3);
+        Replace("[COLOR]", requestedBackground);
 
         context.Response.StatusCode = 200;
         context.Response.ContentType = "image/svg+xml";
